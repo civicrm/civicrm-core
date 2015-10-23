@@ -812,15 +812,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function deletes main entity and related linked entities from recurring-entity table
+   * This function deletes main entity and related linked entities from recurring-entity table.
    *
    * @param int $entityId
    *   Entity id
    * @param string $entityTable
    *   Name of the entity table
    *
+   * @param bool $isDelLinkedEntities
    *
-   * @return bool|CRM_Core_DAO_RecurringEntity
+   * @return bool|\CRM_Core_DAO_RecurringEntity
+   * @throws \Exception
    */
   static public function delEntity($entityId, $entityTable, $isDelLinkedEntities = FALSE) {
     if (empty($entityId) || empty($entityTable)) {
@@ -1143,6 +1145,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *   Event id .
    * @param string $linkedEntityTable
    *   Linked entity table name for this event .
+   * @param string $mainEntityTable
+   *
    * @return array
    */
   public static function updateModeLinkedEntity($entityId, $linkedEntityTable, $mainEntityTable) {

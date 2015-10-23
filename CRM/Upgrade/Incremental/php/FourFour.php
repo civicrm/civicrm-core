@@ -695,11 +695,13 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   }
 
   /**
-   * Syntatic sugar for adding a task which (a) is in this class and (b) has
-   * a high priority.
+   * Syntactic sugar for adding a task which (a) is in this class and (b) has a high priority.
    *
    * After passing the $funcName, you can also pass parameters that will go to
    * the function. Note that all params must be serializable.
+   *
+   * @param string $title
+   * @param string $funcName
    */
   protected function addTask($title, $funcName) {
     $queue = CRM_Queue_Service::singleton()->load(array(

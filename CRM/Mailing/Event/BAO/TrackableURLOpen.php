@@ -40,8 +40,9 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   }
 
   /**
-   * Track a click-through and return the URL to redirect.  If the numbers
-   * don't match up, return the base url.
+   * Track a click-through and return the URL to redirect.
+   *
+   * If the numbers don't match up, return the base url.
    *
    * @param int $queue_id
    *   The Queue Event ID of the clicker.
@@ -104,6 +105,8 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    * @param int $url_id
    *   Optional ID of a url to filter on.
    *
+   * @param string $toDate
+   *
    * @return int
    *   Number of rows in result set
    */
@@ -157,10 +160,11 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   }
 
   /**
-   * CRM-12814
-   * Get tracked url count for each mailing for a given set of mailing IDs
+   * Get tracked url count for each mailing for a given set of mailing IDs.
    *
-   * @param $mailingIDs
+   * CRM-12814
+   *
+   * @param array $mailingIDs
    *
    * @return array
    *   trackable url count per mailing ID

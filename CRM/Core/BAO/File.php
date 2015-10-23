@@ -173,8 +173,15 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   }
 
   /**
-   * A static function wrapper that deletes the various objects that are
-   * connected to a file object (i.e. file, entityFile and customValue
+   * A static function wrapper that deletes the various objects.
+   *
+   * Objects are those hat are connected to a file object (i.e. file, entityFile and customValue.
+   *
+   * @param int $fileID
+   * @param int $entityID
+   * @param int $fieldID
+   *
+   * @throws \Exception
    */
   public static function deleteFileReferences($fileID, $entityID, $fieldID) {
     $fileDAO = new CRM_Core_DAO_File();
@@ -218,8 +225,13 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    * } */
 
   /**
-   * Delete all the files and associated object associated with this
-   * combination
+   * Delete all the files and associated object associated with this combination.
+   *
+   * @param string $entityTable
+   * @param int $entityID
+   * @param int $fileTypeID
+   * @param int $fileID
+   *
    * @return bool
    *   Was file deleted?
    */
@@ -277,8 +289,13 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   }
 
   /**
-   * Get all the files and associated object associated with this
-   * combination
+   * Get all the files and associated object associated with this combination.
+   *
+   * @param string $entityTable
+   * @param int $entityID
+   * @param bool $addDeleteArgs
+   *
+   * @return array|null
    */
   public static function getEntityFile($entityTable, $entityID, $addDeleteArgs = FALSE) {
     if (empty($entityTable) || !$entityID) {

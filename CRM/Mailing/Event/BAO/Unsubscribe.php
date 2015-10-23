@@ -421,7 +421,9 @@ WHERE  email = %2
    * @param bool $is_distinct
    *   Group by queue ID?.
    *
-   * @param null $org_unsubscribe
+   * @param string $org_unsubscribe
+   *
+   * @param string $toDate
    *
    * @return int
    *   Number of rows in result set

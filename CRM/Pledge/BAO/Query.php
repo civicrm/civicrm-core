@@ -364,9 +364,11 @@ class CRM_Pledge_BAO_Query {
   }
 
   /**
+   * From clause.
+   *
    * @param string $name
-   * @param $mode
-   * @param $side
+   * @param string $mode
+   * @param string $side
    *
    * @return null|string
    */
@@ -415,6 +417,11 @@ class CRM_Pledge_BAO_Query {
 
   /**
    * Ideally this function should include fields that are displayed in the selector.
+   *
+   * @param int $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
    */
   public static function defaultReturnProperties(
     $mode,

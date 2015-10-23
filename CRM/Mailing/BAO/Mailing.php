@@ -606,6 +606,10 @@ ORDER BY   i.contact_id, i.{$tempColumn}
 
   /**
    * Returns the regex patterns that are used for preparing the text and html templates.
+   *
+   * @param bool $onlyHrefs
+   *
+   * @return array|string
    */
   private function getPatterns($onlyHrefs = FALSE) {
 

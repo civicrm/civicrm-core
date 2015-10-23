@@ -146,7 +146,11 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Does profile consists of a multi-record custom field
+   * Does profile consists of a multi-record custom field.
+   *
+   * @param int $gId
+   *
+   * @return bool
    */
   public static function checkMultiRecordFieldExists($gId) {
     $queryString = "SELECT f.field_name

@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
@@ -56,7 +55,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_WordRepalcement
+   * @return CRM_Core_DAO_WordReplacement
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_WordRepalcement', $params, $defaults);
@@ -283,6 +282,8 @@ WHERE  domain_id = %1
    * Get WordReplacements for a locale.
    *
    * @param string $locale
+   * @param int $domainId
+   *
    * @return array
    *   List of word replacements (enabled/disabled) for the given locale.
    */
@@ -294,6 +295,13 @@ WHERE  domain_id = %1
     return CRM_Utils_Array::value($locale, self::_getLocaleCustomStrings($domainId));
   }
 
+  /**
+   * Get custom locale strings.
+   *
+   * @param int $domainId
+   *
+   * @return array|mixed
+   */
   private static function _getLocaleCustomStrings($domainId) {
     // TODO: Would it be worthwhile using memcache here?
     $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', array(
@@ -304,6 +312,13 @@ WHERE  domain_id = %1
     }
   }
 
+  /**
+   * Set locale strings.
+   *
+   * @param string $locale
+   * @param array $values
+   * @param int $domainId
+   */
   public static function setLocaleCustomStrings($locale, $values, $domainId = NULL) {
     if ($domainId === NULL) {
       $domainId = CRM_Core_Config::domainID();
@@ -316,8 +331,10 @@ WHERE  domain_id = %1
   }
 
   /**
-   * @param $domainId
-   * @param $lcs
+   * Set locale strings.
+   *
+   * @param int $domainId
+   * @param string $lcs
    */
   private static function _setLocaleCustomStrings($domainId, $lcs) {
     CRM_Core_DAO::executeQuery("UPDATE civicrm_domain SET locale_custom_strings = %1 WHERE id = %2", array(

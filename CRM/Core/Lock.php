@@ -135,7 +135,12 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
   }
 
   /**
+   * Acquire lock.
+   *
+   * @param int $timeout
+   *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public function acquire($timeout = NULL) {
     if (!$this->_hasLock) {

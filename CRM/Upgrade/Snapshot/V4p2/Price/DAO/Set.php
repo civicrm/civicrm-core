@@ -306,6 +306,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO {
   /**
    * returns the list of fields that can be exported.
    *
+   * @param bool $prefix
+   *
    * @return array
    */
   static function &export($prefix = FALSE) {

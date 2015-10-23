@@ -598,6 +598,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Append to the query log (if enabled)
+   *
+   * @param string $string
    */
   public static function debug_query($string) {
     if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
@@ -942,6 +944,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Terminate execution abnormally.
+   *
+   * @param string $code
    */
   protected static function abend($code) {
     // do a hard rollback of any pending transactions

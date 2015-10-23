@@ -421,9 +421,9 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    *
    * PHP NULL's will be treated as SQL NULL's. The PHP string "null" will be treated as a string.
    *
-   * @throws CRM_Core_Exception
+   * @param string $activeMode
+   *
    * @return string
-   *   SQL expression
    */
   public function interpolate($expr, $args, $activeMode = self::INTERPOLATE_INPUT) {
     if ($args === NULL) {

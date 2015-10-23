@@ -184,11 +184,9 @@ class CRM_Event_Badge {
   }
 
   /**
-   * Create labels (pdf)
+   * Create labels (pdf).
    *
    * @param array $participants
-   *
-   * @return;
    */
   public function createLabels(&$participants) {
 

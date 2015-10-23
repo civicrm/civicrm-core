@@ -826,6 +826,13 @@ WHERE  civicrm_participant.id = {$participantId}
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   *
+   * @param array $defaults
+   * @param string $property
+   * @param string $lookup
+   * @param bool $reverse
+   *
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, $lookup, $reverse) {
     $id = $property . '_id';

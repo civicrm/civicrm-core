@@ -104,6 +104,9 @@ class CRM_Queue_Page_AJAX {
 
   /**
    * Performing any view-layer filtering on result and send to client.
+   *
+   * @param string $op
+   * @param array $result
    */
   public static function _return($op, $result) {
     if ($result['is_error']) {
