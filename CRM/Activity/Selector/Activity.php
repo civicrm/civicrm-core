@@ -130,9 +130,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     }
     $activityTypeName = CRM_Utils_Array::value($activityTypeId, $activeActTypes);
 
-    //CRM-7607
-    //lets allow to have normal operation for only activity types.
-    //when activity type is disabled or no more exists give only delete.
+    // CRM-7607
+    // Lets allow to have normal operation for only activity types.
+    // When activity type is disabled or no more exists give only delete.
     switch ($activityTypeName) {
       case 'Event Registration':
       case 'Change Registration':
@@ -199,7 +199,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
         $qsView = "atype={$activityTypeId}&action=view&reset=1&id=%%id%%&cid=%%cid%%&context=%%cxt%%{$extraParams}";
         $qsUpdate = "atype={$activityTypeId}&action=update&reset=1&id=%%id%%&cid=%%cid%%&context=%%cxt%%{$extraParams}";
 
-        //when type is not available lets hide view and update.
+        // When type is not available lets hide view and update.
         if (empty($activityTypeName)) {
           $showView = $showUpdate = FALSE;
         }
@@ -396,7 +396,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
 
     $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
 
-    //CRM-4418
+    // CRM-4418
     $permissions = array($this->_permission);
     if (CRM_Core_Permission::check('delete activities')) {
       $permissions[] = CRM_Core_Permission::DELETE;
@@ -449,7 +449,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
         $row['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
       }
 
-      //CRM-3553
+      // CRM-3553
       $accessMailingReport = FALSE;
       if (!empty($row['mailingId'])) {
         $accessMailingReport = TRUE;

@@ -73,12 +73,6 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Add local and global form rules.
-   */
-  public function addRules() {
-  }
-
-  /**
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
