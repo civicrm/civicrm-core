@@ -253,6 +253,8 @@ class CRM_Core_Permission_Base {
    * Get the permissions defined in the hook_civicrm_permission implementation
    * in all enabled CiviCRM module extensions.
    *
+   * @param bool $descriptions
+   *
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */

@@ -69,7 +69,7 @@ class CRM_Core_Menu {
   /**
    * This function fetches the menu items from xml and xmlMenu hooks.
    *
-   * @param boolen $fetchFromXML
+   * @param boolean $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
    *
    * @return array

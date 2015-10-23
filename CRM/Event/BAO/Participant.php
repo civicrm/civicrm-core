@@ -2065,9 +2065,16 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
   }
 
   /**
-   * @param $updatedAmount
-   * @param $paidAmount
+   * Record adjusted amount.
+   *
+   * @param int $updatedAmount
+   * @param int $paidAmount
    * @param int $contributionId
+   *
+   * @param int $taxAmount
+   * @param bool $updateAmountLevel
+   *
+   * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
   public static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
     $pendingAmount = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);

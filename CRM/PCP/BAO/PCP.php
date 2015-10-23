@@ -348,10 +348,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Delete the campaign page.
    *
-   * @param int $id
+   * @param int
    *   Campaign page id.
-   *
-   * @return;
    */
   public static function deleteById($id) {
     CRM_Utils_Hook::pre('delete', 'Campaign', $id, CRM_Core_DAO::$_nullArray);
@@ -580,14 +578,12 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Approve / Reject the campaign page
+   * Approve / Reject the campaign page.
    *
    * @param int $id
    *   Campaign page id.
    *
    * @param $is_active
-   *
-   * @return;
    */
   public static function setIsActive($id, $is_active) {
     switch ($is_active) {

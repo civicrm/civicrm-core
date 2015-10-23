@@ -132,7 +132,6 @@ class CRM_Utils_Array {
    * @param string $seperator
    *   (optional) String to be appended after open/close tags.
    *
-   *
    * @return string
    *   XML fragment representing $list.
    */
@@ -345,8 +344,11 @@ class CRM_Utils_Array {
   }
 
   /**
-   * @param $subset
-   * @param $superset
+   * Is array A a subset of array B.
+   *
+   * @param array $subset
+   * @param array $superset
+   *
    * @return bool
    *   TRUE if $subset is a subset of $superset
    */
@@ -388,12 +390,18 @@ class CRM_Utils_Array {
   }
 
   /**
-   * convert associative array names to values.
-   * and vice-versa.
+   * Convert associative array names to values and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   *
+   * @param array $defaults
+   * @param string $property
+   * @param $lookup
+   * @param $reverse
+   *
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, $lookup, $reverse) {
     $id = $property . '_id';
