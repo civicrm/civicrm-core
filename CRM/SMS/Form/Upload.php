@@ -50,7 +50,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
 
-    //need to differentiate new/reuse mailing, CRM-2873
+    // Need to differentiate new/reuse mailing, CRM-2873.
     $reuseMailing = FALSE;
     if ($mailingID) {
       $reuseMailing = TRUE;
@@ -72,8 +72,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $dao->find(TRUE);
       $dao->storeValues($dao, $defaults);
 
-      //we don't want to retrieve template details once it is
-      //set in session
+      // We don't want to retrieve template details once it is
+      // set in session.
       $templateId = $this->get('template');
       $this->assign('templateSelected', $templateId ? $templateId : 0);
       if (isset($defaults['msg_template_id']) && !$templateId) {
@@ -94,7 +94,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
     }
 
-    //fix for CRM-2873
+    // Fix for CRM-2873.
     if (!$reuseMailing) {
       $textFilePath = $this->get('textFilePath');
       if ($textFilePath &&
@@ -227,7 +227,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       'SMSsaveTemplateName',
     );
     $msgTemplate = NULL;
-    //mail template is composed
+    // Mail template is composed.
     if ($formValues['upload_type']) {
       $composeParams = array();
       foreach ($composeFields as $key) {
@@ -272,13 +272,13 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
     $ids['mailing_id'] = $this->_mailingID;
 
-    //get the from email address
+    // Get the from email address.
     $params['sms_provider_id'] = $formValues['sms_provider_id'];
 
-    //get the from Name
+    // Get the from Name.
     $params['from_name'] = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $params['sms_provider_id'], 'username');
 
-    //Build SMS in mailing table
+    // Build SMS in mailing table.
     CRM_Mailing_BAO_Mailing::create($params, $ids);
   }
 
@@ -315,7 +315,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     require_once 'api/api.php';
     $contact = civicrm_api('contact', 'get', $values);
 
-    //CRM-4524
+    // CRM-4524.
     $contact = reset($contact['values']);
 
     $verp = array_flip(array('optOut', 'reply', 'unsubscribe', 'resubscribe', 'owner'));
@@ -369,8 +369,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
       $dataErrors = array();
 
-      /* Do a full token replacement on a dummy verp, the current
-       * contact and domain, and the first organization. */
+      // Do a full token replacement on a dummy verp, the current
+      // contact and domain, and the first organization.
 
       // here we make a dummy mailing object so that we
       // can retrieve the tokens that we need to replace
