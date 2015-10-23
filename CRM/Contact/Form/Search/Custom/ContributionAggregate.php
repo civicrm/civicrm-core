@@ -201,7 +201,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
     $clauses[] = "contrib.is_test = 0";
 
     $startTime = isset($this->_formValues['start_date_time']) ? $this->_formValues['start_date_time'] : '12:00AM';
-    $endTime = isset($this->formValues['end_date_time']) ? $this->formValues['end_date_time'] : '11:59PM';
+    $endTime = isset($this->_formValues['end_date_time']) ? $this->_formValues['end_date_time'] : '11:59PM';
 
     $startDate = CRM_Utils_Date::processDate($this->_formValues['start_date'], $startTime);
     if ($startDate) {
