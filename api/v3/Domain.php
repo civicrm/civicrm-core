@@ -130,6 +130,14 @@ function _civicrm_api3_domain_get_spec(&$params) {
  */
 function civicrm_api3_domain_create($params) {
   $params['version'] = $params['domain_version'];
+  if ($params['version'] == 3) {
+    // This is an ugly hack to fix CRM-17430. Since CiviCRM version 3 is way
+    // older than this hack, we can safely assume that the user does not want
+    // to set his CiviCRM version to 3.
+    // domain_version is set to 3 by the function below. But if you leave that
+    // assignment out, a lot of unit tests break. So let's hack around this.
+    unset($params['version']);
+  }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
