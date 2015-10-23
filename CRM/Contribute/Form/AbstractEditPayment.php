@@ -307,6 +307,8 @@ WHERE  contribution_id = {$id}
    * @param int $statusId
    * @param int|null $previousStatusId
    *
+   * @param string $receiveDate
+   *
    * @return null|string
    */
   protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {

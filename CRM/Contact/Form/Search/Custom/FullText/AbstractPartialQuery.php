@@ -130,18 +130,23 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
     }
   }
 
-
   /**
+   * Run queries.
+   *
    * @param string $queryText
    * @param array $tables
    *   A list of places to query. Keys may be:.
    *   - sql: an array of SQL queries to execute
    *   - final: an array of SQL queries to execute at the end
    *   - *: All other keys are treated as table names
+   * @param string $entityIDTableName
+   * @param int $limit
+   *
    * @return array
-   *   keys: match-descriptor
+   *   Keys: match-descriptor
    *   - count: int
    *   - files: NULL | array
+   * @throws \CRM_Core_Exception
    */
   public function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
     $sql = "TRUNCATE {$entityIDTableName}";

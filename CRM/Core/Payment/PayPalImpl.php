@@ -947,10 +947,17 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Hash_call: Function to perform the API call to PayPal using API signature
+   * Hash_call: Function to perform the API call to PayPal using API signature.
+   *
    * @methodName is name of API  method.
    * @nvpStr is nvp string.
-   * returns an associtive array containing the response from the server.
+   * returns an associative array containing the response from the server.
+   *
+   * @param array $args
+   * @param null $url
+   *
+   * @return array|object
+   * @throws \Exception
    */
   public function invokeAPI($args, $url = NULL) {
 
@@ -1022,10 +1029,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * This function will take NVPString and convert it to an Associative Array and it will decode the response.
-   * It is useful to search for a particular key and displaying arrays.
-   * @nvpstr is NVPString.
-   * @nvpArray is Associative Array.
+   * This function will take NVPString and convert it to an Associative Array.
+   *
+   * It will decode the response. It is useful to search for a particular key and displaying arrays.
+   *
+   * @param string $str
+   *
+   * @return array
    */
   public static function deformat($str) {
     $result = array();

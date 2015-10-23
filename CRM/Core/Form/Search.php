@@ -127,6 +127,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
 
   /**
    * Add checkboxes for each row plus a master checkbox.
+   *
+   * @param array $rows
    */
   public function addRowSelectors($rows) {
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
@@ -140,8 +142,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
-   * Add actions menu to search results form
-   * @param $tasks
+   * Add actions menu to search results form.
+   *
+   * @param array $tasks
    */
   public function addTaskMenu($tasks) {
     if (is_array($tasks) && !empty($tasks)) {

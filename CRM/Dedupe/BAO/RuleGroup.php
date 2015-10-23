@@ -412,6 +412,11 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
   /**
    * Get all of the combinations of fields that would work with a rule.
+   *
+   * @param array $rgFields
+   * @param int $threshold
+   * @param array $combos
+   * @param array $running
    */
   public static function combos($rgFields, $threshold, &$combos, $running = array()) {
     foreach ($rgFields as $rgField => $weight) {

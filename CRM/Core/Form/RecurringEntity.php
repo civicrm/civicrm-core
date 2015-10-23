@@ -326,6 +326,12 @@ class CRM_Core_Form_RecurringEntity {
 
   /**
    * Process the form submission.
+   *
+   * @param array $params
+   * @param string $type
+   * @param array $linkedEntities
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function postProcess($params = array(), $type, $linkedEntities = array()) {
     //Check entity_id not present in params take it from class variable

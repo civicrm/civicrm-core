@@ -67,6 +67,8 @@ class CRM_Utils_ReCAPTCHA {
 
   /**
    * Add element to form.
+   *
+   * @param CRM_Core_Form $form
    */
   public static function add(&$form) {
     $error = NULL;

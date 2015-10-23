@@ -1436,6 +1436,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int $fileID
    * @param bool $absolute
    *
+   * @param string $multiRecordWhereClause
+   *
    * @return array
    */
   public static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE, $multiRecordWhereClause = NULL) {

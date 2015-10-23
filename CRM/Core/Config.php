@@ -218,6 +218,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * One function to get domain ID.
+   *
+   * @param int $domainID
+   * @param bool $reset
+   *
+   * @return int|null
    */
   public static function domainID($domainID = NULL, $reset = FALSE) {
     static $domain;
@@ -358,6 +363,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * Check if running in upgrade mode.
+   *
+   * @param string $path
+   *
+   * @return bool
    */
   public static function isUpgradeMode($path = NULL) {
     if (defined('CIVICRM_UPGRADE_ACTIVE')) {

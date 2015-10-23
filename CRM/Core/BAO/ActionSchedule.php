@@ -662,8 +662,11 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param $dao
-   * @return string|NULL
+   * Pick SMS phone number.
+   *
+   * @param int $smsToContactId
+   *
+   * @return NULL|string
    */
   protected static function pickSmsPhoneNumber($smsToContactId) {
     $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($smsToContactId, FALSE, 'Mobile', array(

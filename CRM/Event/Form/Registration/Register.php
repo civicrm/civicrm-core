@@ -1358,7 +1358,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param bool $useDedupeRules
    *   Force usage of dedupe rules.
    *
-   * @return void
+   * @return int
    */
   public static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
     // CRM-3907, skip check for preview registrations

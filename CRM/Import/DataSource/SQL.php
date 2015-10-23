@@ -91,6 +91,10 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
   /**
    * Process the form submission.
+   *
+   * @param array $params
+   * @param string $db
+   * @param \CRM_Core_Form $form
    */
   public function postProcess(&$params, &$db, &$form) {
     $importJob = new CRM_Contact_Import_ImportJob(

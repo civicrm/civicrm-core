@@ -207,11 +207,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * adding permissions for financial types
-   *
+   * Add permissions for financial types.
    *
    * @param array $permissions
-   *   an array of permissions
+   * @param array $descriptions
+   *
+   * @return bool
    */
   public static function permissionedFinancialTypes(&$permissions, $descriptions) {
     if (!self::isACLFinancialTypeStatus()) {
@@ -249,7 +250,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @param array $financialTypes
    *   (reference ) an array of financial types
-   * @param string $action
+   * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
    *   load values from static cache
@@ -288,7 +289,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @param array $membershipTypes
    *   (reference ) an array of membership types
-   * @param string $action
+   * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    *
    * @return array

@@ -99,6 +99,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
   /**
    * Class constructor.
+   *
+   * @param array $mapperKeys
+   * @param int $mapperLocType
+   * @param int $mapperPhoneType
+   * @param int $mapperImProvider
+   * @param int $mapperRelated
+   * @param int $mapperRelatedContactType
+   * @param array $mapperRelatedContactDetails
+   * @param int $mapperRelatedContactLocType
+   * @param int $mapperRelatedContactPhoneType
+   * @param int $mapperRelatedContactImProvider
+   * @param int $mapperWebsiteType
+   * @param int $mapperRelatedContactWebsiteType
    */
   public function __construct(
     &$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL, $mapperImProvider = NULL, $mapperRelated = NULL, $mapperRelatedContactType = NULL, $mapperRelatedContactDetails = NULL, $mapperRelatedContactLocType = NULL, $mapperRelatedContactPhoneType = NULL, $mapperRelatedContactImProvider = NULL,
@@ -122,7 +135,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * The initializer code, called before the processing
+   * The initializer code, called before the processing.
    */
   public function init() {
     $contactFields = CRM_Contact_BAO_Contact::importableFields($this->_contactType);
@@ -1640,6 +1653,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
   /**
    * Method for creating contact.
+   *
+   * @param array $formatted
+   * @param array $contactFields
+   * @param int $onDuplicate
+   * @param int $contactId
+   * @param bool $requiredCheck
+   * @param int $dedupeRuleGroupID
+   *
+   * @return array|bool|\CRM_Contact_BAO_Contact|\CRM_Core_Error|null
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
     $dupeCheck = FALSE;

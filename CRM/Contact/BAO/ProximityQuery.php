@@ -95,7 +95,7 @@ class CRM_Contact_BAO_ProximityQuery {
    *
    * @param float $longitude
    * @param float $latitude
-   * @param float $height
+   * @param float|int $height
    *
    * @return array
    */
