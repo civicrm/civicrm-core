@@ -72,6 +72,9 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     );
   }
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     $tokens = CRM_Utils_Array::subset(
       CRM_Utils_Array::collect('title', CRM_Contribute_DAO_Contribution::fields()),

@@ -41,16 +41,17 @@ class CRM_Utils_ReCAPTCHA {
   protected $_phrase = NULL;
 
   /**
+   * Singleton.
+   *
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
-   * @var object
+   * @var CRM_Utils_ReCAPTCHA
    */
   static private $_singleton = NULL;
 
   /**
    * Singleton function used to manage this object.
-   *
    *
    * @return object
    */

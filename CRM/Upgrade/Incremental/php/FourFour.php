@@ -97,7 +97,9 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
   }
 
   /**
-   * @param $rev
+   * Upgrade 4.4.alpha1.
+   *
+   * @param string $rev
    *
    * @return bool
    */

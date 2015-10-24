@@ -86,6 +86,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     }
   }
 
+  /**
+   * Build quick form.
+   */
   public function buildQuickForm() {
     $fields = self::fields();
     // Get fields of type date
@@ -151,7 +154,12 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         // CRM-10338
         $v[2] = self::checkArrayKeyEmpty($v[2]);
 
-        if (in_array($v[1], array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY')) &&
+        if (in_array($v[1], array(
+            'IS NULL',
+            'IS NOT NULL',
+            'IS EMPTY',
+            'IS NOT EMPTY',
+          )) &&
           !empty($v[2])
         ) {
           $errorMsg["value[$v[3]][$v[4]]"] = ts('Please clear your value if you want to use %1 operator.', array(1 => $v[1]));
@@ -281,11 +289,16 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     return TRUE;
   }
 
+  /**
+   * Normalise form values.
+   */
   public function normalizeFormValues() {
   }
 
   /**
-   * @param $formValues
+   * Convert form values.
+   *
+   * @param array $formValues
    *
    * @return array
    */
@@ -294,6 +307,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   /**
+   * Get return properties.
+   *
    * @return array
    */
   public function &returnProperties() {
@@ -386,6 +401,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   /**
+   * Get fields.
+   *
    * @return array
    */
   public static function fields() {
@@ -400,6 +417,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
    * CRM-9434 Hackish function to fetch fields with options.
+   *
    * FIXME: When our core fields contain reliable metadata this will be much simpler.
    * @return array
    *   (string => string) key: field_name value: api entity name

@@ -309,7 +309,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given an id, get the name of the saved search
+   * Given an id, get the name of the saved search.
    *
    * @param int $id
    *   The id of the saved search.
@@ -329,8 +329,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given a label and a set of normalized POST
-   * formValues, create a smart group with that
+   * Create a smart group from normalised values.
    *
    * @param array $params
    *
