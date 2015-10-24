@@ -1,4 +1,14 @@
-/* Add any CSS rules for Angular module "statuspage" */
+/* CSS rules for Angular module "statuspage" */
+
+#crm-status-list h3 {
+  color: white;
+  opacity: .85;
+}
+
+#crm-status-list h3:hover,
+#crm-status-list h3.menuopen {
+  opacity: 1;
+}
 
 /* Error Severity */
 #crm-status-list .crm-severity-emergency,
@@ -6,65 +16,51 @@
 #crm-status-list .crm-severity-critical,
 #crm-status-list .crm-severity-error{
   background-color: #E43D2B;
-  color: white;
-}
-
-#crm-status-list .crm-severity-emergency:hover,
-#crm-status-list .crm-severity-alert:hover,
-#crm-status-list .crm-severity-critical:hover,
-#crm-status-list .crm-severity-error:hover {
-  background-color: #DD0000;
-  color: white;
 }
 
 /* Warning Severity */
-#crm-status-list .crm-severity-warning
-{
-  background-color: #EDA737;
-  color: white;
+#crm-status-list .crm-severity-warning {
+  background-color: #eba12d;
 }
-
-#crm-status-list .crm-severity-warning:hover
-{
-  background-color: #F09E1A;
-  color: white;
-}
-
 
 /* Not Okay - Not Warning */
-#crm-status-list .crm-severity-notice
-{
-  background-color: #4A88DF;
-  color: white;
-}
-
-#crm-status-list .crm-severity-notice :hover
-{
-  background-color: #41477E;
-  color: white;
+#crm-status-list .crm-severity-notice {
+  background-color: #4d90eb;
 }
 
 /* All OK Severity */
 #crm-status-list .crm-severity-info,
 #crm-status-list .crm-severity-debug {
   background-color: #00994D;
-  color: white;
 }
 
-
-#crm-status-list .crm-severity-info:hover,
-#crm-status-list .crm-severity-debug:hover {
-  background-color: #006633;
-  color: white;
+#crm-status-list .crm-status-message-body {
+  margin: 1em 0;
 }
 
-/* over-riding divs for snooze-options so that inline-block looks better */
+#crm-status-list .hush-menu > div {
+  position: relative;
+  width: 20em; /* determines max-width of popup menu */
+  font-size: .8em;
+}
 
-.crm-container .status-snooze-options .crm-section .content,
-.crm-container .status-snooze-options .crm-section .label {
-  margin-left: inherit;
-  text-align: inherit;
-  float: inherit;
-  width: inherit;
-  display: inline-block;
+#crm-status-list .hush-menu button {
+  float: right;
+  cursor: pointer;
+}
+
+#crm-status-list .hush-menu ul {
+  position: absolute;
+  top: 1.5em;
+  right: 0;
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+#crm-status-list .hush-menu li {
+  padding: 0.2em 0.5em;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 99999;
+  font-weight: normal;
 }
