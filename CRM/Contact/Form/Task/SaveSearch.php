@@ -186,7 +186,15 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     // an exact match for the form requirements & task the form layer with converting backwards and forwards.
     // Ideally per CRM-17075 we will use entity reference fields heavily in the form layer & convert to the
     // sql operator syntax at the query layer.
-    $savedSearch->form_values = serialize($this->get('queryParams'));
+    if (!$isSearchBuilder) {
+      $savedSearch->form_values = serialize($this->get('queryParams'));
+    }
+    else {
+      // We want search builder to be able to convert back & forth at the form layer
+      // to a standardised style - but it can't yet!
+      $savedSearch->form_values = serialize($formValues);
+    }
+
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = $this->get('customSearchID');
     $savedSearch->save();
