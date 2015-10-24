@@ -428,4 +428,31 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     return $defaults;
   }
 
+  /**
+   * Function to deal with groups that may have been mis-saved during a glitch.
+   *
+   * This deals with groups that may have been saved with differing mapping parameters than
+   * the latest supported ones.
+   *
+   * @param int $id
+   * @param array $formValues
+   */
+  public function tempFixFormValues($id, &$formValues) {
+    foreach ($formValues as $index => $formValue) {
+      if (is_array($formValue) && isset($formValue[1])) {
+        if ($formValue[1] == 'IN') {
+          $formValues[$formValue[0]] = $formValue[2];
+          unset($formValues[$index]);
+        }
+        if ($formValue[1] == '=') {
+          $formValues[$formValue[0]] = $formValue[2];
+          if (substr($formValue[0], -4, 4) == '_low' || substr($formValue[0], -5, 5) == '_high') {
+            $formValues[str_replace('_low', '', str_replace('_high','', $formValue[0])). '_relative'] = 0;
+          }
+          unset($formValues[$index]);
+        }
+      }
+    }
+  }
+
 }

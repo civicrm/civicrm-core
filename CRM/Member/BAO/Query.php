@@ -197,16 +197,6 @@ class CRM_Member_BAO_Query {
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
-      // CRM-17011 These 2 variants appear in some smart groups saved at some time prior to 4.6.6.
-      case 'member_status_id':
-      case 'member_membership_type_id':
-        if (is_array($value)) {
-          $op = 'IN';
-          $value = array_keys($value);
-        }
-      case 'membership_status':
-      case 'membership_status_id':
-      case 'membership_type':
       case 'membership_type_id':
         // CRM-17075 we are specifically handling the possibility we are dealing with the entity reference field
         // for membership_type_id here (although status would be handled if converted). The unhandled pathway at the moment
@@ -217,7 +207,21 @@ class CRM_Member_BAO_Query {
         if (is_string($value) && strpos($value, ',') && $op == '=') {
           $value = array('IN' => explode(',', $value));
         }
+
+      // CRM-17011 These 2 variants appear in some smart groups saved at some time prior to 4.6.6.
+      case 'member_status_id':
+      case 'member_membership_type_id':
+        if (is_array($value)) {
+          $op = 'IN';
+          $value = array_keys($value);
+        }
+      case 'membership_status':
+      case 'membership_status_id':
+      case 'membership_type':
       case 'member_id':
+        if (strstr($name, 'status') && is_string($value) && !is_numeric($value)) {
+          $value = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $value);
+        }
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
           $qillName = ts('Membership Status');
