@@ -90,6 +90,91 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     }
   }
 
+  /**
+   * Function to deal with groups that may have been mis-saved during a glitch.
+   *
+   * This deals with groups that may have been saved with differing mapping parameters than
+   * the latest supported ones.
+   *
+   * @param int $id
+   * @param array $formValues
+   */
+  public function tempFixFormValues($id, &$formValues) {
+    $mappingID = CRM_Core_DAO::singleValueQuery('SELECT mapping_id FROM civicrm_saved_search WHERE id = %1', array(1 => array($id, 'Integer')));
+    $addressFields = civicrm_api3('Address', 'getfields');
+    $options = self::fieldOptions();
+    $entities = array(
+      'contact',
+      'address',
+      'activity',
+      'participant',
+      'pledge',
+      'membership',
+      'contribution',
+      'case',
+      'grant',
+    );
+
+    if (empty($formValues['mapper']) && $mappingID) {
+      $mappingFields = CRM_Core_BAO_Mapping::getMappingFields($mappingID);
+      foreach ($mappingFields[0][1] as $index => $mappingField) {
+        $formValues['mapper'][1][$index] = array($mappingFields[1][1][$index], $mappingFields[0][1][$index]);
+        $formValues['operator'][1][$index] = $mappingFields[6][1][$index];
+        $formValues['value'][1][$index] = $mappingFields[7][1][$index];
+
+      }
+    }
+    /*
+    foreach ($formValues['mapper'] as $index => $fields) {
+      foreach ($fields as $fieldIndex => $field) {
+        $entity = $options[$field[1]];
+        if ($entity == 'contact' || isset($addressFields['values'][$field[1]])) {
+
+          $existing = (CRM_Core_DAO::singleValueQuery("SELECT contact_type FROM civicrm_mapping_field WHERE mapping_id = $mappingID AND grouping = $index AND column_number = $fieldIndex"));
+          if ($existing != 'Contact') {
+            $formValues['mapper'][$index][$fieldIndex][0] = 'Contact';
+            //CRM_Core_DAO::executeQuery("UPDATE civicrm_mapping_field SET contact_type = 'Contact' WHERE mapping_id = $mappingID AND grouping = $index AND column_number = $fieldIndex");
+          }
+        }
+        if (in_array($entity, $entities)) {
+          $values = civicrm_api3($entity, 'getoptions', array('field' => $field[1]));
+          $currentValue = $formValues['value'][$index][$fieldIndex];
+          if (!isset($values['values'][$currentValue]) && in_array($currentValue, $values['values'])) {
+            $newValue = array_search($currentValue, $values['values']);
+            $formValues['value'][$index][$fieldIndex] = $newValue;
+            //CRM_Core_DAO::executeQuery("UPDATE civicrm_mapping_field SET value = $newValue WHERE mapping_id = $mappingID AND grouping = $index AND column_number = $fieldIndex");
+
+          }
+        }
+        /*
+        $i = $index;
+        while ($i > 0) {
+          if ($fields == $formValues['mapper'][$i] && ($formValues['operator'][$i] == $formValues['operator'][$index]) && '=' == $formValues['operator'][$index]) {
+          }
+          $i--;
+        }
+
+      }
+    }
+  */
+
+    $savedSearch = new CRM_Contact_DAO_SavedSearch();
+    $savedSearch->id = $id;
+    $savedSearch->find(TRUE);
+
+    $tables = $whereTables = array();
+    $savedSearch->where_clause = CRM_Contact_BAO_Query::getWhereClause($formValues, NULL, $tables, $whereTables);
+    if (!empty($tables)) {
+      $savedSearch->select_tables = serialize($tables);
+    }
+    if (!empty($whereTables)) {
+      $savedSearch->where_tables = serialize($whereTables);
+    }
+
+    $savedSearch->form_values = serialize($formValues);
+    $savedSearch->save();
+  }
+
   public function buildQuickForm() {
     $fields = self::fields();
     // Get fields of type date

@@ -569,7 +569,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->normalizeFormValues();
       $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
       $this->_returnProperties = &$this->returnProperties();
-
       // also get the uf group id directly from the post value
       $this->_ufGroupID = CRM_Utils_Array::value('uf_group_id', $_POST, $this->_ufGroupID);
       $this->_formValues['uf_group_id'] = $this->_ufGroupID;
@@ -603,8 +602,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       // fix for CRM-1907
       if (isset($this->_ssID) && $this->_context != 'smog') {
         // we only retrieve the saved search values if out current values are null
-        $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
-
+        $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
+        $this->tempFixFormValues($this->_ssID, $formValues);
+        $this->_formValues = $formValues;
+        $this->set('formValues', $formValues);
         //fix for CRM-1505
         if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'mapping_id')) {
           $this->_params = CRM_Contact_BAO_SavedSearch::getSearchParams($this->_ssID);
@@ -625,7 +626,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         if (isset($this->_operator)) {
           $this->_formValues['operator'] = $this->_operator;
         }
-
         // FIXME: we should generalise in a way that components could inject url-filters
         // just like they build their own form elements
         foreach (array(
@@ -743,6 +743,12 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     $controller->moveFromSessionToTemplate();
+  }
+
+  /**
+   * Function to deal with groups that may have been mis-saved during a glitch.
+   */
+  function tempFixFormValues($id, $formValues) {
   }
 
   /**
