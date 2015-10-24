@@ -157,7 +157,6 @@ function civicrm_api3_domain_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_create_spec(&$params) {
-  $params['domain_version']['api.required'] = 1;
   unset($params['version']);
   $params['name']['api.required'] = 1;
 }
