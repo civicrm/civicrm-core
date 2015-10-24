@@ -4,46 +4,34 @@
   <form name="crm-system-status" crm-ui-id-scope>
 
     <div>
-      <h1>Status Page</h1>
+      <h1>{{ts('Status Messages')}}</h1>
     </div>
 
     <div crm-ui-tab-set>
       <div
-        ng-repeat="tab in [{is_visible: 1, name: 'visible', icon: 'fa-bell'}, {is_visible: 0, name: 'hidden', icon: 'fa-bell-slash-o'}]"
+        ng-repeat="tab in [{is_visible: 1, icon: 'fa-bell'}, {is_visible: 0, icon: 'fa-bell-slash-o'}]"
         crm-ui-tab
-        id="tab-{{tab.name}}"
+        id="tab-status-visible-{{tab.is_visible}}"
         count="{{_.where(statuses, {is_visible: tab.is_visible}).length}}"
-        crm-title="tab.is_visible ? ts('Active') : ts('Hushed/Snoozed')"
+        crm-title="tab.is_visible ? ts('Active') : ts('Hidden')"
         crm-icon="{{tab.icon}}"
         >
         <div id="crm-status-list" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
           <h3 class="crm-severity-{{status.severity}}">
             <i ng-if="status.icon" class="crm-i {{status.icon}}"></i>
             {{status.title}}
-            <span class="status-snooze-options" ng-show="status.snoozeOptions.show" style="display: inline-block">
-              <div crm-snooze-options style="display: inline"></div>
-            </span>
-            <a  ng-if="status.is_visible"  ng-click="showSnoozeOptions(status)" ng-show="!status.snoozeOptions.show" class="crm-hover-button" crm-icon="fa-clock-o" title="{{ts('Snooze')}}"></a>
-            <a ng-click="showSnoozeOptions(status)" ng-show="status.snoozeOptions.show" class="crm-hover-button" crm-icon="fa-times" style="display: inline" title="{{ts('Close')}}"></a>
-            <a ng-if="status.is_visible" ng-click="hush(status)" class="crm-hover-button" crm-icon="fa-bell-slash-o" title="{{ts('Hush')}}"></a>
-            <a ng-if="!status.is_visible" ng-click="unhush(status)" class="crm-hover-button" crm-icon="fa-bell-o" title="{{ts('Unhush And Unsnooze')}}"></a>
+            <div statuspage-popup-menu class="hush-menu css_right"></div>
           </h3>
-          <h4>
-            <div class="crm-block">
-              <div class="crm-group">
-                <div class="crm-status-message-body">
-                  <span ng-bind-html="status.message | trusted"></span>
-                  <a
-                    ng-if="status.help"
-                    class="helpicon"
-                    ng-click="alert(status.help, status.title, 'info');"
-                    href="javascript:void(0)"
-                    >
-                  </a>
-                </div>
-              </div>
-            </div>
-          </h4><br/>
+          <div class="crm-block crm-status-message-body">
+            <span ng-bind-html="status.message | trusted"></span>
+            <a
+              ng-if="status.help"
+              class="helpicon"
+              ng-click="alert(status.help, status.title, 'info');"
+              href="javascript:void(0)"
+              >
+            </a>
+          </div>
         </div>
 
       </div>
