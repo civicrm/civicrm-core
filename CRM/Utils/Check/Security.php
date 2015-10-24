@@ -235,19 +235,23 @@ class CRM_Utils_Check_Security {
     $messages = array();
     $files = array(
       array(
-        "{$civicrm_root}/packages/dompdf/dompdf.php",                                   // CRM-16005, upgraded from Civi <= 4.5.6
+        // CRM-16005, upgraded from Civi <= 4.5.6
+        "{$civicrm_root}/packages/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
-        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php",                     // CRM-16005, Civi >= 4.5.7
+        // CRM-16005, Civi >= 4.5.7
+        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
-        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php",                              // CRM-16005, Civi >= 4.6.0
+        // CRM-16005, Civi >= 4.6.0
+        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
-        "{$civicrm_root}/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php", // CIVI-SA-2013-001
+        // CIVI-SA-2013-001
+        "{$civicrm_root}/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
