@@ -31,12 +31,14 @@
  */
 
 /**
- * Address utilties
+ * Address utilities.
  */
 class CRM_Utils_Address_USPS {
 
   /**
-   * @param $values
+   * Check address.
+   *
+   * @param array $values
    *
    * @return bool
    */

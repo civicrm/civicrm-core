@@ -26,6 +26,9 @@ class Paths {
 
   private $variableFactory = array();
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     $this
       ->register('civicrm.root', function () {
@@ -82,6 +85,13 @@ class Paths {
     return $this->variables[$name][$attr];
   }
 
+  /**
+   * Does the variable exist.
+   *
+   * @param string $name
+   *
+   * @return bool
+   */
   public function hasVariable($name) {
     return isset($this->variableFactory[$name]);
   }

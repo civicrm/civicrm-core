@@ -26,9 +26,14 @@
  */
 namespace Civi\Core\Lock;
 
+/**
+ * Lock interface.
+ */
 interface LockInterface {
 
   /**
+   * Acquire lock.
+   *
    * @param int|NULL $timeout
    *   The number of seconds to wait to get the lock.
    *   For a default value, use NULL.

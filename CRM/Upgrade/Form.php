@@ -94,19 +94,11 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    *
    * @param object $state
    *   State associated with this form.
-   * @param \const|\enum $action The mode the form is operating in (None/Create/View/Update/Delete)
+   * @param const|\enum|int $action The mode the form is operating in (None/Create/View/Update/Delete)
    * @param string $method
    *   The type of http method used (GET/POST).
    * @param string $name
    *   The name of the form if different from class name.
-   *
-   * @return \CRM_Core_Form
-   */
-  /**
-   * @param null|object $state
-   * @param const|enum|int $action
-   * @param string $method
-   * @param null|string $name
    */
   public function __construct(
     $state = NULL,
