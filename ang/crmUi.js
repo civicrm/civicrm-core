@@ -979,18 +979,19 @@
 
     // Sets the one and only page title - uses CMS title if available
     // WARNING: Use only once per route!
+    // Note: Title should be plain-text only
     // Example: <h1 crm-ui-title>{{ts('Hello')}}</h1>
     .directive('crmUiTitle', function($timeout) {
       return {
         link: function(scope, $el, attrs) {
           function update() {
             $timeout(function() {
-              var newTitle = $el.html();
-              document.title = $('title').html().replace(pageTitle, newTitle);
+              var newTitle = $el.text();
+              document.title = $('title').text().replace(pageTitle, newTitle);
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
-                if (_.trim($(this).html()) === _.trim(pageTitle)) {
-                  $(this).html(newTitle);
+                if (_.trim($(this).text()) === _.trim(pageTitle)) {
+                  $(this).text(newTitle);
                   $el.hide();
                 }
               });
@@ -1000,7 +1001,7 @@
 
           scope.$watch(function() {return $el.html();}, update);
         }
-      }
+      };
     })
 
     .run(function($rootScope, $location) {
