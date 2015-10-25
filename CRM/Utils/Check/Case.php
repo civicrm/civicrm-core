@@ -52,7 +52,7 @@ class CRM_Utils_Check_Case {
   }
 
   /**
-   * Run some sanity checks.
+   * Run all checks in this class.
    *
    * @return array<CRM_Utils_Check_Message>
    */
@@ -81,13 +81,17 @@ class CRM_Utils_Check_Case {
       elseif ($normalFile && $mungedFile) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('Case type "%2" has duplicate XML files ("%3" and "%4").<br /><a href="%1">Read more about this warning</a>', array(
-            1 => CRM_Utils_System::getWikiBaseURL() . __FUNCTION__,
-            2 => $caseTypeName,
-            3 => $normalFile,
-            4 => $mungedFile,
-          )),
-          ts('CiviCase')
+          ts('Case type "%1" has duplicate XML files ("%2" and "%3")', array(
+            1 => $caseTypeName,
+            2 => $normalFile,
+            3 => $mungedFile,
+          )) .
+          '<br /><a href="' . CRM_Utils_System::getWikiBaseURL() . __FUNCTION__ . '">' .
+          ts('Read more about this warning') .
+          '</a>',
+          ts('CiviCase'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-puzzle-piece'
         );
       }
       elseif ($normalFile && !$mungedFile) {
@@ -96,13 +100,17 @@ class CRM_Utils_Check_Case {
       elseif (!$normalFile && $mungedFile) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('Case type "%2" corresponds to XML file ("%3") The XML file should be named "%4".<br /><a href="%1">Read more about this warning</a>', array(
-            1 => CRM_Utils_System::getWikiBaseURL() . __FUNCTION__,
-            2 => $caseTypeName,
-            3 => $mungedFile,
-            4 => "{$caseTypeName}.xml",
-          )),
-          ts('CiviCase')
+          ts('Case type "%1" corresponds to XML file ("%2") The XML file should be named "%3".', array(
+            1 => $caseTypeName,
+            2 => $mungedFile,
+            3 => "{$caseTypeName}.xml",
+          )) .
+          '<br /><a href="' . CRM_Utils_System::getWikiBaseURL() . __FUNCTION__ . '">' .
+          ts('Read more about this warning') .
+          '</a>',
+          ts('CiviCase'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-puzzle-piece'
         );
       }
       elseif (!$normalFile && !$mungedFile) {

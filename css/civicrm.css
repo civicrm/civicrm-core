@@ -1594,7 +1594,7 @@ input.crm-form-entityref {
   font-size: 0.9em;
 }
 
-#mainTabContainer li.crm-tab-button {
+.crm-container li.crm-tab-button {
   margin: 0 2px 2px 0;
 }
 
@@ -2820,14 +2820,12 @@ tbody.scrollContent tr.alternateRow {
 
 .crm-container .disabled,
 .crm-container .cancelled,
-#mainTabContainer li.disabled a.ui-tabs-anchor,
-#mainTabContainer li.crm-count-0 a.ui-tabs-anchor,
-#mainTabContainer li.crm-count-0 a.ui-tabs-anchor em {
+.crm-container li.disabled a.ui-tabs-anchor,
+.crm-container li.crm-count-0 a.ui-tabs-anchor,
+.crm-container li.crm-count-0 a.ui-tabs-anchor em {
   color: #999999 !important;
 }
-#mainTabContainer li.disabled {
-  text-decoration: none;
-}
+
 #crm-container tr.crm-job {
   text-decoration: none !important;
 }

@@ -12,31 +12,8 @@
       templateUrl: '~/statuspage/StatusPage.html',
 
       resolve: {
-        statuses: function(statuspageGetStatuses) {
-          return statuspageGetStatuses({is_visible: 1});
-        },
-        statusModel: function(statuspageStatusModel) {
-          return statuspageStatusModel();
-        },
-        preferences: function(statuspageGetPreferences){
-          return statuspageGetPreferences();
-        }
-      }
-    });
-
-    $routeProvider.when('/status/hushed', {
-      controller: 'statuspageStatusPage',
-      templateUrl: '~/statuspage/StatusPage.html',
-
-      resolve: {
-        statuses: function(statuspageGetStatuses) {
-          return statuspageGetStatuses({is_visible: 0});
-        },
-        statusModel: function(statuspageStatusModel) {
-          return statuspageStatusModel();
-        },
-        preferences: function(statuspageGetPreferences){
-          return statuspageGetPreferences();
+        statusData: function(crmApi) {
+          return crmApi('System', 'check', {sequential: 1, options: {limit: 0}});
         }
       }
     });

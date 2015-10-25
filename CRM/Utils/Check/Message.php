@@ -59,6 +59,12 @@ class CRM_Utils_Check_Message {
   private $help;
 
   /**
+   * @var string
+   *   crm-i css class
+   */
+  private $icon;
+
+  /**
    *
    * @var bool
    *      This is used for Admin Status Page to determine hushed statuses.
@@ -79,7 +85,7 @@ class CRM_Utils_Check_Message {
    *
    * @see Psr\Log\LogLevel
    */
-  public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING) {
+  public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING, $icon = NULL) {
     $this->name = $name;
     $this->message = $message;
     $this->title = $title;
@@ -88,6 +94,7 @@ class CRM_Utils_Check_Message {
       $level = CRM_Utils_Check::severityMap($level);
     }
     $this->level = $level;
+    $this->icon = $icon;
   }
 
   /**
@@ -154,6 +161,7 @@ class CRM_Utils_Check_Message {
       'title' => $this->title,
       'severity' => $this->level,
       'is_visible' => $this->isVisible,
+      'icon' => $this->icon,
     );
     if (!empty($this->help)) {
       $array['help'] = $this->help;
