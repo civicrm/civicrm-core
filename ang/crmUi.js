@@ -1,7 +1,8 @@
 /// crmUi: Sundry UI helpers
 (function (angular, $, _) {
 
-  var uidCount = 0;
+  var uidCount = 0,
+    pageTitle = 'CiviCRM';
 
   angular.module('crmUi', [])
 
@@ -975,6 +976,33 @@
         }
       };
     })
+
+    // Sets the one and only page title - uses CMS title if available
+    // WARNING: Use only once per route!
+    // Example: <h1 crm-ui-title>{{ts('Hello')}}</h1>
+    .directive('crmUiTitle', function($timeout) {
+      return {
+        link: function(scope, $el, attrs) {
+          function update() {
+            $timeout(function() {
+              var newTitle = $el.html();
+              document.title = $('title').html().replace(pageTitle, newTitle);
+              // If the CMS has already added title markup to the page, use it
+              $('h1').not('.crm-container h1').each(function() {
+                if (_.trim($(this).html()) === _.trim(pageTitle)) {
+                  $(this).html(newTitle);
+                  $el.hide();
+                }
+              });
+              pageTitle = newTitle;
+            });
+          }
+
+          scope.$watch(function() {return $el.html();}, update);
+        }
+      }
+    })
+
     .run(function($rootScope, $location) {
       /// Example: <button ng-click="goto('home')">Go home!</button>
       $rootScope.goto = function(path) {
