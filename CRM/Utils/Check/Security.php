@@ -50,7 +50,7 @@ class CRM_Utils_Check_Security {
   }
 
   /**
-   * Run some sanity checks.
+   * Run all checks in this class.
    *
    * @return array<CRM_Utils_Check_Message>
    */
@@ -110,9 +110,11 @@ class CRM_Utils_Check_Security {
               . '<br />' .
               '<a href="%2">Read more about this warning</a>';
             $messages[] = new CRM_Utils_Check_Message(
-              'checkLogFileIsNotAccessible',
+              __FUNCTION__,
               ts($msg, array(1 => $log_url, 2 => $docs_url)),
-              ts('Security Warning')
+              ts('Security Warning'),
+              \Psr\Log\LogLevel::WARNING,
+              'fa-lock'
             );
           }
         }
@@ -151,7 +153,7 @@ class CRM_Utils_Check_Security {
       $heuristicUrl = $this->guessUrl($privateDir);
       if ($this->isDirAccessible($privateDir, $heuristicUrl)) {
         $messages[] = new CRM_Utils_Check_Message(
-          'checkUploadsAreNotAccessible',
+          __FUNCTION__,
           ts('Files in the data directory (<a href="%3">%2</a>) should not be downloadable.'
             . '<br />'
             . '<a href="%1">Read more about this warning</a>',
@@ -161,7 +163,8 @@ class CRM_Utils_Check_Security {
               3 => $heuristicUrl,
             )),
           ts('Private Files Readable'),
-          \Psr\Log\LogLevel::WARNING
+          \Psr\Log\LogLevel::WARNING,
+          'fa-lock'
         );
       }
     }
@@ -205,10 +208,11 @@ class CRM_Utils_Check_Security {
           '<a href="%3">Read more about this warning</a>';
         $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
         $messages[] = new CRM_Utils_Check_Message(
-          'checkDirectoriesAreNotBrowseable',
+          __FUNCTION__,
           ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url)),
           ts('Browseable Directories'),
-          \Psr\Log\LogLevel::ERROR
+          \Psr\Log\LogLevel::ERROR,
+          'fa-lock'
         );
       }
     }
@@ -231,19 +235,23 @@ class CRM_Utils_Check_Security {
     $messages = array();
     $files = array(
       array(
-        "{$civicrm_root}/packages/dompdf/dompdf.php",                                   // CRM-16005, upgraded from Civi <= 4.5.6
+        // CRM-16005, upgraded from Civi <= 4.5.6
+        "{$civicrm_root}/packages/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
-        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php",                     // CRM-16005, Civi >= 4.5.7
+        // CRM-16005, Civi >= 4.5.7
+        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
-        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php",                              // CRM-16005, Civi >= 4.6.0
+        // CRM-16005, Civi >= 4.6.0
+        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
-        "{$civicrm_root}/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php", // CIVI-SA-2013-001
+        // CIVI-SA-2013-001
+        "{$civicrm_root}/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
@@ -254,10 +262,11 @@ class CRM_Utils_Check_Security {
     foreach ($files as $file) {
       if (file_exists($file[0])) {
         $messages[] = new CRM_Utils_Check_Message(
-          'checkFilesAreNotPresent',
+          __FUNCTION__,
           ts('File \'%1\' presents a security risk and should be deleted.', array(1 => $file)),
           ts('Unsafe Files'),
-          $file[1]
+          $file[1],
+          'fa-lock'
         );
       }
     }
@@ -281,11 +290,13 @@ class CRM_Utils_Check_Security {
 
     if (!empty($list)) {
       $messages[] = new CRM_Utils_Check_Message(
-        'checkCxnOverrides',
+        __FUNCTION__,
         ts('The system administrator has disabled security settings (%1). Connections to remote applications are insecure.', array(
           1 => implode(', ', $list),
         )),
-        ts('Security Warning')
+        ts('Security Warning'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
       );
     }
 

@@ -653,7 +653,7 @@
       };
     })
 
-    // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
+    // example <div crm-ui-tab id="tab-1" crm-title="ts('My Title')" count="3">...content...</div>
     // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {
       return {
@@ -661,6 +661,8 @@
         restrict: 'EA',
         scope: {
           crmTitle: '@',
+          crmIcon: '@',
+          count: '@',
           id: '@'
         },
         template: '<div ng-transclude></div>',
@@ -844,8 +846,11 @@
     .directive('crmIcon', function() {
       return {
         restrict: 'EA',
-        scope: {},
         link: function (scope, element, attrs) {
+          if (element.is('[crm-ui-tab]')) {
+            // handled in crmUiTab ctrl
+            return;
+          }
           if (attrs.crmIcon.substring(0,3) == 'fa-') {
             $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '"></i> ');
           }
