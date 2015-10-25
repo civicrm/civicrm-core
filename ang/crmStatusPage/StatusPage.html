@@ -3,9 +3,7 @@
 
   <form name="crm-system-status" crm-ui-id-scope>
 
-    <div>
-      <h1>{{ts('Status Messages')}}</h1>
-    </div>
+    <h1 crm-ui-title>{{ts('CiviCRM System Status (%1)', {1: _.where(statuses, {is_visible: 1}).length})}}</h1>
 
     <div id="crm-status-list" crm-ui-tab-set>
       <div
