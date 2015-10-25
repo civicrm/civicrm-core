@@ -30,17 +30,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
 
-  /**
-   */
   const REPORT_GROUP_NAME = 'report_template';
 
-  /**
-   */
   public function __construct() {
     parent::__construct(TRUE);
     $this->groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',

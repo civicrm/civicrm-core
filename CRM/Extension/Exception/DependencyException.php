@@ -26,6 +26,11 @@
  */
 
 /**
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * An extension management operation failed because it would
  * break a dependency.
  */
