@@ -24,6 +24,10 @@
               });
             });
           });
+          // TODO: Is there a more "Angular" way to do this animation?
+          element.on('click', 'button:not(.hush-menu-button), li', function() {
+            $(this).closest('div.crm-status-item').slideUp();
+          })
         }
       };
     });

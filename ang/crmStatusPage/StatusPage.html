@@ -7,7 +7,7 @@
       <h1>{{ts('Status Messages')}}</h1>
     </div>
 
-    <div crm-ui-tab-set>
+    <div id="crm-status-list" crm-ui-tab-set>
       <div
         ng-repeat="tab in [{is_visible: 1, icon: 'fa-bell'}, {is_visible: 0, icon: 'fa-bell-slash-o'}]"
         crm-ui-tab
@@ -16,7 +16,7 @@
         crm-title="tab.is_visible ? ts('Active') : ts('Hidden')"
         crm-icon="{{tab.icon}}"
         >
-        <div id="crm-status-list" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
+        <div class="crm-status-item" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
           <h3 class="crm-severity-{{status.severity}}">
             <i ng-if="status.icon" class="crm-i {{status.icon}}"></i>
             {{status.title}}
