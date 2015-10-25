@@ -52,6 +52,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     parent::setUp();
     $params = array(
       'name' => 'Default Domain Name',
+      'domain_version' => '4.7',
     );
     $result = $this->callAPISuccess('domain', 'get', $params);
     if (empty($result['id'])) {
@@ -515,6 +516,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testDefaults() {
     $domparams = array(
       'name' => 'B Team Domain',
+      'domain_version' => '4.7',
     );
     $dom = $this->callAPISuccess('domain', 'create', $domparams);
     $params = array(
