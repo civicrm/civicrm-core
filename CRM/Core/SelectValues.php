@@ -357,8 +357,8 @@ class CRM_Core_SelectValues {
   public static function ufVisibility() {
     return array(
       'User and User Admin Only' => ts('User and User Admin Only'),
-      'Public Pages' => ts('Public Pages'),
-      'Public Pages and Listings' => ts('Public Pages and Listings'),
+      'Public Pages' => ts('Expose Publicly'),
+      'Public Pages and Listings' => ts('Expose Publicly and for Listings'),
     );
   }
 
