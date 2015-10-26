@@ -1024,20 +1024,17 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       //added for discount
       $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
-
+      $params['amount_level'] = $this->getAmountLevel($params, $discountId);
       if (!empty($this->_values['discount'][$discountId])) {
         $params['discount_id'] = $discountId;
-        $params['amount_level'] = $this->_values['discount'][$discountId][$params['amount']]['label'];
-
         $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
       }
       elseif (empty($params['priceSetId'])) {
         if (!empty($params['amount'])) {
-          $params['amount_level'] = $this->_values['fee'][$params['amount']]['label'];
           $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
         }
         else {
-          $params['amount_level'] = $params['amount'] = '';
+          $params['amount'] = '';
         }
       }
       else {

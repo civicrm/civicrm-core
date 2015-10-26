@@ -60,54 +60,17 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * helper function to record participant with paid contribution.
-   * @param $feeTotal
-   * @param $actualPaidAmt
+   * Helper function to record participant with paid contribution.
+   *
+   * @param int $feeTotal
+   * @param int $actualPaidAmt
    *
    * @return array
    * @throws Exception
    */
-  public function _addParticipantWithPayment($feeTotal, $actualPaidAmt) {
-    // creating price set, price field
-    $paramsSet['title'] = 'Price Set';
-    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
-    $paramsSet['is_active'] = FALSE;
-    $paramsSet['extends'] = 1;
-
-    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceset->id);
-    $priceSetId = $priceset->id;
-
-    //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
-      'id', $paramsSet['title'], 'Check DB for created priceset'
-    );
-    $paramsField = array(
-      'label' => 'Price Field',
-      'name' => CRM_Utils_String::titleToVar('Price Field'),
-      'html_type' => 'Text',
-      'price' => $feeTotal,
-      'option_label' => array('1' => 'Price Field'),
-      'option_value' => array('1' => $feeTotal),
-      'option_name' => array('1' => $feeTotal),
-      'option_weight' => array('1' => 1),
-      'option_amount' => array('1' => 1),
-      'is_display_amounts' => 1,
-      'weight' => 1,
-      'options_per_line' => 1,
-      'is_active' => array('1' => 1),
-      'price_set_id' => $priceset->id,
-      'is_enter_qty' => 1,
-      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
-    );
-
-    $ids = array();
-    $pricefield = CRM_Price_BAO_PriceField::create($paramsField, $ids);
-
-    //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_PriceField', $pricefield->id, 'label',
-      'id', $paramsField['label'], 'Check DB for created pricefield'
-    );
+  protected function addParticipantWithPayment($feeTotal, $actualPaidAmt) {
+    $priceSetId = $this->eventPriceSetCreate($feeTotal);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetId);
 
     // create participant record
     $eventId = $this->_eventId;
@@ -174,7 +137,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $feeAmt = 100;
     $amtPaid = 60;
     $balance = $feeAmt - $amtPaid;
-    list($participant, $contribution) = $this->_addParticipantWithPayment($feeAmt, $amtPaid);
+    list($participant, $contribution) = $this->addParticipantWithPayment($feeAmt, $amtPaid);
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant['id'], 'event');
 
     // amount checking
