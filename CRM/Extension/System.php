@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_System {
   private static $singleton;
@@ -262,7 +260,7 @@ class CRM_Extension_System {
       $url = CRM_Core_BAO_Setting::getItem('Extension Preferences', 'ext_repo_url', NULL, CRM_Extension_Browser::DEFAULT_EXTENSIONS_REPOSITORY);
 
       // boolean false means don't try to check extensions
-      // http://issues.civicrm.org/jira/browse/CRM-10575
+      // CRM-10575
       if ($url === FALSE) {
         $this->_repoUrl = FALSE;
       }

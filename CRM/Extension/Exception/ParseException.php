@@ -26,6 +26,11 @@
  */
 
 /**
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * Error reading XML for an extension
  */
 class CRM_Extension_Exception_ParseException extends CRM_Extension_Exception {

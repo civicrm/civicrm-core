@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_Browser {
 
@@ -165,7 +163,6 @@ class CRM_Extension_Browser {
       return $exts[$key];
     }
     else {
-      // throw new CRM_Extension_Exception("Unknown remote extension: $key");
       return NULL;
     }
   }
