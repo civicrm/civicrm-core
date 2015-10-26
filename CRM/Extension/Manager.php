@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_Manager {
   /**
@@ -121,7 +119,6 @@ class CRM_Extension_Manager {
    *
    * @param string $tmpCodeDir
    *   Path to a local directory containing a copy of the new (inert) code.
-   * @return void
    * @throws CRM_Extension_Exception
    */
   public function replace($tmpCodeDir) {
@@ -204,7 +201,6 @@ class CRM_Extension_Manager {
    *
    * @param array $keys
    *   List of extension keys.
-   * @return void
    * @throws CRM_Extension_Exception
    */
   public function install($keys) {
@@ -249,7 +245,6 @@ class CRM_Extension_Manager {
 
     foreach ($keys as $key) {
       list ($info, $typeManager) = $this->_getInfoTypeHandler($key); // throws Exception
-      //print_r(array('post post?', $info, 'k' => $key, 'os'=> $origStatuses[$key]));
 
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
@@ -278,7 +273,6 @@ class CRM_Extension_Manager {
    *
    * @param array $keys
    *   List of extension keys.
-   * @return void
    * @throws CRM_Extension_Exception
    */
   public function enable($keys) {
@@ -290,7 +284,6 @@ class CRM_Extension_Manager {
    *
    * @param array $keys
    *   List of extension keys.
-   * @return void
    * @throws CRM_Extension_Exception
    */
   public function disable($keys) {
@@ -339,7 +332,6 @@ class CRM_Extension_Manager {
    *
    * @param array $keys
    *   List of extension keys.
-   * @return void
    * @throws CRM_Extension_Exception
    */
   public function uninstall($keys) {
