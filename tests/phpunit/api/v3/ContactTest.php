@@ -2836,4 +2836,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertContains($household['id'], array_keys($result['values']));
   }
 
+  /**
+   * Test merging 2 contacts.
+   */
+  public function testMerge() {
+    $otherContact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $mainContact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $this->callAPISuccess('contact', 'merge', array('main_id' => $mainContact['id'], 'other_id' => $otherContact['id']));
+    $contacts = $this->callAPISuccess('contact', 'get', $this->_params);
+    $this->assertEquals($otherContact['id'], $contacts['id']);
+
+  }
+
 }
