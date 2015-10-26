@@ -366,9 +366,6 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
           if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
             return civicrm_api3_create_error("Empty Contribution and Invoice and Transaction ID. Row was skipped.");
           }
-          else {
-            return civicrm_api3_create_error("No Contact ID, External ID and/or Email provided. Row was skipped.");
-          }
         }
         break;
 
