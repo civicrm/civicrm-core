@@ -89,7 +89,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       'Export',
       $this->_mappingId,
       $this->_exportColumnCount,
-      $blockCnt = 2,
+      2,
       $this->get('exportMode')
     );
 
