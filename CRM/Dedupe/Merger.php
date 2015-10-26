@@ -43,6 +43,12 @@ class CRM_Dedupe_Merger {
   public static function relTables() {
     static $relTables;
 
+    // Setting these merely prevents enotices - but it may be more appropriate not to add the user table below
+    // if the url can't be retrieved. A more standardised way to retrieve them is.
+    // CRM_Core_Config::singleton()->userSystem->getUserRecordUrl() - however that function takes a contact_id &
+    // we may need a different function when it is not known.
+    $title = $userRecordUrl = '';
+
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal) {
       $userRecordUrl = CRM_Utils_System::url('user/%ufid');
