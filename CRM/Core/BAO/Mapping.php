@@ -212,7 +212,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Function returns associated array of elements, that will be passed for search
+   * Function returns associated array of elements, that will be passed for search.
    *
    * @param int $smartGroupId
    *   Smart group id.
