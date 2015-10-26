@@ -151,8 +151,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
           }
 
           $result['privacy_options'] = array();
-          foreach ($result['privacy'] as $name => $value) {
-            if ($value) {
+          foreach ($result['privacy'] as $name => $val) {
+            if ($val) {
               $result['privacy_options'][] = $name;
             }
           }
