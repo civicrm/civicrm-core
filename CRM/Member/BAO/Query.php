@@ -216,9 +216,8 @@ class CRM_Member_BAO_Query {
         // the load function. The where clause and the whereTables are saved so they should suffice to generate the query
         // to get a contact list. But, better to deal with in 4.8 now...
         if (is_string($value) && strpos($value, ',') && $op == '=') {
-          $value = array('IN' => explode($value));
+          $value = array('IN' => explode(',', $value));
         }
-
 
       case 'membership_status':
       case 'membership_status_id':
