@@ -1010,23 +1010,43 @@ function _civicrm_api3_contact_deprecation() {
  *
  * @return array
  *   API Result Array
+ * @throws CiviCRM_API3_Exception
  */
 function civicrm_api3_contact_merge($params) {
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
   $autoFlip = CRM_Utils_Array::value('auto_flip', $params, TRUE);
 
-  $dupePairs = array(array(
-  'srcID' => CRM_Utils_Array::value('main_id', $params),
+  $dupePairs = array(
+    array(
+      'srcID' => CRM_Utils_Array::value('main_id', $params),
       'dstID' => CRM_Utils_Array::value('other_id', $params),
-    ));
-  $result = CRM_Dedupe_Merger::merge($dupePairs, array(), $mode, $autoFlip);
+    ),
+  );
 
-  if ($result['is_error'] == 0) {
-    return civicrm_api3_create_success();
+  if (($result = CRM_Dedupe_Merger::merge($dupePairs, array(), $mode, $autoFlip)) != FALSE) {
+    return civicrm_api3_create_success($result, $params);
   }
-  else {
-    return civicrm_api3_create_error($result['messages']);
-  }
+  throw new CiviCRM_API3_Exception('Merge failed');
+}
+
+/**
+ * Adjust metadata for contact_proximity api function.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_contact_merge_spec(&$params) {
+  $params['main_id'] = array(
+    'title' => 'ID of the contact to merge & remove',
+    'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['other_id'] = array(
+    'title' => 'ID of the contact to keep',
+    'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+  );
 }
 
 /**
