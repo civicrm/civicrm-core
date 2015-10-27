@@ -58,10 +58,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Attempt to match header labels with our mapper fields.
+   *
    * FIXME: This is essentially the same function as parent::defaultFromHeader
    *
-   * @param $columnName name of column header
-   * @param $patterns pattern to match for the column
+   * @param string $columnName name of column header
+   * @param array $patterns pattern to match for the column
    *
    * @return string
    */
