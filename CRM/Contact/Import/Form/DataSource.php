@@ -226,16 +226,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
+   * Set the default values of various form elements.
    *
    * access        public
    *
    * @return array
    *   reference to the array of default values
-   */
-  /**
-   * @return array
    */
   public function setDefaultValues() {
     $config = CRM_Core_Config::singleton();

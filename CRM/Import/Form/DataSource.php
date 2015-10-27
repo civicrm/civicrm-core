@@ -26,22 +26,17 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Base class for upload-only import forms (all but Contact import)
+ * Base class for upload-only import forms (all but Contact import).
  */
 abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
@@ -57,8 +52,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Common form elements.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
@@ -114,7 +107,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * A long-winded way to add one radio element to the form
+   * A long-winded way to add one radio element to the form.
    */
   protected function addContactTypeSelector() {
     //contact types option
@@ -145,6 +138,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
+   * Store form values.
+   *
    * @param array $names
    */
   protected function storeFormValues($names) {
@@ -154,7 +149,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Common form postProcess
+   * Common form postProcess.
    *
    * @param string $parserClassName
    */
@@ -186,7 +181,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Return a descriptive name for the page, used in wizard header
+   * Return a descriptive name for the page, used in wizard header.
    *
    * @return string
    */
