@@ -1151,7 +1151,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         empty($params['additional_participants'])
         && !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
       ) {
-        self::processRegistration($this->_params);
+        self::processRegistration($this);
       }
     }
 
@@ -1165,18 +1165,18 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Process Registration of free event.
    *
-   * @param array $params
-   *   Form values.
+   * @param object $form
    * @param int $contactID
    */
-  public static function processRegistration($params, $contactID = NULL) {
+  public static function processRegistration(&$form, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
-    $this->_participantInfo = array();
+    $form->_participantInfo = array();
+    $params = $form->_params;
 
     // CRM-4320, lets build array of cancelled additional participant ids
     // those are drop or skip by primary at the time of confirmation.
     // get all in and then unset those are confirmed.
-    $cancelledIds = $this->_additionalParticipantIds;
+    $cancelledIds = $form->_additionalParticipantIds;
 
     $participantCount = array();
     foreach ($params as $participantNum => $record) {
@@ -1208,50 +1208,50 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             }
           }
           if ($participantEmail) {
-            $this->_participantInfo[] = $participantEmail;
+            $form->_participantInfo[] = $participantEmail;
           }
           else {
-            $this->_participantInfo[] = $value['first_name'] . ' ' . $value['last_name'];
+            $form->_participantInfo[] = $value['first_name'] . ' ' . $value['last_name'];
           }
         }
         elseif (!empty($value['contact_id'])) {
           $contactID = $value['contact_id'];
         }
         else {
-          $contactID = $this->getContactID();
+          $contactID = $form->getContactID();
         }
 
-        CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
+        CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $form);
         //for free event or additional participant, dont create billing email address.
-        if (empty($value['is_primary']) || !$this->_values['event']['is_monetary']) {
-          unset($value["email-{$this->_bltID}"]);
+        if (empty($value['is_primary']) || !$form->_values['event']['is_monetary']) {
+          unset($value["email-{$form->_bltID}"]);
         }
 
-        $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $value, $fields, $this);
+        $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $value, $fields, $form);
 
         // lets store the contactID in the session
         // we dont store in userID in case the user is doing multiple
         // transactions etc
         // for things like tell a friend
-        if (!$this->getContactID() && !empty($value['is_primary'])) {
+        if (!$form->getContactID() && !empty($value['is_primary'])) {
           $session->set('transaction.userID', $contactID);
         }
 
         //lets get the status if require approval or waiting.
 
         $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-        if ($this->_allowWaitlist && !$this->_allowConfirmation) {
+        if ($form->_allowWaitlist && !$form->_allowConfirmation) {
           $value['participant_status_id'] = $value['participant_status'] = array_search('On waitlist', $waitingStatuses);
         }
-        elseif ($this->_requireApproval && !$this->_allowConfirmation) {
+        elseif ($form->_requireApproval && !$form->_allowConfirmation) {
           $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
         }
 
-        $this->set('value', $value);
-        $this->confirmPostProcess($contactID, NULL, NULL);
+        $form->set('value', $value);
+        $form->confirmPostProcess($contactID, NULL, NULL);
 
         //lets get additional participant id to cancel.
-        if ($this->_allowConfirmation && is_array($cancelledIds)) {
+        if ($form->_allowConfirmation && is_array($cancelledIds)) {
           $additonalId = CRM_Utils_Array::value('participant_id', $value);
           if ($additonalId && $key = array_search($additonalId, $cancelledIds)) {
             unset($cancelledIds[$key]);
@@ -1261,7 +1261,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // update status and send mail to cancelled additional participants, CRM-4320
-    if ($this->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
+    if ($form->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
       $cancelledId = array_search('Cancelled',
         CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")
       );
@@ -1269,24 +1269,24 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     //set information about additional participants if exists
-    if (count($this->_participantInfo)) {
-      $this->set('participantInfo', $this->_participantInfo);
+    if (count($form->_participantInfo)) {
+      $form->set('participantInfo', $form->_participantInfo);
     }
 
     //send mail Confirmation/Receipt
-    if ($this->_contributeMode != 'checkout' ||
-      $this->_contributeMode != 'notify'
+    if ($form->_contributeMode != 'checkout' ||
+      $form->_contributeMode != 'notify'
     ) {
       $isTest = FALSE;
-      if ($this->_action & CRM_Core_Action::PREVIEW) {
+      if ($form->_action & CRM_Core_Action::PREVIEW) {
         $isTest = TRUE;
       }
 
       //handle if no additional participant.
       if (!$registerByID) {
-        $registerByID = $this->get('registerByID');
+        $registerByID = $form->get('registerByID');
       }
-      $primaryContactId = $this->get('primaryContactId');
+      $primaryContactId = $form->get('primaryContactId');
 
       //build an array of custom profile and assigning it to template.
       $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL,
@@ -1310,32 +1310,32 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
 
         //carry the participant submitted values.
-        $this->_values['params'][$participantID] = $params[$participantNum];
+        $form->_values['params'][$participantID] = $params[$participantNum];
       }
 
       //lets send  mails to all with meanigful text, CRM-4320.
-      $this->assign('isOnWaitlist', $this->_allowWaitlist);
-      $this->assign('isRequireApproval', $this->_requireApproval);
+      $form->assign('isOnWaitlist', $form->_allowWaitlist);
+      $form->assign('isRequireApproval', $form->_requireApproval);
 
       foreach ($additionalIDs as $participantID => $contactId) {
         if ($participantID == $registerByID) {
           //set as Primary Participant
-          $this->assign('isPrimary', 1);
+          $form->assign('isPrimary', 1);
 
-          $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $isTest);
+          $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $form->_values, NULL, $isTest);
 
           if (count($customProfile)) {
-            $this->assign('customProfile', $customProfile);
-            $this->set('customProfile', $customProfile);
+            $form->assign('customProfile', $customProfile);
+            $form->set('customProfile', $customProfile);
           }
         }
         else {
-          $this->assign('isPrimary', 0);
-          $this->assign('customProfile', NULL);
+          $form->assign('isPrimary', 0);
+          $form->assign('customProfile', NULL);
         }
 
         //send Confirmation mail to Primary & additional Participants if exists
-        CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
+        CRM_Event_BAO_Event::sendMail($contactId, $form->_values, $participantID, $isTest);
       }
     }
   }
