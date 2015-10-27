@@ -157,13 +157,13 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $currentRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
       CRM_Contact_BAO_Relationship::CURRENT,
       0, 0, 0,
-      $links, $mask
+      $links, $mask, TRUE
     );
 
     $inactiveRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
       CRM_Contact_BAO_Relationship::INACTIVE,
       0, 0, 0,
-      $links, $mask
+      $links, $mask, TRUE
     );
 
     $this->assign('currentRelationships', $currentRelationships);
