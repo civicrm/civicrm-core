@@ -777,7 +777,7 @@ abstract class CRM_Core_Payment {
    *
    * @return string cancel url
    */
-  protected function getCancelUrl($qfKey, $participantID) {
+  public function getCancelUrl($qfKey, $participantID) {
     if ($this->_component == 'event') {
       return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
         'reset' => 1,

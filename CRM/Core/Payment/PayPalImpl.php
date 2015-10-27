@@ -220,7 +220,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
+      throw new PaymentProcessorException($result->message);
     }
 
     /* Success */
@@ -264,7 +264,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
+      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
 
     /* Success */
@@ -1017,6 +1017,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     if (strtolower($result['ack']) != 'success' &&
       strtolower($result['ack']) != 'successwithwarning'
     ) {
+      throw new PaymentProcessorException("{$result['l_shortmessage0']} {$result['l_longmessage0']}");
       $e = CRM_Core_Error::singleton();
       $e->push($result['l_errorcode0'],
         0, NULL,
