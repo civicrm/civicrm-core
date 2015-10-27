@@ -950,9 +950,11 @@ WHERE  id = %1";
     $priceFieldSelection = self::filterPriceFieldsFromParams($priceSetID, $params);
     $priceFieldMetadata = self::getCachedPriceSetDetail($priceSetID);
     $displayParticipantCount = NULL;
+
     $amount_level = array();
     foreach ($priceFieldMetadata['fields'] as $field) {
       if (!empty($priceFieldSelection[$field['id']])) {
+        $qtyString = '';
         if ($field['is_enter_qty']) {
           $qtyString = ' - ' . (float) $params['price_' . $field['id']];
         }
