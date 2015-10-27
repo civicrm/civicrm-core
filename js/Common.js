@@ -928,16 +928,13 @@ if (!CRM.vars) CRM.vars = {};
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
       });
-      $('textarea.crm-form-wysiwyg', e.target)
-        .not('.crm-wysiwyg-enabled')
-        .addClass('crm-wysiwyg-enabled')
-        .each(function() {
-          if ($(this).hasClass("collapsed")) {
-            CRM.wysiwyg.createCollapsed(this);
-          } else {
-            CRM.wysiwyg.create(this);
-          }
-        });
+      $('textarea.crm-form-wysiwyg', e.target).each(function() {
+        if ($(this).hasClass("collapsed")) {
+          CRM.wysiwyg.createCollapsed(this);
+        } else {
+          CRM.wysiwyg.create(this);
+        }
+      });
     })
     .on('dialogopen', function(e) {
       var $el = $(e.target);
