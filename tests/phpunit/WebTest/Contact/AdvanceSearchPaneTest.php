@@ -327,7 +327,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
           'title' => 'Memberships',
           'fields' => array(
             'Membership Type' => array(
-              'type' => 'multiselect2',
+              'type' => 'select2',
               'locator' => 'membership_type_id',
               'values' => array(array('General', 'Student')),
             ),
