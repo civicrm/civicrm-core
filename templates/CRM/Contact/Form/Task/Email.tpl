@@ -82,6 +82,7 @@
 </table>
 
 {include file="CRM/Contact/Form/Task/EmailCommon.tpl"}
+{include file="CRM/Activity/Form/FollowUp.tpl" type='email-'}
 
 <div class="spacer"> </div>
 
