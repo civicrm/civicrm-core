@@ -827,8 +827,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      CRM_Core_Error::displaySessionError($e->getMessage());
-      CRM_Utils_System::redirect($params['cancelURL']);
+      CRM_Core_Error::statusBounce(ts('Payment approval failed with message :') . $e->getMessage(), $payment->getCancelUrl($params['qfKey'], CRM_Utils_Array::value('participant_id', $params)));
     }
 
     $this->set('pre_approval_parameters', $result['pre_approval_parameters']);
