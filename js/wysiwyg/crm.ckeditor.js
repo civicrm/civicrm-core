@@ -5,10 +5,10 @@
   function getInstance(item) {
     var name = $(item).attr("name"),
       id = $(item).attr("id");
-    if (name && CKEDITOR.instances[name]) {
+    if (name && window.CKEDITOR && CKEDITOR.instances[name]) {
       return CKEDITOR.instances[name];
     }
-    if (id && CKEDITOR.instances[id]) {
+    if (id && window.CKEDITOR && CKEDITOR.instances[id]) {
       return CKEDITOR.instances[id];
     }
   }
