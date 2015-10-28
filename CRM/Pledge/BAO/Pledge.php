@@ -466,7 +466,7 @@ GROUP BY  currency
         $pledgeDAO->id = $pledgePaymentDAO->pledge_id;
         if ($pledgeDAO->find(TRUE)) {
           $params[$pledgeDAO->id] = array(
-            'honor_type' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $honorDAO->soft_credit_type_id, 'value'),
+            'honor_type' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $honorDAO->soft_credit_type_id),
             'honorId' => $pledgeDAO->contact_id,
             'amount' => $pledgeDAO->amount,
             'status' => CRM_Contribute_PseudoConstant::contributionStatus($pledgeDAO->status_id),
