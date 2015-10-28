@@ -100,15 +100,15 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
    * @param $numberOfTrxn
    */
   public function _testAssignBatch($numberOfTrxn) {
-    $this->select("xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn");
+    $this->waitForAjaxContent();
+    $this->select("xpath=//div[@class='dataTables_length']/label/select", "value={$numberOfTrxn}");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
-    sleep(5);
+    $this->waitForAjaxContent();
     $this->click('toggleSelect');
     $this->select('trans_assign', 'value=Assign');
     $this->click('Go');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
   /**
@@ -119,7 +119,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
   public function _testExportBatch($setTitle, $batchId, $exportFormat) {
     $this->openCiviPage("financial/batch", "reset=1&action=export&id=$batchId");
     if ($exportFormat == 'CSV') {
-      $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[2]");
+      $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[1]");
       $this->click('_qf_FinancialBatch_next-botttom');
       $this->waitForPageToLoad($this->getTimeoutMsec());
     }
@@ -129,9 +129,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
     }
     $this->openCiviPage("dashboard", "reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->clickLink("xpath=//div[@id='recently-viewed']/ul/li[1]/a", "_qf_Activity_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='crm-recently-viewed']/ul/li[1]/a", "_qf_Activity_cancel-bottom");
     $this->webtestVerifyTabularData(
       array(
         'Current Attachment(s)' => 'Financial_Transactions_',
