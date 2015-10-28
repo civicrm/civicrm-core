@@ -5,10 +5,10 @@
   function getInstance(item) {
     var name = $(item).attr("name"),
       id = $(item).attr("id");
-    if (name && CKEDITOR.instances[name]) {
+    if (name && window.CKEDITOR && CKEDITOR.instances[name]) {
       return CKEDITOR.instances[name];
     }
-    if (id && CKEDITOR.instances[id]) {
+    if (id && window.CKEDITOR && CKEDITOR.instances[id]) {
       return CKEDITOR.instances[id];
     }
   }
@@ -66,6 +66,8 @@
         browseUrl = CRM.config.resourceBase + "packages/kcfinder/browse.php?cms=civicrm",
         uploadUrl = CRM.config.resourceBase + "packages/kcfinder/upload.php?cms=civicrm";
 
+      $(item).addClass('crm-wysiwyg-enabled');
+
       CKEDITOR.replace($(item)[0], {
         filebrowserBrowseUrl: browseUrl + '&type=files',
         filebrowserImageBrowseUrl: browseUrl + '&type=images',
@@ -79,8 +81,11 @@
         }
       });
     }
-    
-    if ($(item).length) {
+
+    if ($(item).hasClass('crm-wysiwyg-enabled')) {
+      deferred.resolve();
+    }
+    else if ($(item).length) {
       // Lazy-load ckeditor.js
       if (window.CKEDITOR) {
         initialize();
@@ -97,6 +102,7 @@
   };
 
   CRM.wysiwyg.destroy = function(item) {
+    $(item).removeClass('crm-wysiwyg-enabled');
     var editor = getInstance(item);
     if (editor) {
       editor.destroy();
