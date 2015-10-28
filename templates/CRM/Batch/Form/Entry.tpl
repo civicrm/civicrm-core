@@ -28,7 +28,10 @@
     {ts}Click Validate & Process below when you've entered all items for the batch. You can also Save & Continue Later at any time.{/ts}
     {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
       {capture assign=batchEntryProfileURL}{crmURL p="civicrm/admin/uf/group" q="reset=1&selectedChild=reserved-profiles"}{/capture}
-      {ts 1=$batchEntryProfileURL}Add, remove or change the order of columns by editing the reserved <a href="%1" target="_blank">Contribution Bulk Entry profile</a>. Custom fields and a Personal Campaign Page field can be added if needed.{/ts}
+      {ts 1=$batchEntryProfileURL}Add, remove or change the order of columns by editing the corresponding <a href="%1" target="_blank">Bulk Entry profile</a>.{/ts}
+      {if $batchType EQ 1}
+        {ts}Custom fields and a Personal Campaign Page field can be added if needed.{/ts}
+      {/if}
     {/if}
   </div>
   {if $batchAmountMismatch}
