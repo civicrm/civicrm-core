@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form to process actions on the field aspect of Custom
+ * Form to process actions on the field aspect of Custom.
  */
 class CRM_UF_Form_Field extends CRM_Core_Form {
 
@@ -46,7 +44,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_gid;
 
   /**
-   * The field id, used when editing the field
+   * The field id, used when editing the field.
    *
    * @var int
    */
@@ -504,7 +502,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    $ids = array('uf_group' => $this->_gid);
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       $fieldValues = array('uf_group_id' => $this->_gid);
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_UFField', $this->_id, $fieldValues);
@@ -523,12 +521,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
+    $params['uf_group_id'] = $this->_gid;
     if ($params['visibility'] == 'User and User Admin Only') {
       $params['is_searchable'] = $params['in_selector'] = 0;
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['uf_field'] = $this->_id;
+      $params['id'] = $this->_id;
     }
 
     $name = NULL;
@@ -543,13 +542,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     //check for duplicate fields
-    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, $ids)) {
+    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, array('uf_group' => $params['uf_group_id'], 'uf_field' => $params['id']))) {
       CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
       return;
     }
     else {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
-      $ufField = CRM_Core_BAO_UFField::add($params, $ids);
+      $ufField = CRM_Core_BAO_UFField::add($params);
 
       //reset other field is searchable and in selector settings, CRM-4363
       if ($this->_hasSearchableORInSelector &&
