@@ -329,7 +329,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
           'amount' => $dao->amount,
           'contact_name' => $dao->display_name,
           'soft_credit_type' => $dao->soft_credit_type_id,
-          'soft_credit_type_label' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $dao->soft_credit_type_id),
+          'soft_credit_type_label' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $dao->soft_credit_type_id),
         );
         $count++;
       }
@@ -437,7 +437,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $result[$cs->id]['pcp_roll_nickname'] = $cs->pcp_roll_nickname;
       $result[$cs->id]['pcp_personal_note'] = $cs->pcp_personal_note;
       $result[$cs->id]['contribution_status'] = CRM_Utils_Array::value($cs->contribution_status_id, $contributionStatus);
-      $result[$cs->id]['sct_label'] = CRM_Core_OptionGroup::getLabel('soft_credit_type', $cs->soft_credit_type_id);
+      $result[$cs->id]['sct_label'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $cs->soft_credit_type_id);
 
       if ($isTest) {
         $result[$cs->id]['contribution_status'] = $result[$cs->id]['contribution_status'] . '<br /> (test)';

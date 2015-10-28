@@ -487,7 +487,7 @@ class CRM_Financial_Page_AJAX {
     }
 
     $batchPID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $entityID, 'payment_instrument_id');
-    $paymentInstrument = CRM_Core_OptionGroup::getLabel('payment_instrument', $batchPID);
+    $paymentInstrument = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchPID);
     foreach ($cIDs as $key => $value) {
       $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $value, 'payment_instrument_id');
       if ($action == 'Remove' || ($recordPID == $batchPID && $action == 'Assign') || !isset($batchPID)) {

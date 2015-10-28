@@ -59,7 +59,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       }
       // get contribution status label
       if (!empty($values['contribution_status_id'])) {
-        $values['contribution_status'] = CRM_Core_OptionGroup::getLabel('contribution_status', $values['contribution_status_id']);
+        $values['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $values['contribution_status_id']);
       }
 
       $this->assign('recur', $values);
