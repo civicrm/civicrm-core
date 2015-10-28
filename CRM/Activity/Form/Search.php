@@ -378,6 +378,13 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['activity_date_high'] = $dateHigh;
     }
 
+    // Enable search activity by activity_type_id
+    $activity_type_id = CRM_Utils_Request::retrieve('activity_type_id', 'String', $this);
+    if ($activity_type_id) {
+      $this->_formValues['activity_type_id'][] = $activity_type_id;
+      $this->_defaults['activity_type_id'][] = $activity_type_id;
+    }
+
     // Enable search activity by custom value
     $requestParams = CRM_Utils_Request::exportValues();
     foreach (array_keys($requestParams) as $key) {
