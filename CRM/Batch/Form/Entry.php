@@ -466,6 +466,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
 
+        // Build PCP params
+        if (!empty($params['pcp_made_through_id'][$key])) {
+          $value['pcp']['pcp_made_through_id'] = $params['pcp_made_through_id'][$key];
+          $value['pcp']['pcp_display_in_roll'] = !empty($params['pcp_display_in_roll'][$key]);
+          if (!empty($params['pcp_roll_nickname'][$key])) {
+            $value['pcp']['pcp_roll_nickname'] = $params['pcp_roll_nickname'][$key];
+          }
+          if (!empty($params['pcp_personal_note'][$key])) {
+            $value['pcp']['pcp_personal_note'] = $params['pcp_personal_note'][$key];
+          }
+        }
+
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
           NULL,
           'Contribution'

@@ -136,24 +136,37 @@ class CRM_Contribute_Form_SoftCredit {
       }
     }
 
-    // CRM-7368 allow user to set or edit PCP link for contributions
-    $siteHasPCPs = CRM_Contribute_PseudoConstant::pcPage();
-    if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
-      $form->assign('siteHasPCPs', 1);
-      // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
-      $form->add('text', 'pcp_made_through_id', ts('Credit to a Personal Campaign Page'), array('class' => 'twenty', 'placeholder' => ts('- select -')));
-      // stores the label
-      $form->add('hidden', 'pcp_made_through');
-      $form->addElement('checkbox', 'pcp_display_in_roll', ts('Display in Honor Roll?'), NULL);
-      $form->addElement('text', 'pcp_roll_nickname', ts('Name (for Honor Roll)'));
-      $form->addElement('textarea', 'pcp_personal_note', ts('Personal Note (for Honor Roll)'));
-    }
+    self::addPCPFields($form);
+
     $form->assign('showSoftCreditRow', $showSoftCreditRow);
     $form->assign('rowCount', $item_count);
     $form->addElement('hidden', 'sct_default_id',
       CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
       array('id' => 'sct_default_id')
     );
+  }
+
+  /**
+   * Add PCP fields for the new contribution form and others.
+   *
+   * @param CRM_Core_Form &$form
+   *   The form being built.
+   * @param string $suffix
+   *   A suffix to add to field names.
+   */
+  public static function addPCPFields(&$form, $suffix = '') {
+    // CRM-7368 allow user to set or edit PCP link for contributions
+    $siteHasPCPs = CRM_Contribute_PseudoConstant::pcPage();
+    if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
+      $form->assign('siteHasPCPs', 1);
+      // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
+      $form->add('text', "pcp_made_through_id$suffix", ts('Credit to a Personal Campaign Page'), array('class' => 'twenty', 'placeholder' => ts('- select -')));
+      // stores the label
+      $form->add('hidden', "pcp_made_through$suffix");
+      $form->addElement('checkbox', "pcp_display_in_roll$suffix", ts('Display in Honor Roll?'), NULL);
+      $form->addElement('text', "pcp_roll_nickname$suffix", ts('Name (for Honor Roll)'));
+      $form->addElement('textarea', "pcp_personal_note$suffix", ts('Personal Note (for Honor Roll)'));
+    }
   }
 
   /**
