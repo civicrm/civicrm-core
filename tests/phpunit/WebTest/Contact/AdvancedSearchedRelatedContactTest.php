@@ -329,6 +329,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue(TRUE, 'greater than or equal to "{$Pdate}" AND less than or equal to "{$Ndate}"');
     $value = "$lastNameSoft, $firstNameSoft";
+    $this->waitForElementPresent("xpath= id('rowid{$cid}')/td[3]/a");
     $this->verifyText("xpath= id('rowid{$cid}')/td[3]/a", preg_quote($value));
 
   }

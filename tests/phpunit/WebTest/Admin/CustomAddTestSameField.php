@@ -69,6 +69,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/custom/group/field/add', "reset=1&action=add&gid=$gid");
     $textFieldLabel = 'test_text_field';
     $this->click("header");
+    $this->waitForElementPresent('label');
     $this->type("label", $textFieldLabel);
     $this->click("_qf_Field_next_new-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -80,6 +81,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->click("//option[@value='CheckBox']");
 
     $checkboxFieldLabel = 'test_checkbox';
+    $this->waitForElementPresent('label');
     $this->type("label", $checkboxFieldLabel);
     $checkboxOptionLabel1 = 'check1';
     $this->type("option_label_1", $checkboxOptionLabel1);
@@ -117,6 +119,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     //add custom field - alphanumeric text
     $textFieldLabel = 'test_text_field';
     $this->click("header");
+    $this->waitForElementPresent('label');
     $this->type("label", $textFieldLabel);
     $this->clickLink("_qf_Field_next_new-bottom");
 
@@ -139,6 +142,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->click("//option[@value='Radio']");
 
     $radioFieldLabel = 'test_radio';
+    $this->waitForElementPresent('label');
     $this->type("label", $radioFieldLabel);
     $radioOptionLabel1 = 'radio1';
     $this->type("option_label_1", $radioOptionLabel1);
