@@ -295,6 +295,7 @@ class CRM_Utils_Check_Env {
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1)) {
       $vc = CRM_Utils_VersionCheck::singleton();
       $newerVersion = $vc->isNewerVersionAvailable();
+      $title = ts('Update Status');
 
       if ($newerVersion['version']) {
         $vInfo = array(
@@ -309,16 +310,19 @@ class CRM_Utils_Check_Env {
         if ($newerVersion['upgrade'] == 'security') {
           // Security
           $severity = \Psr\Log\LogLevel::CRITICAL;
+          $title = ts('Security Update Required');
           $message = ts('New security release %1 is available. The site is currently running %2.', $vInfo);
         }
         elseif ($newerVersion['status'] == 'eol') {
           // Warn about EOL
           $severity = \Psr\Log\LogLevel::WARNING;
+          $title = ts('CiviCRM Update Needed');
           $message = ts('New version %1 is available. The site is currently running %2, which has reached its end of life.', $vInfo);
         }
         else {
           // For most new versions, just make them notice
           $severity = \Psr\Log\LogLevel::NOTICE;
+          $title = ts('CiviCRM Update Available');
           $message = ts('New version %1 is available. The site is currently running %2.', $vInfo);
         }
       }
@@ -336,7 +340,7 @@ class CRM_Utils_Check_Env {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $message,
-        ts('Update Status'),
+        $title,
         $severity,
         'fa-cloud-upload'
       );
