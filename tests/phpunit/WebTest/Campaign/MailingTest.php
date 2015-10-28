@@ -158,13 +158,15 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->click("xpath=//button[@title='Close']");
 
     //--------track and respond----------
-    $this->click("xpath=//ul/li/a[text()='Tracking']");
+    $this->waitForAjaxContent();
+    $this->click('link=Tracking');
     $this->assertChecked("url_tracking");
     $this->assertChecked("open_tracking");
     // no need tracking for this test
 
     // default header and footer ( with label )
-    $this->click("xpath=//ul/li/a[text()='Header and Footer']");
+    $this->waitForAjaxContent();
+    $this->click('link=Header and Footer');
     $this->select("header_id", "label=Mailing Header");
     $this->select("footer_id", "label=Mailing Footer");
 

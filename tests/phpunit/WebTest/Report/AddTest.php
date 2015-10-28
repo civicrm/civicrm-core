@@ -88,7 +88,6 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $reportDescription = "New Contact Summary Report";
     $emaiSubject = "Contact Summary Report";
     $emailCC = "tesmail@example.org";
-
     $this->click("xpath=//div[@id='mainTabContainer']/ul/li[4]/a");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']");
     $this->click("_qf_Summary_submit_save");
@@ -109,9 +108,11 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->type("email_subject", $emaiSubject);
 
     // Fill Email To
+    $this->waitForElementPresent('email_to');
     $this->type("email_to", $emailId);
 
     // Fill Email CC
+    $this->waitForElementPresent('email_cc');
     $this->type("email_cc", $emailCC);
 
     // We want navigation menu
