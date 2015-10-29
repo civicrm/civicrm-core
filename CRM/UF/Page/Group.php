@@ -157,6 +157,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
 
     // assign vars to templates
     $this->assign('action', $action);
+    $this->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'String', $this));
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );
@@ -379,9 +380,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param int $id
    *   Uf group id.
    *
-   * @param $action
-   *
-   * @return void
+   * @param int $action
    */
   public function preview($id, $action) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('CiviCRM Profile Group Preview'), NULL);

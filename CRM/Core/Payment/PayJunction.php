@@ -172,9 +172,10 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   }
   // end function doDirectPayment
 
-
   /**
    * This function checks the PayJunction response code.
+   *
+   * @param array $response
    *
    * @return bool
    */

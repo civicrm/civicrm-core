@@ -125,10 +125,12 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   }
 
   /**
-   * *******************************************************
-   * This function sends request and receives response from
-   * eWAY payment process
-   * *******************************************************
+   * Sends request and receive response from eWAY payment process.
+   *
+   * @param array $params
+   *
+   * @return array|object
+   * @throws \Exception
    */
   public function doDirectPayment(&$params) {
     if (CRM_Utils_Array::value('is_recur', $params) == TRUE) {
@@ -409,9 +411,11 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   // end function doDirectPayment
 
   /**
-   * **********************************************************************************************
-   * This function checks the eWAY response status - returning a boolean false if status != 'true'
-   * ************************************************************************************************
+   * Checks the eWAY response status - returning a boolean false if status != 'true'.
+   *
+   * @param object $response
+   *
+   * @return bool
    */
   public function isError(&$response) {
     $status = $response->Status();
@@ -423,9 +427,12 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   }
 
   /**
-   * ************************************************
-   * Produces error message and returns from class
-   * *************************************************
+   * Produces error message and returns from class.
+   *
+   * @param int $errorCode
+   * @param string $errorMessage
+   *
+   * @return object
    */
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();

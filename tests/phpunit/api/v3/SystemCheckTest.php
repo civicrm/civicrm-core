@@ -85,7 +85,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = array();
       }
     }
-    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
+    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
   }
 
   /**
@@ -109,7 +109,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = array();
       }
     }
-    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
+    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);;
   }
 
   /**
@@ -133,7 +133,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = array();
       }
     }
-    $this->assertArrayHasKey('name', $testedCheck, ' in line ' . __LINE__);
+    $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);
   }
 
   /**
@@ -157,7 +157,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = array();
       }
     }
-    $this->assertArrayHasKey('name', $testedCheck, ' in line ' . __LINE__);
+    $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);
   }
 
   /**
@@ -179,7 +179,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = array();
       }
     }
-    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
+    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
   }
 
   /**
@@ -201,7 +201,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = array();
       }
     }
-    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
+    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
   }
 
   /**
@@ -223,7 +223,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = array();
       }
     }
-    $this->assertArrayHasKey('name', $testedCheck, ' in line ' . __LINE__);
+    $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);
   }
 
 }

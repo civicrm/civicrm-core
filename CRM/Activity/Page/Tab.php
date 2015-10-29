@@ -56,6 +56,11 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId);
   }
 
+  /**
+   * Edit tab.
+   *
+   * @return mixed
+   */
   public function edit() {
     // used for ajax tabs
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -118,7 +123,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
   public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
-    //FIX ME: need to fix this conflict
+    // FIXME: need to fix this conflict
     $this->assign('contactID', $this->_contactId);
 
     // check logged in url permission
@@ -159,7 +164,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
-    //do check for view/edit operation.
+    // Do check for view/edit operation.
     if ($this->_id &&
       in_array($action, array(CRM_Core_Action::UPDATE, CRM_Core_Action::VIEW))
     ) {

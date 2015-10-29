@@ -225,7 +225,7 @@
         {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
         <a class="button cancel" href="{$cancelURL}">
           <span>
-            <div class="icon ui-icon-close"></div>
+            <i class="crm-i fa-times"></i>
             {ts}Cancel{/ts}
           </span>
         </a>

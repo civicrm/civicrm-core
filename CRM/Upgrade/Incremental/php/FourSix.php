@@ -37,7 +37,6 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.6.alpha1') {
@@ -181,6 +180,11 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
    * Queue Task Callback for CRM-16846
    *
    * Run a sql file without resetting locale to that version
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $rev
+   *
+   * @return bool
    */
   public static function task_4_6_x_runOnlySql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();

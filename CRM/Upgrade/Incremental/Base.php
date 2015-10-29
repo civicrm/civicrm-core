@@ -63,14 +63,17 @@ class CRM_Upgrade_Incremental_Base {
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
   }
 
-
   /**
    * (Queue Task Callback)
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $rev
+   *
+   * @return bool
    */
   public static function runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -80,11 +83,15 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
-   * Syntactic sugar for adding a task which (a) is in this class and (b) has
-   * a high priority.
+   * Syntactic sugar for adding a task.
+   *
+   * Task is (a) in this class and (b) has a high priority.
    *
    * After passing the $funcName, you can also pass parameters that will go to
    * the function. Note that all params must be serializable.
+   *
+   * @param string $title
+   * @param string $funcName
    */
   protected function addTask($title, $funcName) {
     $queue = CRM_Queue_Service::singleton()->load(array(

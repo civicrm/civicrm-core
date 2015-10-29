@@ -9,7 +9,7 @@
   </ul>
   <div class="crm-wizard-body" ng-transclude/>
   <div class="crm-wizard-buttons">
-    <button crm-icon="triangle-1-w" ng-click="crmUiWizardCtrl.previous()" ng-show="!crmUiWizardCtrl.$first()">{{ts('Previous')}}</button>
-    <button crm-icon="triangle-1-e" title="{{!crmUiWizardCtrl.$validStep() ? ts('Complete all required fields first') : ts('Next step')}}" ng-click="crmUiWizardCtrl.next()" ng-show="!crmUiWizardCtrl.$last()" ng-disabled="!crmUiWizardCtrl.$validStep()">{{ts('Next')}}</button>
+    <button crm-icon="fa-chevron-left" ng-click="crmUiWizardCtrl.previous()" ng-show="!crmUiWizardCtrl.$first()">{{ts('Previous')}}</button>
+    <button crm-icon="fa-chevron-right" title="{{!crmUiWizardCtrl.$validStep() ? ts('Complete all required fields first') : ts('Next step')}}" ng-click="crmUiWizardCtrl.next()" ng-show="!crmUiWizardCtrl.$last()" ng-disabled="!crmUiWizardCtrl.$validStep()">{{ts('Next')}}</button>
   </div>
 </div>

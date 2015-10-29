@@ -1223,6 +1223,10 @@ SELECT is_primary,
 
   /**
    * Call common delete function.
+   *
+   * @param int $id
+   *
+   * @return bool
    */
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Address', $id);
@@ -1249,6 +1253,10 @@ SELECT is_primary,
     switch ($fieldName) {
       // Filter state_province list based on chosen country or site defaults
       case 'state_province_id':
+      case 'state_province_name':
+      case 'state_province':
+        // change $fieldName to DB specific names.
+        $fieldName = 'state_province_id';
         if (empty($props['country_id'])) {
           $config = CRM_Core_Config::singleton();
           if (!empty($config->provinceLimit)) {
@@ -1265,6 +1273,9 @@ SELECT is_primary,
 
       // Filter country list based on site defaults
       case 'country_id':
+      case 'country':
+        // change $fieldName to DB specific names.
+        $fieldName = 'country_id';
         if ($context != 'get' && $context != 'validate') {
           $config = CRM_Core_Config::singleton();
           if (!empty($config->countryLimit) && is_array($config->countryLimit)) {
@@ -1282,6 +1293,8 @@ SELECT is_primary,
 
       // Not a real field in this entity
       case 'world_region':
+      case 'worldregion':
+      case 'worldregion_id':
         return CRM_Core_PseudoConstant::worldRegion();
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);

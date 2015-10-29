@@ -58,7 +58,7 @@ class CRM_Utils_Cache {
   /**
    * Singleton function used to manage this object.
    *
-   * @return object
+   * @return CRM_Utils_Cache_Interface
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
@@ -101,6 +101,7 @@ class CRM_Utils_Cache {
         $defaults = array();
         break;
 
+      case 'Redis':
       case 'Memcache':
       case 'Memcached':
         $defaults = array(
@@ -180,7 +181,7 @@ class CRM_Utils_Cache {
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
-          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, array('Memcache', 'Memcached'))) {
+          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, array('Memcache', 'Memcached', 'Redis'))) {
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
             $settings['prefix'] = $settings['prefix'] . '_' . $params['name'];

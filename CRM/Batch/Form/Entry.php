@@ -252,7 +252,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_Entry_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
     }
   }
 
@@ -466,6 +466,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
 
+        // Build PCP params
+        if (!empty($params['pcp_made_through_id'][$key])) {
+          $value['pcp']['pcp_made_through_id'] = $params['pcp_made_through_id'][$key];
+          $value['pcp']['pcp_display_in_roll'] = !empty($params['pcp_display_in_roll'][$key]);
+          if (!empty($params['pcp_roll_nickname'][$key])) {
+            $value['pcp']['pcp_roll_nickname'] = $params['pcp_roll_nickname'][$key];
+          }
+          if (!empty($params['pcp_personal_note'][$key])) {
+            $value['pcp']['pcp_personal_note'] = $params['pcp_personal_note'][$key];
+          }
+        }
+
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
           NULL,
           'Contribution'
@@ -506,12 +518,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $lineItem = array();
         CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
 
-        //unset amount level since we always use quick config price set
+        // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
+        // function to get correct amount level consistently. Remove setting of the amount level in
+        // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+        // to cover all variants.
         unset($value['amount_level']);
 
         //CRM-11529 for back office transactions
         //when financial_type_id is passed in form, update the
         //line items with the financial type selected in form
+        // @todo - create a price set or price field per financial type & simply choose the appropriate
+        // price field rather than working around the fact that each price_field is supposed to have a financial
+        // type & we are allowing that to be overridden.
         if (!empty($value['financial_type_id']) && !empty($lineItem[$priceSetId])) {
           foreach ($lineItem[$priceSetId] as &$values) {
             $values['financial_type_id'] = $value['financial_type_id'];

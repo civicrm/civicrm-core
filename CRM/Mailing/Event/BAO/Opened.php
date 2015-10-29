@@ -73,6 +73,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @param bool $is_distinct
    *   Group by queue ID?.
    *
+   * @param string $toDate
+   *
    * @return int
    *   Number of rows in result set
    */

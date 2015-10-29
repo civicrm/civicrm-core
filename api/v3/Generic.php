@@ -234,7 +234,15 @@ function civicrm_api3_generic_getfield($apiRequest) {
   return civicrm_api3_create_success($result, $apiRequest['params'], $apiRequest['entity'], 'getfield');
 }
 
-
+/**
+ * Get metadata for getfield action.
+ *
+ * @param array $params
+ * @param array $apiRequest
+ *
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Exception
+ */
 function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
   $params = array(
     'name' => array(
@@ -350,6 +358,7 @@ function civicrm_api3_generic_getvalue($apiRequest) {
  * Get count of contact references.
  *
  * @param array $params
+ * @param array $apiRequest
  */
 function _civicrm_api3_generic_getrefcount_spec(&$params, $apiRequest) {
   $params['id']['api.required'] = 1;

@@ -79,11 +79,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of permissions, null if none
    */
-  /**
-   * @param bool $getAllUnconditionally
-   *
-   * @return array|null
-   */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
     $permissions = array(
       'access CiviContribute' => array(

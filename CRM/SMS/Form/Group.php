@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Choose include / exclude groups and mass sms
- *
+ * Choose include / exclude groups and mass sms.
  */
 class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     if (!CRM_SMS_BAO_Provider::activeProviderCount()) {
@@ -55,10 +50,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
   /**
    * Set default values for the form.
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
+   * The default values are retrieved from the database.
    */
   public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
@@ -102,12 +94,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
-    //get the context
+    // Get the context.
     $context = $this->get('context');
 
     $this->assign('context', $context);
@@ -117,10 +107,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       TRUE
     );
 
-    //get the mailing groups.
+    // Get the mailing groups.
     $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
 
-    //get the sms mailing list
+    // Get the sms mailing list.
     $mailings = CRM_Mailing_PseudoConstant::completed('sms');
     if (!$mailings) {
       $mailings = array();

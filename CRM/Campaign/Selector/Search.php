@@ -199,7 +199,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param string $action
    *
    * @return int
    *   Total number of rows

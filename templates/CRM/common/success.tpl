@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* success.tpl: Display page for Upgrades. Provides complete HTML doc.*}
+{* Display page for Upgrades. *}
 {if $config->userSystem->is_drupal neq '1'}
     <h2>{$pageTitle}</h2>
 {/if}
@@ -46,11 +46,11 @@
             {ts 1=$docLink}This process may change your database structure and values. In case of emergency you may need to revert to a backup. For more detailed information, refer to the %1.{/ts}</p>
         <input type="hidden" name="action" value="begin" />
         <button type="submit" class="crm-button" name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" >
-          <span class="icon ui-icon-check"></span>
+          <i class="crm-i fa-rocket"></i>
           {ts}Upgrade Now{/ts}
         </button>&nbsp;&nbsp;
         <a class="button cancel crm-form-submit" href="{$cancelURL}">
-          <span class="icon ui-icon-close"></span>
+          <i class="crm-i fa-times"></i>
           {ts}Cancel{/ts}
         </a>
     </form>

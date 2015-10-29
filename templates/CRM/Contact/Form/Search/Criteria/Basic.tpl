@@ -38,7 +38,7 @@
       </div>
       <div class="crm-submit-buttons reset-advanced-search">
         <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button css_right" title="{ts}Clear all search criteria{/ts}">
-          <span class="icon ui-icon-circle-close"></span>
+          <i class="crm-i fa-undo"></i>
           {ts}Reset Form{/ts}
         </a>
       </div>

@@ -38,7 +38,7 @@
 
   {if $action eq 8 or $action eq 32768 }
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div> &nbsp;
+    <i class="crm-i fa-info-circle"></i> &nbsp;
     {if $action eq 8}
       {ts 1=$activityTypeName}Click Delete to move this &quot;%1&quot; activity to the Trash.{/ts}
     {else}
@@ -49,7 +49,7 @@
   <table class="form-layout">
     {if $activityTypeDescription }
       <tr>
-        <div id="help">{$activityTypeDescription}</div>
+        <div class="help">{$activityTypeDescription}</div>
       </tr>
     {/if}
     {* Block for change status, case type and start date. *}
@@ -127,7 +127,7 @@
                   <td>{$form.assignee_contact_id.html}
                     {if $activityAssigneeNotification}
                       <br />
-                      <span class="description"><span class="icon ui-icon-mail-closed"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+                      <span class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
                     {/if}
                   </td>
                 </tr>

@@ -1488,14 +1488,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create Payment Processor.
    *
-   * @return CRM_Financial_DAO_PaymentProcessor
-   *   instance of Payment Processor
+   * @return int
+   *   Id Payment Processor
    */
   public function processorCreate() {
     $processorParams = array(
       'domain_id' => 1,
       'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
+      'payment_processor_type_id' => 'Dummy',
       'financial_account_id' => 12,
       'is_test' => TRUE,
       'is_active' => 1,
@@ -1503,8 +1503,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'url_site' => 'http://dummy.com',
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
+      'sequential' => 1,
     );
-    return CRM_Financial_BAO_PaymentProcessor::create($processorParams);
+    $processor = $this->callAPISuccess('PaymentProcessor', 'create', $processorParams);
+    return $processor['id'];
   }
 
   /**
@@ -1516,8 +1518,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *    Instance of Dummy Payment Processor
    */
   public function dummyProcessorCreate($processorParams = array()) {
-    $paymentProcessor = $this->processorCreate($processorParams);
-    return Civi\Payment\System::singleton()->getById($paymentProcessor->id);
+    $paymentProcessorID = $this->processorCreate($processorParams);
+    return Civi\Payment\System::singleton()->getById($paymentProcessorID);
   }
 
   /**
@@ -1541,6 +1543,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     return $contributionPage;
+  }
+
+  /**
+   * Create a sample batch.
+   */
+  public function batchCreate() {
+    $params = $this->_params;
+    $params['name'] = $params['title'] = 'Batch_433397';
+    $params['status_id'] = 1;
+    $result = $this->callAPISuccess('batch', 'create', $params);
+    return $result['id'];
   }
 
   /**
@@ -1636,17 +1649,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param array $params
    *   Array of parameters.
-   * @param int $cTypeID
-   *   Id of financial type.
-   * @param int $invoiceID
-   * @param int $trxnID
-   * @param int $paymentInstrumentID
    *
    * @return int
    *   id of created contribution
    */
-  public function contributionCreate($params, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345,
-    $paymentInstrumentID = 1) {
+  public function contributionCreate($params) {
 
     $params = array_merge(array(
       'domain_id' => 1,
@@ -1654,45 +1661,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'total_amount' => 100.00,
       'fee_amount' => 5.00,
       'net_ammount' => 95.00,
-      'financial_type_id' => $cTypeID,
-      'payment_instrument_id' => empty($paymentInstrumentID) ? 1 : $paymentInstrumentID,
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
-      'trxn_id' => $trxnID,
-      'invoice_id' => $invoiceID,
+      'trxn_id' => 12345,
+      'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ), $params);
 
     $result = $this->callAPISuccess('contribution', 'create', $params);
-    return $result['id'];
-  }
-
-  /**
-   * Create online contribution.
-   *
-   * @param array $params
-   * @param int $financialType
-   *   Id of financial type.
-   * @param int $invoiceID
-   * @param int $trxnID
-   *
-   * @return int
-   *   id of created contribution
-   */
-  public function onlineContributionCreate($params, $financialType, $invoiceID = 67890, $trxnID = 12345) {
-    $contribParams = array(
-      'contact_id' => $params['contact_id'],
-      'receive_date' => date('Ymd'),
-      'total_amount' => 100.00,
-      'financial_type_id' => $financialType,
-      'contribution_page_id' => $params['contribution_page_id'],
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
-      'source' => 'SSF',
-    );
-    $contribParams = array_merge($contribParams, $params);
-    $result = $this->callAPISuccess('contribution', 'create', $contribParams);
-
     return $result['id'];
   }
 
@@ -1743,7 +1721,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'registration_end_date' => 20081015,
       'max_participants' => 100,
       'event_full_text' => 'Sorry! We are already full',
-      'is_monetory' => 0,
+      'is_monetary' => 0,
       'is_active' => 1,
       'is_show_location' => 0,
     ), $params);
@@ -3050,6 +3028,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *  $this->createLoggedInUser();
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
+   *
+   * @param bool $isProfile
    */
   public function setupACL($isProfile = FALSE) {
     global $_REQUEST;
@@ -3231,8 +3211,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     //create a contribution so our membership & contribution don't both have id = 1
     $this->contributionCreate(array(
       'contact_id' => $this->_contactID,
-      'is_test' => 1),
-      1, 'abcd', '345j');
+      'is_test' => 1,
+      'financial_type_id' => 1,
+      'invoice_id' => 'abcd',
+      'trxn_id' => 345,
+    ));
     $this->setupRecurringPaymentProcessorTransaction();
 
     $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(
@@ -3335,7 +3318,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * @param $exists
+   * Assert the attachment exists.
+   *
+   * @param bool $exists
    * @param array $apiResult
    */
   protected function assertAttachmentExistence($exists, $apiResult) {
@@ -3348,6 +3333,51 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', array(
       1 => array($fileId, 'Int'),
     ));
+  }
+
+  /**
+   * Create a price set for an event.
+   *
+   * @param int $feeTotal
+   *
+   * @return int
+   *   Price Set ID.
+   */
+  protected function eventPriceSetCreate($feeTotal) {
+    // creating price set, price field
+    $paramsSet['title'] = 'Price Set';
+    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
+    $paramsSet['is_active'] = FALSE;
+    $paramsSet['extends'] = 1;
+
+    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
+    $priceSetId = $priceset->id;
+
+    //Checking for priceset added in the table.
+    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
+      'id', $paramsSet['title'], 'Check DB for created priceset'
+    );
+    $paramsField = array(
+      'label' => 'Price Field',
+      'name' => CRM_Utils_String::titleToVar('Price Field'),
+      'html_type' => 'Text',
+      'price' => $feeTotal,
+      'option_label' => array('1' => 'Price Field'),
+      'option_value' => array('1' => $feeTotal),
+      'option_name' => array('1' => $feeTotal),
+      'option_weight' => array('1' => 1),
+      'option_amount' => array('1' => 1),
+      'is_display_amounts' => 1,
+      'weight' => 1,
+      'options_per_line' => 1,
+      'is_active' => array('1' => 1),
+      'price_set_id' => $priceset->id,
+      'is_enter_qty' => 1,
+      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+    );
+    CRM_Price_BAO_PriceField::create($paramsField);
+
+    return $priceSetId;
   }
 
 }

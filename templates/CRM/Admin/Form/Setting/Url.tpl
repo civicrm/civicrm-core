@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-url-form-block">
-<div id="help">
+<div class="help">
   <p>
     {ts}These settings define the URLs used to access CiviCRM resources (CSS files, Javascript files, images, etc.).{/ts}
   </p>

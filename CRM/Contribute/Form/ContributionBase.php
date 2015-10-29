@@ -182,6 +182,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public $_useForMember;
 
+  /**
+   * @deprecated
+   *
+   * @var
+   */
   public $_isBillingAddressRequiredForPayLater;
 
   /**
@@ -297,7 +302,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           CRM_Utils_Array::value('payment_processor', $this->_values)
         );
 
-        $this->assignPaymentProcessor();
+        $this->assignPaymentProcessor($isPayLater);
       }
 
       // get price info
@@ -506,6 +511,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ));
     }
 
+    // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
+    // function to get correct amount level consistently. Remove setting of the amount level in
+    // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+    // to cover all variants.
     if (isset($this->_params['amount_other']) || isset($this->_params['selectMembership'])) {
       $this->_params['amount_level'] = '';
     }
@@ -554,6 +563,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
 
+    // The concept of contributeMode is deprecated.
+    // The payment processor object can provide info about the fields it shows.
     if ($this->_contributeMode == 'direct' && $assignCCInfo) {
       if ($this->_paymentProcessor &&
         $this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT

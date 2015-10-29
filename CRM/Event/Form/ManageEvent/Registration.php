@@ -26,17 +26,12 @@
  */
 
 /**
- *
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing Event
- *
+ * This class generates form components for processing Event.
  */
 class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent {
 
@@ -52,8 +47,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_addProfileBottom = CRM_Utils_Array::value('addProfileBottom', $_GET, FALSE);
@@ -90,10 +83,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Set default values for the form.
-   * the default values are retrieved from the database
    *
-   *
-   * @return void
+   * The default values are retrieved from the database.
    */
   public function setDefaultValues() {
     if ($this->_addProfileBottom || $this->_addProfileBottomAdd) {
@@ -780,6 +771,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Add additional profiles from the form to an array of profile ids.
+   *
+   * @param array $profileIds
+   * @param array $values
+   * @param string $field
    */
   public static function addMultipleProfiles(&$profileIds, $values, $field) {
     if ($multipleProfiles = CRM_Utils_Array::value($field, $values)) {

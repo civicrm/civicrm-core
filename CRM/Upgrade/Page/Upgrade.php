@@ -29,19 +29,28 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
+
+  /**
+   * Pre-process.
+   */
   public function preProcess() {
     parent::preProcess();
   }
 
+  /**
+   * Run upgrade.
+   *
+   * @throws \Exception
+   */
   public function run() {
     // lets get around the time limit issue if possible for upgrades
     if (!ini_get('safe_mode')) {
       set_time_limit(0);
     }
+
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 
     $upgrade = new CRM_Upgrade_Form();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
@@ -78,7 +87,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   }
 
   /**
-   * Display an introductory screen with any pre-upgrade messages
+   * Display an introductory screen with any pre-upgrade messages.
    */
   public function runIntro() {
     $upgrade = new CRM_Upgrade_Form();

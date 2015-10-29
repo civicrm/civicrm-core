@@ -273,8 +273,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param string $orderBy
    * @param null $orderProfiles
    *
+   * @param bool $eventProfile
+   *
    * @return array
-   *   the fields that belong to this ufgroup(s)
+   *   The fields that belong to this ufgroup(s)
+   * @throws \Exception
    */
   public static function getFields(
     $id,
@@ -2176,6 +2179,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       $form->addElement('hidden', 'sct_default_id', $SCTDefaultValue, array('id' => 'sct_default_id'));
     }
+    elseif ($fieldName == 'contribution_soft_credit_pcp_id') {
+      CRM_Contribute_Form_SoftCredit::addPCPFields($form, "[$rowNumber]");
+    }
     elseif ($fieldName == 'currency') {
       $form->addCurrency($name, $title, $required);
     }
@@ -2313,7 +2319,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $defaults
    *   Defaults array.
    * @param bool $singleProfile
-   *   True for single profile else false(batch update).
+   *   True for single profile else false(Update multiple items).
    * @param int $componentId
    *   Id for specific components like contribute, event etc.
    * @param null $component
@@ -2335,7 +2341,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           continue;
         }
 
-        //set the field name depending upon the profile mode(single/batch)
+        //set the field name depending upon the profile mode(single/multiple)
         if ($singleProfile) {
           $fldName = $name;
         }

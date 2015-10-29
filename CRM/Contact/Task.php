@@ -118,12 +118,12 @@ class CRM_Contact_Task {
           'class' => 'CRM_Activity_Form_Activity',
         ),
         self::SAVE_SEARCH => array(
-          'title' => ts('Smart group - create'),
+          'title' => ts('Group - create smart group'),
           'class' => 'CRM_Contact_Form_Task_SaveSearch',
           'result' => TRUE,
         ),
         self::SAVE_SEARCH_UPDATE => array(
-          'title' => ts('Smart group - update'),
+          'title' => ts('Group - update smart group'),
           'class' => 'CRM_Contact_Form_Task_SaveSearch_Update',
           'result' => TRUE,
         ),
@@ -138,7 +138,7 @@ class CRM_Contact_Task {
           'result' => TRUE,
         ),
         self::BATCH_UPDATE => array(
-          'title' => ts('Batch update contacts via profile'),
+          'title' => ts('Update multiple contacts'),
           'class' => array(
             'CRM_Contact_Form_Task_PickProfile',
             'CRM_Contact_Form_Task_Batch',
@@ -252,7 +252,6 @@ class CRM_Contact_Task {
 
       CRM_Utils_Hook::searchTasks('contact', self::$_tasks);
 
-      asort(self::$_tasks);
     }
   }
 
@@ -285,7 +284,6 @@ class CRM_Contact_Task {
     ) {
       unset($titles[self::DELETE_PERMANENTLY]);
     }
-    asort($titles);
     return $titles;
   }
 

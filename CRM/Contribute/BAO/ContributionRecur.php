@@ -488,11 +488,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
   /**
    * CRM-16285 - Function to handle validation errors on form, for recurring contribution field.
+   *
    * @param array $fields
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param CRM_Core_Form $self
+   * @param array $errors
    */
   public static function validateRecurContribution($fields, $files, $self, &$errors) {
     if (!empty($fields['is_recur'])) {

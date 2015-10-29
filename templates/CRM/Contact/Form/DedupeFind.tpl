@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-dedupe-find-form-block">
-<div id="help">
+<div class="help">
     {ts}You can search all contacts for duplicates or limit the search to a specific group.{/ts}
 </div>
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

@@ -287,9 +287,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    */
   public function setDefaultValues() {
     $defaults = array();
-    if ($this->_ppType) {
-      $defaults['payment_processor_type_id'] = $this->_ppType;
-    }
+
     if (!$this->_id) {
       $defaults['is_active'] = $defaults['is_default'] = 1;
       $defaults['url_site'] = $this->_ppDAO->url_site_default;
@@ -300,6 +298,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $defaults['test_url_api'] = $this->_ppDAO->url_api_test_default;
       $defaults['test_url_recur'] = $this->_ppDAO->url_recur_test_default;
       $defaults['test_url_button'] = $this->_ppDAO->url_button_test_default;
+      // When user changes payment processor type, it is passed in via $this->_ppType so update defaults array.
+      if ($this->_ppType) {
+        $defaults['payment_processor_type_id'] = $this->_ppType;
+      }
       return $defaults;
     }
     $domainID = CRM_Core_Config::domainID();
@@ -312,6 +314,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     }
 
     CRM_Core_DAO::storeValues($dao, $defaults);
+    // When user changes payment processor type, it is passed in via $this->_ppType so update defaults array.
+    if ($this->_ppType) {
+      $defaults['payment_processor_type_id'] = $this->_ppType;
+    }
 
     // now get testID
     $testDAO = new CRM_Financial_DAO_PaymentProcessor();
@@ -364,6 +370,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param bool $test
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
+    // @todo remove this function (some or all) in favour or CRM_Financial_BAO_PaymentProcessor::create.
     $dao = new CRM_Financial_DAO_PaymentProcessor();
 
     $dao->id = $test ? $this->_testID : $this->_id;

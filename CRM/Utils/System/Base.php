@@ -632,7 +632,7 @@ abstract class CRM_Utils_System_Base {
       $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
     }
     elseif ($config->userFramework == 'WordPress') {
-      $userFrameworkResourceURL = $baseURL . "wp-content/plugins/civicrm/civicrm/";
+      $userFrameworkResourceURL = CIVICRM_PLUGIN_URL . "civicrm/";
     }
     elseif ($this->is_drupal) {
       // Drupal setting
@@ -877,7 +877,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Log error to CMS.
    *
-   * $param string $message
+   * @param string $message
    */
   public function logger($message) {
   }

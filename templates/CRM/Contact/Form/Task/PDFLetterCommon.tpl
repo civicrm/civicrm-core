@@ -135,7 +135,7 @@ CRM.$(function($) {
       });
       $dialog.dialog('option', 'buttons', [{
         text: {/literal}"{ts escape='js'}Done{/ts}"{literal},
-        icons: {primary: 'ui-icon-close'},
+        icons: {primary: 'fa-times'},
         click: function() {$(this).dialog('close');}
       }]);
     }
@@ -215,7 +215,7 @@ function selectFormat( val, bind ) {
     cj.post( dataUrl, {formatId: val}, function( data ) {
       fillFormatInfo(data, bind);
       }, 'json');
-  } 
+  }
   else {
     data=JSON.parse(val);
     fillFormatInfo(data, bind);
@@ -310,4 +310,3 @@ function showSaveDetails(chkbox)  {
 
 </script>
 {/literal}
-

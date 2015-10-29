@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -74,8 +72,6 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @return void
    */
   public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);

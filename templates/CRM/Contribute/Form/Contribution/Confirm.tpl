@@ -30,7 +30,7 @@
 {include file="CRM/common/TrackingFields.tpl"}
 
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block">
-    <div id="help">
+    <div class="help">
         <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
             {if $contributeMode EQ 'notify' and ! $is_pay_later}
                 {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout'}

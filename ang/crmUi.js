@@ -394,7 +394,9 @@
           }
 
           ngModel.$render = function(value) {
-            CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
+            editor.done(function() {
+              CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
+            });
           };
         }
       };
@@ -429,20 +431,20 @@
           var titleLocked = parse(attrs.titleLocked, ts('Locked'));
           var titleUnlocked = parse(attrs.titleUnlocked, ts('Unlocked'));
 
-          $(element).addClass('ui-icon lock-button');
+          $(element).addClass('crm-i lock-button');
           var refresh = function () {
             var locked = binding(scope);
             if (locked) {
               $(element)
-                .removeClass('ui-icon-unlocked')
-                .addClass('ui-icon-locked')
+                .removeClass('fa-unlock')
+                .addClass('fa-lock')
                 .prop('title', titleLocked(scope))
               ;
             }
             else {
               $(element)
-                .removeClass('ui-icon-locked')
-                .addClass('ui-icon-unlocked')
+                .removeClass('fa-lock')
+                .addClass('fa-unlock')
                 .prop('title', titleUnlocked(scope))
               ;
             }
@@ -599,7 +601,7 @@
 
           function init() {
             // TODO watch select2-options
-            element.select2(scope.crmUiSelect || {});
+            element.crmSelect2(scope.crmUiSelect || {});
             if (ngModel) {
               element.on('change', refreshModel);
               $timeout(ngModel.$render);
@@ -651,7 +653,7 @@
       };
     })
 
-    // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
+    // example <div crm-ui-tab id="tab-1" crm-title="ts('My Title')" count="3">...content...</div>
     // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {
       return {
@@ -659,6 +661,8 @@
         restrict: 'EA',
         scope: {
           crmTitle: '@',
+          crmIcon: '@',
+          count: '@',
           id: '@'
         },
         template: '<div ng-transclude></div>',
@@ -837,13 +841,22 @@
       };
     })
 
-    // Example: <button crm-icon="check">Save</button>
+    // Example for Font Awesome: <button crm-icon="fa-check">Save</button>
+    // Example for jQuery UI (deprecated): <button crm-icon="check">Save</button>
     .directive('crmIcon', function() {
       return {
         restrict: 'EA',
-        scope: {},
         link: function (scope, element, attrs) {
-          $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          if (element.is('[crm-ui-tab]')) {
+            // handled in crmUiTab ctrl
+            return;
+          }
+          if (attrs.crmIcon.substring(0,3) == 'fa-') {
+            $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '"></i> ');
+          }
+          else {
+            $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          }
           if ($(element).is('button')) {
             $(element).addClass('crm-button');
           }

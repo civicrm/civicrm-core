@@ -467,7 +467,7 @@ class CRM_Activity_BAO_Query {
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'activity_campaign_id');
 
-    //add engagement level CRM-7775
+    // Add engagement level CRM-7775.
     $buildEngagementLevel = FALSE;
     $buildSurveyResult = FALSE;
     if (CRM_Campaign_BAO_Campaign::isCampaignEnable() &&

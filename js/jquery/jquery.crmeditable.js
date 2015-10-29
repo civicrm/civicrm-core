@@ -107,10 +107,10 @@
 
       var settings = {
         tooltip: $i.data('tooltip') || ts('Click to edit'),
-        placeholder: $i.data('placeholder') || '<span class="crm-editable-placeholder">' + ts('Click to edit') + '</span>',
+        placeholder: $i.data('placeholder') || '<i class="crm-i fa-pencil crm-editable-placeholder"></i>',
         onblur: 'cancel',
-        cancel: '<button type="cancel"><span class="ui-icon ui-icon-closethick"></span></button>',
-        submit: '<button type="submit"><span class="ui-icon ui-icon-check"></span></button>',
+        cancel: '<button type="cancel"><i class="crm-i fa-times"></i></button>',
+        submit: '<button type="submit"><i class="crm-i fa-check"></i></button>',
         cssclass: 'crm-editable-form',
         data: getData,
         onreset: restoreContainer

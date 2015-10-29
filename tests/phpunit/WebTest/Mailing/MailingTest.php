@@ -117,14 +117,14 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("xpath=//button[@title='Close']");
 
     // select default header and footer ( with label )
-    $this->click("xpath=//ul/li/a[text()='Header and Footer']");
+    $this->click('link=Header and Footer');
     $this->select2("s2id_crmUiId_10", "Mailing Header");
     $this->select2("s2id_crmUiId_11", "Mailing Footer");
 
     //--------track and respond----------
 
     // check for default settings options
-    $this->click("xpath=//ul/li/a[text()='Tracking']");
+    $this->click('link=Tracking');
     $this->assertChecked("url_tracking");
     $this->assertChecked("open_tracking");
 
@@ -370,14 +370,14 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("xpath=//button[@title='Close']");
 
     // select default header and footer ( with label )
-    $this->click("xpath=//ul/li/a[text()='Header and Footer']");
+    $this->click('link=Header and Footer');
     $this->select2("s2id_crmUiId_10", "Mailing Header");
     $this->select2("s2id_crmUiId_11", "Mailing Footer");
 
     //--------track and respond----------
 
     // check for default settings options
-    $this->click("xpath=//ul/li/a[text()='Tracking']");
+    $this->click('link=Tracking');
     $this->assertChecked("url_tracking");
     $this->assertChecked("open_tracking");
 

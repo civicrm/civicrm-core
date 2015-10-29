@@ -122,7 +122,7 @@
           }
 
         if ( showError ) {
-          cj('#validate_pricefield').show().html("<span class='icon red-icon ui-icon-alert'></span>{/literal}{ts escape='js'}This Option is already full for this event.{/ts}{literal}");
+          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
         }
         else {
           cj('#validate_pricefield').hide( ).html('');
@@ -180,7 +180,7 @@
   <div class="crm-block crm-form-block crm-participant-form-block">
     <div class="view-content">
       {if $participantMode}
-        <div id="help">
+        <div class="help">
           {ts 1=$displayName 2=$registerMode}Use this form to submit an event registration on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
         </div>
       {/if}
@@ -188,7 +188,7 @@
 
 
       {if $action eq 1 AND $paid}
-        <div id="help">
+        <div class="help">
           {ts}If you are accepting offline payment from this participant, check <strong>Record Payment</strong>. You will be able to fill in the payment information, and optionally send a receipt.{/ts}
         </div>
       {/if}
@@ -461,4 +461,3 @@
 </script>
 
 {/if} {* end of main event block*}
-

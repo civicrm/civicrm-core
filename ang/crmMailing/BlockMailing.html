@@ -11,6 +11,7 @@ It could perhaps be thinned by 30-60% by making more directives.
         <select
           crm-ui-id="subform.msg_template_id"
           name="msg_template_id"
+          class="fa-clipboard"
           crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
           ng-model="mailing.msg_template_id"
           ng-change="loadTemplate(mailing, mailing.msg_template_id)"
@@ -18,7 +19,7 @@ It could perhaps be thinned by 30-60% by making more directives.
           <option value=""></option>
           <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
         </select>
-        <a crm-icon="disk" ng-if="checkPerm('edit message templates')" ng-click="saveTemplate(mailing)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+        <a crm-icon="fa-floppy-o" ng-if="checkPerm('edit message templates')" ng-click="saveTemplate(mailing)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
       </div>
     </div>
     <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From'), help: hs('from_email')}">

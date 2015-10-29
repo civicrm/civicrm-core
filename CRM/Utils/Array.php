@@ -132,7 +132,6 @@ class CRM_Utils_Array {
    * @param string $seperator
    *   (optional) String to be appended after open/close tags.
    *
-   *
    * @return string
    *   XML fragment representing $list.
    */
@@ -345,8 +344,11 @@ class CRM_Utils_Array {
   }
 
   /**
-   * @param $subset
-   * @param $superset
+   * Is array A a subset of array B.
+   *
+   * @param array $subset
+   * @param array $superset
+   *
    * @return bool
    *   TRUE if $subset is a subset of $superset
    */
@@ -388,12 +390,18 @@ class CRM_Utils_Array {
   }
 
   /**
-   * convert associative array names to values.
-   * and vice-versa.
+   * Convert associative array names to values and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   *
+   * @param array $defaults
+   * @param string $property
+   * @param $lookup
+   * @param $reverse
+   *
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, $lookup, $reverse) {
     $id = $property . '_id';
@@ -1016,6 +1024,27 @@ class CRM_Utils_Array {
       );
     }
     return $result;
+  }
+
+  /**
+   * Convert array where key(s) holds the actual value and value(s) as 1 into array of actual values
+   *  Ex: array('foobar' => 1, 4 => 1) formatted into array('foobar', 4)
+   *
+   * @param array $array
+   * @return void
+   */
+  public static function formatArrayKeys(&$array) {
+    $keys = array_keys($array, 1);
+    if (count($keys) > 1 ||
+      (count($keys) == 1 &&
+        (current($keys) > 1 ||
+          is_string(current($keys)) ||
+          (current($keys) == 1 && $array[1] == 1) // handle (0 => 4), (1 => 1)
+        )
+      )
+    ) {
+      $array = $keys;
+    }
   }
 
 }

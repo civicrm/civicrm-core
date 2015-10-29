@@ -71,7 +71,7 @@
       <a href="{$configPagesURL}" class="button no-popup"><span>{ts}Manage Contribution Pages{/ts}</span></a>
     </td>
     <td>
-      <a href="{$newPageURL}" class="button no-popup"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Contribution Page{/ts}</span></a>
+      <a href="{$newPageURL}" class="button no-popup"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Contribution Page{/ts}</span></a>
     </td>
   </tr>
 </table>

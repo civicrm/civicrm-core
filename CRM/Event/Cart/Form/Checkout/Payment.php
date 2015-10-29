@@ -254,6 +254,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $price_set_amount = array();
       CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
       $cost = $event_price_values['amount'];
+      // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
+      // function to get correct amount level consistently. Remove setting of the amount level in
+      // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+      // to cover all variants.
       $amount_level = $event_price_values['amount_level'];
       $price_details[$price_set_id] = $price_set_amount;
     }
@@ -394,13 +398,14 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
       // validate payment instrument values (e.g. credit card number)
-      CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, $self);
+      CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, NULL);
     }
 
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
+   * @todo this should surely go! Test & remove.
    * @return bool
    */
   public function validate() {

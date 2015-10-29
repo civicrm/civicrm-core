@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
 

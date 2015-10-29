@@ -47,7 +47,7 @@ class CRM_Utils_Check_Message {
   private $title;
 
   /**
-   * @var string
+   * @var int
    * @see Psr\Log\LogLevel
    */
   private $level;
@@ -59,6 +59,21 @@ class CRM_Utils_Check_Message {
   private $help;
 
   /**
+   * @var string
+   *   crm-i css class
+   */
+  private $icon;
+
+  /**
+   *
+   * @var bool
+   *      This is used for Admin Status Page to determine hushed statuses.
+   */
+  private $isVisible;
+
+  /**
+   * Class constructor.
+   *
    * @param string $name
    *   Symbolic name for the check.
    * @param string $message
@@ -70,7 +85,7 @@ class CRM_Utils_Check_Message {
    *
    * @see Psr\Log\LogLevel
    */
-  public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING) {
+  public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING, $icon = NULL) {
     $this->name = $name;
     $this->message = $message;
     $this->title = $title;
@@ -79,9 +94,12 @@ class CRM_Utils_Check_Message {
       $level = CRM_Utils_Check::severityMap($level);
     }
     $this->level = $level;
+    $this->icon = $icon;
   }
 
   /**
+   * Get name.
+   *
    * @return string
    */
   public function getName() {
@@ -89,6 +107,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Get message.
+   *
    * @return string
    */
   public function getMessage() {
@@ -103,6 +123,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Get level.
+   *
    * @return string
    * @see Psr\Log\LogLevel
    */
@@ -119,7 +141,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Set optional additional help text
+   * Set optional additional help text.
+   *
    * @param string $help
    */
   public function addHelp($help) {
@@ -127,6 +150,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Convert to array.
+   *
    * @return array
    */
   public function toArray() {
@@ -135,11 +160,31 @@ class CRM_Utils_Check_Message {
       'message' => $this->message,
       'title' => $this->title,
       'severity' => $this->level,
+      'is_visible' => $this->isVisible,
+      'icon' => $this->icon,
     );
     if (!empty($this->help)) {
       $array['help'] = $this->help;
     }
     return $array;
+  }
+
+  /**
+   * Getter for is visible.
+   *
+   * @return bool
+   */
+  public function isVisible() {
+    return $this->isVisible;
+  }
+
+  /**
+   * Seter for is visible.
+   *
+   * @param bool $isVisible
+   */
+  public function setVisible($isVisible) {
+    $this->isVisible = $isVisible ? 1 : 0;
   }
 
 }

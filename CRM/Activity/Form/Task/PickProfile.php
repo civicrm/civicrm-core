@@ -57,27 +57,25 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
 
+    // Initialize the task and row fields.
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
 
-    CRM_Utils_System::setTitle(ts('Batch Profile Update for Activities'));
+    CRM_Utils_System::setTitle(ts('Update multiple activities'));
 
     $validate = FALSE;
-    //validations
+    // Validations.
     if (count($this->_activityHolderIds) > $this->_maxActivities) {
-      CRM_Core_Session::setStatus(ts("The maximum number of Activities you can select for Batch update is %1. You have selected %2. Please select fewer Activities from your search results and try again.", array(
+      CRM_Core_Session::setStatus(ts("The maximum number of activities you can select for Update multiple activities is %1. You have selected %2. Please select fewer Activities from your search results and try again.", array(
             1 => $this->_maxActivities,
             2 => count($this->_activityHolderIds),
           )), ts('Maximum Exceeded'), 'error');
       $validate = TRUE;
     }
 
-    // than redirect
+    // Then redirect.
     if ($validate) {
       CRM_Utils_System::redirect($this->_userContext);
     }
@@ -112,7 +110,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     }
 
     if (empty($profiles)) {
-      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Batch update activities via profile. Navigate to Administer > Customize Data and Screens > Profiles to configure a Profile. Consult the online Administrator documentation for more information.", array(1 => $types[0])), ts("No Profile Configured"), "alert");
+      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple activities. Navigate to Administer > Customize Data and Screens > Profiles to configure a Profile. Consult the online Administrator documentation for more information.", array(1 => $types[0])), ts("No Profile Configured"), "alert");
       CRM_Utils_System::redirect($this->_userContext);
     }
     elseif ($notEditable) {

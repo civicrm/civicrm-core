@@ -52,11 +52,11 @@ function smarty_block_crmButton($params, $text, &$smarty) {
     $params['href'] = CRM_Utils_System::crmURL($params + array('h' => FALSE));
   }
   // Always add class 'button' - fixme probably should be crm-button
-  $params['class'] = 'button ' . CRM_Utils_Array::value('class', $params, '');
+  $params['class'] = empty($params['class']) ? 'button' : 'button ' . $params['class'];
   // Any jQuery-UI icon works
   $icon = CRM_Utils_Array::value('icon', $params, 'pencil');
   // All other params are treated as html attributes
   CRM_Utils_Array::remove($params, 'icon', 'p', 'q', 'a', 'f', 'h', 'fb', 'fe');
   $attributes = CRM_Utils_String::htmlAttributes($params);
-  return "<a $attributes><span><span class='icon ui-icon-$icon'></span> $text</span></a>";
+  return "<a $attributes><span><span class='crm-i fa-$icon'></span> $text</span></a>";
 }

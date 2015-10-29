@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
@@ -49,7 +47,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Event_BAO_ManageEvent
+   * @return CRM_Event_DAO_Event
    */
   public static function retrieve(&$params, &$defaults) {
     $event = new CRM_Event_DAO_Event();
@@ -82,8 +80,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   *
-   * @return object
+   * @return CRM_Event_DAO_Event
    */
   public static function add(&$params) {
     CRM_Utils_System::flushCache();
@@ -222,14 +219,14 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Delete the location block associated with an event,
-   * if not being used by any other event.
+   * Delete the location block associated with an event.
    *
-   * @param $locBlockId
+   * Function checks that it is not being used by any other event.
+   *
+   * @param int $locBlockId
    *   Location block id to be deleted.
    * @param int $eventId
    *   Event with which loc block is associated.
-   *
    */
   public static function deleteEventLocBlock($locBlockId, $eventId = NULL) {
     $query = "SELECT count(ce.id) FROM civicrm_event ce WHERE ce.loc_block_id = $locBlockId";
@@ -246,7 +243,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Get current/future Events
+   * Get current/future Events.
    *
    * @param int $all
    *   0 returns current and future events.
@@ -320,7 +317,6 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
 
   /**
    * Get events Summary.
-   *
    *
    * @return array
    *   Array of event summary values
@@ -598,7 +594,6 @@ $event_summary_limit
    *   Consider role for participant count.
    * @param bool $role consider counted( is filter role) participant.
    *   Consider counted( is filter role) participant.
-   *
    *
    * @return array
    *   array with count of participants for each event based on status/role
@@ -911,8 +906,9 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * make a copy of a Event, including
-   * all the fields in the event Wizard
+   * Make a copy of a Event.
+   *
+   * Include all the fields in the event Wizard.
    *
    * @param int $id
    *   The event id to copy.
@@ -1030,8 +1026,13 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * This is sometimes called in a loop (during event search)
-   * hence we cache the values to prevent repeated calls to the db
+   * This is sometimes called in a loop (during event search).
+   *
+   * We cache the values to prevent repeated calls to the db.
+   *
+   * @param int $id
+   *
+   * @return bool
    */
   public static function isMonetary($id) {
     static $isMonetary = array();
@@ -1045,8 +1046,13 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * This is sometimes called in a loop (during event search)
-   * hence we cache the values to prevent repeated calls to the db
+   * This is sometimes called in a loop (during event search).
+   *
+   * We cache the values to prevent repeated calls to the db.
+   *
+   * @param int $id
+   *
+   * @return bool
    */
   public static function usesPriceSet($id) {
     static $usesPriceSet = array();
@@ -1057,15 +1063,13 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * Process that send e-mails
+   * Send e-mails.
    *
    * @param int $contactID
-   * @param $values
+   * @param array $values
    * @param int $participantId
    * @param bool $isTest
    * @param bool $returnMessageText
-   *
-   * @return void
    */
   public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
@@ -1151,6 +1155,7 @@ WHERE civicrm_event.is_active = 1
           'email' => $email,
           'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
           'isShowLocation' => CRM_Utils_Array::value('is_show_location', $values['event']),
+          // The concept of contributeMode is deprecated.
           'contributeMode' => CRM_Utils_Array::value('contributeMode', $template->_tpl_vars),
           'participantID' => $participantId,
           'conference_sessions' => $sessions,
@@ -1186,12 +1191,13 @@ WHERE civicrm_event.is_active = 1
         // address required during receipt processing (pdf and email receipt)
         if ($displayAddress = CRM_Utils_Array::value('address', $values)) {
           $sendTemplateParams['tplParams']['address'] = $displayAddress;
+          // The concept of contributeMode is deprecated.
           $sendTemplateParams['tplParams']['contributeMode'] = NULL;
         }
 
         // set lineItem details
         if ($lineItem = CRM_Utils_Array::value('lineItem', $values)) {
-          // check if additional prticipant, if so filter only to relevant ones
+          // check if additional participant, if so filter only to relevant ones
           // CRM-9902
           if (!empty($values['params']['additionalParticipant'])) {
             $ownLineItems = array();
@@ -1247,19 +1253,18 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * Add the custom fields OR array of participant's
-   * profile info
+   * Add the custom fields OR array of participant's profile info.
    *
    * @param int $id
    * @param string $name
    * @param int $cid
-   * @param $template
+   * @param string $template
    * @param int $participantId
-   * @param $isTest
+   * @param bool $isTest
    * @param bool $isCustomProfile
    * @param array $participantParams
    *
-   * @return void
+   * @return array|null
    */
   public static function buildCustomDisplay(
     $id,
@@ -1445,8 +1450,6 @@ WHERE civicrm_event.is_active = 1
    *   Formatted array of key value.
    *
    * @param array $profileFields
-   *
-   * @return void
    */
   public static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = array()) {
     if ($gid) {
@@ -1708,7 +1711,7 @@ WHERE  id = $cfID
   }
 
   /**
-   * Build the array for Additional participant's information  array of priamry and additional Ids
+   * Build the array for Additional participant's information  array of primary and additional Ids.
    *
    * @param int $participantId
    *   Id of Primary participant.

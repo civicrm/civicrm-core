@@ -218,6 +218,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * One function to get domain ID.
+   *
+   * @param int $domainID
+   * @param bool $reset
+   *
+   * @return int|null
    */
   public static function domainID($domainID = NULL, $reset = FALSE) {
     static $domain;
@@ -234,6 +239,8 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   /**
    * Do general cleanup of caches, temp directories and temp tables
    * CRM-8739
+   *
+   * @param bool $sessionReset
    */
   public function cleanupCaches($sessionReset = TRUE) {
     // cleanup templates_c directory
@@ -358,6 +365,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * Check if running in upgrade mode.
+   *
+   * @param string $path
+   *
+   * @return bool
    */
   public static function isUpgradeMode($path = NULL) {
     if (defined('CIVICRM_UPGRADE_ACTIVE')) {
@@ -416,6 +427,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * @deprecated
+   *
+   * @param string $defaultCurrency
+   *
+   * @return string
    */
   public function defaultCurrencySymbol($defaultCurrency = NULL) {
     return CRM_Core_BAO_Country::defaultCurrencySymbol($defaultCurrency);

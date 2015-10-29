@@ -55,7 +55,7 @@
     function checkResponse(e, response) {
       if (response.illegal) {
         $(this).dialog('option', 'buttons', [
-          {text: {/literal}'{ts escape="js"}Close{/ts}'{literal}, click: function() {$(this).dialog('close');}, icons: {primary: 'ui-icon-close'}}
+          {text: {/literal}'{ts escape="js"}Close{/ts}'{literal}, click: function() {$(this).dialog('close');}, icons: {primary: 'fa-times'}}
         ]);
       }
     }

@@ -934,7 +934,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       else {
         // validate payment instrument (e.g. credit card number)
-        CRM_Core_Payment_Form::validatePaymentInstrument($fields['payment_processor_id'], $fields, $errors, $self);
+        CRM_Core_Payment_Form::validatePaymentInstrument($fields['payment_processor_id'], $fields, $errors, NULL);
       }
     }
 
@@ -1133,6 +1133,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->_params['amount'] = $this->_params['total_amount'];
+    // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
+    // function to get correct amount level consistently. Remove setting of the amount level in
+    // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+    // to cover all variants.
     $this->_params['amount_level'] = 0;
     $this->_params['description'] = ts("Contribution submitted by a staff person using contributor's credit card");
     $this->_params['currencyID'] = CRM_Utils_Array::value('currency',

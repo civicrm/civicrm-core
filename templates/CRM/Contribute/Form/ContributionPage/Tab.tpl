@@ -28,7 +28,7 @@
    <ul id="actions">
       <li><div id="crm-contribpage-links-wrapper">
             <a id="crm-contribpage-links-link" class="button">
-              <span><div class="icon ui-icon-arrow-1-se css_right"></div>{ts}Contribution Links{/ts}</span>
+              <span><i class="crm-i fa-bars"></i> {ts}Contribution Links{/ts}</span>
             </a>
               <div class="ac_results" id="crm-contribpage-links-list">
                  <div class="crm-contribpage-links-list-inner">

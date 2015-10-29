@@ -36,12 +36,15 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method create()
+   * Check method create().
    */
   public function testCreate() {
     $contactId = $this->individualCreate();
     $financialTypeId = 1;
-    $this->contributionCreate(array('contact_id' => $contactId), $financialTypeId);
+    $this->contributionCreate(array(
+      'contact_id' => $contactId,
+      'financial_type_id' => $financialTypeId,
+    ));
     $params = array(
       'contribution_id' => $financialTypeId,
       'to_financial_account_id' => 1,

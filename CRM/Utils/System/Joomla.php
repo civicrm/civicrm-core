@@ -424,12 +424,18 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * FIXME: Do something
+   *
+   * @param string $message
    */
   public function setMessage($message) {
   }
 
   /**
    * FIXME: Do something
+   *
+   * @param \obj $user
+   *
+   * @return bool
    */
   public function loadUser($user) {
     return TRUE;
@@ -716,6 +722,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * Append Joomla js to coreResourcesList.
+   *
+   * @param array $list
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.joomla.js';

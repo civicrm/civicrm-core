@@ -242,9 +242,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
 
+    if (!$this->_memType) {
+      $params = CRM_Utils_Request::exportValues();
+      if (isset($params['membership_type_id'][1])) {
+        $this->_memType = $params['membership_type_id'][1];
+      }
+    }
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_memType, 1, 'Membership', $this->_id);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
@@ -806,7 +812,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     if (!empty($params['payment_processor_id'])) {
       // validate payment instrument (e.g. credit card number)
-      CRM_Core_Payment_Form::validatePaymentInstrument($params['payment_processor_id'], $params, $errors, $self);
+      CRM_Core_Payment_Form::validatePaymentInstrument($params['payment_processor_id'], $params, $errors, NULL);
     }
 
     $joinDate = NULL;

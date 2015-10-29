@@ -943,7 +943,10 @@ LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table 
    * payments is important for forensic and outreach reasons.
    *
    * @param int $contributionID
+   * @param int $contactID
    * @param string $message
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function failPayment($contributionID, $contactID, $message) {
     civicrm_api3('activity', 'create', array(
@@ -1089,6 +1092,12 @@ LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table 
         'title' => 'Soft Credit Contact ID',
         'headerPattern' => '/^soft_credit_contact_id$/i',
         'where' => 'civicrm_contribution_soft.contact_id',
+      ),
+      'contribution_pcp_title' => array(
+        'name' => 'contribution_pcp_title',
+        'title' => 'Personal Campaign Page Title',
+        'headerPattern' => '/^contribution_pcp_title$/i',
+        'where' => 'contribution_pcp.title',
       ),
     );
 
@@ -1246,7 +1255,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
          AND b.is_test = 0
          AND b.receive_date >= $startDate
          AND b.receive_date <  $endDate
-      $additionalWhere 
+      $additionalWhere
       GROUP BY currency
       ";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
@@ -1947,9 +1956,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $contactContributionsSQL = "
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
-      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution' $liWhere 
-      WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} 
-      $additionalWhere 
+      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution' $liWhere
+      WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId}
+      $additionalWhere
       AND i.id IS NULL";
 
     $contactSoftCreditContributionsSQL = "
@@ -2380,7 +2389,7 @@ WHERE  contribution_id = %1 ";
 
       $values['custom_pre_id'] = $custom_pre_id;
       $values['custom_post_id'] = $custom_post_ids;
-      //for tasks 'Change Participant Status' and 'Batch Update Participants Via Profile' case
+      //for tasks 'Change Participant Status' and 'Update multiple Contributions' case
       //and cases involving status updation through ipn
       // whatever that means!
       // total_amount appears to be the preferred input param & it is unclear why we support amount here

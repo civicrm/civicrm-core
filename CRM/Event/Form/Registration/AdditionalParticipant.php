@@ -30,13 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing Event
- *
+ * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_Registration {
 
@@ -561,7 +558,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     // validate supplied payment instrument values (e.g. credit card number and cvv)
     $payment_processor_id = $self->_params[0]['payment_processor'];
-    CRM_Core_Payment_Form::validatePaymentInstrument($payment_processor_id, $self->_params[0], $errors, $self);
+    CRM_Core_Payment_Form::validatePaymentInstrument($payment_processor_id, $self->_params[0], $errors, (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing'));
 
     if (!empty($errors)) {
       return FALSE;
@@ -662,14 +659,12 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
         //added for discount
         $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
-
+        $params['amount_level'] = $this->getAmountLevel($params, $discountId);
         if (!empty($this->_values['discount'][$discountId])) {
           $params['discount_id'] = $discountId;
-          $params['amount_level'] = $this->_values['discount'][$discountId][$params['amount']]['label'];
           $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
         }
         elseif (empty($params['priceSetId'])) {
-          $params['amount_level'] = $this->_values['fee'][$params['amount']]['label'];
           $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
         }
         else {
@@ -729,7 +724,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       && CRM_Utils_Array::value('additional_participants', $this->_params[0])
       && $this->isLastParticipant()
     ) {
-      CRM_Event_Form_Registration_Register::processRegistration($this->_params, NULL);
+      $this->processRegistration($this->_params);
     }
   }
 

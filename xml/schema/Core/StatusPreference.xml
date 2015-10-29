@@ -54,7 +54,7 @@
   </index>
   <field>
     <name>hush_until</name>
-    <title>Hush Status Notifications Until</title>
+    <title>Snooze Status Notifications Until</title>
     <type>date</type>
     <import>true</import>
     <comment>expires ignore_severity.  NULL never hushes.</comment>

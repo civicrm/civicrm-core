@@ -27,7 +27,7 @@
    {include file="CRM/Admin/Form/ContactType.tpl"}
 {else}
 
-  <div id="help">
+  <div class="help">
     {ts}CiviCRM comes with 3 basic (built-in) contact types: Individual, Household, and Organization. You can create additional contact types based on these types to further differentiate contacts (for example you might create Student, Parent, Staff, and /or Volunteer types from the basic Individual type...).{/ts} {help id="id-contactSubtype-intro"}
   </div>
 {if $rows}
@@ -63,7 +63,7 @@
     </div>
   {/if}
   <div class="action-link">
-    {crmButton q="action=add&reset=1" icon="circle-plus"}{ts}Add Contact Type{/ts}{/crmButton}
-    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+    {crmButton q="action=add&reset=1" icon="plus-circle"}{ts}Add Contact Type{/ts}{/crmButton}
+    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
   </div>
 {/if}

@@ -188,6 +188,12 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
    * Execute the default schedule, without any special recipient selections.
    *
    * @dataProvider createTestCases
+   *
+   * @param string $targetDate
+   * @param string $setupFuncs
+   * @param array $expectMessages
+   *
+   * @throws \Exception
    */
   public function testDefault($targetDate, $setupFuncs, $expectMessages) {
     $this->targetDate = $targetDate;

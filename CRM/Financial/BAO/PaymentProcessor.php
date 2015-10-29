@@ -303,6 +303,21 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processor);
     }
 
+    // Add the pay-later pseudo-processor.
+    $processors['values'][0] = array(
+      'object' => new CRM_Core_Payment_Manual(),
+      'id' => 0,
+      'payment_processor_type_id' => 0,
+      // This shouldn't be required but there are still some processors hacked into core with nasty 'if's.
+      'payment_processor_type' => 'Manual',
+      'class_name' => 'Payment_Manual',
+      'name' => 'pay_later',
+      'billing_mode' => '',
+      // Making this optionally recur would give lots of options -but it should
+      // be a row in the payment processor table before we do that.
+      'is_recur' => FALSE,
+    );
+
     CRM_Utils_Cache::singleton()->set($cacheKey, $processors['values']);
 
     return $processors['values'];
@@ -418,7 +433,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     ) {
       return $result;
     }
-    //FIXME:
+
     if ($component == 'membership') {
       $sql = "
     SELECT cr.payment_processor_id as ppID1, cp.payment_processor as ppID2, con.is_test
@@ -444,7 +459,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
      WHERE cr.id = %1";
     }
 
-    //we are interesting in single record.
+    // We are interested in a single record.
     $sql .= ' LIMIT 1';
 
     $params = array(1 => array($entityID, 'Integer'));

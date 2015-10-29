@@ -32,7 +32,7 @@
  */
 
 /**
- * This class provides the functionality for batch profile update.
+ * This class provides the functionality for Update multiple contacts
  */
 class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
 
@@ -71,7 +71,7 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     $validate = FALSE;
     //validations
     if (count($this->_contactIds) > $this->_maxContacts) {
-      CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Batch update is %1. You have selected %2. Please select fewer contacts from your search results and try again.", array(
+      CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Update multiple contacts is %1. You have selected %2. Please select fewer contacts from your search results and try again.", array(
             1 => $this->_maxContacts,
             2 => count($this->_contactIds),
           )), ts('Maximum Exceeded'), 'error');
@@ -79,7 +79,7 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     }
 
     if (CRM_Contact_BAO_Contact_Utils::checkContactType($this->_contactIds)) {
-      CRM_Core_Session::setStatus(ts("Batch update requires that all selected contacts be the same basic type (e.g. all Individuals OR all Organizations...). Please modify your selection and try again."), ts('Contact Type Mismatch'), 'error');
+      CRM_Core_Session::setStatus(ts("Update multiple contacts requires that all selected contacts be the same basic type (e.g. all Individuals OR all Organizations...). Please modify your selection and try again."), ts('Contact Type Mismatch'), 'error');
       $validate = TRUE;
     }
 
@@ -93,7 +93,7 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Batch Profile Update for Contact'));
+    CRM_Utils_System::setTitle(ts('Update multiple contacts'));
 
     foreach ($this->_contactIds as $id) {
       $this->_contactTypes = CRM_Contact_BAO_Contact::getContactTypes($id);
@@ -106,7 +106,7 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
 
     if (empty($profiles)) {
       $types = implode(' ' . ts('or') . ' ', $this->_contactTypes);
-      CRM_Core_Session::setStatus(ts("The contact type selected for Batch update does not have a corresponding profile. Please set up a profile for %1s and try again.", array(1 => $types)), ts('No Profile Available'), 'error');
+      CRM_Core_Session::setStatus(ts("The contact type selected for Update multiple contacts does not have a corresponding profile. Please set up a profile for %1s and try again.", array(1 => $types)), ts('No Profile Available'), 'error');
       CRM_Utils_System::redirect($this->_userContext);
     }
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'), array('' => ts('- select profile -')) + $profiles, TRUE, array('class' => 'crm-select2 huge'));
@@ -132,7 +132,7 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
    */
   public static function formRule($fields) {
     if (CRM_Core_BAO_UFField::checkProfileType($fields['uf_group_id'])) {
-      $errorMsg['uf_group_id'] = "You cannot select mix profile for batch update.";
+      $errorMsg['uf_group_id'] = "You cannot select a mixed profile for Update multiple contacts.";
     }
 
     if (!empty($errorMsg)) {

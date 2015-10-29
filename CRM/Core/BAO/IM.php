@@ -165,6 +165,10 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
 
   /**
    * Call common delete function.
+   *
+   * @param int $id
+   *
+   * @return bool
    */
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('IM', $id);

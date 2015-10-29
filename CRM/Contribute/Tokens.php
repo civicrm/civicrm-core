@@ -57,6 +57,11 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     );
   }
 
+  /**
+   * Get alias tokens.
+   *
+   * @return array
+   */
   protected function getAliasTokens() {
     return array(
       'id' => 'contribution_id',
@@ -67,6 +72,9 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     );
   }
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     $tokens = CRM_Utils_Array::subset(
       CRM_Utils_Array::collect('title', CRM_Contribute_DAO_Contribution::fields()),
@@ -105,11 +113,14 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @param \Civi\Token\TokenRow $row
    *   The record for which we want token values.
+   * @param string $entity
    * @param string $field
    *   The name of the token field.
    * @param mixed $prefetch
    *   Any data that was returned by the prefetch().
+   *
    * @return mixed
+   * @throws \CRM_Core_Exception
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];

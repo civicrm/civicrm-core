@@ -373,6 +373,7 @@ if (!CRM.vars) CRM.vars = {};
     return $(this).each(function () {
       var
         $el = $(this),
+        iconClass,
         settings = {allowClear: !$el.hasClass('required')};
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
@@ -383,6 +384,19 @@ if (!CRM.vars) CRM.vars = {};
       // quickform does not support disabled option, so yet another hack to
       // add disabled property for option values
       $('option[value^=crm_disabled_opt]', this).attr('disabled', 'disabled');
+
+      // Placeholder icon - total hack hikacking the escapeMarkup function but select2 3.5 dosn't have any other callbacks for this :(
+      if ($el.is('[class*=fa-]')) {
+        settings.escapeMarkup = function (m) {
+          var out = _.escape(m),
+            placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
+          if (m.length && placeholder === m) {
+            iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
+            out = '<i class="crm-i ' + iconClass + '"></i> ' + out;
+          }
+          return out;
+        };
+      }
 
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
@@ -422,7 +436,7 @@ if (!CRM.vars) CRM.vars = {};
         selectParams = {};
       $el.data('api-entity', entity);
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
-      $el.data('api-params', $.extend({}, $el.data('api-params') || {}, options.api));
+      $el.data('api-params', $.extend(true, {}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
       $el.addClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref');
       var settings = {
@@ -608,7 +622,7 @@ if (!CRM.vars) CRM.vars = {};
         $clearLink = $();
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><span class="icon ui-icon-close"></span></a>')
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><i class="crm-i fa-times"></i></a>')
           .insertAfter($dataField);
       }
       if (settings.time !== false) {
@@ -745,9 +759,23 @@ if (!CRM.vars) CRM.vars = {};
       createLinks = params.contact_type ? _.where(CRM.config.entityRef.contactCreate, {type: params.contact_type}) : CRM.config.entityRef.contactCreate;
     }
     _.each(createLinks, function(link) {
+      var icon;
+      switch (link.type) {
+        case 'Individual':
+          icon = 'fa-user';
+          break;
+
+        case 'Organization':
+          icon = 'fa-building';
+          break;
+
+        case 'Household':
+          icon = 'fa-home';
+          break;
+      }
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
-      if (link.type) {
-        markup += '<span class="icon ' + link.type + '-profile-icon"></span> ';
+      if (icon) {
+        markup += '<i class="crm-i ' + icon + '"></i> ';
       }
       markup += link.label + '</a>';
     });
@@ -900,16 +928,13 @@ if (!CRM.vars) CRM.vars = {};
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
       });
-      $('textarea.crm-form-wysiwyg', e.target)
-        .not('.crm-wysiwyg-enabled')
-        .addClass('crm-wysiwyg-enabled')
-        .each(function() {
-          if ($(this).hasClass("collapsed")) {
-            CRM.wysiwyg.createCollapsed(this);
-          } else {
-            CRM.wysiwyg.create(this);
-          }
-        });
+      $('textarea.crm-form-wysiwyg', e.target).each(function() {
+        if ($(this).hasClass("collapsed")) {
+          CRM.wysiwyg.createCollapsed(this);
+        } else {
+          CRM.wysiwyg.create(this);
+        }
+      });
     })
     .on('dialogopen', function(e) {
       var $el = $(e.target);
@@ -918,9 +943,10 @@ if (!CRM.vars) CRM.vars = {};
         $el.addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
       }
+      $el.parent().find('.ui-dialog-titlebar .ui-icon-closethick').removeClass('ui-icon-closethick').addClass('fa-times');
       // Add resize button
       if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
-        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
+        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'fa-expand'}, text: false}));
         $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
           if ($el.data('origSize')) {
             $el.dialog('option', $el.data('origSize'));
@@ -1149,7 +1175,7 @@ if (!CRM.vars) CRM.vars = {};
         buttons.push({
           text: label,
           'data-op': op,
-          icons: {primary: op === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
+          icons: {primary: op === 'no' ? 'fa-times' : 'fa-check'},
           click: function() {
             var event = $.Event('crmConfirm:' + op);
             $(this).trigger(event);

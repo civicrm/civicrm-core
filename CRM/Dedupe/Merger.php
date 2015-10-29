@@ -43,6 +43,12 @@ class CRM_Dedupe_Merger {
   public static function relTables() {
     static $relTables;
 
+    // Setting these merely prevents enotices - but it may be more appropriate not to add the user table below
+    // if the url can't be retrieved. A more standardised way to retrieve them is.
+    // CRM_Core_Config::singleton()->userSystem->getUserRecordUrl() - however that function takes a contact_id &
+    // we may need a different function when it is not known.
+    $title = $userRecordUrl = '';
+
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal) {
       $userRecordUrl = CRM_Utils_System::url('user/%ufid');
@@ -157,6 +163,10 @@ class CRM_Dedupe_Merger {
 
   /**
    * Returns the related tables groups for which a contact has any info entered.
+   *
+   * @param int $cid
+   *
+   * @return array
    */
   public static function getActiveRelTables($cid) {
     $cid = (int) $cid;
@@ -319,6 +329,12 @@ WHERE
 
   /**
    * Return payment update Query.
+   *
+   * @param string $tableName
+   * @param int $mainContactId
+   * @param int $otherContactId
+   *
+   * @return array
    */
   public static function paymentSql($tableName, $mainContactId, $otherContactId) {
     $sqls = array();
@@ -415,6 +431,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * Based on the provided two contact_ids and a set of tables, move the
    * belongings of the other contact to the main one.
    *
+   * @param int $mainId
+   * @param int $otherId
+   * @param bool $tables
+   * @param array $tableOperations
    */
   public static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array()) {
     $cidRefs = self::cidRefs();
@@ -778,6 +798,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Helps decide how to behave when there are conflicts.
    *                                 A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                                 Does a force merge otherwise (aggressive mode).
+   *
+   * @param array $conflicts
    *
    * @return bool
    */

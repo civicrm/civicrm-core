@@ -77,7 +77,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]");
     $createdBy = $this->getText("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[3]/a");
     $this->click("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[7]/span/a[2]");
-    $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table/tbody/tr[2]/td[contains(text(), '{$createdBy}')]");
+    $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[1]/tbody/tr[2]/td[contains(text(), '{$createdBy}')]");
     $this->openCiviPage('group', 'reset=1');
 
     //search groups using created by
@@ -252,7 +252,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
 
     $this->openCiviPage('group', 'reset=1');
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Group']");
+    $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']/div[@class='crm-submit-buttons']/a/span[text()=' Add Group']");
     $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/span[contains(text(), '{$group}')]");
     $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/span[text()='{$group}']/../../td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());

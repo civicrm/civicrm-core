@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
@@ -70,7 +68,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *   Contribution object.
    * @param bool $taxTrxnID
    *
-   * @return void
+   * @param int $trxnId
+   *
+   * @return CRM_Financial_DAO_FinancialItem
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -130,7 +130,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * Create the financial Items and financial enity trxn.
+   * Create the financial Items and financial entity trxn.
    *
    * @param array $params
    *   Associated array to create financial items.
@@ -139,7 +139,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $trxnIds
    *   Financial item ids.
    *
-   * @return object
+   * @return CRM_Financial_DAO_FinancialItem
    */
   public static function create(&$params, $ids = NULL, $trxnIds = NULL) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
@@ -209,7 +209,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   public static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
     $financialItem = new CRM_Financial_DAO_EntityFinancialTrxn();
     $financialItem->copyValues($params);
-    //retrieve last entry from civicrm_entity_financial_trxn
+    // retrieve last entry from civicrm_entity_financial_trxn
     if ($maxId) {
       $financialItem->orderBy('id DESC');
       $financialItem->limit(1);

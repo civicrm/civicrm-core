@@ -314,6 +314,8 @@ WHERE  contribution_id = {$id}
    * @param int $statusId
    * @param int|null $previousStatusId
    *
+   * @param string $receiveDate
+   *
    * @return null|string
    */
   protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {
@@ -711,6 +713,32 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
       );
     }
+  }
+
+  /**
+   * Get default values for billing fields.
+   *
+   * @todo this function still replicates code in several other places in the code.
+   *
+   * Also - the call to getProfileDefaults possibly covers the state_province & country already.
+   *
+   * @param $defaults
+   *
+   * @return array
+   */
+  protected function getBillingDefaults($defaults) {
+    // set default country from config if no country set
+    $config = CRM_Core_Config::singleton();
+    if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
+      $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
+    }
+
+    if (empty($defaults["billing_state_province_id-{$this->_bltID}"])) {
+      $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
+    }
+
+    $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
+    return array_merge($defaults, $billingDefaults);
   }
 
 }

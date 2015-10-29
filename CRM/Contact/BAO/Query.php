@@ -1507,13 +1507,31 @@ class CRM_Contact_BAO_Query {
 
     foreach ($formValues as $id => $values) {
 
-      self::legacyConvertFormValues($id, $values);
-
       if (self::isAlreadyProcessedForQueryFormat($values)) {
         $params[] = $values;
         continue;
       }
-      if ($id == 'privacy') {
+
+      self::legacyConvertFormValues($id, $values);
+
+      // The form uses 1 field to represent two db fields
+      if ($id == 'contact_type' && $values && (!is_array($values) || !array_intersect(array_keys($values), CRM_Core_DAO::acceptedSQLOperators()))) {
+        $contactType = array();
+        $subType = array();
+        foreach ((array) $values as $key => $type) {
+          $types = explode('__', is_numeric($type) ? $key : $type);
+          $contactType[$types[0]] = $types[0];
+          // Add sub-type if specified
+          if (!empty($types[1])) {
+            $subType[$types[1]] = $types[1];
+          }
+        }
+        $params[] = array('contact_type', 'IN', $contactType, 0, 0);
+        if ($subType) {
+          $params[] = array('contact_sub_type', 'IN', $subType, 0, 0);
+        }
+      }
+      elseif ($id == 'privacy') {
         if (is_array($formValues['privacy'])) {
           $op = !empty($formValues['privacy']['do_not_toggle']) ? '=' : '!=';
           foreach ($formValues['privacy'] as $key => $value) {
@@ -1594,15 +1612,18 @@ class CRM_Contact_BAO_Query {
    *
    */
   public static function legacyConvertFormValues($id, &$values) {
-    if (in_array($id, array('group', 'tag')) && is_array($values)) {
+    $legacyElements = array(
+      'group',
+      'tag',
+      'contact_tags',
+      'contact_type',
+      'membership_type_id',
+      'membership_status_id',
+    );
+    if (in_array($id, $legacyElements) && is_array($values)) {
       // prior to 4.7, formValues for some attributes (e.g. group, tag) are stored in array(id1 => 1, id2 => 1),
       // as per the recent Search fixes $values need to be in standard array(id1, id2) format
-      $ids = array_keys($values, 1);
-      if (count($ids) > 1 ||
-        (count($ids) == 1 && (key($values) > 1 || (key($values) == 1 && $values[1] == 1))) // handle (0 => 4), (1 => 1)
-      ) {
-        $values = $ids;
-      }
+      CRM_Utils_Array::formatArrayKeys($values);
     }
   }
 
@@ -1718,10 +1739,6 @@ class CRM_Contact_BAO_Query {
         $this->deletedContacts($values);
         return;
 
-      case 'contact_type':
-        $this->contactType($values);
-        return;
-
       case 'contact_sub_type':
         $this->contactSubType($values);
         return;
@@ -1807,10 +1824,13 @@ class CRM_Contact_BAO_Query {
         return;
 
       case 'state_province':
+      case 'state_province_id':
+      case 'state_province_name':
         $this->stateProvince($values);
         return;
 
       case 'country':
+      case 'country_id':
         $this->country($values, FALSE);
         return;
 
@@ -2014,7 +2034,7 @@ class CRM_Contact_BAO_Query {
 
     $multipleFields = array('url');
 
-    //check if the location type exits for fields
+    //check if the location type exists for fields
     $lType = '';
     $locType = explode('-', $name);
 
@@ -2799,7 +2819,7 @@ class CRM_Contact_BAO_Query {
 
     $clause = array();
     $alias = "contact_a.contact_sub_type";
-    $qillOperators = array('NOT LIKE' => ts('Not Like')) + CRM_Core_SelectValues::getSearchBuilderOperators();
+    $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();
 
     $op = str_replace('IN', 'LIKE', $op);
     $op = str_replace('=', 'LIKE', $op);
@@ -3603,11 +3623,7 @@ WHERE  $smartGroupClause
     }
 
     $countryClause = $countryQill = NULL;
-    if (
-      $values &&
-      !empty($value)
-    ) {
-
+    if ($values && !empty($value)) {
       $this->_tables['civicrm_address'] = 1;
       $this->_whereTables['civicrm_address'] = 1;
 
@@ -3714,73 +3730,12 @@ WHERE  $smartGroupClause
   public function stateProvince(&$values, $status = NULL) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    // quick escape for IS NULL
-    if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-      $value = NULL;
-    }
-    elseif (!is_array($value)) {
-      // force the state to be an array
-      // check if its in the mapper format!
-      $values = self::parseSearchBuilderString($value);
-      if (is_array($values)) {
-        $value = $values;
-      }
-      else {
-        $value = array($value);
-      }
-    }
-
-    // check if the values are ids OR names of the states
-    $inputFormat = 'id';
-    if ($value) {
-      foreach ($value as $v) {
-        if (!is_numeric($v)) {
-          $inputFormat = 'name';
-          break;
-        }
-      }
-    }
-
-    $names = array();
-    if ($op == '=') {
-      $op = 'IN';
-    }
-    elseif ($op == '!=') {
-      $op = 'NOT IN';
-    }
-    else {
-      // this converts IS (NOT)? EMPTY to IS (NOT)? NULL
-      $op = str_replace('EMPTY', 'NULL', $op);
-    }
-    if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-      $stateClause = "civicrm_address.state_province_id $op";
-    }
-    elseif ($inputFormat == 'id') {
-      if ($op != 'NOT IN') {
-        $op = 'IN';
-      }
-      $stateClause = "civicrm_address.state_province_id $op (" . implode(',', $value) . ')';
-
-      foreach ($value as $id) {
-        $names[] = CRM_Core_PseudoConstant::stateProvince($id, FALSE);
-      }
-    }
-    else {
-      $inputClause = array();
-      $stateProvince = CRM_Core_PseudoConstant::stateProvince();
-      foreach ($value as $name) {
-        $name = trim($name);
-        $inputClause[] = CRM_Utils_Array::key($name, $stateProvince);
-      }
-      $stateClause = "civicrm_address.state_province_id $op (" . implode(',', $inputClause) . ')';
-      $names = $value;
-    }
+    $stateClause = self::buildClause('civicrm_address.state_province_id', $op, $value, 'Positive');
     $this->_tables['civicrm_address'] = 1;
     $this->_whereTables['civicrm_address'] = 1;
 
     $countryValues = $this->getWhereValues('country', $grouping);
     list($countryClause, $countryQill) = $this->country($countryValues, TRUE);
-
     if ($countryClause) {
       $clause = "( $stateClause AND $countryClause )";
     }
@@ -3789,11 +3744,12 @@ WHERE  $smartGroupClause
     }
 
     $this->_where[$grouping][] = $clause;
+    list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_Address', "state_province_id", $value, $op);
     if (!$status) {
-      $this->_qill[$grouping][] = ts('State/Province') . " $op " . implode(' ' . ts('or') . ' ', $names) . $countryQill;
+      $this->_qill[$grouping][] = ts("State/Province %1 %2 %3", array(1 => $qillop, 2 => $qillVal, 3 => $countryQill));
     }
     else {
-      return implode(' ' . ts('or') . ' ', $names) . $countryQill;
+      return implode(' ' . ts('or') . ' ', $qillVal) . $countryQill;
     }
   }
 
@@ -4479,7 +4435,7 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @return bool;
    */
-  protected static function isAlreadyProcessedForQueryFormat($values) {
+  public static function isAlreadyProcessedForQueryFormat($values) {
     if (!is_array($values)) {
       return FALSE;
     }
@@ -5325,6 +5281,15 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     }
   }
 
+  /**
+   * Calculate date from age.
+   *
+   * @param string $asofDate
+   * @param int $age
+   * @param string $type
+   *
+   * @return string
+   */
   public static function calcDateFromAge($asofDate, $age, $type) {
     $date = new DateTime($asofDate);
     if ($type == "min") {
@@ -5376,8 +5341,8 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       case 'IN':
       case 'NOT IN':
         // I feel like this would be escaped properly if passed through $queryString = CRM_Core_DAO::createSqlFilter.
-        if (!empty($value) && is_array($value) && !array_key_exists($op, $value)) {
-          $value = array($op => $value);
+        if (!empty($value) && (!is_array($value) || !array_key_exists($op, $value))) {
+          $value = array($op => (array) $value);
         }
 
       default:
@@ -5592,8 +5557,8 @@ AND   displayRelType.is_active = 1
    *   depends on the operator and who's calling the query builder.
    * @param int $grouping
    *   the index where to place the where clause.
-   * @param $selectValues
-   *   The key value pairs for this element. This allows us to use this function for things besides option-value pairs.
+   * @param string $daoName
+   *   DAO Name.
    * @param array $field
    *   an array that contains various properties of the field identified by $name.
    * @param string $label

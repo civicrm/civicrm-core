@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing Wordpress Access Control  *}
-<div id="help">
+<div class="help">
     <p>{ts}Use this form to Grant access to CiviCRM components and other CiviCRM permissions to WordPress roles.{/ts}<br /><br />
   {ts}<strong>NOTE: Super Admin</strong> and <strong>Administrator</strong> roles will have all permissions in CiviCRM.{/ts}
   </p>

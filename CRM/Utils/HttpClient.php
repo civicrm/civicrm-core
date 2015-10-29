@@ -92,6 +92,7 @@ class CRM_Utils_HttpClient {
 
     $fp = @fopen($localFile, "w");
     if (!$fp) {
+      // Fixme: throw error instead of setting message
       CRM_Core_Session::setStatus(ts('Unable to write to %1.<br />Is the location writable?', array(1 => $localFile)), ts('Write Error'), 'error');
       return self::STATUS_WRITE_ERROR;
     }
@@ -99,8 +100,9 @@ class CRM_Utils_HttpClient {
 
     curl_exec($ch);
     if (curl_errno($ch)) {
+      // Fixme: throw error instead of setting message
       CRM_Core_Session::setStatus(ts('Unable to download extension from %1. Error Message: %2',
-        array(1 => $remoteFile, 2 => curl_error($ch))), ts('Download Error'), 'error');
+        array(1 => $remoteFile, 2 => curl_error($ch))), ts('Extension download error'), 'error');
       return self::STATUS_DL_ERROR;
     }
     else {

@@ -606,7 +606,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
 
-    $params['name'] = CRM_Utils_String::titleToVar($params['label']);
     $params['is_display_amounts'] = CRM_Utils_Array::value('is_display_amounts', $params, FALSE);
     $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);

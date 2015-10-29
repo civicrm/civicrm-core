@@ -25,6 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
+/**
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
 use Civi\ActionSchedule\RecipientBuilder;
 
 /**
@@ -85,9 +90,11 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *   The schedule as configured by the administrator.
    * @param string $phase
    *   See, e.g., RecipientBuilder::PHASE_RELATION_FIRST.
+   *
+   * @param array $defaultParams
+   *
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
-   * @throws \CRM_Core_Exception
    */
   public function createQuery($schedule, $phase, $defaultParams) {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);

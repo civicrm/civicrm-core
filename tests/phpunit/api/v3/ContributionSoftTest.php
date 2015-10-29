@@ -36,11 +36,25 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
   /**
-   * Assume empty database with just civicrm_data.
+   * The hard credit contact.
+   *
+   * @var int
    */
-  protected $_individualId; //the hard credit contact
-  protected $_softIndividual1Id; //the first soft credit contact
-  protected $_softIndividual2Id; //the second soft credit contact
+  protected $_individualId;
+
+  /**
+   * The first soft credit contact.
+   *
+   * @var int
+   */
+  protected $_softIndividual1Id;
+
+  /**
+   * The second soft credit contact.
+   *
+   * @var int
+   */
+  protected $_softIndividual2Id;
   protected $_contributionId;
   protected $_financialTypeId = 1;
   protected $_apiversion = 3;
@@ -58,7 +72,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->_softIndividual2Id = $this->individualCreate();
     $this->_contributionId = $this->contributionCreate(array('contact_id' => $this->_individualId));
 
-    $paymentProcessor = $this->processorCreate();
+    $this->processorCreate();
     $this->_params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -85,6 +99,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
   /**
    * Test get methods.
+   *
    * @todo - this might be better broken down into more smaller tests
    */
   public function testGetContributionSoft() {

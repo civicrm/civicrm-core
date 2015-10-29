@@ -70,11 +70,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('sort_name', "Smiths_x");
     $this->click('_qf_Basic_refresh');
 
-    // Batch Update Via Profile
+    // Update multiple contacts
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
-    $this->select('task', "label=Batch update contacts via profile");
+    $this->select('task', "label=Update multiple contacts");
     $this->waitForElementPresent('_qf_PickProfile_next');
     $this->waitForElementPresent('uf_group_id');
     $this->select('uf_group_id', "label={$profileTitle}");
@@ -152,11 +152,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
 
-    // Batch Update Via Profile
+    // Update multiple contacts
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
-    $this->select('task', "label=Batch update contacts via profile");
+    $this->select('task', "label=Update multiple contacts");
     $this->waitForElementPresent('_qf_PickProfile_next');
 
     $this->select('uf_group_id', "label={$profileTitle}");
@@ -331,11 +331,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
 
-    // Batch Update Via Profile
+    // Update multiple contacts
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
-    $this->select('task', "label=Batch update contacts via profile");
+    $this->select('task', "label=Update multiple contacts");
     $this->waitForElementPresent('_qf_PickProfile_next');
 
     $this->select('uf_group_id', "label={$profileTitle}");

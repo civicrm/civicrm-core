@@ -38,12 +38,12 @@ class CRM_Upgrade_Incremental_php_FourTwo extends CRM_Upgrade_Incremental_Base {
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $preUpgradeMessage
+   * @param string $preUpgradeMessage
    * @param string $rev
    *   a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'.
    * @param null $currentVer
    *
-   * @return void
+   * @return bool
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.2.alpha1') {
@@ -139,7 +139,6 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.2.beta5') {
@@ -378,6 +377,11 @@ HAVING COUNT(cpse.price_set_id) > 1 AND MIN(cpse1.id) <> cpse.id ";
    * (Queue Task Callback)
    *
    * Upgrade code to create priceset for contribution pages and events
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $rev
+   *
+   * @return bool
    */
   public static function task_4_2_alpha1_createPriceSets(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -429,8 +433,11 @@ WHERE     cpse.price_set_id IS NULL";
   }
 
   /**
+   * Create price sets.
    *
-   * create price sets
+   * @param string $daoName
+   * @param string $addTo
+   * @param array $options
    */
   public static function createPriceSet($daoName, $addTo, $options = array()) {
     $query = "SELECT title FROM {$addTo[0]} where id =%1";
@@ -782,6 +789,10 @@ AND       cli.entity_id IS NULL AND cp.fee_amount IS NOT NULL";
    * (Queue Task Callback)
    *
    * Create an event registration profile with a single email field CRM-9587
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
    */
   public static function task_4_2_alpha1_eventProfile(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();

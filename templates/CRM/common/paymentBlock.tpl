@@ -29,14 +29,7 @@
   CRM.$(function($) {
     function buildPaymentBlock(type) {
       var $form = $('#billing-payment-block').closest('form');
-
-      {/literal}{if !$isBillingAddressRequiredForPayLater}{literal}
-      if (type == 0) {
-        $("#billing-payment-block").html('');
-        return;
-      }
-      {/literal}{/if}
-
+      {/literal}
       {if $contributionPageID}
         {capture assign='contributionPageID'}id={$contributionPageID}&{/capture}
       {else}
@@ -47,8 +40,13 @@
       {else}
         {capture assign='urlPathVar'}{/capture}
       {/if}
+      {if $billing_profile_id}
+        {capture assign='profilePathVar'}billing_profile_id={$billing_profile_id}&{/capture}
+      {else}
+        {capture assign='profilePathVar'}{/capture}
+      {/if}
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="`$urlPathVar``$contributionPageID`processor_id="}" + type;
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="`$urlPathVar``$profilePathVar``$contributionPageID`processor_id="}" + type;
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {

@@ -64,7 +64,10 @@ class CRM_Case_XMLRepository {
   }
 
   /**
-   * @param array <String,SimpleXMLElement> $xml
+   * Class constructor.
+   *
+   * @param array $allCaseTypes
+   * @param array $xml
    */
   public function __construct($allCaseTypes = NULL, $xml = array()) {
     $this->allCaseTypes = $allCaseTypes;
@@ -72,8 +75,12 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Retrieve case.
+   *
    * @param string $caseType
-   * @return SimpleXMLElement|FALSE
+   *
+   * @return FALSE|\SimpleXMLElement
+   * @throws \CRM_Core_Exception
    */
   public function retrieve($caseType) {
     // check if xml definition is defined in db
@@ -106,6 +113,8 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Retrieve file.
+   *
    * @param string $caseType
    * @return SimpleXMLElement|FALSE
    */
@@ -136,6 +145,8 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Find xml file.
+   *
    * @param string $caseType
    * @return null|string
    *   file path

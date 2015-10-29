@@ -93,27 +93,12 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   }
 
   /**
-   * Get the ID of the database billing location.
+   * Creates the entry in the civicrm_loc_block.
+   *
+   * @param string $location
+   * @param array $entityElements
    *
    * @return int
-   *   Billing location type id.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function getBillingLocationId() {
-    static $billingTypeID = NULL;
-    if ($billingTypeID) {
-      return $billingTypeID;
-    }
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $billingTypeID = array_search('Billing', $locationTypes);
-    if (!$billingTypeID) {
-      throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
-    }
-    return $billingTypeID;
-  }
-  /**
-   * Creates the entry in the civicrm_loc_block.
    */
   public static function createLocBlock(&$location, &$entityElements) {
     $locId = self::findExisting($entityElements);
@@ -152,6 +137,10 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
   /**
    * Takes an entity array and finds the existing location block.
+   *
+   * @param array $entityElements
+   *
+   * @return int
    */
   public static function findExisting($entityElements) {
     $eid = $entityElements['entity_id'];
@@ -175,8 +164,8 @@ WHERE e.id = %1";
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object
-   *   CRM_Core_BAO_locBlock object on success, null otherwise
+   * @return CRM_Core_BAO_locBlock
+   *   Object on success, null otherwise
    */
   public static function addLocBlock(&$params) {
     $locBlock = new CRM_Core_DAO_LocBlock();
@@ -248,7 +237,9 @@ WHERE e.id = %1";
   }
 
   /**
-   * @param $entityBlock
+   * Get values.
+   *
+   * @param array $entityBlock
    * @param bool $microformat
    *
    * @return array
@@ -361,12 +352,10 @@ WHERE e.id = %1";
   }
 
   /**
-   * If contact has data for any location block, make sure
-   * contact should have only one primary block, CRM-5051
+   * Make sure contact should have only one primary block, CRM-5051.
    *
    * @param int $contactId
    *   Contact id.
-   *
    */
   public static function checkPrimaryBlocks($contactId) {
     if (!$contactId) {
@@ -408,6 +397,8 @@ WHERE e.id = %1";
   }
 
   /**
+   * Get chain select values (whatever that means!).
+   *
    * @param mixed $values
    * @param string $valueType
    * @param bool $flatten

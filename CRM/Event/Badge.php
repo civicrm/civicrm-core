@@ -75,12 +75,11 @@ class CRM_Event_Badge {
   }
 
   /**
-   * Create the labels (pdf)
+   * Create the labels (pdf).
+   *
    * It assumes the participants are from the same event
    *
    * @param array $participants
-   *
-   * @return;
    */
   public function run(&$participants) {
     // fetch the 1st participant, and take her event to retrieve its attributes
@@ -171,7 +170,9 @@ class CRM_Event_Badge {
   }
 
   /**
-   * This is supposed to be overrided.
+   * This is supposed to be overridden.
+   *
+   * @param array $participant
    */
   public function generateLabel($participant) {
     $txt = "{$this->event['title']}
@@ -185,11 +186,9 @@ class CRM_Event_Badge {
   }
 
   /**
-   * Create labels (pdf)
+   * Create labels (pdf).
    *
    * @param array $participants
-   *
-   * @return;
    */
   public function createLabels(&$participants) {
 

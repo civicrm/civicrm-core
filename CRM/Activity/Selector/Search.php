@@ -262,7 +262,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $mailingIDs = CRM_Mailing_BAO_Mailing::mailingACLIDs();
     $accessCiviMail = CRM_Core_Permission::check('access CiviMail');
 
-    //get all campaigns.
+    // Get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
@@ -270,13 +270,13 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-    //get all activity types
+    // Get all activity types
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE);
 
     while ($result->fetch()) {
       $row = array();
 
-      // ignore rows where we dont have an activity id
+      // Ignore rows where we dont have an activity id.
       if (empty($result->activity_id)) {
         continue;
       }
@@ -345,7 +345,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         $result->activity_id
       );
 
-      //carry campaign to selector.
+      // Carry campaign to selector.
       $row['campaign'] = CRM_Utils_Array::value($result->activity_campaign_id, $allCampaigns);
       $row['campaign_id'] = $result->activity_campaign_id;
 
@@ -355,7 +355,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         );
       }
 
-      //Check if recurring activity
+      // Check if recurring activity.
       $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($row['activity_id'], 'civicrm_activity');
       $row['repeat'] = '';
       if ($repeat) {

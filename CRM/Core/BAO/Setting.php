@@ -279,10 +279,15 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Validate & convert settings input
+   * Validate & convert settings input.
    *
-   * @value mixed value of the setting to be set
-   * @fieldSpec array Metadata for given field (drawn from the xml)
+   * @param mixed $value
+   *   value of the setting to be set
+   * @param array $fieldSpec
+   *   Metadata for given field (drawn from the xml)
+   *
+   * @return bool
+   * @throws \api_Exception
    */
   public static function validateSetting(&$value, $fieldSpec) {
     if ($fieldSpec['type'] == 'String' && is_array($value)) {
@@ -300,10 +305,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Validate & convert settings input - translate True False to 0 or 1
+   * Validate & convert settings input - translate True False to 0 or 1.
    *
-   * @value mixed value of the setting to be set
-   * @fieldSpec array Metadata for given field (drawn from the xml)
+   * @param mixed $value value of the setting to be set
+   * @param array $fieldSpec Metadata for given field (drawn from the xml)
+   *
+   * @return bool
+   * @throws \api_Exception
    */
   public static function validateBoolSetting(&$value, $fieldSpec) {
     if (!CRM_Utils_Rule::boolean($value)) {

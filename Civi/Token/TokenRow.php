@@ -169,6 +169,10 @@ class TokenRow {
 
   /**
    * Auto-convert between different formats
+   *
+   * @param string $format
+   *
+   * @return $this
    */
   public function fill($format = NULL) {
     if ($format === NULL) {
@@ -245,20 +249,36 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
   protected $tokenRow;
 
   /**
-   * @param $tokenProcessor
-   * @param $tokenRow
+   * Class constructor.
+   *
+   * @param array $tokenProcessor
+   * @param array $tokenRow
    */
   public function __construct($tokenProcessor, $tokenRow) {
     $this->tokenProcessor = $tokenProcessor;
     $this->tokenRow = $tokenRow;
   }
 
+  /**
+   * Does offset exist.
+   *
+   * @param mixed $offset
+   *
+   * @return bool
+   */
   public function offsetExists($offset) {
     return
       isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])
       || isset($this->tokenProcessor->context[$offset]);
   }
 
+  /**
+   * Get offset.
+   *
+   * @param string $offset
+   *
+   * @return string
+   */
   public function &offsetGet($offset) {
     if (isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])) {
       return $this->tokenProcessor->rowContexts[$this->tokenRow][$offset];
@@ -270,22 +290,48 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
     return $val;
   }
 
+  /**
+   * Set offset.
+   *
+   * @param string $offset
+   * @param mixed $value
+   */
   public function offsetSet($offset, $value) {
     $this->tokenProcessor->rowContexts[$this->tokenRow][$offset] = $value;
   }
 
+  /**
+   * Unset offset.
+   *
+   * @param mixed $offset
+   */
   public function offsetUnset($offset) {
     unset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset]);
   }
 
+  /**
+   * Get iterator.
+   *
+   * @return \ArrayIterator
+   */
   public function getIterator() {
     return new \ArrayIterator($this->createMergedArray());
   }
 
+  /**
+   * Count.
+   *
+   * @return int
+   */
   public function count() {
     return count($this->createMergedArray());
   }
 
+  /**
+   * Create merged array.
+   *
+   * @return array
+   */
   protected function createMergedArray() {
     return array_merge(
       $this->tokenProcessor->rowContexts[$this->tokenRow],

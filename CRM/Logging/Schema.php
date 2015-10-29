@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Logging_Schema {
   private $logs = array();
@@ -53,10 +51,11 @@ class CRM_Logging_Schema {
   );
 
   /**
-   * (Setting Callback - Validate)
+   * Setting Callback - Validate.
    *
    * @param mixed $value
    * @param array $fieldSpec
+   *
    * @return bool
    * @throws API_Exception
    */
@@ -70,7 +69,8 @@ class CRM_Logging_Schema {
   }
 
   /**
-   * (Setting Callback - On Change)
+   * Setting Callback - On Change.
+   *
    * Respond to changes in the "logging" setting. Set up or destroy
    * triggers, etal.
    *
@@ -118,7 +118,8 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     $this->tables = preg_grep('/_cache$/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/_log/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/^civicrm_queue_/', $this->tables, PREG_GREP_INVERT);
-    $this->tables = preg_grep('/^civicrm_menu/', $this->tables, PREG_GREP_INVERT); //CRM-14672
+    //CRM-14672
+    $this->tables = preg_grep('/^civicrm_menu/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/_temp_/', $this->tables, PREG_GREP_INVERT);
 
     // do not log civicrm_mailing_event* tables, CRM-12300
@@ -159,6 +160,10 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   /**
    * Return custom data tables for specified entity / extends.
+   *
+   * @param string $extends
+   *
+   * @return array
    */
   public function entityCustomDataLogTables($extends) {
     $customGroupTables = array();
@@ -187,6 +192,8 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   /**
    * Drop triggers for all logged tables.
+   *
+   * @param string $tableName
    */
   public function dropTriggers($tableName = NULL) {
     $dao = new CRM_Core_DAO();
@@ -228,9 +235,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   }
 
   /**
-   * Enable sitewide logging.
-   *
-   * @return void
+   * Enable site-wide logging.
    */
   public function enableLogging() {
     $this->fixSchemaDifferences(TRUE);
@@ -241,8 +246,6 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    * Sync log tables and rebuild triggers.
    *
    * @param bool $enableLogging : Ensure logging is enabled
-   *
-   * @return void
    */
   public function fixSchemaDifferences($enableLogging = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -266,7 +269,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    * @param bool $rebuildTrigger
    *   should we rebuild the triggers.
    *
-   * @return void
+   * @return bool
    */
   public function fixSchemaDifferencesFor($table, $cols = array(), $rebuildTrigger = FALSE) {
     if (empty($table)) {
@@ -310,7 +313,9 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   }
 
   /**
-   * @param $table
+   * Get query table.
+   *
+   * @param string $table
    *
    * @return array
    */
@@ -322,8 +327,10 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   }
 
   /**
-   * @param $col
-   * @param $createQuery
+   * Get column query.
+   *
+   * @param string $col
+   * @param bool $createQuery
    *
    * @return array|mixed|string
    */
@@ -336,6 +343,8 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   }
 
   /**
+   * Fix schema differences.
+   *
    * @param bool $rebuildTrigger
    */
   public function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
@@ -360,11 +369,13 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   }
 
   /**
+   * Fix timestamp.
+   *
    * Log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
    * so there's no need for a default timestamp and therefore we remove such default timestamps
    * also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
    *
-   * @param $query
+   * @param string $query
    *
    * @return mixed
    */
@@ -376,6 +387,9 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     return $query;
   }
 
+  /**
+   * Add reports.
+   */
   private function addReports() {
     $titles = array(
       'logging/contact/detail' => ts('Logging Details'),
@@ -407,6 +421,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   /**
    * Get an array of column names of the given table.
+   *
+   * @param string $table
+   * @param bool $force
+   *
+   * @return array
    */
   private function columnsOf($table, $force = FALSE) {
     static $columnsOf = array();
@@ -430,6 +449,10 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   /**
    * Get an array of columns and their details like DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT for the given table.
+   *
+   * @param string $table
+   *
+   * @return array
    */
   private function columnSpecsOf($table) {
     static $columnSpecs = array(), $civiDB = NULL;
@@ -469,8 +492,10 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
   }
 
   /**
-   * @param $civiTable
-   * @param $logTable
+   * Get columns that have changed.
+   *
+   * @param string $civiTable
+   * @param string $logTable
    *
    * @return array
    */
@@ -532,6 +557,8 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
 
   /**
    * Create a log table with schema mirroring the given table’s structure and seeding it with the given table’s contents.
+   *
+   * @param string $table
    */
   private function createLogTableFor($table) {
     $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
@@ -571,6 +598,9 @@ COLS;
     $this->logs[$table] = "log_$table";
   }
 
+  /**
+   * Delete reports.
+   */
   private function deleteReports() {
     // disable logging templates
     CRM_Core_DAO::executeQuery("
@@ -618,7 +648,9 @@ COLS;
   }
 
   /**
-   * @param $info
+   * Get trigger info.
+   *
+   * @param array $info
    * @param null $tableName
    * @param bool $force
    */
@@ -707,10 +739,11 @@ COLS;
   }
 
   /**
+   * Disable logging temporarily.
+   *
    * This allow logging to be temporarily disabled for certain cases
    * where we want to do a mass cleanup but dont want to bother with
    * an audit trail
-   *
    */
   public static function disableLoggingForThisConnection() {
     // do this only if logging is enabled

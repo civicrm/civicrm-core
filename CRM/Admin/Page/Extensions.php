@@ -48,6 +48,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * Obtains the group name from url and sets the title.
    */
   public function preProcess() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
     $destination = CRM_Utils_System::url('civicrm/admin/extensions',
       'reset=1');
@@ -203,9 +205,17 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     }
     $this->assign('localExtensionRows', $localExtensionRows);
 
+    try {
+      $remoteExtensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
+    }
+    catch (CRM_Extension_Exception $e) {
+      $remoteExtensions = array();
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Extension download error'), 'error');
+    }
+
     // build list of available downloads
     $remoteExtensionRows = array();
-    foreach (CRM_Extension_System::singleton()->getBrowser()->getExtensions() as $info) {
+    foreach ($remoteExtensions as $info) {
       $row = (array) $info;
       $row['id'] = $info->key;
       $action = CRM_Core_Action::UPDATE;

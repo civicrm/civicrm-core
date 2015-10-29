@@ -35,12 +35,10 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $preUpgradeMessage
+   * @param string $preUpgradeMessage
    * @param string $rev
    *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
    * @param null $currentVer
-   *
-   * @return void
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.7.alpha1') {
@@ -70,7 +68,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.7.alpha1') {
@@ -124,6 +121,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_alpha4($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Remove %1', array(1 => 'Moneris')), 'removePaymentProcessorType', 'Moneris');
+    $this->addTask('Update Smart Groups', 'fixContactTypeInSmartGroups');
   }
 
   /**
@@ -304,6 +302,31 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
         );
         CRM_Core_BAO_UFJoin::create($ufJoinParam);
       }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * CRM-11782 - Get rid of VALUE_SEPARATOR character in saved search form values
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function fixContactTypeInSmartGroups(CRM_Queue_TaskContext $ctx) {
+    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, form_values FROM civicrm_saved_search WHERE form_values LIKE '%$sep%'");
+    while ($dao->fetch()) {
+      $formValues = unserialize($dao->form_values);
+      if (isset($formValues['contact_type']) && is_array($formValues['contact_type'])) {
+        $newVals = array();
+        foreach ($formValues['contact_type'] as $key => $val) {
+          $newVals[str_replace($sep, '__', $key)] = is_string($val) ? str_replace($sep, '__', $val) : $val;
+        }
+        $formValues['contact_type'] = $newVals;
+      }
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_saved_search SET form_values = %1 WHERE id = {$dao->id}", array(1 => array(serialize($formValues), 'String')));
     }
 
     return TRUE;

@@ -153,6 +153,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Contribution mode for event registration for offline mode.
+   *
+   * @deprecated
    */
   public $_contributeMode = 'direct';
 
@@ -806,7 +808,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     if (!empty($values['payment_processor_id'])) {
       // make sure that payment instrument values (e.g. credit card number and cvv) are valid
-      CRM_Core_Payment_Form::validatePaymentInstrument($values['payment_processor_id'], $values, $errorMsg, $self);
+      CRM_Core_Payment_Form::validatePaymentInstrument($values['payment_processor_id'], $values, $errorMsg, NULL);
     }
 
     if (!empty($values['record_contribution'])) {
@@ -1571,6 +1573,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           CRM_Utils_System::mungeCreditCard($params['credit_card_number'])
         );
         $this->assign('credit_card_type', $params['credit_card_type']);
+        // The concept of contributeMode is deprecated.
         $this->assign('contributeMode', 'direct');
         $this->assign('isAmountzero', 0);
         $this->assign('is_pay_later', 0);

@@ -56,19 +56,17 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * going to filter the
-   * submitted values across XSS vulnerability.
+   * Going to filter the submitted values across XSS vulnerability.
    *
    * @param array|string $values
-   *
-   * @internal param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
-   *    If FALSE, then non-string values will be preserved
    */
   public function encodeInput(&$values) {
   }
 
   /**
-   * @param $values
+   * Decode output.
+   *
+   * @param array $values
    * @param bool $castToString
    */
   public function decodeOutput(&$values, $castToString = FALSE) {
@@ -85,13 +83,12 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * @inheritDoc
-   */
-  /**
-   * @param $apiRequest
-   * @param $result
+   * To api output.
    *
-   * @return modified
+   * @param array $apiRequest
+   * @param array $result
+   *
+   * @return array
    */
   public function toApiOutput($apiRequest, $result) {
     $lowerAction = strtolower($apiRequest['action']);

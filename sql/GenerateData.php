@@ -267,7 +267,11 @@ class CRM_GCD {
    */
 
   /**
-   * get a randomly generated string
+   * Get a randomly generated string.
+   *
+   * @param int $size
+   *
+   * @return string
    */
   private function randomString($size = 32) {
     $string = "";

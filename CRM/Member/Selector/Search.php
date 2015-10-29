@@ -29,15 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class is used to retrieve and display a range of
  * contacts that match the given criteria (specifically for
  * results of advanced search options.
- *
  */
 class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
@@ -176,13 +173,14 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
   /**
    * This method returns the links that are given for each search row.
-   * currently the links added for each row are
+   *
+   * Currently the links added for each row are
    *
    * - View
    * - Edit
    *
    * @param string $status
-   * @param null $isPaymentProcessor
+   * @param bool $isPaymentProcessor
    * @param null $accessContribution
    * @param null $qfKey
    * @param null $context
@@ -270,7 +268,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Getter for array of the parameters required for creating pager.
    *
-   * @param $action
+   * @param int $action
    * @param array $params
    */
   public function getPagerParams($action, &$params) {
@@ -290,7 +288,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param int $action
    *
    * @return int
    *   Total number of rows
@@ -472,7 +470,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * Returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples.
+   *
    * (name, sortName (key to the sort array))
    *
    * @param string $action
@@ -538,6 +537,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
+   * Alphabet query.
+   *
    * @return mixed
    */
   public function alphabetQuery() {
@@ -545,6 +546,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
+   * Get query.
+   *
    * @return string
    */
   public function &getQuery() {

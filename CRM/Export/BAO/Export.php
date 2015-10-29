@@ -1718,8 +1718,16 @@ WHERE  id IN ( $deleteIDString )
 
   /**
    * The function unsets static part of the string, if token is the dynamic part.
+   *
    * Example: 'Hello {contact.first_name}' => converted to => '{contact.first_name}'
    * i.e 'Hello Alan' => converted to => 'Alan'
+   *
+   * @param string $parsedString
+   * @param string $defaultGreeting
+   * @param bool $addressMergeGreetings
+   * @param string $greetingType
+   *
+   * @return mixed
    */
   public static function _trimNonTokens(
     &$parsedString, $defaultGreeting,

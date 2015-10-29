@@ -221,6 +221,14 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_contribution_soft_contact'] = 1;
       $query->_tables['civicrm_contribution_soft_phone'] = 1;
     }
+
+    if (!empty($query->_returnProperties['contribution_soft_credit_pcp_id'])) {
+      $query->_select['contribution_soft_credit_pcp_id'] = "civicrm_contribution_soft.pcp_id as contribution_soft_credit_pcp_id";
+      $query->_element['contribution_soft_credit_pcp_id'] = 1;
+      $query->_tables['civicrm_contribution'] = 1;
+      $query->_tables['civicrm_contribution_soft'] = 1;
+    }
+
     if (!empty($query->_returnProperties['contribution_campaign_title'])) {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;

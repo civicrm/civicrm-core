@@ -35,7 +35,7 @@
 {ts}Smart Group{/ts}
 {/htxt}
 {htxt id='id-advanced-smart'}
-    <p>{ts}If you've changed search criteria for this 'smart group' and want to save your changes, select <strong>Smart group - update</strong> from the '- more actions -' drop-down menu, and then click Go.{/ts}</p>
+    <p>{ts}If you've changed search criteria for this 'smart group' and want to save your changes, select <strong>Group - update smart group</strong> from the '- more actions -' drop-down menu{/ts}</p>
 {/htxt}
 
 {htxt id="id-privacy-title"}

@@ -40,6 +40,9 @@
  */
 class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     parent::__construct('membership', array(
       'fee' => ts('Membership Fee'),
@@ -52,6 +55,13 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     ));
   }
 
+  /**
+   * Is token active.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   *
+   * @return bool
+   */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
     return
@@ -76,10 +86,12 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @param \Civi\Token\TokenRow $row
    *   The record for which we want token values.
+   * @param string $entity
    * @param string $field
    *   The name of the token field.
    * @param mixed $prefetch
    *   Any data that was returned by the prefetch().
+   *
    * @return mixed
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {

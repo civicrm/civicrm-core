@@ -168,7 +168,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     if (!$this->_rtypeId) {
-      $params = $this->controller->exportValues($this->_name);
+      $params = CRM_Utils_Request::exportValues();
       if (isset($params['relationship_type_id'])) {
         $this->_rtypeId = $params['relationship_type_id'];
       }
@@ -202,7 +202,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_relationshipTypeId, 1, 'Relationship', $this->_relationshipId);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }

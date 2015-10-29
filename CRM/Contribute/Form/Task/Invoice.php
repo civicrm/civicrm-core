@@ -470,6 +470,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       if (empty($contactID)) {
         $contactID = $session->get('transaction.userID');
       }
+      // Fix Invoice email doesnot send out when completed payment using Paypal
+      if (empty($contactID)) {
+        $contactID = $contactIds['0'];
+      }
       $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
       $emails = array();
       $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
@@ -629,6 +633,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * @param string $html
    *   Content for pdf in html format.
+   *
+   * @param string $name
    *
    * @return string
    *   Name of file which is in pdf format

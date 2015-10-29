@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-contact-task-addtoOrganization-form-block">
-<div id="help">
+<div class="help">
     {ts}Choose Relationship Type and Target Organization{/ts}
 </div>
 <table class="form-layout-compressed">

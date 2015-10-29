@@ -44,6 +44,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $_participantPaymentID;
   protected $_financialTypeId;
 
+  /**
+   * Set up for tests.
+   */
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -199,15 +202,15 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentOnline() {
 
-    $paymentProcessor = $this->processorCreate();
-    $pageParams['processor_id'] = $paymentProcessor->id;
+    $pageParams['processor_id'] = $this->processorCreate();
     $contributionPage = $this->contributionPageCreate($pageParams);
     $contributionParams = array(
       'contact_id' => $this->_contactID,
       'contribution_page_id' => $contributionPage['id'],
-      'payment_processor' => $paymentProcessor->id,
+      'payment_processor' => $pageParams['processor_id'],
+      'financial_type_id' => 1,
     );
-    $contributionID = $this->onlineContributionCreate($contributionParams, 1);
+    $contributionID = $this->contributionCreate($contributionParams);
 
     $this->_participantPaymentID = $this->participantPaymentCreate($this->_participantID, $contributionID);
     $params = array(
@@ -225,16 +228,14 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
     );
-    $deletePayment = $this->callAPISuccess('participant_payment', 'delete', $params);
+    $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
   /**
    * Check financial records for online Participant pay later scenario.
    */
   public function testPaymentPayLaterOnline() {
-
-    $paymentProcessor = $this->processorCreate();
-    $pageParams['processor_id'] = $paymentProcessor->id;
+    $pageParams['processor_id'] = $this->processorCreate();
     $pageParams['is_pay_later'] = 1;
     $contributionPage = $this->contributionPageCreate($pageParams);
     $contributionParams = array(
@@ -242,8 +243,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'contribution_page_id' => $contributionPage['id'],
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
+      'financial_type_id' => 1,
     );
-    $contributionID = $this->onlineContributionCreate($contributionParams, 1);
+    $contributionID = $this->contributionCreate($contributionParams);
 
     $this->_participantPaymentID = $this->participantPaymentCreate($this->_participantID, $contributionID);
     $params = array(
@@ -261,7 +263,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
     );
-    $deletePayment = $this->callAPISuccess('participant_payment', 'delete', $params);
+    $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
 

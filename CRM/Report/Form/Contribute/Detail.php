@@ -403,7 +403,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     // This is a solution to not throw fatal errors when there is a column in order-by, not present in select/display columns.
     foreach ($this->_orderByFields as $orderBy) {
       if (!array_key_exists($orderBy['name'], $this->_params['fields']) &&
-        empty($orderBy['section'])
+        empty($orderBy['section']) && (strpos($this->_select, $orderBy['dbAlias']) === FALSE)
       ) {
         $this->_select .= ", {$orderBy['dbAlias']} as {$orderBy['tplField']}";
       }
@@ -506,13 +506,15 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $totalAmount = $average = array();
+    $totalAmount = $average = $fees = $net = array();
     $count = 0;
     $select = "
         SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,
                SUM( {$this->_aliases['civicrm_contribution']}.total_amount ) as amount,
                ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,
-               {$this->_aliases['civicrm_contribution']}.currency as currency
+               {$this->_aliases['civicrm_contribution']}.currency as currency,
+	       SUM( {$this->_aliases['civicrm_contribution']}.fee_amount ) as fees,
+               SUM( {$this->_aliases['civicrm_contribution']}.net_amount ) as net
         ";
 
     $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
@@ -520,8 +522,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
-      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" .
-        $dao->count . ")";
+      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" . $dao->count . ")";
+      $fees[] = CRM_Utils_Money::format($dao->fees, $dao->currency);
+      $net[] = CRM_Utils_Money::format($dao->net, $dao->currency);
       $average[] = CRM_Utils_Money::format($dao->avg, $dao->currency);
       $count += $dao->count;
     }
@@ -533,6 +536,16 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $statistics['counts']['count'] = array(
       'title' => ts('Total Contributions'),
       'value' => $count,
+    );
+    $statistics['counts']['fees'] = array(
+      'title' => ts('Fees'),
+      'value' => implode(',  ', $fees),
+      'type' => CRM_Utils_Type::T_STRING,
+    );
+    $statistics['counts']['net'] = array(
+      'title' => ts('Net'),
+      'value' => implode(',  ', $net),
+      'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['avg'] = array(
       'title' => ts('Average'),
@@ -662,6 +675,19 @@ UNION ALL
       $orderClause = array();
       foreach ($this->_orderByArray as $clause) {
         list($alias, $rest) = explode('.', $clause);
+        // CRM-17280 -- In case, we are ordering by custom fields
+        // modify $rest to match the alias used for them in temp3 table
+        $grp = new CRM_Core_DAO_CustomGroup();
+        $grp->table_name = $aliases[$alias];
+        if ($grp->find()) {
+          list($fld, $order) = explode(' ', $rest);
+          foreach ($this->_columns[$aliases[$alias]]['fields'] as $fldName => $value) {
+            if ($value['name'] == $fld) {
+              $fld = $fldName;
+            }
+          }
+          $rest = "{$fld} {$order}";
+        }
         $orderClause[] = $aliases[$alias] . "_" . $rest;
       }
       $orderBy = (!empty($orderClause)) ? "ORDER BY " . implode(', ', $orderClause) : '';

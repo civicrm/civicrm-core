@@ -75,13 +75,13 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
       $dupeActionString = ts('These records have been filled in with the imported data.');
     }
     else {
-      /* Skip by default */
+      // Skip by default.
 
       $dupeActionString = ts('These records have not been imported.');
 
       $this->assign('dupeError', TRUE);
 
-      /* only subtract dupes from successful import if we're skipping */
+      // Only subtract dupes from successful import if we're skipping.
 
       $this->set('validRowCount', $totalRowCount - $invalidRowCount -
         $conflictRowCount - $duplicateRowCount - $mismatchCount

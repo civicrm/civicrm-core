@@ -36,12 +36,12 @@ class CRM_Upgrade_Incremental_php_FourThree extends CRM_Upgrade_Incremental_Base
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $preUpgradeMessage
+   * @param string $preUpgradeMessage
    * @param string $rev
    *   a version number, e.g. '4.3.alpha1', '4.3.beta3', '4.3.0'.
    * @param null $currentVer
    *
-   * @return void|bool
+   * @return bool
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.3.beta3') {
@@ -938,8 +938,13 @@ ALTER TABLE civicrm_financial_account
   }
 
   /**
-   * Read creation and modification times from civicrm_log; add
-   * them to civicrm_contact.
+   * Read creation and modification times from civicrm_log; add them to civicrm_contact.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param int $startId
+   * @param int $endId
+   *
+   * @return bool
    */
   public function convertTimestamps(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $sql = "
@@ -971,6 +976,10 @@ ALTER TABLE civicrm_financial_account
 
   /**
    * Change index and add missing constraints for civicrm_contribution_recur.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
    */
   public function addMissingConstraints(CRM_Queue_TaskContext $ctx) {
     $query = "SHOW KEYS FROM `civicrm_contribution_recur` WHERE key_name = 'UI_contrib_payment_instrument_id'";
@@ -1002,6 +1011,10 @@ ALTER TABLE civicrm_financial_account
   /**
    * Update financial_account_id for bad data in financial_trxn table.
    * CRM-12844
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
    */
   public function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
@@ -1064,6 +1077,10 @@ id IN (' . implode(',', $val) . ')';
   /**
    * Update financial_account_id for bad data in financial_trxn table.
    * CRM-12844
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
    */
   public function updateLineItemData(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,
@@ -1127,7 +1144,14 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
 
   /**
    * Replace contribution_type to financial_type in table.
-   * civicrm_saved_search and Structure civicrm_report_instance
+   *
+   * Civicrm_saved_search and Structure civicrm_report_instance
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $query
+   * @param string $table
+   *
+   * @return bool
    */
   public function replaceContributionTypeId(CRM_Queue_TaskContext $ctx, $query, $table) {
     $dao = CRM_Core_DAO::executeQuery($query);

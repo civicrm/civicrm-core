@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-path-form-block">
-  <div id="help">
+  <div class="help">
     <p>
       {ts}You may configure these upload directories using absolute paths or path variables.{/ts}
       {help id='id-path_vars'}

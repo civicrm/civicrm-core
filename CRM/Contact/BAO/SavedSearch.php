@@ -83,13 +83,13 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * Given an id, extract the formValues of the saved search
+   * Given an id, extract the formValues of the saved search.
    *
    * @param int $id
    *   The id of the saved search.
    *
    * @return array
-   *   the values of the posted saved search
+   *   the values of the posted saved search used as default values in various Search Form
    */
   public static function &getFormValues($id) {
     $fv = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'form_values');
@@ -99,33 +99,74 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
       $result = unserialize($fv);
     }
 
-    // check to see if we need to convert the old privacy array
-    // CRM-9180
-    if (isset($result['privacy'])) {
-      if (is_array($result['privacy'])) {
-        $result['privacy_operator'] = 'AND';
-        $result['privacy_toggle'] = 1;
-        if (isset($result['privacy']['do_not_toggle'])) {
-          if ($result['privacy']['do_not_toggle']) {
-            $result['privacy_toggle'] = 2;
-          }
-          unset($result['privacy']['do_not_toggle']);
+    $specialFields = array('contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id');
+    foreach ($result as $element => $value) {
+      if (CRM_Contact_BAO_Query::isAlreadyProcessedForQueryFormat($value)) {
+        $id = CRM_Utils_Array::value(0, $value);
+        $value = CRM_Utils_Array::value(2, $value);
+        if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $value = CRM_Utils_Array::value(key($value), $value);
         }
-
-        $result['privacy_options'] = array();
-        foreach ($result['privacy'] as $name => $value) {
-          if ($value) {
-            $result['privacy_options'][] = $name;
+        $result[$id] = $value;
+        unset($result[$element]);
+        continue;
+      }
+      if (!empty($value) && is_array($value)) {
+        if (in_array($element, $specialFields)) {
+          $element = str_replace('member_membership_type_id', 'membership_type_id', $element);
+          $element = str_replace('member_status_id', 'membership_status_id', $element);
+          CRM_Contact_BAO_Query::legacyConvertFormValues($element, $value);
+          $result[$element] = $value;
+        }
+        // As per the OK (Operator as Key) value format, value array may contain key
+        // as an operator so to ensure the default is always set actual value
+        elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $result[$element] = CRM_Utils_Array::value(key($value), $value);
+          if (is_string($result[$element])) {
+            $result[$element] = str_replace("%", '', $result[$element]);
           }
         }
       }
-      unset($result['privacy']);
+      if (substr($element, 0, 7) == 'custom_' &&
+        (substr($element, -5, 5) == '_from' || substr($element, -3, 3) == '_to')
+      ) {
+        // Ensure the _relative field is set if from or to are set to ensure custom date
+        // fields with 'from' or 'to' values are displayed when the are set in the smart group
+        // being loaded. (CRM-17116)
+        if (!isset($result[CRM_Contact_BAO_Query::getCustomFieldName($element) . '_relative'])) {
+          $result[CRM_Contact_BAO_Query::getCustomFieldName($element) . '_relative'] = 0;
+        }
+      }
+      // check to see if we need to convert the old privacy array
+      // CRM-9180
+      if (!empty($result['privacy'])) {
+        if (is_array($result['privacy'])) {
+          $result['privacy_operator'] = 'AND';
+          $result['privacy_toggle'] = 1;
+          if (isset($result['privacy']['do_not_toggle'])) {
+            if ($result['privacy']['do_not_toggle']) {
+              $result['privacy_toggle'] = 2;
+            }
+            unset($result['privacy']['do_not_toggle']);
+          }
+
+          $result['privacy_options'] = array();
+          foreach ($result['privacy'] as $name => $val) {
+            if ($val) {
+              $result['privacy_options'][] = $name;
+            }
+          }
+        }
+        unset($result['privacy']);
+      }
     }
 
     return $result;
   }
 
   /**
+   * Get search parameters.
+   *
    * @param int $id
    *
    * @return array
@@ -171,6 +212,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
+   * Contact IDS Sql (whatever that means!).
+   *
    * @param int $id
    *
    * @return string
@@ -195,6 +238,8 @@ WHERE  $where";
   }
 
   /**
+   * Get from where email (whatever that means!).
+   *
    * @param int $id
    *
    * @return array
@@ -227,8 +272,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given a saved search compute the clause and the tables
-   * and store it for future use
+   * Given a saved search compute the clause and the tables and store it for future use.
    */
   public function buildClause() {
     $fv = unserialize($this->form_values);
@@ -252,6 +296,11 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     }
   }
 
+  /**
+   * Save the search.
+   *
+   * @param bool $hook
+   */
   public function save($hook = TRUE) {
     // first build the computed fields
     $this->buildClause();
@@ -260,7 +309,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given an id, get the name of the saved search
+   * Given an id, get the name of the saved search.
    *
    * @param int $id
    *   The id of the saved search.
@@ -280,8 +329,11 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given a label and a set of normalized POST
-   * formValues, create a smart group with that
+   * Create a smart group from normalised values.
+   *
+   * @param array $params
+   *
+   * @return \CRM_Contact_DAO_SavedSearch
    */
   public static function create(&$params) {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();
@@ -304,6 +356,13 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     return $savedSearch;
   }
 
+  /**
+   * Assign test value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
     if ($fieldName == 'form_values') {
       // A dummy value for form_values.

@@ -47,7 +47,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param $paymentProcessor
+   * @param CRM_Core_Payment $paymentProcessor
    *
    * @return \CRM_Core_Payment_PayPalImpl
    */
@@ -68,7 +68,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are back office payments supported.
+   *
+   * E.g paypal standard won't permit you to enter a credit card associated
+   * with someone else's login.
+   *
    * @return bool
    */
   protected function supportsBackOffice() {
@@ -123,8 +127,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
-   * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
+   * Billing mode button is basically synonymous with paypal express.
+   *
+   * This is probably a good example of 'odds & sods' code we
+   * need to find a way for the payment processor to assign.
+   *
+   * A tricky aspect is that the payment processor may need to set the order
    *
    * @param CRM_Core_Form $form
    */
@@ -167,13 +175,16 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $errors
    */
   public function validatePaymentInstrument($values, &$errors) {
-    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Pro') {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && !$this->isPaypalExpress($values)) {
       CRM_Core_Payment_Form::validateCreditCard($values, $errors);
+      CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     }
   }
 
   /**
-   * Express checkout code. Check PayPal documentation for more information
+   * Express checkout code.
+   *
+   * Check PayPal documentation for more information
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
@@ -209,7 +220,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
+      throw new PaymentProcessorException($result->message);
     }
 
     /* Success */
@@ -232,7 +243,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Get details from paypal. Check PayPal documentation for more information
+   * Get details from paypal.
+   *
+   * Check PayPal documentation for more information
    *
    * @param string $token
    *   The key associated with this transaction.
@@ -251,7 +264,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
+      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
 
     /* Success */
@@ -273,14 +286,16 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Do the express checkout at paypal. Check PayPal documentation for more information
+   * Do the express checkout at paypal.
+   *
+   * Check PayPal documentation for more information
    *
    * @param array $params
    *
-   * @internal param string $token the key associated with this transaction
-   *
    * @return array
-   *   the result in an nice formatted array (or an error object)
+   *   The result in an nice formatted array.
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doExpressCheckout(&$params) {
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
@@ -316,7 +331,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $params['fee_amount'] = $result['feeamt'];
     $params['net_amount'] = CRM_Utils_Array::value('settleamt', $result);
     if ($params['net_amount'] == 0 && $params['fee_amount'] != 0) {
-      $params['net_amount'] = $params['gross_amount'] - $params['fee_amount'];
+      $params['net_amount'] = number_format(($params['gross_amount'] - $params['fee_amount']), 2);
     }
     $params['payment_status'] = $result['paymentstatus'];
     $params['pending_reason'] = $result['pendingreason'];
@@ -330,8 +345,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return $params;
   }
 
-  //LCD add new function for handling recurring payments for PayPal Express
   /**
+   * Create recurring payments.
+   *
    * @param array $params
    *
    * @return mixed
@@ -382,15 +398,17 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $params['fee_amount'] = $result['feeamt'];
     $params['net_amount'] = $result['settleamt'];
     if ($params['net_amount'] == 0 && $params['fee_amount'] != 0) {
-      $params['net_amount'] = $params['gross_amount'] - $params['fee_amount'];
+      $params['net_amount'] = number_format(($params['gross_amount'] - $params['fee_amount']), 2);
     }
     $params['payment_status'] = $result['paymentstatus'];
     $params['pending_reason'] = $result['pendingreason'];
 
     return $params;
   }
-  //LCD end
+
   /**
+   * Initialise.
+   *
    * @param $args
    * @param $method
    */
@@ -429,13 +447,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
-    if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal_Express'
-    && (!empty($params['credit_card_number']) && empty($params['token']))
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Express'
+      || ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && !empty($params['token']))
     ) {
-      return parent::doPayment($params, $component);
+      $this->_component = $component;
+      return $this->doExpressCheckout($params);
+
     }
-    $this->_component = $component;
-    return $this->doExpressCheckout($params);
+    return parent::doPayment($params, $component);
   }
 
   /**
@@ -553,6 +572,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = $this->invokeAPI($args);
     return array(
       'fee_amount' => $result['feeamt'],
+      'net_amount' => $params['gross_amount'] - $result['feeamt'],
     );
   }
 
@@ -745,7 +765,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   - redirect_url (if set the browser will be redirected to this.
    */
   public function doPreApproval(&$params) {
-    if (!isset($params['button']) || !stristr($params['button'], 'express')) {
+    if (!$this->isPaypalExpress($params)) {
       return array();
     }
     $this->_component = $params['component'];
@@ -817,7 +837,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $paypalParams = array(
       'business' => $this->_paymentProcessor['user_name'],
       'notify_url' => $notifyURL,
-      'item_name' => $params['item_name'],
+      'item_name' => $this->getPaymentDescription(),
       'quantity' => 1,
       'undefined_quantity' => 0,
       'cancel_return' => $cancelURL,
@@ -927,10 +947,17 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Hash_call: Function to perform the API call to PayPal using API signature
+   * Hash_call: Function to perform the API call to PayPal using API signature.
+   *
    * @methodName is name of API  method.
    * @nvpStr is nvp string.
-   * returns an associtive array containing the response from the server.
+   * returns an associative array containing the response from the server.
+   *
+   * @param array $args
+   * @param null $url
+   *
+   * @return array|object
+   * @throws \Exception
    */
   public function invokeAPI($args, $url = NULL) {
 
@@ -990,6 +1017,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     if (strtolower($result['ack']) != 'success' &&
       strtolower($result['ack']) != 'successwithwarning'
     ) {
+      throw new PaymentProcessorException("{$result['l_shortmessage0']} {$result['l_longmessage0']}");
       $e = CRM_Core_Error::singleton();
       $e->push($result['l_errorcode0'],
         0, NULL,
@@ -1002,10 +1030,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * This function will take NVPString and convert it to an Associative Array and it will decode the response.
-   * It is useful to search for a particular key and displaying arrays.
-   * @nvpstr is NVPString.
-   * @nvpArray is Associative Array.
+   * This function will take NVPString and convert it to an Associative Array.
+   *
+   * It will decode the response. It is useful to search for a particular key and displaying arrays.
+   *
+   * @param string $str
+   *
+   * @return array
    */
   public static function deformat($str) {
     $result = array();
@@ -1059,6 +1090,40 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $params[$civicrmField] = isset($paypalParams[$paypalField]) ? $paypalParams[$paypalField] : NULL;
     }
     return $params;
+  }
+
+  /**
+   * Is this being processed by payment express.
+   *
+   * Either because it is payment express or because is pro with paypal express in use.
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  protected function isPaypalExpress($params) {
+    if ($this->_processorName == ts('PayPal Express')) {
+      return TRUE;
+    }
+
+    // This would occur postProcess.
+    if (!empty($params['token'])) {
+      return TRUE;
+    }
+    if (isset($params['button']) && stristr($params['button'], 'express')) {
+      return TRUE;
+    }
+
+    // The contribution form passes a 'button' but the event form might still set one of these fields.
+    // @todo more standardisation & get paypal fully out of the form layer.
+    $possibleExpressFields = array(
+      '_qf_Register_upload_express_x',
+      '_qf_Payment_upload_express_x',
+    );
+    if (array_intersect_key($params, array_fill_keys($possibleExpressFields, 1))) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }

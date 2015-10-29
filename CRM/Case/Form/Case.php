@@ -179,9 +179,15 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $className::preProcess($this);
     $activityGroupTree = $this->_groupTree;
 
+    if (!$this->_caseTypeId) {
+      $params = CRM_Utils_Request::exportValues();
+      if (isset($params['case_type_id'])) {
+        $this->_caseTypeId = $params['case_type_id'];
+      }
+    }
     // for case custom fields to populate with defaults
     if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_caseTypeId, 1, 'Case', $this->_caseId);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 

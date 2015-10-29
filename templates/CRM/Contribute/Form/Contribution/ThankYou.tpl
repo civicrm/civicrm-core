@@ -49,7 +49,7 @@
     </div><br /><br />
   {/if}
 
-  <div id="help">
+  <div class="help">
     {* PayPal_Standard sets contribution_mode to 'notify'. We don't know if transaction is successful until we receive the IPN (payment notification) *}
     {if $is_pay_later}
       <div class="bold">{$pay_later_receipt}</div>

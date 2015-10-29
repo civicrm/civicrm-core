@@ -49,6 +49,8 @@ class CRM_Utils_Address_BatchUpdate {
   var $returnError = 0;
 
   /**
+   * Class constructor.
+   *
    * @param array $params
    */
   public function __construct($params) {
@@ -61,6 +63,8 @@ class CRM_Utils_Address_BatchUpdate {
   }
 
   /**
+   * Run batch update.
+   *
    * @return array
    */
   public function run() {
@@ -120,9 +124,11 @@ class CRM_Utils_Address_BatchUpdate {
   }
 
   /**
-   * @param $config
-   * @param $processGeocode
-   * @param $parseStreetAddress
+   * Process contacts.
+   *
+   * @param CRM_Core_Config $config
+   * @param bool $processGeocode
+   * @param bool $parseStreetAddress
    *
    * @return array
    * @throws Exception
@@ -284,6 +290,8 @@ class CRM_Utils_Address_BatchUpdate {
   }
 
   /**
+   * Return result.
+   *
    * @return array
    */
   public function returnResult() {

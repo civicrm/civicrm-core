@@ -27,6 +27,11 @@
  */
 
 /**
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * Class CRM_Member_Tokens
  *
  * Generate "activity.*" tokens.
@@ -50,6 +55,13 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     ));
   }
 
+  /**
+   * Check is active.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   *
+   * @return bool
+   */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
     return
@@ -62,9 +74,9 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       return;
     }
 
-    // The join expression for activities needs some extra nuance to handle
-    // multiple revisions of the activity. Q: Could we simplify & move the
-    // extra AND clauses into `where(...)`?
+    // The joint expression for activities needs some extra nuance to handle.
+    // Multiple revisions of the activity.
+    // Q: Could we simplify & move the extra AND clauses into `where(...)`?
     $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
 
     $e->query->select('e.*'); // FIXME: seems too broad.
@@ -86,10 +98,12 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @param \Civi\Token\TokenRow $row
    *   The record for which we want token values.
+   * @param string $entity
    * @param string $field
    *   The name of the token field.
    * @param mixed $prefetch
    *   Any data that was returned by the prefetch().
+   *
    * @return mixed
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {

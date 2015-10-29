@@ -40,9 +40,7 @@ class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base 
    * @param $preUpgradeMessage
    * @param string $rev
    *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
-   * @param null $currentVer
-   *
-   * @return void
+   * @param string $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.4.beta1') {
@@ -68,7 +66,6 @@ class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base 
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.4.1') {
@@ -100,7 +97,9 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
   }
 
   /**
-   * @param $rev
+   * Upgrade 4.4.alpha1.
+   *
+   * @param string $rev
    *
    * @return bool
    */
@@ -352,11 +351,11 @@ ALTER TABLE civicrm_dashboard
   }
 
   /**
-   * @param $rev
-   * @param $originalVer
-   * @param $latestVer
+   * Upgrade script for 4.4.7.
    *
-   * @return void
+   * @param string $rev
+   * @param string $originalVer
+   * @param string $latestVer
    */
   public function upgrade_4_4_7($rev, $originalVer, $latestVer) {
     // For WordPress/Joomla(?), cleanup broken image_URL from 4.4.6 upgrades - https://issues.civicrm.org/jira/browse/CRM-14971
@@ -429,7 +428,10 @@ ALTER TABLE civicrm_dashboard
     $dao = new CRM_Contact_DAO_SavedSearch();
     $dao->find();
     while ($dao->fetch()) {
-      $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($dao->id);
+      $formValues = NULL;
+      if (!empty($dao->form_values)) {
+        $formValues = unserialize($dao->form_values);
+      }
       if (!empty($formValues['mapper'])) {
         foreach ($formValues['mapper'] as $key => $value) {
           foreach ($value as $k => $v) {
@@ -695,11 +697,13 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   }
 
   /**
-   * Syntatic sugar for adding a task which (a) is in this class and (b) has
-   * a high priority.
+   * Syntactic sugar for adding a task which (a) is in this class and (b) has a high priority.
    *
    * After passing the $funcName, you can also pass parameters that will go to
    * the function. Note that all params must be serializable.
+   *
+   * @param string $title
+   * @param string $funcName
    */
   protected function addTask($title, $funcName) {
     $queue = CRM_Queue_Service::singleton()->load(array(

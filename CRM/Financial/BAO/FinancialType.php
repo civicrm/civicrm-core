@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
 
@@ -144,7 +142,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     // tables to ingore checks for financial_type_id
     $ignoreTables = array('CRM_Financial_DAO_EntityFinancialAccount');
 
-    //TODO: if (!$financialType->find(true)) {
+    // TODO: if (!$financialType->find(true)) {
 
     // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
     $occurrences = $financialType->findReferences();
@@ -166,7 +164,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       }
     }
 
-    //delete from financial Type table
+    // delete from financial Type table
     $financialType->delete();
 
     $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount();
@@ -209,11 +207,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * adding permissions for financial types
-   *
+   * Add permissions for financial types.
    *
    * @param array $permissions
-   *   an array of permissions
+   * @param array $descriptions
+   *
+   * @return bool
    */
   public static function permissionedFinancialTypes(&$permissions, $descriptions) {
     if (!self::isACLFinancialTypeStatus()) {
@@ -251,7 +250,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @param array $financialTypes
    *   (reference ) an array of financial types
-   * @param string $action
+   * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
    *   load values from static cache
@@ -290,7 +289,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @param array $membershipTypes
    *   (reference ) an array of membership types
-   * @param string $action
+   * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    *
    * @return array

@@ -138,7 +138,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
 
     $form->_activityHolderIds = $form->_componentIds = $ids;
 
-    //set the context for redirection for any task actions
+    // Set the context for redirection for any task actions.
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
@@ -159,7 +159,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
 
   /**
    * Given the membership id, compute the contact id
-   * since its used for things like send email
+   * since it's used for things like send email.
    */
   public function setContactIDs() {
     $IDs = implode(',', $this->_activityHolderIds);

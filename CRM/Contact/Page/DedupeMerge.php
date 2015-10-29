@@ -123,6 +123,16 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
 
   /**
    * Carry out batch merges.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param int $rgid
+   * @param int $gid
+   * @param string $mode
+   * @param bool $autoFlip
+   * @param int $batchLimit
+   * @param int $isSelected
+   *
+   * @return int
    */
   public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
     $result = CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $autoFlip, $batchLimit, $isSelected);

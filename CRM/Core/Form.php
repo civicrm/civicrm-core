@@ -93,12 +93,35 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Available payment processors (IDS).
    *
    * As part of trying to consolidate various payment pages we store processors here & have functions
-   * at this level to manage them.
+   * at this level to manage them. An alternative would be to have a separate Form that is inherited
+   * by all forms that allow payment processing.
    *
    * @var array
    *   An array of the IDS available on this form.
    */
   public $_paymentProcessorIDs;
+
+  /**
+   * Default or selected processor id.
+   *
+   * As part of trying to consolidate various payment pages we store processors here & have functions
+   * at this level to manage them. An alternative would be to have a separate Form that is inherited
+   * by all forms that allow payment processing.
+   *
+   * @var int
+   */
+  protected $_paymentProcessorID;
+
+  /**
+   * Is pay later enabled for the form.
+   *
+   * As part of trying to consolidate various payment pages we store processors here & have functions
+   * at this level to manage them. An alternative would be to have a separate Form that is inherited
+   * by all forms that allow payment processing.
+   *
+   * @var int
+   */
+  protected $_is_pay_later_enabled;
 
   /**
    * The renderer used for this form
@@ -468,8 +491,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Core function that builds the form. We redefine this function
-   * here and expect all CRM forms to build their form in the function
+   * Core function that builds the form.
+   *
+   * We redefine this function here and expect all CRM forms to build their form in the function
    * buildQuickForm.
    */
   public function buildForm() {
@@ -523,7 +547,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add default Next / Back buttons
+   * Add default Next / Back buttons.
    *
    * @param array $params
    *   Array of associative arrays in the order in which the buttons should be
@@ -546,11 +570,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       if (in_array($button['type'], array('upload', 'next', 'submit', 'done', 'process', 'refresh'))) {
         $attrs['class'] .= ' validate';
-        $defaultIcon = 'check';
+        $defaultIcon = 'fa-check';
       }
       else {
         $attrs['class'] .= ' cancel';
-        $defaultIcon = $button['type'] == 'back' ? 'triangle-1-w' : 'close';
+        $defaultIcon = $button['type'] == 'back' ? 'fa-chevron-left' : 'fa-times';
       }
 
       if ($button['type'] === 'reset') {
@@ -559,13 +583,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         if (!empty($button['subName'])) {
           if ($button['subName'] == 'new') {
-            $defaultIcon = 'plus';
+            $defaultIcon = 'fa-plus-circle';
           }
           if ($button['subName'] == 'done') {
-            $defaultIcon = 'circle-check';
+            $defaultIcon = 'fa-check-circle';
           }
           if ($button['subName'] == 'next') {
-            $defaultIcon = 'circle-triangle-e';
+            $defaultIcon = 'fa-chevron-right';
           }
         }
 
@@ -623,7 +647,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for title. Should be over-ridden by derived class
+   * Getter function for title.
+   *
+   * Should be over-ridden by derived class.
    *
    * @return string
    */
@@ -647,7 +673,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws CRM_Core_Exception
    */
   public function assignBillingType() {
-    $this->_bltID = CRM_Core_BAO_Location::getBillingLocationId();
+    $this->_bltID = CRM_Core_BAO_LocationType::getBilling();
     $this->set('bltID', $this->_bltID);
     $this->assign('bltID', $this->_bltID);
   }
@@ -657,15 +683,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * It would be good to sync it with the back-end function on abstractEditPayment & use one everywhere.
    *
+   * @param bool $is_pay_later_enabled
+   *
    * @throws \CRM_Core_Exception
    */
-  protected function assignPaymentProcessor() {
+  protected function assignPaymentProcessor($is_pay_later_enabled) {
     $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(
       array(ucfirst($this->_mode) . 'Mode'),
       $this->_paymentProcessorIDs
     );
 
     if (!empty($this->_paymentProcessors)) {
+      if ($is_pay_later_enabled) {
+        $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
+      }
       foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
         if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
         ) {
@@ -681,6 +712,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     else {
       throw new CRM_Core_Exception(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
     }
+
   }
 
   /**
@@ -750,7 +782,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           }
         }
       }
-      if ($this->_paymentProcessorID) {
+      if ($this->_paymentProcessorID
+        || (isset($this->_submitValues['payment_processor_id']) && $this->_submitValues['payment_processor_id'] == 0)
+      ) {
         CRM_Core_Payment_ProcessorForm::preProcess($this);
       }
       else {
@@ -759,6 +793,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       CRM_Financial_Form_Payment::addCreditCardJs();
     }
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+    // We save the fact that the profile 'billing' is required on the payment form.
+    // Currently pay-later is the only 'processor' that takes notice of this - but ideally
+    // 1) it would be possible to select the minimum_billing_profile_id for the contribution form
+    // 2) that profile_id would be set on the payment processor
+    // 3) the payment processor would return a billing form that combines these user-configured
+    // minimums with the payment processor minimums. This would lead to fields like 'postal_code'
+    // only being on the form if either the admin has configured it as wanted or the processor
+    // requires it.
+    $this->assign('billing_profile_id', (CRM_Utils_Array::value('is_billing_required', $this->_values) ? 'billing' : ''));
   }
 
   /**
@@ -784,8 +827,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      CRM_Core_Error::displaySessionError($e->getMessage());
-      CRM_Utils_System::redirect($params['cancelURL']);
+      CRM_Core_Error::statusBounce(ts('Payment approval failed with message :') . $e->getMessage(), $payment->getCancelUrl($params['qfKey'], CRM_Utils_Array::value('participant_id', $params)));
     }
 
     $this->set('pre_approval_parameters', $result['pre_approval_parameters']);
@@ -859,8 +901,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for renderer. If renderer is not set
-   * create one and initialize it
+   * Getter function for renderer.
+   *
+   * If renderer is not set create one and initialize it.
    *
    * @return object
    */
@@ -895,8 +938,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * A wrapper for getTemplateFileName that includes calling the hook to
-   * prevent us from having to copy & paste the logic of calling the hook
+   * A wrapper for getTemplateFileName.
+   *
+   * This includes calling the hook to prevent us from having to copy & paste the logic of calling the hook.
    */
   public function getHookedTemplateFileName() {
     $pageTemplateFile = $this->getTemplateFileName();
@@ -905,8 +949,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Default extra tpl file basically just replaces .tpl with .extra.tpl
-   * i.e. we dont override
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl.
+   *
+   * i.e. we do not override.
    *
    * @return string
    */
@@ -1504,6 +1549,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $entities
    * @param bool $default
    *   //CRM-15427.
+   * @param string $usedFor
    */
   public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE, $usedFor = NULL) {
     // Output widget
@@ -1731,6 +1777,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    *  Function that will add date and time.
+   *
+   * @param string $name
+   * @param string $label
+   * @param bool $required
+   * @param null $attributes
    */
   public function addDateTime($name, $label, $required = FALSE, $attributes = NULL) {
     $addTime = array('addTime' => TRUE);
@@ -1746,6 +1797,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add a currency and money element to the form.
+   *
+   * @param string $name
+   * @param string $label
+   * @param bool $required
+   * @param null $attributes
+   * @param bool $addCurrency
+   * @param string $currencyName
+   * @param null $defaultCurrency
+   * @param bool $freezeCurrency
+   *
+   * @return \HTML_QuickForm_Element
    */
   public function addMoney(
     $name,
@@ -1769,6 +1831,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add currency element to the form.
+   *
+   * @param string $name
+   * @param null $label
+   * @param bool $required
+   * @param string $defaultCurrency
+   * @param bool $freezeCurrency
    */
   public function addCurrency(
     $name = 'currency',
@@ -1907,7 +1975,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Helper function to verify that required fields have been filled.
+   *
    * Typically called within the scope of a FormRule function
+   *
+   * @param array $fields
+   * @param array $values
+   * @param array $errors
    */
   public static function validateMandatoryFields($fields, $values, &$errors) {
     foreach ($fields as $name => $fld) {
@@ -1978,6 +2051,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return is_numeric($userID) ? $userID : NULL;
   }
 
+  /**
+   * Get the contact id that the form is being submitted for.
+   *
+   * @return int|NULL
+   */
   public function getContactID() {
     return $this->setContactID();
   }

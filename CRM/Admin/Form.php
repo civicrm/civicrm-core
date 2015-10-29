@@ -68,6 +68,8 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * Basic setup.
    */
   public function preProcess() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
     $this->_values = array();

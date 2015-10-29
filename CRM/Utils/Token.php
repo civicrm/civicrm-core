@@ -1412,6 +1412,12 @@ class CRM_Utils_Token {
 
   /**
    * Replace existing greeting tokens in message/subject.
+   *
+   * @param string $tokenString
+   * @param array $contactDetails
+   * @param int $contactId
+   * @param string $className
+   * @param bool $escapeSmarty
    */
   public static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL, $escapeSmarty = FALSE) {
 
