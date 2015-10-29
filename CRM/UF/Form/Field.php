@@ -536,13 +536,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $name = $this->_selectFields[$params['field_name'][1]];
     }
 
-    //Hack for Formatting Field Name
+    // Hack for Formatting Field Name.
     if ($params['field_name'][0] == 'Formatting') {
       $params['field_name'][1] = 'formatting_' . rand(1000, 9999);
     }
 
-    //check for duplicate fields
-    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, array('uf_group' => $params['uf_group_id'], 'uf_field' => $params['id']))) {
+    // Check for duplicate fields.
+    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params)) {
       CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
       return;
     }
@@ -550,7 +550,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
       $ufField = CRM_Core_BAO_UFField::add($params);
 
-      //reset other field is searchable and in selector settings, CRM-4363
+      // Reset other field is searchable and in selector settings, CRM-4363.
       if ($this->_hasSearchableORInSelector &&
         in_array($ufField->field_type, array('Participant', 'Contribution', 'Membership', 'Activity', 'Case'))
       ) {
