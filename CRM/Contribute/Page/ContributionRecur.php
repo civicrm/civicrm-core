@@ -63,7 +63,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       }
       // Get financial type name
       if (!empty($values['financial_type_id'])) {
-        $values['financial_type_name'] = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
+        $values['financial_type_name'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $values['financial_type_id']);
       }
       // Get Paid By label
       if (!empty($values['payment_instrument_id'])) {
