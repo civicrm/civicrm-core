@@ -207,9 +207,7 @@ class CRM_Member_BAO_Query {
           $op = 'IN';
           $value = array_keys($value);
         }
-      case 'membership_status':
-      case 'membership_status_id':
-      case 'membership_type':
+
       case 'membership_type_id':
         // CRM-17075 we are specifically handling the possibility we are dealing with the entity reference field
         // for membership_type_id here (although status would be handled if converted). The unhandled pathway at the moment
@@ -218,9 +216,16 @@ class CRM_Member_BAO_Query {
         // the load function. The where clause and the whereTables are saved so they should suffice to generate the query
         // to get a contact list. But, better to deal with in 4.8 now...
         if (is_string($value) && strpos($value, ',') && $op == '=') {
-          $value = array('IN' => explode($value));
+          $value = array('IN' => explode(',', $value));
         }
+
+      case 'membership_status':
+      case 'membership_status_id':
+      case 'membership_type':
       case 'member_id':
+        if (strstr($name, 'status') && is_string($value) && !is_numeric($value)) {
+          $value = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $value);
+        }
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
           $qillName = 'Membership Status(s)';
