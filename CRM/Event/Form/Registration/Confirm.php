@@ -237,6 +237,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
+        if ($v == 'skip') {
+          continue;
+        }
         $individualTaxAmount = 0;
         //display tax amount on confirmation page
         $taxAmount += $v['tax_amount'];
