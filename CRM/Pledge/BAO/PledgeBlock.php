@@ -212,7 +212,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $nextPayment = array();
       $isNextPayment = FALSE;
       $overduePayments = array();
-      $now = date('Ymd');
       foreach ($allPayments as $payID => $value) {
         if ($allStatus[$value['status_id']] == 'Overdue') {
           $overduePayments[$payID] = array(
@@ -244,20 +243,22 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $payments = array();
       if (!empty($overduePayments)) {
         foreach ($overduePayments as $id => $payment) {
-          $key = ts("%1 - due on %2 (overdue)", array(
+          $label = ts("%1 - due on %2 (overdue)", array(
             1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $payment), CRM_Utils_Array::value('scheduled_amount_currency', $payment)),
             2 => CRM_Utils_Array::value('scheduled_date', $payment),
           ));
-          $payments[$key] = CRM_Utils_Array::value('id', $payment);
+          $paymentID = CRM_Utils_Array::value('id', $payment);
+          $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $payment)));
         }
       }
 
       if (!empty($nextPayment)) {
-        $key = ts("%1 - due on %2", array(
+        $label = ts("%1 - due on %2", array(
           1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $nextPayment), CRM_Utils_Array::value('scheduled_amount_currency', $nextPayment)),
           2 => CRM_Utils_Array::value('scheduled_date', $nextPayment),
         ));
-        $payments[$key] = CRM_Utils_Array::value('id', $nextPayment);
+        $paymentID = CRM_Utils_Array::value('id', $nextPayment);
+        $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)));
       }
       // give error if empty or build form for payment.
       if (empty($payments)) {
@@ -265,7 +266,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       }
       else {
         $form->assign('is_pledge_payment', TRUE);
-        $form->addCheckBox('pledge_amount', ts('Make Pledge Payment(s):'), $payments);
+        $form->addGroup($payments, 'pledge_amount', ts('Make Pledge Payment(s):'), '<br />');
       }
     }
     else {
