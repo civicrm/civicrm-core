@@ -25,7 +25,14 @@
 *}
 <div class="batch-entry form-item">
   <div class="help">
-    {ts}Click Validate & Process below when you've entered all items for the batch. You can also Save & Continue Later at any time. Go to Administer > Customize Data and Screens > Profiles > Reserved Profiles > to add, remove or change the order of columns.{/ts}
+    {ts}Click Validate & Process below when you've entered all items for the batch. You can also Save & Continue Later at any time.{/ts}
+    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+      {capture assign=batchEntryProfileURL}{crmURL p="civicrm/admin/uf/group" q="reset=1&selectedChild=reserved-profiles"}{/capture}
+      {ts 1=$batchEntryProfileURL}Add, remove or change the order of columns by editing the corresponding <a href="%1" target="_blank">Bulk Entry profile</a>.{/ts}
+      {if $batchType EQ 1}
+        {ts}Custom fields and a Personal Campaign Page field can be added if needed.{/ts}
+      {/if}
+    {/if}
   </div>
   {if $batchAmountMismatch}
     <div class="status message status-warning">
@@ -98,6 +105,14 @@
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
             </div>
             <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
+          {elseif $n eq 'soft_credit_type'}
+          {elseif $n eq 'contribution_soft_credit_pcp_id'}
+            <div class="compressed crm-grid-cell">
+              <div>{$form.pcp_made_through_id.$rowNumber.html}{$form.pcp_made_through.$rowNumber.html}</div>
+              <div>{$form.pcp_display_in_roll.$rowNumber.label}&nbsp;{$form.pcp_display_in_roll.$rowNumber.html}</div>
+              <div class="pcp_roll_display">{$form.pcp_roll_nickname.$rowNumber.label}&nbsp;{$form.pcp_roll_nickname.$rowNumber.html}</div>
+              <div class="pcp_roll_display">{$form.pcp_personal_note.$rowNumber.label}&nbsp;{$form.pcp_personal_note.$rowNumber.html}</div>
+            </div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
           {elseif $n eq 'total_amount'}

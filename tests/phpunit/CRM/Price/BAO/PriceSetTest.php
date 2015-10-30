@@ -17,46 +17,47 @@
  | See the GNU Affero General Public License for more details.        |
  |                                                                    |
  | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviSeleniumTestCase.php';
+require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
- * Class WebTest_Admin_Form_Setting_LocalizationTest
+ * Test class for CRM_Price_BAO_PriceSet.
  */
-class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
+class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
 
+  /**
+   * Sets up the fixtures.
+   */
   protected function setUp() {
     parent::setUp();
   }
 
-  public function testDefaultCountryIsEnabled() {
-    $this->webtestLogin();
-    $this->openCiviPage("admin/setting/localization", "reset=1");
-    $this->addSelection("countryLimit", "label=UNITED STATES");
-    $this->click("//select[@id='countryLimit']/option");
-    $this->click("//input[@name='remove']");
-    $this->addSelection("countryLimit", "label=AFGHANISTAN");
-    $this->removeSelection("countryLimit", "label=AFGHANISTAN");
-    $this->addSelection("countryLimit", "label=CAMBODIA");
-    $this->removeSelection("countryLimit", "label=CAMBODIA");
-    $this->addSelection("countryLimit", "label=CAMEROON");
-    $this->removeSelection("countryLimit", "label=CAMEROON");
-    $this->addSelection("countryLimit", "label=CANADA");
-    $this->click("//input[@name='add']");
-    $this->click("_qf_Localization_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    try {
-      $this->assertFalse($this->isTextPresent("Your changes have been saved."));
-    }
-    catch (PHPUnit_Framework_AssertionFailedError$e) {
-      array_push($this->verificationErrors, $e->toString());
-    }
+  /**
+   * Tears down the fixture.
+   */
+  protected function tearDown() {
+  }
+
+  /**
+   * Test the correct amount level is returned for an event which is not presented as a price set event.
+   *
+   * (these are denoted as 'quickConfig' in the code - but quickConfig is only supposed to refer to the
+   * configuration interface - there should be no different post process.
+   */
+  public function testGetAmountLevelTextAmount() {
+    $priceSetID = $this->eventPriceSetCreate(9);
+    $priceSet = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($priceSetID);
+    $field = reset($priceSet['fields']);
+    $params = array('priceSetId' => $priceSetID, 'price_' . $field['id'] => 1);
+    $amountLevel = CRM_Price_BAO_PriceSet::getAmountLevelText($params);
+    $this->assertEquals(CRM_Core_DAO::VALUE_SEPARATOR . 'Price Field - 1' . CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel);
   }
 
 }

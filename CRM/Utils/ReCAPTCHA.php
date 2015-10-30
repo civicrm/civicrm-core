@@ -62,10 +62,6 @@ class CRM_Utils_ReCAPTCHA {
     return self::$_singleton;
   }
 
-  public function __construct() {
-    // Empty function?
-  }
-
   /**
    * Add element to form.
    *

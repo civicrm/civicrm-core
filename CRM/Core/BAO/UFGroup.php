@@ -2179,6 +2179,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       $form->addElement('hidden', 'sct_default_id', $SCTDefaultValue, array('id' => 'sct_default_id'));
     }
+    elseif ($fieldName == 'contribution_soft_credit_pcp_id') {
+      CRM_Contribute_Form_SoftCredit::addPCPFields($form, "[$rowNumber]");
+    }
     elseif ($fieldName == 'currency') {
       $form->addCurrency($name, $title, $required);
     }

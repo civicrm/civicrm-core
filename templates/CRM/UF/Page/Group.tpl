@@ -59,8 +59,8 @@
     {if $rows}
     <div id='mainTabContainer'>
         <ul>
-            <li id='tab_user'>    <a href='#user-profiles'     title='{ts}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a></li>
-            <li id='tab_reserved'><a href='#reserved-profiles' title='{ts}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a></li>
+            <li id='tab_user-profiles'>    <a href='#user-profiles'     title='{ts}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a></li>
+            <li id='tab_reserved-profiles'><a href='#reserved-profiles' title='{ts}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a></li>
         </ul>
 
         {* handle enable/disable actions*}
@@ -154,10 +154,11 @@
 
   </div> {* maincontainer*}
   <script type='text/javascript'>
-      CRM.$(function($) {ldelim}
-        var selectedTab = '{if $selectedChild}{$selectedChild}{else}user-profiles{/if}';
-        var tabIndex = $('#tab_' + selectedTab).prevAll().length;
-        {literal}
+    var selectedTab = 'user-profiles';
+    {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
+    {literal}
+      CRM.$(function($) {
+        var tabIndex = $('#tab_' + selectedTab).prevAll().length
         $("#mainTabContainer").tabs( {active: tabIndex} );
       });
     {/literal}

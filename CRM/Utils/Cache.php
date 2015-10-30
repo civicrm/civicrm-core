@@ -58,7 +58,7 @@ class CRM_Utils_Cache {
   /**
    * Singleton function used to manage this object.
    *
-   * @return object
+   * @return CRM_Utils_Cache_Interface
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {

@@ -229,18 +229,14 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("_qf_Search_refresh");
 
     $this->waitForElementPresent('toggleSelect');
-    $this->click('toggleSelect');
+    $this->click("xpath=//table[@class='selector row-highlight']/thead/tr/th[1]/input[@id='toggleSelect']");
     $this->select('task', "Record Survey Responses");
     $this->waitForElementPresent("_qf_Interview_cancel_interview");
+    $this->select("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[@class='result']/select", "value=Label $title 1");
+    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[8]/a");
 
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[8]/select", "value=Label $title 1");
-    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[9]/a");
-
-    $this->click("CIVICRM_QFID_2_8");
-
-    $this->select("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[8]/select", "value=Label $title 2");
-    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[9]/a");
+    $this->select("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[@class='result']/select", "value=Label $title 2");
+    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[8]/a");
     $this->click("_qf_Interview_cancel_interview");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

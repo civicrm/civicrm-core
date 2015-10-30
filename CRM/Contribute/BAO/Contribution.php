@@ -1093,6 +1093,12 @@ LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table 
         'headerPattern' => '/^soft_credit_contact_id$/i',
         'where' => 'civicrm_contribution_soft.contact_id',
       ),
+      'contribution_pcp_title' => array(
+        'name' => 'contribution_pcp_title',
+        'title' => 'Personal Campaign Page Title',
+        'headerPattern' => '/^contribution_pcp_title$/i',
+        'where' => 'contribution_pcp.title',
+      ),
     );
 
     return $extraFields;

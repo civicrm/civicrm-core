@@ -259,7 +259,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $this->_fields['followup_activity_type_id']['attributes'] = array('' => '- select activity type -') + $aTypes;
     }
 
-    $result = parent::buildQuickForm();
+    parent::buildQuickForm();
 
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::DETACH | CRM_Core_Action::RENEW)) {
       return;

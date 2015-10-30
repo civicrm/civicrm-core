@@ -506,13 +506,15 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $totalAmount = $average = array();
+    $totalAmount = $average = $fees = $net = array();
     $count = 0;
     $select = "
         SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,
                SUM( {$this->_aliases['civicrm_contribution']}.total_amount ) as amount,
                ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,
-               {$this->_aliases['civicrm_contribution']}.currency as currency
+               {$this->_aliases['civicrm_contribution']}.currency as currency,
+	       SUM( {$this->_aliases['civicrm_contribution']}.fee_amount ) as fees,
+               SUM( {$this->_aliases['civicrm_contribution']}.net_amount ) as net
         ";
 
     $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
@@ -520,8 +522,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
-      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" .
-        $dao->count . ")";
+      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" . $dao->count . ")";
+      $fees[] = CRM_Utils_Money::format($dao->fees, $dao->currency);
+      $net[] = CRM_Utils_Money::format($dao->net, $dao->currency);
       $average[] = CRM_Utils_Money::format($dao->avg, $dao->currency);
       $count += $dao->count;
     }
@@ -533,6 +536,16 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $statistics['counts']['count'] = array(
       'title' => ts('Total Contributions'),
       'value' => $count,
+    );
+    $statistics['counts']['fees'] = array(
+      'title' => ts('Fees'),
+      'value' => implode(',  ', $fees),
+      'type' => CRM_Utils_Type::T_STRING,
+    );
+    $statistics['counts']['net'] = array(
+      'title' => ts('Net'),
+      'value' => implode(',  ', $net),
+      'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['avg'] = array(
       'title' => ts('Average'),

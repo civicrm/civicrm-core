@@ -28,7 +28,6 @@
 /**
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
@@ -82,6 +81,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
 
   /**
    * @inheritDoc
+   *
+   * @return array
    */
   public function checkRequirements() {
     $errors = array();
@@ -93,6 +94,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
 
   /**
    * @inheritDoc
+   *
+   * @return array_keys
    */
   public function getKeys() {
     $k2c = $this->getKeysToContainer();
@@ -101,6 +104,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
 
   /**
    * @inheritDoc
+   *
+   * @param string $key
    */
   public function getPath($key) {
     return $this->getContainer($key)->getPath($key);
@@ -108,6 +113,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
 
   /**
    * @inheritDoc
+   *
+   * @param string $key
    */
   public function getResUrl($key) {
     return $this->getContainer($key)->getResUrl($key);
