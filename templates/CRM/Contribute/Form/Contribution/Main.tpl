@@ -454,6 +454,17 @@
 
     $('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
   });
+
+  CRM.$(function($) {
+    // Update pledge contribution amount when pledge checkboxes change
+    cj("input[name^='pledge_amount']").on('change', function() {
+      var total = 0;
+      cj("input[name^='pledge_amount']:checked").each(function() {
+        total += Number(cj(this).attr('amount'));
+      });
+      cj("input[name^='price_']").val(total.toFixed(2));
+    });
+  });
   {/literal}
 </script>
 {/if}
