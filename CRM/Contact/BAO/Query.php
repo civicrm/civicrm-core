@@ -1672,7 +1672,8 @@ class CRM_Contact_BAO_Query {
 
     if ($apiEntity &&
       (substr($id, 0, strlen($apiEntity)) != $apiEntity) &&
-      (substr($id, 0, 10) != 'financial_' && substr($id, 0, 8) != 'payment_')
+      (substr($id, 0, 10) != 'financial_' && substr($id, 0, 8) != 'payment_') &&
+      (substr($id, 0, 7) != 'custom_')
     ) {
       $id = $apiEntity . '_' . $id;
     }
