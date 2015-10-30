@@ -5,7 +5,6 @@
   ]);
 
   // router
-
   angular.module('statuspage').config( function($routeProvider) {
     $routeProvider.when('/status', {
       controller: 'statuspageStatusPage',
