@@ -133,11 +133,11 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // get select field ids
     // get select field option1
-    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td/span/a[text()='Edit Option']@href");
     $selectFieldOp1 = $this->urlArg('oid', $selectFieldOp1URL);
 
     // get select field option2
-    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td/span/a[text()='Edit Option']@href");
     $selectFieldOp2 = $this->urlArg('oid', $selectFieldOp2URL);
 
     // create event.
@@ -328,11 +328,11 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // get select field ids
     // get select field option1
-    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td/span/a[text()='Edit Option']@href");
     $selectFieldOp1 = $this->urlArg('oid', $selectFieldOp1URL);
 
     // get select field option2
-    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td/span/a[text()='Edit Option']@href");
     $selectFieldOp2 = $this->urlArg('oid', $selectFieldOp2URL);
 
     // create event.
@@ -515,11 +515,11 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // get select field ids
     // get select field option1
-    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']/table/tbody/tr[1]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td/span/a[text()='Edit Option']@href");
     $selectFieldOp1 = $this->urlArg('oid', $selectFieldOp1URL);
 
     // get select field option2
-    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']/table/tbody/tr[2]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td/span/a[text()='Edit Option']@href");
     $selectFieldOp2 = $this->urlArg('oid', $selectFieldOp2URL);
 
     // create event.
@@ -792,11 +792,11 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // get select field ids
     // get select field option1
-    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td/span/a[text()='Edit Option']@href");
     $selectFieldOp1 = $this->urlArg('oid', $selectFieldOp1URL);
 
     // get select field option2
-    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td/span/a[text()='Edit Option']@href");
     $selectFieldOp2 = $this->urlArg('oid', $selectFieldOp2URL);
 
     // create event.
@@ -1113,7 +1113,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
     $this->click('xpath=//form[@id="Fee"]//div/table/tbody//tr//td/label[contains(text(), "Yes")]');
     $processorName = $params['payment_processor'];
-    $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
+    $this->select2('payment_processor', $processorName, TRUE);
     $this->select('financial_type_id', 'value=4');
 
     if (array_key_exists('price_set', $params)) {
