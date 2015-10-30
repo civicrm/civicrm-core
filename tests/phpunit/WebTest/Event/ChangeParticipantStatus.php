@@ -161,7 +161,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
         'Event Source' => 'Event StandaloneAddTest Webtest',
       )
     );
-    $this->verifyText("xpath=//td[text()='Selections']/following-sibling::td//div/div", preg_quote('Event Total: $ 800.00'));
+    $this->verifyText("xpath=//td[text()='Selections']/following-sibling::td//div", preg_quote('Event Total: $ 800.00'));
   }
 
 }
