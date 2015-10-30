@@ -320,54 +320,6 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($assertCheck, 'copy rows for field two failed[radio button]');
 
-    //test with tinymce editor
-    $this->openCiviPage('admin/setting/preferences/display', 'reset=1', '_qf_Display_next-bottom');
-    $this->select('editor_id', 'TinyMCE');
-    $this->click('_qf_Display_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Find Contact
-    $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
-    $this->type('sort_name', $lastName);
-    $this->click('_qf_Basic_refresh');
-
-    // Update multiple contacts
-    $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
-    $this->click('CIVICRM_QFID_ts_all_4');
-
-    $this->select('task', "label=Update multiple contacts");
-    $this->waitForElementPresent('_qf_PickProfile_next');
-
-    $this->select('uf_group_id', "label={$profileTitle}");
-    $this->click('_qf_PickProfile_next');
-
-    $this->waitForElementPresent('_qf_Batch_next');
-
-    $this->isElementPresent("xpath=//form[@id='Batch']/div[2]/table/tbody//tr/td[text()='{$Name2}']");
-    $this->isElementPresent("xpath=//form[@id='Batch']/div[2]/table/tbody//tr/td[text()='{$Name1}']");
-
-    $richTextAreaIdOne = $this->getAttribute("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[5]/textarea/@id");
-    $richTextAreaIdTwo = $this->getAttribute("xpath=//form[@id='Batch']/div[2]/table/tbody/tr[2]/td[5]/textarea/@id");
-
-    $this->selectFrame("css=td.mceIframeContainer iframe#{$richTextAreaIdOne}_ifr");
-    $this->type("//html/body", 'this is intro text');
-    $this->selectFrame('relative=top');
-
-    $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[5]/img");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(5);
-
-    if ($this->getValue($richTextAreaIdOne) == $this->getValue($richTextAreaIdTwo)) {
-      $assertCheck = TRUE;
-    }
-    else {
-      $assertCheck = FALSE;
-    }
-
-    $this->assertTrue($assertCheck, 'Rich Text Area coping failed [TinyMCE]');
-
     //campaign test for interview
     //enable CiviCampaign module if necessary
     $this->enableComponents("CiviCampaign");

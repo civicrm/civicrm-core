@@ -243,10 +243,10 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Select roles
     $this->multiselect2('role_id', array('Volunteer', 'Host'));
 
-    $this->waitForElementPresent("xpath=//div[@class='crm-customData-block']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']");
-    $this->click("xpath=//div[@class='crm-customData-block']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']//div[1]");
-    $this->click("xpath=//div[@class='crm-customData-block']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[2]//td[2]//table//tbody//tr[1]//td[1]//label");
-    $this->click("xpath=//div[@class='crm-customData-block']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[4]//td[2]//table//tbody//tr[1]//td[1]//label");
+    $this->waitForElementPresent("xpath=//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']");
+    $this->click("xpath=//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']//div[1]");
+    $this->click("xpath=//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[2]//td[2]//table//tbody//tr[1]//td[1]//label");
+    $this->click("xpath=//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[4]//td[2]//table//tbody//tr[1]//td[1]//label");
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -438,8 +438,8 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     foreach ($return as $values) {
       foreach ($values as $entityType => $customData) {
         //checking for duplicate custom data present or not
-        $this->assertElementPresent("xpath=//*[@class='crm-customData-block']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']");
-        $this->assertEquals(1, $this->getXpathCount("//*[@class='crm-customData-block']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']"));
+        $this->assertElementPresent("xpath=//div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']");
+        $this->assertEquals(1, $this->getXpathCount("//div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']"));
       }
     }
   }
