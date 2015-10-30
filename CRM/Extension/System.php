@@ -256,8 +256,7 @@ class CRM_Extension_System {
    */
   public function getRepositoryUrl() {
     if (empty($this->_repoUrl) && $this->_repoUrl !== FALSE) {
-      $config = CRM_Core_Config::singleton();
-      $url = CRM_Core_BAO_Setting::getItem('Extension Preferences', 'ext_repo_url', NULL, CRM_Extension_Browser::DEFAULT_EXTENSIONS_REPOSITORY);
+      $url = Civi::settings()->get('ext_repo_url');
 
       // boolean false means don't try to check extensions
       // CRM-10575
