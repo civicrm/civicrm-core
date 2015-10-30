@@ -43,7 +43,6 @@
 function civicrm_api3_uf_field_create($params) {
   $ufFieldArray = array();
 
-
   $ufField = CRM_Core_BAO_UFField::create($params);
 
   _civicrm_api3_object_to_array($ufField, $ufFieldArray[$ufField->id]);

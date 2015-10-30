@@ -64,7 +64,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
       $groupId = CRM_Utils_Array::value('uf_group_id', $params);
     }
 
-    $field_name       = CRM_Utils_Array::value('field_name', $params);
+    $field_name = CRM_Utils_Array::value('field_name', $params);
 
     if (strpos($field_name, 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
       throw new API_Exception('The field_name is not valid');
@@ -75,19 +75,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     }
 
     $fieldId = CRM_Utils_Array::value('id', $params);
-    if (!empty($fieldId)) {
-      $UFField = new CRM_Core_BAO_UFField();
-      $UFField->id = $fieldId;
-      if ($UFField->find(TRUE)) {
-        if (!(CRM_Utils_Array::value('group_id', $params))) {
-          // this copied here from previous api function - not sure if required
-          $params['group_id'] = $UFField->uf_group_id;
-        }
-      }
-      else {
-        throw new API_Exception("There is no field for this fieldId.");
-      }
-    }
 
     if (CRM_Core_BAO_UFField::duplicateField($params)) {
       throw new API_Exception("The field was not added. It already exists in this profile.");
@@ -186,7 +173,16 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    */
   public static function duplicateField($params) {
     $ufField = new CRM_Core_DAO_UFField();
+
     $ufField->uf_group_id = CRM_Utils_Array::value('uf_group_id', $params);
+
+    $field_type       = CRM_Utils_Array::value('field_type', $params);
+    $field_name       = CRM_Utils_Array::value('field_name', $params);
+    $location_type_id = CRM_Utils_Array::value('location_type_id', $params, CRM_Utils_Array::value('website_type_id', $params));
+    $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
+
+    $params['field_name'] = array($field_type, $field_name, $location_type_id, $phone_type);
+
     $ufField->field_type = $params['field_name'][0];
     $ufField->field_name = $params['field_name'][1];
     if ($params['field_name'][1] == 'url') {
