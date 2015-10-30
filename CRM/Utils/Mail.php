@@ -203,7 +203,7 @@ class CRM_Utils_Mail {
     $headers['Return-Path'] = CRM_Utils_Array::value('returnPath', $params);
 
     // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
-    $replyTo = CRM_Utils_Array::value('replyTo', $params, $from);
+    $replyTo = CRM_Utils_Array::value('replyTo', $params, CRM_Utils_Array::value('from', $params));
 
     if (!empty($replyTo)) {
       $headers['Reply-To'] = $replyTo;
