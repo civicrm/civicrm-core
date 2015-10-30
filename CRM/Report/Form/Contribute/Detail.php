@@ -484,13 +484,17 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         !empty($this->_params['bid_value']))
     ) {
       $this->_from .= "
-                LEFT JOIN civicrm_entity_financial_trxn tx ON (tx.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
-                   tx.entity_table = 'civicrm_contribution')
-                 LEFT JOIN  civicrm_entity_batch {$this->_aliases['civicrm_entity_batch']}
-                        ON ({$this->_aliases['civicrm_entity_batch']}.entity_id = tx.financial_trxn_id AND
-                        {$this->_aliases['civicrm_entity_batch']}.entity_table = 'civicrm_financial_trxn')
-                 LEFT JOIN civicrm_batch {$this->_aliases['civicrm_batch']}
-                        ON {$this->_aliases['civicrm_batch']}.id = {$this->_aliases['civicrm_entity_batch']}.batch_id";
+        LEFT JOIN (
+          SELECT entity_id, financial_trxn_id
+          FROM civicrm_entity_financial_trxn
+          WHERE entity_table = 'civicrm_contribution'
+          GROUP BY entity_id
+        ) tx ON tx.entity_id = {$this->_aliases['civicrm_contribution']}.id
+        LEFT JOIN  civicrm_entity_batch {$this->_aliases['civicrm_entity_batch']}
+          ON ({$this->_aliases['civicrm_entity_batch']}.entity_id = tx.financial_trxn_id
+          AND {$this->_aliases['civicrm_entity_batch']}.entity_table = 'civicrm_financial_trxn')
+        LEFT JOIN civicrm_batch {$this->_aliases['civicrm_batch']}
+          ON {$this->_aliases['civicrm_batch']}.id = {$this->_aliases['civicrm_entity_batch']}.batch_id";
     }
   }
 
