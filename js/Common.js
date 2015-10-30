@@ -558,11 +558,12 @@ if (!CRM.vars) CRM.vars = {};
                 // Once a filter has been chosen, rerender create links and refocus the search box
                 $el.select2('close');
                 $el.select2('open');
+              } else {
+                $('.crm-entityref-links', '#select2-drop').replaceWith(renderEntityRefCreateLinks($el));
               }
             })
             .on('change.crmEntity', 'select.crm-entityref-filter-key', function() {
-              var filter = $el.data('user-filter') || {};
-              filter.key = $(this).val();
+              var filter = {key: $(this).val()};
               $(this).toggleClass('active', !!filter.key);
               $el.data('user-filter', filter);
               loadEntityRefFilterOptions($el);
@@ -854,7 +855,7 @@ if (!CRM.vars) CRM.vars = {};
           });
       }
     } else {
-      $valField.hide();
+      $valField.hide().val('').change();
     }
   }
 
