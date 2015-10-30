@@ -342,12 +342,13 @@ class CRM_Contribute_Form_AdditionalInfo {
     // retrieve individual prefix value for honoree
     if (isset($params['soft_credit'])) {
       $softCreditTypes = $softCredits = array();
+      $softCreditType = CRM_Core_OptionGroup::values('soft_credit_type', FALSE);
       foreach ($params['soft_credit'] as $key => $softCredit) {
         $softCredits[$key] = array(
-          'Name' => $softCredit['contact_name'],
-          'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency']),
+          'Name' => CRM_Utils_Array::value('contact_name', $softCredit)? $softCredit['contact_name'] : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $softCredit['contact_id'], 'display_name'),
+          'Amount' => CRM_Utils_Money::format($softCredit['amount'], CRM_Utils_Array::value('currency', $softCredit)),
         );
-        $softCreditTypes[$key] = $softCredit['soft_credit_type_label'];
+        $softCreditTypes[$key] = CRM_Utils_Array::value('soft_credit_type_label', $softCredit)? $softCredit['soft_credit_type_label'] : $softCreditType[$softCredit['soft_credit_type_id']];
       }
       $form->assign('softCreditTypes', $softCreditTypes);
       $form->assign('softCredits', $softCredits);
