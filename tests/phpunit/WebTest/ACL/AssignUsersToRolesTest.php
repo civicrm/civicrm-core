@@ -162,6 +162,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->click('newACL');
     $this->waitForElementPresent("acl_role_id");
     $this->select("acl_role_id", "label=" . $label);
+    $this->waitForAjaxContent();
     $this->select("entity_id", "label={$groupTitle}");
     $this->clickLink("_qf_EntityRole_next-botttom", 'newACL', FALSE);
 
@@ -171,6 +172,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("group_id");
     $this->select("group_id", "label={$smartGroupTitle}");
     $this->select("operation", "label=Edit");
+    $this->waitForAjaxContent();
     $this->select("entity_id", "label={$label}");
     $this->type("name", "describe {$label}");
     $this->clickLink("_qf_ACL_next-bottom", 'newACL', FALSE);
@@ -180,6 +182,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('name');
     $this->type("name", "Edit All Events $label");
     $this->select("entity_id", "label={$label}");
+    $this->waitForAjaxContent();
     $this->select("operation", "label=Edit");
     $this->click("xpath=//label[contains(text(), 'Events')]");
     $this->select("event_id", "value=0");
@@ -376,6 +379,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->type("name", "Edit Events{$label}");
     $this->select("operation", "label=Edit");
     $this->select("entity_id", "label={$label}");
+    $this->waitForElementPresent("xpath=//tr[@class='crm-acl-form-block-object_type']/td[2]/label[contains(text(), 'Events')]");
     $this->click("xpath=//tr[@class='crm-acl-form-block-object_type']/td[2]/label[contains(text(), 'Events')]");
     $this->select("event_id", "label=All Events");
     $this->clickLink("_qf_ACL_next-bottom");
