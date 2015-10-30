@@ -24,8 +24,10 @@
           });
       };
       
-      $scope.countVisible = function(is_visible) {
-        return _.where($scope.statuses, {is_visible: is_visible}).length;
+      $scope.countVisible = function(visibility) {
+        return _.filter($scope.statuses, function(s) {
+          return s.is_visible == visibility && s.severity_id >= 3;
+        }).length;
       };
     });
 
