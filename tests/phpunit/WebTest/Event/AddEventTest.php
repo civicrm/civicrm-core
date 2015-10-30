@@ -317,6 +317,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     //check if pay later option is disabled
     $this->click('CIVICRM_QFID_1_is_monetary');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('is_pay_later');
     $this->assertNotChecked('is_pay_later');
   }
@@ -449,7 +450,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     }
 
     if ($processorName) {
-      $this->check("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']/../input");
+      $this->select2('payment_processor', $processorName, TRUE);
     }
     $this->select("financial_type_id", "value=4");
     if ($priceSet) {
