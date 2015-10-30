@@ -2,7 +2,8 @@
 (function (angular, $, _) {
 
   var uidCount = 0,
-    pageTitle = 'CiviCRM';
+    pageTitle = 'CiviCRM',
+    documentTitle = 'CiviCRM';
 
   angular.module('crmUi', [])
 
@@ -977,29 +978,34 @@
       };
     })
 
-    // Sets the one and only page title - uses CMS title if available
+    // Sets document title & page title; attempts to override CMS title markup for the latter
     // WARNING: Use only once per route!
-    // Note: Title should be plain-text only
-    // Example: <h1 crm-ui-title>{{ts('Hello')}}</h1>
-    .directive('crmUiTitle', function($timeout) {
+    // Example (same title for both): <h1 crm-page-title>{{ts('Hello')}}</h1>
+    // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag"></i>{{ts('Hello')}}</h1>
+    .directive('crmPageTitle', function($timeout) {
       return {
+        scope: {
+          crmDocumentTitle: '='
+        },
         link: function(scope, $el, attrs) {
           function update() {
             $timeout(function() {
-              var newTitle = $el.text();
-              document.title = $('title').text().replace(pageTitle, newTitle);
+              var newPageTitle = _.trim($el.html()),
+                newDocumentTitle = scope.crmDocumentTitle || $el.text();
+              document.title = $('title').text().replace(documentTitle, newDocumentTitle);
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
-                if (_.trim($(this).text()) === _.trim(pageTitle)) {
-                  $(this).text(newTitle);
+                if (_.trim($(this).html()) === pageTitle) {
+                  $(this).html(newPageTitle);
                   $el.hide();
                 }
               });
-              pageTitle = newTitle;
+              pageTitle = newPageTitle;
+              documentTitle = newDocumentTitle;
             });
           }
 
-          scope.$watch(function() {return $el.html();}, update);
+          scope.$watch(function() {return scope.crmDocumentTitle + $el.html();}, update);
         }
       };
     })

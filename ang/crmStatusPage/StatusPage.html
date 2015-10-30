@@ -3,14 +3,17 @@
 
   <form name="crm-system-status" crm-ui-id-scope>
 
-    <h1 crm-ui-title>{{ts('CiviCRM System Status (%1)', {1: _.where(statuses, {is_visible: 1}).length})}}</h1>
+    <h1 crm-page-title
+      crm-document-title="ts('CiviCRM System Status') + ' (' + countVisible(1) + ')'"
+      >
+      {{ts('CiviCRM System Status')}}
+    </h1>
 
     <div id="crm-status-list" crm-ui-tab-set>
-      <div
+      <div crm-ui-tab
         ng-repeat="tab in [{is_visible: 1, icon: 'fa-bell'}, {is_visible: 0, icon: 'fa-bell-slash-o'}]"
-        crm-ui-tab
         id="tab-status-visible-{{tab.is_visible}}"
-        count="{{_.where(statuses, {is_visible: tab.is_visible}).length}}"
+        count="{{countVisible(tab.is_visible)}}"
         crm-title="tab.is_visible ? ts('Active') : ts('Hidden')"
         crm-icon="{{tab.icon}}"
         >
