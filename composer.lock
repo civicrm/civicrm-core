@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1ca80bcd5b78e24dbc9578ae774ac763",
-    "content-hash": "ae05dc8ff99d56f083c2d09c7e54c4a2",
+    "hash": "ef9002cf84b250ea5201b6ce0c5baa56",
+    "content-hash": "a02a7a13793c8f4f6d5e053690a8aedc",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -87,6 +87,28 @@
             "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
             "homepage": "https://github.com/dompdf/dompdf",
             "time": "2014-03-11 01:59:52"
+        },
+        {
+            "name": "iats-payments/civicrm",
+            "version": "1.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/iATSPayments/com.iatspayments.civicrm.git",
+                "reference": "17b0edcdb056fa6257c4cd6612ff354c3f18dcce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/iATSPayments/com.iatspayments.civicrm/zipball/17b0edcdb056fa6257c4cd6612ff354c3f18dcce",
+                "reference": "17b0edcdb056fa6257c4cd6612ff354c3f18dcce",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL"
+            ],
+            "description": "CiviCRM extension for iATS Payments",
+            "time": "2015-10-30 17:48:34"
         },
         {
             "name": "phenx/php-font-lib",
@@ -264,12 +286,12 @@
             "target-dir": "Symfony/Component/Config",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Config.git",
+                "url": "https://github.com/symfony/config.git",
                 "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "url": "https://api.github.com/repos/symfony/config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
                 "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e",
                 "shasum": ""
             },
@@ -312,12 +334,12 @@
             "target-dir": "Symfony/Component/DependencyInjection",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/DependencyInjection.git",
+                "url": "https://github.com/symfony/dependency-injection.git",
                 "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/DependencyInjection/zipball/c42aee05b466cc9c66b87ddf7d263402befb6962",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/c42aee05b466cc9c66b87ddf7d263402befb6962",
                 "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962",
                 "shasum": ""
             },
@@ -369,12 +391,12 @@
             "target-dir": "Symfony/Component/EventDispatcher",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/EventDispatcher.git",
+                "url": "https://github.com/symfony/event-dispatcher.git",
                 "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
                 "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
                 "shasum": ""
             },
@@ -426,12 +448,12 @@
             "target-dir": "Symfony/Component/Filesystem",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Filesystem.git",
+                "url": "https://github.com/symfony/filesystem.git",
                 "reference": "d3c24d7d6e9c342008d8421b2fade460311647ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Filesystem/zipball/d3c24d7d6e9c342008d8421b2fade460311647ea",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/d3c24d7d6e9c342008d8421b2fade460311647ea",
                 "reference": "d3c24d7d6e9c342008d8421b2fade460311647ea",
                 "shasum": ""
             },
