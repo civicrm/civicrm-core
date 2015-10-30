@@ -433,22 +433,22 @@
   CRM.$(function($) {
     // highlight price sets
     function updatePriceSetHighlight() {
-      cj('#priceset .price-set-row span').removeClass('highlight');
-      cj('#priceset .price-set-row input:checked').parent().addClass('highlight');
+      $('#priceset .price-set-row span').removeClass('highlight');
+      $('#priceset .price-set-row input:checked').parent().addClass('highlight');
     }
-    cj('#priceset input[type="radio"]').change(updatePriceSetHighlight);
+    $('#priceset input[type="radio"]').change(updatePriceSetHighlight);
     updatePriceSetHighlight();
 
     function toggleBillingBlockIfFree(){
       var total_amount_tmp =  $(this).data('raw-total');
       // Hide billing questions if this is free
       if (total_amount_tmp == 0){
-        cj("#billing-payment-block").hide();
-        cj(".payment_options-group").hide();
+        $("#billing-payment-block").hide();
+        $(".payment_options-group").hide();
       }
       else {
-        cj("#billing-payment-block").show();
-        cj(".payment_options-group").show();
+        $("#billing-payment-block").show();
+        $(".payment_options-group").show();
       }
     }
 
@@ -457,12 +457,12 @@
 
   CRM.$(function($) {
     // Update pledge contribution amount when pledge checkboxes change
-    cj("input[name^='pledge_amount']").on('change', function() {
+    $("input[name^='pledge_amount']").on('change', function() {
       var total = 0;
-      cj("input[name^='pledge_amount']:checked").each(function() {
-        total += Number(cj(this).attr('amount'));
+      $("input[name^='pledge_amount']:checked").each(function() {
+        total += Number($(this).attr('amount'));
       });
-      cj("input[name^='price_']").val(total.toFixed(2));
+      $("input[name^='price_']").val(total.toFixed(2));
     });
   });
   {/literal}
