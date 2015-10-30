@@ -505,7 +505,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
    */
   public function testEventWithPriceSet() {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -677,6 +676,23 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       )
     );
     $this->verifyText("xpath=//td[text()='Contribution Amount']/following-sibling::td//div/div", preg_quote('Contribution Total: $ 2,705.00'));
+
+    // CRM-17182 - Rename the price option and check the same in Find Participants
+    $this->openCiviPage('admin/price/field', "reset=1&action=browse&sid={$sid}", 'newPriceField');
+    $this->click("xpath=//table[@id='options']/tbody/tr[3]/td[8]/a[text()='Edit Price Options']");
+    $this->waitForElementPresent("xpath=//span[contains(text(), 'Done')]");
+    $this->click("xpath=//tr/td/div[text()='First Night']/../following-sibling::td[8]/span/a[text()='Edit Option']");
+    $this->waitForElementPresent("_qf_Option_cancel");
+    $this->type('label', 'First Night Edited');
+    $this->click('_qf_Option_next');
+    $this->waitForText('crm-notification-container', "The option 'First Night Edited' has been saved.");
+
+    $this->openCiviPage('event/search', "reset=1", '_qf_Search_refresh');
+    $this->select2('participant_fee_id', 'First Night Edited');
+    $this->clickLink('_qf_Search_refresh');
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "xpath=//span[contains(text(), 'Done')]", FALSE);
+    $expectedLineItems[4][1] = 'Evening Sessions - First Night Edited';
+    $this->_checkLineItems($expectedLineItems);
   }
 
 
