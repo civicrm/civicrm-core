@@ -596,6 +596,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
           $value['from_email_address'] = $domainEmail;
           $value['contribution_id'] = $contribution->id;
+          if (!empty($value['soft_credit'])) {
+            $value = array_merge($value, CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id));
+          }
           CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $value);
         }
       }
