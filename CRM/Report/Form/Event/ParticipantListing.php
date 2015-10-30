@@ -139,6 +139,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'contact_sub_type' => array(
             'title' => ts('Contact Subtype'),
           ),
+          'modified_date' => array(
+            'title' => ts('Modified Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE
+          ),
         ),
       ),
       'civicrm_email' => array(
@@ -161,6 +166,8 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => array(
           'street_address' => NULL,
+          'supplemental_address_1' => NULL,
+          'supplemental_address_2' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
           'state_province_id' => array(
@@ -196,6 +203,9 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'fee_currency' => array(
             'required' => TRUE,
             'no_display' => TRUE,
+          ),
+          'registered_by_id' => array(
+            'title' => ts('Registered by Participant ID'),
           ),
           'participant_fee_level' => NULL,
           'participant_fee_amount' => array('title' => ts('Participant Fee')),
@@ -246,7 +256,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
-
+          'registered_by_id' => array(
+            'title' => ts('Registered by Participant ID'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operator' => 'like',
+          ),
         ),
         'order_bys' => array(
           'participant_register_date' => array(
