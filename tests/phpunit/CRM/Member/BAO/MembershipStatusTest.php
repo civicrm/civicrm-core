@@ -84,7 +84,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $membershipStatus2 = CRM_Member_BAO_MembershipStatus::add($params);
-    $result = CRM_Member_PseudoConstant::membershipStatus($membershipStatus->id);
+    $result = CRM_Member_PseudoConstant::membershipStatus($membershipStatus->id, NULL, 'name', FALSE, FALSE);
     $this->assertEquals($result, 'test Status', 'Verify Updated Membership status name From PseduoConstant.');
     CRM_Member_BAO_MembershipStatus::del($membershipStatus->id);
   }
