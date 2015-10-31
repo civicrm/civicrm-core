@@ -68,6 +68,26 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals($result->name, 'testStatus', 'Verify membership status name.');
     CRM_Member_BAO_MembershipStatus::del($membershipStatus->id);
   }
+  
+  public function testPseudoConstantflush() {
+    $params = array(
+      'name' => 'testStatus',
+      'is_active' => 1,
+    );
+    $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
+    $defaults = array();
+    $result = CRM_Member_BAO_MembershipStatus::retrieve($params, $defaults);
+    $this->assertEquals($result->name, 'testStatus', 'Verify membership status name.');
+    $params = array(
+      'id' = $membershipStatus->id,
+      'name' => 'test Status',
+      'is_active' => 1,
+    );
+    $membershipStatus2 = CRM_Member_BAO_MembershipStatus::add($params);
+    $result = CRM_Member_PseudoConstant::membershipStatus($membershipStatus->id);
+    $this->assertEquals($result, 'test Status', 'Verify Updated Membership status name From PseduoConstant.');
+    CRM_Member_BAO_MembershipStatus::del($membershipStatus->id);
+  }
 
   public function testSetIsActive() {
 
