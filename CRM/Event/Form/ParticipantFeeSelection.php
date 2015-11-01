@@ -157,6 +157,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $statuses = CRM_Event_PseudoConstant::participantStatus();
     $this->assign('partiallyPaid', array_search('Partially paid', $statuses));
     $this->assign('pendingRefund', array_search('Pending refund', $statuses));
+    $this->assign('registered', array_search('Registered', $statuses));
     $this->assign('participantStatus', $this->_participantStatus);
 
     $config = CRM_Core_Config::singleton();

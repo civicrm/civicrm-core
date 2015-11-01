@@ -52,6 +52,7 @@ function populatebalanceFee(updatedAmt, onlyStatusUpdate) {
   // assign statuses
   var partiallyPaid = {/literal}{$partiallyPaid}{literal};
   var pendingRefund = {/literal}{$pendingRefund}{literal};
+  var registered = {/literal}{$registered}{literal};
   var participantStatus = {/literal}{$participantStatus}{literal};
 
   // fee actually paid
@@ -75,9 +76,12 @@ function populatebalanceFee(updatedAmt, onlyStatusUpdate) {
   if (balanceAmt > 0 && feePaid != 0) {
     cj('#status_id').val(partiallyPaid);
   }
+  else if(balanceAmt==0 && feePaid!=0) {
+    cj('#status_id').val(registered);
+  }
   else if(balanceAmt < 0) {
     cj('#status_id').val(pendingRefund);
-  }
+  } 
   else {
     cj('#status_id').val(participantStatus);
   }
