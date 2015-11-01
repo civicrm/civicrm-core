@@ -87,13 +87,12 @@ describe('crmMailingRadioDate', function() {
       expect(element.find('.crm-form-time').timeEntry('getTime').getMinutes()).toBe(3);
 
       var now = new Date();
-      var month = '' + (now.getMonth() + 1);
-      var day = '' + (now.getDate() + 1);
+      var month = '' + now.getMonth();
       var year = (now.getFullYear() + 1);
-      var hours = '03';
-      var minutes = '30';
       if (month.length < 2) month = '0' + month;
-      if (day.length < 2) day = '0' + day;
+      var day = "01";
+      var minutes = "30";
+      var hours = "09";
       var datenow = [year, month, day].join('-');
       var time = [hours, minutes, "00"].join(':');
       var currentDate = datenow + ' ' + time;
