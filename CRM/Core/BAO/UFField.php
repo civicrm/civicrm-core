@@ -43,18 +43,18 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   private static $_memberBatchEntryFields = NULL;
 
   /**
-   * Create UFField object
+   * Create UFField object.
    *
    * @param array $params
    *   Array per getfields metadata.
    *
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    *
    * @return CRM_Core_BAO_UFField
    */
   public static function create(&$params) {
     // CRM-14756: kind of a hack-ish fix. If the user gives the id, uf_group_id is retrieved and then set.
-    if (isset($params['id'])) {
+    if (isset($params['id']) && !isset($params['uf_group_id'])) {
       $groupId = civicrm_api3('UFField', 'getvalue', array(
         'return' => 'uf_group_id',
         'id' => $params['id'],
@@ -64,10 +64,16 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
       $groupId = CRM_Utils_Array::value('uf_group_id', $params);
     }
 
-    $field_name = CRM_Utils_Array::value('field_name', $params);
+    if (isset($params['field_name'])) {
+      $field_name = CRM_Utils_Array::value('field_name', $params);
 
-    if (strpos($field_name, 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
-      throw new API_Exception('The field_name is not valid');
+      if (strpos($field_name, 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
+        throw new CRM_Core_Exception('The field_name is not valid');
+      }
+
+      if (CRM_Core_BAO_UFField::duplicateField($params)) {
+        throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
+      }
     }
 
     if (!(CRM_Utils_Array::value('group_id', $params))) {
@@ -76,9 +82,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
     $fieldId = CRM_Utils_Array::value('id', $params);
 
-    if (CRM_Core_BAO_UFField::duplicateField($params)) {
-      throw new API_Exception("The field was not added. It already exists in this profile.");
-    }
     // @todo why is this even optional? Surely weight should just be 'managed' ??
     if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
@@ -87,6 +90,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
     $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($groupId, TRUE);
     CRM_Core_BAO_UFGroup::updateGroupTypes($groupId, $fieldsType);
+
+    civicrm_api3('profile', 'getfields', array('cache_clear' => TRUE));
 
     return $ufField;
   }
@@ -258,7 +263,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // set values for uf field properties and save
     $ufField = new CRM_Core_DAO_UFField();
 
-    if (!is_string($params['field_name'])) {
+    if (isset($params['field_name']) && !is_string($params['field_name'])) {
       $ufField->copyValues($params);
 
       $field_type       = CRM_Utils_Array::value('field_type', $params);
@@ -305,8 +310,11 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // fix for CRM-316
     $oldWeight = NULL;
 
-    if (!empty($params['field_id'])) {
-      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['field_id'], 'weight', 'id');
+    if (!empty($params['id'])) {
+      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['id'], 'weight', 'id');
+      if (!isset($params['weight'])) {
+        return $oldWeight;
+      }
     }
     $fieldValues = array('uf_group_id' => $params['group_id']);
     return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);

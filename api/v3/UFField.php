@@ -41,13 +41,7 @@
  *   Newly created $ufFieldArray
  */
 function civicrm_api3_uf_field_create($params) {
-  $ufFieldArray = array();
-
-  $ufField = CRM_Core_BAO_UFField::create($params);
-
-  _civicrm_api3_object_to_array($ufField, $ufFieldArray[$ufField->id]);
-  civicrm_api3('profile', 'getfields', array('cache_clear' => TRUE));
-  return civicrm_api3_create_success($ufFieldArray, $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
