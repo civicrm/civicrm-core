@@ -397,7 +397,7 @@
 
           ngModel.$render = function(value) {
             editor.done(function() {
-              CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
+              CRM.wysiwyg.setVal(elm, ngModel.$viewValue || '');
             });
           };
         }
