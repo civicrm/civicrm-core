@@ -65,9 +65,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   public function getAngularModules() {
     // load angular files only if valid permissions are granted to the user
     if (!CRM_Core_Permission::check('access CiviMail')
-      || !CRM_Core_Permission::check('create mailings')
-      || !CRM_Core_Permission::check('schedule mailings')
-      || !CRM_Core_Permission::check('approve mailings')
+      && !CRM_Core_Permission::check('create mailings')
+      && !CRM_Core_Permission::check('schedule mailings')
+      && !CRM_Core_Permission::check('approve mailings')
     ) {
       return array();
     }
