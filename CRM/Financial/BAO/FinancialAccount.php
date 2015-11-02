@@ -188,8 +188,7 @@ WHERE cft.id = %1
    */
   public static function getARAccounts($financialAccountId, $financialAccountTypeId = NULL, $accountTypeCode = 'ar') {
     if (!$financialAccountTypeId) {
-      $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
-      $financialAccountTypeId = array_search('Asset', $financialAccountType);
+      $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
     }
     $query = "SELECT count(id) FROM civicrm_financial_account WHERE financial_account_type_id = %1 AND LCASE(account_type_code) = %2
       AND id != %3 AND is_active = 1;";
