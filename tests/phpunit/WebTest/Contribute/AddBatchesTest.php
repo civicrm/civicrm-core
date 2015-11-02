@@ -120,7 +120,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // create a new pledge for contact
-    $contact = WebTest_Pledge_StandaloneAddTest::testStandalonePledgeAdd();
+    $contact = $this->webtestStandalonePledgeAdd();
 
     $itemCount = 2;
     $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
