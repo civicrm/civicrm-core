@@ -83,7 +83,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       self::disableEnableRelationship($id, $action, $params, $ids, $active);
     }
 
-    self::addRecent($params, $relationship);
+    if (empty($params['skipRecentView'])) {
+      self::addRecent($params, $relationship);
+    }
+
     return $relationship;
   }
 
