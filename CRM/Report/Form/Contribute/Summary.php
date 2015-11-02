@@ -44,7 +44,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   /**
-<<<<<<< HEAD
    * To what frequency group-by a date column
    *
    * @var array
@@ -58,9 +57,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   );
 
   /**
-=======
    * Class constructor.
->>>>>>> upstream/4.6
    */
   public function __construct() {
 
