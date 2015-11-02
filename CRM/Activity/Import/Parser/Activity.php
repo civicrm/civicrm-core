@@ -55,13 +55,18 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * Class constructor.
    *
    * @param array $mapperKeys
-   * @param null $mapperLocType
-   * @param null $mapperPhoneType
+   * @param int $mapperLocType
+   * @param int $mapperPhoneType
    */
   public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
   }
+
+  /**
+   * Function of undocumented functionality required by the interface.
+   */
+  protected function fini() {}
 
   /**
    * The initializer code, called before the processing.
@@ -161,9 +166,8 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    */
   public function summary(&$values) {
     $erroneousField = NULL;
-    $response = $this->setActiveFieldValues($values, $erroneousField);
+    $this->setActiveFieldValues($values, $erroneousField);
     $index = -1;
-    $errorRequired = FALSE;
 
     if ($this->_activityTypeIndex > -1 && $this->_activityLabelIndex > -1) {
       array_unshift($values, ts('Please select either Activity Type ID OR Activity Type Label.'));
@@ -262,7 +266,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     if (!isset($params['source_contact_id'])) {
       $params['source_contact_id'] = $session->get('userID');
     }
-    $formatted = array();
+
     $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
 
     foreach ($params as $key => $val) {
