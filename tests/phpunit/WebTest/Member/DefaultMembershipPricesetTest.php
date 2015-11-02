@@ -83,7 +83,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     //senario 1
     $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
 
-    $this->_testDefaultSenarios("National_Membership_{$title}-section", 2);
+    $this->_testDefaultSenarios("national_membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
@@ -92,10 +92,10 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     //senario 2
     $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
     // checking
-    $this->checkOptions("National_Membership_{$title}-section", 2);
+    $this->checkOptions("national_membership_{$title}-section", 2);
     // senario 1
-    $this->_testDefaultSenarios("National_Membership_{$title}-section", 4);
-    $this->_testDefaultSenarios("Second_Membership_{$title}-section", 2);
+    $this->_testDefaultSenarios("national_membership_{$title}-section", 4);
+    $this->_testDefaultSenarios("second_membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
@@ -104,10 +104,10 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     //senario 3
     $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
     // checking
-    $this->checkOptions("Second_Membership_{$title}-section", 2);
+    $this->checkOptions("second_membership_{$title}-section", 2);
     // senario 2
 
-    $this->_testDefaultSenarios("National_Membership_{$title}-section", 3);
+    $this->_testDefaultSenarios("national_membership_{$title}-section", 3);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
@@ -118,7 +118,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     // checking senario 3
     $this->assertTrue($this->isTextPresent("You have a current Lifetime Membership which does not need to be renewed."));
 
-    $this->_testDefaultSenarios("National_Membership_{$title}-section", 1);
+    $this->_testDefaultSenarios("national_membership_{$title}-section", 1);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Main_upload-bottom");
     $this->assertTrue($this->isTextPresent("You already have a lifetime membership and cannot select a membership with a shorter term."));
