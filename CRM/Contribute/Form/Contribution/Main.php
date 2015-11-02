@@ -395,7 +395,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if (count($pps) > 1) {
       $this->addRadio('payment_processor', ts('Payment Method'), $pps,
-        NULL, "&nbsp;", TRUE
+        NULL, "&nbsp;"
       );
     }
     elseif (!empty($pps)) {
@@ -1020,6 +1020,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
       }
+    }
+
+    if (!empty($fields['amount']) && $fields['amount'] > 0 && !isset($fields['payment_processor'])) {
+      $errors['payment_processor'] = ts('Please select a Payment Method');
     }
 
     // also return if paylater mode
