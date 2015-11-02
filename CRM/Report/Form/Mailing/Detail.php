@@ -38,8 +38,6 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
 
   /**
    */
-  /**
-   */
   public function __construct() {
     $this->_columns = array();
 
@@ -125,8 +123,8 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           'type' => CRM_Utils_Type::T_STRING,
           'options' => array(
             '' => 'Any',
-            'successful' => 'Successful',
-            'bounced' => 'Bounced',
+            'Successful' => 'Successful',
+            'Bounced' => 'Bounced',
           ),
         ),
       ),
@@ -271,7 +269,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
               $columns[$tableName][$fieldName] = $field;
             }
             elseif ($fieldName == 'delivery_id') {
-              $select[] = "IF(mailing_event_delivered_civireport.id IS NOT NULL, 'Successful', IF(mailing_event_bounce_civireport.id IS NOT NULL, 'Bounced ', 'Unknown')) as {$tableName}_{$fieldName}";
+              $select[] = "IF(mailing_event_bounce_civireport.id IS NOT NULL, 'Bounced', IF(mailing_event_delivered_civireport.id IS NOT NULL, 'Successful', 'Unknown')) as {$tableName}_{$fieldName}";
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = CRM_Utils_Array::value('no_display', $field);
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
@@ -316,14 +314,14 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
         LEFT JOIN civicrm_mailing_event_bounce {$this->_aliases['civicrm_mailing_event_bounce']}
           ON {$this->_aliases['civicrm_mailing_event_bounce']}.event_queue_id = civicrm_mailing_event_queue.id";
       if (CRM_Utils_Array::value('delivery_status_value', $this->_params) ==
-        'bounced'
+        'Bounced'
       ) {
         $this->_columns['civicrm_mailing_event_delivered']['filters']['delivery_status']['clause'] = "{$this->_aliases['civicrm_mailing_event_bounce']}.id IS NOT NULL";
       }
       elseif (CRM_Utils_Array::value('delivery_status_value', $this->_params) ==
-        'successful'
+        'Successful'
       ) {
-        $this->_columns['civicrm_mailing_event_delivered']['filters']['delivery_status']['clause'] = "{$this->_aliases['civicrm_mailing_event_delivered']}.id IS NOT NULL";
+        $this->_columns['civicrm_mailing_event_delivered']['filters']['delivery_status']['clause'] = "{$this->_aliases['civicrm_mailing_event_delivered']}.id IS NOT NULL AND {$this->_aliases['civicrm_mailing_event_bounce']}.id IS NULL";
       }
     }
     else {
