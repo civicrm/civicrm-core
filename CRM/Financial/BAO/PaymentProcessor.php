@@ -313,6 +313,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       'class_name' => 'Payment_Manual',
       'name' => 'pay_later',
       'billing_mode' => '',
+      'is_default' => 0,
       // Making this optionally recur would give lots of options -but it should
       // be a row in the payment processor table before we do that.
       'is_recur' => FALSE,
