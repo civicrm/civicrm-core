@@ -67,7 +67,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
         ),
         'filters' => array(
           'sort_name' => array(
-            'title' => ts('Contact Name')
+            'title' => ts('Contact Name'),
           ),
           'source' => array(
             'title' => ts('Contact Source'),
@@ -95,7 +95,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           'modified_date' => array(
             'title' => ts('Modified Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type'         => CRM_Utils_Type::T_DATE
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
         'grouping' => 'contact-fields',
