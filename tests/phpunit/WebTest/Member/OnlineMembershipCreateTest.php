@@ -456,16 +456,16 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       //Find Contribution
       $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
       $this->type("sort_name", "$lastName $firstName");
+      $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
       $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
       $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
       //View Contribution Record and verify data
       $expected = array(
         'From' => "{$firstName} {$lastName}",
-        'Financial Type' => 'Member Dues',
+        'Financial Type' => 'Member Dues (test) ',
         'Total Amount' => '0.00',
         'Contribution Status' => 'Completed',
-        'Received Into' => 'Payment Processor Account',
         'Source' => "Online Contribution: $contributionTitle",
         'Online Contribution Page' => $contributionTitle,
       );
@@ -473,6 +473,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
       //Find Member
       $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
+      $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
 
       $this->type("sort_name", "$lastName $firstName");
       $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
