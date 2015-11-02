@@ -139,11 +139,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'contact_sub_type' => array(
             'title' => ts('Contact Subtype'),
           ),
-          'modified_date' => array(
-            'title' => ts('Modified Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE
-          ),
         ),
       ),
       'civicrm_email' => array(
