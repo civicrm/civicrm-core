@@ -342,7 +342,7 @@ SET    cache_date = null,
           $query = "
 DELETE g
 FROM  civicrm_group_contact_cache g
-WHERE g.group_id = $group
+WHERE g.group_id = $dao->id;
 ";
           CRM_Core_DAO::executeQuery($query, $params);
         }
