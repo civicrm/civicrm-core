@@ -49,7 +49,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
 
     $this->click('radio_ts', 'ts_all');
 
-    $this->select('task', "label=Update Pending Contribution Status");
+    $this->select('task', "label=Update pending contribution status");
     $this->clickLink("_qf_Search_next_action");
     $this->select('contribution_status_id', 'label=Completed');
     $this->click('_qf_Status_next');
@@ -105,7 +105,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('radio_ts', 'ts_all');
 
-    $this->select('task', "label=Update Pending Contribution Status");
+    $this->select('task', "label=Update pending contribution status");
     $this->waitForElementPresent("_qf_Search_next_action");
     $this->click("_qf_Search_next_action");
     $this->waitForPageToLoad($this->getTimeoutMsec());
