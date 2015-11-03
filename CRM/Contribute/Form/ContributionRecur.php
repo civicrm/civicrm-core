@@ -217,9 +217,17 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     $cid        = CRM_Utils_Request::retrieve('cid', 'Integer', $this);
     $id         = CRM_Utils_Request::retrieve('crid', 'Integer', $this);
 
+    $this->_paymentProcessors = $this->getValidProcessors();
+    $offlineRecurPaymentProcessors = array();
+    foreach ($this->_paymentProcessors as $processor) {
+      if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('EditRecurringContribution')
+          && $processor['is_test'] == 0) {
+        $offlineRecurPaymentProcessors[$processor['id']] = $processor['name'];
+      }
+    }
     $paymentProcessor = $this->add('select', 'payment_processor_id',
       ts('Payment Processor'),
-      array('' => ts('- select -')) + $this->_recurPaymentProcessors,
+      array('' => ts('- select -')) + $offlineRecurPaymentProcessors,
       TRUE,
       NULL
     );
