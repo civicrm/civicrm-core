@@ -36,7 +36,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @return array
+   * Add pledge
    */
   public function testStandalonePledgeAdd() {
     $this->webtestStandalonePledgeAdd();
