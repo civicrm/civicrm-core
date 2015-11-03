@@ -632,8 +632,10 @@ $event_summary_limit
       if ($role) {
         $roleClause = 'IN';
       }
-      $roles = implode(',', array_keys($roleTypes));
-      if (empty($roles)) {
+      if (array_keys($roleTypes)) {
+        $roles = '"' . implode("','", array_keys($roleTypes)) . '"';
+      }
+      else {
         $roles = 0;
       }
       $clause[] = "participant.role_id {$roleClause} ( $roles )";

@@ -201,7 +201,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           }
         }
         if (!empty($this->_formValues['participant_role_id'])) {
-          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', (array) $this->_formValues['participant_role_id']) . ' ) )';
+          $seatClause[] = '( participant.role_id IN ( "' . implode('" , "', (array) $this->_formValues['participant_role_id']) . '" ) )';
         }
 
         // CRM-15379
