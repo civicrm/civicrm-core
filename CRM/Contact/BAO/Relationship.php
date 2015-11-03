@@ -51,8 +51,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @throws \CRM_Core_Exception
    */
   public static function create(&$params) {
-
     $extendedParams = self::loadExistingRelationshipDetails($params);
+    
     // When id is specified we always wan't to update, so we don't need to
     // check for duplicate relations.
     if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, $extendedParams['contact_id_a'], $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
@@ -63,6 +63,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       throw new CRM_Core_Exception('Invalid Relationship');
     }
     $relationship = self::add($params);
+    $id = empty($params['id']) ? $relationship->id : $params['id'];
+    
+    CRM_Utils_Hook::pre('create', 'Relationship', $id, $relationship);
+    
     if (!empty($params['contact_id_a'])) {
       $ids = array(
         'contactTarget' => $relationship->contact_id_b,
@@ -79,10 +83,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $action = CRM_Core_Action::ENABLE;
         $active = TRUE;
       }
-      $id = empty($params['id']) ? $relationship->id : $params['id'];
       self::disableEnableRelationship($id, $action, $params, $ids, $active);
     }
 
+    CRM_Utils_Hook::post('create', 'Relationship', $id, $relationship);
+    
     self::addRecent($params, $relationship);
     return $relationship;
   }
