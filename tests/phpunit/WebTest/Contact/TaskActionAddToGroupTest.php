@@ -52,8 +52,8 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
       $cids[] = $this->urlArg('cid');
 
       // update email of new contact
-      $this->waitForElementPresent("//ul[@id='actions']/li/a/span[text()='Edit']");
-      $this->click("//ul[@id='actions']/li/a/span[text()='Edit']");
+      $this->waitForElementPresent("xpath=//div[@class='crm-actions-ribbon']/ul[@id='actions']//li/a/span[text()=' Edit']");
+      $this->click("xpath=//div[@class='crm-actions-ribbon']/ul[@id='actions']//li/a/span[text()=' Edit']");
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->type("email_1_email", $emailString . $i . 'webtest');
       $this->click("_qf_Contact_upload_view");

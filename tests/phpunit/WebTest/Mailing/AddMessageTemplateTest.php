@@ -133,12 +133,12 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->click('subject');
 
     // check for default settings options
-    $this->click("xpath=//ul/li/a[text()='Tracking']");
+    $this->click('link=Tracking');
     $this->assertChecked("url_tracking");
     $this->assertChecked("open_tracking");
 
     // check for default header and footer ( with label )
-    $this->click("xpath=//ul/li/a[text()='Header and Footer']");
+    $this->click('link=Header and Footer');
     $this->select('header_id', "label=Mailing Header");
     $this->select('footer_id', "label=Mailing Footer");
 
@@ -154,7 +154,6 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 
     // finally schedule the mail by clicking submit
     $this->click("xpath=//center/a/div[text()='Submit Mailing']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
     $this->waitForTextPresent("Find Mailings");
