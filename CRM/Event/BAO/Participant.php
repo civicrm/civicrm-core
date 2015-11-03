@@ -383,7 +383,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
       $where[] = ' ( participant.is_test = 0 OR participant.is_test IS NULL ) ';
     }
     if (!empty($participantRoles)) {
-      $where[] = ' participant.role_id IN ( "' . implode("', '", array_keys($participantRoles)) . '" ) ';
+      $where[] = ' participant.role_id IN ( "' . implode('", "', array_keys($participantRoles)) . '" ) ';
     }
 
     $eventParams = array(1 => array($eventId, 'Positive'));

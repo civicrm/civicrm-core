@@ -633,7 +633,7 @@ $event_summary_limit
         $roleClause = 'IN';
       }
       if (array_keys($roleTypes)) {
-        $roles = '"' . implode("','", array_keys($roleTypes)) . '"';
+        $roles = '"' . implode('","', array_keys($roleTypes)) . '"';
       }
       else {
         $roles = 0;
