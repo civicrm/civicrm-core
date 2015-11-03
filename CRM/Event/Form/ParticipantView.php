@@ -189,6 +189,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
     if ($invoicing) {
       $this->assign('totalTaxAmount', $totalTaxAmount);
+      $this->assign('invoicing', 1);
     }
     if ($participantCount) {
       $this->assign('pricesetFieldsCount', $participantCount);
