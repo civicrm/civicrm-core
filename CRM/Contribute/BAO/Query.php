@@ -368,6 +368,7 @@ class CRM_Contribute_BAO_Query {
       case 'payment_instrument_id':
       case 'contribution_payment_instrument_id':
       case 'contribution_page_id':
+      case 'contribution_status_id':
       case 'contribution_id':
       case 'contribution_currency_type':
       case 'contribution_currency':
