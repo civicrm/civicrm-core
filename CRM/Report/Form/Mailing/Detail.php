@@ -123,8 +123,8 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           'type' => CRM_Utils_Type::T_STRING,
           'options' => array(
             '' => 'Any',
-            'Successful' => 'Successful',
-            'Bounced' => 'Bounced',
+            'successful' => 'Successful',
+            'bounced' => 'Bounced',
           ),
         ),
       ),
@@ -314,12 +314,12 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
         LEFT JOIN civicrm_mailing_event_bounce {$this->_aliases['civicrm_mailing_event_bounce']}
           ON {$this->_aliases['civicrm_mailing_event_bounce']}.event_queue_id = civicrm_mailing_event_queue.id";
       if (CRM_Utils_Array::value('delivery_status_value', $this->_params) ==
-        'Bounced'
+        'bounced'
       ) {
         $this->_columns['civicrm_mailing_event_delivered']['filters']['delivery_status']['clause'] = "{$this->_aliases['civicrm_mailing_event_bounce']}.id IS NOT NULL";
       }
       elseif (CRM_Utils_Array::value('delivery_status_value', $this->_params) ==
-        'Successful'
+        'successful'
       ) {
         $this->_columns['civicrm_mailing_event_delivered']['filters']['delivery_status']['clause'] = "{$this->_aliases['civicrm_mailing_event_delivered']}.id IS NOT NULL AND {$this->_aliases['civicrm_mailing_event_bounce']}.id IS NULL";
       }
