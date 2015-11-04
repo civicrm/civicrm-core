@@ -94,7 +94,6 @@
       payment_processor.show();
       payment_information.show();
       billing_block.show();
-      cj("#crm-submit-buttons").show();
     }
   }
 
