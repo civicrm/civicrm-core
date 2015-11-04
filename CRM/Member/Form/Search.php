@@ -282,7 +282,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     );
     if ($status) {
       $status = explode(',', $status);
-      $this->_formValues['status_id'] = $this->_defaults['status_id'] = (array) $status;
+      $this->_formValues['membership_status_id'] = $this->_defaults['membership_status_id'] = (array) $status;
     }
 
     $membershipType = CRM_Utils_Request::retrieve('type', 'String',

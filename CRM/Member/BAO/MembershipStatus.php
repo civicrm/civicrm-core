@@ -148,6 +148,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     $membershipStatus->id = $id;
 
     $membershipStatus->save();
+    CRM_Member_PseudoConstant::flush('membershipStatus');
     return $membershipStatus;
   }
 
@@ -207,6 +208,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->id = $membershipStatusId;
     $membershipStatus->delete();
+    CRM_Member_PseudoConstant::flush('membershipStatus');
     $membershipStatus->free();
   }
 

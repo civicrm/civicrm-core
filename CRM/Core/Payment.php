@@ -102,6 +102,18 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Opportunity for the payment processor to override the entire form build.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @return bool
+   *   Should form building stop at this point?
+   */
+  public function buildForm(&$form) {
+    return FALSE;
+  }
+
+  /**
    * Log payment notification message to forensic system log.
    *
    * @todo move to factory class \Civi\Payment\System (or similar)
@@ -535,6 +547,24 @@ abstract class CRM_Core_Payment {
     }
     //CRM-15767 - Submit Credit Card Contribution not being saved
     return $result;
+  }
+
+  /**
+   * Query payment processor for details about a transaction.
+   *
+   * @param array $params
+   *   Array of parameters containing one of:
+   *   - trxn_id Id of an individual transaction.
+   *   - processor_id Id of a recurring contribution series as stored in the civicrm_contribution_recur table.
+   *
+   * @return array
+   *   Extra parameters retrieved.
+   *   Any parameters retrievable through this should be documented in the function comments at
+   *   CRM_Core_Payment::doQuery. Currently:
+   *   - fee_amount Amount of fee paid
+   */
+  public function doQuery($params) {
+    return array();
   }
 
   /**

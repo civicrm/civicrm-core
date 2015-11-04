@@ -1177,16 +1177,19 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     switch ($html_type) {
       case 'Radio':
         if ($data_type == 'Boolean') {
-          $option = array('No', 'Yes');
+          $options = array('No', 'Yes');
+        }
+        else {
+          $options = $option;
         }
         if (is_array($value)) {
           $display = NULL;
           foreach ($value as $data) {
-            $display .= $display ? ', ' . $option[$data] : $option[$data];
+            $display .= $display ? ', ' . $options[$data] : $options[$data];
           }
         }
         else {
-          $display = CRM_Utils_Array::value($value, $option);
+          $display = CRM_Utils_Array::value($value, $options);
         }
         break;
 
