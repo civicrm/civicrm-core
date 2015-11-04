@@ -50,10 +50,8 @@
 function smarty_function_crmVersion($params, &$smarty) {
   $version = CRM_Utils_System::version();
 
-  $redact = !CRM_Core_Permission::check('access CiviCRM');
-  if ($redact) {
-    $parts = explode('.', $version);
-    $version = $parts[0] . '.' . $parts[1] . '.x';
+  if (!CRM_Core_Permission::check('access CiviCRM')) {
+    $version = CRM_Utils_System::majorVersion();
   }
 
   if (isset($params['assign'])) {
