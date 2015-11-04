@@ -31,16 +31,12 @@
 
   <div class="crm-footer" id="civicrm-footer">
     {crmVersion assign=version}
-    {ts 1=$version}Powered by CiviCRM %1.{/ts}
-    {if !empty($footer_status_severity)}
-      <span class="status{if $footer_status_severity gt 3} crm-error{elseif $footer_status_severity gt 2} crm-warning{else} crm-ok{/if}">
-      <a href="{crmURL p='civicrm/a/#/status'}">{$footer_status_message}</a>
-    </span>
-    {/if}
+    {ts 1=$version}Powered by the Progressive Technology Project &amp; built on CiviCRM %1.{/ts}
     {ts 1='http://www.gnu.org/licenses/agpl-3.0.html'}CiviCRM is openly available under the <a href='%1'>GNU AGPL License</a>.{/ts}<br/>
-    <a href="https://civicrm.org/download">{ts}Download CiviCRM.{/ts}</a> &nbsp; &nbsp;
-    <a href="http://issues.civicrm.org/jira/browse/CRM?report=com.atlassian.jira.plugin.system.project:roadmap-panel">{ts}View issues and report bugs.{/ts}</a> &nbsp; &nbsp;
-    {docURL page="" text="Online documentation."}
-  </div>
+    <a href="mailto:support@progressivetech.org">{ts}Contact support{/ts}</a> &nbsp; &nbsp;
+    <a href="https://www.youtube.com/playlist?list=PLE5F8CFD9F95DD6D0&amp;feature=plcp">{ts}See video tutorials{/ts}</a> &nbsp; &nbsp;
+    <a href="http://book.civicrm.org/user/">{ts}View online documentation{/ts}</a> &nbsp; &nbsp;
+    <a href="https://ptp.ourpowerbase.net/GetPowerBase">{ts}Get PowerBase{/ts}</a> &nbsp; &nbsp;
+  </div> 
   {include file="CRM/common/notifications.tpl"}
 {/if}
