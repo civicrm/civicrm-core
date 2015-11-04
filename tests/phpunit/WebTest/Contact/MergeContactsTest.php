@@ -136,10 +136,10 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=update");
 
     // Select the contacts to be merged
-    $this->select("name=option51_length", "value=100");
-
-    $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
-    $this->clickLink("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
+    $this->waitForElementPresent('dupePairs_length');
+    $this->select("name=dupePairs_length", "value=100");
+    $this->waitForElementPresent("xpath=//table[@id='dupePairs']/tbody//tr/td[5]/a[text()='$firstName $lastName']/../../td[8]/a[text()='merge']");
+    $this->click("xpath=//table[@id='dupePairs']/tbody//tr/td[5]/a[text()='$firstName $lastName']/../../td[8]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
 
     $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", '_qf_Merge_cancel-bottom');
@@ -181,10 +181,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Verify activity merged
     $this->click("css=li#tab_activity a");
-    $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr");
-    $this->verifyText("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr/td[5]/a",
-      preg_quote("$lastName, $firstName")
-    );
+    $this->waitForElementPresent("xpath=//table[@class='dataTable no-footer']/tbody/tr");
+    $this->verifyText("xpath=//table[@class='dataTable no-footer']/tbody/tr/td[5]/a", preg_quote("$lastName, $firstName"));
 
     // Verify group merged
     $this->click("css=li#tab_group a");
@@ -241,10 +239,10 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_DedupeFind_submit-bottom');
     $this->click("_qf_DedupeFind_next-bottom");
 
-    $this->waitForElementPresent("xpath=//form[@id='DedupeFind']/div[2]/div/table/tbody/tr[1]/td[4]/a[text()='merge']");
-    $this->waitForElementPresent("xpath=//form[@id='DedupeFind']/a[3]/span[contains(text(),'Done')]");
-    $this->isElementPresent("xpath=//table[@id='option51']/tbody/tr/td[1]/a[text()='{$firstName} {$lastName}']/../td[2]/a[text()='{$fName} {$lName}']");
-    $this->click("xpath=//table[@id='option51']/tbody/tr[1]/td[4]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=//table[@id='dupePairs']/tbody//tr/td[5]/a[text()='$firstName $lastName']/../../td[8]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=//form[@id='DedupeFind']//a/span[contains(text(),'Done')]");
+    $this->isElementPresent("xpath=//table[@id='dupePairs']/tbody//tr//td/a[text()='$firstName $lastName']/../../td[5]/a[text()='{$fName} {$lName}']/../../td[8]/a[text()='merge']");
+    $this->click("xpath=//table[@id='dupePairs']/tbody//tr//td/a[text()='{$firstName} {$lastName}']/../../td[8]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
     $this->click('toggleSelect');
     $this->click('_qf_Merge_next-bottom');
@@ -382,7 +380,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew");
 
     // Select the contacts to be merged
-    $this->select("name=option51_length", "value=100");
+    $this->waitForElementPresent('dupePairs_length');
+    $this->select("name=dupePairs_length", "value=100");
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']");
     $this->click("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
@@ -471,7 +470,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew");
 
     // Select the contacts to be merged
-    $this->select("name=option51_length", "value=100");
+    $this->waitForElementPresent('dupePairs_length');
+    $this->select("name=dupePairs_length", "value=100");
     $this->waitForElementPresent("xpath=//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']");
     $this->click("xpath=//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
@@ -593,7 +593,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Find and Merge Contacts with Supervised Rule
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew", "css=#DedupeFind table.pagerDisplay tbody tr");
 
-    $this->select("name=option51_length", "value=100");
+    $this->waitForElementPresent('dupePairs_length');
+    $this->select("name=dupePairs_length", "value=100");
     $totalContacts = $this->getXpathCount("//table[@class='pagerDisplay']/tbody/tr");
     $this->click("//form[@id='DedupeFind']//a/span[contains(text(),'Batch Merge Duplicates')]");
 

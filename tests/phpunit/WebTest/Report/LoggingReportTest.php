@@ -78,7 +78,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
-    sleep(3);
+    $this->waitForElementPresent("tagtree");
     $this->click("xpath=//div[@id='tagtree']/ul//li/span/label[text()='Company']");
     $this->waitForTextPresent("Saved");
     $this->click("xpath=//div[@id='tagtree']/ul//li/span/label[text()='Government Entity']");
@@ -92,7 +92,6 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
-    sleep(3);
     $this->click("xpath=//div[@class='view-content']//div[@class='action-link']/a");
 
     $this->waitForElementPresent("_qf_Note_upload-top");
