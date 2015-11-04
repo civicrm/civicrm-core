@@ -36,9 +36,6 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  # just a toggle we use to build the from
-  protected $_mailingidField = FALSE;
-
   protected $_customGroupExtends = array();
 
   protected $_add2groupSupported = FALSE;
