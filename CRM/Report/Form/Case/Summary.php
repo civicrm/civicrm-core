@@ -291,7 +291,11 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
             if ($fieldName == 'case_type_id') {
               $value = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
               if (!empty($value)) {
-                $clause = "( {$field['dbAlias']} REGEXP '[[:<:]]" .
+                $operator = '';
+                if ($op == 'notin') {
+                  $operator = 'NOT';
+                }
+                $clause = "( {$field['dbAlias']} {$operator} REGEXP '[[:<:]]" .
                   implode('[[:>:]]|[[:<:]]', $value) . "[[:>:]]' )";
               }
               $op = NULL;
