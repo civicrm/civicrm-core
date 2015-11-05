@@ -388,7 +388,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
         $escapedRoles[] = CRM_Utils_Type::escape($participantRole, 'String');
       }
 
-      $where[] = ' participant.role_id IN ( "' . implode('", "', $escapedRoles) . '" ) ';
+      $where[] = " participant.role_id IN ( '" . implode("', '", $escapedRoles) . "' ) ";
     }
 
     $eventParams = array(1 => array($eventId, 'Positive'));

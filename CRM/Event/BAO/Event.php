@@ -639,7 +639,7 @@ $event_summary_limit
           $escapedRoles[] = CRM_Utils_Type::escape($roleType, 'String');
         }
 
-        $clause[] = 'participant.role_id {$roleClause} ( "' . implode('", "', $escapedRoles) . '" ) ';
+        $clause[] = "participant.role_id {$roleClause} ( '" . implode("', '", $escapedRoles) . "' ) ";
       }
     }
 
