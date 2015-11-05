@@ -1515,6 +1515,12 @@ WHERE  v.option_group_id = g.id
     if (!empty($this->_values['discount'][$discountID])) {
       return $this->_values['discount'][$discountID][$params['amount']]['label'];
     }
+    if (empty($params['priceSetId'])) {
+      // CRM-17509 An example of this is where the person is being waitlisted & there is no payment.
+      // ideally we would have calculated amount first & only call this is there is an
+      // amount but the flow needs more changes for that.
+      return '';
+    }
     return CRM_Price_BAO_PriceSet::getAmountLevelText($params);
   }
 
