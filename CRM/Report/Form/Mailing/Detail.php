@@ -34,6 +34,13 @@
  */
 class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
 
+  protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Household',
+    'Organization',
+  );
+
   protected $_exposeContactID = FALSE;
 
   /**
