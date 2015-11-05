@@ -476,7 +476,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           if (!$self->_allowConfirmation && empty($self->_values['event']['has_waitlist']) &&
             $totalParticipants > $self->_availableRegistrations
           ) {
-            $errors['_qf_default'] = ts('It looks like event has only %2 seats available and you are trying to register %1 participants, so could you please select price options accordingly.', array(
+            $errors['_qf_default'] = ts('Sorry, it looks like this event only has %2 spaces available, and you are trying to register %1 participants. Please change your selections accordingly.', array(
                 1 => $totalParticipants,
                 2 => $self->_availableRegistrations,
               ));
