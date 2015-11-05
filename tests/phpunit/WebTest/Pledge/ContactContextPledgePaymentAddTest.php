@@ -276,11 +276,10 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
-
     $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
-    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
-    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
+    $this->click("xpath=//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->click("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->waitForElementPresent("adjust-option-type");

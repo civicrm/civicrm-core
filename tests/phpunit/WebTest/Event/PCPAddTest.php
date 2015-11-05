@@ -214,7 +214,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
-    $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
+    $this->select2('payment_processor', $processorName, TRUE);
     if ($priceSet) {
       // get one - TBD
     }
@@ -256,7 +256,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
-    $this->click('intro_text-plain');
+    $this->click('intro_text');
     $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
