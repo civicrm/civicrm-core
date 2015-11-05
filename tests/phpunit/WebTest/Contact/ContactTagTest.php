@@ -145,7 +145,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
 
     // Visit contact summary page.
     $this->click("css=ul.ui-autocomplete li");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForAjaxContent();
     $this->waitForText('tags', "tagset1, tagset2");
   }
 

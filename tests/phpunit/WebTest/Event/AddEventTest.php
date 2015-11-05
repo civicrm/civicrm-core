@@ -798,7 +798,6 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     //unselect the payment processor configured
     $this->openCiviPage("event/manage/fee", "reset=1&action=update&id={$eventId}", '_qf_Fee_upload-bottom');
-    $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='Test Processor']");
     $this->click("_qf_Fee_upload-bottom");
     $this->waitForText('crm-notification-container', "'Fees' information has been saved.");
 
