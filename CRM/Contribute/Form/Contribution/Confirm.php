@@ -1825,6 +1825,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params['invoiceID'] = md5(uniqid(rand(), TRUE));
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
     $form->_amount = $params['amount'];
+    // hack these in for test support.
+    $form->_fields['billing_first_name'] = 1;
+    $form->_fields['billing_last_name'] = 1;
     $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
     $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
     $priceSetFields = reset($priceFields);
@@ -1932,31 +1935,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // billing email address
     $fields["email-{$this->_bltID}"] = 1;
-
-    //unset the billing parameters if it is pay later mode
-    //to avoid creation of billing location
-    // @todo - note that elsewhere we don't unset these - we simply make
-    // a sensible decision about including them when building the form
-    // and if they are submitted we handle them. Check out abstractEditPaymentForm.
-    if ($isPayLater && !$this->_isBillingAddressRequiredForPayLater) {
-      $billingFields = array(
-        'billing_first_name',
-        'billing_middle_name',
-        'billing_last_name',
-        "billing_street_address-{$this->_bltID}",
-        "billing_city-{$this->_bltID}",
-        "billing_state_province-{$this->_bltID}",
-        "billing_state_province_id-{$this->_bltID}",
-        "billing_postal_code-{$this->_bltID}",
-        "billing_country-{$this->_bltID}",
-        "billing_country_id-{$this->_bltID}",
-      );
-
-      foreach ($billingFields as $value) {
-        unset($params[$value]);
-        unset($fields[$value]);
-      }
-    }
 
     // if onbehalf-of-organization contribution, take out
     // organization params in a separate variable, to make sure

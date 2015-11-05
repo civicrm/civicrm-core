@@ -150,6 +150,91 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test form submission with billing first & last name where the contact does NOT
+   * otherwise have one.
+   */
+  public function testSubmitNewBillingNameData() {
+    $this->setUpContributionPage();
+    $contact = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => 'wonderwoman@amazon.com'));
+    $priceFieldID = reset($this->_ids['price_field']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
+    $submitParams = array(
+      'price_' . $priceFieldID => $priceFieldValueID,
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Wonder',
+      'billing_last_name' => 'Woman',
+      'contactID' => $contact['id'],
+      'email' => 'wonderwoman@amazon.com',
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contact = $this->callAPISuccess('Contact', 'get', array(
+      'id' => $contact['id'],
+      'return' => array(
+        'first_name',
+        'last_name',
+        'sort_name',
+        'display_name',
+      ),
+    ));
+    $this->assertEquals(array(
+      'first_name' => 'Wonder',
+      'last_name' => 'Woman',
+      'display_name' => 'Wonder Woman',
+      'sort_name' => 'Woman, Wonder',
+      'id' => $contact['id'],
+      'contact_id' => $contact['id'],
+    ), $contact['values'][$contact['id']]);
+
+  }
+
+  /**
+   * Test form submission with billing first & last name where the contact does
+   * otherwise have one and should not be overwritten.
+   */
+  public function testSubmitNewBillingNameDoNotOverwrite() {
+    $this->setUpContributionPage();
+    $contact = $this->callAPISuccess('Contact', 'create', array(
+      'contact_type' => 'Individual',
+      'email' => 'wonderwoman@amazon.com',
+      'first_name' => 'Super',
+      'last_name' => 'Boy',
+    ));
+    $priceFieldID = reset($this->_ids['price_field']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
+    $submitParams = array(
+      'price_' . $priceFieldID => $priceFieldValueID,
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Wonder',
+      'billing_last_name' => 'Woman',
+      'contactID' => $contact['id'],
+      'email' => 'wonderwoman@amazon.com',
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contact = $this->callAPISuccess('Contact', 'get', array(
+      'id' => $contact['id'],
+      'return' => array(
+        'first_name',
+        'last_name',
+        'sort_name',
+        'display_name',
+      ),
+    ));
+    $this->assertEquals(array(
+      'first_name' => 'Super',
+      'last_name' => 'Boy',
+      'display_name' => 'Super Boy',
+      'sort_name' => 'Boy, Super',
+      'id' => $contact['id'],
+      'contact_id' => $contact['id'],
+    ), $contact['values'][$contact['id']]);
+
+  }
+
+  /**
    * Test process with instant payment when more than one configured for the page.
    *
    * CRM-16923
