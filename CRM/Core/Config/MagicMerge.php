@@ -182,7 +182,7 @@ class CRM_Core_Config_MagicMerge {
       'customFileUploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
       'customPHPPathDir' => array('setting-path'),
       'customTemplateDir' => array('setting-path'),
-      'extensionsDir' => array('setting-path'),
+      'extensionsDir' => array('setting-path', NULL, array('mkdir')),
       'imageUploadDir' => array('setting-path', NULL, array('mkdir')),
       'uploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
 
@@ -234,7 +234,7 @@ class CRM_Core_Config_MagicMerge {
       case 'setting-url-abs':
       case 'setting-url-rel':
         $type = (strstr($type, 'abs')) ? 'absolute' : 'relative';
-        $value =  CRM_Utils_File::addTrailingSlash($this->getSettings()->get($name));
+        $value = CRM_Utils_File::addTrailingSlash($this->getSettings()->get($name));
         $this->cache[$k] = Civi::paths()->getUrl($value, $type);
         return $this->cache[$k];
 
