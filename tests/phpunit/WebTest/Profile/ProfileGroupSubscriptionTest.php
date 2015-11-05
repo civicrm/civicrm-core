@@ -93,6 +93,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
 
+    $this->waitForElementPresent("field_name[1]");
     $this->select('field_name[1]', 'value=group');
     $this->click("//option[@value='group']");
 
