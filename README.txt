@@ -26,7 +26,6 @@ and WordPress content management systems.
 *************************
 The download URLs and installation instructions are available on our
 website:
-
 https://civicrm.org/download
 
 Installation instruction can be found on the wiki:
