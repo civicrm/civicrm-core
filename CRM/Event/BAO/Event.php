@@ -632,13 +632,15 @@ $event_summary_limit
       if ($role) {
         $roleClause = 'IN';
       }
-      if (array_keys($roleTypes)) {
-        $roles = '"' . implode('","', array_keys($roleTypes)) . '"';
+
+      if (!empty($roleTypes)) {
+        $escapedRoles = array();
+        foreach (array_keys($roleTypes) as $roleType) {
+          $escapedRoles[] = CRM_Utils_Type::escape($roleType, 'String');
+        }
+
+        $clause[] = 'participant.role_id {$roleClause} ( "' . implode('", "', $escapedRoles) . '" ) ';
       }
-      else {
-        $roles = 0;
-      }
-      $clause[] = "participant.role_id {$roleClause} ( $roles )";
     }
 
     $sqlClause = '';
