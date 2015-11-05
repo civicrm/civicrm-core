@@ -631,7 +631,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     if (!$id) {
       $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
-      $id = self::getActivityContact($activity->id . $sourceID);
+      $id = self::getActivityContact($activity->id, $sourceID);
     }
     $logParams = array(
       'entity_table' => 'civicrm_activity',
