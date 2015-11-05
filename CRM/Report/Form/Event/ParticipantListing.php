@@ -572,7 +572,11 @@ ORDER BY  cv.label
             if ($fieldName == 'rid') {
               $value = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
               if (!empty($value)) {
-                $clause = "( {$field['dbAlias']} REGEXP '[[:<:]]" .
+                $operator = '';
+                if ($op == 'notin') {
+                  $operator = 'NOT';
+                }
+                $clause = "( {$field['dbAlias']} {$operator} REGEXP '[[:<:]]" .
                   implode('[[:>:]]|[[:<:]]', $value) . "[[:>:]]' )";
               }
               $op = NULL;
