@@ -85,7 +85,8 @@
                       {if $section.pageBreak}
                         {$l}if $pageBroke >= {$h} or $pageBroke == 0{$r}
                           </table>
-                          <table class="report-layout display page-break">
+                          <div class="page-break"></div>
+                          <table class="report-layout display">
                         {$l}/if{$r}
                         {$l}assign var=pageBroke value={$h}{$r}
                       {/if}
