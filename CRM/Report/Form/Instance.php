@@ -237,8 +237,12 @@ class CRM_Report_Form_Instance {
     if ($instanceID) {
       // this is already retrieved via Form.php
       $defaults['description'] = CRM_Utils_Array::value('description', $defaults);
-      $defaults['report_header'] = CRM_Utils_Array::value('header', $defaults);
-      $defaults['report_footer'] = CRM_Utils_Array::value('footer', $defaults);
+      if (!empty($defaults['header'])) {
+        $defaults['report_header'] = $defaults['header'];
+      }
+      if (!empty($defaults['footer'])) {
+        $defaults['report_footer'] = $defaults['footer'];
+      }
 
       if (!empty($defaults['navigation_id'])) {
         // Get the default navigation parent id.
