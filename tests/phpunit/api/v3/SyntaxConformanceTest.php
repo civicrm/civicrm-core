@@ -630,6 +630,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'weight', //won't update as there is no 1 in the same price set
         ),
       ),
+      'ReportInstance' => array(
+        // View mode is part of the navigation which is not retrieved by the api.
+        'cant_return' => array('view_mode'),
+      ),
       'SavedSearch' => array(
         // I think the fields below are generated based on form_values.
         'cant_update' => array(
