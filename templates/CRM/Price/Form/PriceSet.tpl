@@ -123,9 +123,6 @@
       <div class="messages help">{$priceSet.help_post}</div>
     {/if}
 
-{* Include the total calculation widget if this is NOT a quickconfig event/contribution page. *}
-{if !$quickConfig and !$dontInclCal}
     {include file="CRM/Price/Form/Calculate.tpl"}
-{/if}
 </div>
 {/crmRegion}

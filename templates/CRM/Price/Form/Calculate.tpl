@@ -23,16 +23,22 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $noCalcValueDisplay neq 'false'}
+
+{assign var='hideTotal' value=$quickConfig+$noCalcValueDisplay}
 <div id="pricesetTotal" class="crm-section section-pricesetTotal">
-  <div class="label" id="pricelabel"><label>
-    {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
-      {ts}Total Amount{/ts}{else}{ts}Total Fee(s){/ts}
-       {if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}
-    {/if}</label></div>
-  <div class="content calc-value" id="pricevalue" ></div>
+  {if !$hideTotal}
+  <div class="label" id="pricelabel">
+    <label>
+      {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
+        {ts}Total Amount{/ts}{else}{ts}Total Fee(s){/ts}
+         {if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}
+      {/if}
+    </label>
+  </div>
+  {/if}
+  <div class="content calc-value" {if $hideTotal}style="display:none;"{/if} id="pricevalue" ></div>
 </div>
-{/if}
+
 <script type="text/javascript">
 {literal}
 
