@@ -130,7 +130,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $streetAddress = "100 Main Street";
     $this->_testAddLocation($streetAddress);
 
-    $this->_testAddFees(FALSE, FALSE, $paymentProcessorId);
+    $this->_testAddFees(FALSE, FALSE, $processorName);
 
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
@@ -212,12 +212,12 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
    * @param bool $priceSet
    * @param int $processorId
    */
-  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName) {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
-    $this->check("payment_processor[$processorId]");
+    $this->select2('payment_processor', $processorName, TRUE);
     $this->select("financial_type_id", "value=4");
     if ($priceSet) {
       // get one - TBD
@@ -257,8 +257,8 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
       $this->assertChecked("is_multiple_registrations");
     }
 
-    $this->click('intro_text-plain');
-    $this->fillRichTextField("intro_text", $registerIntro);
+    $this->click("xpath=//div[@id='registration_screen']/table/tbody/tr[1]/td[2]/div[@class='replace-plain']");
+    $this->fillRichTextField("cke_wysiwyg_frame", $registerIntro);
 
     // enable confirmation email
     $this->click("CIVICRM_QFID_1_is_email_confirm");
