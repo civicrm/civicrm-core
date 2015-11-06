@@ -103,25 +103,16 @@
     var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
     var alwaysShowFlag = (isMultiple && cj("#additional_participants").val());
     var alwaysHideFlag = '{/literal}{$bypassPayment}{literal}';
-    cj('.price-set-option-content input[data-amount]').each( function(){
-      // CRM-15433 Remove currency symbol, decimal separator so we can check for zero numeric total regardless of localization.
-      currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
-      if( !alwaysShowFlag && cj(this).is(':checked') && currentTotal == 0 ) {
-        isHide = true;
-      }
-    });
-
-    cj('.price-set-option-content input[data-amount]').change( function () {
-      if ( !alwaysShowFlag && cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
-        isHide = true;
-      } else {
-        isHide = false;
-      }
-      if (alwaysHideFlag) {
-        isHide = true;
-      }
-      showHidePayment(isHide);
-    });
+    var total_amount_tmp =  cj('#pricevalue').data('raw-total');
+    // Hide billing questions if this is free
+    if (!alwaysShowFlag && total_amount_tmp == 0){
+      isHide = true;
+    } else {
+      isHide = false;
+    }
+    if (alwaysHideFlag) {
+      isHide = true;
+    }
     showHidePayment(isHide);
   }
 
