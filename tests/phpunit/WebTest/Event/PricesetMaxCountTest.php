@@ -205,7 +205,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // fill billing related info and register
     $this->_fillRegisterWithBillingInfo();
 
-    $this->assertStringsPresent(array('Sorry, currently only a single seat is available for this option.'));
+    $this->assertStringsPresent(array('Sorry, currently only a single space is available for this option.'));
 
     // fill correct value for test field
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
