@@ -22,7 +22,7 @@
   <tr>
    <td>
     <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
-    <p>{ts}Your Event Registration has been Transferred.{/ts}</p>
+    <p>{ts}Your Event Registration has been Transferred to {$to_participant}.{/ts}</p>
    </td>
   </tr>
   <tr>
