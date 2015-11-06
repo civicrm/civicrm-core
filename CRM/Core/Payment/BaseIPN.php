@@ -785,6 +785,8 @@ LIMIT 1;";
     if (!array_key_exists('is_email_receipt', $values) ||
       $values['is_email_receipt'] == 1
     ) {
+      $template = CRM_Core_Smarty::singleton();
+      $template->clearTemplateVars();
       self::sendMail($input, $ids, $objects, $values, $recur, FALSE);
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
