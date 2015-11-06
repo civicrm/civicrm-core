@@ -294,6 +294,7 @@ SET @adminConsolelastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
+    ( @domainID, 'civicrm/a/#/status',               '{ts escape="sql" skip="true"}System Status{/ts}',           'System Status',           'administer CiviCRM', '', @adminConsolelastID, '1', NULL, 0 ),
     ( @domainID, 'civicrm/admin/configtask?reset=1', '{ts escape="sql" skip="true"}Configuration Checklist{/ts}', 'Configuration Checklist', 'administer CiviCRM', '', @adminConsolelastID, '1', NULL, 1 );
 
 INSERT INTO civicrm_navigation
