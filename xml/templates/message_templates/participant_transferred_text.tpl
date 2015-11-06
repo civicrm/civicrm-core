@@ -1,6 +1,6 @@
 {ts 1=$contact.display_name}Dear %1{/ts},
 
-{ts}Your Event Registration has been transferred to {$to_participant}.{/ts}
+{ts 1=$to_participant}Your Event Registration has been transferred to %1.{/ts}
 
 
 ===========================================================
