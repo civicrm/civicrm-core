@@ -86,6 +86,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
+    $this->waitForElementPresent('field_name[1]');
     $this->click('field_name[1]');
     $this->select('field_name[1]', 'value=email');
     $this->click("//option[@value='Contact']");

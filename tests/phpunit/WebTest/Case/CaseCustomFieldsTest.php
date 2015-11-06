@@ -138,7 +138,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       "Priority" => "Normal",
     );
     $this->webtestVerifyTabularData($openCaseData);
-    $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
+    $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon fa-times']");
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
