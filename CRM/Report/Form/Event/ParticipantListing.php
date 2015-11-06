@@ -576,8 +576,9 @@ ORDER BY  cv.label
                 if ($op == 'notin') {
                   $operator = 'NOT';
                 }
-                $clause = "( {$field['dbAlias']} {$operator} REGEXP '[[:<:]]" .
-                  implode('[[:>:]]|[[:<:]]', $value) . "[[:>:]]' )";
+
+                $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', $value) . "[[:cntrl:]]*";
+                $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
               }
               $op = NULL;
             }
