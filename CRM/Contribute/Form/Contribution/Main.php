@@ -204,14 +204,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
     }
 
-    $entityId = NULL;
+    $entityId = $memtypeID = NULL;
     if ($this->_priceSetId) {
       if (($this->_useForMember && !empty($this->_currentMemberships)) || $this->_defaultMemTypeId) {
         $selectedCurrentMemTypes = array();
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             $opMemTypeId = CRM_Utils_Array::value('membership_type_id', $values);
-            $priceFieldName = 'price_' . $values['price_field_id'];
             $priceFieldValue = CRM_Price_BAO_PriceSet::getPriceFieldValueFromURL($this, $priceFieldName);
             if (!empty($priceFieldValue)) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $priceFieldValue, $val['html_type'], $this->_defaults);
@@ -226,7 +225,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
-              $selectedCurrentMemTypes[] = $values['membership_type_id'];
+              $memtypeID = $selectedCurrentMemTypes[] = $values['membership_type_id'];
             }
             elseif (!empty($values['is_default']) &&
               !$opMemTypeId &&
@@ -235,10 +234,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                 !isset($this->_defaults[$priceFieldName][$keys]))
               )) {
                 CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
+                $memtypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_defaults[$priceFieldName], 'membership_type_id');
             }
           }
         }
-        $memtypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_defaults[$priceFieldName], 'membership_type_id');
         $entityId = CRM_Utils_Array::value('id', CRM_Member_BAO_Membership::getContactMembership($contactID, $memtypeID, NULL));
       }
       else {
