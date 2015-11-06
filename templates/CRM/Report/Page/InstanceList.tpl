@@ -47,9 +47,18 @@
                   <tr id="row_{counter}" class="crm-report-instanceList">
                     <td class="crm-report-instanceList-title" style="width:35%"><a href="{$row.url}" title="{ts}Run this report{/ts}">&raquo; <strong>{$row.title}</strong></a></td>
                     <td class="crm-report-instanceList-description">{$row.description}</td>
-                    {if $row.deleteUrl}
-                      <td class="crm-report-instanceList-deleteUrl" style = "width:5%"><a href="{$row.deleteUrl}" onclick="return window.confirm('{ts}Are you sure you want delete this report?{/ts} {ts}This action cannot be undone.{/ts}');">{ts}Delete{/ts}</a></td>
-                    {/if}
+                    <td>
+                    <a href="{$row.viewUrl}" class="action-item crm-hover-button">{ts}View Results{/ts}</a>
+                    <span class="btn-slide crm-hover-button">more
+                      <ul class="panel">
+                        {foreach from=$row.actions item=action key=action_name}
+                          <li><a href="{$action.url}" class="{$action_name} action-item crm-hover-button small-popup"
+                          {if $action.confirm_message}onclick="return window.confirm({$action.confirm_message|json_encode|htmlspecialchars})"{/if}
+                          title="{$action.label}">{$action.label}</a></li>
+                        {/foreach}
+                      </ul>
+                    </span>
+                    </td>
                   </tr>
                 {/foreach}
               </table>

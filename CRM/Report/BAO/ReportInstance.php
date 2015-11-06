@@ -119,6 +119,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
   /**
    * Create instance.
+   *
    * takes an associative array and creates a instance object and does any related work like permissioning, adding to dashboard etc.
    *
    * This function is invoked from within the web form layer and also from the api layer
