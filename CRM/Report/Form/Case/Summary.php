@@ -295,8 +295,9 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
                 if ($op == 'notin') {
                   $operator = 'NOT';
                 }
-                $clause = "( {$field['dbAlias']} {$operator} REGEXP '[[:<:]]" .
-                  implode('[[:>:]]|[[:<:]]', $value) . "[[:>:]]' )";
+
+                $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', $value) . "[[:cntrl:]]*";
+                $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
               }
               $op = NULL;
             }
