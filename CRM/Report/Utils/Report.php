@@ -285,7 +285,9 @@ WHERE  inst.report_id = %1";
               $value = CRM_Utils_Date::customFormat($value, '%Y-%m-%d');
             }
           }
-          elseif (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) == 1024) {
+          // Note the reference to a specific field does not belong in this generic class & does not work on all reports.
+          // @todo - fix this properly rather than just supressing the en-otice. Repeat transaction report is a good example.
+          elseif (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) == 1024 && !empty($row['civicrm_contribution_currency'])) {
             $value = CRM_Utils_Money::format($value, $row['civicrm_contribution_currency']);
           }
           $displayRows[$v] = '"' . $value . '"';
