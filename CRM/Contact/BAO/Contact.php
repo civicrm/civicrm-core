@@ -524,6 +524,35 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
+   * Add billing fields to the params if appropriate.
+   *
+   * If we have ANY name fields then we want to ignore all the billing name fields. However, if we
+   * don't then we should set the name fields to the filling fields AND add the preserveDBName
+   * parameter (which will tell the BAO only to set those fields if none already exist.
+   *
+   * We specifically don't want to set first name from billing and last name form an on-page field. Mixing &
+   * matching is best done by hipsters.
+   *
+   * @param array $params
+   */
+  public static function addBillingNameFieldsIfOtherwiseNotSet(&$params) {
+    $nameFields = array('first_name', 'middle_name', 'last_name');
+    foreach ($nameFields as $field) {
+      if (!empty($params[$field])) {
+        return;
+      }
+    }
+    // There are only 3 - we can iterate through them twice :-)
+    foreach ($nameFields as $field) {
+      if (!empty($params['billing_' . $field])) {
+        $params[$field] = $params['billing_' . $field];
+      }
+      $params['preserveDBName'] = TRUE;
+    }
+
+  }
+
+  /**
    * Create last viewed link to recently updated contact.
    *
    * @param array $crudLinkSpec
@@ -1825,6 +1854,7 @@ ORDER BY civicrm_email.is_primary DESC";
     if ($ufGroupId) {
       $params['uf_group_id'] = $ufGroupId;
     }
+    self::addBillingNameFieldsIfOtherwiseNotSet($params);
 
     // If a user has logged in, or accessed via a checksum
     // Then deliberately 'blanking' a value in the profile should remove it from their record
@@ -2018,7 +2048,7 @@ ORDER BY civicrm_email.is_primary DESC";
     $primaryPhoneLoc = NULL;
     $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
-      $fieldName = $locTypeId = $typeId = NULL;
+      $locTypeId = $typeId = NULL;
       list($fieldName, $locTypeId, $typeId) = CRM_Utils_System::explode('-', $key, 3);
 
       //store original location type id
