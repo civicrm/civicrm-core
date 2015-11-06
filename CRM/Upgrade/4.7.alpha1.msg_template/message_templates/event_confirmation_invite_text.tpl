@@ -14,6 +14,7 @@ Click this link to go to a web page where you can confirm your registration onli
    {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
  {ts}Self service cancel transfer:{/ts} {$selfService}
 {/if}
+
 ===========================================================
 {ts}Event Information and Location{/ts}
 
