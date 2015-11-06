@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,51 +29,34 @@
     {include file="CRM/Contribute/Form/ContributionView.tpl"}
 {else}
     <div class="view-content">
-        <div class="help">
+        <div id="help">
             {if $permission EQ 'edit'}
-              {capture assign=newContribURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
-              {capture assign=link}class="action-item" href="{$newContribURL}"{/capture}
-              {ts 1=$link}Click <a %1>Record Contribution</a> to record a new contribution received from this contact.{/ts}
-                {if $newCredit}
-                  {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution&mode=live"}{/capture}
-                  {capture assign=link}class="action-item" href="{$newCreditURL}"{/capture}
-                  {ts 1=$link}Click <a %1>Submit Credit Card Contribution</a> to process a new contribution on behalf of the contributor using their credit card.{/ts}
-                {/if}
+              {capture assign=newContribRecurURL}{crmURL p="civicrm/contributionrecur/add" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
+              {capture assign=link}class="action-item" href="{$newContribRecurURL}"{/capture}
+              {ts 1=$link}Click <a %1>Set Up Recurring Contribution</a> to setup a new recurring contribution for this contact.{/ts}
             {else}
                 {ts 1=$displayName}Contributions received from %1 since inception.{/ts}
             {/if}
         </div>
 
-        {if $action eq 16 and $permission EQ 'edit'}
+         {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-                <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
-                {if $newCredit}
-                    <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
-                {/if}
+                <a accesskey="N" href="{$newContribRecurURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Set Up Recurring Contribution{/ts}</span></a>
                 <br /><br />
             </div>
       <div class='clear'> </div>
         {/if}
 
-
-        {if $rows}
-            {include file="CRM/Contribute/Page/ContributionTotals.tpl" mode="view"}
-            <p> </p>
-            {include file="CRM/Contribute/Form/Selector.tpl"}
-        {else}
+        {if $recur}
+            <div>
+                <br /><label>{ts 1=$displayName}Recurring Contributions{/ts}</label>
+            </div>
+            {include file="CRM/Contribute/Page/ContributionRecur.tpl"}
+        {else}    
             <div class="messages status no-popup">
-                    <div class="icon inform-icon"></div>
-                    {ts}No contributions have been recorded from this contact.{/ts}
+                <div class="icon inform-icon"></div>
+                {ts}No recurring contributions have been recorded from this contact.{/ts}
             </div>
-        {/if}
-
-        {if $softCredit}
-            <div class="solid-border-top">
-                <br />
-                <div class="label">{ts}Soft credits{/ts} {help id="id-soft_credit"}</div>
-                <div class="spacer"></div>
-            </div>
-            {include file="CRM/Contribute/Page/ContributionSoft.tpl"}
         {/if}
     </div>
 {/if}

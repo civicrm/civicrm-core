@@ -45,24 +45,52 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
-    $this->ids['contact'][0] = $this->individualCreate();
+    $this->_individualId = $this->individualCreate();
+    $this->_paymentProcessorId = $this->paymentProcessorCreate();
     $this->params = array(
-      'contact_id' => $this->ids['contact'][0],
+      'contact_id' => $this->_individualId,
       'installments' => '12',
       'frequency_interval' => '1',
       'amount' => '500',
       'contribution_status_id' => 1,
-      'start_date' => '2012-01-01 00:00:00',
+      'start_date' => '2015-10-01 00:00:00',
       'currency' => 'USD',
       'frequency_unit' => 'day',
+      'payment_processor_id' => $this->_paymentProcessorId,
     );
   }
 
+  /**
+   * Function tests creating recurring contribution record
+   */
   public function testCreateContributionRecur() {
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
+    $params = array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '500',
+      'contribution_status_id' => 1,
+      'start_date' => '2015-10-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'day',
+      'payment_processor_id' => $this->_paymentProcessorId,
+    );
+    $contributionRecur = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
+
+    // Update amount
+    $newParams = array(
+      'id' => $result['id'],
+      'amount' => '100',
+    );
+    $contributionRecur = $this->callAPISuccess($this->_entity, 'create', $newParams);
+
+    // Test get by contact id works.
+    $contributionRecur = $this->callAPISuccess($this->_entity, 'get', array('contact_id' => $this->_individualId));
   }
 
   public function testGetContributionRecur() {
@@ -89,8 +117,22 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
 
+  /**
+   * Function tests deleting recurring contribution record
+   */
   public function testDeleteContributionRecur() {
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $params = array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '500',
+      'contribution_status_id' => 1,
+      'start_date' => '2015-10-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'day',
+      'payment_processor_id' => $this->_paymentProcessorId,
+    );
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $deleteParams = array('id' => $result['id']);
     $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
@@ -100,6 +142,36 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   public function testGetFieldsContributionRecur() {
     $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(12, $result['values']['start_date']['type']);
+  }
+
+  /**
+   * Function tests creating recurring contribution record with custom data
+   */
+  public function testCreateWithCustom() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    $params = array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '500',
+      'contribution_status_id' => 1,
+      'start_date' => '2015-10-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'day',
+      'payment_processor_id' => $this->_paymentProcessorId,
+    );
+    $params['custom_' . $ids['custom_field_id']] = "custom string";
+    $description = "This demonstrates setting a custom field through the API.";
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description);
+
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'id' => $result['id'],
+    ));
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
   }
 
 }

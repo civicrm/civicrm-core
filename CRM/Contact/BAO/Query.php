@@ -5405,6 +5405,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     // pane name to table mapper
     $panesMapper = array(
       ts('Contributions') => 'civicrm_contribution',
+      ts('Recurring Contributions') => 'civicrm_contribution_recur',
       ts('Memberships') => 'civicrm_membership',
       ts('Events') => 'civicrm_participant',
       ts('Relationships') => 'civicrm_relationship',

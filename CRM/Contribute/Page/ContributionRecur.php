@@ -61,8 +61,20 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       if (!empty($values['contribution_status_id'])) {
         $values['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $values['contribution_status_id']);
       }
+      // Get financial type name
+      if (!empty($values['financial_type_id'])) {
+        $values['financial_type_name'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $values['financial_type_id']);
+      }
+      // Get Paid By label
+      if (!empty($values['payment_instrument_id'])) {
+        $values['payment_instrument'] = CRM_Core_OptionGroup::getLabel('payment_instrument', $values['payment_instrument_id']);
+      }
 
       $this->assign('recur', $values);
+      $this->assign('customDataType', 'ContributionRecur');
+
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('ContributionRecur', $this, $this->_id);
+      CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
     }
   }
 

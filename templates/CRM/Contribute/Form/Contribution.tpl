@@ -214,6 +214,23 @@
 
   {include file='CRM/Core/BillingBlockWrapper.tpl'}
 
+    <!-- start of recurring contribution -->
+    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="ContributionRecur">
+      <div class="crm-accordion-header">
+        {ts}Recurring Contribution{/ts}
+      </div>
+      <div class="crm-accordion-body">
+        <table class="form-layout-compressed">
+            <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-contribution_recur_id">
+              <td class="label">{$form.contribution_recur_id.label}</td><td{$valueStyle}>{$form.contribution_recur_id.html}<br/>
+                <sub>( Amount / Payment Processor / Status / Start Date)</sub>
+              </td>
+            </tr>
+        </table>
+      </div>
+    </div>
+    <!-- end of recurring contribution -->
+  
     <!-- start of soft credit -->
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
       <div class="crm-accordion-header">
@@ -392,6 +409,8 @@
       CRM.$(function($) {
 
         var $form = $("form.{/literal}{$form.formClass}{literal}");
+        $("#contact_id", $form).change(displayRecurring);
+        displayRecurring();
         $("#contact_id", $form).change(checkEmail);
         checkEmail( );
 
@@ -404,6 +423,35 @@
           else {
             $("#email-receipt", $form).hide();
           }
+        }
+        
+        function displayRecurring( ) {
+            var data = $("#contact_id", $form).select2('data');
+            var paymentProcessor = {/literal}{$backOfficePaymentProcessors}{literal};
+            if (data) {
+                CRM.api3('ContributionRecur', 'get', {'contact_id': data.id},
+                    {success: function(data) {
+                        cj('#contribution_recur_id').find('option').remove();    
+                        cj('#contribution_recur_id').append(cj('<option>', { 
+                            value: '',
+                            text : '- select -'
+                        }));
+                        cj.each(data.values, function(key, value) {
+                            if (paymentProcessor[value.payment_processor_id]){
+                                CRM.api3('PaymentProcessor', 'get', {
+                                    "sequential": 1,
+                                    "id": value.payment_processor_id,
+                                }).done(function(result) {
+                                    cj('#contribution_recur_id').append(cj('<option>', { 
+                                        value: value.id,
+                                        text : value.amount + ' / ' + result.values[0].name + ' / ' + value.contribution_status_id + ' / ' + value.start_date
+                                    }));
+                                });
+                            }
+                        });
+                    }
+                }); 
+            }
         }
 
         showHideByValue( 'is_email_receipt', '', 'receiptDate', 'table-row', 'radio', true);

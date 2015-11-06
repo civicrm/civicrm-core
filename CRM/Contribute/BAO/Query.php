@@ -41,6 +41,8 @@ class CRM_Contribute_BAO_Query {
 
   static $_contribOrSoftCredit = "only_contribs";
 
+  static $_contribRecurPayment = FALSE;
+
   /**
    * Function get the import/export fields for contribution.
    *
@@ -503,6 +505,19 @@ class CRM_Contribute_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
+      case 'contribution_recur_payment_made':
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.id", 'IS NOT EMPTY');
+        if ($value) {
+          $query->_qill[$grouping][] = ts("Made payment for the recurring contributions");
+          self::$_contribRecurPayment = TRUE;
+        }
+        else {
+          $query->_qill[$grouping][] = ts("All recurring contributions regardless of payments");
+          self::$_contribRecurPayment = FALSE;
+        }
+        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
+        return;
+
       case 'contribution_note':
         $value = $strtolower(CRM_Core_DAO::escapeString($value));
         if ($wildcard) {
@@ -615,8 +630,14 @@ class CRM_Contribute_BAO_Query {
 
       case 'civicrm_contribution_recur':
         if ($mode == 1) {
-          // in contact mode join directly onto profile - in case no contributions exist yet
-          $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
+          // 'Made payment for the recurring contributions?' is ticked yes
+          if (self::$_contribRecurPayment == TRUE) {
+            $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
+            $from .= " INNER JOIN civicrm_contribution ON civicrm_contribution.contact_id = contact_a.id ";
+          }
+          else {
+            $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
+          }
         }
         else {
           $from = " $side JOIN civicrm_contribution_recur ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id ";
@@ -981,6 +1002,13 @@ class CRM_Contribute_BAO_Query {
         'context' => 'search',
       )
     );
+
+    // Add field to check if payment is made for recurring contribution
+    $recurringPaymentOptions = array(
+      0 => ts('All recurring contributions'),
+      1 => ts('Made at least one payment for the recurring contributions'),
+    );
+    $form->addRadio('contribution_recur_payment_made', ts(''), $recurringPaymentOptions);
 
     // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
     $form->add('select', 'contribution_product_id',

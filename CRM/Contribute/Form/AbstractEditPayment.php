@@ -249,6 +249,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     // Also don't allow user to update some fields for recurring contributions.
     if (!$this->_online) {
       $this->_online = CRM_Utils_Array::value('contribution_recur_id', $values);
+      // Make additional Details editable if payment processor supports backoffice edit
+      if ($this->_online) {
+        $paymentProcessorId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $this->_online, 'payment_processor_id');
+        if (array_key_exists($paymentProcessorId, $this->_recurPaymentProcessors)) {
+          $this->_online = FALSE;
+        }
+      }
     }
 
     $this->assign('isOnline', $this->_online ? TRUE : FALSE);

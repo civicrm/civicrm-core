@@ -96,3 +96,10 @@
 <em>{ts}Example: If you enter a payment of 60 when the scheduled amount is 50, the total pledge amount will be increased by 10.{/ts}</em>
 </p>
 {/htxt}
+
+{htxt id="id-processor_id-title"}
+  {ts}Processor ID{/ts}
+{/htxt}
+{htxt id="id-processor_id"}
+{ts}Payment processor's own ID or reference for this recurring contribution. Ideally should be unique but in practice may not be.{/ts}
+{/htxt}

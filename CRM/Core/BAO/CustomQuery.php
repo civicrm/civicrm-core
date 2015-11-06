@@ -112,6 +112,7 @@ class CRM_Core_BAO_CustomQuery {
     'Household' => 'civicrm_contact',
     'Organization' => 'civicrm_contact',
     'Contribution' => 'civicrm_contribution',
+    'ContributionRecur' => 'civicrm_contribution_recur',
     'Membership' => 'civicrm_membership',
     'Participant' => 'civicrm_participant',
     'Group' => 'civicrm_group',
