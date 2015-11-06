@@ -68,6 +68,7 @@
             {assign var=columnCount value=$columnHeaders|@count}
             {assign var=l value=$smarty.ldelim}
             {assign var=r value=$smarty.rdelim}
+            {assign var=pageBroke value=0}
             {foreach from=$sections item=section key=column name=sections}
                 {counter assign="h"}
                 {$l}isValueChange value=$row.{$column} key="{$column}" assign=isValueChanged{$r}
@@ -80,8 +81,18 @@
                     {$l}else{$r}
                         {$l}assign var=printValue value=$row.{$column}{$r}
                     {$l}/if{$r}
+                    {$l}if $rowid neq 0{$r}
+                      {if $section.pageBreak}
+                        {$l}if $pageBroke >= {$h} or $pageBroke == 0{$r}
+                          </table>
+                          <div class="page-break"></div>
+                          <table class="report-layout display">
+                        {$l}/if{$r}
+                        {$l}assign var=pageBroke value={$h}{$r}
+                      {/if}
+                    {$l}/if{$r}
+                    <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}"><th colspan="{$columnCount}">
 
-                    <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}{if $section.pageBreak} page-break{/if}"><th colspan="{$columnCount}">
                         <h{$h}>{$section.title}: {$l}$printValue|default:"<em>none</em>"{$r}
                             ({$l}sectionTotal key=$row.{$column} depth={$smarty.foreach.sections.index}{$r})
                         </h{$h}>
