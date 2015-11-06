@@ -22,27 +22,9 @@
   <tr>
    <td>
     <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
+    <p>{ts}Your Event Registration has been Transferred.{/ts}</p>
    </td>
   </tr>
-  {if !$isAdditional and $participant.id}
-   <tr>
-    <th {$headerStyle}>
-     {ts}Confirm Your Registration{/ts}
-    </th>
-   </tr>
-   <tr>
-    <td colspan="2" {$valueStyle}>
-     {capture assign=confirmUrl}{crmURL p='civicrm/event/confirm' q="reset=1&participantId=`$participant.id`&cs=`$checksumValue`" a=true h=0 fe=1}{/capture}
-     <a href="{$confirmUrl}">Go to a web page where you can confirm your registration online</a>
-    </td>
-   </tr>
-  {/if}
-  {if $event.allow_selfcancelxfer }
-  This event allows for self-cancel or transfer
-  {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
-       <a href="{$selfService}">{ts}Self service cancel transfer{/ts}</a>
-  {/if}
-
   <tr>
    <td>
     <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
@@ -57,26 +39,6 @@
        {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
       </td>
      </tr>
-     {if $conference_sessions}
-      <tr>
-       <td colspan="2" {$labelStyle}>
-  {ts}Your schedule:{/ts}
-       </td>
-      </tr>
-      <tr>
-       <td colspan="2" {$valueStyle}>
-  {assign var='group_by_day' value='NA'}
-  {foreach from=$conference_sessions item=session}
-   {if $session.start_date|date_format:"%Y/%m/%d" != $group_by_day|date_format:"%Y/%m/%d"}
-    {assign var='group_by_day' value=$session.start_date}
-          <em>{$group_by_day|date_format:"%m/%d/%Y"}</em><br />
-   {/if}
-   {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}<br />
-   {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br />{/if}
-  {/foreach}
-       </td>
-      </tr>
-     {/if}
      <tr>
       <td {$labelStyle}>
        {ts}Participant Role{/ts}:
@@ -141,15 +103,6 @@
         </tr>
        {/if}
       {/foreach}
-     {/if}
-
-     {if $event.is_public}
-      <tr>
-       <td colspan="2" {$valueStyle}>
-        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-        <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
-       </td>
-      </tr>
      {/if}
 
      {if $contact.email}

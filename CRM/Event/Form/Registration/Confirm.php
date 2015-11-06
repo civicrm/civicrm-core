@@ -909,6 +909,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
           $this->assign('isPrimary', 0);
           $this->assign('customProfile', NULL);
+
           //Additional Participant should get only it's payment information
           if (!empty($this->_amount)) {
             $amount = array();
