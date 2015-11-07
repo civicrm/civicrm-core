@@ -52,7 +52,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $streetAddress = "100 Main Street";
     $this->_testAddLocation($streetAddress);
 
-    $this->_testAddFees(FALSE, FALSE, $paymentProcessorId);
+    $this->_testAddFees(FALSE, FALSE, $processorName);
     $this->openCiviPage('event/manage', 'reset=1');
     $this->type('title', $eventTitle);
     $this->click('_qf_SearchEvent_refresh');
@@ -200,12 +200,12 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
    * @param bool $priceSet
    * @param int $processorId
    */
-  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName) {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
-    $this->check("payment_processor[{$processorId}]");
+    $this->select2('payment_processor', $processorName, TRUE);
     $this->select("financial_type_id", "value=4");
     if ($priceSet) {
       // get one - TBD
