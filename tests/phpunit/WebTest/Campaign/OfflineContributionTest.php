@@ -221,8 +221,8 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
       $this->type('sort_name', $firstName);
       $this->click("_qf_Search_refresh");
-      $this->waitForElementPresent("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']");
-      $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']");
+      $this->waitForElementPresent("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span//a[text()='Edit']");
+      $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span//a[text()='Edit']");
       $this->waitForElementPresent("_qf_Contribution_cancel-bottom");
       $this->assertTrue($this->isTextPresent("$campaignTitle"));
     }
