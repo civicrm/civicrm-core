@@ -619,6 +619,120 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-13725 - Two relationships of same type with same start and end date
+   * should be OK if the custom field values differ.
+   */
+  public function testRelationshipCreateDuplicateWithCustomFields() {
+    $this->createCustomGroup();
+    $this->_ids = $this->createCustomField();
+
+    $custom_params_1 = array(
+      "custom_{$this->_ids[0]}" => 'Hello! this is custom data for relationship',
+      "custom_{$this->_ids[1]}" => 'Y',
+      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
+      "custom_{$this->_ids[3]}" => 'http://example.com',
+    );
+
+    $custom_params_2 = array(
+      "custom_{$this->_ids[0]}" => 'Hello! this is other custom data',
+      "custom_{$this->_ids[1]}" => 'Y',
+      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
+      "custom_{$this->_ids[3]}" => 'http://example.org',
+    );
+
+    $params = array(
+      'contact_id_a' => $this->_cId_a,
+      'contact_id_b' => $this->_cId_b,
+      'relationship_type_id' => $this->_relTypeID,
+      'start_date' => '2008-12-20',
+      'is_active' => 1,
+    );
+
+    $params_1 = array_merge($params, $custom_params_1);
+    $params_2 = array_merge($params, $custom_params_2);
+
+    $result_1 = $this->callAPISuccess('relationship', 'create', $params_1);
+    $result_2 = $this->callAPISuccess('relationship', 'create', $params_2);
+
+    $this->assertNotNull($result_2['id']);
+    $this->assertEquals(0, $result_2['is_error']);
+
+    $this->relationshipTypeDelete($this->_relTypeID);
+  }
+
+  /**
+   * CRM-13725 - Two relationships of same type with same start and end date
+   * should be OK if the custom field values differ. In this case, the
+   * existing relationship does not have custom values, but the new one
+   * does.
+   */
+  public function testRelationshipCreateDuplicateWithCustomFields2() {
+    $this->createCustomGroup();
+    $this->_ids = $this->createCustomField();
+
+    $custom_params_2 = array(
+      "custom_{$this->_ids[0]}" => 'Hello! this is other custom data',
+      "custom_{$this->_ids[1]}" => 'Y',
+      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
+      "custom_{$this->_ids[3]}" => 'http://example.org',
+    );
+
+    $params_1 = array(
+      'contact_id_a' => $this->_cId_a,
+      'contact_id_b' => $this->_cId_b,
+      'relationship_type_id' => $this->_relTypeID,
+      'start_date' => '2008-12-20',
+      'is_active' => 1,
+    );
+
+    $params_2 = array_merge($params_1, $custom_params_2);
+
+    $this->callAPISuccess('relationship', 'create', $params_1);
+    $result_2 = $this->callAPISuccess('relationship', 'create', $params_2);
+
+    $this->assertNotNull($result_2['id']);
+    $this->assertEquals(0, $result_2['is_error']);
+
+    $this->relationshipTypeDelete($this->_relTypeID);
+  }
+
+  /**
+   * CRM-13725 - Two relationships of same type with same start and end date
+   * should be OK if the custom field values differ. In this case, the
+   * existing relationship does have custom values, but the new one
+   * does not.
+   */
+  public function testRelationshipCreateDuplicateWithCustomFields3() {
+    $this->createCustomGroup();
+    $this->_ids = $this->createCustomField();
+
+    $custom_params_1 = array(
+      "custom_{$this->_ids[0]}" => 'Hello! this is other custom data',
+      "custom_{$this->_ids[1]}" => 'Y',
+      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
+      "custom_{$this->_ids[3]}" => 'http://example.org',
+    );
+
+    $params_2 = array(
+      'contact_id_a' => $this->_cId_a,
+      'contact_id_b' => $this->_cId_b,
+      'relationship_type_id' => $this->_relTypeID,
+      'start_date' => '2008-12-20',
+      'is_active' => 1,
+    );
+
+    $params_1 = array_merge($params_2, $custom_params_1);
+
+    $this->callAPISuccess('relationship', 'create', $params_1);
+    $result_2 = $this->callAPISuccess('relationship', 'create', $params_2);
+
+    $this->assertNotNull($result_2['id']);
+    $this->assertEquals(0, $result_2['is_error']);
+
+    $this->relationshipTypeDelete($this->_relTypeID);
+  }
+
+  /**
    * Check with valid params array.
    */
   public function testRelationshipsGet() {
