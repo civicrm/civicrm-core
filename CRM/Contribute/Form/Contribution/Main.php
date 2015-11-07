@@ -211,6 +211,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             $opMemTypeId = CRM_Utils_Array::value('membership_type_id', $values);
+            $priceFieldName = 'price_' . $values['price_field_id'];
             $priceFieldValue = CRM_Price_BAO_PriceSet::getPriceFieldValueFromURL($this, $priceFieldName);
             if (!empty($priceFieldValue)) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $priceFieldValue, $val['html_type'], $this->_defaults);
@@ -603,7 +604,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $self->_useForMember
       )
     ) {
-      $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, FALSE, TRUE);
+      $isTest = ($self->_action & CRM_Core_Action::PREVIEW) ? TRUE : FALSE;
+      $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, $isTest, TRUE);
 
       $membershipOrgDetails = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization();
 
