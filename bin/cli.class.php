@@ -88,7 +88,7 @@ class civicrm_cli {
       return TRUE;
     }
     else {
-      trigger_error("cli.php can only be run from command line.", E_USER_ERROR);
+      die("cli.php can only be run from command line.");
     }
   }
 
