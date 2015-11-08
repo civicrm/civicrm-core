@@ -187,9 +187,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   *
-   * /**
-   * The function returns the component(Event/Contribute..)and whether it is Test or not
+   * The function returns the component(Event/Contribute..)and whether
+   * it is Test or not
    *
    * @param array $privateData
    *   Contains the name-value pairs of transaction related data.
@@ -200,7 +199,6 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    *   context of this call (test, component, payment processor id)
    */
   public static function getContext($privateData, $orderNo) {
-
     $component = NULL;
     $isTest = NULL;
 
@@ -267,7 +265,6 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * $dps_method is either pxaccess or pxpay
    */
   public static function main($dps_method, $rawPostData, $dps_url, $dps_user, $dps_key, $mac_key) {
-
     $config = CRM_Core_Config::singleton();
     define('RESPONSE_HANDLER_LOG_FILE', $config->uploadDir . 'CiviCRM.PaymentExpress.log');
 
@@ -367,14 +364,11 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     list($mode, $component, $duplicateTransaction) = self::getContext($privateData, $transactionReference);
     $mode = $mode ? 'test' : 'live';
 
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
-      $mode
-    );
+    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID, $mode);
 
-    $ipn = self::singleton($mode, $component, $paymentProcessor);
+    $ipn = new CRM_Core_Payment_PaymentExpressIPN($mode, $paymentProcessor);
 
-    //Check status and take appropriate action
-
+    // Check status and take appropriate action
     if ($success == 1) {
       if ($duplicateTransaction == 0) {
         $ipn->newOrderNotify($success, $privateData, $component, $amount, $transactionReference);
