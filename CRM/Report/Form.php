@@ -4567,6 +4567,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
       return FALSE;
     }
+    $financialTypes = NULL;
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     if (empty($financialTypes)) {
       $contFTs = "0";
