@@ -458,9 +458,9 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   public function _getImportComponentContactType($component, $contactType) {
     $importComponentMode = array(
       'Event' => array(
-        'Individual' => 'CIVICRM_QFID_1_18',
-        'Household' => 'CIVICRM_QFID_2_20',
-        'Organization' => 'CIVICRM_QFID_4_22',
+        'Individual' => 'CIVICRM_QFID_1_20',
+        'Household' => 'CIVICRM_QFID_2_22',
+        'Organization' => 'CIVICRM_QFID_4_24',
       ),
       'Contribution' => array(
         'Individual' => 'CIVICRM_QFID_1_18',
