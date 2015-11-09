@@ -420,7 +420,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $summaryInfoLinks = array(
       'Intended Recipients',
       'Successful Deliveries',
-      'Tracked Opens',
+      'Unique Opens', //as per CRM-16506- Fixed and improve mailing stats changes
+      'Total Opens',
       'Click-throughs',
       'Forwards',
       'Replies',
@@ -457,7 +458,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
           'Mailing Delivery -' => "Successful",
         ),
       ),
-      'Tracked Opens' => array(
+      'Unique Opens' => array(
         'report' => array('report_name' => 'Mail Opened', 'Mailing' => "Mailing $mailingName Webtest"),
         'search' => array(
           'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",

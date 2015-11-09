@@ -174,15 +174,15 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $xpath = "xpath=//label[text() = '{$payLaterText}']/preceding-sibling::input[1]";
     $this->click($xpath);
 
-    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+    $this->click("_qf_Main_upload-bottom");
+    $this->waitForElementPresent("xpath=//div[@class='bold pay_later_receipt-section']");
 
     $payLaterInstructionsText = "Pay later instructions $hash";
     $this->verifyText("xpath=//div[@class='bold pay_later_receipt-section']/p", $payLaterInstructionsText);
-
     $this->click("_qf_Confirm_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->verifyText("xpath=//div[@id='help']/div/p", $payLaterInstructionsText);
+    $this->waitForElementPresent("xpath=//div[@class='help']/div/p");
+    $this->verifyText("xpath=//div[@class='help']/div/p", $payLaterInstructionsText);
 
     //login to check contribution
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
