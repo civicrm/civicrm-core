@@ -337,33 +337,31 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               // TODO: Not all widget types and validation rules are supported by crmEditable so some fields will not be in-place editable
               $fieldAttributes = array('class' => "crmf-custom_{$fieldId}_$recId");
               $editable = FALSE;
-              if ($linkAction & CRM_Core_Action::UPDATE) {
+              if (!$options[$fieldId]['attributes']['is_view'] && $linkAction & CRM_Core_Action::UPDATE) {
                 $spec = $options[$fieldId]['attributes'];
-                if ($spec['is_view'] == '0') {
-                  switch ($spec['html_type']) {
-                    case 'Text':
-                      // Other data types like money would require some extra validation
-                      // FIXME: crmEditable currently does not support any validation rules :(
-                      $supportedDataTypes = array('Float', 'String', 'Int');
-                      $editable = in_array($spec['data_type'], $supportedDataTypes);
-                      break;
+                switch ($spec['html_type']) {
+                  case 'Text':
+                    // Other data types like money would require some extra validation
+                    // FIXME: crmEditable currently does not support any validation rules :(
+                    $supportedDataTypes = array('Float', 'String', 'Int');
+                    $editable = in_array($spec['data_type'], $supportedDataTypes);
+                    break;
 
-                    case 'TextArea':
-                      $editable = TRUE;
-                      $fieldAttributes['data-type'] = 'textarea';
-                      break;
+                  case 'TextArea':
+                    $editable = TRUE;
+                    $fieldAttributes['data-type'] = 'textarea';
+                    break;
 
-                    case 'Radio':
-                    case 'Select':
-                    case 'Select Country':
-                    case 'Select State/Province':
-                      $editable = TRUE;
-                      $fieldAttributes['data-type'] = $spec['data_type'] == 'Boolean' ? 'boolean' : 'select';
-                      if (!$spec['is_required']) {
-                        $fieldAttributes['data-empty-option'] = ts('- none -');
-                      }
-                      break;
-                  }
+                  case 'Radio':
+                  case 'Select':
+                  case 'Select Country':
+                  case 'Select State/Province':
+                    $editable = TRUE;
+                    $fieldAttributes['data-type'] = $spec['data_type'] == 'Boolean' ? 'boolean' : 'select';
+                    if (!$spec['is_required']) {
+                      $fieldAttributes['data-empty-option'] = ts('- none -');
+                    }
+                    break;
                 }
               }
               if ($editable) {
