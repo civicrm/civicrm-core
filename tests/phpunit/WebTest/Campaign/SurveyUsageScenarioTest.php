@@ -233,10 +233,10 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('task', "Record Survey Responses");
     $this->waitForElementPresent("_qf_Interview_cancel_interview");
     $this->select("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[@class='result']/select", "value=Label $title 1");
-    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[8]/a");
+    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[9]/a[1]");
 
     $this->select("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[@class='result']/select", "value=Label $title 2");
-    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[8]/a");
+    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[9]/a[1]");
     $this->click("_qf_Interview_cancel_interview");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -603,8 +603,6 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('activity_survey_id');
     $this->select('activity_survey_id', "label=$surveyTitle");
     $this->click('_qf_Search_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
     $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']");
     $this->verifyText("xpath=//table[@class='selector row-highlight']/tbody//tr/td[5]/a[text()='Smith, $firstName1']/../../td[3]",
       preg_quote("$surveyTitle - Respondent Interview")
