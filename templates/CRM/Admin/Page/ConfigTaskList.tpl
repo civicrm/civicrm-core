@@ -47,7 +47,7 @@
         <td>{ts}Enable the required CiviCRM components.(CiviContribute, CiviEvent etc.){/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="https://civicrm.org/register-site" title="{ts}Register your site at CiviCRM.org. Opens in a new window.{/ts}" target="_blank">{ts}Register your site{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{$registerSite}" title="{ts}Register your site at CiviCRM.org. Opens in a new window.{/ts}" target="_blank">{ts}Register your site{/ts}</a></td>
         <td>{ts}Register your site, join the community, and help CiviCRM remain a leading CRM for organizations worldwide.{/ts}</td>
     </tr>
 
