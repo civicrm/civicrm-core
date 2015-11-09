@@ -228,6 +228,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         'time_format',
         'default_value',
         'is_required',
+        'is_view',
       );
       foreach ($fieldIDs as $key => $fieldID) {
         $fieldIDs[$key] = !is_numeric($fieldID) ? CRM_Core_BAO_CustomField::getKeyID($fieldID) : $fieldID;
@@ -252,6 +253,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $options[$fieldIDs[$key]]['attributes']['data_type'] = $returnValues['data_type'];
         $options[$fieldIDs[$key]]['attributes']['is_required'] = !empty($returnValues['is_required']);
         $options[$fieldIDs[$key]]['attributes']['default_value'] = CRM_Utils_Array::value('default_value', $returnValues);
+        $options[$fieldIDs[$key]]['attributes']['is_view'] = CRM_Utils_Array::value('is_view', $returnValues);
 
         $options[$fieldIDs[$key]]['attributes']['format']
           = $options[$fieldIDs[$key]]['attributes']['date_format'] = CRM_Utils_Array::value('date_format', $returnValues);
@@ -337,29 +339,31 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               $editable = FALSE;
               if ($linkAction & CRM_Core_Action::UPDATE) {
                 $spec = $options[$fieldId]['attributes'];
-                switch ($spec['html_type']) {
-                  case 'Text':
-                    // Other data types like money would require some extra validation
-                    // FIXME: crmEditable currently does not support any validation rules :(
-                    $supportedDataTypes = array('Float', 'String', 'Int');
-                    $editable = in_array($spec['data_type'], $supportedDataTypes);
-                    break;
+                if ($spec['is_view'] == '0') {
+                  switch ($spec['html_type']) {
+                    case 'Text':
+                      // Other data types like money would require some extra validation
+                      // FIXME: crmEditable currently does not support any validation rules :(
+                      $supportedDataTypes = array('Float', 'String', 'Int');
+                      $editable = in_array($spec['data_type'], $supportedDataTypes);
+                      break;
 
-                  case 'TextArea':
-                    $editable = TRUE;
-                    $fieldAttributes['data-type'] = 'textarea';
-                    break;
+                    case 'TextArea':
+                      $editable = TRUE;
+                      $fieldAttributes['data-type'] = 'textarea';
+                      break;
 
-                  case 'Radio':
-                  case 'Select':
-                  case 'Select Country':
-                  case 'Select State/Province':
-                    $editable = TRUE;
-                    $fieldAttributes['data-type'] = $spec['data_type'] == 'Boolean' ? 'boolean' : 'select';
-                    if (!$spec['is_required']) {
-                      $fieldAttributes['data-empty-option'] = ts('- none -');
-                    }
-                    break;
+                    case 'Radio':
+                    case 'Select':
+                    case 'Select Country':
+                    case 'Select State/Province':
+                      $editable = TRUE;
+                      $fieldAttributes['data-type'] = $spec['data_type'] == 'Boolean' ? 'boolean' : 'select';
+                      if (!$spec['is_required']) {
+                        $fieldAttributes['data-empty-option'] = ts('- none -');
+                      }
+                      break;
+                  }
                 }
               }
               if ($editable) {
