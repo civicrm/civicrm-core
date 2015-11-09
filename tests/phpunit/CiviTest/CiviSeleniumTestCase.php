@@ -2522,7 +2522,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->type("last_name", $lastName);
 
     //address section
+    $this->waitForElementPresent('street_address-1');
     $this->type("street_address-1", "902C El Camino Way SW");
+    $this->waitForElementPresent('city-1');
     $this->type("city-1", "Dumfries");
     $this->type("postal_code-1", "1234");
     $this->assertSelected('country-1', "UNITED STATES");

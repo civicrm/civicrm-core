@@ -384,7 +384,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('dupePairs_length');
     $this->select("name=dupePairs_length", "value=100");
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']");
-    $this->click("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
+    $this->click("xpath=//a[text()='$firstName $lastName']/../../td[8]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
     $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']", FALSE);
     $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[5]/td[4]/span[text()='(add)']");
@@ -473,8 +473,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Select the contacts to be merged
     $this->waitForElementPresent('dupePairs_length');
     $this->select("name=dupePairs_length", "value=100");
-    $this->waitForElementPresent("xpath=//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']");
-    $this->click("xpath=//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=//table[@id='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']");
+    $this->click("xpath=//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[8]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
     $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(overwrite)']");
     $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(add)']");
@@ -857,9 +857,9 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Relationship created.");
 
     $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("xpath=//a[text()='$sortName']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//a[text()='$sortName']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForAjaxContent();
 
     // Check if Membership for the individual is created
     $this->waitForElementPresent("xpath=//li[@id='tab_member']/a/em");
