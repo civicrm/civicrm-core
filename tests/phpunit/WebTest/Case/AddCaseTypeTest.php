@@ -91,7 +91,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->fillRichTextField("activity_details", $details, 'CKEditor');
     $this->type("activity_subject", $subject);
     $this->waitForElementPresent('case_type_id');
-    $this->select("case_type_id", "label={$caseTypeLabel}");
+    $this->select("case_type_id", "label=$caseTypeLabel");
     $this->waitForElementPresent('status_id');
     $this->select("status_id", "label={$caseStatusLabel}");
 
@@ -109,6 +109,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     }
 
     $this->click("xpath=//div[contains(text(), 'Roles')]");
+    $this->waitForAjaxContent();
 
     // check that expected roles are listed in the Case Roles pane
     foreach ($caseRoles as $key => $role) {
@@ -133,7 +134,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->type('title', $editCaseTypeLabel);
 
     $this->select2("xpath=//div[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tfoot/tr/td/span/div/a", 'Sibling of', FALSE, TRUE);
-    $this->click("xpath=//*[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tbody/tr[4]/td[2]/input[@type='checkbox']");
+    $this->click("xpath=//form[@name='editCaseTypeForm']/div/div[4]/table/tbody/tr[4]/td[2]/input[@type='checkbox']");
 
     $this->click("xpath=//a[text()='Standard Timeline']");
     $this->select2("xpath=//tr[@class='addRow']/td/span[@placeholder='Add activity']/div/a", 'SMS', FALSE, TRUE);

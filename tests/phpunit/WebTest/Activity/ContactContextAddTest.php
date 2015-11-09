@@ -44,7 +44,6 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName1, "Summerson", $firstName1 . "@summerson.name");
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Anderson", $firstName2 . "@anderson.name");
-
     $this->click("css=li#tab_activity a");
 
     // waiting for the activity dropdown to show up
@@ -116,11 +115,10 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', $subject);
-
-    $this->waitForElementPresent("xpath=//div[@class='crm-activity-selector-activity']/div[2]/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//div[@class='crm-activity-selector-activity']/div[2]/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // verify Activity created
