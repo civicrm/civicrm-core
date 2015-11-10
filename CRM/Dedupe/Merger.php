@@ -1550,7 +1550,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // get the contact_id -> file_id mapping
       $fileIds = array();
       $sql = "SELECT entity_id, {$columnName} AS file_id FROM {$tableName} WHERE entity_id IN ({$mainId}, {$otherId})";
-      $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+      $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         $fileIds[$dao->entity_id] = $dao->file_id;
       }
@@ -1569,7 +1569,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       else {
         $sql = "INSERT INTO {$tableName} ( entity_id, {$columnName} ) VALUES ( {$mainId}, {$fileIds[$otherId]} )";
       }
-      CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($sql);
 
       if (CRM_Core_DAO::singleValueQuery("
         SELECT id
@@ -1586,7 +1586,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           INSERT INTO civicrm_entity_file ( entity_table, entity_id, file_id )
           VALUES ( '{$tableName}', {$mainId}, {$fileIds[$otherId]} )";
       }
-      CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($sql);
     }
 
     // move view only custom fields CRM-5362

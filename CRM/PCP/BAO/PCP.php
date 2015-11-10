@@ -104,7 +104,7 @@ FROM   civicrm_pcp, civicrm_contact
 WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   AND  civicrm_pcp.id = {$id}
 ";
-    return CRM_Core_DAO::singleValueQuery($query, CRM_Core_DAO::$_nullArray);
+    return CRM_Core_DAO::singleValueQuery($query);
   }
 
   /**
@@ -266,7 +266,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
                   AND cs.pcp_display_in_roll = 1
                   AND contribution_status_id = 1
                   AND is_test = 0";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     $honor = array();
     while ($dao->fetch()) {
       $honor[$dao->id]['nickname'] = ucwords($dao->pcp_roll_nickname);

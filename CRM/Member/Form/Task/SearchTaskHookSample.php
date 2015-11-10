@@ -59,7 +59,7 @@ FROM       civicrm_membership mem
 INNER JOIN civicrm_contact ct ON ( mem.contact_id = ct.id )
 WHERE      mem.id IN ( $memberIDs )";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $rows[] = array(
         'display_name' => $dao->display_name,
