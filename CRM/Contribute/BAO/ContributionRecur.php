@@ -98,6 +98,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       CRM_Utils_Hook::post('create', 'ContributionRecur', $recurring->id, $recurring);
     }
 
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution_recur', $recurring->id);
+    }
+
     return $result;
   }
 
