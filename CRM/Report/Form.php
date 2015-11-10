@@ -1737,22 +1737,17 @@ class CRM_Report_Form extends CRM_Core_Form {
         break;
 
       case 'mhas':
+      case 'mnot':
         // mhas == multiple has
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
-          $clause
-            = "{$field['dbAlias']} REGEXP '[[:cntrl:]]" . implode('|', $value) .
-            "[[:cntrl:]]'";
-        }
-        break;
-
-      case 'mnot':
-        // mnot == multiple is not one of
-        if ($value !== NULL && count($value) > 0) {
-          $sqlOP = $this->getSQLOperator($op);
-          $clause
-            = "( {$field['dbAlias']} NOT REGEXP '[[:cntrl:]]" . implode('|', $value) .
-            "[[:cntrl:]]' OR {$field['dbAlias']} IS NULL )";
+          $operator = '';
+          if ($op == 'mnot') {
+            // mnot == multiple is not one of
+            $operator = 'NOT';
+          }
+          $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:cntrl:]]*";
+          $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
         }
         break;
 
