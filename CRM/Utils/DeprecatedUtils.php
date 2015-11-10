@@ -82,12 +82,7 @@ function _civicrm_api3_deprecated_participant_formatted_param($params, &$values,
             if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
               (strtolower(trim($customValue)) == strtolower(trim($v1)))
             ) {
-              if ($type == 'CheckBox') {
-                $values[$key][$customValue] = 1;
-              }
-              else {
-                $values[$key][] = $customValue;
-              }
+              $values[$key][] = $customValue;
             }
           }
         }
