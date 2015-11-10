@@ -40,7 +40,7 @@ class CRM_Contribute_BAO_Query {
   static $_contributionFields = NULL;
 
   static $_contribOrSoftCredit = "only_contribs";
-  
+
   static $_contribRecurPayment = FALSE;
 
   /**

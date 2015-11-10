@@ -169,9 +169,6 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
-   *
-   * @return array
-   *   the result in a nice formatted array (or an error object)
    */
   public function doDirectPayment(&$params) {
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
