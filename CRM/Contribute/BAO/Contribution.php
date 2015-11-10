@@ -848,7 +848,7 @@ LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table 
   GROUP BY  currency
 ";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     $amount = array();
     $count = 0;
     while ($dao->fetch()) {
@@ -1178,7 +1178,7 @@ FROM   civicrm_contribution, civicrm_contact
 WHERE  civicrm_contribution.contact_id = civicrm_contact.id
   AND  civicrm_contribution.id = {$id}
 ";
-    return CRM_Core_DAO::singleValueQuery($query, CRM_Core_DAO::$_nullArray);
+    return CRM_Core_DAO::singleValueQuery($query);
   }
 
   /**

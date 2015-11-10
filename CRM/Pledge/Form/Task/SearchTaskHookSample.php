@@ -54,7 +54,7 @@ class CRM_Pledge_Form_Task_SearchTaskHookSample extends CRM_Pledge_Form_Task {
 INNER JOIN civicrm_contact ct ON ( plg.contact_id = ct.id )
      WHERE plg.id IN ( $pledgeIDs )";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $rows[] = array(
         'display_name' => $dao->display_name,

@@ -356,9 +356,7 @@ class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {
   function count() {
     $sql = $this->all();
 
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     return $dao->N;
   }
 
