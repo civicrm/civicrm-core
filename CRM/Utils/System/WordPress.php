@@ -338,6 +338,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function loadBootStrap($name = NULL, $pass = NULL) {
     global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb, $current_site, $current_blog, $current_user;
 
+    if (!defined('WP_USE_THEMES')) {
+      define('WP_USE_THEMES', false);
+    }
+
     $cmsRootPath = $this->cmsRootPath();
     if (!$cmsRootPath) {
       CRM_Core_Error::fatal("Could not find the install directory for WordPress");
