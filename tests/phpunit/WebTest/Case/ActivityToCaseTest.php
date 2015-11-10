@@ -301,7 +301,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->select2('file_on_case_unclosed_case_id', $firstName);
     $this->assertElementContainsText("xpath=//div[@id='s2id_file_on_case_unclosed_case_id']", "$firstName", 'Contact not found in line ' . __LINE__);
     $this->type('file_on_case_activity_subject', $subject);
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Save']");
     $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span/a[1][text()='View']");
 
     // verify if custom data is present
@@ -311,8 +311,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
     $id = $this->urlArg('id');
     $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]");
-
-    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]/div[text()='{$subject}']/../../td[8]/a[1]");
+    $this->click("xpath=//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]/div[text()='{$subject}']/../../td[8]/a[text()='View']");
 
     $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");

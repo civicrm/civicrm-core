@@ -114,10 +114,11 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[2]/td[2]/table[@class='nestedSelector']/tbody/tr[3]/td[8]/a[text()='View Payment']");
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[2]/td[2]/table[@class='nestedSelector']/tbody/tr[3]/td[8]/a");
-    $this->waitForElementPresent("xpath=//form[@id='ContributionView']//div[2]/div/div/a[2]/span[text()='Delete']");
-    $this->click("xpath=//form[@id='ContributionView']//div[2]/div/div/a[2]/span[text()='Delete']");
-    $this->waitForElementPresent("xpath=//form[@id='Contribution']/div[2]/div[2]/span/input[@value='Delete']");
-    $this->click("xpath=//form[@id='Contribution']/div[2]/div[2]/span/input[@value='Delete']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Delete']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Delete']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Delete']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Delete']");
+
     $this->waitForElementPresent("xpath=//li[@id='tab_pledge']/a");
     $this->click("xpath=//li[@id='tab_pledge']/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[10]/span/a[text()='View']");
