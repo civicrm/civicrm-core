@@ -339,7 +339,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb, $current_site, $current_blog, $current_user;
 
     if (!defined('WP_USE_THEMES')) {
-      define('WP_USE_THEMES', false);
+      define('WP_USE_THEMES', FALSE);
     }
 
     $cmsRootPath = $this->cmsRootPath();
@@ -380,7 +380,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if ($uid) {
       if ($uid instanceof WP_User) {
         $account = wp_set_current_user($uid->ID);
-      } else {
+      }
+      else {
         $account = wp_set_current_user($uid);
       }
       if ($account && $account->data->ID) {
