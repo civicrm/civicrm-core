@@ -336,7 +336,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @return bool
    */
   public function loadBootStrap($name = NULL, $pass = NULL) {
-    global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb;
+    global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb, $current_site, $current_blog, $current_user;
 
     $cmsRootPath = $this->cmsRootPath();
     if (!$cmsRootPath) {
