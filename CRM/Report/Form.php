@@ -1744,7 +1744,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           $operator = '';
           if ($op == 'mnot') {
             // mnot == multiple is not one of
-            $operator = 'NOT';  
+            $operator = 'NOT';
           }
           $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:cntrl:]]*";
           $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
