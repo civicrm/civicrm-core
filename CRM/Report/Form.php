@@ -4584,13 +4584,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $query->_where = "WHERE {$query->_aliases['civicrm_contribution']}.id IS NOT NULL ";
     }
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
-    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from} 
+    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from}
               LEFT JOIN civicrm_line_item   {$query->_aliases['civicrm_line_item']}
                       ON {$query->_aliases['civicrm_contribution']}.id = {$query->_aliases['civicrm_line_item']}.contribution_id AND
-                         {$query->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution' 
-                      AND {$query->_aliases['civicrm_line_item']}.financial_type_id NOT IN (" . $liFTs . ") 
-              {$query->_where} 
-                      AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ") 
+                         {$query->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'
+                      AND {$query->_aliases['civicrm_line_item']}.financial_type_id NOT IN (" . $liFTs . ")
+              {$query->_where}
+                      AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ")
                       AND {$query->_aliases['civicrm_line_item']}.id IS NULL
               GROUP BY {$query->_aliases['civicrm_contribution']}.id";
     CRM_Core_DAO::executeQuery($sql);
