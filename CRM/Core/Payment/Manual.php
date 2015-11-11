@@ -155,4 +155,13 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
     return '';
   }
 
+  /**
+   * Declare that more than one payment can be processed at once.
+   *
+   * @return bool
+   */
+  protected function supportsMultipleConcurrentPayments() {
+    return TRUE;
+  }
+
 }
