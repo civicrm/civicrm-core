@@ -29,6 +29,3 @@
         {include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
     </table>
 </div>
-
-
-
