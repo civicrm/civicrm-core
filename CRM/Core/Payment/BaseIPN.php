@@ -442,6 +442,12 @@ class CRM_Core_Payment_BaseIPN {
       $values['is_email_receipt'] = $input['is_email_receipt'];
     }
     $source = NULL;
+
+    // CRM-17519 - clear the Smarty template. Otherwise, when multiple transactions are completed,
+    // details from a contribution receipt can leak into later ones, leading to privacy issues.
+    $template = CRM_Core_Smarty::singleton();
+    $template->clearTemplateVars();
+
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
         CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
@@ -785,8 +791,6 @@ LIMIT 1;";
     if (!array_key_exists('is_email_receipt', $values) ||
       $values['is_email_receipt'] == 1
     ) {
-      $template = CRM_Core_Smarty::singleton();
-      $template->clearTemplateVars();
       self::sendMail($input, $ids, $objects, $values, $recur, FALSE);
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
