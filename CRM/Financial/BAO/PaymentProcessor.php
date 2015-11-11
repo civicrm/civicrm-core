@@ -314,6 +314,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       'name' => 'pay_later',
       'billing_mode' => '',
       'is_default' => 0,
+      // This should ideally be retrieved from the DB but existing default is check so we'll code that for now.
+      'payment_instrument_id' => CRM_Core_OptionGroup::getValue('payment_instrument', 'Check', 'name'),
       // Making this optionally recur would give lots of options -but it should
       // be a row in the payment processor table before we do that.
       'is_recur' => FALSE,
