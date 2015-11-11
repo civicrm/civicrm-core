@@ -355,7 +355,7 @@ GROUP BY  currency
     $end = substr($endDate, 0, 8);
     $pCount = 0;
     $pamount = array();
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $pCount += $dao->pledge_count;
       $pamount[] = CRM_Utils_Money::format($dao->pledge_amount, $dao->currency);
@@ -417,7 +417,7 @@ GROUP BY  currency
  GROUP BY  cp.currency
 ";
     if ($select) {
-      $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      $dao = CRM_Core_DAO::executeQuery($query);
       $amount = array();
       $count = 0;
 
