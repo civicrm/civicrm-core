@@ -17,7 +17,8 @@
     "symfony/finder": "~2.5.0",
     "totten/ca-config": "~13.02",
     "civicrm/civicrm-cxn-rpc": "~0.15.07.27",
-    "iats-payments/civicrm": "~1.4.2"
+    "iats-payments/civicrm": "~1.4.2",
+    "guzzlehttp/guzzle": "~5.0"
   },
   "scripts": {
     "post-install-cmd": [
