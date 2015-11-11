@@ -120,52 +120,48 @@ cj("input,#priceset select,#priceset").each(function () {
 
   case 'select-one':
 
-    //default calcution of element.
-    var ele = cj(this).attr('id');
-    if ( ! price[ele] ) {
-      price[ele] = 0;
+    //default calculation of element.
+    var elementID = cj(this).attr('id');
+    if ( ! price[elementID] ) {
+      price[elementID] = 0;
     }
-    eval( 'var selectedText = ' + cj(this).attr('price') );
-    var addprice = 0;
-    if ( cj(this).val( ) ) {
-      optionPart = selectedText[cj(this).val( )].split(optionSep);
-      addprice   = parseFloat( optionPart[0] );
-    }
-
-    if ( addprice ) {
-      totalfee   = parseFloat(totalfee) + addprice - parseFloat(price[ele]);
-      price[ele] = addprice;
-    }
+    var addPrice = calculateSelectLineItemValue(this);
+    // In other words we subtract any existing value before adding the new value it seems.
+    totalfee   = parseFloat(totalfee) + addPrice - parseFloat(price[elementID]);
+    price[elementID] = addPrice;
 
     //event driven calculation of element.
     cj(this).change( function() {
-      var ele = cj(this).attr('id');
-      if ( ! price[ele] ) {
-        price[ele] = 0;
-      }
-      eval( 'var selectedText = ' + cj(this).attr('price') );
-
-      var addprice = 0;
-      if ( cj(this).val( ) ) {
-        optionPart = selectedText[cj(this).val( )].split(optionSep);
-        addprice   = parseFloat( optionPart[0] );
+      var elementID = cj(this).attr('id');
+      if ( ! price[elementID] ) {
+        price[elementID] = 0;
       }
 
-      if ( addprice ) {
-        totalfee   = parseFloat(totalfee) + addprice - parseFloat(price[ele]);
-        price[ele] = addprice;
-      }
-      else {
-        totalfee   = parseFloat(totalfee) - parseFloat(price[ele]);
-        price[ele] = parseFloat('0');
-      }
+      var addPrice = calculateSelectLineItemValue(this);
+      totalfee   = parseFloat(totalfee) + addPrice - parseFloat(price[elementID]);
+      price[elementID] = addPrice;
       display( totalfee );
     });
+
     display( totalfee );
     break;
     }
   }
 });
+
+/**
+ * Calculate the value of the line item for a select value.
+ */
+function calculateSelectLineItemValue(priceElement) {
+  eval( 'var selectedText = ' + cj(priceElement).attr('price') );
+  var addprice = parseFloat('0');
+  if ( cj(priceElement).val( ) ) {
+    optionPart = selectedText[cj(priceElement).val( )].split(optionSep);
+    addprice   = parseFloat( optionPart[0] );
+  }
+  return addprice;
+
+}
 
 //calculation for text box.
 function calculateText( object ) {
