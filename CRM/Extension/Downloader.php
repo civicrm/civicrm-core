@@ -83,7 +83,6 @@ class CRM_Extension_Downloader {
       );
     }
 
-
     return $errors;
   }
 
