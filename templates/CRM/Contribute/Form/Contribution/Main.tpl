@@ -253,10 +253,7 @@
   {/if}
 
   <div id="billing-payment-block">
-    {* If we have a payment processor, load it - otherwise it happens via ajax *}
-    {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
-      {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
-    {/if}
+    {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
   </div>
   {include file="CRM/common/paymentBlock.tpl"}
 
