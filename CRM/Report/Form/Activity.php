@@ -724,7 +724,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
   public static function formRule($fields, $files, $self) {
     $errors = array();
     $componentId = CRM_Core_Component::getComponentID('CiviCase');
-    $caseActivityTypes = CRM_Core_OptionGroup::values('activity_type', TRUE, FALSE, FALSE," AND v.component_id={$componentId}");
+    $caseActivityTypes = CRM_Core_OptionGroup::values('activity_type', TRUE, FALSE, FALSE, " AND v.component_id={$componentId}");
     if (!empty($fields['activity_type_id_value']) && is_array($fields['activity_type_id_value']) && empty($fields['include_case_activities_value'])) {
       foreach ($fields['activity_type_id_value'] as $activityTypeId) {
         if (in_array($activityTypeId, $caseActivityTypes)) {
