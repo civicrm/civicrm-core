@@ -905,8 +905,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return $errors;
     }
 
-    if (CRM_Utils_Array::value('payment_method', $fields) == NULL) {
-      $errors['payment_method'] = ts('Payment Method is a required field.');
+    if (CRM_Utils_Array::value('payment_processor_id', $fields) == NULL) {
+      $errors['payment_processor_id'] = ts('Payment Method is a required field.');
     }
     else {
       CRM_Core_Payment_Form::validatePaymentInstrument(
