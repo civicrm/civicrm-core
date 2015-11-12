@@ -60,9 +60,9 @@ function _civicrm_api3_navigation_reset_spec(&$params) {
  */
 function civicrm_api3_navigation_reset($params) {
   if ($params['for'] == 'report') {
-    CRM_Core_BAO_Navigation::resetNavigation();
+    CRM_Core_BAO_Navigation::rebuildReportsNavigation($params['domain_id']);
   }
-  CRM_Core_BAO_Navigation::rebuildReportsNavigation($params['domain_id']);
+  CRM_Core_BAO_Navigation::resetNavigation();
   return civicrm_api3_create_success(1, $params, 'navigation', 'reset');
 }
 

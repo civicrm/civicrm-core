@@ -174,7 +174,7 @@
         e.preventDefault();
         CRM.confirm({
           title: $(this).text(),
-          message: '{/literal}{ts escape='js'}This will rebuild the "Reports" menu to include all currently active reports.{/ts}{literal}'
+          message: '{/literal}{ts escape='js'}This will add links for all currently active reports to the "Reports" menu under the relevant component. If you have added report instances to other menus, they will be moved to "Reports".  Are you sure?{/ts}{literal}'
         })
           .on('crmConfirm:yes', function() {
             $('#crm-container').block();
