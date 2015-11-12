@@ -3252,12 +3252,13 @@ WHERE  contribution_id = %1 ";
     if ($context == 'changedStatus') {
       //get all the statuses
       $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
+      $cancelledTaxAmount = 0;
       if ($params['prevContribution']->contribution_status_id == array_search('Completed', $contributionStatus)
         && ($params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
           || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))
       ) {
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
+        $cancelledTaxAmount = CRM_Utils_Array::value('tax_amount', $params, '0.00');
         if (empty($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
           $creditNoteId = self::createCreditNoteId();
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
@@ -3282,7 +3283,7 @@ WHERE  contribution_id = %1 ";
           $params['trxnParams']['from_financial_account_id'] = $arAccountId;
         }
       }
-      $itemAmount = $params['trxnParams']['total_amount'];
+      $itemAmount = $params['trxnParams']['total_amount'] + $cancelledTaxAmount;
     }
     elseif ($context == 'changePaymentInstrument') {
       if ($params['trxnParams']['total_amount'] < 0) {
@@ -3363,6 +3364,11 @@ WHERE  contribution_id = %1 ";
             $currency = $params['contribution']->currency;
           }
           $diff = 1;
+          if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)
+            || $params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
+            ) {
+            $diff = -1;
+          }
           if (!empty($params['is_quick_config'])) {
             $amount = $itemAmount;
             if (!$amount) {
@@ -3370,11 +3376,6 @@ WHERE  contribution_id = %1 ";
             }
           }
           else {
-            if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)
-              || $params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
-            ) {
-              $diff = -1;
-            }
             $amount = $diff * $fieldValues['line_total'];
           }
 
