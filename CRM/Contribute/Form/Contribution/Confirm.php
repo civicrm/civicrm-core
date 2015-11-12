@@ -1415,7 +1415,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isProcessSeparateMembershipTransaction, $financialTypeID, $membershipLineItems, $isPayLater, $isPending) {
     $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
-    $errors = $createdMemberships = $paymentResult = array();
+    $errors = $createdMemberships = $paymentResults = array();
 
     if ($isPaidMembership) {
       if ($isProcessSeparateMembershipTransaction) {
@@ -1446,8 +1446,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (empty($form->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
           unset($membershipParams['is_recur']);
         }
-        $membershipContribution = $this->processSecondaryFinancialTransaction($contactID, $form, $membershipParams,
+        list($membershipContribution, $secondPaymentResult) = $this->processSecondaryFinancialTransaction($contactID, $form, $membershipParams,
           $isTest, $membershipLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
+        $paymentResults[] = array('contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult);
       }
       catch (CRM_Core_Exception $e) {
         $errors[2] = $e->getMessage();
@@ -1579,9 +1580,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
       $paymentActionResult = $payment->doPayment($form->_params, 'contribute');
-      $this->completeTransaction($paymentActionResult, $paymentResult['contribution']->id);
+      $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
       // Do not send an email if Recurring transaction is done via Direct Mode
       // Email will we sent when the IPN is received.
+      foreach ($paymentResults as $result) {
+        $this->completeTransaction($result['result'], $result['contribution_id']);
+      }
       return;
     }
 
@@ -1690,10 +1694,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $result = $payment->doPayment($tempParams, 'contribute');
       $form->set('membership_trx_id', $result['trxn_id']);
       $form->assign('membership_trx_id', $result['trxn_id']);
-      $this->completeTransaction($result, $membershipContribution->id);
     }
 
-    return $membershipContribution;
+    return array($membershipContribution, $result);
   }
 
   /**
