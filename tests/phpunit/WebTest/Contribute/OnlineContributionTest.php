@@ -312,7 +312,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     //View Contribution Record and verify data
     $expected = array(
-      'From' => "{$email}",
+      'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       $amountLabel => $amountValue,
       'Contribution Status' => 'Completed',
