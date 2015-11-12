@@ -158,7 +158,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     $this->add('text',
       'label',
       ts('Label'),
-      CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'label'),
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'label'),// The label field which causes the issue. Something here or in getAttribute might need fixing.
       TRUE
     );
 
@@ -171,6 +171,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       );
     }
 
+    // This is the rule which causes the error mentioned in the issue to pop up.
     if (!in_array($this->_gName, array(
         'email_greeting',
         'postal_greeting',
@@ -350,6 +351,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
           'addressee',
         )) && empty($self->_defaultValues['is_reserved'])
     ) {
+      // Checking on label occurs here.
       $label = $fields['label'];
       $condition = " AND v.label = '{$label}' ";
       $values = CRM_Core_OptionGroup::values($self->_gName, FALSE, FALSE, FALSE, $condition, 'filter');
@@ -431,6 +433,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
 
       $groupParams = array('name' => ($this->_gName));
+      // Option values get stored here. Might be some problem with addOptionValue.
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $this->_action, $this->_id);
 
       // CRM-11516
