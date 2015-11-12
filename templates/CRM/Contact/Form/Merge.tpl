@@ -48,77 +48,152 @@
   </a>
 </div>
 
+<div class="action-link">
+  <a href="javascript:void(0);" class="action-item crm-hover-button toggle_equal_rows">
+    <span class="icon ui-icon-circle-check"></span>
+    {ts}Show/hide rows with the same data on each contact record.{/ts}
+  </a>
+</div>
+
 <table class="row-highlight">
   <tr class="columnheader">
     <th>&nbsp;</th>
     <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}</a> ({ts}duplicate{/ts})</th>
     <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
     <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name}</a></th>
+    <th width="300">Add/overwrite?</th>
   </tr>
+  
+  {crmAPI var='other_result' entity='Contact' action='get' return="modified_date" id=$other_cid}
+  
+   {crmAPI var='main_result' entity='Contact' action='get' return="modified_date" id=$main_cid}
+ 
+   
+  <tr style="background-color: #FFFFCC !important; border-bottom:1px solid #ccc !important;">
+    <td>Last modified</td>
+    <td>{$other_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} (Most recent) {/if}</td>
+    <td>{if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} &gt;&gt;&gt;&gt;&gt;&gt; {else} &lt;&lt;&lt;&lt;&lt;&lt; {/if} </td>
+    <td>{$main_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $main_result.values.0.modified_date gt $other_result.values.0.modified_date} (Most recent) {/if}</td>
+    <td></td>
+  </tr>
+  
   {foreach from=$rows item=row key=field}
-     <tr class="{cycle values="odd-row,even-row"}">
-        <td>{$row.title}</td>
+   
+    {if !isset($row.main) && !isset($row.other)} 
+       <tr style="background-color: #fff !important; border-bottom:1px solid #ccc !important;" class="no-data">
         <td>
-          {if !is_array($row.other)}
-            {$row.other}
-          {elseif $row.other.fileName}
-            {$row.other.fileName}
-          {else}
-            {', '|implode:$row.other}
-          {/if}
+          <strong>{$row.title}</strong>
         </td>
-        <td style='white-space: nowrap'>{if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}</td>
-        <td>
-            {if $row.title|substr:0:5 == "Email"   OR
-                $row.title|substr:0:7 == "Address" OR
-                $row.title|substr:0:2 == "IM"      OR
-                $row.title|substr:0:6 == "OpenID"  OR
-                $row.title|substr:0:5 == "Phone"}
-
-          {assign var=position  value=$field|strrpos:'_'}
-                {assign var=blockId   value=$field|substr:$position+1}
-                {assign var=blockName value=$field|substr:14:$position-14}
-
-                {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
-                {if $blockName eq 'email' || $blockName eq 'phone' }
-     <span id="main_{$blockName}_{$blockId}_overwrite">{if $row.main}(overwrite){$form.location.$blockName.$blockId.operation.html}&nbsp;<br />{else}(add){/if}</span>
-    {literal}
-    <script type="text/javascript">
-    function mergeBlock(blockname, element, blockId) {
-        var allBlock = {/literal}{$mainLocBlock}{literal};
-        var block    = eval( "allBlock." + 'main_'+ blockname + element.value);
-        if(blockname == 'email' || blockname == 'phone'){
-           var label = '(overwrite)'+ '<span id="main_blockname_blockId_overwrite">{/literal}{$form.location.$blockName.$blockId.operation.html}{literal}<br /></span>';
-        }
-        else {
-          label = '(overwrite)<br />';
-        }
-
-        if ( !block ) {
-                  block = '';
-           label   = '(add)';
-           }
-         cj( "#main_"+ blockname +"_" + blockId ).html( block );
-         cj( "#main_"+ blockname +"_" + blockId +"_overwrite" ).html( label );
-    }
-    </script>
-    {/literal}
     {else}
-    <span id="main_{$blockName}_{$blockId}_overwrite">{if $row.main}(overwrite)<br />{else}(add){/if}</span>
-                {/if}
-
-            {/if}
-            {*NYSS 5546*}
-            <span id="main_{$blockName}_{$blockId}">
-              {if !is_array($row.main)}
-                {$row.main}
-              {elseif $row.main.fileName}
-                {$row.main.fileName}
-              {else}
-                {', '|implode:$row.main}
-              {/if}
-            </span>
+      {if $row.main eq $row.other}
+         <tr style="background-color: #EFFFE7 !important; border-bottom:1px solid #ccc !important;" class="equal-data {cycle values="odd-row,even-row"}">
+      {else}
+         <tr style="background-color: #FFECEC !important; border-bottom:1px solid #ccc !important;" class="diff-data {cycle values="odd-row,even-row"}">
+      {/if}
+        <td>
+          {$row.title}
         </td>
+    {/if}    
+           
+           <td>
+             {if $row.title|substr:0:7 == "Address"}<span id="other_{$blockName}_{$blockId}" style="white-space:pre">{else}<span id="other_{$blockName}_{$blockId}">{/if}{if !is_array($row.other)}{$row.other}{elseif $row.other.fileName}{$row.other.fileName}{else}{', '|implode:$row.other}{/if}</span>
+         	 </td>
+        
+        <td style='white-space: nowrap'>
+           {if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
+        </td>
+        
+       {assign var=position  value=$field|strrpos:'_'}
+       {assign var=blockId   value=$field|substr:$position+1}
+       {assign var=blockName value=$field|substr:14:$position-14}
+       
+        {if $row.title|substr:0:5 == "Email"   OR
+            $row.title|substr:0:7 == "Address" OR
+            $row.title|substr:0:2 == "IM"      OR
+            $row.title|substr:0:7 == "Website" OR  
+            $row.title|substr:0:5 == "Phone"}           
+                
+    <td>
+             {if $row.title|substr:0:7 == "Address"}<span id="main_{$blockName}_{$blockId}" style="white-space:pre">{else}<span id="main_{$blockName}_{$blockId}">{/if}{if !is_array($row.main)}{$row.main}{elseif $row.main.fileName}{$row.main.fileName}{else}{', '|implode:$row.main}{/if}</span>
+         	 </td>
+          
+           <td>  
+            
+              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
+                {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
+              {/if}
+              
+              {* TODO display other_type_id for websites, ims and phones *}
+              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
+                  {$form.type.$blockName.$blockId.typeTypeId.html}&nbsp;      
+              {/if}  
+             
+              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'website' || $blockName eq 'im' }
+                <span id="main_{$blockName}_{$blockId}_overwrite">
+                   {if $row.main}
+                     (overwrite){$form.location.$blockName.$blockId.html}&nbsp;<br />
+                   {else}		
+                     (add)
+                   {/if} 
+                </span>
+              {/if}
+               
+              {literal}
+                <script type="text/javascript">
+                function mergeBlock(blockname, element, blockId) {
+                    var allBlock = {/literal}{$mainLocBlock}{literal};
+                    var block    = eval( "allBlock." + 'main_'+ blockname + element.value);
+                    if(blockname == 'email' || blockname == 'phone'){
+                       var label = '(overwrite)'+ '<span id="main_blockname_blockId_overwrite">{/literal}{$form.location.$blockName.$blockId.operation.html}{literal}<br /></span>';
+                    }
+                    else {
+                      label = '(overwrite)<br />';
+                    }
+            
+                    if ( !block ) {
+                       block = '';
+                       label   = '(add)';
+                       }
+                     cj( "#main_"+ blockname +"_" + blockId ).html( block );
+                     cj( "#main_"+ blockname +"_" + blockId +"_overwrite" ).html( label ); 
+                }
+                </script>
+                {/literal}
+                
+            </td>
+            
+              {else}
+                        
+               <td>
+              <span id="main_{$blockName}_{$blockId}">
+                {if !is_array($row.main)}
+                    {$row.main}
+                {elseif $row.main.fileName}
+                  {$row.main.fileName}
+                {else}
+                  {', '|implode:$row.main}
+                {/if}
+              </span>
+         	 </td>
+           
+           <td>
+              
+            {if isset($row.main) || isset($row.other)} 
+              <span id="main_{$blockName}_{$blockId}_overwrite">
+                 {if $row.main}
+                    (overwrite)<br />
+                 {else}
+                    (add)
+                 {/if}
+              </span>
+            {/if}
+              
+            </td>
+  
+          {/if}
+          {*NYSS 5546*}
+
+         
      </tr>
   {/foreach}
 
@@ -126,10 +201,12 @@
     {if $paramName eq 'move_rel_table_users'}
       <tr class="{cycle values="even-row,odd-row"}">
       <td><strong>{ts}Move related...{/ts}</strong></td><td>{if $otherUfId}<a target="_blank" href="{$params.other_url}">{$otherUfName}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;{else}<td style='white-space: nowrap'></td>{/if}</td><td>{if $mainUfId}<a target="_blank" href="{$params.main_url}">{$mainUfName}</a>{/if}</td>
+      <td>(migrate)</td>
     </tr>
     {else}
     <tr class="{cycle values="even-row,odd-row"}">
       <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+       <td>(migrate)</td>
     </tr>
     {/if}
   {/foreach}
@@ -177,6 +254,12 @@ You will need to manually delete that user (click on the link to open Drupal Use
           });
        }
     });
+  });
+  
+  // show / hide same data rows
+		
+  CRM.$('.toggle_equal_rows').click( function() {
+    CRM.$('tr.equal-data').toggle();
   });
 
 </script>
