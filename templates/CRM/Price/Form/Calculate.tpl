@@ -46,7 +46,7 @@ var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
 var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
 var symbol         = '{/literal}{$currencySymbol}{literal}';
 var optionSep      = '|';
-var priceSet = price = Array();
+
 cj("#priceset [price]").each(function () {
 
     var elementType =  cj(this).attr('type');
@@ -185,15 +185,12 @@ function display(totalfee) {
     totalfee = Math.round(totalfee*100)/100;
     var totalEventFee  = formatMoney( totalfee, 2, separator, thousandMarker);
     document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
-    scriptfee   = totalfee;
 
     cj('#total_amount').val( totalfee );
     cj('#pricevalue').data('raw-total', totalfee).trigger('change');
 
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
-    if (typeof skipPaymentMethod == 'function') {
-      skipPaymentMethod();
-    }
+    skipPaymentMethod();
 }
 
 //money formatting/localization
@@ -205,6 +202,60 @@ var n = amount,
     i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
     j = (j = i.length) > 3 ? j % 3 : 0;
   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+}
+
+/**
+ * Show or hide payment options.
+ *
+ * @param bool $isHide
+ *   Should the block be hidden.
+ */
+function showHidePayment(isHide) {
+  var payment_options = cj(".payment_options-group");
+  var payment_processor = cj("div.payment_processor-section");
+  var payment_information = cj("div#payment_information");
+  // I've added a hide for billing block. But, actually the issue
+  // might be that the unselecting of the processor should cause it
+  // to be hidden (or removed) in which case it can go from this function.
+  var billing_block = cj("div#billing-payment-block");
+  if (isHide) {
+    payment_options.hide();
+    payment_processor.hide();
+    payment_information.hide();
+    billing_block.hide();
+    // also unset selected payment methods
+    cj('input[name="payment_processor_id"]').removeProp('checked');
+  }
+  else {
+    payment_options.show();
+    payment_processor.show();
+    payment_information.show();
+    billing_block.show();
+  }
+}
+
+/**
+ * Hides or shows billing and payment options block depending on whether payment is required.
+ *
+ * In general incomplete orders or $0 orders do not require a payment block.
+ */
+function skipPaymentMethod() {
+  var isHide = false;
+  var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
+  var alwaysShowFlag = (isMultiple && cj("#additional_participants").val());
+  var alwaysHideFlag = (cj("#bypass_payment").val() == 1);
+  var total_amount_tmp =  cj('#pricevalue').data('raw-total');
+  // Hide billing questions if this is free
+  if (!alwaysShowFlag && total_amount_tmp == 0){
+    isHide = true;
+  }
+  else {
+    isHide = false;
+  }
+  if (alwaysHideFlag) {
+    isHide = true;
+  }
+  showHidePayment(isHide);
 }
 
 {/literal}
