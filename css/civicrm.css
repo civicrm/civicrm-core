@@ -2117,14 +2117,20 @@ a.crm-i:hover {
   color: #6177D5;
 }
 
+.crm-i-button {
+  position: relative;
+}
+
 .crm-i-button>.crm-i {
-  padding-left: 2px;
-  line-height: inherit;
+  position: absolute;
+  pointer-events: none;
+  top: .4em;
+  left: .4em;
 }
 
 .crm-container .crm-button.crm-i-button input[type="button"],
 .crm-container .crm-button.crm-i-button input.crm-form-submit {
-  padding-left: 0;
+  padding-left: 1.6em;
 }
 
 .crm-container .inform-icon {
