@@ -430,6 +430,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         if (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') {
           $choice[] = $qf->createElement('radio', NULL, '', ts('No thank you'), '-1',
             array(
+              'price' => json_encode(array($elementName, '0|0')),
+              'data-currency' => $currencyName,
               'onclick' => 'clearAmountOther();',
             )
           );

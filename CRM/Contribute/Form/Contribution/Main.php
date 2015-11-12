@@ -330,7 +330,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if (count($pps) > 1) {
       $this->addRadio('payment_processor_id', ts('Payment Method'), $pps,
-        NULL, "&nbsp;", TRUE
+        NULL, "&nbsp;"
       );
     }
     elseif (!empty($pps)) {
@@ -683,7 +683,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $errorText = 'Your %1 membership was previously cancelled and can not be renewed online. Please contact the site administrator for assistance.';
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
           if ($fieldValue['html_type'] != 'Text' && CRM_Utils_Array::value('price_' . $fieldKey, $fields)) {
-            if (!is_array($fields['price_' . $fieldKey])) {
+            if (!is_array($fields['price_' . $fieldKey]) && isset($fieldValue['options'][$fields['price_' . $fieldKey]])) {
               if (array_key_exists('membership_type_id', $fieldValue['options'][$fields['price_' . $fieldKey]])
                 && in_array($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'], $currentMemberships)
               ) {
@@ -691,11 +691,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               }
             }
             else {
-              foreach ($fields['price_' . $fieldKey] as $key => $ignore) {
-                if (array_key_exists('membership_type_id', $fieldValue['options'][$key])
-                  && in_array($fieldValue['options'][$key]['membership_type_id'], $currentMemberships)
-                ) {
-                  $errors['price_' . $fieldKey] = ts($errorText, array(1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$key]['membership_type_id'])));
+              if (is_array($fields['price_' . $fieldKey])) {
+                foreach (array_keys($fields['price_' . $fieldKey]) as $key) {
+                  if (array_key_exists('membership_type_id', $fieldValue['options'][$key])
+                    && in_array($fieldValue['options'][$key]['membership_type_id'], $currentMemberships)
+                  ) {
+                    $errors['price_' . $fieldKey] = ts($errorText, array(1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$key]['membership_type_id'])));
+                  }
                 }
               }
             }
@@ -903,12 +905,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return $errors;
     }
 
-    CRM_Core_Payment_Form::validatePaymentInstrument(
-      $fields['payment_processor_id'],
-      $fields,
-      $errors,
-      (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
-    );
+    if (CRM_Utils_Array::value('payment_processor_id', $fields) == NULL) {
+      $errors['payment_processor_id'] = ts('Payment Method is a required field.');
+    }
+    else {
+      CRM_Core_Payment_Form::validatePaymentInstrument(
+        $fields['payment_processor_id'],
+        $fields,
+        $errors,
+        (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
+      );
+    }
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
@@ -1008,7 +1015,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $priceOptions = array();
         while ($priceField->fetch()) {
           CRM_Price_BAO_PriceFieldValue::getValues($priceField->id, $priceOptions);
-          if ($selectedPriceOptionID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) {
+          if (($selectedPriceOptionID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) != FALSE && $selectedPriceOptionID > 0) {
             switch ($priceField->name) {
               case 'membership_amount':
                 $this->_params['selectMembership'] = $params['selectMembership'] = CRM_Utils_Array::value('membership_type_id', $priceOptions[$selectedPriceOptionID]);
