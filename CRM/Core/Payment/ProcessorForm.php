@@ -57,6 +57,10 @@ class CRM_Core_Payment_ProcessorForm {
       $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($form->_type, $form->_mode);
     }
 
+    if (empty($form->_paymentProcessor)) {
+      // This would happen when hitting the back-button on a multi-page form with a $0 selection in play.
+      return;
+    }
     $form->set('paymentProcessor', $form->_paymentProcessor);
     $form->_paymentObject = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
 
