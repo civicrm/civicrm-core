@@ -42,168 +42,151 @@
 <script type="text/javascript">
 {literal}
 
-var totalfee       = 0;
 var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
-var seperator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
+var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
 var symbol         = '{/literal}{$currencySymbol}{literal}';
 var optionSep      = '|';
-var priceSet = price = Array( );
-cj("input,#priceset select,#priceset").each(function () {
+var priceSet = price = Array();
+cj("#priceset [price]").each(function () {
 
-  if ( cj(this).attr('price') ) {
-    var eleType =  cj(this).attr('type');
+    var elementType =  cj(this).attr('type');
     if ( this.tagName == 'SELECT' ) {
-      eleType = 'select-one';
+      elementType = 'select-one';
     }
-    switch( eleType ) {
 
+    switch(elementType) {
       case 'checkbox':
-
-        //default calcution of element.
-        eval( 'var option = ' + cj(this).attr('price') ) ;
-        ele = option[0];
-        optionPart = option[1].split(optionSep);
-        addprice   = parseFloat( optionPart[0] );
-
-        if( cj(this).prop('checked') ) {
-          totalfee   += addprice;
-          price[ele] += addprice;
-        }
-
         //event driven calculation of element.
-        cj(this).click( function(){
-
-          if ( cj(this).prop('checked') )  {
-            totalfee   += addprice;
-            price[ele] += addprice;
-          }
-          else {
-            totalfee   -= addprice;
-            price[ele] -= addprice;
-          }
-          display( totalfee );
+        cj(this).click(function(){
+          calculateCheckboxLineItemValue(this);
+          display(calculateTotalFee());
         });
-        display( totalfee );
+        calculateCheckboxLineItemValue(this);
       break;
 
     case 'radio':
-
-      //default calcution of element.
-      eval( 'var option = ' + cj(this).attr('price') );
-      ele        = option[0];
-      optionPart = option[1].split(optionSep);
-      addprice   = parseFloat( optionPart[0] );
-      if ( ! price[ele] ) {
-        price[ele] = 0;
-      }
-
-      if( cj(this).prop('checked') ) {
-        totalfee   = parseFloat(totalfee) + addprice - parseFloat(price[ele]);
-        price[ele] = addprice;
-      }
-
       //event driven calculation of element.
       cj(this).click( function(){
-        totalfee   = parseFloat(totalfee) + addprice - parseFloat(price[ele]);
-        price[ele] = addprice;
-
-        display( totalfee );
+        calculateRadioLineItemValue(this);
+        display(calculateTotalFee());
       });
-      display( totalfee );
+      calculateRadioLineItemValue(this);
       break;
 
   case 'text':
 
-    //default calcution of element.
-    calculateText( this );
-
     //event driven calculation of element.
-    cj(this).bind( 'keyup', function() { calculateText( this );
-    }).bind( 'blur' , function() { calculateText( this );
+    cj(this).bind( 'keyup', function() {
+      calculateText(this);
+    }).bind( 'blur' , function() {
+      calculateText(this);
     });
+    //default calculation of element.
+    calculateText(this);
 
     break;
 
   case 'select-one':
-
-    //default calculation of element.
-    var elementID = cj(this).attr('id');
-    if ( ! price[elementID] ) {
-      price[elementID] = 0;
-    }
-    var addPrice = calculateSelectLineItemValue(this);
-    // In other words we subtract any existing value before adding the new value it seems.
-    totalfee   = parseFloat(totalfee) + addPrice - parseFloat(price[elementID]);
-    price[elementID] = addPrice;
+    calculateSelectLineItemValue(this);
 
     //event driven calculation of element.
     cj(this).change( function() {
-      var elementID = cj(this).attr('id');
-      if ( ! price[elementID] ) {
-        price[elementID] = 0;
-      }
-
-      var addPrice = calculateSelectLineItemValue(this);
-      totalfee   = parseFloat(totalfee) + addPrice - parseFloat(price[elementID]);
-      price[elementID] = addPrice;
-      display( totalfee );
+      calculateSelectLineItemValue(this);
+      display(calculateTotalFee());
     });
 
-    display( totalfee );
+
     break;
-    }
+
   }
+  display(calculateTotalFee());
 });
+
+/**
+ * Calculate the value of the line item for a radio value.
+ */
+function calculateCheckboxLineItemValue(priceElement) {
+  eval( 'var option = ' + cj(priceElement).attr('price') ) ;
+  optionPart = option[1].split(optionSep);
+  price = parseFloat(0);
+  if (cj(priceElement).prop('checked')) {
+    price = parseFloat(optionPart[0]);
+  }
+  cj(priceElement).data('line_raw_total', price);
+}
+
+/**
+ * Calculate the value of the line item for a radio value.
+ */
+function calculateRadioLineItemValue(priceElement) {
+  eval( 'var option = ' + cj(priceElement).attr('price') );
+  optionPart = option[1].split(optionSep);
+  var lineTotal = parseFloat(optionPart[0]);
+  cj(priceElement).data('line_raw_total', lineTotal);
+  var radionGroupName = cj(priceElement).attr("name");
+  // Reset all unchecked options to having a data value of 0.
+  cj('input[name=' + radionGroupName + ']:radio:unchecked').each(
+    function () {
+      cj(this).data('line_raw_total', 0);
+    }
+  );
+}
 
 /**
  * Calculate the value of the line item for a select value.
  */
 function calculateSelectLineItemValue(priceElement) {
   eval( 'var selectedText = ' + cj(priceElement).attr('price') );
-  var addprice = parseFloat('0');
-  if ( cj(priceElement).val( ) ) {
-    optionPart = selectedText[cj(priceElement).val( )].split(optionSep);
-    addprice   = parseFloat( optionPart[0] );
+  var price = parseFloat('0');
+  var option = cj(priceElement).val();
+  if (option) {
+    optionPart = selectedText[option].split(optionSep);
+    price   = parseFloat(optionPart[0]);
   }
-  return addprice;
-
+  cj(priceElement).data('line_raw_total', price);
 }
 
-//calculation for text box.
-function calculateText( object ) {
+/**
+ * Calculate the value of the line item for a text box.
+ */
+function calculateText(priceElement) {
   //CRM-16034 - comma acts as decimal in price set text pricing
-  var textval = parseFloat( cj(object).val().replace(thousandMarker, '') );
+  var textval = parseFloat(cj(priceElement).val().replace(thousandMarker, ''));
 
-   eval( 'var option = '+ cj(object).attr('price') );
-   ele         = option[0];
-   if ( ! price[ele] ) {
-       price[ele] = 0;
-   }
-   optionPart = option[1].split(optionSep);
-   addprice   = parseFloat( optionPart[0] );
-   var curval  = textval * addprice;
-   if ( textval >= 0 ) {
-       totalfee   = parseFloat(totalfee) + curval - parseFloat(price[ele]);
-       price[ele] = curval;
-   }
-   else {
-       totalfee   = parseFloat(totalfee) - parseFloat(price[ele]);
-       price[ele] = parseFloat('0');
-   }
-   display( totalfee );
+  if (isNaN(textval)) {
+    textval = parseFloat(0);
+  }
+  eval('var option = '+ cj(priceElement).attr('price'));
+  optionPart = option[1].split(optionSep);
+  addprice = parseFloat(optionPart[0]);
+  var curval  = textval * addprice;
+  cj(priceElement).data('line_raw_total', curval);
+  display(calculateTotalFee());
 }
-{/literal}
-{if $displayOveride neq 'true'}
-{literal}
-//display calculated amount
-function display( totalfee ) {
+
+/**
+ * Calculate the total fee for the visible priceset.
+ */
+function calculateTotalFee() {
+  var totalFee = 0;
+  cj("#priceset [price]").each(function () {
+    totalFee = totalFee + cj(this).data('line_raw_total');
+  });
+  return totalFee;
+}
+
+/**
+ * Display calculated amount.
+ */
+function display(totalfee) {
+
     // totalfee is monetary, round it to 2 decimal points so it can
     // go as a float - CRM-13491
     totalfee = Math.round(totalfee*100)/100;
-    var totalEventFee  = formatMoney( totalfee, 2, seperator, thousandMarker);
+    var totalEventFee  = formatMoney( totalfee, 2, separator, thousandMarker);
     document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
     scriptfee   = totalfee;
-    scriptarray = price;
+
     cj('#total_amount').val( totalfee );
     cj('#pricevalue').data('raw-total', totalfee).trigger('change');
 
@@ -212,9 +195,7 @@ function display( totalfee ) {
       skipPaymentMethod();
     }
 }
-{/literal}
-{/if}
-{literal}
+
 //money formatting/localization
 function formatMoney (amount, c, d, t) {
 var n = amount,
