@@ -282,11 +282,10 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // Is status message correct?
     $this->assertTrue($this->isTextPresent('The contribution record has been saved.'), "Status message didn't show up after saving!");
-
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Membership view screen
-    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
     $expected = array(
       2 => $financialType,
@@ -429,7 +428,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // View Contribution Record and test for expected values
     $expected = array(
-      'From' => "{$email}",
+      'From' => "{$firstName} {$lastName}",
       'Financial Type' => $financialType,
       // as per changes made in CRM-15407
       'Fee Amount' => '$ 1.50',
@@ -491,6 +490,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $pageId = $this->urlArg('id');
 
     //this contribution page for online contribution
+    $this->waitForElementPresent("xpath=//tr[@class='crm-contribution-contributionpage-amount-form-block-payment_processor']/td");
     $this->click("xpath=//tr[@class='crm-contribution-contributionpage-amount-form-block-payment_processor']/td/label[text()='$processorName']");
     $this->select('price_set_id', 'label=' . $setTitle);
     $this->clickLink('_qf_Amount_next-bottom');
