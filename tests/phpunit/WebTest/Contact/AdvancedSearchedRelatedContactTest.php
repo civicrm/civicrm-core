@@ -198,7 +198,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   /**
    * @param bool $discount
    * @param bool $priceSet
-   * @param int|array  $processorIDs
+   * @param int|array $processorIDs
    */
   public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorIDs) {
     // Go to Fees tab
