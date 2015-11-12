@@ -1686,6 +1686,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_bltID
     );
 
+    $result = array();
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
       // At the moment our tests are calling this form in a way that leaves 'object' empty. For
       // now we compensate here.
