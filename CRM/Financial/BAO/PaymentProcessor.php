@@ -346,16 +346,15 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   public static function getPaymentProcessors($capabilities = array(), $ids = FALSE) {
     $mode = NULL;
     $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : array();
-    $processors = $liveProcessors = self::getAllPaymentProcessors('all');
+    $processors = self::getAllPaymentProcessors('all');
 
     if (in_array('TestMode', $capabilities)) {
-      if ($ids) {
-        foreach ($testProcessors as $testProcessor) {
-          if (!in_array($testProcessor['id'], $ids)) {
-            foreach ($liveProcessors as $liveProcessor) {
-              if ($liveProcessor['name'] == $testProcessor['name']) {
-                $ids[] = $testProcessor['id'];
-              }
+      $possibleLiveIDs = array_diff($ids, array_keys($testProcessors));
+      foreach ($possibleLiveIDs as $possibleLiveID) {
+        if (isset($processors[$possibleLiveID]) && ($liveProcessorName = $processors[$possibleLiveID]['name']) != FALSE) {
+          foreach ($testProcessors as $index => $testProcessor) {
+            if ($testProcessor['name'] == $liveProcessorName) {
+              $ids[] = $testProcessor['id'];
             }
           }
         }
@@ -364,7 +363,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
 
     foreach ($processors as $index => $processor) {
-      if ($ids && !in_array($processor['id'], $ids)) {
+      if (is_array($ids) && !in_array($processor['id'], $ids)) {
         unset ($processors[$index]);
         continue;
       }
