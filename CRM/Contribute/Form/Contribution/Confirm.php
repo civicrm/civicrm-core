@@ -108,7 +108,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
 
-    $contributionParams['contribution_status_id'] = ($pending && $contributionParams['total_amount'] != 0) ? 2 : 1;
+    $contributionParams['contribution_status_id'] = $pending ? 2 : 1;
     if (isset($contributionParams['invoice_id'])) {
       $contributionParams['id'] = CRM_Core_DAO::getFieldValue(
         'CRM_Contribute_DAO_Contribution',
