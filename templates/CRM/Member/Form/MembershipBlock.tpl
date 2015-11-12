@@ -168,14 +168,12 @@
         if ( cj('#member_price_set_id').val() ) {
             cj('#membership_type-label').hide();
             cj('#membership_type-block').hide();
-            cj('#requiredSignup').hide();
             cj('#displayFee').hide();
             cj('#separatePayment').hide();
             cj('#quickConfigConvertMessage').hide();
         } else {
             cj('#membership_type-label').show();
             cj('#membership_type-block').show();
-            cj('#requiredSignup').show();
             cj('#displayFee').show();
             cj('#separatePayment').show();
         }
