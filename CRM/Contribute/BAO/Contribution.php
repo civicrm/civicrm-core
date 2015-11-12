@@ -2220,44 +2220,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    // retrieve the other optional objects first so
-    // stuff down the line can use this info and do things
-    // CRM-6056
-    //in any case get the memberships associated with the contribution
-    //because we now support multiple memberships w/ price set
-    // see if there are any other memberships to be considered for same contribution.
-    $query = "
-          SELECT entity_id as membership_id
-          FROM   civicrm_line_item
-WHERE  contribution_id = %1 AND entity_table = 'civicrm_membership'";
-    $params = array(1 => array($this->id, 'Integer'));
-
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    while ($dao->fetch()) {
-      if ($dao->membership_id) {
-        if (!is_array($ids['membership'])) {
-          $ids['membership'] = array();
-        }
-        $ids['membership'][] = $dao->membership_id;
-      }
-    }
-
-    if (array_key_exists('membership', $ids) && is_array($ids['membership'])) {
-      foreach ($ids['membership'] as $id) {
-        if (!empty($id)) {
-          $membership = new CRM_Member_BAO_Membership();
-          $membership->id = $id;
-          if (!$membership->find(TRUE)) {
-            throw new Exception("Could not find membership record: $id");
-          }
-          $membership->join_date = CRM_Utils_Date::isoToMysql($membership->join_date);
-          $membership->start_date = CRM_Utils_Date::isoToMysql($membership->start_date);
-          $membership->end_date = CRM_Utils_Date::isoToMysql($membership->end_date);
-          $this->_relatedObjects['membership'][$membership->membership_type_id] = $membership;
-          $membership->free();
-        }
-      }
-    }
+    $this->loadRelatedMembershipObjects($ids);
 
     if ($this->_component != 'contribute') {
       // we are in event mode
@@ -4462,6 +4425,56 @@ LIMIT 1;";
     } while ($result > 0);
 
     return $creditNoteId;
+  }
+
+  /**
+   * Load related memberships.
+   *
+   * Note that in theory it should be possible to retrieve these from the line_item table
+   * with the membership_payment table being deprecated. Attempting to do this here causes tests to fail
+   * as it seems the api is not correctly linking the line items when the contribution is created in the flow
+   * where the contribution is created in the API, followed by the membership (using the api) followed by the membership
+   * payment. The membership payment BAO does have code to address this but it doesn't appear to be working.
+   *
+   * I don't know if it never worked or broke as a result of https://issues.civicrm.org/jira/browse/CRM-14918.
+   *
+   * @param array $ids
+   *
+   * @throws Exception
+   */
+  public function loadRelatedMembershipObjects(&$ids) {
+    $query = "
+      SELECT membership_id
+      FROM   civicrm_membership_payment
+      WHERE  contribution_id = %1 ";
+    $params = array(1 => array($this->id, 'Integer'));
+
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    while ($dao->fetch()) {
+      if ($dao->membership_id) {
+        if (!is_array($ids['membership'])) {
+          $ids['membership'] = array();
+        }
+        $ids['membership'][] = $dao->membership_id;
+      }
+    }
+
+    if (array_key_exists('membership', $ids) && is_array($ids['membership'])) {
+      foreach ($ids['membership'] as $id) {
+        if (!empty($id)) {
+          $membership = new CRM_Member_BAO_Membership();
+          $membership->id = $id;
+          if (!$membership->find(TRUE)) {
+            throw new Exception("Could not find membership record: $id");
+          }
+          $membership->join_date = CRM_Utils_Date::isoToMysql($membership->join_date);
+          $membership->start_date = CRM_Utils_Date::isoToMysql($membership->start_date);
+          $membership->end_date = CRM_Utils_Date::isoToMysql($membership->end_date);
+          $this->_relatedObjects['membership'][$membership->membership_type_id] = $membership;
+          $membership->free();
+        }
+      }
+    }
   }
 
 }
