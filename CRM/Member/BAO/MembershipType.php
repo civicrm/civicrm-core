@@ -486,7 +486,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Calculate start date and end date for renewal membership.
+   * Calculate start date and end date for membership updates.
+   *
+   * Note that this function is called by the api for any membership update although it was
+   * originally written for renewal (which feels a bit fragile but hey....).
    *
    * @param int $membershipId
    * @param $changeToday
@@ -503,17 +506,19 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   public static function getRenewalDatesForMembershipType($membershipId, $changeToday = NULL, $membershipTypeID = NULL, $numRenewTerms = 1) {
     $params = array('id' => $membershipId);
     $membershipDetails = CRM_Member_BAO_Membership::getValues($params, $values);
-    $statusID = $membershipDetails[$membershipId]->status_id;
-    $membershipDates = array(
-      'join_date' => CRM_Utils_Date::customFormat($membershipDetails[$membershipId]->join_date, '%Y%m%d'),
-    );
+    $membershipDetails = $membershipDetails[$membershipId];
+    $statusID = $membershipDetails->status_id;
+    $membershipDates = array();
+    if (!empty($membershipDetails->join_date)) {
+      $membershipDates['join_date'] = CRM_Utils_Date::customFormat($membershipDetails->join_date, '%Y%m%d');
+    }
 
     $oldPeriodType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
       CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id'), 'period_type');
 
     // CRM-7297 Membership Upsell
     if (is_null($membershipTypeID)) {
-      $membershipTypeDetails = self::getMembershipTypeDetails($membershipDetails[$membershipId]->membership_type_id);
+      $membershipTypeDetails = self::getMembershipTypeDetails($membershipDetails->membership_type_id);
     }
     else {
       $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeID);
@@ -521,14 +526,14 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $statusDetails = CRM_Member_BAO_MembershipStatus::getMembershipStatus($statusID);
 
     if ($statusDetails['is_current_member'] == 1) {
-      $startDate = $membershipDetails[$membershipId]->start_date;
+      $startDate = $membershipDetails->start_date;
       // CRM=7297 Membership Upsell: we need to handle null end_date in case we are switching
       // from a lifetime to a different membership type
-      if (is_null($membershipDetails[$membershipId]->end_date)) {
+      if (is_null($membershipDetails->end_date)) {
         $date = date('Y-m-d');
       }
       else {
-        $date = $membershipDetails[$membershipId]->end_date;
+        $date = $membershipDetails->end_date;
       }
       $date = explode('-', $date);
       $logStartDate = date('Y-m-d', mktime(0, 0, 0,
@@ -592,6 +597,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $membershipDates['start_date'] = $renewalDates['start_date'];
       $membershipDates['end_date'] = $renewalDates['end_date'];
       $membershipDates['log_start_date'] = $renewalDates['start_date'];
+    }
+    if (!isset($membershipDates['join_date'])) {
+      $membershipDates['join_date'] = $membershipDates['start_date'];
     }
 
     return $membershipDates;
