@@ -1579,7 +1579,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
 
       $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
-      $paymentActionResult = $payment->doPayment($form->_params, 'contribute');
+      // The contribution_other_id is effectively the ID for the only contribution or the non-membership contribution.
+      // Since we have called the membership contribution (in a 2 contribution scenario) this is out
+      // primary-contribution compared to that - but let's face it - it's all just too hard & confusing at the moment!
+      $paymentParams = array_merge($form->_params, array('contributionID' => $form->_values['contribution_other_id']));
+      $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
       $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
       // Do not send an email if Recurring transaction is done via Direct Mode
       // Email will we sent when the IPN is received.
