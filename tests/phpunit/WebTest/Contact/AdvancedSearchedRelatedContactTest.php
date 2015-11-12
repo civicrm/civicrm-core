@@ -198,14 +198,14 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   /**
    * @param bool $discount
    * @param bool $priceSet
-   * @param int $processorId
+   * @param int|array $processorIDs
    */
-  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName) {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorIDs) {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
-    $this->select2('payment_processor', $processorName, TRUE);
+    $this->select2('payment_processor', $processorIDs, TRUE);
     $this->select("financial_type_id", "value=4");
     if ($priceSet) {
       // get one - TBD

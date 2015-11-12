@@ -913,7 +913,8 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
     $processorName = 'Test Processor';
-    $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
+    $this->select2('payment_processor', $processorName, TRUE);
+
     $this->select('financial_type_id', 'label=Event Fee');
     $this->type("label[1]", 'Junior Stars');
     $this->type("value[1]", '500.00');

@@ -86,8 +86,8 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("$widgetTitle");
 
     // click Full Screen icon and test full screen container
-    $this->waitForElementPresent("css=li#widget-2 a.fullscreen-icon");
-    $this->click("css=li#widget-2 a.fullscreen-icon");
+    $this->waitForElementPresent("css=li#widget-3 a.fa-expand");
+    $this->click("css=li#widget-3 a.fa-expand");
     $this->waitForElementPresent("ui-id-1");
     $this->waitForTextPresent("$widgetTitle");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
@@ -134,7 +134,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->WebtestAddActivity();
     $widgetTitle = "Activities";
     $widgetEnabledSelector = "contact-activity-selector-dashlet_wrapper";
-    $widgetConfigureID = "2-0";
+    $widgetConfigureID = "3-0";
 
     // now add the widget
     $this->open($this->sboxPath . "civicrm");
