@@ -266,7 +266,7 @@
     // Callback for when a user starts resorting a list.  Hides all the empty placeholders.
     function hideEmptyPlaceholders(e, ui) {
         for (var c in dashboard.columns) {
-            if( typeof dashboard.columns[c] == 'object ' ) dashboard.columns[c].emptyPlaceholder.hide();
+            if( (typeof dashboard.columns[c]) == 'object' ) dashboard.columns[c].emptyPlaceholder.hide();
         }
     }
 
