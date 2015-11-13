@@ -53,18 +53,15 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @return CRM_Core_BAO_UFField
    */
   public static function create(&$params) {
-    // CRM-14756: kind of a hack-ish fix. If the user gives the id, uf_group_id is retrieved and then set.
-    if (isset($params['id']) && !isset($params['uf_group_id'])) {
-      $groupId = civicrm_api3('UFField', 'getvalue', array(
-        'return' => 'uf_group_id',
-        'id' => $params['id'],
-      ));
+    // CRM-14756: If the user gives the id, uf_group_id is retrieved and then set.
+    if (!empty($params['id']) && empty($params['uf_group_id'])) {
+      $groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['id'], 'uf_group_id', 'id');
     }
     else {
       $groupId = CRM_Utils_Array::value('uf_group_id', $params);
     }
 
-    if (isset($params['field_name'])) {
+    if (!empty($params['field_name'])) {
       $field_name = CRM_Utils_Array::value('field_name', $params);
 
       if (strpos($field_name, 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
@@ -79,8 +76,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     if (!(CRM_Utils_Array::value('group_id', $params))) {
       $params['group_id'] = $groupId;
     }
-
-    $fieldId = CRM_Utils_Array::value('id', $params);
 
     // @todo why is this even optional? Surely weight should just be 'managed' ??
     if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
