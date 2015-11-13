@@ -78,10 +78,10 @@
       var params = {};
 
       // For each column...
-      for (var c in dashboard.columns) {
+      for (var c2 in dashboard.columns) {
 
         // IDs of the sortable elements in this column.
-        if( typeof dashboard.columns[c] == 'object' ) var ids = dashboard.columns[c].element.sortable('toArray');
+        if( typeof dashboard.columns[c2] == 'object' ) var ids = dashboard.columns[c2].element.sortable('toArray');
 
         // For each id...
         for (var w in ids) {
@@ -90,7 +90,7 @@
 
           // Add one flat property to the params object that will look like an array element to the PHP server.
           // Unfortunately jQuery doesn't do this for us.
-          if ( typeof dashboard.widgets[id] == 'object' ) params['columns[' + c + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
+          if ( typeof dashboard.widgets[id] == 'object' ) params['columns[' + c2 + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
         }
       }
 
