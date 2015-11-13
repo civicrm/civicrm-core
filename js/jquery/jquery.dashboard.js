@@ -81,12 +81,12 @@
       for (var c2 in dashboard.columns) {
 
         // IDs of the sortable elements in this column.
-        if( typeof dashboard.columns[c2] == 'object' ) var ids = dashboard.columns[c2].element.sortable('toArray');
+        var ids = (typeof dashboard.columns[c2] == 'object') ? dashboard.columns[c2].element.sortable('toArray') : undefined;
 
         // For each id...
         for (var w in ids) {
           // Chop 'widget-' off of the front so that we have the real widget id.
-          if( typeof ids[w] == 'string' ) var id = ids[w].substring('widget-'.length);
+          var id = (typeof ids[w] == 'string') ? ids[w].substring('widget-'.length) : undefined;
 
           // Add one flat property to the params object that will look like an array element to the PHP server.
           // Unfortunately jQuery doesn't do this for us.
