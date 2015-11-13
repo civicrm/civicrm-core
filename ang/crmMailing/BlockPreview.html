@@ -13,7 +13,7 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
     <div ng-hide="!mailing.body_html">
       <a class="crm-hover-button action-item" crm-icon="fa-television" ng-disabled="crmMailing.$invalid" ng-click="doPreview('html')">{{ts('Preview as HTML')}}</a>
     </div>
-    <div ng-hide="!mailing.body_html && !mailing.body_text">
+    <div ng-hide="!mailing.body_html && !mailing.body_text" style="margin-top: 1em;">
       <a class="crm-hover-button action-item" crm-icon="fa-file-text-o" ng-disabled="crmMailing.$invalid" ng-click="doPreview('text')">{{ts('Preview as Plain Text')}}</a>
     </div>
     <!--
