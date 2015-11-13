@@ -317,7 +317,7 @@ WHERE  domain_id = %1
       }
       CRM_Utils_Cache::singleton()->set($cacheString, $cached);
     }
-    return ($cached) ?  array() : $cached;
+    return ($cached) ? array() : $cached;
   }
 
   /**
