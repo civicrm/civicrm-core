@@ -1106,7 +1106,7 @@ VALUES
   ( 'creditCard'      ,   0, 10, 'M Y', '',   'Month and year only for credit card expiration.'                                                                                  ),
   ( 'custom'          ,  20, 20, '',    '',   'Uses date range passed in by form field. Can pass in a posix date part parameter. Start and end offsets defined here are ignored.'),
   ( 'mailing'         ,   0,  1, '',    '',   'Date and time. Used for scheduling mailings.'                                                                                      ),
-  ( 'searchDate'        ,  20, 20, '',    '',   'Used in search forms.'                                                                                                            );
+  ( 'searchDate'      ,  20, 20, '',    '',   'Used in search forms and for relationships.'                                                                                                            );
 
 
 -- various processor options
