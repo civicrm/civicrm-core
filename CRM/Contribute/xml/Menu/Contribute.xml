@@ -119,7 +119,6 @@
     <page_callback>CRM_Financial_Page_FinancialType</page_callback>
     <desc>Formerly civicrm_contribution_type merged into this table in 4.1</desc>
     <adminGroup>CiviContribute</adminGroup>
-    <access_arguments>administer CiviCRM Financial Types</access_arguments>
     <weight>580</weight>
   </item>
   <item>
