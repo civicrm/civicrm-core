@@ -168,10 +168,6 @@
       skipPaymentMethod();
     });
 
-    CRM.$(function($) {
-      skipPaymentMethod();
-    });
-
   {/literal}
   {if $pcp && $is_honor_roll }
     pcpAnonymous();
@@ -228,12 +224,14 @@
       if (isrequireApproval) {
         cj("#id-waitlist-approval-msg").show();
         cj("#id-waitlist-msg").hide();
+        cj("#bypass_payment").val(1);
       }
       else {
         cj("#id-waitlist-approval-msg").hide();
+        cj("#bypass_payment").val(0);
       }
       //reset value since user don't want or not eligible for waitlist
-      cj("#bypass_payment").val(0);
+      skipPaymentMethod();
     }
   }
 
