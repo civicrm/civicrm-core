@@ -2856,7 +2856,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $values
    * @param CRM_Core_Smarty $template
    */
-  public function profileDisplay($gid, $values, $template) {
+  static public function profileDisplay($gid, $values, $template) {
     $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'title');
     $template->assign('grouptitle', $groupTitle);
     if (count($values)) {
