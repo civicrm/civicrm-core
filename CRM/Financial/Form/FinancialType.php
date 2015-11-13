@@ -37,6 +37,19 @@
 class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    // Check permission for Financial Type when ACL-FT is enabled
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
+    ) {
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    }
+    parent::preProcess();
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
