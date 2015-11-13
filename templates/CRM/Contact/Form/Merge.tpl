@@ -71,7 +71,7 @@
   <tr style="background-color: #FFFFCC !important; border-bottom:1px solid #ccc !important;">
     <td>Last modified</td>
     <td>{$other_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} (Most recent) {/if}</td>
-    <td>{if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} &gt;&gt;&gt;&gt;&gt;&gt; {else} &lt;&lt;&lt;&lt;&lt;&lt; {/if} </td>
+    <td></td>
     <td>{$main_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $main_result.values.0.modified_date gt $other_result.values.0.modified_date} (Most recent) {/if}</td>
     <td></td>
   </tr>
