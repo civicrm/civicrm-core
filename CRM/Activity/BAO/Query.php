@@ -351,9 +351,9 @@ class CRM_Activity_BAO_Query {
         //from civicrm_activity_target or civicrm_activity_assignment.
         //as component specific activities does not have entry in
         //activity target table so lets consider civicrm_activity_assignment.
-        $from .= " INNER JOIN civicrm_activity_contact
+        $from .= " $side JOIN civicrm_activity_contact
                       ON ( civicrm_activity_contact.contact_id = contact_a.id ) ";
-        $from .= " INNER JOIN civicrm_activity
+        $from .= " $side JOIN civicrm_activity
                       ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
                       AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )";
 
