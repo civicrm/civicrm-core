@@ -55,37 +55,34 @@
           {* Include Edit button if contact has 'edit contacts' permission OR user is viewing their own contact AND has 'edit my contact' permission. CRM_Contact_Page_View::checkUserPermission handles this and assigns $permission true as needed. *}
           {if $permission EQ 'edit'}
             <li>
-              {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
-              <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
-              <span><i class="crm-i fa-pencil"></i> {ts}Edit{/ts}</span>
-              </a>
+              {crmButton p='civicrm/contact/add' q="$urlParams&action=update&cid=$contactId" class="edit"}
+                {ts}Edit{/ts}
+              {/crmButton}
             </li>
           {/if}
         {/if}
 
         {* Check for permissions to provide Restore and Delete Permanently buttons for contacts that are in the trash. *}
-        {if (call_user_func(array('CRM_Core_Permission','check'), 'access deleted contacts') and
-          $is_deleted)}
+        {if call_user_func(array('CRM_Core_Permission','check'), 'access deleted contacts') and $is_deleted}
           <li class="crm-contact-restore">
-            <a href="{crmURL p='civicrm/contact/view/delete' q="reset=1&cid=$contactId&restore=1"}" class="delete button" title="{ts}Restore{/ts}">
-              <span><i class="crm-i fa-undo"></i> {ts}Restore from Trash{/ts}</span>
-            </a>
+            {crmButton p='civicrm/contact/view/delete' q="reset=1&cid=$contactId&restore=1" class="delete" icon="undo"}
+              {ts}Restore from Trash{/ts}
+            {/crmButton}
           </li>
 
           {if call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
             <li class="crm-contact-permanently-delete">
-              <a href="{crmURL p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId&skip_undelete=1"}" class="delete button" title="{ts}Delete Permanently{/ts}">
-                <span><i class="crm-i fa-trash"></i> {ts}Delete Permanently{/ts}</span>
-              </a>
+              {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId&skip_undelete=1" class="delete" icon="trash"}
+                {ts}Delete Permanently{/ts}
+              {/crmButton}
             </li>
           {/if}
 
         {elseif call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
-          {assign var='deleteParams' value="&reset=1&delete=1&cid=$contactId"}
           <li class="crm-delete-action crm-contact-delete">
-            <a href="{crmURL p='civicrm/contact/view/delete' q=$deleteParams}" class="delete button" title="{ts}Delete{/ts}">
-              <span><i class="crm-i fa-trash"></i> {ts}Delete Contact{/ts}</span>
-            </a>
+            {crmButton p='civicrm/contact/view/delete' q="&reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
+              {ts}Delete Contact{/ts}
+            {/crmButton}
           </li>
         {/if}
 
@@ -96,28 +93,26 @@
           </li>
         {else}
           {if $nextContactID}
-            {assign var='viewParams' value=$urlParams|cat:"&cid=$nextContactID"}
             <li class="crm-next-action">
-              <a href="{crmURL p='civicrm/contact/view' q=$viewParams}" class="view button" title="{$nextContactName}">
-                <span title="{$nextContactName}"><i class="crm-i fa-chevron-right"></i> {ts}Next{/ts}</span>
-              </a>
+              {crmButton p='civicrm/contact/view' q="$urlParams&cid=$nextContactID" class="view" title=$nextContactName icon="chevron-right"}
+                {ts}Next{/ts}
+              {/crmButton}
             </li>
           {/if}
           {if $prevContactID}
-            {assign var='viewParams' value=$urlParams|cat:"&cid=$prevContactID"}
             <li class="crm-previous-action">
-              <a href="{crmURL p='civicrm/contact/view' q=$viewParams}" class="view button" title="{$prevContactName}">
-                <span title="{$prevContactName}"><i class="crm-i fa-chevron-left"></i> {ts}Previous{/ts}</span>
-              </a>
+              {crmButton p='civicrm/contact/view' q="$urlParams&cid=$prevContactID" class="view" title=$prevContactName icon="chevron-left"}
+                {ts}Previous{/ts}
+              {/crmButton}
             </li>
           {/if}
         {/if}
 
         {if !empty($groupOrganizationUrl)}
           <li class="crm-contact-associated-groups">
-            <a href="{$groupOrganizationUrl}" class="associated-groups button" title="{ts}Associated Multi-Org Group{/ts}">
-              <span><i class="crm-i fa-cubes"></i> {ts}Associated Multi-Org Group{/ts}</span>
-            </a>
+            {crmButton href=$groupOrganizationUrl class="associated-groups" icon="cubes"}
+              {ts}Associated Multi-Org Group{/ts}
+            {/crmButton}
           </li>
         {/if}
       </ul>
