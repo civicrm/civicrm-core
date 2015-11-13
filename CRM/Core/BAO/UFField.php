@@ -61,16 +61,13 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
       $groupId = CRM_Utils_Array::value('uf_group_id', $params);
     }
 
-    if (!empty($params['field_name'])) {
-      $field_name = CRM_Utils_Array::value('field_name', $params);
+    $field_name = CRM_Utils_Array::value('field_name', $params);
+    if (!CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
+      throw new CRM_Core_Exception('The field_name is not valid');
+    }
 
-      if (strpos($field_name, 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
-        throw new CRM_Core_Exception('The field_name is not valid');
-      }
-
-      if (CRM_Core_BAO_UFField::duplicateField($params)) {
-        throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
-      }
+    if (strpos($field_name, 'formatting') !== 0 && CRM_Core_BAO_UFField::duplicateField($params)) {
+      throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
     }
 
     if (!(CRM_Utils_Array::value('group_id', $params))) {
@@ -104,20 +101,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_UFField', $params, $defaults);
-  }
-
-  /**
-   * Get the form title.
-   *
-   * @param int $id
-   *   Id of uf_form.
-   *
-   * @return string
-   *   title
-   *
-   */
-  public static function getTitle($id) {
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $groupId, 'title');
   }
 
   /**
@@ -307,9 +290,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
 
     if (!empty($params['id'])) {
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['id'], 'weight', 'id');
-      if (!isset($params['weight'])) {
-        return $oldWeight;
-      }
     }
     $fieldValues = array('uf_group_id' => $params['group_id']);
     return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
