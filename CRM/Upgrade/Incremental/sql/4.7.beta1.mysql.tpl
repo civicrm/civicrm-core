@@ -14,5 +14,5 @@ LEFT JOIN civicrm_payment_processor p ON p.payment_processor_type_id = pp.id
 SET pp.is_recur = 1, p.is_recur = 1
 WHERE pp.name='PayPal_Express';
 
-UPDATE civicrm_preferences_date SET description = 'Used in search forms and for relationships.'
+UPDATE civicrm_preferences_date SET description = '{ts escape="sql"}Used in search forms and for relationships.{/ts}'
 WHERE name = 'searchDate';
