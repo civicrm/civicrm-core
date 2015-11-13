@@ -24,7 +24,7 @@
 *}
 <div class="block-civicrm crm-container">
 <div id="crm-create-new-wrapper">
-  <a id="crm-create-new-link" class="button" href="#"><span><i class="crm-i fa-bars"></i> {ts}Create New{/ts}</span></a>
+  {crmButton id="crm-create-new-link" href="#" icon="bars"}{ts}Create New{/ts}{/crmButton}
     <div id="crm-create-new-list">
       <div class="crm-create-new-list-inner">
       <ul>
