@@ -81,6 +81,9 @@ class CRM_Utils_Check {
         $statusMessages = array();
         $statusType = 'alert';
         foreach ($messages as $message) {
+          if (!$message->isVisible()) {
+            continue;
+          }
           if ($filter === TRUE || $message->getSeverity() >= 3) {
             $statusType = $message->getSeverity() >= 4 ? 'error' : $statusType;
             $statusMessage = $message->getMessage();
@@ -209,7 +212,7 @@ class CRM_Utils_Check {
 
     foreach ($messages as $key => $message) {
       $hush = self::checkHushSnooze($message);
-      $message->setVisible(!$hush);
+      $messages[$key]->setVisible(!$hush);
     }
     uasort($messages, array(__CLASS__, 'severitySort'));
 
@@ -232,7 +235,8 @@ class CRM_Utils_Check {
   /**
    * Evaluate if a system check should be hushed/snoozed.
    *
-   * @param string $message
+   * @param CRM_Utils_Check_Message $message
+   *   The message to evaluate.
    *
    * @return bool
    *   TRUE means hush/snooze, FALSE means display.
