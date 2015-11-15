@@ -905,4 +905,20 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->_paymentProcessor = $this->callAPISuccess('payment_processor', 'getsingle', array('id' => $this->params['payment_processor_id']));
   }
 
+  /**
+   * Add a profile to a contribution page.
+   *
+   * @param string $name
+   * @param int $contributionPageID
+   */
+  protected function addProfile($name, $contributionPageID) {
+    $this->callAPISuccess('UFJoin', 'create', array(
+      'uf_group_id' => $name,
+      'module' => 'civicrm_contribution_page',
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contributionPageID,
+      'weight' => 1,
+    ));
+  }
+
 }

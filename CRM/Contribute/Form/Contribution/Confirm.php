@@ -1514,6 +1514,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $numTerms, $membershipID, $pending,
           $contributionRecurID, $membershipSource, $isPayLater, $campaignId
         );
+        $createdMemberships[] = $membership;
         $form->set('renewal_mode', $renewalMode);
         if (!empty($dates)) {
           $form->assign('mem_start_date',
@@ -1844,6 +1845,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params['invoiceID'] = md5(uniqid(rand(), TRUE));
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
     $form->_amount = $params['amount'];
+    $form->_bltID = CRM_Core_BAO_LocationType::getBilling();
+
     // hack these in for test support.
     $form->_fields['billing_first_name'] = 1;
     $form->_fields['billing_last_name'] = 1;
