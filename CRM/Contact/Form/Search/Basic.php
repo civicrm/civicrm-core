@@ -47,10 +47,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Build the form object.
    */
   public function buildQuickForm() {
-    // text for sort_name or email criteria
-    $config = CRM_Core_Config::singleton();
-    $label = empty($config->includeEmailInName) ? ts('Name') : ts('Name or Email');
-    $this->add('text', 'sort_name', $label);
+    $this->addSortNameField();
 
     $searchOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'advanced_search_options'
