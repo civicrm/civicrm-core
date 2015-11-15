@@ -166,14 +166,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    // text for sort_name
-    $this->addElement('text',
-      'sort_name',
-      ts('Contributor Name or Email'),
-      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact',
-        'sort_name'
-      )
-    );
+    $this->addSortNameField();
 
     $this->_group = CRM_Core_PseudoConstant::nestedGroup();
 
@@ -212,6 +205,28 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $this->addTaskMenu($tasks);
     }
 
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is on.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithEmail() {
+    return ts('Contributor Name or Email');
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is off.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithOutEmail() {
+    return ts('Contributor Name');
   }
 
   /**

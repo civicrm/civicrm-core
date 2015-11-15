@@ -588,7 +588,7 @@
               $timeout(function () {
                 // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
                 // new item is added before selection is made
-                element.select2('val', ngModel.$viewValue);
+                element.select2('val', ngModel.$modelValue);
               });
             };
           }
@@ -631,7 +631,7 @@
             $timeout(function () {
               // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
               // new item is added before selection is made
-              element.select2('val', ngModel.$viewValue);
+              element.select2('val', ngModel.$modelValue);
             });
           };
           function refreshModel() {
