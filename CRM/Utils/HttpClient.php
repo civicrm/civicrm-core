@@ -97,14 +97,7 @@ class CRM_Utils_HttpClient {
       return self::STATUS_WRITE_ERROR;
     }
     curl_setopt($ch, CURLOPT_FILE, $fp);
-
-    if ($this->isRedirectSupported()){
-      curl_exec($ch);
-    }
-    else{
-      $this->curl_exec_follow($ch);
-    }
-
+    $this->curl_exec_follow($ch);
     if (curl_errno($ch)) {
       // Fixme: throw error instead of setting message
       CRM_Core_Session::setStatus(ts('Unable to download extension from %1. Error Message: %2',
@@ -147,12 +140,7 @@ class CRM_Utils_HttpClient {
     }
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    if ($this->isRedirectSupported()){
-      $data = curl_exec($ch);
-    }
-    else{
-      $data = $this->curl_exec_follow($ch);
-    }
+    $data = $this->curl_exec_follow($ch);
     if (curl_errno($ch)) {
       return array(self::STATUS_DL_ERROR, $data);
     }
@@ -191,12 +179,7 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_POST, TRUE);
     curl_setopt($ch, CURLOPT_POST, count($params));
     curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-    if ($this->isRedirectSupported()){
-      $data = curl_exec($ch);
-    }
-    else{
-      $data = $this->curl_exec_follow($ch);
-    }
+    $data = $this->curl_exec_follow($ch);
     if (curl_errno($ch)) {
       return array(self::STATUS_DL_ERROR, $data);
     }
