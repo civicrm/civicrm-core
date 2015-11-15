@@ -678,7 +678,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     if (!isset($this->_componentMode)) {
       $this->_componentMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
-    $modeValues = self::getModeValue($this->_componentMode);
+    self::setModeValues();
 
     self::$_selectorName = $this->_modeValue['selectorName'];
 
