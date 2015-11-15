@@ -36,8 +36,11 @@
  *      Draggable
  *      UI Core
  *
+ * NOTE: This file is viewed as "legacy" and shouldn't be used to
+ * develop new functionality. Its lint problems are grandfathered
+ * (although if someone wants to cleanup+test, please feel welcome).
  */
-
+/* jshint ignore:start */
 (function($) { // Create closure.
   // Constructor for dashboard object.
   $.fn.dashboard = function(options) {
