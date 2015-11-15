@@ -3304,18 +3304,7 @@ WHERE  $smartGroupClause
     $value = $strtolower(CRM_Core_DAO::escapeString(trim($value)));
     if (strlen($value)) {
       $fieldsub = array();
-      if ($wildcard && $op == 'LIKE') {
-        if ($config->includeWildCardInName) {
-          $value = "'%$value%'";
-        }
-        else {
-          $value = "'$value%'";
-        }
-        $op = 'LIKE';
-      }
-      else {
-        $value = "'$value'";
-      }
+      $value = "'" . $this->getWildCardedValue($wildcard, $op, $value) . "'";
       if ($fieldName == 'sort_name') {
         $wc = self::caseImportant($op) ? "LOWER(contact_a.sort_name)" : "contact_a.sort_name";
       }
@@ -3364,29 +3353,20 @@ WHERE  $smartGroupClause
    *
    * @param array $values
    */
-  public function email(&$values) {
+  protected function email(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $n = trim($value);
+    $n = strtolower(trim($value));
     if ($n) {
-      $config = CRM_Core_Config::singleton();
-
       if (substr($n, 0, 1) == '"' &&
         substr($n, -1, 1) == '"'
       ) {
         $n = substr($n, 1, -1);
-        $value = strtolower(CRM_Core_DAO::escapeString($n));
-        $value = "'$value'";
+        $value = CRM_Core_DAO::escapeString($n);
         $op = '=';
       }
       else {
-        $value = strtolower($n);
-        if ($wildcard) {
-          if (strpos($value, '%') === FALSE) {
-            $value = "%{$value}%";
-          }
-          $op = 'LIKE';
-        }
+        $value = $this->getWildCardedValue($wildcard, $op, $n);
       }
       $this->_qill[$grouping][] = ts('Email') . " $op '$n'";
       $this->_where[$grouping][] = self::buildClause('civicrm_email.email', $op, $value, 'String');
@@ -5894,6 +5874,36 @@ AND   displayRelType.is_active = 1
     }
 
     return array(CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue);
+  }
+
+  /**
+   * Alter value to reflect wildcard settings.
+   *
+   * The form will have tried to guess whether this is a good field to wildcard but there is
+   * also a site-wide setting that specifies whether it is OK to append the wild card to the beginning
+   * or only the end of the string
+   *
+   * @param bool $wildcard
+   *   This is a bool made on an assessment 'elsewhere' on whether this is a good field to wildcard.
+   * @param string $op
+   *   Generally '=' or 'LIKE'.
+   * @param string $value
+   *   The search string.
+   *
+   * @return string
+   */
+  public function getWildCardedValue($wildcard, $op, $value) {
+    if ($wildcard && $op == 'LIKE') {
+      if (CRM_Core_Config::singleton()->includeWildCardInName && (substr($value, 0, 1) != '%')) {
+        return "%$value%";
+      }
+      else {
+        return "$value%";
+      }
+    }
+    else {
+      return "$value";
+    }
   }
 
 }
