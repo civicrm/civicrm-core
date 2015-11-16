@@ -244,7 +244,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
     //Assertions
     $actualAmount = $this->_getPremiumActualCost($contId, $from, $to, NULL, "'civicrm_contribution'");
-    $this->assertEquals($actualAmount, null, "Verify actual cost for deleted premium");
+    $this->assertEquals($actualAmount, NULL, "Verify actual cost for deleted premium");
   }
 
   public function testChangePaymentInstrument() {
