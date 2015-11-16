@@ -171,21 +171,18 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Run some sanity checks.
+   * Run all system checks.
    *
-   * This could become a hook so that CiviCRM can run both built-in
-   * configuration & sanity checks, and modules/extensions can add
-   * their own checks.
+   * This functon is wrapped by the System.check api.
    *
-   * We might even expose the results of these checks on the Wordpress
-   * plugin status page or the Drupal admin/reports/status path.
+   * Calls hook_civicrm_check() for extensions to add or modify messages.
+   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_check
    *
    * @param bool $max
    *   Whether to return just the maximum non-hushed severity
    *
    * @return array
-   *   Array of messages
-   * @link https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
+   *   Array of CRM_Utils_Check_Message objects
    */
   public static function checkAll($max = FALSE) {
     $checks = array();
