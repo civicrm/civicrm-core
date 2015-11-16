@@ -65,6 +65,12 @@ class CRM_Utils_Check_Message {
   private $icon;
 
   /**
+   * @var bool|string
+   *   Date this message is hidden until
+   */
+  private $hiddenUntil;
+
+  /**
    * Class constructor.
    *
    * @param string $name
@@ -156,6 +162,9 @@ class CRM_Utils_Check_Message {
       'is_visible' => (int) $this->isVisible(),
       'icon' => $this->icon,
     );
+    if ($this->getHiddenUntil()) {
+      $array['hidden_until'] = $this->getHiddenUntil();
+    }
     if (!empty($this->help)) {
       $array['help'] = $this->help;
     }
@@ -163,12 +172,69 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Check if message is visible or has been hidden by the user.
+   * Return message visibility.
    *
    * @return bool
    */
   public function isVisible() {
-    return !CRM_Utils_Check::checkHushSnooze($this);
+    return !$this->checkStatusPreference();
+  }
+
+  /**
+   * @return string
+   */
+  public function getHiddenUntil() {
+    if (!isset($this->hiddenUntil)) {
+      $this->checkStatusPreference();
+    }
+    return $this->hiddenUntil;
+  }
+
+  /**
+   * Check if message is visible or has been hidden by the user.
+   *
+   * @return bool
+   *   TRUE means hidden, FALSE means visible.
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function checkStatusPreference() {
+    $this->hiddenUntil = FALSE;
+    $statusPreferenceParams = array(
+      'name' => $this->getName(),
+      'domain_id' => CRM_Core_Config::domainID(),
+    );
+    // Check if there's a StatusPreference matching this name/domain.
+    $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
+    $spid = FALSE;
+    if (isset($statusPreference['id'])) {
+      $spid = $statusPreference['id'];
+    }
+    if ($spid) {
+      // If so, compare severity to StatusPreference->severity.
+      $severity = $this->getSeverity();
+      if ($severity <= $statusPreference['values'][$spid]['ignore_severity']) {
+        // A hush or a snooze has been set.  Find out which.
+        if (isset($statusPreference['values'][$spid]['hush_until'])) {
+          // Snooze is set.
+          $this->hiddenUntil = $statusPreference['values'][$spid]['hush_until'];
+          $today = new DateTime();
+          $snoozeDate = new DateTime($statusPreference['values'][$spid]['hush_until']);
+          if ($today > $snoozeDate) {
+            // Snooze is expired.
+            return FALSE;
+          }
+          else {
+            // Snooze is active.
+            return TRUE;
+          }
+        }
+        else {
+          // Hush.
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
 }
