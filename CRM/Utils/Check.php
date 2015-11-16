@@ -207,10 +207,6 @@ class CRM_Utils_Check {
 
     CRM_Utils_Hook::check($messages);
 
-    foreach ($messages as $key => $message) {
-      $hush = self::checkHushSnooze($message);
-      $messages[$key]->setVisible(!$hush);
-    }
     uasort($messages, array(__CLASS__, 'severitySort'));
 
     $maxSeverity = 1;

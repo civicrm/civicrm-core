@@ -65,13 +65,6 @@ class CRM_Utils_Check_Message {
   private $icon;
 
   /**
-   *
-   * @var bool
-   *      This is used for Admin Status Page to determine hushed statuses.
-   */
-  private $isVisible;
-
-  /**
    * Class constructor.
    *
    * @param string $name
@@ -160,7 +153,7 @@ class CRM_Utils_Check_Message {
       'message' => $this->message,
       'title' => $this->title,
       'severity' => $this->level,
-      'is_visible' => $this->isVisible,
+      'is_visible' => (int) $this->isVisible(),
       'icon' => $this->icon,
     );
     if (!empty($this->help)) {
@@ -170,21 +163,12 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Getter for is visible.
+   * Check if message is visible or has been hidden by the user.
    *
    * @return bool
    */
   public function isVisible() {
-    return $this->isVisible;
-  }
-
-  /**
-   * Seter for is visible.
-   *
-   * @param bool $isVisible
-   */
-  public function setVisible($isVisible) {
-    $this->isVisible = $isVisible ? 1 : 0;
+    return !CRM_Utils_Check::checkHushSnooze($this);
   }
 
 }
