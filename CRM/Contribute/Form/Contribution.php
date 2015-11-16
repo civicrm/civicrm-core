@@ -1193,7 +1193,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contributionParams,
       $financialType,
       FALSE,
-      $this->_bltID
+      $this->_bltID,
+      CRM_Utils_Array::value('is_recur', $this->_params)
     );
 
     $paymentParams['contributionID'] = $contribution->id;
