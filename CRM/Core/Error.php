@@ -590,7 +590,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     $file_log->close();
 
-    if ($config->userFrameworkLogging) {
+    if (!empty($config->userFrameworkLogging)) {
       // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
       if ($config->userSystem->is_drupal and function_exists('watchdog')) {
         watchdog('civicrm', '%message', array('%message' => $message), WATCHDOG_DEBUG);
