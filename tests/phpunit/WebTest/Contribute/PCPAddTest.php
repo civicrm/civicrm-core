@@ -176,7 +176,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
     $this->waitForElementPresent('contribution_pcp_made_through_id');
-    $this->select2('pcp_made_through_id', $lastName . ', ' . $firstName);
+    $this->multiselect2('contribution_pcp_made_through_id', array($pcpTitle));
 
     $this->clickLink("_qf_Search_refresh", "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[1][text()='View']");
     $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[1][text()='View']");
