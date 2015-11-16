@@ -116,8 +116,10 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $form->_bltID,
         $isRecur
       );
-
-      $paymentParams['contributionTypeID'] = $contributionTypeId;
+      $paymentParams['contributionID'] = $contribution->id;
+      //CRM-15297 deprecate contributionTypeID
+      $paymentParams['financialTypeID'] = $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
+      $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
       $paymentParams['item_name'] = $form->_params['description'];
 
       if ($contribution && $form->_values['is_recur'] && $contribution->contribution_recur_id
