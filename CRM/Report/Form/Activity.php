@@ -591,6 +591,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
               if ($fieldName == 'activity_type_id' &&
                 empty($this->_params['activity_type_id_value'])
               ) {
+                if (empty($this->_params['include_case_activities_value'])) {
+                  $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE);
+                }
                 $actTypes = array_flip($this->activityTypes);
                 $clause = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (" .
                   implode(',', $actTypes) . ") )";
@@ -723,12 +726,15 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
-    $componentId = CRM_Core_Component::getComponentID('CiviCase');
-    $caseActivityTypes = CRM_Core_OptionGroup::values('activity_type', TRUE, FALSE, FALSE, " AND v.component_id={$componentId}");
-    if (!empty($fields['activity_type_id_value']) && is_array($fields['activity_type_id_value']) && empty($fields['include_case_activities_value'])) {
-      foreach ($fields['activity_type_id_value'] as $activityTypeId) {
-        if (in_array($activityTypeId, $caseActivityTypes)) {
-          $errors['fields'] = ts("Please enable 'Include Case Activities' to filter with Case Activity types.");
+    $config = CRM_Core_Config::singleton();
+    if (in_array("CiviCase", $config->enableComponents)) {
+      $componentId = CRM_Core_Component::getComponentID('CiviCase');
+      $caseActivityTypes = CRM_Core_OptionGroup::values('activity_type', TRUE, FALSE, FALSE, " AND v.component_id={$componentId}");
+      if (!empty($fields['activity_type_id_value']) && is_array($fields['activity_type_id_value']) && empty($fields['include_case_activities_value'])) {
+        foreach ($fields['activity_type_id_value'] as $activityTypeId) {
+          if (in_array($activityTypeId, $caseActivityTypes)) {
+            $errors['fields'] = ts("Please enable 'Include Case Activities' to filter with Case Activity types.");
+          }
         }
       }
     }
