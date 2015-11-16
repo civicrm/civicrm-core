@@ -105,7 +105,7 @@
         {assign var=position  value=$field|strrpos:'_'}
         {assign var=blockId   value=$field|substr:$position+1}
         {assign var=blockName value=$field|substr:14:$position-14}
-        
+
         {* For location blocks *}
         {if $row.title|substr:0:5 == "Email"   OR
             $row.title|substr:0:7 == "Address" OR
@@ -139,12 +139,38 @@
 
             {literal}
               <script type="text/javascript">
-                function mergeBlock(blockname, element, blockId) {
+                function mergeBlock(blockname, element, blockId, type) {
                   var allBlock = {/literal}{$mainLocBlock}{literal};
-                  var block    = eval( "allBlock." + 'main_'+ blockname + element.value);
+
+                  // Get type of select list that's been changed (location or type)
+                  var locTypeId = '';
+                  var typeTypeId = '';
+
+                  // If the location was changed, lookup the type if it exists
+                  if (type == 'locTypeId') {
+                    locTypeId = element.value;
+                    typeTypeId = CRM.$( 'select#type_' + blockname + '_' + blockId + '_typeTypeId' ).val();
+                  }
+
+                  // Otherwise the type was changed, lookup the location if it exists
+                  else {
+                    locTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_locTypeId' ).val();
+                    typeTypeId = element.value;
+                  }
+
+                  // Get the matching block, based on location and type, from the main contact record
+                  if (!typeTypeId) {
+                    var block = eval( "allBlock.main_" + blockname + "_" + locTypeId);
+                  }
+                  else {
+                    // @todo Fix this 'special handling' for websites (no location id)
+                    if (!locTypeId) { locTypeId = 0; }
+                    var block = eval( "allBlock.main_" + blockname + "_" + locTypeId + "_" + typeTypeId);
+                  }
+
                   var label    = '';
                   if (blockname == 'email' || blockname == 'phone') {
-                    label = '(overwrite)'+ '<span id="main_blockname_blockId_overwrite">{/literal}{$form.location.$blockName.$blockId.operation.html}{literal}<br /></span>';
+                    label = '(overwrite)' + '<span id="main_blockname_blockId_overwrite">{/literal}{$form.location.$blockName.$blockId.operation.html}{literal}<br /></span>';
                   }
                   else {
                     label = '(overwrite)<br />';
@@ -154,14 +180,14 @@
                     block = '';
                     label   = '(add)';
                   }
-                  cj( "#main_"+ blockname +"_" + blockId ).html( block );
-                  cj( "#main_"+ blockname +"_" + blockId +"_overwrite" ).html( label );
+                  CRM.$( "#main_" + blockname + "_" + blockId ).html( block );
+                  CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
                 }
               </script>
             {/literal}
 
           </td>
-          
+
         {* For non-location blocks *}
         {else}
 
@@ -229,7 +255,7 @@ You will need to manually delete that user (click on the link to open Drupal Use
 <script type="text/javascript">
 
   CRM.$(function($) {
-  
+
     $('table td input.form-checkbox').each(function() {
      var ele = null;
      var element = $(this).attr('id').split('_',3);
@@ -252,12 +278,12 @@ You will need to manually delete that user (click on the link to open Drupal Use
         });
      }
     });
-    
+
     // Show/hide matching data rows
     $('.toggle_equal_rows').click(function() {
       $('tr.equal-data').toggle();
     });
-    
+
   });
 
 </script>
