@@ -383,8 +383,8 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       CRM_Core_DAO::$_nullObject
     );
     if ($caseType) {
-      $this->_formValues['case_type_id'][$caseType] = 1;
-      $this->_defaults['case_type_id'][$caseType] = 1;
+      $this->_formValues['case_type_id'] = $caseType;
+      $this->_defaults['case_type_id'] = $caseType;
     }
 
     $caseFromDate = CRM_Utils_Request::retrieve('pstart', 'Date',
