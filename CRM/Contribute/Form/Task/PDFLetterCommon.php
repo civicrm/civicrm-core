@@ -343,10 +343,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $defaults['from'] = array_pop($emails);
       }
       if (!empty($params['subject'])) {
-        $defaults['subject'] => $params['subject'];
+        $defaults['subject'] = $params['subject'];
       }
       else {
-        $defaults['subject'] => ts('Thank you for your contribution/s');
+        $defaults['subject'] = ts('Thank you for your contribution/s');
       }
       if ($is_pdf) {
         $defaults['html'] = ts('Please see attached');
