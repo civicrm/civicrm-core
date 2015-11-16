@@ -212,7 +212,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->openCiviPage("admin/contribute/managePremiums", "action=add&reset=1");
     // add premium
     $this->addPremium($premiumName, $sku, $amount, $price, $cost, $financialType['name']);
-
     // add contribution with premium
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone");
 
@@ -245,7 +244,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
     //Assertions
     $actualAmount = $this->_getPremiumActualCost($contId, $from, $to, NULL, "'civicrm_contribution'");
-    $this->assertEquals($actualAmount, $cost, "Verify actual cost for deleted premium");
+    $this->assertEquals($actualAmount, null, "Verify actual cost for deleted premium");
   }
 
   public function testChangePaymentInstrument() {
