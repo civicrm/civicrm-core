@@ -195,7 +195,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    */
   public static function processPremium($params, $contributionID, $premiumID = NULL, $options = array()) {
     $selectedProductID = $params['product_name'][0];
-    $selectedProductOptionID = $params['product_name'][1];
+    $selectedProductOptionID = CRM_Utils_Array::value(1, $params['product_name']);
 
     $dao = new CRM_Contribute_DAO_ContributionProduct();
     $dao->contribution_id = $contributionID;
@@ -338,7 +338,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       $params['paidBy'] = $paymentInstrument[$params['payment_instrument_id']];
       if ($params['paidBy'] != 'Check' && isset($params['check_number'])) {
-         unset($params['check_number']);
+        unset($params['check_number']);
       }
     }
 
