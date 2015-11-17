@@ -1,12 +1,10 @@
 (function(angular, $, _) {
 
   angular.module('statuspage').controller('statuspageStatusPage',
-    function($scope, crmApi, crmStatus, statusData, statuspageSeverityList) {
+    function($scope, crmApi, crmStatus, statusData) {
 
       function preprocessStatuses(apiData) {
         _.each(apiData.values, function(status) {
-          status.severity_id = status.severity;
-          status.severity = statuspageSeverityList[status.severity];
           if (status.hidden_until) {
             var date = $.datepicker.parseDate('yy-mm-dd', status.hidden_until);
             status.hidden_until = $.datepicker.formatDate(CRM.config.dateInputFormat, date);
