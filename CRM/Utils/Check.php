@@ -146,19 +146,27 @@ class CRM_Utils_Check {
   /**
    * Get the integer value (useful for thresholds) of the severity.
    *
-   * @param int|const $severity
+   * @param int|string $severity
    *   the value to look up
    * @param bool $reverse
    *   whether to find the constant from the integer
-   * @return bool
+   * @return string|int
+   * @throws \CRM_Core_Exception
    */
   public static function severityMap($severity, $reverse = FALSE) {
-    // Lowercase string-based severities
-    if (!$reverse) {
-      $severity = strtolower($severity);
+    if ($reverse) {
+      if (isset(self::$severityList[$severity])) {
+        return self::$severityList[$severity];
+      }
     }
-
-    return ($reverse) ? self::$severityList[$severity] : array_search($severity, self::$severityList);
+    else {
+      // Lowercase string-based severities
+      $severity = strtolower($severity);
+      if (in_array($severity, self::$severityList)) {
+        return array_search($severity, self::$severityList);
+      }
+    }
+    throw new CRM_Core_Exception('Invalid PSR Severity Level');
   }
 
   /**
