@@ -37,14 +37,6 @@
     return url;
   };
 
-  // @deprecated
-  $.extend ({'crmURL':
-    function (p, params) {
-      CRM.console('warn', 'Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
-      return CRM.url(p, params);
-    }
-  });
-
   $.fn.crmURL = function () {
     return this.each(function() {
       if (this.href) {
@@ -150,15 +142,6 @@
         }
       });
     })($.extend({}, settings, options));
-  };
-
-  /**
-   * Backwards compatible with jQuery fn
-   * @deprecated
-   */
-  $.fn.crmAPI = function(entity, action, params, options) {
-    CRM.console('warn', 'Calling crmAPI from jQuery is deprecated. Please use CRM.api3() instead.');
-    return CRM.api.call(this, entity, action, params, options);
   };
 
   $.widget('civi.crmSnippet', {
