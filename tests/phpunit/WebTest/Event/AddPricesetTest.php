@@ -636,7 +636,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td/table/tbody/tr[2]/td", preg_quote('$ 2,705.00'));
     $expectedLineItems = array(
       2 => array(
-        1 => 'Full Conference',
+        1 => 'Full Conference ',
         2 => '5',
         3 => '$ 525.00',
         4 => '$ 2,625.00',
@@ -647,13 +647,13 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         4 => '$ 50.00',
       ),
       4 => array(
-        1 => 'Evening Sessions - First Night',
+        1 => 'Evening Sessions - First Night ',
         2 => '1',
         3 => '$ 15.00',
         4 => '$ 15.00',
       ),
       5 => array(
-        1 => 'Evening Sessions - Second Night',
+        1 => 'Evening Sessions - Second Night ',
         2 => '1',
         3 => '$ 15.00',
         4 => '$ 15.00',

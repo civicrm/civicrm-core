@@ -282,7 +282,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->select("field_name_2", "value=2");
 
     // click on Save buttonProfile Field Saved
-    $this->clickLink('_qf_Field_next-bottom', "xpath=//a/span[text()=' Add Field']", FALSE);
+    $this->clickLink("xpath=//button/span[text()='Save']", "xpath=//a/span/i[@class='crm-i fa-plus-circle']", FALSE);
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', "Profile Field Saved");
@@ -293,7 +293,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $id = $id[1];
 
     // click on Edit Settings
-    $this->clickLink("xpath=//a/span[text()=' Edit Settings']", '_qf_Group_next-bottom', FALSE);
+    $this->clickLink("xpath=//a/span/i[@class='crm-i fa-wrench']", '_qf_Group_next-bottom', FALSE);
 
     // check for description field
     $this->waitForElementPresent('description');
@@ -301,7 +301,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->assertEquals($this->getValue('description'), $profileDescription);
 
     // click on save button
-    $this->clickLink('_qf_Group_next-bottom', "xpath=//a/span[text()=' Edit Settings']", FALSE);
+    $this->clickLink('_qf_Group_next-bottom', "xpath=//a/span/i[@class='crm-i fa-wrench']", FALSE);
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Saved');
