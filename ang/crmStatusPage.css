@@ -38,15 +38,26 @@
   margin: 1em 0;
 }
 
+#crm-status-list .hidden-until {
+  font-weight: normal;
+  font-size: .8em;
+  margin-right: 1em;
+}
+
+#tab-status-visible-1 .hush-menu > div {
+  width: 20em; /* determines max-width of popup menu */
+}
+
 #crm-status-list .hush-menu > div {
   position: relative;
-  width: 20em; /* determines max-width of popup menu */
   font-size: .8em;
+  top: -2px;
 }
 
 #crm-status-list .hush-menu button {
   float: right;
   cursor: pointer;
+  line-height: 1em;
 }
 
 #crm-status-list .hush-menu ul {

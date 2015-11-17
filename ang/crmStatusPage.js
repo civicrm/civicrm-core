@@ -12,7 +12,7 @@
 
       resolve: {
         statusData: function(crmApi) {
-          return crmApi('System', 'check', {sequential: 1, options: {limit: 0}});
+          return crmApi('System', 'check', {sequential: 1});
         }
       }
     });

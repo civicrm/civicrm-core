@@ -35,6 +35,21 @@ class CRM_Utils_Check {
   const CHECK_TIMER = 86400;
 
   /**
+   * @var array
+   * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
+   */
+  protected static $severityList = array(
+    \Psr\Log\LogLevel::DEBUG,
+    \Psr\Log\LogLevel::INFO,
+    \Psr\Log\LogLevel::NOTICE,
+    \Psr\Log\LogLevel::WARNING,
+    \Psr\Log\LogLevel::ERROR,
+    \Psr\Log\LogLevel::CRITICAL,
+    \Psr\Log\LogLevel::ALERT,
+    \Psr\Log\LogLevel::EMERGENCY,
+  );
+
+  /**
    * We only need one instance of this object, so we use the
    * singleton pattern and cache the instance in this variable
    *
@@ -52,6 +67,13 @@ class CRM_Utils_Check {
       self::$_singleton = new CRM_Utils_Check();
     }
     return self::$_singleton;
+  }
+
+  /**
+   * @return array
+   */
+  public static function getSeverityList() {
+    return self::$severityList;
   }
 
   /**
@@ -84,8 +106,8 @@ class CRM_Utils_Check {
           if (!$message->isVisible()) {
             continue;
           }
-          if ($filter === TRUE || $message->getSeverity() >= 3) {
-            $statusType = $message->getSeverity() >= 4 ? 'error' : $statusType;
+          if ($filter === TRUE || $message->getLevel() >= 3) {
+            $statusType = $message->getLevel() >= 4 ? 'error' : $statusType;
             $statusMessage = $message->getMessage();
             $statusMessages[] = $statusTitle = $message->getTitle();
           }
@@ -112,8 +134,8 @@ class CRM_Utils_Check {
    * @return int
    */
   public static function severitySort($a, $b) {
-    $aSeverity = $a->getSeverity();
-    $bSeverity = $b->getSeverity();
+    $aSeverity = $a->getLevel();
+    $bSeverity = $b->getLevel();
     if ($aSeverity == $bSeverity) {
       return strcmp($a->getName(), $b->getName());
     }
@@ -124,30 +146,27 @@ class CRM_Utils_Check {
   /**
    * Get the integer value (useful for thresholds) of the severity.
    *
-   * @param int|const $severity
+   * @param int|string $severity
    *   the value to look up
    * @param bool $reverse
    *   whether to find the constant from the integer
-   * @return bool
+   * @return string|int
+   * @throws \CRM_Core_Exception
    */
   public static function severityMap($severity, $reverse = FALSE) {
-    // Lowercase string-based severities
-    if (!$reverse) {
-      $severity = strtolower($severity);
+    if ($reverse) {
+      if (isset(self::$severityList[$severity])) {
+        return self::$severityList[$severity];
+      }
     }
-
-    // See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
-    $levels = array(
-      \Psr\Log\LogLevel::EMERGENCY => 7,
-      \Psr\Log\LogLevel::ALERT => 6,
-      \Psr\Log\LogLevel::CRITICAL => 5,
-      \Psr\Log\LogLevel::ERROR => 4,
-      \Psr\Log\LogLevel::WARNING => 3,
-      \Psr\Log\LogLevel::NOTICE => 2,
-      \Psr\Log\LogLevel::INFO => 1,
-      \Psr\Log\LogLevel::DEBUG => 0,
-    );
-    return ($reverse) ? array_search($severity, $levels) : $levels[$severity];
+    else {
+      // Lowercase string-based severities
+      $severity = strtolower($severity);
+      if (in_array($severity, self::$severityList)) {
+        return array_search($severity, self::$severityList);
+      }
+    }
+    throw new CRM_Core_Exception('Invalid PSR Severity Level');
   }
 
   /**
@@ -171,21 +190,18 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Run some sanity checks.
+   * Run all system checks.
    *
-   * This could become a hook so that CiviCRM can run both built-in
-   * configuration & sanity checks, and modules/extensions can add
-   * their own checks.
+   * This functon is wrapped by the System.check api.
    *
-   * We might even expose the results of these checks on the Wordpress
-   * plugin status page or the Drupal admin/reports/status path.
+   * Calls hook_civicrm_check() for extensions to add or modify messages.
+   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_check
    *
    * @param bool $max
    *   Whether to return just the maximum non-hushed severity
    *
    * @return array
-   *   Array of messages
-   * @link https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
+   *   Array of CRM_Utils_Check_Message objects
    */
   public static function checkAll($max = FALSE) {
     $checks = array();
@@ -210,10 +226,6 @@ class CRM_Utils_Check {
 
     CRM_Utils_Hook::check($messages);
 
-    foreach ($messages as $key => $message) {
-      $hush = self::checkHushSnooze($message);
-      $messages[$key]->setVisible(!$hush);
-    }
     uasort($messages, array(__CLASS__, 'severitySort'));
 
     $maxSeverity = 1;
@@ -230,54 +242,6 @@ class CRM_Utils_Check {
     Civi::cache()->set('systemCheckDate', $timestamp);
 
     return ($max) ? $maxSeverity : $messages;
-  }
-
-  /**
-   * Evaluate if a system check should be hushed/snoozed.
-   *
-   * @param CRM_Utils_Check_Message $message
-   *   The message to evaluate.
-   *
-   * @return bool
-   *   TRUE means hush/snooze, FALSE means display.
-   * @throws \CiviCRM_API3_Exception
-   */
-  public static function checkHushSnooze($message) {
-    $statusPreferenceParams = array(
-      'name' => $message->getName(),
-      'domain_id' => CRM_Core_Config::domainID(),
-    );
-    // Check if there's a StatusPreference matching this name/domain.
-    $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
-    $spid = FALSE;
-    if (isset($statusPreference['id'])) {
-      $spid = $statusPreference['id'];
-    }
-    if ($spid) {
-      // If so, compare severity to StatusPreference->severity.
-      $severity = $message->getSeverity();
-      if ($severity <= $statusPreference['values'][$spid]['ignore_severity']) {
-        // A hush or a snooze has been set.  Find out which.
-        if (isset($statusPreference['values'][$spid]['hush_until'])) {
-          // Snooze is set.
-          $today = new DateTime();
-          $snoozeDate = new DateTime($statusPreference['values'][$spid]['hush_until']);
-          if ($today > $snoozeDate) {
-            // Snooze is expired.
-            return FALSE;
-          }
-          else {
-            // Snooze is active.
-            return TRUE;
-          }
-        }
-        else {
-          // Hush.
-          return TRUE;
-        }
-      }
-    }
-    return FALSE;
   }
 
 }

@@ -65,11 +65,16 @@ class CRM_Utils_Check_Message {
   private $icon;
 
   /**
-   *
    * @var bool
-   *      This is used for Admin Status Page to determine hushed statuses.
+   *   Has this message been suppressed?
    */
   private $isVisible;
+
+  /**
+   * @var bool|string
+   *   Date this message is hidden until
+   */
+  private $hiddenUntil;
 
   /**
    * Class constructor.
@@ -84,14 +89,20 @@ class CRM_Utils_Check_Message {
    *   The severity of the message. Use PSR-3 log levels.
    *
    * @see Psr\Log\LogLevel
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING, $icon = NULL) {
     $this->name = $name;
     $this->message = $message;
     $this->title = $title;
-    // Handle non-integer severity levels.
-    if (!CRM_Utils_Rule::integer($level)) {
+    // Convert level to integer
+    if (!CRM_Utils_Rule::positiveInteger($level)) {
       $level = CRM_Utils_Check::severityMap($level);
+    }
+    else {
+      // Validate numeric input - this will throw an exception if invalid
+      CRM_Utils_Check::severityMap($level, TRUE);
     }
     $this->level = $level;
     $this->icon = $icon;
@@ -123,9 +134,9 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Get level.
+   * Get severity level number.
    *
-   * @return string
+   * @return int
    * @see Psr\Log\LogLevel
    */
   public function getLevel() {
@@ -133,11 +144,13 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Alias for Level
+   * Get severity string.
+   *
    * @return string
+   * @see Psr\Log\LogLevel
    */
   public function getSeverity() {
-    return $this->getLevel();
+    return CRM_Utils_Check::severityMap($this->level, TRUE);
   }
 
   /**
@@ -159,10 +172,14 @@ class CRM_Utils_Check_Message {
       'name' => $this->name,
       'message' => $this->message,
       'title' => $this->title,
-      'severity' => $this->level,
-      'is_visible' => $this->isVisible,
+      'severity' => $this->getSeverity(),
+      'severity_id' => $this->level,
+      'is_visible' => (int) $this->isVisible(),
       'icon' => $this->icon,
     );
+    if ($this->getHiddenUntil()) {
+      $array['hidden_until'] = $this->getHiddenUntil();
+    }
     if (!empty($this->help)) {
       $array['help'] = $this->help;
     }
@@ -170,21 +187,75 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Getter for is visible.
+   * Get message visibility.
    *
    * @return bool
    */
   public function isVisible() {
+    if (!isset($this->isVisible)) {
+      $this->isVisible = !$this->checkStatusPreference();
+    }
     return $this->isVisible;
   }
 
   /**
-   * Seter for is visible.
+   * Get date hidden until.
    *
-   * @param bool $isVisible
+   * @return string
    */
-  public function setVisible($isVisible) {
-    $this->isVisible = $isVisible ? 1 : 0;
+  public function getHiddenUntil() {
+    if (!isset($this->hiddenUntil)) {
+      $this->checkStatusPreference();
+    }
+    return $this->hiddenUntil;
+  }
+
+  /**
+   * Check if message is visible or has been hidden by the user.
+   *
+   * Also populates this->hiddenUntil property.
+   *
+   * @return bool
+   *   TRUE means hidden, FALSE means visible.
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function checkStatusPreference() {
+    $this->hiddenUntil = FALSE;
+    $statusPreferenceParams = array(
+      'name' => $this->getName(),
+      'domain_id' => CRM_Core_Config::domainID(),
+    );
+    // Check if there's a StatusPreference matching this name/domain.
+    $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
+    $spid = FALSE;
+    if (isset($statusPreference['id'])) {
+      $spid = $statusPreference['id'];
+    }
+    if ($spid) {
+      // If so, compare severity to StatusPreference->severity.
+      if ($this->level <= $statusPreference['values'][$spid]['ignore_severity']) {
+        // A hush or a snooze has been set.  Find out which.
+        if (isset($statusPreference['values'][$spid]['hush_until'])) {
+          // Snooze is set.
+          $this->hiddenUntil = $statusPreference['values'][$spid]['hush_until'];
+          $today = new DateTime();
+          $snoozeDate = new DateTime($statusPreference['values'][$spid]['hush_until']);
+          if ($today > $snoozeDate) {
+            // Snooze is expired.
+            return FALSE;
+          }
+          else {
+            // Snooze is active.
+            return TRUE;
+          }
+        }
+        else {
+          // Hush.
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
 }
