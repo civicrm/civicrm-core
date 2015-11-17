@@ -89,14 +89,20 @@ class CRM_Utils_Check_Message {
    *   The severity of the message. Use PSR-3 log levels.
    *
    * @see Psr\Log\LogLevel
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING, $icon = NULL) {
     $this->name = $name;
     $this->message = $message;
     $this->title = $title;
-    // Handle non-integer severity levels.
-    if (!CRM_Utils_Rule::integer($level)) {
+    // Convert level to integer
+    if (!CRM_Utils_Rule::positiveInteger($level)) {
       $level = CRM_Utils_Check::severityMap($level);
+    }
+    else {
+      // Validate numeric input - this will throw an exception if invalid
+      CRM_Utils_Check::severityMap($level, TRUE);
     }
     $this->level = $level;
     $this->icon = $icon;
