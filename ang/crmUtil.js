@@ -19,7 +19,7 @@
       if (_.isObject(entity)) {
         // eval content is locally generated.
         /*jshint -W061 */
-        p = backend(eval('('+angular.toJson(entity)+')'), message);
+        p = backend(eval('('+angular.toJson(entity)+')'), action);
       } else {
         // eval content is locally generated.
         /*jshint -W061 */

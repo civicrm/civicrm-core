@@ -3,24 +3,36 @@
   angular.module('statuspage').controller('statuspageStatusPage',
     function($scope, crmApi, crmStatus, statusData, statuspageSeverityList) {
 
-      var ts = $scope.ts = CRM.ts();
+      function preprocessStatuses(apiData) {
+        _.each(apiData.values, function(status) {
+          status.severity_id = status.severity;
+          status.severity = statuspageSeverityList[status.severity];
+          if (status.hidden_until) {
+            var date = $.datepicker.parseDate('yy-mm-dd', status.hidden_until);
+            status.hidden_until = $.datepicker.formatDate(CRM.config.dateInputFormat, date);
+          }
+        });
+        $scope.statuses = apiData.values;
+      }
+      preprocessStatuses(statusData);
+
+      $scope.ts = CRM.ts();
       $scope.alert = CRM.alert;
-      $scope.statuses = statusData.values;
 
-      _.each($scope.statuses, function(status) {
-        status.severity_id = status.severity;
-        status.severity = statuspageSeverityList[status.severity];
-      });
-
-      // updates a status preference
+      // updates a status preference and refreshes status data
       $scope.setPref = function(status, until, visible) {
-        crmApi('StatusPreference', 'create', {
-          "name": status.name,
-          "ignore_severity": visible ? 0 : status.severity,
-          "hush_until": until
-        }, true)
-          .then(function() {
-            status.is_visible = visible;
+        // Use an array because it's important that one api call executes before the other
+        var apiCalls = [
+          ['StatusPreference', 'create', {
+              "name": status.name,
+              "ignore_severity": visible ? 0 : status.severity,
+              "hush_until": until
+            }],
+          ['System', 'check', {sequential: 1}]
+        ];
+        crmApi(apiCalls, true)
+          .then(function(result) {
+            preprocessStatuses(result[1]);
           });
       };
       
