@@ -65,6 +65,12 @@ class CRM_Utils_Check_Message {
   private $icon;
 
   /**
+   * @var bool
+   *   Has this message been suppressed?
+   */
+  private $isVisible;
+
+  /**
    * @var bool|string
    *   Date this message is hidden until
    */
@@ -173,15 +179,20 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Return message visibility.
+   * Get message visibility.
    *
    * @return bool
    */
   public function isVisible() {
-    return !$this->checkStatusPreference();
+    if (!isset($this->isVisible)) {
+      $this->isVisible = !$this->checkStatusPreference();
+    }
+    return $this->isVisible;
   }
 
   /**
+   * Get date hidden until.
+   *
    * @return string
    */
   public function getHiddenUntil() {
@@ -193,6 +204,8 @@ class CRM_Utils_Check_Message {
 
   /**
    * Check if message is visible or has been hidden by the user.
+   *
+   * Also populates this->hiddenUntil property.
    *
    * @return bool
    *   TRUE means hidden, FALSE means visible.
