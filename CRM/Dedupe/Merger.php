@@ -1058,7 +1058,27 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $blockName = strtolower($block);
       foreach (array('main' => $mainId, 'other' => $otherId) as $moniker => $cid) {
         $cnt = 1;
-        $values = civicrm_api($blockName, 'get', array('contact_id' => $cid, 'version' => 3));
+        $searchParams = array(
+          'version' => 3,
+          'contact_id' => $cid,
+        );
+        // CRM-17556 Order by location and type
+        // @todo Temporary fix for websites (no location, only type)
+        if ($blockName == 'website') {
+          $searchParams['options'] = array('sort' => 'website_type_id');
+        }
+        // Sort by location and type
+        elseif ($blockName == 'phone') {
+          $searchParams['options'] = array('sort' => 'location_type_id,phone_type_id');
+        }
+        elseif ($blockName == 'im') {
+          $searchParams['options'] = array('sort' => 'location_type_id,provider_id');
+        }
+        // Sort by just location
+        else {
+          $searchParams['options'] = array('sort' => 'location_type_id');
+        }
+        $values = civicrm_api($blockName, 'get', $searchParams);
         $count = $values['count'];
         if ($count) {
           if ($count > $cnt) {
