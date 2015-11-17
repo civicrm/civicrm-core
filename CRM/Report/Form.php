@@ -295,10 +295,20 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_selectedTables;
 
   /**
-   * Output mode e.g 'print', 'csv', 'pdf'
+   * Output mode e.g 'print', 'csv', 'pdf'.
+   *
    * @var string
    */
   protected $_outputMode;
+
+  /**
+   * Format of any chart in use.
+   *
+   * (it's unclear if this could be merged with outputMode at this stage)
+   *
+   * @var
+   */
+  protected $_format;
 
   public $_having = NULL;
   public $_select = NULL;
