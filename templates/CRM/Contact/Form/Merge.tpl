@@ -127,7 +127,7 @@
             {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
               {$form.type.$blockName.$blockId.typeTypeId.html}&nbsp;
             {/if}
-            
+
             {* Display the overwrite/add/add new label *}
             <span id="main_{$blockName}_{$blockId}_overwrite">
               {if $row.main}
@@ -236,7 +236,7 @@ You will need to manually delete that user (click on the link to open Drupal Use
       if (!locTypeId) { locTypeId = 0; }
       var block = eval( "allBlock.main_" + blockname + "_" + locTypeId + "_" + typeTypeId);
     }
-    
+
     // Create appropriate label / add new link after changing the block
     if (!block) {
       block = '';
@@ -250,7 +250,7 @@ You will need to manually delete that user (click on the link to open Drupal Use
       }
       label += '<br>';
     }
-    
+
     CRM.$( "#main_" + blockname + "_" + blockId ).html( block );
     CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
   }
@@ -268,26 +268,26 @@ You will need to manually delete that user (click on the link to open Drupal Use
     });
 
     $('table td input.form-checkbox').each(function() {
-     var ele = null;
-     var element = $(this).attr('id').split('_',3);
+      var ele = null;
+      var element = $(this).attr('id').split('_',3);
 
-     switch ( element['1'] ) {
-       case 'addressee':
-         ele = '#' + element['0'] + '_' + element['1'];
-         break;
+      switch ( element['1'] ) {
+        case 'addressee':
+          ele = '#' + element['0'] + '_' + element['1'];
+          break;
 
-       case 'email':
-       case 'postal':
-         ele = '#' + element['0'] + '_' + element['1'] + '_' + element['2'];
-         break;
-     }
+         case 'email':
+         case 'postal':
+           ele = '#' + element['0'] + '_' + element['1'] + '_' + element['2'];
+           break;
+      }
 
-     if( ele ) {
+      if( ele ) {
         $(this).on('click', function() {
           var val = $(this).prop('checked');
           $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
         });
-     }
+      }
     });
 
     // Show/hide matching data rows
