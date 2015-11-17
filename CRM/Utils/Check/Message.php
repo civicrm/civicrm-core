@@ -134,9 +134,9 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Get level.
+   * Get severity level number.
    *
-   * @return string
+   * @return int
    * @see Psr\Log\LogLevel
    */
   public function getLevel() {
@@ -144,11 +144,13 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Alias for Level
+   * Get severity string.
+   *
    * @return string
+   * @see Psr\Log\LogLevel
    */
   public function getSeverity() {
-    return $this->getLevel();
+    return CRM_Utils_Check::severityMap($this->level, TRUE);
   }
 
   /**
@@ -170,7 +172,7 @@ class CRM_Utils_Check_Message {
       'name' => $this->name,
       'message' => $this->message,
       'title' => $this->title,
-      'severity' => CRM_Utils_Check::severityMap($this->level, TRUE),
+      'severity' => $this->getSeverity(),
       'severity_id' => $this->level,
       'is_visible' => (int) $this->isVisible(),
       'icon' => $this->icon,
@@ -231,8 +233,7 @@ class CRM_Utils_Check_Message {
     }
     if ($spid) {
       // If so, compare severity to StatusPreference->severity.
-      $severity = $this->getSeverity();
-      if ($severity <= $statusPreference['values'][$spid]['ignore_severity']) {
+      if ($this->level <= $statusPreference['values'][$spid]['ignore_severity']) {
         // A hush or a snooze has been set.  Find out which.
         if (isset($statusPreference['values'][$spid]['hush_until'])) {
           // Snooze is set.
