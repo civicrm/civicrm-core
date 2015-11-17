@@ -1036,7 +1036,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->openCiviPage("event/manage", "reset=1");
     $this->type("title", $eventName);
     $this->click("_qf_SearchEvent_refresh");
-    $this->waitForPageToLoad();
+    $this->waitForAjaxContent();
     $this->_testAddReminder($eventName);
     $this->webtestLogout();
 
@@ -1059,8 +1059,8 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
       "edit-{$roleId[5]}-access-civicrm",
       "edit-{$roleId[5]}-access-civievent",
     );
-
     $this->changePermissions($permissions);
+
     //Create TestUser2
     $this->open($this->sboxPath . "admin/people/create");
     $this->waitForElementPresent("edit-submit");
