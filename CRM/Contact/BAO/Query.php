@@ -2414,14 +2414,9 @@ class CRM_Contact_BAO_Query {
       );
     }
 
-    // add group_contact and group_contact_cache table if group table is present
-    if (!empty($tables['civicrm_group'])) {
-      if (empty($tables['civicrm_group_contact'])) {
-        $tables['civicrm_group_contact'] = " LEFT JOIN civicrm_group_contact ON civicrm_group_contact.contact_id = contact_a.id AND civicrm_group_contact.status = 'Added' ";
-      }
-      if (empty($tables['civicrm_group_contact_cache'])) {
-        $tables['civicrm_group_contact_cache'] = " LEFT JOIN civicrm_group_contact_cache ON civicrm_group_contact_cache.contact_id = contact_a.id ";
-      }
+    // add group_contact table if group table is present
+    if (!empty($tables['civicrm_group']) && empty($tables['civicrm_group_contact'])) {
+      $tables['civicrm_group_contact'] = " LEFT JOIN civicrm_group_contact ON civicrm_group_contact.contact_id = contact_a.id AND civicrm_group_contact.status = 'Added'";
     }
 
     // add group_contact and group table is subscription history is present
@@ -2538,15 +2533,11 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_group':
-          $from .= " $side JOIN civicrm_group ON (civicrm_group.id = civicrm_group_contact.group_id OR civicrm_group.id = civicrm_group_contact_cache.group_id) ";
+          $from .= " $side JOIN civicrm_group ON civicrm_group.id =  civicrm_group_contact.group_id ";
           continue;
 
         case 'civicrm_group_contact':
           $from .= " $side JOIN civicrm_group_contact ON contact_a.id = civicrm_group_contact.contact_id ";
-          continue;
-
-        case 'civicrm_group_contact_cache':
-          $from .= " $side JOIN civicrm_group_contact_cache ON contact_a.id = civicrm_group_contact_cache.contact_id ";
           continue;
 
         case 'civicrm_activity':
@@ -2781,6 +2772,11 @@ class CRM_Contact_BAO_Query {
   public function group(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
+
     // Replace pseudo operators from search builder
     $op = str_replace('EMPTY', 'NULL', $op);
 
@@ -2861,9 +2857,7 @@ class CRM_Contact_BAO_Query {
 
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
     $this->_qill[$grouping][] = ts("Group(s) %1 %2", array(1 => $qillop, 2 => $qillVal));
-    if (strpos($op, 'NULL') === FALSE) {
-      $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
-    }
+    $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
     if ($groupClause) {
       $this->_where[$grouping][] = $groupClause;
     }
