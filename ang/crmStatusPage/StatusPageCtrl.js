@@ -2,20 +2,10 @@
 
   angular.module('statuspage').controller('statuspageStatusPage',
     function($scope, crmApi, crmStatus, statusData) {
-
-      function preprocessStatuses(apiData) {
-        _.each(apiData.values, function(status) {
-          if (status.hidden_until) {
-            var date = $.datepicker.parseDate('yy-mm-dd', status.hidden_until);
-            status.hidden_until = $.datepicker.formatDate(CRM.config.dateInputFormat, date);
-          }
-        });
-        $scope.statuses = apiData.values;
-      }
-      preprocessStatuses(statusData);
-
       $scope.ts = CRM.ts();
       $scope.alert = CRM.alert;
+      $scope.formatDate = CRM.utils.formatDate;
+      $scope.statuses = statusData.values;
 
       // updates a status preference and refreshes status data
       $scope.setPref = function(status, until, visible) {
@@ -30,7 +20,7 @@
         ];
         crmApi(apiCalls, true)
           .then(function(result) {
-            preprocessStatuses(result[1]);
+            $scope.statuses = result[1].values;
           });
       };
       
