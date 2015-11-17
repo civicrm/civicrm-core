@@ -467,7 +467,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
       FALSE, FALSE, NULL, array(),
       'CRM_Event_BAO_Participant'
-   );
+    );
     foreach ($currentContactDetails as $contactId => $contactValues) {
       $contactDetails[$this->_from_contact_id] = $contactValues;
     }
