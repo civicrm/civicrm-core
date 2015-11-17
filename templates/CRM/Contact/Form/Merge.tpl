@@ -118,6 +118,7 @@
           </td>
 
           <td>
+            {* Display location for fields with locations *}
             {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
               {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
             {/if}
@@ -126,66 +127,19 @@
             {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
               {$form.type.$blockName.$blockId.typeTypeId.html}&nbsp;
             {/if}
-
-            {if $blockName eq 'address' || $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'website' || $blockName eq 'im' }
-              <span id="main_{$blockName}_{$blockId}_overwrite">
-                {if $row.main}
-                  (overwrite){$form.location.$blockName.$blockId.html}&nbsp;<br />
-                {else}
-                  (add)
-                {/if}
-              </span>
-            {/if}
-
-            {literal}
-              <script type="text/javascript">
-                function mergeBlock(blockname, element, blockId, type) {
-                  var allBlock = {/literal}{$mainLocBlock}{literal};
-
-                  // Get type of select list that's been changed (location or type)
-                  var locTypeId = '';
-                  var typeTypeId = '';
-
-                  // If the location was changed, lookup the type if it exists
-                  if (type == 'locTypeId') {
-                    locTypeId = element.value;
-                    typeTypeId = CRM.$( 'select#type_' + blockname + '_' + blockId + '_typeTypeId' ).val();
-                  }
-
-                  // Otherwise the type was changed, lookup the location if it exists
-                  else {
-                    locTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_locTypeId' ).val();
-                    typeTypeId = element.value;
-                  }
-
-                  // Get the matching block, based on location and type, from the main contact record
-                  if (!typeTypeId) {
-                    var block = eval( "allBlock.main_" + blockname + "_" + locTypeId);
-                  }
-                  else {
-                    // @todo Fix this 'special handling' for websites (no location id)
-                    if (!locTypeId) { locTypeId = 0; }
-                    var block = eval( "allBlock.main_" + blockname + "_" + locTypeId + "_" + typeTypeId);
-                  }
-
-                  var label    = '';
-                  if (blockname == 'email' || blockname == 'phone') {
-                    label = '(overwrite)' + '<span id="main_blockname_blockId_overwrite">{/literal}{$form.location.$blockName.$blockId.operation.html}{literal}<br /></span>';
-                  }
-                  else {
-                    label = '(overwrite)<br />';
-                  }
-
-                  if (!block) {
-                    block = '';
-                    label   = '(add)';
-                  }
-                  CRM.$( "#main_" + blockname + "_" + blockId ).html( block );
-                  CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
-                }
-              </script>
-            {/literal}
-
+            
+            {* Display the overwrite/add/add new label *}
+            <span id="main_{$blockName}_{$blockId}_overwrite">
+              {if $row.main}
+                <span class="action_label">(overwrite)</span>&nbsp;
+                 {if $blockName eq 'email' || $blockName eq 'phone' }
+                   {$form.location.$blockName.$blockId.operation.html}&nbsp;
+                 {/if}
+                 <br />
+              {else}
+                <span class="action_label">(add)</span>&nbsp;
+              {/if}
+            </span>
           </td>
 
         {* For non-location blocks *}
@@ -207,9 +161,9 @@
             {if isset($row.main) || isset($row.other)}
               <span id="main_{$blockName}_{$blockId}_overwrite">
                 {if $row.main}
-                  (overwrite)<br />
+                  <span class="action_label">(overwrite)</span><br />
                  {else}
-                   (add)
+                   <span class="action_label">(add)</span>
                 {/if}
               </span>
             {/if}
@@ -254,7 +208,64 @@ You will need to manually delete that user (click on the link to open Drupal Use
 {literal}
 <script type="text/javascript">
 
+  function mergeBlock(blockname, element, blockId, type) {
+    var allBlock = {/literal}{$mainLocBlock}{literal};
+
+    // Get type of select list that's been changed (location or type)
+    var locTypeId = '';
+    var typeTypeId = '';
+
+    // If the location was changed, lookup the type if it exists
+    if (type == 'locTypeId') {
+      locTypeId = element.value;
+      typeTypeId = CRM.$( 'select#type_' + blockname + '_' + blockId + '_typeTypeId' ).val();
+    }
+
+    // Otherwise the type was changed, lookup the location if it exists
+    else {
+      locTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_locTypeId' ).val();
+      typeTypeId = element.value;
+    }
+
+    // Get the matching block, based on location and type, from the main contact record
+    if (!typeTypeId) {
+      var block = eval( "allBlock.main_" + blockname + "_" + locTypeId);
+    }
+    else {
+      // @todo Fix this 'special handling' for websites (no location id)
+      if (!locTypeId) { locTypeId = 0; }
+      var block = eval( "allBlock.main_" + blockname + "_" + locTypeId + "_" + typeTypeId);
+    }
+    
+    // Create appropriate label / add new link after changing the block
+    if (!block) {
+      block = '';
+      label = '<span class="action_label">(add)</span>';
+    }
+    else {
+      var label = '<span class="action_label">(overwrite)</span> ';
+      if (blockname == 'email' || blockname == 'phone') {
+        var opLabel = 'location[' + blockname + '][' + blockId + '][operation]';
+        label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">add new</label><br />';
+      }
+      label += '<br>';
+    }
+    
+    CRM.$( "#main_" + blockname + "_" + blockId ).html( block );
+    CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
+  }
+
   CRM.$(function($) {
+
+    $('body').on('change', "input[id*='[operation]']", function() {
+      var originalHtml = $(this).prevAll('span.action_label').html();
+      if ($(this).is(":checked")) {
+        $(this).prevAll('span.action_label').html(originalHtml.replace('(overwrite)', '(add new)'));
+      }
+      else {
+        $(this).prevAll('span.action_label').html(originalHtml.replace('(add new)', '(overwrite)'));
+      }
+    });
 
     $('table td input.form-checkbox').each(function() {
      var ele = null;
