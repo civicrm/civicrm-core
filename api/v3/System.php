@@ -83,10 +83,46 @@ function _civicrm_api3_system_flush_spec(&$params) {
  * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
  */
 function _civicrm_api3_system_check_spec(&$spec) {
-  // $spec['magicword']['api.required'] = 1;
+  $spec['id'] = array(
+    'title' => 'ID',
+    'description' => 'Not a real identifier - do not use',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $spec['name'] = array(
+    'title' => 'Name',
+    'description' => 'Unique identifier',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $spec['title'] = array(
+    'title' => 'Title',
+    'description' => 'Short title text',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $spec['message'] = array(
+    'title' => 'Message',
+    'description' => 'Long description html',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $spec['help'] = array(
+    'title' => 'Help',
+    'description' => 'Optional extra help (html string)',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $spec['severity'] = array(
+    'title' => 'Severity',
+    'description' => 'Integer representation of Psr\Log\LogLevel',
+    'type' => CRM_Utils_Type::T_INT,
+    'options' => CRM_Utils_Check::$severityMap,
+  );
   $spec['is_visible'] = array(
     'title' => 'is visible',
+    'description' => '0 if message has been hidden by the user',
     'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+  $spec['hidden_until'] = array(
+    'title' => 'Hidden_until',
+    'description' => 'When will hidden message be visible again?',
+    'type' => CRM_Utils_Type::T_DATE,
   );
 }
 
@@ -104,16 +140,17 @@ function _civicrm_api3_system_check_spec(&$spec) {
 function civicrm_api3_system_check($params) {
   // array(array('name'=> $, 'severity'=>$, ...))
   $id = 1;
-  $returnValues = array();
+  $returnValues = $fields = array();
+  _civicrm_api3_system_check_spec($fields);
 
   // array(CRM_Utils_Check_Message)
-  $messages = CRM_Utils_Check::singleton()->checkAll();
+  $messages = CRM_Utils_Check::checkAll();
 
   foreach ($messages as $msg) {
     $returnValues[] = $msg->toArray() + array('id' => $id++);
   }
 
-  return _civicrm_api3_basic_array_get('systemCheck', $params, $returnValues, "id", array('id', 'name', 'message', 'title', 'severity', 'is_visible'));
+  return _civicrm_api3_basic_array_get('systemCheck', $params, $returnValues, "id", array_keys($fields));
 }
 
 /**
