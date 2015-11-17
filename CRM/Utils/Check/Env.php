@@ -501,12 +501,14 @@ class CRM_Utils_Check_Env {
         default:
       }
     }
-    $msg = implode('  ', $msgArray);
-    if (empty($msgArray)) {
-      $msg = (empty($okextensions)) ? ts('No extensions installed.') : ts('Extensions are up-to-date:') . ' ' . implode(', ', $okextensions);
+    if ($msgArray) {
+      $msg = '<ul><li>' . implode('</li><li>', $msgArray) . '</li></ul>';
+      if ($okextensions) {
+        $msg .= ts('Other extensions are up-to-date:') . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>';
+      }
     }
-    elseif (!empty($okextensions)) {
-      $msg .= '  ' . ts('Other extensions are up-to-date:') . ' ' . implode(', ', $okextensions);
+    else {
+      $msg = (empty($okextensions)) ? ts('No extensions installed.') : ts('Extensions are up-to-date:') . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>';
     }
 
     // OK, return several data rows
