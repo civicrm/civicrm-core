@@ -1507,5 +1507,5 @@ if (!CRM.vars) CRM.vars = {};
         throw 'Invalid input passed to CRM.utils.formatDate';
     }
     return $.datepicker.formatDate(outputFormat || CRM.config.dateInputFormat, input);
-  }
+  };
 })(jQuery, _);
