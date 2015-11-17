@@ -112,13 +112,13 @@ function _civicrm_api3_system_check_spec(&$spec) {
     'title' => 'Severity',
     'description' => 'Psr\Log\LogLevel string',
     'type' => CRM_Utils_Type::T_STRING,
-    'options' => array_combine(CRM_Utils_Check::$severityMap, CRM_Utils_Check::$severityMap),
+    'options' => array_combine(CRM_Utils_Check::getSeverityList(), CRM_Utils_Check::getSeverityList()),
   );
   $spec['severity_id'] = array(
     'title' => 'Severity ID',
     'description' => 'Integer representation of Psr\Log\LogLevel',
     'type' => CRM_Utils_Type::T_INT,
-    'options' => CRM_Utils_Check::$severityMap,
+    'options' => CRM_Utils_Check::getSeverityList(),
   );
   $spec['is_visible'] = array(
     'title' => 'is visible',

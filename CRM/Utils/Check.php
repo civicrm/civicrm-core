@@ -38,7 +38,7 @@ class CRM_Utils_Check {
    * @var array
    * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
    */
-  public static $severityMap = array(
+  protected static $severityList = array(
     \Psr\Log\LogLevel::DEBUG,
     \Psr\Log\LogLevel::INFO,
     \Psr\Log\LogLevel::NOTICE,
@@ -67,6 +67,13 @@ class CRM_Utils_Check {
       self::$_singleton = new CRM_Utils_Check();
     }
     return self::$_singleton;
+  }
+
+  /**
+   * @return array
+   */
+  public static function getSeverityList() {
+    return self::$severityList;
   }
 
   /**
@@ -151,7 +158,7 @@ class CRM_Utils_Check {
       $severity = strtolower($severity);
     }
 
-    return ($reverse) ? self::$severityMap[$severity] : array_search($severity, self::$severityMap);
+    return ($reverse) ? self::$severityList[$severity] : array_search($severity, self::$severityList);
   }
 
   /**
