@@ -89,7 +89,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
   }
 
   /**
-   *Edit Dedupe rule for individual
+   * Edit Dedupe rule for individual
    */
   public function testEditRule() {
     $this->webtestLogin();
