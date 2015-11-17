@@ -49,6 +49,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    $caseEnabled = in_array("CiviCase", $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
@@ -278,6 +279,18 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         'fields' => array(),
       ),
     ) + $this->addressFields(TRUE);
+
+    if ($caseEnabled && CRM_Core_Permission::check('access all cases and activities')) {
+      $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+      $this->_columns['civicrm_activity']['filters']['activity_type_id']['options'] = $this->activityTypes;
+      $this->_columns['civicrm_activity']['filters']['include_case_activities'] = array(
+        'name' => 'include_case_activities',
+        'title' => ts('Include Case Activities'),
+        'type' => CRM_Utils_Type::T_INT,
+        'operatorType' => CRM_Report_Form::OP_SELECT,
+        'options' => array('0' => ts('No'), '1' => ts('Yes')),
+      );
+    }
 
     if ($campaignEnabled) {
       // Add display column and filter for Survey Results, Campaign and Engagement Index if CiviCampaign is enabled
@@ -572,9 +585,15 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                 CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
               );
+              if ($field['name'] == 'include_case_activities') {
+                $clause = NULL;
+              }
               if ($fieldName == 'activity_type_id' &&
                 empty($this->_params['activity_type_id_value'])
               ) {
+                if (empty($this->_params['include_case_activities_value'])) {
+                  $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE);
+                }
                 $actTypes = array_flip($this->activityTypes);
                 $clause = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (" .
                   implode(',', $actTypes) . ") )";
@@ -696,6 +715,30 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     else {
       CRM_Core_Session::setStatus(ts("The listed records(s) cannot be added to the group."));
     }
+  }
+
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
+  public static function formRule($fields, $files, $self) {
+    $errors = array();
+    $config = CRM_Core_Config::singleton();
+    if (in_array("CiviCase", $config->enableComponents)) {
+      $componentId = CRM_Core_Component::getComponentID('CiviCase');
+      $caseActivityTypes = CRM_Core_OptionGroup::values('activity_type', TRUE, FALSE, FALSE, " AND v.component_id={$componentId}");
+      if (!empty($fields['activity_type_id_value']) && is_array($fields['activity_type_id_value']) && empty($fields['include_case_activities_value'])) {
+        foreach ($fields['activity_type_id_value'] as $activityTypeId) {
+          if (in_array($activityTypeId, $caseActivityTypes)) {
+            $errors['fields'] = ts("Please enable 'Include Case Activities' to filter with Case Activity types.");
+          }
+        }
+      }
+    }
+    return $errors;
   }
 
   public function postProcess() {
