@@ -125,6 +125,39 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_alpha3($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Encrypt password for payment processor.'), 'encyptPassword');
+  }
+
+  /**
+   *
+   * CRM-16621 - encrypt password for payment processor.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function encyptPassword(CRM_Queue_TaskContext $ctx) {
+    $sql = "SELECT id, password FROM civicrm_payment_processor WHERE password IS NOT NULL AND password <> ''";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $sql = 'UPDATE civicrm_payment_processor SET password = %1 WHERE id = %2';
+    while ($dao->fetch()) {
+      CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($dao->password, 'encrypt');
+      $sqlParams = array(
+        1 => array($dao->password, 'String'),
+        2 => array($dao->id, 'Integer'),
+      );
+      CRM_Core_DAO::executeQuery($sql, $sqlParams);
+    }
+    return TRUE;
+  }
+
+  /**
    * CRM-16354
    *
    * @return int

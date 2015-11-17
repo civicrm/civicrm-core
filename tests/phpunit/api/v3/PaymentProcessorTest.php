@@ -126,4 +126,27 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name'], ' in line ' . __LINE__);
   }
 
+  /**
+   * Check if password is encrypted/decrypted
+   */
+  public function testPaymentProcessorsPassword() {
+    $params = $this->_params;
+    $params['password'] = 'test@12345';
+    $params['user_name'] = 'test@test.com';
+    $this->callAPISuccess('payment_processor', 'create', $params);
+    $params = array(
+      'user_name' => 'test@test.com',
+      'return' => 'password',
+    );
+    $results = $this->callAPISuccess('payment_processor', 'get', $params);
+    $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
+    $this->assertEquals('test@12345', $results['values'][$results['id']]['password'], ' in line ' . __LINE__);
+    $params = array(
+      'id' => $results['id'],
+      'return' => 'password',
+    );
+    $results = $this->callAPISuccess('payment_processor', 'getvalue', $params);
+    $this->assertEquals('test@12345', $results, ' in line ' . __LINE__);
+  }
+
 }

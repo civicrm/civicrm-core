@@ -65,7 +65,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $processor->billing_mode = $ppTypeDAO->billing_mode;
     $processor->class_name = $ppTypeDAO->class_name;
     $processor->payment_type = $ppTypeDAO->payment_type;
-
+    // CRM-16621
+    CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($processor->password, 'encrypt');
     $processor->save();
     // CRM-11826, add entry in civicrm_entity_financial_account
     // if financial_account_id is not NULL
@@ -107,6 +108,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentProcessor->copyValues($params);
     if ($paymentProcessor->find(TRUE)) {
+      // CRM-16621
+      CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($paymentProcessor->password);
       CRM_Core_DAO::storeValues($paymentProcessor, $defaults);
       return $paymentProcessor;
     }
@@ -493,6 +496,20 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
       $result = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     }
     return $result;
+  }
+
+  /**
+   * Encrypt/Decrypt payment processor password
+   * CRM-16621
+   *
+   * @param int $password
+   * @param string $action
+   *
+   */
+  public static function encryptDecryptPass(&$password, $action = 'decrypt') {
+    if (!CRM_Utils_System::isNull($password)) {
+      $password = CRM_Utils_Crypt::$action($password);
+    }
   }
 
 }
