@@ -106,8 +106,8 @@ class CRM_Utils_Check {
           if (!$message->isVisible()) {
             continue;
           }
-          if ($filter === TRUE || $message->getSeverity() >= 3) {
-            $statusType = $message->getSeverity() >= 4 ? 'error' : $statusType;
+          if ($filter === TRUE || $message->getLevel() >= 3) {
+            $statusType = $message->getLevel() >= 4 ? 'error' : $statusType;
             $statusMessage = $message->getMessage();
             $statusMessages[] = $statusTitle = $message->getTitle();
           }
@@ -134,8 +134,8 @@ class CRM_Utils_Check {
    * @return int
    */
   public static function severitySort($a, $b) {
-    $aSeverity = $a->getSeverity();
-    $bSeverity = $b->getSeverity();
+    $aSeverity = $a->getLevel();
+    $bSeverity = $b->getLevel();
     if ($aSeverity == $bSeverity) {
       return strcmp($a->getName(), $b->getName());
     }
