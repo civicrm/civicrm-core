@@ -399,8 +399,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select('duration_unit', 'label=year');
     $this->select('period_type', 'value=rolling');
 
-    $this->removeSelection('relationship_type_id', 'label=- select -');
-    $this->addSelection('relationship_type_id', 'label=Employer of');
+    $this->select2('relationship_type_id', 'Employer of', TRUE);
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');

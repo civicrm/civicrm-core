@@ -192,14 +192,14 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     // note since this is generated data
     // we are not sure if someone has this selection, so
     // we are not testing for an empty record set
-    $stringsToCheck = array("Soup Selection = Chicken Combo");
+    $stringsToCheck = array("Soup Selection In Chicken Combo");
 
     $this->_checkStrings($stringsToCheck);
 
     $this->select("css=select[data-crm-custom='Food_Preference:Soup_Selection']", 'Salmon Stew');
     $this->clickLink("_qf_Search_refresh");
 
-    $stringsToCheck = array("Soup Selection = Salmon Stew");
+    $stringsToCheck = array("Soup Selection In Salmon Stew");
 
     $this->_checkStrings($stringsToCheck);
   }
