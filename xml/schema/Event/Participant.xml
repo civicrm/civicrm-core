@@ -279,4 +279,17 @@
     <comment>On Waiting List</comment>
     <add>4.1</add>
   </field>
+  <field>
+    <name>transferred_to_contact_id</name>
+    <type>int unsigned</type>
+    <title>Transferred to Contact ID</title>
+    <comment>FK to Contact ID</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>transferred_to_contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
 </table>

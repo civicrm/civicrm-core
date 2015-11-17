@@ -1590,7 +1590,8 @@ INSERT INTO civicrm_participant_status_type
   (12, 'Expired',                             '{ts escape="sql"}Expired{/ts}',                             'Negative', 1,           1,         0,          12,     2            ),
   (13, 'Pending in cart',                     '{ts escape="sql"}Pending in cart{/ts}',                     'Pending',  1,           1,         0,          13,     2            ),
   (14,  'Partially paid',                      '{ts escape="sql"}Partially paid{/ts}',                      'Positive', 1,           1,         1,          14,     2           ),
-  (15,  'Pending refund',                      '{ts escape="sql"}Pending refund{/ts}',                      'Positive', 1,           1,         1,          14,     2           );
+  (15,  'Pending refund',                      '{ts escape="sql"}Pending refund{/ts}',                      'Positive', 1,           1,         1,          15,     2           ),
+  (16,  'Transferred',                      '{ts escape="sql"}Transferred{/ts}',                      'Negative', 1,           1,         0,          16,     2           );
 
 
 

@@ -64,6 +64,7 @@
       'participant_cancelled' => ts('Events - Registration Cancellation Notice',                 array('escape' => 'sql')),
       'participant_confirm'   => ts('Events - Registration Confirmation Invite',                 array('escape' => 'sql')),
       'participant_expired'   => ts('Events - Pending Registration Expiration Notice',           array('escape' => 'sql')),
+      'participant_transferred'   => ts('Events - Registration Transferred Notice',           array('escape' => 'sql')),
     ),
     'friend' => array(
       'friend' => ts('Tell-a-Friend Email', array('escape' => 'sql')),
