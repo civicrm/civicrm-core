@@ -35,6 +35,21 @@ class CRM_Utils_Check {
   const CHECK_TIMER = 86400;
 
   /**
+   * @var array
+   * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
+   */
+  public static $severityMap = array(
+    \Psr\Log\LogLevel::DEBUG,
+    \Psr\Log\LogLevel::INFO,
+    \Psr\Log\LogLevel::NOTICE,
+    \Psr\Log\LogLevel::WARNING,
+    \Psr\Log\LogLevel::ERROR,
+    \Psr\Log\LogLevel::CRITICAL,
+    \Psr\Log\LogLevel::ALERT,
+    \Psr\Log\LogLevel::EMERGENCY,
+  );
+
+  /**
    * We only need one instance of this object, so we use the
    * singleton pattern and cache the instance in this variable
    *
@@ -136,18 +151,7 @@ class CRM_Utils_Check {
       $severity = strtolower($severity);
     }
 
-    // See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
-    $levels = array(
-      \Psr\Log\LogLevel::EMERGENCY => 7,
-      \Psr\Log\LogLevel::ALERT => 6,
-      \Psr\Log\LogLevel::CRITICAL => 5,
-      \Psr\Log\LogLevel::ERROR => 4,
-      \Psr\Log\LogLevel::WARNING => 3,
-      \Psr\Log\LogLevel::NOTICE => 2,
-      \Psr\Log\LogLevel::INFO => 1,
-      \Psr\Log\LogLevel::DEBUG => 0,
-    );
-    return ($reverse) ? array_search($severity, $levels) : $levels[$severity];
+    return ($reverse) ? self::$severityMap[$severity] : array_search($severity, self::$severityMap);
   }
 
   /**
