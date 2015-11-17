@@ -154,7 +154,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_from_contact_id = $this->_part_values['participant_contact_id'];
     $this->assign('action', $this->_action);
     if ($this->_from_participant_id) {
-      $this->assign('participantId', $this->_id);
+      $this->assign('participantId', $this->_from_participant_id);
     }
     $event = array();
     $daoName = 'title';
@@ -251,8 +251,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $errors['_qf_default'] = $message;
     }
     $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($email, "");
-    $contact_id = $contact->contact_id;
-    if ($contact_id == NULL) {
+    $contact_id = empty($contact->contact_id) ? NULL : $contact->contact_id;
+    if (empty($contact_id)) {
       $params = array(
         'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
         'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
@@ -279,7 +279,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     while ($dao->fetch()) {
       $to_event_id[]  = $dao->event_id;
     }
-    if ($to_event_id != NULL) {
+    if (!empty($to_event_id)) {
       foreach ($to_event_id as $id) {
         if ($id == $self->_event_id) {
           $status = $display_name . ts(" is already registered for this event");
@@ -340,9 +340,12 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //now cancel the from participant record, leaving the original line-item(s)
     $value_from = array();
     $value_from['id'] = $this->_from_participant_id;
-    $cancelledId = array_search('Cancelled',
-      CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'"));
-    $value_from['status_id'] = $cancelledId;
+    $tansferId = array_search('Transferred', CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'"));
+    $value_from['status_id'] = $tansferId;
+    $value_from['transferred_to_contact_id'] = $contact_id;
+    $contact_details = CRM_Contact_BAO_Contact::getContactDetails($contact_id);
+    $display_name = current($contact_details);
+    $this->assign('to_participant', $display_name);
     CRM_Event_BAO_Participant::create($value_from);
     $this->sendCancellation();
     list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contact_id);
@@ -410,7 +413,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $eventDetails[$participant->event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
     $res = CRM_Event_BAO_Participant::sendTransitionParticipantMail($participant->id, $participantDetails[$participant->id], $eventDetails[$participant->event_id], $contactDetails[$participant->contact_id], $domainValues, "Confirm", TRUE);
     //now registered_id can be updated (mail won't be send if it is set
-    return res;
+    return $res;
   }
   /**
    * Send confirmation of cancellation to source participant
@@ -460,21 +463,21 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $locParams = array('entity_id' => $this->_event_id, 'entity_table' => 'civicrm_event');
     $eventDetails[$this->_event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
     //get contact details
-    $contactIds[$this->_contact_id] = $this->_from_contact_id;
+    $contactIds[$this->_from_contact_id] = $this->_from_contact_id;
     list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
       FALSE, FALSE, NULL, array(),
       'CRM_Event_BAO_Participant'
-    );
+   );
     foreach ($currentContactDetails as $contactId => $contactValues) {
       $contactDetails[$this->_from_contact_id] = $contactValues;
     }
     //send a 'cancelled' email to user, and cc the event's cc_confirm email
-    $mail = CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_participant_id,
+    $mail = CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_from_participant_id,
       $participantDetails[$this->_from_participant_id],
       $eventDetails[$this->_event_id],
       $contactDetails[$this->_from_contact_id],
       $domainValues,
-      "Cancelled",
+      "Transferred",
       ""
     );
     $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $this->_contact_name));

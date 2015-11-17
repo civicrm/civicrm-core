@@ -848,4 +848,18 @@
       <type>CheckBox</type>
     </html>
   </field>
+  <field>
+    <name>selfcancelxfer_time</name>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>Time before start date to cancel or transfer</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>allow_selfcancelxfer</name>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Allow self service cancel or transfer for event</comment>
+    <add>4.6</add>
+  </field>
 </table>

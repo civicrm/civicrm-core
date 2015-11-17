@@ -128,7 +128,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_contact_id = $this->_part_values['participant_contact_id'];
     $this->assign('action', $this->_action);
     if ($this->_participant_id) {
-      $this->assign('participantId', $this->_id);
+      $this->assign('participantId', $this->_participant_id);
     }
     $event = array();
     $daoName = 'title';
@@ -165,7 +165,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $time_limit  = $dao->time;
       $start_date = $dao->start;
     }
-    if ($time_limit != NULL && $time_limit > 0) {
+    if (!empty($time_limit) && $time_limit > 0) {
       $timenow = new Datetime("");
       $start_time = new Datetime($start_date);
       $interval = $timenow->diff($start_time);
