@@ -51,11 +51,13 @@
 #crm-status-list .hush-menu > div {
   position: relative;
   font-size: .8em;
+  top: -2px;
 }
 
 #crm-status-list .hush-menu button {
   float: right;
   cursor: pointer;
+  line-height: 1em;
 }
 
 #crm-status-list .hush-menu ul {
