@@ -69,6 +69,9 @@
     <comment>Hush messages up to and including this severity.</comment>
     <default>1</default>
     <add>4.7</add>
+    <pseudoconstant>
+      <callback>CRM_Utils_Check::getSeverityList</callback>
+    </pseudoconstant>
   </field>
   <field>
     <name>prefs</name>

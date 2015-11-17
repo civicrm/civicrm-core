@@ -1,26 +1,26 @@
 (function(angular, $, _) {
 
   angular.module('statuspage').controller('statuspageStatusPage',
-    function($scope, crmApi, crmStatus, statusData, statuspageSeverityList) {
-
-      var ts = $scope.ts = CRM.ts();
+    function($scope, crmApi, crmStatus, statusData) {
+      $scope.ts = CRM.ts();
       $scope.alert = CRM.alert;
+      $scope.formatDate = CRM.utils.formatDate;
       $scope.statuses = statusData.values;
 
-      _.each($scope.statuses, function(status) {
-        status.severity_id = status.severity;
-        status.severity = statuspageSeverityList[status.severity];
-      });
-
-      // updates a status preference
+      // updates a status preference and refreshes status data
       $scope.setPref = function(status, until, visible) {
-        crmApi('StatusPreference', 'create', {
-          "name": status.name,
-          "ignore_severity": visible ? 0 : status.severity,
-          "hush_until": until
-        }, true)
-          .then(function() {
-            status.is_visible = visible;
+        // Use an array because it's important that one api call executes before the other
+        var apiCalls = [
+          ['StatusPreference', 'create', {
+              "name": status.name,
+              "ignore_severity": visible ? 0 : status.severity,
+              "hush_until": until
+            }],
+          ['System', 'check', {sequential: 1}]
+        ];
+        crmApi(apiCalls, true)
+          .then(function(result) {
+            $scope.statuses = result[1].values;
           });
       };
       
