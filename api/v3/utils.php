@@ -795,7 +795,9 @@ function _civicrm_api3_field_names($fields) {
  */
 function _civicrm_api3_custom_fields_for_entity($entity) {
   $result = array();
-
+  if (!in_array($entity, CRM_Core_BAO_CustomQuery::$extendsMap)) {
+    return $result;
+  }
   $query = "
 SELECT f.id, f.label, f.data_type,
        f.html_type, f.is_search_range,

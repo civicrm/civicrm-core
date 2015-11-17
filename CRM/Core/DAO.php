@@ -108,6 +108,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
       CRM_Core_DAO::executeQuery('SET SESSION sql_mode = STRICT_TRANS_TABLES');
     }
+    CRM_Core_DAO::executeQuery('SET NAMES utf8');
   }
 
   /**
@@ -354,7 +355,6 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function initialize() {
     $this->_connect();
-    $this->query("SET NAMES utf8");
   }
 
   /**

@@ -303,13 +303,21 @@ WHERE  domain_id = %1
    * @return array|mixed
    */
   private static function _getLocaleCustomStrings($domainId) {
-    // TODO: Would it be worthwhile using memcache here?
-    $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', array(
-      1 => array($domainId, 'Integer'),
-    ));
-    while ($domain->fetch()) {
-      return empty($domain->locale_custom_strings) ? array() : unserialize($domain->locale_custom_strings);
+    $cacheString = __FUNCTION__ . 'locale_custom_strings_' . $domainId;
+    $cached = CRM_Utils_Cache::singleton()->get($cacheString);
+    if (!$cached) {
+      $domainStrings = CRM_Core_DAO::singleValueQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', array(
+        1 => array($domainId, 'Integer'),
+      ));
+      if (empty($domainStrings)) {
+        $cached = array();
+      }
+      else {
+        $cached = unserialize($domainStrings);
+      }
+      CRM_Utils_Cache::singleton()->set($cacheString, $cached);
     }
+    return ($cached) ? array() : $cached;
   }
 
   /**

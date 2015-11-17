@@ -104,6 +104,8 @@ class CRM_Core_BAO_CustomQuery {
   /**
    * This stores custom data group types and tables that it extends.
    *
+   * @todo there is in fact an option group to store this but it's not being used :-(.
+   *
    * @var array
    */
   static $extendsMap = array(
