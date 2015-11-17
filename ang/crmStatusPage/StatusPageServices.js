@@ -3,10 +3,6 @@
   angular.module('statuspage')
     .filter('trusted', function($sce){ return $sce.trustAsHtml; })
 
-    .service('statuspageSeverityList', function() {
-      return ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'];
-    })
-
     // Todo: abstract this into a generic crmUi directive?
     .directive('statuspagePopupMenu', function($timeout) {
       return {

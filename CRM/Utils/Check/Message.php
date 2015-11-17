@@ -158,7 +158,8 @@ class CRM_Utils_Check_Message {
       'name' => $this->name,
       'message' => $this->message,
       'title' => $this->title,
-      'severity' => $this->level,
+      'severity' => CRM_Utils_Check::severityMap($this->level, TRUE),
+      'severity_id' => $this->level,
       'is_visible' => (int) $this->isVisible(),
       'icon' => $this->icon,
     );
