@@ -55,6 +55,7 @@
 
   /**
    * AJAX api
+   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3
    */
   CRM.api3 = function(entity, action, params, status) {
     if (typeof(entity) === 'string') {
