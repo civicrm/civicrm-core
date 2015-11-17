@@ -127,7 +127,7 @@
               {$form.type.$blockName.$blockId.typeTypeId.html}&nbsp;
             {/if}
 
-            {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'website' || $blockName eq 'im' }
+            {if $blockName eq 'address' || $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'website' || $blockName eq 'im' }
               <span id="main_{$blockName}_{$blockId}_overwrite">
                 {if $row.main}
                   (overwrite){$form.location.$blockName.$blockId.html}&nbsp;<br />
