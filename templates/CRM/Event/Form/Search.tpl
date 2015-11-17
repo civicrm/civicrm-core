@@ -38,6 +38,13 @@
         <tr class="crm-event-search-form-block-sort_name">
            <td class="font-size12pt" colspan="2">
                {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}&nbsp;&nbsp;&nbsp;{$form.buttons.html}
+               {if $form.deleted_contacts}
+                    <tr class="crm-event-search-form-block-deleted_contacts">
+                        <td colspan="2">
+                            {$form.deleted_contacts.html}&nbsp;&nbsp;{$form.deleted_contacts.label}
+                        </td>
+                    </tr>
+                {/if}
            </td>
         </tr>
 
