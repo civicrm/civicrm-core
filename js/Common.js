@@ -1481,4 +1481,31 @@ if (!CRM.vars) CRM.vars = {};
     var scale = Math.pow(10.0, len-digits);
     return Math.round(n / scale) * scale;
   };
+
+  // Format a date for output to the user
+  // Input may be a js Date object, a unix timestamp or a yyyy-mm-dd string
+  CRM.utils.formatDate = function(input, outputFormat) {
+    if (!input) {
+      return '';
+    }
+    switch (typeof input) {
+      case 'object':
+        // already a date object
+        break;
+
+      case 'string':
+        // convert iso format
+        input = $.datepicker.parseDate('yy-mm-dd', input.substr(0, 10));
+        break;
+
+      case 'number':
+        // convert unix timestamp
+        input = new Date(input*1000);
+        break;
+
+      default:
+        throw 'Invalid input passed to CRM.utils.formatDate';
+    }
+    return $.datepicker.formatDate(outputFormat || CRM.config.dateInputFormat, input);
+  }
 })(jQuery, _);
