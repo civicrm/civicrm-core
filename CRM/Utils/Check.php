@@ -87,9 +87,7 @@ class CRM_Utils_Check {
    *   Set TRUE to show all messages.
    */
   public function showPeriodicAlerts($messages = NULL, $filter = array(__CLASS__, 'severityMap')) {
-    if (CRM_Core_Permission::check('administer CiviCRM')
-      && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityAlert', NULL, TRUE)
-    ) {
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
 
@@ -237,9 +235,7 @@ class CRM_Utils_Check {
       break;
     }
 
-    Civi::cache()->set('systemCheckSeverity', $maxSeverity);
-    $timestamp = time();
-    Civi::cache()->set('systemCheckDate', $timestamp);
+    Civi::settings()->set('systemStatusCheckResult', $maxSeverity);
 
     return ($max) ? $maxSeverity : $messages;
   }
