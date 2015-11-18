@@ -210,14 +210,14 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
   /**
    * @param bool $discount
    * @param bool $priceSet
-   * @param int $processorId
+   * @param int $processorIds
    */
-  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName) {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorIds) {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
-    $this->select2('payment_processor', $processorName, TRUE);
+    $this->select2('payment_processor', $processorIds, TRUE);
     $this->select("financial_type_id", "value=4");
     if ($priceSet) {
       // get one - TBD
@@ -258,7 +258,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     }
 
     $this->click("xpath=//div[@id='registration_screen']/table/tbody/tr[1]/td[2]/div[@class='replace-plain']");
-    $this->fillRichTextField("cke_wysiwyg_frame", $registerIntro);
+    $this->fillRichTextField('intro_text', $registerIntro, 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click("CIVICRM_QFID_1_is_email_confirm");
@@ -360,7 +360,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']");
     $this->click("xpath=//div[@id='participantSearch']/table/tbody/tr/td[11]/span[1]/a[2][text()='Edit']");
     $this->waitForElementPresent("_qf_Participant_cancel-bottom");
-    $this->assertElementContainsText("xpath=//form[@id='Participant']//div/div/table/tbody//tr/td[2]/select", "$campaignTitle");
+    $this->assertElementContainsText("xpath=//div[@id='s2id_campaign_id']", "$campaignTitle");
   }
 
 }

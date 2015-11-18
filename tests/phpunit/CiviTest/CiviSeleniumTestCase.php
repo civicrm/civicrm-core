@@ -379,8 +379,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   public function webtestGetValidCountryID() {
     static $_country_id;
     if (is_null($_country_id)) {
-      $config_backend = $this->webtestGetConfig('countryLimit');
-      $_country_id = current($config_backend);
+      $_country_id = $this->webtestGetSetting('defaultContactCountry');
     }
     return $_country_id;
   }
@@ -398,24 +397,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       return current(array_keys($result['values']));
     }
     return NULL;
-  }
-
-  /**
-   * @param $field
-   *
-   * @return mixed
-   */
-  public function webtestGetConfig($field) {
-    static $_config_backend;
-    if (is_null($_config_backend)) {
-      $result = $this->webtest_civicrm_api("Domain", "getvalue", array(
-        'current_domain' => 1,
-        'option.limit' => 1,
-        'return' => 'config_backend',
-      ));
-      $_config_backend = unserialize($result);
-    }
-    return $_config_backend[$field];
   }
 
   /**

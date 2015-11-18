@@ -44,21 +44,21 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     //Online Pay Later Contribution
     $this->_testOnlineContribution($contact);
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/../a[1]");
     $this->type("sort_name", $contact['sort_name']);
     $this->click("_qf_Search_refresh");
-
     $this->waitForPageToLoad($this->getTimeoutMsec());
+
     $this->click('radio_ts', 'ts_all');
     $contriIDOff = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a@href"));
-    $contriIDOn = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr[2]/td[11]/span/a@href"));
+    $contriIDOn = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a@href"));
     if (!empty($contriIDOff)) {
       $contriIDOff = substr($contriIDOff[1], (strrpos($contriIDOff[1], '=') + 1));
     }
     if (!empty($contriIDOn)) {
       $contriIDOn = substr($contriIDOn[1], (strrpos($contriIDOn[1], '=') + 1));
     }
-    $this->select('task', "label=Update Pending Contribution Status");
+    $this->select('task', "label=Update pending contribution status");
     $this->click("_qf_Search_next_action");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->select('contribution_status_id', 'label=Completed');
@@ -257,8 +257,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
     $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->type("sort_name", $contact['sort_name']);
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']", FALSE);
-    $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr//td/a[text()='{$contact['sort_name']}']/../td[11]/span/a[text()='View']");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table/tbody/tr[1]/td[11]/span/a[text()='View']", FALSE);
+    $this->click("xpath=//div[@id='contributionSearch']//table/tbody/tr[1]/td[11]/span/a[text()='View']");
     // View Contribution Record and test for expected values
     $expected = array(
       'From' => $contact['display_name'],
