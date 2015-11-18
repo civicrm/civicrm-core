@@ -137,12 +137,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
           // CRM-7925
           CRM_Core_Error::fatal(ts('The Contact Sub Type does not match the Contact type for this record'));
         }
-        if (is_array($params['contact_sub_type'])) {
-          $params['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['contact_sub_type']) . CRM_Core_DAO::VALUE_SEPARATOR;
-        }
-        else {
-          $params['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . trim($params['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
-        }
+        $params['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
       }
     }
     else {
@@ -160,15 +155,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $prefComm = CRM_Utils_Array::value('preferred_communication_method', $params, '');
     if ($prefComm && is_array($prefComm)) {
       unset($params['preferred_communication_method']);
-      $newPref = array();
 
-      foreach ($prefComm as $k => $v) {
-        if ($v) {
-          $newPref[$k] = $v;
-        }
-      }
-
-      $prefComm = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($newPref)) . CRM_Core_DAO::VALUE_SEPARATOR;
+      CRM_Utils_Array::formatArrayKeys($prefComm);
+      $prefComm = CRM_Utils_Array::implodePadded($prefComm);
     }
 
     $contact->preferred_communication_method = $prefComm;
@@ -1135,7 +1124,7 @@ WHERE id={$id}; ";
       return $implodeDelimiter ? NULL : array();
     }
 
-    $subtype = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subtype, CRM_Core_DAO::VALUE_SEPARATOR));
+    $subtype = CRM_Utils_Array::explodePadded($subtype);
 
     if ($implodeDelimiter) {
       $subtype = implode($implodeDelimiter, $subtype);
@@ -1163,7 +1152,7 @@ WHERE id={$id}; ";
     if ($contact) {
       $contactTypes = array();
       if ($contact->contact_sub_type) {
-        $contactTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($contact->contact_sub_type, CRM_Core_DAO::VALUE_SEPARATOR));
+        $contactTypes = CRM_Utils_Array::explodePadded($contact->contact_sub_type);
       }
       array_unshift($contactTypes, $contact->contact_type);
 
@@ -2011,16 +2000,16 @@ ORDER BY civicrm_email.is_primary DESC";
     if (array_key_exists('contact_sub_type', $params) &&
       !empty($params['contact_sub_type'])
     ) {
-      $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $params['contact_sub_type']) . CRM_Core_DAO::VALUE_SEPARATOR;
+      $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
     }
     elseif (array_key_exists('contact_sub_type_hidden', $params) &&
       !empty($params['contact_sub_type_hidden'])
     ) {
       // if profile was used, and had any subtype, we obtain it from there
       //CRM-13596 - add to existing contact types, rather than overwriting
-      $data_contact_sub_type_arr = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR));
+      $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
       if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
-        $data['contact_sub_type'] = $data['contact_sub_type'] . implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $params['contact_sub_type_hidden']) . CRM_Core_DAO::VALUE_SEPARATOR;
+        $data['contact_sub_type'] .= CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
       }
     }
 
@@ -2252,7 +2241,7 @@ ORDER BY civicrm_email.is_primary DESC";
             $type = $data['contact_type'];
             if (!empty($data['contact_sub_type'])) {
               $type = $data['contact_sub_type'];
-              $type = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($type, CRM_Core_DAO::VALUE_SEPARATOR));
+              $type = CRM_Utils_Array::explodePadded($type);
               // generally a contact even if, has multiple subtypes the parent-type is going to be one only
               // and since formatCustomField() would be interested in parent type, lets consider only one subtype
               // as the results going to be same.
