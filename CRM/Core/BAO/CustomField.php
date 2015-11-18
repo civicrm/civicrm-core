@@ -1647,6 +1647,11 @@ SELECT id
               array_values($value)
             ) . CRM_Core_DAO::VALUE_SEPARATOR;
         }
+        // Passing a single value via api-explorer you won't get an array
+        // but a string without separators - CRM-17588
+        elseif (strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) !== 0) {
+          $value = CRM_Core_DAO::VALUE_SEPARATOR . $value . CRM_Core_DAO::VALUE_SEPARATOR;
+        }
       }
       else {
         $value = '';
