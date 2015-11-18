@@ -497,7 +497,7 @@ class CRM_Utils_Check_Env {
                 2 => $key,
                 3 => $row['version'],
                 4 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id=$key&key=$key") . '"',
-                5 => $remotes[$key]->version
+                5 => $remotes[$key]->version,
               ));
           }
           else {
