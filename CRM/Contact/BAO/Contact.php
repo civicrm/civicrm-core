@@ -157,7 +157,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     }
 
     // Fix for preferred communication method.
-    $prefComm = CRM_Utils_Array::value('preferred_communication_method', $params);
+    $prefComm = CRM_Utils_Array::value('preferred_communication_method', $params, '');
     if ($prefComm && is_array($prefComm)) {
       unset($params['preferred_communication_method']);
       $newPref = array();
@@ -168,15 +168,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
         }
       }
 
-      $prefComm = $newPref;
-      if (is_array($prefComm) && !empty($prefComm)) {
-        $prefComm = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($prefComm)) . CRM_Core_DAO::VALUE_SEPARATOR;
-        $contact->preferred_communication_method = $prefComm;
-      }
-      else {
-        $contact->preferred_communication_method = '';
-      }
+      $prefComm = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($newPref)) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
+
+    $contact->preferred_communication_method = $prefComm;
 
     $allNull = $contact->copyValues($params);
 
