@@ -108,6 +108,14 @@
     <td scope="row" class="label" width="20%">{$form.expiration_time.label}</td>
     <td>{$form.expiration_time.html|crmAddClass:four} {help id="id-expiration_time"}</td>
   </tr>
+  <tr class="crm-event-manage-registration-form-block-selfcancelxfer">
+    <td scope="row" class="label" width="20%">{$form.allow_selfcancelxfer.label}</td>
+    <td>{$form.allow_selfcancelxfer.html} {help id="id-allow_selfcancelxfer"}</td>
+  </tr>
+  <tr class="crm-event-manage-registration-form-block-selfcancelxfer_time">
+    <td scope="row" class="label" width="20%">{$form.selfcancelxfer_time.label}</td>
+    <td>{$form.selfcancelxfer_time.html|crmAddClass:four} {help id="id-selfcancelxfer_time"}</td>
+  </tr>
 </table>
 <div class="spacer"></div>
 
