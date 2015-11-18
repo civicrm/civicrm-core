@@ -508,7 +508,7 @@ class CRM_Utils_Check_Env {
       return array(new CRM_Utils_Check_Message(
         'extensionsOk',
         ts('No extensions installed. <a %1>Browse available extensions</a>.', array(
-          1 => CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'),
+          1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
         )),
         ts('Extensions'),
         \Psr\Log\LogLevel::INFO,
