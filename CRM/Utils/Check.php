@@ -77,16 +77,9 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Execute "checkAll".
-   *
-   * @param array|NULL $messages
-   *   List of CRM_Utils_Check_Message; or NULL if the default list should be fetched.
-   * @param array|string|callable $filter
-   *   Restrict messages using a callback filter.
-   *   By default, only show warnings and errors.
-   *   Set TRUE to show all messages.
+   * Display daily system status alerts (admin only).
    */
-  public function showPeriodicAlerts($messages = NULL, $filter = array(__CLASS__, 'severityMap')) {
+  public function showPeriodicAlerts() {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
@@ -95,29 +88,28 @@ class CRM_Utils_Check {
         $config = CRM_Core_Config::singleton();
         $config->cleanup(0, FALSE);
 
-        if ($messages === NULL) {
-          $messages = $this->checkAll();
-        }
         $statusMessages = array();
-        $statusType = 'alert';
-        foreach ($messages as $message) {
+        $maxSeverity = 0;
+        foreach ($this->checkAll() as $message) {
           if (!$message->isVisible()) {
             continue;
           }
-          if ($filter === TRUE || $message->getLevel() >= 3) {
-            $statusType = $message->getLevel() >= 4 ? 'error' : $statusType;
+          if ($message->getLevel() >= 3) {
+            $maxSeverity = max($maxSeverity, $message->getLevel());
             $statusMessage = $message->getMessage();
             $statusMessages[] = $statusTitle = $message->getTitle();
           }
         }
 
-        if (count($statusMessages)) {
+        if ($statusMessages) {
           if (count($statusMessages) > 1) {
-            $statusTitle = ts('Multiple Alerts');
-            $statusMessage = ts('Please check your <a href="%1">status page</a> for a full list and further details.', array(1 => CRM_Utils_System::url('civicrm/a/#/status'))) . '<ul><li>' . implode('</li><li>', $statusMessages) . '</li></ul>';
+            $statusTitle = self::toStatusLabel($maxSeverity);
+            $statusMessage = '<ul><li>' . implode('</li><li>', $statusMessages) . '</li></ul>';
           }
 
-          // @todo add link to status page
+          $statusMessage .= '<p><a href="' . CRM_Utils_System::url('civicrm/a/#/status') . '">' . ts('View details and manage alerts') . '</a></p>';
+
+          $statusType = $maxSeverity >= 4 ? 'error' : 'alert';
           CRM_Core_Session::setStatus($statusMessage, $statusTitle, $statusType);
         }
       }
@@ -238,6 +230,35 @@ class CRM_Utils_Check {
     Civi::settings()->set('systemStatusCheckResult', $maxSeverity);
 
     return ($max) ? $maxSeverity : $messages;
+  }
+
+  /**
+   * @param int $level
+   * @return string
+   */
+  public static function toStatusLabel($level) {
+    switch ($level) {
+      case 7:
+        return ts('System Status: Emergency');
+
+      case 6:
+        return ts('System Status: Alert');
+
+      case 5:
+        return ts('System Status: Critical');
+
+      case 4:
+        return ts('System Status: Error');
+
+      case 3:
+        return ts('System Status: Warning');
+
+      case 2:
+        return ts('System Status: Notice');
+
+      default:
+        return ts('System Status: Ok');
+    }
   }
 
 }

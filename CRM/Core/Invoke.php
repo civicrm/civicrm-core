@@ -354,36 +354,8 @@ class CRM_Core_Invoke {
     }
     // always use cached results - they will be refreshed by the session timer
     $status = Civi::settings()->get('systemStatusCheckResult');
-    switch ($status) {
-      case 7:
-        $statusMessage = ts('System Status: Emergency');
-        break;
-
-      case 6:
-        $statusMessage = ts('System Status: Alert');
-        break;
-
-      case 5:
-        $statusMessage = ts('System Status: Critical');
-        break;
-
-      case 4:
-        $statusMessage = ts('System Status: Error');
-        break;
-
-      case 3:
-        $statusMessage = ts('System Status: Warning');
-        break;
-
-      case 2:
-        $statusMessage = ts('System Status: Notice');
-        break;
-
-      default:
-        $statusMessage = ts('System Status: Ok');
-    }
     $template->assign('footer_status_severity', $status);
-    $template->assign('footer_status_message', $statusMessage);
+    $template->assign('footer_status_message', CRM_Utils_Check::toStatusLabel($status));
   }
 
   /**
