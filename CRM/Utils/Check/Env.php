@@ -506,7 +506,7 @@ class CRM_Utils_Check_Env {
 
     if (!$okextensions && !$updates && !$errors) {
       return array(new CRM_Utils_Check_Message(
-        __FUNCTION__,
+        'extensionsOk',
         ts('No extensions installed. <a %1>Browse available extensions</a>.', array(
           1 => CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'),
         )),
@@ -537,10 +537,15 @@ class CRM_Utils_Check_Env {
     }
 
     if ($okextensions) {
+      if ($updates || $errors) {
+        $message = ts('1 extension is up-to-date:', array('plural' => '%count extensions are up-to-date:', 'count' => count($okextensions)));
+      }
+      else {
+        $message = ts('All extensions are up-to-date:');
+      }
       $messages[] = new CRM_Utils_Check_Message(
         'extensionsOk',
-        ts('1 extension is up-to-date:', array('plural' => '%count extensions are up-to-date:', 'count' => count($okextensions))) .
-          '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
+        $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
         ts('Extensions'),
         \Psr\Log\LogLevel::INFO,
         'fa-plug'
