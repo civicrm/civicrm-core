@@ -654,6 +654,28 @@
     </html>
   </field>
   <field>
+    <name>allow_selfcancelxfer</name>
+    <type>boolean</type>
+    <default>0</default>
+    <title>Allow Self-service Cancellation or Transfer</title>
+    <comment>Allow self service cancellation or transfer for event?</comment>
+    <add>4.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>selfcancelxfer_time</name>
+    <type>int unsigned</type>
+    <default>0</default>
+    <title>Self-service Cancellation or Transfer Time</title>
+    <comment>Number of hours prior to event start date to allow self-service cancellation or transfer.</comment>
+    <add>4.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
     <name>waitlist_text</name>
     <type>text</type>
     <html>

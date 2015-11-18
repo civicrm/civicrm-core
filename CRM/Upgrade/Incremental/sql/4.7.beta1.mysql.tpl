@@ -16,3 +16,14 @@ WHERE pp.name='PayPal_Express';
 
 UPDATE civicrm_preferences_date SET description = '{ts escape="sql"}Used in search forms and for relationships.{/ts}'
 WHERE name = 'searchDate';
+
+--CRM-16761 Self service cancel or transfer for events
+ALTER TABLE civicrm_event
+  ADD COLUMN selfcancelxfer_time INT(10) unsigned DEFAULT 0 COMMENT 'Number of hours prior to event start date to allow self-service cancellation or transfer.',
+  ADD COLUMN allow_selfcancelxfer TINYINT(4) DEFAULT '0' COMMENT 'Allow self service cancellation or transfer for event?';
+ALTER TABLE civicrm_participant
+  ADD COLUMN transferred_to_contact_id INT(10) unsigned DEFAULT NULL COMMENT 'Contact to which the event registration is transferred',
+  ADD CONSTRAINT `FK_civicrm_participant_transferred_to_contact_id` FOREIGN KEY (`transferred_to_contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL;
+
+INSERT INTO civicrm_participant_status_type(name, {localize field='label'}label{/localize}, class, is_reserved, is_active, is_counted, weight, visibility_id)
+VALUES ('Transferred', '{ts escape="sql"}Transferred{/ts}', 'Negative', 1, 1, 0, 16, 2);
