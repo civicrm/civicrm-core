@@ -462,37 +462,25 @@ class CRM_Utils_Check_Env {
 
     $keys = array_keys($manager->getStatuses());
     sort($keys);
-    $severity = 1;
-    $msgArray = $okextensions = array();
-    $title = ts('Extension Updates Available');
-
-    // Icons used for list bullets
-    $okIcon = '<i class="fa-li crm-i fa-check-square-o"></i>';
-    $upgradeIcon = '<i class="fa-li crm-i fa-cloud-upload"></i>';
-    $problemIcon = '<i class="fa-li crm-i fa-exclamation-triangle"></i>';
+    $updates = $errors = $okextensions = array();
 
     foreach ($keys as $key) {
       try {
         $obj = $mapper->keyToInfo($key);
       }
       catch (CRM_Extension_Exception $ex) {
-        $severity = 4;
-        $title = ts('Extension Problem');
-        $msgArray[] = $problemIcon . ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key));
+        $errors[] = ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key));
         continue;
       }
       $row = CRM_Admin_Page_Extensions::createExtendedInfo($obj);
       switch ($row['status']) {
         case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
-          $severity = 4;
-          $title = ts('Extension Problem');
-          $msgArray[] = $problemIcon . ts('%1 extension (%2) is installed but missing files.', array(1 => CRM_Utils_Array::value('label', $row), 2 => $key));
+          $errors[] = ts('%1 extension (%2) is installed but missing files.', array(1 => CRM_Utils_Array::value('label', $row), 2 => $key));
           break;
 
         case CRM_Extension_Manager::STATUS_INSTALLED:
           if (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
-            $severity = ($severity < 3) ? 3 : $severity;
-            $msgArray[] = $upgradeIcon . ts('%1 (%2) version %3 is installed. <a %4>Upgrade to version %5</a>.', array(
+            $updates[] = ts('%1 (%2) version %3 is installed. <a %4>Upgrade to version %5</a>.', array(
                 1 => CRM_Utils_Array::value('label', $row),
                 2 => $key,
                 3 => $row['version'],
@@ -515,28 +503,49 @@ class CRM_Utils_Check_Env {
           break;
       }
     }
-    if ($msgArray) {
-      $msg = '<ul class="fa-ul"><li>' . implode('</li><li>', $msgArray) . '</li></ul>';
-      if ($okextensions) {
-        $msg .= ts('Other extensions are up-to-date:');
-      }
-    }
-    else {
-      $title = ts('Extensions Up-to-Date');
-      $msg = !$okextensions ? ts('No extensions installed.') : '';
-    }
-    if ($okextensions) {
-      $msg .= '<ul class="fa-ul"><li>' . $okIcon . implode('</li><li>' . $okIcon, $okextensions) . '</li></ul>';
+
+    if (!$okextensions && !$updates && !$errors) {
+      return array(new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('No extensions installed. <a %1>Browse available extensions</a>.', array(
+          1 => CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'),
+        )),
+        ts('Extensions'),
+        \Psr\Log\LogLevel::INFO,
+        'fa-plug'
+      ));
     }
 
-    // OK, return several data rows
-    $messages[] = new CRM_Utils_Check_Message(
-      __FUNCTION__,
-      $msg,
-      $title,
-      $severity,
-      'fa-plug'
-    );
+    if ($errors) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>',
+        ts('Extension Error'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-plug'
+      );
+    }
+
+    if ($updates) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'extensionUpdates',
+        '<ul><li>' . implode('</li><li>', $updates) . '</li></ul>',
+        ts('Extension Update Available', array('plural' => '%count Extension Updates Available', 'count' => count($updates))),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-plug'
+      );
+    }
+
+    if ($okextensions) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'extensionsOk',
+        ts('1 extension is up-to-date:', array('plural' => '%count extensions are up-to-date:', 'count' => count($okextensions))) .
+          '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
+        ts('Extensions'),
+        \Psr\Log\LogLevel::INFO,
+        'fa-plug'
+      );
+    }
 
     return $messages;
   }
