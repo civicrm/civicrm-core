@@ -295,7 +295,6 @@ class CRM_Utils_Check_Env {
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1)) {
       $vc = CRM_Utils_VersionCheck::singleton();
       $newerVersion = $vc->isNewerVersionAvailable();
-      $title = ts('Update Status');
 
       if ($newerVersion['version']) {
         $vInfo = array(
@@ -310,7 +309,7 @@ class CRM_Utils_Check_Env {
         if ($newerVersion['upgrade'] == 'security') {
           // Security
           $severity = \Psr\Log\LogLevel::CRITICAL;
-          $title = ts('Security Update Required');
+          $title = ts('CiviCRM Security Update Required');
           $message = ts('New security release %1 is available. The site is currently running %2.', $vInfo);
         }
         elseif ($newerVersion['status'] == 'eol') {
@@ -334,7 +333,8 @@ class CRM_Utils_Check_Env {
         }
 
         $severity = \Psr\Log\LogLevel::INFO;
-        $message = ts('Version %1 is up-to-date.', array(1 => $vNum));
+        $title = ts('CiviCRM Up-to-Date');
+        $message = ts('CiviCRM version %1 is up-to-date.', array(1 => $vNum));
       }
 
       $messages[] = new CRM_Utils_Check_Message(
@@ -464,59 +464,77 @@ class CRM_Utils_Check_Env {
     sort($keys);
     $severity = 1;
     $msgArray = $okextensions = array();
+    $title = ts('Extension Updates Available');
+
+    // Icons used for list bullets
+    $okIcon = '<i class="fa-li crm-i fa-check-square-o"></i>';
+    $upgradeIcon = '<i class="fa-li crm-i fa-cloud-upload"></i>';
+    $problemIcon = '<i class="fa-li crm-i fa-exclamation-triangle"></i>';
+
     foreach ($keys as $key) {
       try {
         $obj = $mapper->keyToInfo($key);
       }
       catch (CRM_Extension_Exception $ex) {
         $severity = 4;
-        $msgArray[] = ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key));
+        $title = ts('Extension Problem');
+        $msgArray[] = $problemIcon . ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key));
         continue;
       }
       $row = CRM_Admin_Page_Extensions::createExtendedInfo($obj);
       switch ($row['status']) {
         case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
           $severity = 4;
-          $msgArray[] = ts('%1 extension (%2) is installed but missing files.', array(1 => CRM_Utils_Array::value('label', $row), 2 => $key));
+          $title = ts('Extension Problem');
+          $msgArray[] = $problemIcon . ts('%1 extension (%2) is installed but missing files.', array(1 => CRM_Utils_Array::value('label', $row), 2 => $key));
           break;
 
         case CRM_Extension_Manager::STATUS_INSTALLED:
-          if (CRM_Utils_Array::value($key, $remotes)) {
-            if (version_compare($row['version'], $remotes[$key]->version, '<')) {
-              $severity = ($severity < 3) ? 3 : $severity;
-              $msgArray[] = ts('%1 extension (%2) is upgradeable to version %3.', array(1 => CRM_Utils_Array::value('label', $row), 2 => $key, 3 => $remotes[$key]->version));
-            }
-            else {
-              $okextensions[] = CRM_Utils_Array::value('label', $row) ? "{$row['label']} ($key)" : $key;
-            }
+          if (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
+            $severity = ($severity < 3) ? 3 : $severity;
+            $msgArray[] = $upgradeIcon . ts('%1 (%2) version %3 is installed. <a %4>Upgrade to version %5</a>.', array(
+                1 => CRM_Utils_Array::value('label', $row),
+                2 => $key,
+                3 => $row['version'],
+                4 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id=$key&key=$key") . '"',
+                5 => $remotes[$key]->version
+              ));
           }
           else {
-            $okextensions[] = CRM_Utils_Array::value('label', $row) ? "{$row['label']} ($key)" : $key;
+            if (empty($row['label'])) {
+              $okextensions[] = $key;
+            }
+            else {
+              $okextensions[] = ts('%1 (%2) version %3', array(
+                1 => $row['label'],
+                2 => $key,
+                3 => $row['version'],
+              ));
+            }
           }
           break;
-
-        case CRM_Extension_Manager::STATUS_UNINSTALLED:
-        case CRM_Extension_Manager::STATUS_DISABLED:
-        case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
-        default:
       }
     }
     if ($msgArray) {
-      $msg = '<ul><li>' . implode('</li><li>', $msgArray) . '</li></ul>';
+      $msg = '<ul class="fa-ul"><li>' . implode('</li><li>', $msgArray) . '</li></ul>';
       if ($okextensions) {
-        $msg .= ts('Other extensions are up-to-date:') . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>';
+        $msg .= ts('Other extensions are up-to-date:');
       }
     }
     else {
-      $msg = (empty($okextensions)) ? ts('No extensions installed.') : ts('Extensions are up-to-date:') . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>';
+      $title = ts('Extensions Up-to-Date');
+      $msg = !$okextensions ? ts('No extensions installed.') : '';
+    }
+    if ($okextensions) {
+      $msg .= '<ul class="fa-ul"><li>' . $okIcon . implode('</li><li>' . $okIcon, $okextensions) . '</li></ul>';
     }
 
     // OK, return several data rows
     $messages[] = new CRM_Utils_Check_Message(
       __FUNCTION__,
       $msg,
-      ts('Extension Updates'),
-      CRM_Utils_Check::severityMap($severity, TRUE),
+      $title,
+      $severity,
       'fa-plug'
     );
 
