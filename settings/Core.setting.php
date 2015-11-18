@@ -800,4 +800,17 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
+  'systemStatusCheckResult' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'systemStatusCheckResult',
+    'type' => 'Integer',
+    'default' => 0,
+    'add' => '4.7',
+    'title' => NULL,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => NULL,
+    'help_text' => NULL,
+  ),
 );
