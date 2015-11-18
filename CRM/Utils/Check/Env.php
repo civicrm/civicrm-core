@@ -292,7 +292,7 @@ class CRM_Utils_Check_Env {
   public function checkVersion() {
     $messages = array();
 
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1)) {
+    if (Civi::settings()->get('versionCheck')) {
       $vc = CRM_Utils_VersionCheck::singleton();
       $newerVersion = $vc->isNewerVersionAvailable();
 
@@ -348,7 +348,7 @@ class CRM_Utils_Check_Env {
     else {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('The check for new versions of CiviCRM has been disabled.'),
+        ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the setting</a> to receive important security update notifications.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1'))),
         ts('Update Check Disabled'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-times-circle-o'
