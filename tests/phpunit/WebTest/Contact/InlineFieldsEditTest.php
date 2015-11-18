@@ -163,7 +163,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
 
     // Edit demographics
     $this->inlineEdit('crm-demographic-content', array(
-      "xpath=//div[@class='crm-clear']/div[1]/div[@class='crm-content']/label[text()='Female']" => true,
+      "xpath=//div[@class='crm-clear']/div[1]/div[@class='crm-content']/label[text()='Female']" => TRUE,
       'is_deceased' => 1,
       'birth_date' => 'date: Jan 1 1970',
     ), 'no_open');
