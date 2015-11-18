@@ -107,10 +107,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $query = "DELETE FROM civicrm_acl_entity_role where entity_table = 'civicrm_group' AND entity_id = %1";
     CRM_Core_DAO::executeQuery($query, $params);
 
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-      'is_enabled'
-    )
-    ) {
+    if (Civi::settings()->get('is_enabled')) {
       // clear any descendant groups cache if exists
       CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
     }
@@ -427,9 +424,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (CRM_Utils_Array::value('no_parent', $params) !== 1) {
       if (empty($params['parents']) &&
         $domainGroupID != $group->id &&
-        CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-          'is_enabled'
-        ) &&
+        Civi::settings()->get('is_enabled') &&
         !CRM_Contact_BAO_GroupNesting::hasParentGroups($group->id)
       ) {
         // if no parent present and the group doesn't already have any parents,

@@ -926,12 +926,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
     }
 
     if ($writeActivity === NULL) {
-      $writeActivity = CRM_Core_BAO_Setting::getItem(
-        CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'write_activity_record',
-        NULL,
-        TRUE
-      );
+      $writeActivity = Civi::settings()->get('write_activity_record');
     }
 
     if (!$writeActivity) {

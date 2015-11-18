@@ -214,18 +214,14 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       }
 
       //build the sort name.
-      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'sort_name_format'
-      );
+      $format = Civi::settings()->get('sort_name_format');
       $sortName = CRM_Utils_Address::format($formatted, $format,
         FALSE, FALSE, TRUE, $tokenFields
       );
       $sortName = trim($sortName);
 
       //build the display name.
-      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'display_name_format'
-      );
+      $format = Civi::settings()->get('display_name_format');
       $displayName = CRM_Utils_Address::format($formatted, $format,
         FALSE, FALSE, TRUE, $tokenFields
       );

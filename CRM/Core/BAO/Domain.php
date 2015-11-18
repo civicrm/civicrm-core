@@ -253,12 +253,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       return $groupID;
     }
 
-    $domainGroupID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-      'domain_group_id'
-    );
-    $multisite = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-      'is_enabled'
-    );
+    $domainGroupID = Civi::settings()->get('domain_group_id');
+    $multisite = Civi::settings()->get('is_enabled');
 
     if ($domainGroupID) {
       $groupID = $domainGroupID;

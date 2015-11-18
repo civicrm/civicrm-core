@@ -396,9 +396,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       array('' => ts('- select -')) + $pledgePages
     );
 
-    $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
+    $mailingInfo = Civi::settings()->get('mailing_backend');
     $this->assign('outBound_option', $mailingInfo['outBound_option']);
 
     // build custom data

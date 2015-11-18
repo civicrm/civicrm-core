@@ -380,9 +380,7 @@ WHERE      civicrm_event.is_active = 1 AND
       $optionGroupId = $optionGroupDAO->id;
     }
     // Get the event summary display preferences
-    $show_max_events = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'show_events'
-    );
+    $show_max_events = Civi::settings()->get('show_events');
     // default to 10 if no option is set
     if (is_null($show_max_events)) {
       $show_max_events = 10;
@@ -847,9 +845,7 @@ WHERE civicrm_event.is_active = 1
     $permissions = CRM_Core_Permission::event(CRM_Core_Permission::VIEW);
 
     // check if we're in shopping cart mode for events
-    $enable_cart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
+    $enable_cart = Civi::settings()->get('enable_cart');
     if ($enable_cart) {
     }
     while ($dao->fetch()) {
@@ -1240,7 +1236,7 @@ WHERE civicrm_event.is_active = 1
           // append invoice pdf to email
           $template = CRM_Core_Smarty::singleton();
           $taxAmt = $template->get_template_vars('totalTaxAmount');
-          $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+          $prefixValue = Civi::settings()->get('contribution_invoice_settings');
           $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
           if (isset($invoicing) && isset($prefixValue['is_email_pdf']) && !empty($values['contributionId'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;

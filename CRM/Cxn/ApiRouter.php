@@ -46,7 +46,7 @@ class CRM_Cxn_ApiRouter {
     require_once 'api/v3/utils.php';
 
     // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL') &&
+    if (Civi::settings()->get('enableSSL') &&
       !CRM_Utils_System::isSSL() &&
       strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', CRM_Utils_System::getRequestHeaders())) != 'https'
     ) {
