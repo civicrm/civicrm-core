@@ -241,8 +241,8 @@ class CRM_Utils_Check_Env {
     $statusPreference->domain_id = CRM_Core_Config::domainID();
     $statusPreference->name = 'checkLastCron';
 
-    if ($statusPreference->find(TRUE)) {
-      $lastCron = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StatusPreference', $statusPreference->id, 'check_info');
+    if ($statusPreference->find(TRUE) && !empty($statusPreference->check_info)) {
+      $lastCron = $statusPreference->check_info;
       $msg = ts('Last cron run at %1.', array(1 => CRM_Utils_Date::customFormat(date('c', $lastCron))));
     }
     else {
