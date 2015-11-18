@@ -40,7 +40,13 @@ $log->alert('payment_notification processor_name=AuthNet', $_REQUEST);
 
 $authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN($_REQUEST);
 try {
-  $authorizeNetIPN->main();
+  // We allow the possibility of the site opting out of real-(Authorize.net)-time
+  // processing in favour of using the nz.co.fuzion.notificationlog for greater
+  // reliability.
+  if (!defined('CIVICRM_ANET_SKIP_IPN_PROCESSING')) {
+    $authorizeNetIPN->main();
+  }
+  echo "processing intentionally delayed";
 }
 catch (CRM_Core_Exception $e) {
   CRM_Core_Error::debug_log_message($e->getMessage());
