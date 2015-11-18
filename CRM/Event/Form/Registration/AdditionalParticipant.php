@@ -155,7 +155,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @return void
    */
   public function buildQuickForm() {
-    $config = CRM_Core_Config::singleton();
+
     $button = substr($this->controller->getButtonName(), -4);
 
     $this->add('hidden', 'scriptFee', NULL);
@@ -226,6 +226,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
 
       //we might did reset allow waiting in case of dynamic calculation
+      // @TODO - does this bypass_payment still exist?
       if (!empty($this->_params[0]['bypass_payment']) &&
         is_numeric($spaces) &&
         $processedCnt > $spaces
@@ -556,10 +557,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
-    // validate supplied payment instrument values (e.g. credit card number and cvv)
-    $payment_processor_id = $self->_params[0]['payment_processor'];
-    CRM_Core_Payment_Form::validatePaymentInstrument($payment_processor_id, $self->_params[0], $errors, (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing'));
-
+    if (isset($self->_params[0]['payment_processor'])) {
+      // validate supplied payment instrument values (e.g. credit card number and cvv)
+      $payment_processor_id = $self->_params[0]['payment_processor'];
+      CRM_Core_Payment_Form::validatePaymentInstrument($payment_processor_id, $self->_params[0], $errors, (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing'));
+    }
     if (!empty($errors)) {
       return FALSE;
     }
