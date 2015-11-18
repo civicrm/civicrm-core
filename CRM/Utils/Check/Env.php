@@ -505,7 +505,7 @@ class CRM_Utils_Check_Env {
     }
 
     if (!$okextensions && !$updates && !$errors) {
-      return array(new CRM_Utils_Check_Message(
+      $messages[] = new CRM_Utils_Check_Message(
         'extensionsOk',
         ts('No extensions installed. <a %1>Browse available extensions</a>.', array(
           1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
@@ -513,7 +513,7 @@ class CRM_Utils_Check_Env {
         ts('Extensions'),
         \Psr\Log\LogLevel::INFO,
         'fa-plug'
-      ));
+      );
     }
 
     if ($errors) {
