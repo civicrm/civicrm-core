@@ -210,14 +210,14 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
   /**
    * @param bool $discount
    * @param bool $priceSet
-   * @param int $processorId
+   * @param int $processorIds
    */
-  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName) {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorIds) {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
-    $this->select2('payment_processor', $processorName, TRUE);
+    $this->select2('payment_processor', $processorIds, TRUE);
     $this->select("financial_type_id", "value=4");
     if ($priceSet) {
       // get one - TBD
