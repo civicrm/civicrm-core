@@ -48,9 +48,7 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
     CRM_Utils_System::setTitle(ts('CiviEvent'));
 
     $eventSummary = CRM_Event_BAO_Event::getEventSummary();
-    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
+    $enableCart = Civi::settings()->get('enable_cart');
     $eventSummary['tab'] = CRM_Event_Page_ManageEvent::tabs($enableCart);
 
     $actionColumn = FALSE;

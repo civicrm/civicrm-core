@@ -104,7 +104,7 @@ class CRM_Utils_VersionCheck {
       $this->localMajorVersion = $this->getMajorVersion($this->localVersion);
     }
     // Populate $versionInfo
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionCheck', NULL, 1)) {
+    if (Civi::settings()->get('versionCheck')) {
       // Use cached data if available and not stale
       if (!$this->readCacheFile()) {
         // Collect stats for pingback

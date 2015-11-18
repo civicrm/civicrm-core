@@ -126,7 +126,7 @@ class CRM_Contribute_Task {
       }
 
       // remove action "Invoices - print or email"
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if (!$invoicing) {
         unset(self::$_tasks[9]);

@@ -258,7 +258,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if ($invoicing) {
@@ -715,7 +715,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $entityTable = 'civicrm_participant';
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $totalTaxAmount = 0;
       $dataArray = array();

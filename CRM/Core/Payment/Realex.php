@@ -150,7 +150,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     curl_setopt($submit, CURLOPT_HTTPHEADER, array('SOAPAction: ""'));
     curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($submit, CURLOPT_TIMEOUT, 60);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
+    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
     curl_setopt($submit, CURLOPT_HEADER, 0);
 
     // take caching out of the picture

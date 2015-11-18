@@ -140,7 +140,7 @@ class CRM_Core_Resources {
     $this->strings = new CRM_Core_Resources_Strings($cache);
     $this->cacheCodeKey = $cacheCodeKey;
     if ($cacheCodeKey !== NULL) {
-      $this->cacheCode = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, $cacheCodeKey);
+      $this->cacheCode = Civi::settings()->get($cacheCodeKey);
     }
     if (!$this->cacheCode) {
       $this->resetCacheCode();
@@ -644,7 +644,7 @@ class CRM_Core_Resources {
       if (!empty($config->customCSSURL)) {
         $this->addStyleUrl($config->customCSSURL, 99, $region);
       }
-      if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css')) {
+      if (!Civi::settings()->get('disable_core_css')) {
         $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
       }
       // crm-i.css added ahead of other styles so it can be overridden by FA.
@@ -724,7 +724,7 @@ class CRM_Core_Resources {
       "js/wysiwyg/crm.wysiwyg.js",
     );
     // add wysiwyg editor
-    $editor = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
+    $editor = Civi::settings()->get('editor_id');
     if ($editor == "CKEditor") {
       $items[] = "js/wysiwyg/crm.ckeditor.js";
       $ckConfig = CRM_Admin_Page_CKEditorConfig::getConfigUrl();

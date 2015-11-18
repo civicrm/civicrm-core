@@ -81,14 +81,14 @@ class CRM_Utils_QueryFormatter {
    */
   public static function singleton($fresh = FALSE) {
     if ($fresh || self::$singleton === NULL) {
-      $mode = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'fts_query_mode', NULL, self::MODE_NONE);
+      $mode = Civi::settings()->get('fts_query_mode');
       self::$singleton = new CRM_Utils_QueryFormatter($mode);
     }
     return self::$singleton;
   }
 
   /**
-   * @var string 
+   * @var string
    *   eg MODE_NONE
    */
   protected $mode;

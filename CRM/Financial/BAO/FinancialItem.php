@@ -101,7 +101,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     );
 
     if ($taxTrxnID) {
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $params['amount'] = $lineItem->tax_amount;
       $params['description'] = $taxTerm;
@@ -250,7 +250,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       return FALSE;
     }
 
-    $allowPermDelete = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'allowPermDeleteFinancial');
+    $allowPermDelete = Civi::settings()->get('allowPermDeleteFinancial');
 
     if (!$allowPermDelete) {
       $sql = 'SELECT DISTINCT(cc.id), cc.display_name FROM civicrm_contact cc

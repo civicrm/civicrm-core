@@ -311,9 +311,7 @@ ORDER BY start_date desc
       $eventPCPS[$pcpDao->entity_id] = $pcpDao->entity_id;
     }
     // check if we're in shopping cart mode for events
-    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
+    $enableCart = Civi::settings()->get('enable_cart');
     $this->assign('eventCartEnabled', $enableCart);
     $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
       'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,

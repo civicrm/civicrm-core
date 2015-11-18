@@ -209,12 +209,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         $dedupeParams['check_permission'] = FALSE;
         $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
 
-        if (!empty($ids) &&
-          CRM_Core_BAO_Setting::getItem(
-            CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-            'uniq_email_per_site'
-          )
-        ) {
+        if (!empty($ids) && Civi::settings()->get('uniq_email_per_site')) {
           // restrict dupeIds to ones that belong to current domain/site.
           $siteContacts = CRM_Core_BAO_Domain::getContactList();
           foreach ($ids as $index => $dupeId) {

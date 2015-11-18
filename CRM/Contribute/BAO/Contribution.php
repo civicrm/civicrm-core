@@ -3354,7 +3354,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
 
           if ($fieldValues['tax_amount']) {
-            $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+            $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
             $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
             $itemParams['description'] = $taxTerm;
@@ -4410,7 +4410,7 @@ LIMIT 1;";
    *   Credit Note Id.
    */
   public static function createCreditNoteId() {
-    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
 
     $creditNoteNum = CRM_Core_DAO::singleValueQuery("SELECT count(creditnote_id) as creditnote_number FROM civicrm_contribution");
     $creditNoteId = NULL;

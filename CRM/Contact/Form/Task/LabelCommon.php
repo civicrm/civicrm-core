@@ -85,9 +85,7 @@ class CRM_Contact_Form_Task_LabelCommon {
 
     //build the return properties
     $returnProperties = array('display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1);
-    $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'mailing_format'
-    );
+    $mailingFormat = Civi::settings()->get('mailing_format');
 
     $mailingFormatProperties = array();
     if ($mailingFormat) {
@@ -252,9 +250,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *   [street_address => 1, supplemental_address_1 => 1, supplemental_address_2 => 1]
    */
   public static function getAddressReturnProperties() {
-    $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'mailing_format'
-    );
+    $mailingFormat = Civi::settings()->get('mailing_format');
 
     $addressFields = CRM_Utils_Address::sequence($mailingFormat);
     $addressReturnProperties = array_fill_keys($addressFields, 1);
@@ -271,9 +267,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @return array
    */
   public static function getTokenData(&$contacts) {
-    $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'mailing_format'
-    );
+    $mailingFormat = Civi::settings()->get('mailing_format');
     $tokens = $tokenFields = array();
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
 

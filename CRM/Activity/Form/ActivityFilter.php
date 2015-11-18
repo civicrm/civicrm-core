@@ -60,12 +60,9 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
     if ($userID) {
-      $defaults = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-        'activity_tab_filter',
-        NULL,
-        NULL,
-        $userID
-      );
+      $defaults = Civi::service('settings_manager')
+        ->getBagByContact(NULL, $userID)
+        ->get('activity_tab_filter');
     }
     return $defaults;
   }

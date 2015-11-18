@@ -3611,9 +3611,7 @@ SELECT  group_id
     // check for double optin
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviMail', $config->enableComponents)) {
-      return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'profile_double_optin', NULL, FALSE
-      );
+      return Civi::settings()->get('profile_double_optin');
     }
     return FALSE;
   }
@@ -3625,9 +3623,7 @@ SELECT  group_id
     // check for add to group double optin
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviMail', $config->enableComponents)) {
-      return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'profile_add_to_group_double_optin', NULL, FALSE
-      );
+      return Civi::settings()->get('profile_add_to_group_double_optin');
     }
     return FALSE;
   }

@@ -524,7 +524,7 @@ class CRM_Contact_Form_Task_EmailCommon {
         $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activityId, $params);
         $followupStatus = ts('A followup activity has been scheduled.');
 
-        if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'activity_assignee_notification')) {
+        if (Civi::settings()->get('activity_assignee_notification')) {
           if ($followupActivity) {
             $mailToFollowupContacts = array();
             $assignee = array($followupActivity->id);
