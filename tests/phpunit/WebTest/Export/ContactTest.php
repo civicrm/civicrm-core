@@ -481,14 +481,15 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor
-    $softCreditFname = substr(sha1(rand()), 0, 7);
-    $softCreditLname = substr(sha1(rand()), 0, 7);
-    $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
-    $softContactId = $this->urlArg('cid');
-
     $firstName = 'a' . substr(sha1(rand()), 0, 7);
+    $softCreditLname = substr(sha1(rand()), 0, 7);
+    $lastName = 'Anderson';
+    $this->webtestAddContact($firstName, $softCreditLname, FALSE);
+    $this->webtestAddContact($firstName, $lastName, FALSE);
+    $contactId = $this->urlArg('cid');
+
     $this->openCiviPage('contribute/add', 'reset=1&action=add&context=standalone', '_qf_Contribution_upload-bottom');
-    $this->webtestNewDialogContact($firstName);
+    $this->webtestFillAutocomplete("{$lastName}, {$firstName}");
     // select financial type
     $this->select("financial_type_id", "value=1");
 
@@ -504,7 +505,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // create first soft credit
     $this->click("softCredit");
     $this->waitForElementPresent("soft_credit_amount_1");
-    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 's2id_soft_credit_contact_id_1');
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$firstName}", 's2id_soft_credit_contact_id_1');
     $this->type("soft_credit_amount_1", "50");
 
     // Clicking save.
@@ -512,10 +513,11 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     $this->openCiviPage("contribute/search", "reset=1", "_qf_Search_refresh");
     $this->type("sort_name", $firstName);
+    $this->select('contribution_or_softcredits', 'Both');
     $this->clickLink("_qf_Search_refresh");
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $firstName, "Contact did not found in search result!");
-    $contributionID = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']@href"));
+    $contributionID = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr//td//span//a[text()='Edit']@href"));
     // select to export all the contacts from search result.
     $this->click("toggleSelect");
 
@@ -546,16 +548,23 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // All other rows to be check.
     $checkRows = array(
       1 => array(
+        'Soft Credit Amount' => '',
+        'Soft Credit For' => '',
+        'Soft Credit For Contribution ID' => '',
+        'Soft Credit Type' => '',
+        'Soft Credit For Contact ID' => '',
+      ),
+      2 => array(
         'Soft Credit Amount' => 50.00,
-        'Soft Credit For' => "{$softCreditLname}, {$softCreditFname}",
+        'Soft Credit For' => "{$lastName}, {$firstName}",
         'Soft Credit For Contribution ID' => $contributionID,
         'Soft Credit Type' => 'Solicited',
-        'Soft Credit For Contact ID' => $softContactId,
+        'Soft Credit For Contact ID' => $contactId,
       ),
     );
 
     // Read CSV and fire assertions.
-    $this->reviewCSV($csvFile, array(), $checkRows, 1);
+    $this->reviewCSV($csvFile, array(), $checkRows, 2);
 
   }
 
