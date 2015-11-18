@@ -96,16 +96,8 @@ class CRM_Utils_Check_Message {
     $this->name = $name;
     $this->message = $message;
     $this->title = $title;
-    // Convert level to integer
-    if (!CRM_Utils_Rule::positiveInteger($level)) {
-      $level = CRM_Utils_Check::severityMap($level);
-    }
-    else {
-      // Validate numeric input - this will throw an exception if invalid
-      CRM_Utils_Check::severityMap($level, TRUE);
-    }
-    $this->level = $level;
     $this->icon = $icon;
+    $this->setLevel($level);
   }
 
   /**
@@ -160,6 +152,26 @@ class CRM_Utils_Check_Message {
    */
   public function addHelp($help) {
     $this->help = $help;
+  }
+
+  /**
+   * Set severity level
+   *
+   * @param string|int $level
+   * @throws \CRM_Core_Exception
+   */
+  public function setLevel($level) {
+    // Convert level to integer
+    if (!CRM_Utils_Rule::positiveInteger($level)) {
+      $level = CRM_Utils_Check::severityMap($level);
+    }
+    else {
+      // Validate numeric input - this will throw an exception if invalid
+      CRM_Utils_Check::severityMap($level, TRUE);
+    }
+    $this->level = $level;
+    // Clear internal caches
+    unset($this->isVisible, $this->hiddenUntil);
   }
 
   /**
