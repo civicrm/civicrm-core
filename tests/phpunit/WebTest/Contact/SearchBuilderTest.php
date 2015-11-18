@@ -203,13 +203,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
     $firstName8 = "abcc" . substr(sha1(rand()), 0, 7);
     $this->_createContact('Individual', $firstName8, "$firstName8@advsearch.co.in", NULL);
-    $this->_searchBuilder('Note(s): Body and Subject', "this is notes by $firstName8", $firstName8, 'LIKE');
-    $this->_searchBuilder('Note(s): Subject Only', "this is subject by $firstName8", $firstName8, 'LIKE');
-    $this->_searchBuilder('Note(s): Body Only', "this is notes by $firstName8", $firstName8, 'LIKE');
-    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_body', 'notes');
-    $this->_advancedSearch("this is subject by $firstName8", $firstName8, NULL, NULL, 'note_subject', 'notes');
-    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
-    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
+    $this->_searchBuilder('Note(s): Body and Subject', "this is notes by $firstName8 adv$firstName8", $firstName8, 'LIKE');
+    $this->_searchBuilder('Note(s): Subject Only', "this is subject by $firstName8 adv$firstName8", $firstName8, 'LIKE');
+    $this->_searchBuilder('Note(s): Body Only', "this is notes by $firstName8 adv$firstName8", $firstName8, 'LIKE');
+    $this->_advancedSearch("this is notes by $firstName8 adv$firstName8", $firstName8, NULL, NULL, 'note_body', 'notes');
+    $this->_advancedSearch("this is subject by $firstName8 adv$firstName8", $firstName8, NULL, NULL, 'note_subject', 'notes');
+    $this->_advancedSearch("this is notes by $firstName8 adv$firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
+    $this->_advancedSearch("this is notes by $firstName8 adv$firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
   }
 
   /**
