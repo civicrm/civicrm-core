@@ -239,7 +239,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     }
 
     $this->click("xpath=//div[@id='registration_screen']/table/tbody/tr[1]/td[2]/div[@class='replace-plain']");
-    $this->fillRichTextField("cke_wysiwyg_frame", $registerIntro);
+    $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
     $this->click('xpath=//fieldset[@id="mail"]/div/table/tbody/tr/td[2]/label[contains(text(), "Yes")]');
