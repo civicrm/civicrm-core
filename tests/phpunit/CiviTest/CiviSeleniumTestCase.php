@@ -1473,8 +1473,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param int $duration_interval
    * @param string $duration_unit
    * @param string $auto_renew
-   * @param string $auto_renew
-
+   * @param int $minimumFee
+   * @param string $financialType
    *
    * @return array
    */
