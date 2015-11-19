@@ -43,8 +43,51 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $contactName = "Memberson, {$firstName}";
     $displayName = "{$firstName} Memberson";
 
+    // Add new Financial Account
+    $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
+    $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
+    $financialAccountDescription = "{$financialAccountTitle} Description";
+    $accountingCode = 1033;
+    $financialAccountType = 'Liability';
+    $taxDeductible = TRUE;
+    $isActive = FALSE;
+    $isTax = TRUE;
+    $taxRate = 10.00;
+    $isDefault = FALSE;
+
+    //Add new organisation
+    $this->webtestAddOrganization($orgName);
+
+    $this->_testAddFinancialAccount($financialAccountTitle,
+      $financialAccountDescription,
+      $accountingCode,
+      $orgName,
+      $financialAccountType,
+      $taxDeductible,
+      $isActive,
+      $isTax,
+      $taxRate,
+      $isDefault
+    );
+
+    //Add new Financial Type
+    $financialType['name'] = 'Taxable FinancialType ' . substr(sha1(rand()), 0, 4);
+    $financialType['is_deductible'] = TRUE;
+    $financialType['is_reserved'] = FALSE;
+    $this->addeditFinancialType($financialType);
+
+    // Assign the created Financial Account $financialAccountTitle to $financialType
+    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span/a[text()='Accounts']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
+    $this->select('account_relationship', "label=Sales Tax Account is");
+    $this->select('financial_account_id', "label=" . $financialAccountTitle);
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+
     // add membership type
-    $membershipTypes = $this->webtestAddMembershipType();
+    $membershipTypes = $this->webtestAddMembershipType('rolling', 1, 'year', 'no', 100, $financialType['name']);
 
     // now add membership
     $this->openCiviPage("member/add", "reset=1&action=add&context=standalone", "_qf_Membership_upload");
@@ -64,10 +107,20 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     // Let Join Date and Start Date stay default
     $this->click("_qf_Membership_upload");
 
-    //View Membership
+    //Open related 'Edit Contribution' form
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->click("xpath=//div[@id='memberships']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    //CRM-17417, Simply open and save edit contribution form to check that tax shouldn't be reapplied
+    $this->clickLink("xpath=//a[@title='Edit Contribution']", "_qf_Contribution_upload", FALSE);
+    $this->click("_qf_Contribution_upload");
+    $this->waitForAjaxContent();
+    $this->assertTrue($this->isTextPresent("$ 110.00"), "Contribution Amount got updated as Sale Tax got reapplied which is wrong");
+
+    //View Membership
+    $this->click("css=li#tab_member a");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
     $expected = array(
       'Membership Type' => $membershipTypes['membership_type'],
       'Status' => 'New',
