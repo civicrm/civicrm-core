@@ -132,12 +132,14 @@
     if (action === 'getfields') {
       fields.push({
         id: 'api_action',
-        text: 'Action',
+        text: ts('Action')
+      });
+      getFieldData.api_action = {
         options: _.reduce(actions.values, function(ret, item) {
           ret[item] = item;
           return ret;
         }, {})
-      });
+      };
       showFields(['api_action']);
       return;
     }

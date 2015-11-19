@@ -77,7 +77,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // We're using pop-up New Contact dialog
-    $this->createDialogContact('client_id');
+    $params = $this->createDialogContact('client_id');
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -107,6 +107,12 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Case opened successfully.");
+
+    // Go back to dashboard
+    $this->openCiviPage('case', 'reset=1');
+    //Check whether case status link opens in search correctly
+    $this->clickLink("xpath=//table[@class='report']/tbody/tr[3]/td/a");
+    $this->assertElementContainsText('Search', "{$params['last_name']}, {$params['first_name']}");
 
     // Go back to dashboard
     $this->openCiviPage('case', 'reset=1');

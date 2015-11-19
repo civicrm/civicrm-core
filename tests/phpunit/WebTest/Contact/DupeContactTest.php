@@ -88,4 +88,65 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("css=.notify-content", "Please correct the following errors in the form fields below: One matching contact was found. You can View or Edit the existing contact.");
   }
 
+  /**
+   * Edit Dedupe rule for individual
+   */
+  public function testEditRule() {
+    $this->webtestLogin();
+    $this->openCiviPage('contact/deduperules', 'action=add&contact_type=Individual&reset=1');
+    $ruleName = 'Rule_' . substr(sha1(rand()), 0, 7);
+
+    //Add Rule for individual
+    $this->type("title", "$ruleName");
+    $this->click("xpath=//table[@class='form-layout']/tbody/tr[@class='crm-dedupe-rules-form-block-used']/td[2]/label[text()='General']");
+    $lengthValueFname = $lengthValueLname = 7;
+    $weighthValueFname = 5;
+    $weightValueLname = 8;
+    $lengthValueEmail = 20;
+    $weightValueEmail = 15;
+
+    // Add first name
+    $this->select("xpath=//table[@class='form-layout-compressed']/tbody/tr[2]/td[1]/select", 'label=First Name');
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[2]/td[2]/input", 10);
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[2]/td[3]/input", 10);
+    // Add last name
+    $this->select("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td[1]/select", 'label=Last Name');
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td[2]/input", 10);
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td[3]/input", 10);
+    // Add email
+    $this->select("xpath=//table[@class='form-layout-compressed']/tbody/tr[4]/td[1]/select", 'label=Email');
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[4]/td[2]/input", 10);
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[4]/td[3]/input", 10);
+    $this->click("_qf_DedupeRules_next-bottom");
+    $this->waitForText("crm-notification-container", "The rule '$ruleName' has been saved.");
+
+    // Edit the rule for individual.
+    $this->click("xpath=//div[@id='browseValues_Individual']/div[1]/div/table/tbody//tr/td[1][text()='$ruleName']/../td[3]/span//a[text()='Edit Rule']");
+    $this->waitForElementPresent("_qf_DedupeRules_cancel-bottom");
+
+    //edit length and weight for First Name
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[2]/td[2]/input", $lengthValueFname);
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[2]/td[3]/input", $weighthValueFname);
+
+    //edit length and weight for Last Name
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td[2]/input", $lengthValueLname);
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td[3]/input", $weightValueLname);
+
+    //edit length and weight for Email
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[4]/td[2]/input", $lengthValueEmail);
+    $this->type("xpath=//table[@class='form-layout-compressed']/tbody/tr[4]/td[3]/input", $weightValueEmail);
+
+    $this->click("_qf_DedupeRules_next-bottom");
+    $this->waitForAjaxContent();
+    $this->click("xpath=//div[@id='browseValues_Individual']/div[1]/div/table/tbody//tr/td[1][text()='$ruleName']/../td[3]/span//a[text()='Edit Rule']");
+    $this->waitForAjaxContent();
+
+    $this->assertTrue($this->isElementPresent("xpath=//table[@class='form-layout-compressed']/tbody/tr[2]/td[2]/input[@value=$lengthValueFname]"));
+    $this->assertTrue($this->isElementPresent("xpath=//table[@class='form-layout-compressed']/tbody/tr[2]/td[3]/input[@value=$weighthValueFname]"));
+    $this->assertTrue($this->isElementPresent("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td[2]/input[@value=$lengthValueLname]"));
+    $this->assertTrue($this->isElementPresent("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td[3]/input[@value=$weightValueLname]"));
+    $this->assertTrue($this->isElementPresent("xpath=//table[@class='form-layout-compressed']/tbody/tr[4]/td[2]/input[@value=$lengthValueEmail]"));
+    $this->assertTrue($this->isElementPresent("xpath=//table[@class='form-layout-compressed']/tbody/tr[4]/td[3]/input[@value=$weightValueEmail]"));
+  }
+
 }

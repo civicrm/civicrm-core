@@ -1037,6 +1037,9 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     //Login with TestUser1
     $this->webtestLogin($TestUser1, 'Test12345');
     $this->openCiviPage("event/manage", "reset=1");
+    $this->type("title", $eventName);
+    $this->click("_qf_SearchEvent_refresh");
+    $this->waitForAjaxContent();
     $this->_testAddReminder($eventName);
     $this->webtestLogout();
 

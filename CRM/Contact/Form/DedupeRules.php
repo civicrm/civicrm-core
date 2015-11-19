@@ -220,7 +220,7 @@ UPDATE civicrm_dedupe_rule_group
     }
 
     // lets skip updating of fields for reserved dedupe group
-    if (isset($this->_defaults['is_reserved'])) {
+    if (CRM_Utils_Array::value('is_reserved', $this->_defaults)) {
       CRM_Core_Session::setStatus(ts("The rule '%1' has been saved.", array(1 => $rgDao->title)), ts('Saved'), 'success');
       return;
     }
