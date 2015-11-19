@@ -321,7 +321,6 @@ WHERE
     if (!$tables) {
       $tables = array('civicrm_pledge', 'civicrm_membership', 'civicrm_participant');
     }
-
     return $tables;
   }
 
@@ -750,7 +749,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $resultStats['skipped'][] = array('main_id' => $mainId, 'other_id' => $otherId);
         }
 
-        // store  any conflicts
+        // store any conflicts
         if (!empty($conflicts)) {
           foreach ($conflicts as $key => $dnc) {
             $conflicts[$key] = "{$migrationInfo['rows'][$key]['title']}: '{$migrationInfo['rows'][$key]['main']}' vs. '{$migrationInfo['rows'][$key]['other']}'";
@@ -804,7 +803,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return bool
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = array()) {
-    //$conflicts = array();
+
     $migrationData = array(
       'old_migration_info' => $migrationInfo,
       'mode' => $mode,
@@ -817,7 +816,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     foreach ($migrationInfo as $key => $val) {
       if ($val === "null") {
-        // Rule: no overwriting with empty values in any mode
+        // Rule: Never overwrite with an empty value (in any mode)
         unset($migrationInfo[$key]);
         continue;
       }
@@ -825,8 +824,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           substr($key, 0, 12) == 'move_custom_'
         ) and $val != NULL
       ) {
-        // Rule: If both main-contact, and other-contact have a field that
-        // doesn't match, then let $mode decide if to merge it or not
+        // Rule: If both main-contact, and other-contact have a field with a
+        // different value, then let $mode decide if to merge it or not
         if (
           !empty($migrationInfo['rows'][$key]['main'])
           && $migrationInfo['rows'][$key]['main'] != $migrationInfo['rows'][$key]['other']
@@ -1525,7 +1524,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $operation = 2;
         }
         $locBlocks[$fieldName][$fieldCount]['operation'] = $operation;
-        
+
         // Ignore 'locTypeId' for websites
         if ($fieldName != 'website') {
           $locBlocks[$fieldName][$fieldCount]['locTypeId'] = CRM_Utils_Array::value('locTypeId', $migrationInfo['location'][$fieldName][$fieldCount]);
