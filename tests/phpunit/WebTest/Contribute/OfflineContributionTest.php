@@ -283,7 +283,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       'Total Amount' => 123,
-      'Non-deductible Amount' => 123,
+      'Non-deductible Amount' => '0.00',
       'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario4);
