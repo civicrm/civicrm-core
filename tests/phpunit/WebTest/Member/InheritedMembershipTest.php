@@ -424,9 +424,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     $this->select('period_type', 'value=rolling');
 
-    $this->removeSelection('relationship_type_id', 'label=- select -');
-    $this->addSelection('relationship_type_id', 'label=Employer of');
-
+    $this->select2('relationship_type_id', 'Employer of', TRUE);
     $this->type('max_related', '5');
 
     $this->click('_qf_MembershipType_upload-bottom');

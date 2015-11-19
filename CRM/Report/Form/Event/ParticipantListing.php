@@ -306,6 +306,9 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'default_weight' => '2',
             'default_order' => 'ASC',
           ),
+          'event_start_date' => array(
+            'title' => ts('Event Start Date'),
+          ),
         ),
       ),
       'civicrm_contribution' => array(

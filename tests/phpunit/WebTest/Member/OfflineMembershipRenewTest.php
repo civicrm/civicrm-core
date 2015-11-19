@@ -196,14 +196,14 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
     // page was loaded
-    $this->waitForTextPresent($sourceText);
+    $this->waitForAjaxContent();
 
     $this->waitForElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[9]/span/a[contains(text(), 'View')]");
 
     // click through to the membership view screen
     $this->waitForAjaxContent();
     $this->click("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[9]/span/a[contains(text(), 'View')]");
-    $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
+    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     $joinDate = date('F jS, Y');
     $startDate = date('F jS, Y', strtotime("+1 month"));

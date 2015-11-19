@@ -82,7 +82,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     //Create role
     $role = 'role' . substr(sha1(rand()), 0, 7);
     $this->open($this->sboxPath . "admin/people/permissions/roles");
-    $this->waitForElementPresent("edit-submit");
+    $this->waitForAjaxContent();
     $this->type("edit-name", $role);
     $this->click("edit-add");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -234,7 +234,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $role = 'role' . substr(sha1(rand()), 0, 7);
     $this->open($this->sboxPath . "admin/people/permissions/roles");
 
-    $this->waitForElementPresent("edit-add");
+    $this->waitForAjaxContent();
     $this->type("edit-name", $role);
     $this->click("edit-add");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -320,10 +320,10 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$ACLrole1}']");
-    $roleId = explode('/', $this->getAttribute("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$ACLrole1}']/../td[4]/a[text()='edit permissions']/@href"));
+    $roleId = explode("people/permissions/", $this->getAttribute("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$ACLrole1}']/../td[4]/a[text()='edit permissions']/@href"));
     $permissions = array(
-      "edit-{$roleId[5]}-access-civicrm",
-      "edit-{$roleId[5]}-access-civievent",
+      "edit-{$roleId[1]}-access-civicrm",
+      "edit-{$roleId[1]}-access-civievent",
     );
     $this->changePermissions($permissions);
 
