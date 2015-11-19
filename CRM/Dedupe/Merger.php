@@ -795,8 +795,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Array of information about which elements to merge.
    * @param string $mode
    *   Helps decide how to behave when there are conflicts.
-   *                                 A 'safe' value skips the merge if there are any un-resolved conflicts.
-   *                                 Does a force merge otherwise (aggressive mode).
+   *   -  A 'safe' value skips the merge if there are any un-resolved conflicts.
+   *   -  Does a force merge otherwise (aggressive mode).
    *
    * @param array $conflicts
    *
@@ -921,6 +921,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $allPhoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $allProviderTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $allWebsiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
 
     // Fetch contacts
     foreach (array('main' => $mainId, 'other' => $otherId) as $moniker => $cid) {
@@ -983,8 +984,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $rows = $elements = $relTableElements = $migrationInfo = array();
 
-    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-
     foreach ($compareFields['contact'] as $field) {
       if ($field == 'contact_sub_type') {
         // CRM-15681 don't display sub-types in UI
@@ -1042,7 +1041,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           if (is_array($value) && empty($value[1])) {
             $value[1] = NULL;
           }
-          $elements[] = array('advcheckbox', "move_$field", NULL, NULL, NULL, $value);
+
+          // Display a checkbox to migrate, only if the values are different
+          if ($value != $main[$field]) {
+            $elements[] = array('advcheckbox', "move_$field", NULL, NULL, NULL, $value);
+          }
+
           $migrationInfo["move_$field"] = $value;
         }
       }
@@ -1052,11 +1056,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // Handle location blocks.
     // @todo OpenID not in API yet, so is not supported here.
 
-    $locationBlocks = array('Address', 'Email', 'IM', 'Phone', 'Website');
+    $locationBlocks = array(
+      'address' => 'Address',
+      'email' => 'Email',
+      'im' => 'IM',
+      'phone' => 'Phone',
+      'website' => 'Website',
+    );
     $locations = array();
 
-    foreach ($locationBlocks as $block) {
-      $blockName = strtolower($block);
+    foreach ($locationBlocks as $blockName => $block) {
       foreach (array('main' => $mainId, 'other' => $otherId) as $moniker => $cid) {
         $cnt = 1;
         $searchParams = array(
@@ -1064,7 +1073,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           'contact_id' => $cid,
         );
         // CRM-17556 Order by location and type
-        // @todo Temporary fix for websites (no location, only type)
+        // Handle websites (no location, only type)
         if ($blockName == 'website') {
           $searchParams['options'] = array('sort' => 'website_type_id');
         }
@@ -1117,7 +1126,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $locBlockIds['main'] = $locBlockIds['other'] = array();
     $typeBlockIds['main'] = $typeBlockIds['other'] = array();
 
-    foreach ($locationBlocks as $block) {
+    foreach ($locationBlocks as $blockName => $block) {
       $name = strtolower($block);
       foreach (array('main', 'other') as $moniker) {
         $locIndex = CRM_Utils_Array::value($moniker, $locations);
@@ -1316,7 +1325,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $elements[] = array('advcheckbox', "move_location_{$name}_{$count}");
 
         // Add location select list for location block (websites don't have a location)
-        // @todo make sure websites can be migrated as well
         if ($name != 'website') {
           $migrationInfo["move_location_{$name}_{$count}"] = 1;
           // make sure default location type is always on top
@@ -1543,14 +1551,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // **** Do location related migration.
-    // @todo Handle websites.
     // @todo Handle OpenID (not currently in API).
     if (!empty($locBlocks)) {
-      $locComponent = array(
-        'email' => 'Email',
-        'phone' => 'Phone',
-        'im' => 'IM',
+
+      $locationBlocks = array(
         'address' => 'Address',
+        'email' => 'Email',
+        'im' => 'IM',
+        'phone' => 'Phone',
         'website' => 'Website',
       );
 
@@ -1561,7 +1569,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         if (!is_array($block) || CRM_Utils_System::isNull($block)) {
           continue;
         }
-        $daoName = 'CRM_Core_DAO_' . $locComponent[$name];
+        $daoName = 'CRM_Core_DAO_' . $locationBlocks[$name];
         $primaryDAOId = (array_key_exists($name, $primaryBlockIds)) ? array_pop($primaryBlockIds[$name]) : NULL;
         $billingDAOId = (array_key_exists($name, $billingBlockIds)) ? array_pop($billingBlockIds[$name]) : NULL;
 
@@ -1574,7 +1582,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $idKey = $blkCount;
           if (
             $name != 'website'
-            && array_key_exists($name, $locComponent)
+            && array_key_exists($name, $locationBlocks)
           ) {
             $idKey = $locTypeId;
           }

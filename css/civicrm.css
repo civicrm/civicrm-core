@@ -3173,6 +3173,14 @@ div.m ul#civicrm-menu,
 .crm-container .even.crm-row-selected {
   background-color: #fffdb2;
 }
+.crm-container table tr.merge-row-equal {
+  background-color: #EFFFE7;
+  border-bottom: 1px solid #ccc;
+}
+.crm-container table tr.merge-row-diff {
+  background-color: #FFECEC;
+  border-bottom: 1px solid #ccc;
+}
 
 #crm-container .crm-socialnetwork {
   margin-top: 1em;
