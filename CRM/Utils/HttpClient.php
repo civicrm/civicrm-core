@@ -96,9 +96,18 @@ class CRM_Utils_HttpClient {
       CRM_Core_Session::setStatus(ts('Unable to write to %1.<br />Is the location writable?', array(1 => $localFile)), ts('Write Error'), 'error');
       return self::STATUS_WRITE_ERROR;
     }
-    curl_setopt($ch, CURLOPT_FILE, $fp);
 
-    curl_exec($ch);
+    if($this->isRedirectSupported()) {
+      curl_setopt($ch, CURLOPT_FILE, $fp);
+
+      curl_exec($ch);
+    } else {
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+      $data = $this->curlExecWithRedirects($ch);
+      fwrite($fp, $data);
+    }
+
     if (curl_errno($ch)) {
       // Fixme: throw error instead of setting message
       CRM_Core_Session::setStatus(ts('Unable to download extension from %1. Error Message: %2',
@@ -141,7 +150,9 @@ class CRM_Utils_HttpClient {
     }
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
     $data = curl_exec($ch);
+
     if (curl_errno($ch)) {
       return array(self::STATUS_DL_ERROR, $data);
     }
@@ -150,6 +161,45 @@ class CRM_Utils_HttpClient {
     }
 
     return array(self::STATUS_OK, $data);
+  }
+
+  private function curlExecWithRedirects($ch)
+  {
+    if(!$this->isRedirectSupported()) {
+      curl_setopt($ch, CURLOPT_HEADER, 1);
+
+      $redirectsLeft = 20;
+      do {
+        $data = curl_exec($ch);
+        if(curl_errno($ch)) {
+          return array(self::STATUS_DL_ERROR, NULL);
+        }
+
+        $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if($responseCode != 301 && $responseCode != 302) {
+          break;
+        }
+        $headersStart = strpos($data, "\r\n") + 2;
+        $headers = substr($data, $headersStart, strpos($data, "\r\n\r\n", $headersStart)+4);
+
+        $matches = array();
+        if(!preg_match("!\r\n(?:Location|URI): *(?<location>.*?) *\r\n!", $headers, $matches)) {
+          break;
+        }
+
+        curl_setopt($ch, CURLOPT_URL, $matches['location']);
+      } while($redirectsLeft--);
+
+      if(!$redirectsLeft) {
+        return array(self::STATUS_DL_ERROR, NULL);
+      }
+
+      $data = substr($data, strpos($data, "\r\n\r\n")+4);
+    } else {
+      $data = curl_exec($ch);
+    }
+
+    return $data;
   }
 
   /**
