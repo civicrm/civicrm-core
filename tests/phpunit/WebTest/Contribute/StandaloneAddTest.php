@@ -48,17 +48,15 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
     $financialAccountDescription = "{$financialAccountTitle} Description";
     $accountingCode = 1033;
-    $financialAccountType = 'Asset';
-    $taxDeductible = FALSE;
+    $financialAccountType = 'Liability';
+    $taxDeductible = TRUE;
     $isActive = FALSE;
     $isTax = TRUE;
-    $taxRate = 9.9999999;
+    $taxRate = 10.00;
     $isDefault = FALSE;
 
     //Add new organisation
-    if ($orgName) {
-      $this->webtestAddOrganization($orgName);
-    }
+    $this->webtestAddOrganization($orgName);
 
     $this->_testAddFinancialAccount($financialAccountTitle,
       $financialAccountDescription,
@@ -72,13 +70,29 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
+    //Add new Financial Type
+    $financialType['name'] = 'Taxable FinancialType ' . substr(sha1(rand()), 0, 4);
+    $financialType['is_deductible'] = TRUE;
+    $financialType['is_reserved'] = FALSE;
+    $this->addeditFinancialType($financialType);
+
+    // Assign the created Financial Account $financialAccountTitle to $financialType
+    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span/a[text()='Accounts']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
+    $this->select('account_relationship', "label=Sales Tax Account is");
+    $this->select('financial_account_id', "label=" . $financialAccountTitle);
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog
     $contact = $this->createDialogContact();
 
     // select financial type
-    $this->select("financial_type_id", "value=1");
+    $this->select("financial_type_id", "label=" .  $financialType['name']);
 
     // fill in Received Date
     $this->webtestFillDate('receive_date');
@@ -90,9 +104,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("total_amount", "100");
 
     // select payment instrument type = Check and enter chk number
-    $this->select("payment_instrument_id", "value=4");
-    $this->waitForElementPresent("check_number");
-    $this->type("check_number", "check #1041");
+    $this->select("payment_instrument_id", "label=Cash");
     $this->click("is_email_receipt");
     $this->assertTrue($this->isChecked("is_email_receipt"), 'Send Receipt checkbox should be checked.');
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
@@ -101,17 +113,11 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 's2id_soft_credit_contact_id_1');
     $this->type("soft_credit_amount_1", "100");
 
-    //Custom Data
-    //$this->click('CIVICRM_QFID_3_6');
-
     //Additional Detail section
     $this->click("AdditionalDetail");
     $this->waitForElementPresent("thankyou_date");
 
     $this->type("note", "This is a test note.");
-    $this->type("non_deductible_amount", "10");
-    $this->type("fee_amount", "0");
-    $this->type("net_amount", "0");
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
@@ -135,16 +141,18 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     // verify if Membership is created
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
 
+    $contriID = $this->urlArg('id', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+    $contactID = $this->urlArg('cid', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+
     //click through to the Membership view screen
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     $expected = array(
-      'Financial Type' => 'Donation',
-      'Total Amount' => '$ 100.00',
+      'Financial Type' => $financialType['name'],
+      'Total Amount' => '$ 110.00',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Check',
-      'Check Number' => 'check #1041',
+      'Paid By' => 'Cash',
     );
 
     foreach ($expected as $label => $value) {
@@ -171,13 +179,28 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[1]/a", preg_quote($contact['display_name']));
     // verify soft credit details
     $expected = array(
-      4 => 'Donation',
+      4 => $financialType['name'],
       2 => '100.00',
       6 => 'Completed',
     );
     foreach ($expected as $value => $label) {
       $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
     }
+
+    // CRM-17418 fix: Now cancel the contribution
+    $this->openCiviPage("contact/view/contribution", "reset=1&action=update&id=$contriID&cid=$contactID&context=contribution", "_qf_Contribution_upload");
+    $this->select('contribution_status_id', 'label=Cancelled');
+    $this->waitForElementPresent('cancel_reason');
+    $this->click("_qf_Contribution_upload");
+    // Is status message correct?
+    $this->waitForText("crm-notification-container", "The contribution record has been saved.");
+
+    // 1. On first completed contribution the contribution_amount = 100 and Tax Amount = 10
+    // 2. After Cancellation contribution_amount = -100 and Tax Amount = -10
+    // So the sum of all the 4 created financial item's amount would be 0
+    $query = "SELECT SUM( amount ) FROM `civicrm_financial_item` WHERE entity_id = %1";
+    $sum = CRM_Core_DAO::singleValueQuery($query, array(1 => array($contriID, 'Integer')));
+    $this->assertEquals($sum, 0.00);
   }
 
   public function testfinancialTypeSearch() {
