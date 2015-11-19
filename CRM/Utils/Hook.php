@@ -999,6 +999,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called after getting the content of the mail and before tokenizing it.
+   *
+   * @param array $templates
+   *   Array fields include: html, text, subject
+   *
+   * @return mixed
+   */
+  public static function alterMailTemplates(&$templates) {
+    return self::singleton()->invoke(1, $templates,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterMailTemplates'
+    );
+  }
+
+  /**
    * This hook is called when rendering the Manage Case screen.
    *
    * @param int $caseID
