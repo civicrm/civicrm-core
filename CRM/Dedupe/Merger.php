@@ -533,7 +533,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * Find differences between contacts.
+   * Load all non-empty fields for the contacts
    *
    * @param array $main
    *   Contact details.
@@ -542,7 +542,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return array
    */
-  public static function findDifferences($main, $other) {
+  public static function retrieveFields($main, $other) {
     $result = array(
       'contact' => array(),
       'custom' => array(),
@@ -825,10 +825,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           substr($key, 0, 12) == 'move_custom_'
         ) and $val != NULL
       ) {
-        // Rule: if both main-contact has other-contact, let $mode decide if to merge a
-        // particular field or not
-        if (!empty($migrationInfo['rows'][$key]['main'])) {
-          // if main also has a value its a conflict
+        // Rule: If both main-contact, and other-contact have a field that
+        // doesn't match, then let $mode decide if to merge it or not
+        if (
+          !empty($migrationInfo['rows'][$key]['main'])
+          && $migrationInfo['rows'][$key]['main'] != $migrationInfo['rows'][$key]['other']
+        ) {
 
           // note it down & lets wait for response from the hook.
           // For no response $mode will decide if to skip this merge
@@ -978,13 +980,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $fields[$field]['title'] = $params['title'];
     }
 
-    $diffs = self::findDifferences($main, $other);
+    $compareFields = self::retrieveFields($main, $other);
 
     $rows = $elements = $relTableElements = $migrationInfo = array();
 
     $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
 
-    foreach ($diffs['contact'] as $field) {
+    foreach ($compareFields['contact'] as $field) {
       if ($field == 'contact_sub_type') {
         // CRM-15681 don't display sub-types in UI
         continue;
@@ -1424,7 +1426,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
 
       foreach ($group['fields'] as $fid => $field) {
-        if (in_array($fid, $diffs['custom'])) {
+        if (in_array($fid, $compareFields['custom'])) {
           if (!$foundField) {
             $rows["custom_group_$gid"]['title'] = $group['title'];
             $foundField = TRUE;
