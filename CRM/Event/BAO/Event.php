@@ -381,10 +381,6 @@ WHERE      civicrm_event.is_active = 1 AND
     }
     // Get the event summary display preferences
     $show_max_events = Civi::settings()->get('show_events');
-    // default to 10 if no option is set
-    if (is_null($show_max_events)) {
-      $show_max_events = 10;
-    }
     // show all events if show_events is set to a negative value
     if ($show_max_events >= 0) {
       $event_summary_limit = "LIMIT      0, $show_max_events";
