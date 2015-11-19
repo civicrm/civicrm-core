@@ -1473,10 +1473,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param int $duration_interval
    * @param string $duration_unit
    * @param string $auto_renew
+   * @param int $minimumFee
+   * @param string $financialType
    *
    * @return array
    */
-  public function webtestAddMembershipType($period_type = 'rolling', $duration_interval = 1, $duration_unit = 'year', $auto_renew = 'no', $minimumFee = 100) {
+  public function webtestAddMembershipType($period_type = 'rolling', $duration_interval = 1, $duration_unit = 'year', $auto_renew = 'no', $minimumFee = 100, $financialType = 'Member Dues') {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';
     $this->webtestAddOrganization($membershipOrg, TRUE);
@@ -1485,7 +1487,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $memTypeParams = array(
       'membership_type' => $title,
       'member_of_contact' => $membershipOrg,
-      'financial_type' => 2,
+      'financial_type' => $financialType,
       'period_type' => $period_type,
     );
 
@@ -1515,7 +1517,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->select2('member_of_contact_id', $membershipTitle);
 
     $this->type('minimum_fee', $minimumFee);
-    $this->select('financial_type_id', "value={$memTypeParams['financial_type']}");
+    $this->select('financial_type_id', "label={$memTypeParams['financial_type']}");
 
     $this->type('duration_interval', $duration_interval);
     $this->select('duration_unit', "label={$duration_unit}");
