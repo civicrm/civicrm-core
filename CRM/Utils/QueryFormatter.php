@@ -26,9 +26,9 @@
  */
 
  /**
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- */
+  * @package CRM
+  * @copyright CiviCRM LLC (c) 2004-2015
+  */
 
 /**
  * Class CRM_Utils_QueryFormatter
