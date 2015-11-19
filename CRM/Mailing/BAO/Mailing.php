@@ -802,6 +802,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         $template[] = $this->subject;
         $this->templates['subject'] = implode("\n", $template);
       }
+
+      CRM_Utils_Hook::alterMailTemplates($this->templates);
     }
     return $this->templates;
   }
