@@ -68,7 +68,7 @@
 
   {crmAPI var='main_result' entity='Contact' action='get' return="modified_date" id=$main_cid}
 
-  <tr style="background-color: #FFFFCC !important; border-bottom:1px solid #ccc !important;">
+  <tr>
     <td>Last modified</td>
     <td>{$other_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} (Most recent) {/if}</td>
     <td></td>
@@ -85,9 +85,9 @@
         </td>
     {else}
       {if $row.main eq $row.other}
-         <tr style="background-color: #EFFFE7 !important; border-bottom:1px solid #ccc !important;" class="equal-data {cycle values="odd-row,even-row"}">
+         <tr class="merge-row-equal {cycle values="odd-row,even-row"}">
       {else}
-         <tr style="background-color: #FFECEC !important; border-bottom:1px solid #ccc !important;" class="diff-data {cycle values="odd-row,even-row"}">
+         <tr class="merge-row-diff {cycle values="odd-row,even-row"}">
       {/if}
         <td>
           {$row.title}
@@ -160,7 +160,9 @@
           <td>
             {if isset($row.main) || isset($row.other)}
               <span id="main_{$blockName}_{$blockId}_overwrite">
-                {if $row.main}
+                {if $row.main == $row.other}
+                  <span class="action_label">(match)</span><br />
+                {elseif $row.main}
                   <span class="action_label">(overwrite)</span><br />
                  {else}
                    <span class="action_label">(add)</span>
@@ -292,7 +294,7 @@ You will need to manually delete that user (click on the link to open Drupal Use
 
     // Show/hide matching data rows
     $('.toggle_equal_rows').click(function() {
-      $('tr.equal-data').toggle();
+      $('tr.merge-row-equal').toggle();
     });
 
   });
