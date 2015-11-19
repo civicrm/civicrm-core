@@ -1084,20 +1084,25 @@ abstract class CRM_Core_Payment {
     $method = 'handle' . $method;
     $extension_instance_found = FALSE;
 
-    // In all likelihood, we'll just end up with the one instance returned here. But it's
-    // possible we may get more. Hence, iterate through all instances ..
+    // In all likelihood, we'll just end up with the one instance
+    // returned here. But it's possible we may get more. Hence,
+    // iterate through all instances ..
 
     while ($dao->fetch()) {
-      // Check pp is extension - is this still required - surely the singleton below handles it.
+      // Check pp is extension - is this still required - surely the
+      // singleton below handles it.
       $ext = CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($dao->class_name)) {
         $paymentClass = $ext->keyToClass($dao->class_name, 'payment');
         require_once $ext->classToPath($paymentClass);
       }
+      else {
+        $paymentClass = $dao->class_name;
+      }
 
       $processorInstance = Civi\Payment\System::singleton()->getById($dao->processor_id);
-
-      // Should never be empty - we already established this processor_id exists and is active.
+      // Should never be empty - we already established this
+      // processor_id exists and is active.
       if (empty($processorInstance)) {
         continue;
       }
@@ -1106,8 +1111,10 @@ abstract class CRM_Core_Payment {
       if (!method_exists($processorInstance, $method) ||
         !is_callable(array($processorInstance, $method))
       ) {
-        // on the off chance there is a double implementation of this processor we should keep looking for another
-        // note that passing processor_id is more reliable & we should work to deprecate processor_name
+        // on the off chance there is a double implementation of this
+        // processor we should keep looking for another note that
+        // passing processor_id is more reliable & we should work to
+        // deprecate processor_name
         continue;
       }
 
@@ -1124,7 +1131,8 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Check whether a method is present ( & supported ) by the payment processor object.
+   * Check whether a method is present ( & supported ) by the payment
+   * processor object.
    *
    * @deprecated - use $paymentProcessor->supports(array('cancelRecurring');
    *

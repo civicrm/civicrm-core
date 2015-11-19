@@ -121,7 +121,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       CRM_Core_Error::fatal(ts('Component is invalid'));
     }
 
-    $url = $config->userFrameworkResourceURL . "extern/pxIPN.php";
+    $url = $this->getNotifyURL();
 
     if ($component == 'event') {
       $cancelURL = CRM_Utils_System::url('civicrm/event/register',
@@ -136,14 +136,14 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       );
     }
 
-    /*
-     * Build the private data string to pass to DPS, which they will give back to us with the
-     *
-     * transaction result.  We are building this as a comma-separated list so as to avoid long URLs.
-     *
-     * Parameters passed: a=contactID, b=contributionID,c=contributionTypeID,d=invoiceID,e=membershipID,f=participantID,g=eventID
-     */
-
+    // Build the private data string to pass to DPS, which they will
+    // give back to us with the transaction result.  We are building
+    // this as a comma-separated list so as to avoid long URLs.
+    //
+    // Parameters passed:
+    //
+    // a=contactID, b=contributionID, c=contributionTypeID, d=invoiceID,
+    // e=membershipID,f=participantID,g=eventID
     $privateData = "a={$params['contactID']},b={$params['contributionID']},c={$params['contributionTypeID']},d={$params['invoiceID']}";
 
     if ($component == 'event') {
@@ -175,10 +175,8 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     // Allow further manipulation of params via custom hooks
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $dpsParams);
 
-    /*
-     *  determine whether method is pxaccess or pxpay by whether signature (mac key) is defined
-     */
-
+    // Determine whether method is pxaccess or pxpay by whether
+    // signature (mac key) is defined.
     if (empty($this->_paymentProcessor['signature'])) {
       /*
        * Processor is pxpay
@@ -240,6 +238,41 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       $request_string = $pxaccess->makeRequest($request);
       CRM_Utils_System::redirect($request_string);
     }
+  }
+
+  /**
+   * Handle payment notification from browser & DPS PXL client.
+   */
+  function handlePaymentNotification() {
+    $config = CRM_Core_Config::singleton();
+    $log = new CRM_Utils_SystemLogger();
+    $log->alert('payment_notification processor_name=Payment_Express', $_REQUEST);
+
+    $config = $this->_paymentProcessor;
+
+    $method = $config['signature'] ? 'pxaccess' : 'pxpay';
+    require_once 'CRM/Core/Payment/PaymentExpressIPN.php';
+    $rawPostData = $_GET['result'];
+    CRM_Core_Payment_PaymentExpressIPN::main($method, $rawPostData, $config['url_site'], $config['user_name'], $config['password'], $config['signature']);
+  }
+
+  /**
+   * Get the notify (aka ipn, web hook or silent post) url.
+   *
+   * If there is no '.' in it we assume that we are dealing with localhost or
+   * similar and it is unreachable from the web & hence invalid.
+   *
+   * @return string
+   *   URL to notify outcome of transaction.
+   */
+  function getNotifyUrl() {
+    $url = CRM_Utils_System::url(
+      'civicrm/payment/ipn/' . $this->_paymentProcessor['id'],
+      array(),
+      TRUE
+    );
+    $url = trim($url, '?');
+    return (stristr($url, '.')) ? $url : '';
   }
 
 }
