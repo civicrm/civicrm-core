@@ -1628,13 +1628,7 @@ SELECT id
       $customFields[$customFieldId]['html_type'] == 'AdvMulti-Select'
     ) {
       if ($value) {
-        // Note that only during merge this is not an array,
-        // and you can directly use value, CRM-4385
-        if (is_array($value)) {
-          $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-              array_values($value)
-            ) . CRM_Core_DAO::VALUE_SEPARATOR;
-        }
+        $value = CRM_Utils_Array::implodePadded($value);
       }
       else {
         $value = '';
