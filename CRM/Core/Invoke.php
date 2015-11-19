@@ -344,54 +344,18 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * Show status in the footer
+   * Show status in the footer (admin only)
    *
    * @param CRM_Core_Smarty $template
    */
   public static function statusCheck($template) {
-    if (CRM_Core_Config::isUpgradeMode()) {
+    if (CRM_Core_Config::isUpgradeMode() || !CRM_Core_Permission::check('administer CiviCRM')) {
       return;
     }
-    //  check date of last cache and compare to today's date
-    $systemCheckDate = Civi::cache()->get('systemCheckDate');
-    if ($systemCheckDate > strtotime("one day ago")) {
-      $statusSeverity = Civi::cache()->get('systemCheckSeverity');
-    }
-    //  calls helper function in CRM_Utils_Check
-    if (empty($statusSeverity)) {
-      $statusSeverity = CRM_Utils_Check::checkAll(TRUE);
-    }
-    switch ($statusSeverity) {
-      case 7:
-        $statusMessage = ts('System Status: Emergency');
-        break;
-
-      case 6:
-        $statusMessage = ts('System Status: Alert');
-        break;
-
-      case 5:
-        $statusMessage = ts('System Status: Critical');
-        break;
-
-      case 4:
-        $statusMessage = ts('System Status: Error');
-        break;
-
-      case 3:
-        $statusMessage = ts('System Status: Warning');
-        break;
-
-      case 2:
-        $statusMessage = ts('System Status: Notice');
-        break;
-
-      default:
-        $statusMessage = ts('System Status: Ok');
-    }
-    // TODO: get status from CRM_Utils_Check, if cached
-    $template->assign('footer_status_severity', $statusSeverity);
-    $template->assign('footer_status_message', $statusMessage);
+    // always use cached results - they will be refreshed by the session timer
+    $status = Civi::settings()->get('systemStatusCheckResult');
+    $template->assign('footer_status_severity', $status);
+    $template->assign('footer_status_message', CRM_Utils_Check::toStatusLabel($status));
   }
 
   /**
