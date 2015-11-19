@@ -223,7 +223,7 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Check if message is visible or has been hidden by the user.
+   * Check if message has been hidden by the user.
    *
    * Also populates this->hiddenUntil property.
    *
@@ -233,36 +233,30 @@ class CRM_Utils_Check_Message {
    */
   private function checkStatusPreference() {
     $this->hiddenUntil = FALSE;
+    // Debug, info & notice can't be hidden
+    if ($this->level < 3) {
+      return FALSE;
+    }
     $statusPreferenceParams = array(
       'name' => $this->getName(),
       'domain_id' => CRM_Core_Config::domainID(),
+      'sequential' => 1,
     );
     // Check if there's a StatusPreference matching this name/domain.
     $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
-    $spid = FALSE;
-    if (isset($statusPreference['id'])) {
-      $spid = $statusPreference['id'];
-    }
-    if ($spid) {
+    $prefs = CRM_Utils_Array::value('values', $statusPreference, array());
+    if ($prefs) {
       // If so, compare severity to StatusPreference->severity.
-      if ($this->level <= $statusPreference['values'][$spid]['ignore_severity']) {
-        // A hush or a snooze has been set.  Find out which.
-        if (isset($statusPreference['values'][$spid]['hush_until'])) {
-          // Snooze is set.
-          $this->hiddenUntil = $statusPreference['values'][$spid]['hush_until'];
+      if ($this->level <= $prefs[0]['ignore_severity']) {
+        if (isset($prefs[0]['hush_until'])) {
+          // Time-based hush.
+          $this->hiddenUntil = $prefs[0]['hush_until'];
           $today = new DateTime();
-          $snoozeDate = new DateTime($statusPreference['values'][$spid]['hush_until']);
-          if ($today > $snoozeDate) {
-            // Snooze is expired.
-            return FALSE;
-          }
-          else {
-            // Snooze is active.
-            return TRUE;
-          }
+          $snoozeDate = new DateTime($prefs[0]['hush_until']);
+          return !($today > $snoozeDate);
         }
         else {
-          // Hush.
+          // Hidden indefinitely.
           return TRUE;
         }
       }
