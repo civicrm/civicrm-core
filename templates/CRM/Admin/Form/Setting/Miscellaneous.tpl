@@ -77,21 +77,6 @@
             <td>{$form.versionCheck.html}<br />
                 <p class="description">{ts}When enabled, statistics about your CiviCRM installation are reported anonymously to the CiviCRM team to assist in prioritizing ongoing development efforts. The following information is gathered: CiviCRM version, versions of PHP, MySQL and framework (Drupal/Joomla/standalone), and default language. Counts (but no actual data) of the following record types are reported: contacts, activities, cases, relationships, contributions, contribution pages, contribution products, contribution widgets, discounts, price sets, profiles, events, participants, tell-a-friend pages, grants, mailings, memberships, membership blocks, pledges, pledge blocks and active payment processor types.{/ts}</p></td>
         </tr>
-        <tr class="crm-miscellaneous-form-block-versionCheckIgnoreDate">
-            <td class="label">{$form.versionCheckIgnoreDate.label}</td>
-            <td>{$form.versionCheckIgnoreDate.html|crmReplace:type:date}<br />
-                <p class="description">{ts}If you wish to stop receiving alerts about a current update (for example, if you have applied a security patch manually), set this to today's date.{/ts}</p></td>
-        </tr>
-        <tr class="crm-miscellaneous-form-block-securityUpdateAlert">
-          <td class="label">{$form.securityUpdateAlert.label}</td>
-          <td>{$form.securityUpdateAlert.html}<br />
-            <p class="description">{ts}Alert site admins about security advisories. <strong>Strongly recommended.</strong>{/ts}</p></td>
-        </tr>
-        <tr class="crm-miscellaneous-form-block-versionAlert">
-          <td class="label">{$form.versionAlert.label}</td>
-          <td>{$form.versionAlert.html}<br />
-            <p class="description">{ts}Alert site admins about all new CiviCRM releases.{/ts}</p></td>
-        </tr>
         <tr class="crm-miscellaneous-form-block-empoweredBy">
             <td class="label">{$form.empoweredBy.label}</td>
             <td>{$form.empoweredBy.html}<br />
@@ -151,14 +136,6 @@
           .on('crmConfirm:no', function() {
             $('input[name=versionCheck][value=0]').prop('checked', false);
             $('input[name=versionCheck][value=1]').prop('checked', true);
-          })
-      }
-    });
-    $('select[name=securityUpdateAlert]').change(function() {
-      if ($(this).val() == '0') {
-        CRM.confirm({message: {/literal}"{ts escape='js'}Disabling this option will prevent CiviCRM from checking for important security updates. Are you sure?{/ts}"{literal}})
-          .on('crmConfirm:no', function() {
-            $('select[name=securityUpdateAlert]').val('3');
           })
       }
     });

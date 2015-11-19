@@ -218,10 +218,6 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  // Disable automatic download / installation of extensions
  // $civicrm_setting['Extension Preferences']['ext_repo_url'] = false;
 
- // Disable version update alerts.
- // $civicrm_setting['CiviCRM Preferences']['versionAlert']; = false;
-
-
 /**
  * If you are using any CiviCRM script in the bin directory that
  * requires authentication, then you also need to set this key.
