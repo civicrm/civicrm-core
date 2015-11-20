@@ -26,4 +26,4 @@ ALTER TABLE civicrm_participant
   ADD CONSTRAINT `FK_civicrm_participant_transferred_to_contact_id` FOREIGN KEY (`transferred_to_contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL;
 
 INSERT INTO civicrm_participant_status_type(name, {localize field='label'}label{/localize}, class, is_reserved, is_active, is_counted, weight, visibility_id)
-VALUES ('Transferred', '{ts escape="sql"}Transferred{/ts}', 'Negative', 1, 1, 0, 16, 2);
+VALUES ('Transferred', {localize}'{ts escape="sql"}Transferred{/ts}'{/localize}, 'Negative', 1, 1, 0, 16, 2);
