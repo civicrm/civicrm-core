@@ -25,11 +25,13 @@
 *}
 {*this template is used for activity accordion*}
 {assign var=caseid value=$caseID}
-<div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
-  <div class="crm-accordion-header">
-    {ts}Activities{/ts}
-  </div>
-  <div id="activities" class="crm-accordion-body">
+{if isset($isForm) and $isForm}
+  <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
+    <div class="crm-accordion-header">
+      {ts}Activities{/ts}
+    </div>
+
+    <div id="activities" class="crm-accordion-body">
     <div class="crm-accordion-wrapper crm-accordion-inner crm-search_filters-accordion collapsed">
       <div class="crm-accordion-header">
         {ts}Search Filters{/ts}
@@ -70,6 +72,7 @@
         </table>
       </div><!-- /.crm-accordion-body -->
     </div><!-- /.crm-accordion-wrapper -->
+{/if}
 
     <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-order='[[0,"desc"]]' data-page-length="10">
       <thead><tr>
@@ -89,7 +92,7 @@
         var caseId = {/literal}{$caseID}{literal};
         CRM.$('table#case_id_' + caseId).data({
           "ajax": {
-            "url": {/literal}'{crmURL p="civicrm/ajax/activity" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal},
+            "url": {/literal}'{crmURL p="civicrm/ajax/activity" h=0 q="snippet=4&caseID=$caseID&cid=$contactID&userID=$userID"}'{literal},
             "data": function (d) {
               d.status_id = $("select#status_id_" + caseId).val(),
               d.reporter_id = $("select#reporter_id_" + caseId).val(),
@@ -109,5 +112,7 @@
     </script>
   {/literal}
 
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+{if isset($isForm) and $isForm}
+    </div><!-- /.crm-accordion-body -->
+  </div><!-- /.crm-accordion-wrapper -->
+{/if}
