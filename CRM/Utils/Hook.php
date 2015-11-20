@@ -1001,15 +1001,15 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called after getting the content of the mail and before tokenizing it.
    *
-   * @param array $templates
+   * @param array $content
    *   Array fields include: html, text, subject
    *
    * @return mixed
    */
-  public static function alterMailTemplates(&$templates) {
-    return self::singleton()->invoke(1, $templates,
+  public static function alterMailContent(&$content) {
+    return self::singleton()->invoke(1, $content,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_alterMailTemplates'
+      'civicrm_alterMailContent'
     );
   }
 
