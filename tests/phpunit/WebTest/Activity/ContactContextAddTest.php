@@ -118,7 +118,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr//td/div[text()='$subject']/../../td[8]/span[1]/a[1][text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // verify Activity created

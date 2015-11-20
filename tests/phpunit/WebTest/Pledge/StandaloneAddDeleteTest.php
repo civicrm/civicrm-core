@@ -114,11 +114,12 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[2]/td[2]/table[@class='nestedSelector']/tbody/tr[3]/td[8]/a[text()='View Payment']");
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[2]/td[2]/table[@class='nestedSelector']/tbody/tr[3]/td[8]/a");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Delete']");
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Delete']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Delete']");
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Delete']");
-
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[2]");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button/span[text()='Delete']");
+    $this->waitForAjaxContent();
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button/span[text()='Delete']");
+    $this->waitForAjaxContent();
     $this->waitForElementPresent("xpath=//li[@id='tab_pledge']/a");
     $this->click("xpath=//li[@id='tab_pledge']/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[10]/span/a[text()='View']");
@@ -126,12 +127,15 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
 
+    $this->waitForAjaxContent();
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]", "Pending");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td");
 
     // verify that payment owed amount is correct (250.00)
+    $this->waitForAjaxContent();
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td", "250.00");
     // verify that Total Paid and Balance sums are correct
+    $this->waitForAjaxContent();
     $this->verifyText("xpath=//div[@class='view-content' and contains(., 'view pledge payments')]/table[@class='selector row-highlight']//tbody/tr[1]/td[3]", "470.00");
     $this->verifyText("xpath=//div[@class='view-content' and contains(., 'view pledge payments')]/table[@class='selector row-highlight']//tbody/tr[1]/td[4]", "1,930.00");
 
