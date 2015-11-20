@@ -442,6 +442,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type("max_number_of_contacts", 100);
 
     // release frequency
+    $this->waitForElementPresent('release_frequency');
     $this->type("release_frequency", 2);
 
     $this->click("_qf_Main_upload-bottom");
@@ -556,7 +557,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
-    sleep(3);
+    $this->waitForAjaxContent();
     // Survey Report
     $this->openCiviPage("report/survey/detail", "reset=1", '_qf_SurveyDetails_submit');
 

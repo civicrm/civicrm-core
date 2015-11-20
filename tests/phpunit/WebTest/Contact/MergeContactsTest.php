@@ -838,6 +838,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->select('relationship_type_id', "value=5_b_a");
 
     //fill in the individual
+    $this->waitForElementPresent('related_contact_id');
     $this->select2('related_contact_id', $sortName, TRUE, FALSE);
 
     $this->waitForElementPresent("_qf_Relationship_upload");
