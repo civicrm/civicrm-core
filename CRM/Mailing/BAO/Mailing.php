@@ -803,7 +803,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         $this->templates['subject'] = implode("\n", $template);
       }
 
-      CRM_Utils_Hook::alterMailTemplates($this->templates);
+      CRM_Utils_Hook::alterMailContent($this->templates);
     }
     return $this->templates;
   }
