@@ -1108,7 +1108,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'other' => $otherId,
     );
 
-
     foreach ($locationBlocks as $blockName => $blockInfo) {
 
       // Collect existing fields from both 'main' and 'other' contacts first
@@ -1272,16 +1271,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               2 => $count,
               3 => $thisLocId ? $listOptions['location_type_id'][$thisLocId] : '';
               4 => $thisTypeId ? $listOptions[$blockInfo['hasType']][$thisTypeId] : '';
-            )
-          );
+            ));
 
-        // End loop through 'other' locations of this type
+          // End loop through 'other' locations of this type
         }
 
-      // End if 'other' location for this type exists
+        // End if 'other' location for this type exists
       }
 
-    // End loop through each location block entity
+      // End loop through each location block entity
     }
 
     // @todo NEW REFACOTRING DONE UP TO HERE
