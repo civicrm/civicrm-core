@@ -2205,9 +2205,6 @@ AND cl.modified_id  = c.id
             'type' => CRM_Utils_Type::T_BOOLEAN,
           ),
         );
-
-        // add custom data for cases
-        $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Case'));
       }
 
       // add custom data for case activities
