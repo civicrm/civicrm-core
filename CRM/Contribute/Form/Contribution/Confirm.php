@@ -896,6 +896,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if ($pledgeID) {
         //when user doing pledge payments.
         //update the schedule when payment(s) are made
+        $amount = $params['amount'];
+        $pledgePaymentParams = array();
         foreach ($params['pledge_amount'] as $paymentId => $dontCare) {
           $scheduledAmount = CRM_Core_DAO::getFieldValue(
             'CRM_Pledge_DAO_PledgePayment',
@@ -904,14 +906,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             'id'
           );
 
-          $pledgePaymentParams = array(
-            'id' => $paymentId,
-            'contribution_id' => $contribution->id,
-            'status_id' => $contribution->contribution_status_id,
-            'actual_amount' => $scheduledAmount,
-          );
-
-          CRM_Pledge_BAO_PledgePayment::add($pledgePaymentParams);
+          $pledgePayment = ($amount >= $scheduledAmount) ? $scheduledAmount : $amount;
+          if ($pledgePayment > 0) {
+            $pledgePaymentParams[] = array(
+              'id' => $paymentId,
+              'contribution_id' => $contribution->id,
+              'status_id' => $contribution->contribution_status_id,
+              'actual_amount' => $pledgePayment,
+            );
+            $amount -= $pledgePayment;
+          }
+        }
+        if ($amount > 0 && count($pledgePaymentParams)) {
+          $pledgePaymentParams[count($pledgePaymentParams) - 1]['actual_amount'] += $amount;
+        }
+        foreach ($pledgePaymentParams as $p) {
+          CRM_Pledge_BAO_PledgePayment::add($p);
         }
 
         //update pledge status according to the new payment statuses
