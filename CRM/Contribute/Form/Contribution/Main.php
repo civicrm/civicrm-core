@@ -149,19 +149,23 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $completedContributionIds = array();
       $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($this->_values['pledge_id']);
 
+      $paymentAmount = 0;
       $duePayment = FALSE;
       foreach ($pledgePayments as $payId => $value) {
         if ($value['status'] == 'Overdue') {
           $this->_defaults['pledge_amount'][$payId] = 1;
+          $paymentAmount += $value['scheduled_amount'];
         }
         elseif (!$duePayment && $value['status'] == 'Pending') {
           $this->_defaults['pledge_amount'][$payId] = 1;
+          $paymentAmount += $value['scheduled_amount'];
           $duePayment = TRUE;
         }
         elseif ($value['status'] == 'Completed' && $value['contribution_id']) {
           $completedContributionIds[] = $value['contribution_id'];
         }
       }
+      $this->_defaults['price_' . $this->_priceSetId] = $paymentAmount;
 
       if (count($completedContributionIds)) {
         $softCredit = array();
