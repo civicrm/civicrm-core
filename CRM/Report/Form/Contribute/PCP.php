@@ -265,10 +265,10 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     $statistics = parent::statistics($rows);
 
     // Calculate totals from the civicrm_contribution_soft table.
-    $select
-      = "SELECT SUM({$this->_aliases['civicrm_contribution_soft']}.amount) as committed_total, " .
-        "COUNT({$this->_aliases['civicrm_contribution_soft']}.id) as donors_total, " .
-        "SUM(IF( contribution_civireport.contribution_status_id > 1, 0, contribution_soft_civireport.amount)) AS received_total ";
+    $select = "SELECT SUM({$this->_aliases['civicrm_contribution_soft']}.amount) "
+      . "as committed_total, COUNT({$this->_aliases['civicrm_contribution_soft']}.id) "
+      . "as donors_total, SUM(IF( contribution_civireport.contribution_status_id > 1, 0, "
+      . "contribution_soft_civireport.amount)) AS received_total ";
     $sql = "{$select} {$this->_from} {$this->_where}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $dao->fetch();
@@ -278,12 +278,11 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
 
     // Calculate goal total goal from the PCP table (we only want one result per
     // PCP page - the query above produces one result per contribution made).
-    $sql =
-      "SELECT SUM(goal_amount) as goal_total FROM civicrm_pcp WHERE ".
-      "goal_amount IS NOT NULL AND id IN (" .
-        "SELECT DISTINCT {$this->_aliases['civicrm_pcp']}.id {$this->_from} ".
-        "{$this->_where}".
-      ")";
+    $sql = "SELECT SUM(goal_amount) as goal_total FROM civicrm_pcp WHERE "
+      . "goal_amount IS NOT NULL AND id IN ("
+      . "SELECT DISTINCT {$this->_aliases['civicrm_pcp']}.id {$this->_from} "
+      . "{$this->_where}"
+      . ")";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $dao->fetch();
     $goal_total = $dao->goal_total;
