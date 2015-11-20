@@ -42,7 +42,6 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
   public function run() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
-    $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
 
     $this->assign('action', $this->_action);
     $this->assign('context', $this->_context);
@@ -53,27 +52,9 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
 
     CRM_Case_Page_Tab::setContext();
 
-    $params = array('date_range' => 0);
-
-    $caseDetails = array();
-    if (CRM_Case_BAO_Case::accessCiviCase()) {
-      $caseDetails = CRM_Case_BAO_Case::getCaseActivity($caseId, $params, $this->_contactId, NULL, NULL, $type);
-    }
-
-    $this->assign('rows', $caseDetails);
-    $this->assign('caseId', $caseId);
-    $this->assign('contactId', $this->_contactId);
-
-    // Make it easy to refresh this table
-    $params = array(
-      'caseId' => $caseId,
-      'type' => $type,
-      'context' => $this->_context,
-      'cid' => $this->_contactId,
-      'action' => $this->_action,
-      'snippet' => 4,
-    );
-    $this->assign('data_params', json_encode($params));
+    $this->assign('caseID', $caseId);
+    $this->assign('contactID', $this->_contactId);
+    $this->assign('userID', CRM_Core_Session::singleton()->get('userID'));
 
     return parent::run();
   }
