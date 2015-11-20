@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 
-
 {include file="CRM/Case/Form/ActivityTab.tpl"}
 
 {include file="CRM/Case/Form/ActivityToCase.tpl"}
