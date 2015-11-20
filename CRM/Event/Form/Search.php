@@ -201,7 +201,11 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           }
         }
         if (!empty($this->_formValues['participant_role_id'])) {
-          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', (array) $this->_formValues['participant_role_id']) . ' ) )';
+          $escapedRoles = array();
+          foreach ((array) $this->_formValues['participant_role_id'] as $participantRole) {
+            $escapedRoles[] = CRM_Utils_Type::escape($participantRole, 'String');
+          }
+          $seatClause[] = "( participant.role_id IN ( '" . implode("' , '", $escapedRoles) . "' ) )";
         }
 
         // CRM-15379
