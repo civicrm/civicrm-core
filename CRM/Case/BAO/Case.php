@@ -1741,6 +1741,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         'name' => 'case_status',
       );
 
+      // add custom data for cases
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Case'));
+
       self::$_exportableFields = $fields;
     }
     return self::$_exportableFields;
