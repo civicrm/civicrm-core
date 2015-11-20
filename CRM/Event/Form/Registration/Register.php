@@ -368,9 +368,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('allowGroupOnWaitlist', $allowGroupOnWaitlist);
     $this->assign('isAdditionalParticipants', $isAdditionalParticipants);
 
-    //lets get js on two different qf elements.
-    $showHidePayfieldName = NULL;
-    $showHidePaymentInformation = FALSE;
     if ($this->_values['event']['is_monetary']) {
       self::buildAmount($this);
     }
@@ -415,7 +412,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->addElement('hidden', 'bypass_payment', NULL, array('id' => 'bypass_payment'));
     }
     $this->assign('bypassPayment', $bypassPayment);
-    $this->assign('showHidePaymentInformation', $showHidePaymentInformation);
 
     $userID = $this->getContactID();
 
@@ -1061,13 +1057,16 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $invoiceID = md5(uniqid(rand(), TRUE));
       $this->set('invoiceID', $invoiceID);
 
-      if (is_array($this->_paymentProcessor)) {
+      if ($this->_paymentProcessor) {
         $payment = $this->_paymentProcessor['object'];
         $payment->setBaseReturnUrl('civicrm/event/register');
       }
-      // default mode is direct
+
+      // ContributeMode is a deprecated concept. It is short-hand for a bunch of
+      // assumptions we are working to remove.
       $this->set('contributeMode', 'direct');
 
+      // This code is duplicated multiple places and should be consolidated.
       if (isset($params["state_province_id-{$this->_bltID}"]) &&
         $params["state_province_id-{$this->_bltID}"]
       ) {

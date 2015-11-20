@@ -73,6 +73,48 @@
       $('.crm-submit-buttons input').prop('disabled', false);
     })
   });
+  function showHidePayment(flag) {
+    var payment_options = cj(".payment_options-group");
+    var payment_processor = cj("div.payment_processor-section");
+    var payment_information = cj("div#payment_information");
+    // I've added a hide for billing block. But, actually the issue
+    // might be that the unselecting of the processor should cause it
+    // to be hidden (or removed) in which case it can go from this function.
+    var billing_block = cj("div#billing-payment-block");
+    if (flag) {
+      payment_options.hide();
+      payment_processor.hide();
+      payment_information.hide();
+      billing_block.hide();
+      // also unset selected payment methods
+      cj('input[name="payment_processor_id"]').removeProp('checked');
+    }
+    else {
+      payment_options.show();
+      payment_processor.show();
+      payment_information.show();
+      billing_block.show();
+    }
+  }
+
+  // Hides billing and payment options block for $0
+  function skipPaymentMethod() {
+    var isHide = false;
+    var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
+    var alwaysShowFlag = (isMultiple && cj("#additional_participants").val());
+    var alwaysHideFlag = '{/literal}{$bypassPayment}{literal}';
+    var total_amount_tmp =  cj('#pricevalue').data('raw-total');
+    // Hide billing questions if this is free
+    if (!alwaysShowFlag && total_amount_tmp == 0){
+      isHide = true;
+    } else {
+      isHide = false;
+    }
+    if (alwaysHideFlag) {
+      isHide = true;
+    }
+    showHidePayment(isHide);
+  }
 
 </script>
 {/literal}
