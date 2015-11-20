@@ -707,8 +707,11 @@ class CRM_Utils_REST {
       }
     }
 
-    if ($uid) {
+    if ($uid && $contact_id) {
       CRM_Utils_System::loadBootStrap(array('uid' => $uid), TRUE, FALSE);
+      $session = CRM_Core_Session::singleton();
+      $session->set('ufID', $uid);
+      $session->set('userID', $contact_id);
       return NULL;
     }
     else {
