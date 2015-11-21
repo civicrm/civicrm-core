@@ -35,8 +35,6 @@
  * This file contains functions for synchronizing cms users with CiviCRM contacts.
  */
 
-require_once 'DB.php';
-
 /**
  * Class CRM_Core_BAO_CMSUser
  */
@@ -385,97 +383,6 @@ class CRM_Core_BAO_CMSUser {
       $config->userSystem->checkUserNameEmailExists($params, $errors, $emailName);
     }
     return (!empty($errors)) ? $errors : TRUE;
-  }
-
-  /**
-   * @deprecated
-   * This function is not used anywhere
-   *
-   * @param array $contact
-   *   Array of contact-details.
-   *
-   * @return int|bool
-   *   uid if user exists, false otherwise
-   *
-   */
-  public static function userExists(&$contact) {
-    $config = CRM_Core_Config::singleton();
-
-    $isDrupal = $config->userSystem->is_drupal;
-    $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
-    $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
-
-    if (!$isDrupal && !$isJoomla && !$isWordPress) {
-      die('Unknown user framework');
-    }
-
-    // Use UF native framework to fetch data from UF user table
-    if ($isDrupal) {
-      $uid = db_query(
-        "SELECT uid FROM {users} where mail = :email",
-        array(':email' => $contact['email'])
-      )->fetchField();
-
-      if ($uid) {
-        $contact['user_exists'] = TRUE;
-        $result = $uid;
-      }
-    }
-    elseif ($isJoomla) {
-      $mail = $contact['email'];
-
-      $JUserTable = &JTable::getInstance('User', 'JTable');
-
-      $db = $JUserTable->getDbo();
-      $query = $db->getQuery(TRUE);
-      $query->select('username, email');
-      $query->from($JUserTable->getTableName());
-      $query->where('(LOWER(email) = LOWER(\'' . $email . '\'))');
-      $db->setQuery($query, 0, $limit);
-      $users = $db->loadAssocList();
-
-      $row = array();;
-      if (count($users)) {
-        $row = $users[0];
-      }
-
-      if (!empty($row)) {
-        $uid = CRM_Utils_Array::value('id', $row);
-        $contact['user_exists'] = TRUE;
-        $result = $uid;
-      }
-    }
-    elseif ($isWordPress) {
-      if (email_exists($params['mail'])) {
-        $contact['user_exists'] = TRUE;
-        $userObj = get_user_by('email', $params['mail']);
-        return $userObj->ID;
-      }
-    }
-
-    return $result;
-  }
-
-  /**
-   * @param $config
-   *
-   * @return object
-   */
-  public static function &dbHandle(&$config) {
-    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-    $db_uf = DB::connect($config->userFrameworkDSN);
-    unset($errorScope);
-    if (!$db_uf ||
-      DB::isError($db_uf)
-    ) {
-      $session = CRM_Core_Session::singleton();
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-      CRM_Core_Error::statusBounce(ts("Cannot connect to UF db via %1. Please check the CIVICRM_UF_DSN value in your civicrm.settings.php file",
-        array(1 => $db_uf->getMessage())
-      ));
-    }
-    $db_uf->query('/*!40101 SET NAMES utf8 */');
-    return $db_uf;
   }
 
 }
