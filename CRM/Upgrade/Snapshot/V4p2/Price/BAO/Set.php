@@ -1123,10 +1123,7 @@ GROUP BY     mt.member_of_contact_id";
    * @return object
    */
   public static function eventPriceSetDomainID() {
-    return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-      'event_price_set_domain_id',
-      NULL, FALSE
-    );
+    return Civi::settings()->get('event_price_set_domain_id');
   }
 
   /**

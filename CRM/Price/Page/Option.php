@@ -137,7 +137,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
     // display taxTerm for priceFields
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;

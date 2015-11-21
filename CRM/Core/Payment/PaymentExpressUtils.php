@@ -101,8 +101,8 @@ class CRM_Core_Payment_PaymentExpressUtils {
     curl_setopt($curl, CURLOPT_SSLVERSION, 0);
 
     if (strtoupper(substr(@php_uname('s'), 0, 3)) === 'WIN') {
-      curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
-      curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL') ? 2 : 0);
+      curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
+      curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, Civi::settings()->get('verifySSL') ? 2 : 0);
     }
     return $curl;
   }

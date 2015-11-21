@@ -99,7 +99,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
 
     // mailing key check
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'hash_mailing_url')) {
+    if (Civi::settings()->get('hash_mailing_url')) {
       $this->_mailing = new CRM_Mailing_BAO_Mailing();
 
       if (!is_numeric($this->_mailingID)) {

@@ -153,7 +153,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       //CRM-7265 --time being fix.
       $config = CRM_Core_Config::singleton();
       $image_URL = str_replace('https://', 'http://', $image_URL);
-      if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL')) {
+      if (Civi::settings()->get('enableSSL')) {
         $image_URL = str_replace('http://', 'https://', $image_URL);
       }
 
@@ -230,10 +230,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
     if ($contactType == 'Organization' &&
       CRM_Core_Permission::check('administer Multiple Organizations') &&
-      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-        'is_enabled'
-      )
-    ) {
+      Civi::settings()->get('is_enabled')) {
       //check is any relationship between the organization and groups
       $groupOrg = CRM_Contact_BAO_GroupOrganization::hasGroupAssociated($this->_contactId);
       if ($groupOrg) {

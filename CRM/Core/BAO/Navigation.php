@@ -1097,13 +1097,9 @@ ORDER BY parent_id, weight";
    * @return object|string
    */
   public static function getCacheKey($cid) {
-    $key = CRM_Core_BAO_Setting::getItem(
-      CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-      'navigation',
-      NULL,
-      '',
-      $cid
-    );
+    $key = Civi::service('settings_manager')
+      ->getBagByContact(NULL, $cid)
+      ->get('navigation');
     if (strlen($key) !== self::CACHE_KEY_STRLEN) {
       $key = self::resetNavigation($cid);
     }

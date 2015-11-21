@@ -1777,7 +1777,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $errors['body'] = ts('Field "body_html" or "body_text" is required.');
     }
 
-    if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'disable_mandatory_tokens_check')) {
+    if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
       $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->header_id) : NULL;
       $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->footer_id) : NULL;
       foreach (array('body_html', 'body_text') as $field) {
@@ -1832,7 +1832,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    */
   public static function getMailingHash($id) {
     $hash = NULL;
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'hash_mailing_url')) {
+    if (Civi::settings()->get('hash_mailing_url')) {
       $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $id, 'hash', 'id');
     }
     return $hash;

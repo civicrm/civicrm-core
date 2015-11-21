@@ -1112,9 +1112,7 @@ class CRM_Contact_BAO_Query {
             $this->_element["{$tName}_id"] = 1;
             if (substr($tName, -15) == '-state_province') {
               // FIXME: hack to fix CRM-1900
-              $a = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-                'address_format'
-              );
+              $a = Civi::settings()->get('address_format');
 
               if (substr_count($a, 'state_province_name') > 0) {
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] = array(

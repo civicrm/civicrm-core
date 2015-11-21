@@ -67,11 +67,11 @@ class CRM_Utils_Address {
     static $config = NULL;
 
     if (!$format) {
-      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_format');
+      $format = Civi::settings()->get('address_format');
     }
 
     if ($mailing) {
-      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'mailing_format');
+      $format = Civi::settings()->get('mailing_format');
     }
 
     $formatted = $format;

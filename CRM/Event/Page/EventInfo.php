@@ -146,7 +146,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
               $labelClass = 'price_set_field-label';
             }
             // show tax rate with amount
-            $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+            $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
             $displayOpt = CRM_Utils_Array::value('tax_display_settings', $invoiceSettings);
             $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
@@ -287,10 +287,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           }
 
           // check if we're in shopping cart mode for events
-          $enable_cart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-            'enable_cart'
-          );
-
+          $enable_cart = Civi::settings()->get('enable_cart');
           if ($enable_cart) {
             $link = CRM_Event_Cart_BAO_EventInCart::get_registration_link($this->_id);
             $registerText = $link['label'];
@@ -357,7 +354,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('location', $values['location']);
 
     if (CRM_Core_Permission::check('access CiviEvent')) {
-      $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME, 'enable_cart');
+      $enableCart = Civi::settings()->get('enable_cart');
       $this->assign('manageEventLinks', CRM_Event_Page_ManageEvent::tabs($enableCart));
     }
 

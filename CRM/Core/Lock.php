@@ -89,10 +89,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    * @deprecated
    */
   public static function createCivimailLock($name) {
-    $serverWideLock = \CRM_Core_BAO_Setting::getItem(
-      \CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'civimail_server_wide_lock'
-    );
+    $serverWideLock = \Civi::settings()->get('civimail_server_wide_lock');
     return new static($name, NULL, $serverWideLock);
   }
 

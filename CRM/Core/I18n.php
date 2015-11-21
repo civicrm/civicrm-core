@@ -637,7 +637,7 @@ class CRM_Core_I18n {
    * @return string
    */
   public static  function getContactDefaultLanguage() {
-    $language = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'contact_default_language');
+    $language = Civi::settings()->get('contact_default_language');
     if ($language == 'undefined') {
       return NULL;
     }

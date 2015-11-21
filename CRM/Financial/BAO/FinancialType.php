@@ -402,9 +402,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (array_key_exists('acl_financial_type', self::$_statusACLFt)) {
       return self::$_statusACLFt['acl_financial_type'];
     }
-    $contributeSettings = CRM_Core_BAO_Setting::getItem(
-      CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings'
-    );
+    $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
     self::$_statusACLFt['acl_financial_type'] = FALSE;
     if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
       self::$_statusACLFt['acl_financial_type'] = TRUE;

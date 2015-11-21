@@ -956,9 +956,7 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function isMultisiteEnabled() {
-    return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-      'is_enabled'
-    ) ? TRUE : FALSE;
+    return Civi::settings()->get('is_enabled') ? TRUE : FALSE;
   }
 
   /**

@@ -130,7 +130,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @return int
    */
   public static function updateWysiwyg() {
-    $editorID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
+    $editorID = Civi::settings()->get('editor_id');
     // Previously a numeric value indicated one of 4 wysiwyg editors shipped in core, and no value indicated 'Textarea'
     // Now the options are "Textarea", "CKEditor", and the rest have been dropped from core.
     $newEditor = $editorID ? "CKEditor" : "Textarea";

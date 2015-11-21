@@ -145,7 +145,7 @@ class CRM_Utils_Check_Env {
   public function checkOutboundMail() {
     $messages = array();
 
-    $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'mailing_backend');
+    $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
       || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG)
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED

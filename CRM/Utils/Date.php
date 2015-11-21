@@ -179,7 +179,7 @@ class CRM_Utils_Date {
     static $days = array();
     if (!$days) {
       // First day of the week
-      $firstDay = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
+      $firstDay = Civi::settings()->get('weekBegins');
 
       // set LC_TIME and build the arrays from locale-provided names
       // June 1st, 1970 was a Monday
@@ -208,7 +208,7 @@ class CRM_Utils_Date {
     static $days = array();
     if (!$days) {
       // First day of the week
-      $firstDay = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
+      $firstDay = Civi::settings()->get('weekBegins');
 
       // set LC_TIME and build the arrays from locale-provided names
       // June 1st, 1970 was a Monday
@@ -1487,7 +1487,7 @@ class CRM_Utils_Date {
         break;
 
       case 'week':
-        $weekFirst = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
+        $weekFirst = Civi::settings()->get('weekBegins');
         $thisDay = $now['wday'];
         if ($weekFirst > $thisDay) {
           $diffDay = $thisDay - $weekFirst + 7;

@@ -413,7 +413,7 @@ AND       CEF.entity_id    = %2";
   public static function buildAttachment(&$form, $entityTable, $entityID = NULL, $numAttachments = NULL, $ajaxDelete = FALSE) {
 
     if (!$numAttachments) {
-      $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
+      $numAttachments = Civi::settings()->get('max_attachments');
     }
     // Assign maxAttachments count to template for help message
     $form->assign('maxAttachments', $numAttachments);
@@ -530,7 +530,7 @@ AND       CEF.entity_id    = %2";
       CRM_Core_BAO_File::deleteEntityFile($entityTable, $entityID);
     }
 
-    $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
+    $numAttachments = Civi::settings()->get('max_attachments');
 
     $now = date('Ymdhis');
 
@@ -572,7 +572,7 @@ AND       CEF.entity_id    = %2";
    * @param int $entityID
    */
   public static function processAttachment(&$params, $entityTable, $entityID) {
-    $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
+    $numAttachments = Civi::settings()->get('max_attachments');
 
     for ($i = 1; $i <= $numAttachments; $i++) {
       if (
@@ -598,7 +598,7 @@ AND       CEF.entity_id    = %2";
    * @return array
    */
   public static function uploadNames() {
-    $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
+    $numAttachments = Civi::settings()->get('max_attachments');
 
     $names = array();
     for ($i = 1; $i <= $numAttachments; $i++) {

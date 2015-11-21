@@ -319,7 +319,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     $params['contact_id'] = $contact->id;
 
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME, 'is_enabled')) {
+    if (Civi::settings()->get('is_enabled')) {
       // Enabling multisite causes the contact to be added to the domain group.
       $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
       if (!empty($domainGroupID)) {
@@ -2352,7 +2352,7 @@ SELECT     civicrm_contact.id as contact_id,
 FROM       civicrm_contact
 INNER JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )";
 
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME, 'uniq_email_per_site')) {
+    if (Civi::settings()->get('uniq_email_per_site')) {
       // try to find a match within a site (multisite).
       $groups = CRM_Core_BAO_Domain::getChildGroupIds();
       if (!empty($groups)) {
