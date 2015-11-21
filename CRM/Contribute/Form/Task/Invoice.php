@@ -247,7 +247,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $cancelledStatusId = CRM_Utils_Array::key('Cancelled', $contributionStatusID);
 
     // getting data from admin page
-    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
 
     foreach ($invoiceElements['details'] as $contribID => $detail) {
       $input = $ids = $objects = array();

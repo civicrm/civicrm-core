@@ -327,9 +327,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * Form submission of petition signature.
    */
   public function postProcess() {
-    $tag_name = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME,
-      'tag_unconfirmed'
-    );
+    $tag_name = Civi::settings()->get('tag_unconfirmed');
 
     if ($tag_name) {
       // Check if contact 'email confirmed' tag exists, else create one

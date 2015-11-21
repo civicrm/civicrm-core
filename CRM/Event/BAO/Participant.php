@@ -1910,7 +1910,7 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
       $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
       $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId, 'DESC', TRUE);
       $trxnId['id'] = $trxn['financialTrxnId'];
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $updateFinancialItemInfoValues = array();
       $financialItemsArray = array();
@@ -2215,7 +2215,7 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
     if ($fieldName == 'status_id' && $context != 'validate') {
       // Get rid of cart-related option if disabled
       // FIXME: Why does this option even exist if cart is disabled?
-      if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME, 'enable_cart')) {
+      if (!Civi::settings()->get('enable_cart')) {
         $params['condition'][] = "name <> 'Pending in cart'";
       }
     }

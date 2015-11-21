@@ -56,7 +56,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
 
     // In practice, this may not be necessary, but we want to prevent
     // edge-cases that downgrade security-level below system policy.
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL')) {
+    if (Civi::settings()->get('enableSSL')) {
       $civiUrl = preg_replace('/^http:/', 'https:', $civiUrl);
     }
 

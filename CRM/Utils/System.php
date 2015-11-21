@@ -1196,7 +1196,7 @@ class CRM_Utils_System {
     $config = CRM_Core_Config::singleton();
     $req_headers = self::getRequestHeaders();
     // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL') &&
+    if (Civi::settings()->get('enableSSL') &&
       !self::isSSL() &&
       strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', $req_headers)) != 'https'
     ) {
@@ -1823,7 +1823,7 @@ class CRM_Utils_System {
    * @return string
    */
   public static function getSiteID() {
-    $sid = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'site_id');
+    $sid = Civi::settings()->get('site_id');
     if (!$sid) {
       $config = CRM_Core_Config::singleton();
       $sid = md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL);

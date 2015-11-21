@@ -104,9 +104,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     $config = CRM_Core_Config::singleton();
     $locName = NULL;
     //get the address format sequence from the config file
-    $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'mailing_format'
-    );
+    $mailingFormat = Civi::settings()->get('mailing_format');
 
     $sequence = CRM_Utils_Address::sequence($mailingFormat);
 
@@ -120,9 +118,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     //build the returnproperties
     $returnProperties = array('display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1);
-    $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'mailing_format'
-    );
+    $mailingFormat = Civi::settings()->get('mailing_format');
 
     $mailingFormatProperties = array();
     if ($mailingFormat) {

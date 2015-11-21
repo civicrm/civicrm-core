@@ -99,9 +99,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     }
 
     // check if we're in shopping cart mode for events
-    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
+    $enableCart = Civi::settings()->get('enable_cart');
     if (!$enableCart) {
       unset($tabs['conference']);
     }

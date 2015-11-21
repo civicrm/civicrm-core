@@ -119,10 +119,7 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
     $params = $this->controller->exportValues($this->_name);
 
     if (empty($params['write_activity_record'])) {
-      $existingViewOptions = CRM_Core_BAO_Setting::getItem(
-        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'contact_view_options'
-      );
+      $existingViewOptions = Civi::settings()->get('contact_view_options');
 
       $displayValue = CRM_Core_OptionGroup::getValue('contact_view_options', 'CiviMail', 'name');
       $viewOptions = explode(CRM_Core_DAO::VALUE_SEPARATOR, $existingViewOptions);

@@ -198,7 +198,7 @@ class CRM_Utils_HttpClient {
    */
   protected function createCurl($remoteFile) {
     $caConfig = CA_Config_Curl::probe(array(
-      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'),
+      'verify_peer' => (bool) Civi::settings()->get('verifySSL'),
     ));
 
     $ch = curl_init();

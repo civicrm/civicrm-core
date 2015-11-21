@@ -381,7 +381,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (!$cmsRootPath) {
       CRM_Core_Error::fatal("Could not find the install directory for WordPress");
     }
-    $path = CRM_Core_BAO_Setting::getItem('CiviCRM Preferences', 'wpLoadPhp');
+    $path = Civi::settings()->get('wpLoadPhp');
     if (!empty($path)) {
       require_once $path;
     }

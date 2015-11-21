@@ -96,11 +96,7 @@ class CRM_Contact_Form_Edit_Individual {
     }
 
     if (!$inlineEditMode) {
-      $checkSimilar = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'contact_ajax_check_similar',
-        NULL,
-        TRUE
-      );
+      $checkSimilar = Civi::settings()->get('contact_ajax_check_similar');
 
       if ($checkSimilar == NULL) {
         $checkSimilar = 0;

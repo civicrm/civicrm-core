@@ -176,9 +176,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       }
     }
 
-    $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
+    $mailingBackend = Civi::settings()->get('mailing_backend');
 
     if (!empty($mailingBackend)) {
       $formValues = array_merge($mailingBackend, $formValues);
@@ -240,9 +238,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     if (!$this->_defaults) {
       $this->_defaults = array();
 
-      $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'mailing_backend'
-      );
+      $mailingBackend = Civi::settings()->get('mailing_backend');
       if (!empty($mailingBackend)) {
         $this->_defaults = $mailingBackend;
 

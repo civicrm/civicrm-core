@@ -269,7 +269,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
     // Check to see if we have any additional fonts to add. You can specify more fonts in
     // civicrm.settings.php via: $config['CiviCRM Preferences']['additional_fonts']
     // CRM-13307
-    $additionalFonts = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'additional_fonts');
+    $additionalFonts = Civi::settings()->get('additional_fonts');
     if (is_array($additionalFonts)) {
       $fontLabel = array_merge($fontLabel, $additionalFonts);
     }
