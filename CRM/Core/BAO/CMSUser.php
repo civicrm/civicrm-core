@@ -43,15 +43,11 @@ require_once 'DB.php';
 class CRM_Core_BAO_CMSUser {
 
   /**
-   * Synchronizing cms users with CiviCRM contacts.
+   * Synchronize CMS users with CiviCRM contacts.
    *
-   * @param bool $is_interactive
-   *   Whether to show statuses & perform redirects.
-   *   This behavior is misplaced in the BAO layer, but we'll preserve it to avoid
-   *   contract changes in the middle of the support cycle. In the next major
-   *   release, we should remove & document it.
+   * @return array
    */
-  public static function synchronize($is_interactive = TRUE) {
+  public static function synchronize() {
     $config = CRM_Core_Config::singleton();
 
     // Build an array of rows from UF users table.
@@ -187,34 +183,12 @@ class CRM_Core_BAO_CMSUser {
         }
       }
     }
-    //end of synchronization code
 
-    if ($is_interactive) {
-      $status = ts('Synchronize Users to Contacts completed.');
-      $status .= ' ' . ts('Checked one user record.',
-          array(
-            'count' => $contactCount,
-            'plural' => 'Checked %count user records.',
-          )
-        );
-      if ($contactMatching) {
-        $status .= ' ' . ts('Found one matching contact record.',
-            array(
-              'count' => $contactMatching,
-              'plural' => 'Found %count matching contact records.',
-            )
-          );
-      }
-
-      $status .= ' ' . ts('Created one new contact record.',
-          array(
-            'count' => $contactCreated,
-            'plural' => 'Created %count new contact records.',
-          )
-        );
-      CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-    }
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
   }
 
   /**
