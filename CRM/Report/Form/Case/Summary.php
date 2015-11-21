@@ -38,7 +38,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   protected $_relField = FALSE;
   protected $_exposeContactID = FALSE;
 
-
+  protected $_customGroupExtends = array('Case');
 
   /**
    */
