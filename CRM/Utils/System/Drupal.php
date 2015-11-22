@@ -789,4 +789,51 @@ AND    u.status = 1
     drupal_add_http_header($name, $value);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+    $rows = array();
+    $id = 'uid';
+    $mail = 'mail';
+    $name = 'name';
+
+    $result = db_query("SELECT uid, mail, name FROM {users} where mail != ''");
+
+    while ($row = $result->fetchAssoc()) {
+      $rows[] = $row;
+    }
+
+    $user = new StdClass();
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+    foreach ($rows as $row) {
+      $user->$id = $row[$id];
+      $user->$mail = $row[$mail];
+      $user->$name = $row[$name];
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $row[$id], $row[$mail], $uf, 1, 'Individual', TRUE)) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
+  }
+
 }

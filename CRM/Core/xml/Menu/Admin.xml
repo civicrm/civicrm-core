@@ -419,7 +419,7 @@
      <path>civicrm/admin/synchUser</path>
      <title>Synchronize Users to Contacts</title>
      <desc>Automatically create a CiviCRM contact record for each CMS user record.</desc>
-     <page_callback>CRM_Admin_Page_CMSUser</page_callback>
+     <page_callback>CRM_Admin_Form_CMSUser</page_callback>
      <adminGroup>Users and Permissions</adminGroup>
      <icon>admin/small/Synch_user.png</icon>
      <weight>20</weight>

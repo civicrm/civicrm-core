@@ -729,4 +729,63 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $list[] = 'js/crm.joomla.js';
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+    $id = 'id';
+    $mail = 'email';
+    $name = 'name';
+
+    $JUserTable = &JTable::getInstance('User', 'JTable');
+
+    $db = $JUserTable->getDbo();
+    $query = $db->getQuery(TRUE);
+    $query->select($id . ', ' . $mail . ', ' . $name);
+    $query->from($JUserTable->getTableName());
+    $query->where($mail != '');
+
+    $db->setQuery($query);
+    $users = $db->loadObjectList();
+
+    $user = new StdClass();
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+    for ($i = 0; $i < count($users); $i++) {
+      $user->$id = $users[$i]->$id;
+      $user->$mail = $users[$i]->$mail;
+      $user->$name = $users[$i]->$name;
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user,
+        $users[$i]->$id,
+        $users[$i]->$mail,
+        $uf,
+        1,
+        'Individual',
+        TRUE
+      )
+      ) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
+  }
+
 }
