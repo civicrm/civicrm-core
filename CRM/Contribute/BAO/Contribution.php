@@ -3208,7 +3208,9 @@ WHERE  contribution_id = %1 ";
       'Refunded' => array('Cancelled', 'Completed'),
     );
 
-    if (!in_array($contributionStatuses[$fields['contribution_status_id']], $checkStatus[$contributionStatuses[$values['contribution_status_id']]])) {
+    if (!in_array($contributionStatuses[$fields['contribution_status_id']],
+      CRM_Utils_Array::value($contributionStatuses[$values['contribution_status_id']], $checkStatus, array()))
+    ) {
       $errors['contribution_status_id'] = ts("Cannot change contribution status from %1 to %2.", array(
         1 => $contributionStatuses[$values['contribution_status_id']],
         2 => $contributionStatuses[$fields['contribution_status_id']],
