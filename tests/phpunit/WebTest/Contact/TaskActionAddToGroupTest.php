@@ -105,7 +105,6 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
   }
 
   public function testMultiplePageContactSearchAddContactsToGroup() {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
     $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($newGroupName);
