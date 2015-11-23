@@ -1807,7 +1807,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         break;
 
       case 'mnot':
-        // mhas == multiple has
+        // multiple has or multiple not
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
           foreach ($value as $key => $val) {
