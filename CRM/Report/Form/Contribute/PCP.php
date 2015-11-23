@@ -274,7 +274,7 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     $dao->fetch();
     $committed_total = $dao->committed_total;
     $received_total = $dao->received_total;
-    $donors_total =  $dao->donors_total;
+    $donors_total = $dao->donors_total;
 
     // Calculate goal total goal from the PCP table (we only want one result per
     // PCP page - the query above produces one result per contribution made).
