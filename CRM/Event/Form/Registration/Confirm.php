@@ -1047,7 +1047,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // process soft credit / pcp pages
     if (!empty($params['pcp_made_through_id'])) {
-      CRM_Contribute_Form_Contribution_Confirm::formatSoftCreditParams($params, $form);
+      CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($params, $form);
       CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
     }
 

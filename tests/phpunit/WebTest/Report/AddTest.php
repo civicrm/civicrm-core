@@ -174,6 +174,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertContains($reportDescription, $this->getValue("description"), "Report Description expected $reportDescription");
 
     // Is correct email Subject?
+    $this->waitForElementPresent("mainTabContainer");
     $this->click("xpath=//div[@id='mainTabContainer']/ul/li[5]/a");
     $this->waitForAjaxContent();
     $this->assertContains($emaiSubject, $this->getValue("email_subject"), "Email Subject expected $emaiSubject");
