@@ -115,11 +115,4 @@ class Civi {
     return \Civi\Core\Container::getBootService('settings_manager')->getBagByDomain($domainID);
   }
 
-  /**
-   * @return \CRM_Utils_System_Base
-   */
-  public static function userSystem() {
-    return CRM_Core_Config::singleton()->userSystem;
-  }
-
 }
