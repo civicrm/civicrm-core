@@ -170,6 +170,10 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     parent::buildQuickForm();
     $this->addSortNameField();
 
+    if (CRM_Core_Permission::check('access deleted contacts') and Civi::settings()->get('contact_undelete')) {
+      $this->addElement('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));
+    }
+
     CRM_Event_BAO_Query::buildSearchForm($this);
 
     $rows = $this->get('rows');
