@@ -36,7 +36,6 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
   }
 
   public function testLoggingReport() {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
     $this->webtestLogin();
 
     //enable the logging

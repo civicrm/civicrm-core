@@ -42,7 +42,6 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
   }
 
   public function testRecurringEvent() {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
     $this->webtestLogin();
 
     //Add repeat configuration for an event

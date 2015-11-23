@@ -40,7 +40,6 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
    * @param null $msgTitle
    */
   public function testTemplateAdd($useTokens = FALSE, $msgTitle = NULL) {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
     $this->webtestLogin();
 
     $this->openCiviPage("admin/messageTemplates/add", "action=add&reset=1");
@@ -89,7 +88,6 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
   }
 
   public function testAddMailingWithMessageTemplate() {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
     // Call the above test to set up our environment
     $msgTitle = 'msg_' . substr(sha1(rand()), 0, 7);
     $this->testTemplateAdd(TRUE, $msgTitle);
@@ -171,7 +169,7 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
     $this->click("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[2]");
-    $this->assertElementContainsText('help', "Bulk Email Sent.", "Status message didn't show up after saving!");
+    $this->assertElementContainsText("xpath=//div[@class='help']", "Bulk Email Sent.", "Status message didn't show up after saving!");
   }
 
 }

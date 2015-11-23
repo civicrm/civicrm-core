@@ -36,7 +36,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   public function testAdvanceSearch() {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
+    //$this->markTestSkipped('Skipping for now as it works fine locally.');
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -223,6 +223,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Advanced_refresh");
     // verify unique name
     $this->waitForAjaxContent();
+    $this->waitForAjaxContent();
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr//td/a[text()='adv$firstName, $firstName']");
     // should give 1 result only as we are searching with unique name
     $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr/td", preg_quote("1 Contact"));
@@ -234,7 +235,6 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
    * Check for CRM-14952
    */
   public function testStateSorting() {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1', 'group');
     $this->select2("group", "Newsletter", TRUE);
@@ -272,7 +272,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // fill partial sort name
     $this->type("sort_name", "$firstName");
     // select subtype
-    $this->select("contact_type", "value=IndividualStudent");
+    $this->select("contact_type", "value=Individual__Student");
     // select group
     $this->select("group", "label=$groupName");
     // select tag
@@ -284,9 +284,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
     // select preferred communication method
     // phone
-    $this->check("preferred_communication_method[1]");
-    // email
-    $this->check("preferred_communication_method[2]");
+    $this->select2("preferred_communication_method", array('Phone', 'Email'), TRUE);
   }
 
   /**
@@ -394,9 +392,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
    */
   public function addMemberSearchDetail($firstName) {
     // check membership type (Student)
-    $this->click("xpath=//div[@id='memberForm']/table/tbody/tr[1]/td[1]/div[1]//div/label[text()='Student']");
+    $this->select2('membership_type_id', 'Student', TRUE);
     // check membership status (completed)
-    $this->click("xpath=//div[@id='memberForm']/table/tbody/tr[1]/td[2]/div[1]//div/label[text()='New']");
+    $this->select2('membership_status_id', 'New', TRUE);
     // fill member source
     $this->type("member_source", "membership source$firstName");
     // check to search primary member
@@ -425,14 +423,11 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate("pledge_payment_date_low", "-1 day");
     $this->webtestFillDate("pledge_payment_date_high", "+1 day");
     // fill Pledge payment status
-    $this->click("xpath=//div[@id='pledgeForm']/table/tbody/tr[3]/td//label[text()='Completed']");
-    $this->click("xpath=//div[@id='pledgeForm']/table/tbody/tr[3]/td//label[text()='Pending']");
+    $this->select2('pledge_status_id', 'Pending', TRUE);
+    $this->select2('pledge_payment_status_id', 'Pending', TRUE);
     // fill pledge amount range
     $this->type("pledge_amount_low", "100");
     $this->type("pledge_amount_high", "300");
-    // fill plegde status
-    $this->click("xpath=//div[@id='pledgeForm']/table/tbody/tr[4]/td[2]//label[text()='Completed']");
-    $this->click("xpath=//div[@id='pledgeForm']/table/tbody/tr[4]/td[2]//label[text()='Pending']");
     // fill pledge created date range
     $this->webtestFillDate("pledge_create_date_low", "-5 day");
     $this->webtestFillDate("pledge_create_date_high", "+5 day");
@@ -467,7 +462,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("external_identifier", "extid$firstName");
 
     // --- fill few value in Constituent information
-    $this->click("customData1");
+    $this->click("customData");
     $this->waitForElementPresent("custom_3_-1");
 
     $this->click("CIVICRM_QFID_Edu_2");
@@ -505,7 +500,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // --- fill few values in demographics
     $this->click("//form[@id='Contact']/div[2]/div[7]/div[1]");
     $this->waitForElementPresent("is_deceased");
-    $this->click("civicrm_gender_Male_2");
+    $this->click("CIVICRM_QFID_2_gender_id");
 
     $this->webtestFillDate("birth_date", "-1 year");
     $this->click("is_deceased");
