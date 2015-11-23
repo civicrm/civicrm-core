@@ -335,6 +335,12 @@ WHERE  $whereClause
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
 
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      $customFields,
+      $this->_surveyId,
+      'Survey'
+    );
+
     $surveyId = CRM_Campaign_BAO_Survey::create($params);
 
     // also update the ProfileModule tables
