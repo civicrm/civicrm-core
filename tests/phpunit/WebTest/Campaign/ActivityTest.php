@@ -203,6 +203,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
 
     // verify Activity created
+    $this->waitForAjaxContent();
     $this->verifyText("xpath=//form[@id='Activity']/div[2]/table/tbody/tr[5]/td[2]/span", $campaignTitle);
   }
 
