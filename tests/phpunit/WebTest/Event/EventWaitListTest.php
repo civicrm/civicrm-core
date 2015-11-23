@@ -94,8 +94,6 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
     $this->select2('payment_processor', $processorName, TRUE);
-
-
     $this->select("financial_type_id", "Donation");
     $this->type("label_1", "Member");
     $this->type("value_1", "250.00");
@@ -125,8 +123,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
-    $this->click('intro_text');
-    $this->fillRichTextField("intro_text", $registerIntro);
+    $this->fillRichTextField('intro_text', $registerIntro, 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click("CIVICRM_QFID_1_is_email_confirm");
