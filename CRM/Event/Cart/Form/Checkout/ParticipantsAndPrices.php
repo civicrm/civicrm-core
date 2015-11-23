@@ -27,7 +27,9 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
       $this->price_fields_for_event[$event_in_cart->event_id] = $this->build_price_options($event_in_cart->event);
     }
     // XXX
-    $this->addElement('text', 'discountcode', ts('If you have a discount code, enter it here'));
+    // Discount code textbox for CiviDiscount appears if form-name is added to cividiscount, and event is discountable
+    // the code below doesn't handle discounting
+    //$this->addElement('text', 'discountcode', ts('If you have a discount code, enter it here'));
     $this->assign('events_in_carts', $this->cart->get_main_events_in_carts());
     $this->assign('price_fields_for_event', $this->price_fields_for_event);
     $this->addButtons(
@@ -74,15 +76,23 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     $price_fields_for_event = array();
     $base_field_name = "event_{$event->id}_amount";
     $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event->id);
+    //CRM-14492 display admin fields if user is admin
+    $adminFieldVisible = FALSE;
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $adminFieldVisible = TRUE;
+    }
     if ($price_set_id) {
       $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
       $price_set = $price_sets[$price_set_id];
       $index = -1;
       foreach ($price_set['fields'] as $field) {
-        $index++;
-        $field_name = "event_{$event->id}_price_{$field['id']}";
-        CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
-        $price_fields_for_event[] = $field_name;
+        $index++;  //what is $index for?
+        //check whether field is public or visible to admins only
+        if (CRM_Utils_Array::value('visibility', $field) == 'public' || (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE)) {
+          $field_name = "event_{$event->id}_price_{$field['id']}";
+          CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
+          $price_fields_for_event[] = $field_name;
+        }
       }
     }
     return $price_fields_for_event;
@@ -120,10 +130,17 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         }
 
         $lineItem = array();
-        if (is_array($this->_values['fee']['fields'])) {
-          CRM_Price_BAO_PriceSet::processAmount($this->_values['fee']['fields'], $fields, $lineItem);
+        //This form doesn't store _values['fee'], $this->_values['fee'] array is null
+        //if (is_array($this->_values['fee']['fields'])) {
+        //  CRM_Price_BAO_PriceSet::processAmount($this->_values['fee']['fields'], $fields, $lineItem);
+        if (is_array($price_set['fields'])) {
+          CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $params, $lineItem);
+          foreach ($lineItem as $line) {
+            $total += $line['line_total'];
+          }
           //XXX total...
-          if ($fields['amount'] < 0) {
+          //if ($fields['amount'] < 0) {
+          if ($total < 0) {
             $this->_errors['_qf_default'] = ts("Price Levels can not be less than zero. Please select the options accordingly");
           }
         }
@@ -181,9 +198,51 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         && $participant->contact_id == self::getContactID()
       ) {
         $participant->email = NULL;
-        $participant->contact_id = self::find_or_create_contact($this->getContactID());
+        //LSE set contact first, last name, etc.,not just ID
+        $contactdata = array();
+        foreach ($this->_submitValues['field'] as $key => $value) {
+          $contactdata = $value;
+        }
+        if ($contactdata['first_name'] != NULL) {
+          $participant->contact_id = self::find_or_create_contact($this->getContactID(),
+          array(
+            'email' => $contactdata['email-Primary'],
+            'first_name' => $contactdata['first_name'],
+            'last_name' => $contactdata['last_name'],
+            'is_deleted' => FALSE));
+          $participant->save();
+          $this->cid = $participant->contact_id;
+        }
+        //$participant->contact_id = self::find_or_create_contact($this->getContactID());
       }
       $defaults += $form->setDefaultValues();
+      //Match $price_fields_for_event on event ID and price ID; if option
+      // is_default = TRUE, add to $defaults array
+      foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
+        $event_id = $event_in_cart->event_id;
+        $price_set_id = CRM_Event_BAO_Event::usesPriceSet($event_in_cart->event_id);
+        if ($price_set_id) {
+          $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
+          $price_set  = $price_sets[$price_set_id];
+          foreach ($price_set['fields'] as $field) {
+            $options = CRM_Utils_Array::value('options', $field);
+            if (!is_array($options)) {
+              continue;
+            }
+            $field_name = "event_{$event_id}_price_{$field['id']}";
+            foreach ($options as $value) {
+              if ($value['is_default']) {
+                if ($field['html_type'] == 'Checkbox') {
+                  $defaults[$field_name] = 1;
+                }
+                else {
+                  $defaults[$field_name] = $value['id'];
+                }
+              }
+            }
+          }
+        }
+      }  //price defaults
     }
     return $defaults;
   }

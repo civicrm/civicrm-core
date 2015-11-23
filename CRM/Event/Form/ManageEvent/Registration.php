@@ -286,10 +286,16 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       );
       $this->add('textarea', 'approval_req_text', ts('Approval message'), $attributes['approval_req_text']);
     }
-
     $this->add('text', 'expiration_time', ts('Pending participant expiration (hours)'));
     $this->addRule('expiration_time', ts('Please enter the number of hours (as an integer).'), 'integer');
-
+    $this->addElement('checkbox',
+      'allow_selfcancelxfer',
+      ts('Allow self cancel/transfer?'),
+      NULL,
+      array('onclick' => "return showHideByValue('requires_approval', '', 'id-approval-text', 'table-row', 'radio', false);")
+      );
+    $this->add('text', 'selfcancelxfer_time', ts('Self cancel/transfer time limit (hours)'));
+    $this->addRule('selfcancelxfer_time', ts('Please enter the number of hours (as an integer).'), 'integer');
     self::buildRegistrationBlock($this);
     self::buildConfirmationBlock($this);
     self::buildMailBlock($this);
