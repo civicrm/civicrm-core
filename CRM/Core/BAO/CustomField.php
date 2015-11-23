@@ -1163,11 +1163,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $html_type == 'Multi-Select'
       )
     ) {
-      // Keep only the custom option 'key' => 'value' pair
-      // to avoid return of unnecessary data from the hook.
-      if (isset($option['attributes'])) {
-        unset($option['attributes']);
-      }
       CRM_Utils_Hook::customFieldOptions($fieldID, $option);
     }
 
