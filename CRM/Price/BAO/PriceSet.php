@@ -917,9 +917,9 @@ WHERE  id = %1";
     }
     // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
     if (!empty($amount_level)) {
-      $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level);
+      $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . CRM_Core_DAO::VALUE_SEPARATOR;
       if (!empty($displayParticipantCount)) {
-        $params['amount_level'] = $params['amount_level'] . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+        $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
     $params['amount'] = CRM_Utils_Money::format($totalPrice, NULL, NULL, TRUE);
