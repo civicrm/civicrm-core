@@ -375,7 +375,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @return bool
    */
   public function loadBootStrap($name = NULL, $pass = NULL) {
-    global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb;
+    global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb, $current_site, $current_blog, $current_user;
+
+    if (!defined('WP_USE_THEMES')) {
+      define('WP_USE_THEMES', FALSE);
+    }
 
     $cmsRootPath = $this->cmsRootPath();
     if (!$cmsRootPath) {
@@ -402,7 +406,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
       $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
       if ($name) {
-        $uid = wp_authenticate($name, $pass);
+        $uid = wp_authenticate($name, $pass); // this returns a WP_User object if successful
         if (!$uid) {
           if ($throwError) {
             echo '<br />Sorry, unrecognized username or password.';
@@ -413,7 +417,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
     if ($uid) {
-      $account = wp_set_current_user($uid);
+      if ($uid instanceof WP_User) {
+        $account = wp_set_current_user($uid->ID);
+      }
+      else {
+        $account = wp_set_current_user($uid);
+      }
       if ($account && $account->data->ID) {
         global $user;
         $user = $account;
