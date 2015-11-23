@@ -60,6 +60,11 @@ class CRM_Custom_Form_CustomData {
       $form->_type = CRM_Utils_Request::retrieve('type', 'String', $form);
     }
 
+    // Petitions are stored as surveys in the database:
+    if ($type == 'Petition') {
+      $type = 'Survey';
+    }
+
     if (isset($subType)) {
       $form->_subType = $subType;
     }

@@ -126,6 +126,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
    *   array of default values
    */
   public function setDefaultValues() {
+    if ($this->_cdType) {
+      return CRM_Custom_Form_CustomData::setDefaultValues($this);
+    }
+
     $defaults = $this->_values;
 
     $ufContactJoinParams = array(
@@ -161,6 +165,9 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
 
   public function buildQuickForm() {
+    if ($this->_cdType) {
+      return CRM_Custom_Form_CustomData::buildQuickForm($this);
+    }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(
