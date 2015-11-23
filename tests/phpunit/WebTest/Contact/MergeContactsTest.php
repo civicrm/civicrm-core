@@ -856,7 +856,6 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     //check the status message
     $this->waitForText('crm-notification-container', "Relationship created.");
-
     $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[text()='View']");
     $this->waitForAjaxContent();
     $this->click("xpath=//a[text()='$sortName']");
@@ -887,6 +886,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->select('relationship_type_id', "value=5_b_a");
 
     //fill in the individual
+    $this->waitForElementPresent('related_contact_id');
     $this->select2('related_contact_id', $sortNameOther, TRUE, FALSE);
 
     $this->waitForElementPresent("_qf_Relationship_upload");
@@ -919,10 +919,10 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_rel a");
 
     // wait for add Relationship link
-    $this->waitForElementPresent("xpath=//a[text()='$sortName']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr//td//a[text()='$sortName']");
     // go to duplicate organization's related contact
     // to check if membership is added to that contact
-    $this->click("xpath=//a[text()='$sortName']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr//td//a[text()='$sortName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check if Membership for the individual is created
