@@ -91,7 +91,11 @@
       <td>{$register_date|crmDate}&nbsp;</td>
   </tr>
     <tr class="crm-event-participantview-form-block-status">
-      <td class="label">{ts}Status{/ts}</td><td>{$status}&nbsp;</td>
+      <td class="label">{ts}Status{/ts}</td><td>{$status}&nbsp;
+      {if $transferName}
+        {ts}(Transferred to <a href="{crmURL p='civicrm/contact/view/participant' q="action=view&reset=1&id=$pid&cid=$transferId"}" title="{ts}View this Participant{/ts}">{$transferName}</a>){/ts}
+      {/if}
+      </td>
   </tr>
     {if $source}
         <tr class="crm-event-participantview-form-block-event_source">

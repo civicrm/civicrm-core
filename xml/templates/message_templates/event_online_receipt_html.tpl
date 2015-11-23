@@ -507,7 +507,11 @@
        {/foreach}
       {/foreach}
      {/if}
-
+     {if $event.allow_selfcancelxfer }
+     This event allows for self-cancel or transfer
+     {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
+     <a href="{$selfService}">{ts}Self service cancel transfer{/ts}</a>
+     {/if}
     </table>
    </td>
   </tr>

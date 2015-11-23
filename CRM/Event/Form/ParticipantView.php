@@ -86,6 +86,16 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
 
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
+    $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
+    $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
+    if ($status == 'Transferred') {
+      $transferId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'transferred_to_contact_id', 'id');
+      $pid = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $transferId, 'id', 'contact_id');
+      $transferName = current(CRM_Contact_BAO_Contact::getContactDetails($transferId));
+      $this->assign('pid', $pid);
+      $this->assign('transferId', $transferId);
+      $this->assign('transferName', $transferName);
+    }
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
     if ($values[$participantID]['is_test']) {
