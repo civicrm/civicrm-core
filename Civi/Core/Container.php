@@ -335,10 +335,6 @@ class Container {
     );
     $runtime->initialize($loadFromDB);
 
-    if ($loadFromDB && $runtime->dsn) {
-      \CRM_Core_DAO::init($runtime->dsn);
-    }
-
     $bootServices['paths'] = array(
       'class' => 'Civi\Core\Paths',
       'obj' => new \Civi\Core\Paths(),
@@ -377,6 +373,7 @@ class Container {
     );
 
     if ($loadFromDB && $runtime->dsn) {
+      \CRM_Core_DAO::init($runtime->dsn);
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
 
