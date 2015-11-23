@@ -1,0 +1,1 @@
+{* TO DO: Add upgrade logic to update event_online msg templates and insert participant_transferred and cancelled msg templates. *}

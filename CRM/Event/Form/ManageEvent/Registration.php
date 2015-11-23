@@ -289,8 +289,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->add('text', 'expiration_time', ts('Pending participant expiration (hours)'));
     $this->addRule('expiration_time', ts('Please enter the number of hours (as an integer).'), 'integer');
-    $this->addField('allow_selfcancelxfer', array('label' => ts('Allow self cancel/transfer?'), 'type' => 'advcheckbox'));
-    $this->add('text', 'selfcancelxfer_time', ts('Self cancel/transfer time limit (hours)'));
+    $this->addField('allow_selfcancelxfer', array('label' => ts('Allow self-service cancellation or transfer?'), 'type' => 'advcheckbox'));
+    $this->add('text', 'selfcancelxfer_time', ts('Cancellation or transfer time limit (hours)'));
     $this->addRule('selfcancelxfer_time', ts('Please enter the number of hours (as an integer).'), 'integer');
     self::buildRegistrationBlock($this);
     self::buildConfirmationBlock($this);
