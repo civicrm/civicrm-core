@@ -487,6 +487,23 @@ $(function($) {
 
     });
 
+    var allow_selfCancel = $("#allow_selfcancelxfer");
+    if ( !allow_selfCancel.prop('checked') ) {
+        $('#selfcancelxfer_time').hide();
+        $('.crm-event-manage-registration-form-block-selfcancelxfer_time').hide();
+    }
+    allow_selfCancel.change( function( ) {
+        if ( !$(this).prop('checked') ) {
+            $("#selfcancelxfer_time").val('');
+            $('#selfcancelxfer_time').hide();
+            $('.crm-event-manage-registration-form-block-selfcancelxfer_time').hide();
+        } else {
+          $('#selfcancelxfer_time').show();
+          $('.crm-event-manage-registration-form-block-selfcancelxfer_time').show();
+        }
+
+    });
+
     $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
     $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
 

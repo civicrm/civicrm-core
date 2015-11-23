@@ -94,3 +94,18 @@
 {htxt id="id-expiration_time"}
 {ts}Time limit <strong>in hours</strong> for confirming/finishing registration by participants with any of the pending statuses. Enter 0 (or leave empty) to disable this feature.{/ts}
 {/htxt}
+
+{htxt id="id-allow_selfcancelxfer-title"}
+  {ts}Allow Self-service Cancellation or Transfer?{/ts}
+{/htxt}
+{htxt id="id-allow_selfcancelxfer"}
+  <p>{ts}Check this box if you want to allow registered participants to either cancel their registration OR transfer it to another participant. If this feature is enabled, event confirmation emails will include a link to a Cancel or Transfer form.{/ts}</p>
+  <p>{ts}<strong>Automated refunds for cancellations are NOT currently supported.</strong> Participants who have paid for an event will be notified that cancellations are not refundable.{/ts}</p>
+{/htxt}
+
+{htxt id="id-selfcancelxfer_time-title"}
+  {ts}Cancellation or Transfer Time Limit{/ts}
+{/htxt}
+{htxt id="id-selfcancelxfer_time"}
+  {ts}Number of hours prior to event start date to allow self-service cancellation or transfer. Enter 0 (or leave empty) to allow cancellation or transfer up until the event has started.{/ts}
+{/htxt}
