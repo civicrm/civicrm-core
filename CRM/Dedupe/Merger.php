@@ -1109,9 +1109,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'main' => array(),
       'other' => array(),
     );
-    $mainLocBlock = $locBlockIds = array();
-    $locBlockIds['main'] = $locBlockIds['other'] = array();
-    $typeBlockIds['main'] = $typeBlockIds['other'] = array();
+
+    $mainLocBlock = array();
 
     // @todo This could probably be defined and used earlier
     $mergeTargets = array(
