@@ -1046,11 +1046,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
+    // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
+    $params['amount'] = self::computeAmount($params, $this->_values);
 
     if (($this->_values['is_pay_later'] &&
         empty($this->_paymentProcessor) &&
         !array_key_exists('hidden_processor', $params)) ||
       (CRM_Utils_Array::value('payment_processor_id', $params) == 0)
+      && $params['amount'] != 0
     ) {
       $params['is_pay_later'] = 1;
     }
@@ -1068,8 +1071,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
 
-    // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
-    $params['amount'] = self::computeAmount($params, $this->_values);
     $params['separate_amount'] = $params['amount'];
     $memFee = NULL;
     if (!empty($params['selectMembership'])) {
