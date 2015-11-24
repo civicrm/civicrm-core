@@ -1732,6 +1732,9 @@ ORDER BY civicrm_custom_group.weight,
       case 'Contribution':
         return 'civicrm_contribution';
 
+      case 'ContributionRecur':
+        return 'civicrm_contribution_recur';
+
       case 'Relationship':
         return 'civicrm_relationship';
 
