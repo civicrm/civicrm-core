@@ -1,6 +1,6 @@
 {
   "templates": {
-    "toxicAlert": "<img alt=\"Please: Help save the fish from toxic code\" src=\"https://civicrm.org/sites/civicrm.org/files/HazCode-Please.png\">\n\n(Automated notice) This pull-request modifies {SYMBOLS}. That code has been previously identified as hazardous. For advice on dealing with it, please review [Toxic Code Protocol](http://wiki.civicrm.org/confluence/display/CRM/Toxic+Code+Protocol)."
+    "toxicAlert": "(Automated notice) This pull-request modifies {SYMBOLS}. That code has been previously identified as toxic. You will need to ensure that any fix that touches this function works on 4.7 as well. Most likely you will need to do a separate, different PR for 4.7. Alternatively you might manage your fix outside of core for 4.6 and get a fix into 4.7 to ensure a permanent fix"
   },
   "checks": {
     "CRM_Contact_Import_Parser_Contact::import()": "toxicAlert",
