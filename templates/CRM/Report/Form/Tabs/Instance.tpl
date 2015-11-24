@@ -136,10 +136,17 @@
   CRM.$(function($) {
     var confirmed = false,
       formName = {/literal}"{$form.formName}"{literal};
-    $('#_qf_' + formName + '_submit_next, #_qf_' + formName + '_submit_save').click(function() {
+    $('#_qf_' + formName + '_submit_next, #_qf_' + formName + '_submit_save').click(function(e) {
       if ($('#is_navigation').prop('checked') && $('#parent_id').val() == '') {
-        var confirmMsg = {/literal}'{ts escape="js"}You have chosen to include this report in the Navigation Menu without selecting a Parent Menu item from the dropdown. This will add the report to the top level menu bar. Are you sure you want to continue?{/ts}'{literal}
-        return confirm(confirmMsg);
+        var confirmMsg = ts('You have chosen to include this report in the Navigation Menu without selecting a Parent Menu item from the dropdown. This will add the report to the top level menu bar. Are you sure you want to continue?');
+        CRM.confirm({
+          title: ts('Save to top level?'),
+          message: confirmMsg
+        })
+        .on('crmConfirm:no', function(e) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        })
       }
     });
     // Pop-up confirmation when clicking "Save a copy" (submit_next) or "Create Report" (submit_save)
