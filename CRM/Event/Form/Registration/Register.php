@@ -275,8 +275,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // build profiles first so that we can determine address fields etc
@@ -323,7 +321,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           8 => '9',
           9 => '10',
         );
-        $element = $this->add('select', 'additional_participants',
+        $this->add('select', 'additional_participants',
           ts('How many people are you registering?'),
           $additionalOptions,
           NULL,
@@ -522,8 +520,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   True if you want to add formRule.
    * @param int $discountId
    *   Discount id for the event.
-   *
-   * @return void
    */
   static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
     // build amount only when needed, skip incase of event full and waitlisting is enabled
