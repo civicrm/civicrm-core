@@ -33,6 +33,24 @@
 
 /**
  * System wide utilities.
+ *
+ * Provides a collection of Civi utilities + access to the CMS-dependant utilities
+ *
+ * FIXME: This is a massive and random collection that could be split into smaller services
+ *
+ * @method static mixed permissionDenied() Show access denied screen.
+ * @method static mixed logout() Log out the current user.
+ * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
+ * @method static appendBreadCrumb(string $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
+ * @method static resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
+ * @method static addHTMLHead(string $bc) Append a string to the head of the HTML file.
+ * @method static string postURL(int $action) Determine the post URL for a form.
+ * @method static string|null getUFLocale() Get the locale of the CMS.
+ * @method static bool setUFLocale(string $civicrm_language) Set the locale of the CMS.
+ * @method static bool isUserLoggedIn() Check if user is logged in.
+ * @method static int getLoggedInUfID() Get current logged in user id.
+ * @method static setHttpHeader(string $name, string $value) Set http header.
+ * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
  */
 class CRM_Utils_System {
 
@@ -43,6 +61,18 @@ class CRM_Utils_System {
    *   Page title
    */
   static $title = '';
+
+  /**
+   * Access methods in the appropriate CMS class
+   *
+   * @param $name
+   * @param $arguments
+   * @return mixed
+   */
+  public static function __callStatic($name, $arguments) {
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
+    return call_user_func_array(array($userSystem, $name), $arguments);
+  }
 
   /**
    * Compose a new URL string from the current URL string.
@@ -271,36 +301,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Permission denied.
-   *
-   * @return mixed
-   */
-  public static function permissionDenied() {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->permissionDenied();
-  }
-
-  /**
-   * Log out.
-   *
-   * @return mixed
-   */
-  public static function logout() {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->logout();
-  }
-
-  /**
-   * This is a very drupal specific function for now.
-   */
-  public static function updateCategories() {
-    $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal) {
-      $config->userSystem->updateCategories();
-    }
-  }
-
-  /**
    * What menu path are we currently on. Called for the primary tpl.
    *
    * @return string
@@ -341,7 +341,9 @@ class CRM_Utils_System {
    * Sets the title of the page.
    *
    * @param string $title
+   *   Document title - plain text only
    * @param string $pageTitle
+   *   Page title (if different) - may include html
    */
   public static function setTitle($title, $pageTitle = NULL) {
     self::$title = $title;
@@ -462,48 +464,6 @@ class CRM_Utils_System {
     echo $html;
 
     self::civiExit();
-  }
-
-  /**
-   * Append an additional breadcrumb tag to the existing breadcrumbs.
-   *
-   * @param string $breadCrumbs
-   */
-  public static function appendBreadCrumb($breadCrumbs) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->appendBreadCrumb($breadCrumbs);
-  }
-
-  /**
-   * Reset an additional breadcrumb tag to the existing breadcrumb.
-   */
-  public static function resetBreadCrumb() {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->resetBreadCrumb();
-  }
-
-  /**
-   * Append a string to the head of the HTML file.
-   *
-   * @param string $bc
-   */
-  public static function addHTMLHead($bc) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->addHTMLHead($bc);
-  }
-
-  /**
-   * Determine the post URL for a form.
-   *
-   * @param int $action
-   *   The default action if one is pre-specified.
-   *
-   * @return string
-   *   The URL to post the form.
-   */
-  public static function postURL($action) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->postURL($action);
   }
 
   /**
@@ -1387,34 +1347,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get the locale of the hosting CMS.
-   *
-   * @return string
-   *   The used locale or null for none.
-   */
-  public static function getUFLocale() {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->getUFLocale();
-  }
-
-  /**
-   * Set the locale of the hosting CMS.
-   *
-   * For example, a mailing will want to change the CMS language so that
-   * URLs are in the correct language (such as the Drupal language prefix).
-   *
-   * @param string $civicrm_language
-   *   An array of parameters (see CRM_Utils_System::docURL2 method for names)
-   *
-   * @return bool
-   *   Returns whether the locale was successfully changed.
-   */
-  public static function setUFLocale($civicrm_language) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->setUFLocale($civicrm_language);
-  }
-
-  /**
    * Execute external or internal URLs and return server response.
    *
    * @param string $url
@@ -1509,27 +1441,6 @@ class CRM_Utils_System {
     }
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->loadBootStrap($params, $loadUser, $throwError, $realPath);
-  }
-
-  /**
-   * Check if user is logged in.
-   *
-   * @return bool
-   */
-  public static function isUserLoggedIn() {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->isUserLoggedIn();
-  }
-
-  /**
-   * Get current logged in user id.
-   *
-   * @return int
-   *   ufId, currently logged in user uf id.
-   */
-  public static function getLoggedInUfID() {
-    $config = CRM_Core_Config::singleton();
-    return $config->userSystem->getLoggedInUfID();
   }
 
   /**
@@ -1913,16 +1824,6 @@ class CRM_Utils_System {
     }
 
     return NULL;
-  }
-
-  /**
-   * Set http header.
-   *
-   * @param string $name
-   * @param string $value
-   */
-  public static function setHttpHeader($name, $value) {
-    CRM_Core_Config::singleton()->userSystem->setHttpHeader($name, $value);
   }
 
 }

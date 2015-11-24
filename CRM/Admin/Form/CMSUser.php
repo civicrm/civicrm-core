@@ -59,7 +59,7 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    $result = CRM_Core_Config::singleton()->userSystem->synchronizeUsers();
+    $result = CRM_Utils_System::synchronizeUsers();
 
     $status = ts('Checked one user record.',
         array(
