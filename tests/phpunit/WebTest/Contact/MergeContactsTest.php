@@ -382,7 +382,6 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Select the contacts to be merged
     $this->waitForElementPresent('dupePairs_length');
-    $this->select("name=dupePairs_length", "value=100");
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']");
     $this->click("xpath=//a[text()='$firstName $lastName']/../../td[8]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
@@ -594,6 +593,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew", "dupePairs");
 
     $this->waitForElementPresent('dupePairs_length');
+    $this->select("name=dupePairs_length", "value=100");
     $totalContacts = $this->getXpathCount("//table[@id='dupePairs']/tbody/tr");
     $this->click("//form[@id='DedupeFind']//a/span[contains(text(),' Batch Merge All Duplicates')]");
 

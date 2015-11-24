@@ -36,7 +36,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   public function testAdvanceSearch() {
-    //$this->markTestSkipped('Skipping for now as it works fine locally.');
+    $this->markTestSkipped('Skipping for now as it works fine locally.');
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
