@@ -125,7 +125,7 @@
 
             {* Display other_type_id for websites, ims and phones *}
             {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
-              {$form.type.$blockName.$blockId.typeTypeId.html}&nbsp;
+              {$form.location.$blockName.$blockId.typeTypeId.html}&nbsp;
             {/if}
 
             {* Display the overwrite/add/add new label *}

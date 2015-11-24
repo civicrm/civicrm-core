@@ -1294,7 +1294,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             // Add the element
             $elements[] = array(
               'select',
-              "type[$blockName][$count][typeTypeId]",
+              "location[$blockName][$count][typeTypeId]",
               NULL,
               $defaultTypeId + $tmpIdList,
               $js,
