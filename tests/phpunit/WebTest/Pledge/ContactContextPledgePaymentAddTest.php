@@ -179,8 +179,8 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->waitForElementPresent("_qf_Contribution_upload");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']/div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']/div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
 
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $this->webtestVerifyTabularData(array(
@@ -197,6 +197,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
       )
     );
     $this->openCiviPage('admin/setting/localization', 'reset=1');
+    $this->waitForElementPresent("currencyLimit");
     $this->select("currencyLimit", "value=FJD");
     $this->click("remove");
     $this->click("_qf_Localization_next-bottom");
