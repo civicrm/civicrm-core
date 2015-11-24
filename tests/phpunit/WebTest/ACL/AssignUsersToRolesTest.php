@@ -167,6 +167,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_EntityRole_next-botttom", 'newACL', FALSE);
 
     //Create ACL granting 'Edit' access on smart group to the role
+    $this->waitForAjaxContent();
     $this->openCiviPage("acl", "reset=1");
     $this->click('newACL');
     $this->waitForElementPresent("group_id");
@@ -178,6 +179,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_ACL_next-bottom", 'newACL', FALSE);
 
     //ACL granting edit permission on events.
+    $this->waitForAjaxContent();
     $this->click('newACL');
     $this->waitForElementPresent('name');
     $this->type("name", "Edit All Events $label");
