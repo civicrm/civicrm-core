@@ -229,22 +229,29 @@ You will need to manually delete that user (click on the link to open Drupal Use
       typeTypeId = element.value;
     }
 
+    // @todo Fix this 'special handling' for websites (no location id)
+    if (!locTypeId) { locTypeId = 0; }
+
     // Get the matching block, based on location and type, from the main contact record
-    if (!typeTypeId) {
-      var block = eval( "allBlock.main_" + blockname + "_" + locTypeId);
+    var blockQuery = "allBlock.main_" + blockname + "_" + locTypeId;
+    if (typeTypeId) {
+      blockQuery += "_" + typeTypeId;
     }
-    else {
-      // @todo Fix this 'special handling' for websites (no location id)
-      if (!locTypeId) { locTypeId = 0; }
-      var block = eval( "allBlock.main_" + blockname + "_" + locTypeId + "_" + typeTypeId);
-    }
+    var block = eval( blockQuery );
+    var mainBlockId = 0;
+    var mainBlockDisplay = '';
 
     // Create appropriate label / add new link after changing the block
-    if (!block) {
-      block = '';
+    if (typeof block == 'undefined') {
       label = '<span class="action_label">(add)</span>';
     }
     else {
+
+      // Set display and ID
+      mainBlockDisplay = block['display'];
+      mainBlockId = block['id'];
+
+      // Set label
       var label = '<span class="action_label">(overwrite)</span> ';
       if (blockname == 'email' || blockname == 'phone') {
         var opLabel = 'location[' + blockname + '][' + blockId + '][operation]';
@@ -253,7 +260,9 @@ You will need to manually delete that user (click on the link to open Drupal Use
       label += '<br>';
     }
 
-    CRM.$( "#main_" + blockname + "_" + blockId ).html( block );
+    // Update DOM
+    CRM.$( "input[name='location[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
+    CRM.$( "#main_" + blockname + "_" + blockId ).html( mainBlockDisplay );
     CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
   }
 
