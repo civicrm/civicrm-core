@@ -88,10 +88,8 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     //add new note
     $this->waitForElementPresent("xpath=//li[@id='tab_note']/a");
     $this->click("xpath=//li[@id='tab_note']/a");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    $this->click("xpath=//div[@class='view-content']//div[@class='action-link']/a");
+    $this->waitForAjaxContent();
+    $this->click("xpath=//div[@class='view-content']//div[@class='action-link']/a[@class='button medium-popup']");
 
     $this->waitForElementPresent("_qf_Note_upload-top");
     $noteSubject = "test note" . substr(sha1(rand()), 0, 7);
