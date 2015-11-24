@@ -916,8 +916,11 @@ WHERE  id = %1";
       $displayParticipantCount = ' Participant Count -' . $totalParticipant;
     }
     // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
-    if (!empty($amount_level) && !empty($displayParticipantCount)) {
-      $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    if (!empty($amount_level)) {
+      $params['amount_level'] = CRM_Utils_Array::implodePadded($amount_level);
+      if (!empty($displayParticipantCount)) {
+        $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
     }
     $params['amount'] = CRM_Utils_Money::format($totalPrice, NULL, NULL, TRUE);
     $params['tax_amount'] = $totalTax;
