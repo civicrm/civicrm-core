@@ -42,6 +42,8 @@ require_once 'api/api.php';
 
 /**
  * Class CRM_Core_Config
+ *
+ * @property CRM_Utils_System_Base $userSystem
  */
 class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
