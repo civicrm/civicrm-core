@@ -1792,33 +1792,13 @@ class CRM_Report_Form extends CRM_Core_Form {
         break;
 
       case 'mhas':
-        // mhas == multiple has
-        if ($value !== NULL && count($value) > 0) {
-          $sqlOP = $this->getSQLOperator($op);
-          foreach ($value as $key => $val) {
-            $val = str_replace('(', '[[.left-parenthesis.]]', $val);
-            $val = str_replace(')', '[[.right-parenthesis.]]', $val);
-            $value[$key] = $val;
-          }
-          $sp = CRM_Core_DAO::VALUE_SEPARATOR;
-          $clause
-            = "{$field['dbAlias']} REGEXP '$sp" . implode("$sp|$sp", $value) . "$sp'";
-        }
-        break;
-
       case 'mnot':
         // multiple has or multiple not
         if ($value !== NULL && count($value) > 0) {
-          $sqlOP = $this->getSQLOperator($op);
-          foreach ($value as $key => $val) {
-            $val = str_replace('(', '[[.left-parenthesis.]]', $val);
-            $val = str_replace(')', '[[.right-parenthesis.]]', $val);
-            $value[$key] = $val;
-          }
-          $sp = CRM_Core_DAO::VALUE_SEPARATOR;
-          $clause
-            = "( {$field['dbAlias']} NOT REGEXP '$sp" . implode("$sp|$sp", $value) .
-            "$sp' OR {$field['dbAlias']} IS NULL )";
+          $value = CRM_Utils_Type::escapeAll($value, $type);
+          $operator = $op == 'mnot' ? 'NOT' : '';
+          $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:cntrl:]]*";
+          $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
         }
         break;
 
