@@ -1065,9 +1065,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $payment = $this->_paymentProcessor['object'];
         $payment->setBaseReturnUrl('civicrm/event/register');
       }
-      // default mode is direct
+
+      // ContributeMode is a deprecated concept. It is short-hand for a bunch of
+      // assumptions we are working to remove.
       $this->set('contributeMode', 'direct');
 
+      // This code is duplicated multiple places and should be consolidated.
       if (isset($params["state_province_id-{$this->_bltID}"]) &&
         $params["state_province_id-{$this->_bltID}"]
       ) {
