@@ -155,7 +155,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @return void
    */
   public function buildQuickForm() {
-    $config = CRM_Core_Config::singleton();
+
     $button = substr($this->controller->getButtonName(), -4);
 
     $this->add('hidden', 'scriptFee', NULL);
@@ -226,6 +226,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
 
       //we might did reset allow waiting in case of dynamic calculation
+      // @TODO - does this bypass_payment still exist?
       if (!empty($this->_params[0]['bypass_payment']) &&
         is_numeric($spaces) &&
         $processedCnt > $spaces
