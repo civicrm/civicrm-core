@@ -38,7 +38,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGetFinancialTransactionsList() {
     $individualID = $this->individualCreate();
-    $this->contributionCreate($individualID);
+    $this->contributionCreate(array('contact_id' => $individualID));
     $batch = $this->callAPISuccess('Batch', 'create', array('title' => 'test', 'status_id' => 'Open'));
     CRM_Core_DAO::executeQuery("
      INSERT INTO civicrm_entity_batch (entity_table, entity_id, batch_id)

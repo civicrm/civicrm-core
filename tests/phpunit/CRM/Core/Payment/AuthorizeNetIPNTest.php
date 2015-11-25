@@ -16,9 +16,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->_paymentProcessorID = $this->paymentProcessorCreate(array(
-      'payment_processor_type_id' => 'AuthNet',
-    ));
+    $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate(array('is_test' => 0));
     $this->_contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', array(
       'title' => "Test Contribution Page",
@@ -38,8 +36,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    */
   public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
-    $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
-    $paypalIPN->main();
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
+    $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('6511143069', $contribution['trxn_id']);
@@ -47,8 +45,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
-    $paypalIPN->main();
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
+    $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'contribution_recur_id' => $this->_contributionRecurID,
         'sequential' => 1,
@@ -62,8 +60,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    */
   public function testIPNPaymentMembershipRecurSuccess() {
     $this->setupMembershipRecurringPaymentProcessorTransaction();
-    $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
-    $paypalIPN->main();
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
+    $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('6511143069', $contribution['trxn_id']);
@@ -71,8 +69,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
-    $paypalIPN->main();
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
+    $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'contribution_recur_id' => $this->_contributionRecurID,
         'sequential' => 1,
