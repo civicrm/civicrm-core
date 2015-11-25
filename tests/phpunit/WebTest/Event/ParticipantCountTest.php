@@ -391,7 +391,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->assertChecked('is_online_registration');
 
     $this->click('intro_text');
-    $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.');
+    $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.', 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click('CIVICRM_QFID_1_is_email_confirm');
