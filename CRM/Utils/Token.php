@@ -1665,6 +1665,11 @@ class CRM_Utils_Token {
     }
     $field = civicrm_api3($entity, 'getfield', array('action' => 'get', 'name' => $token, 'get_options' => 'get'));
     $field = $field['values'];
+    $fieldType = CRM_Utils_Array::value('type', $field);
+    // Boolean fields
+    if ($fieldType == CRM_Utils_Type::T_BOOLEAN && empty($field['options'])) {
+      $field['options'] = array(ts('No'), ts('Yes'));
+    }
     // Match pseudoconstants
     if (!empty($field['options'])) {
       $ret = array();
@@ -1673,11 +1678,11 @@ class CRM_Utils_Token {
       }
       return implode(', ', $ret);
     }
-    // Format special fields
-    elseif ($entityArray[$token] && CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_DATE) {
+    // Format date fields
+    elseif ($entityArray[$token] && $fieldType == CRM_Utils_Type::T_DATE) {
       return CRM_Utils_Date::customFormat($entityArray[$token]);
     }
-    return $entityArray[$token];
+    return implode(', ', (array) $entityArray[$token]);
   }
 
   /**
@@ -1732,7 +1737,7 @@ class CRM_Utils_Token {
    * @param string $knownTokens
    * @param bool|string $escapeSmarty
    *
-   * @return \Ambigous|mixed|string|\unknown
+   * @return string
    */
   public static function replaceMultipleContributionTokens($separator, $str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
     if (empty($knownTokens['contribution'])) {
@@ -1754,12 +1759,13 @@ class CRM_Utils_Token {
   /**
    * Get replacement strings for any membership tokens (only a small number of tokens are implemnted in the first instance
    * - this is used by the pdfLetter task from membership search
+   * @param string $entity
+   *   should always be "membership"
    * @param string $token
+   *   field name
    * @param array $membership
    *   An api result array for a single membership.
-   * @param bool $escapeSmarty
-   * @return string
-   *   token replacement
+   * @return string token replacement
    */
   public static function getMembershipTokenReplacement($entity, $token, $membership) {
     self::_buildMembershipTokens();
@@ -1843,7 +1849,7 @@ class CRM_Utils_Token {
 
   /**
    * @return array
-   *   legacy_token => new_token
+   *   [legacy_token => new_token]
    */
   public static function legacyContactTokens() {
     return array(
