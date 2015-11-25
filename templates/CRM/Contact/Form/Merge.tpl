@@ -85,9 +85,9 @@
         </td>
     {else}
       {if $row.main eq $row.other}
-         <tr class="merge-row-equal {cycle values="odd-row,even-row"}">
+         <tr class="merge-row-equal crm-row-ok {cycle values="odd-row,even-row"}">
       {else}
-         <tr class="merge-row-diff {cycle values="odd-row,even-row"}">
+         <tr class="crm-row-error {cycle values="odd-row,even-row"}">
       {/if}
         <td>
           {$row.title}
