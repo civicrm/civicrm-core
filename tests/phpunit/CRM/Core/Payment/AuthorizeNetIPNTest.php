@@ -1,6 +1,7 @@
 <?php
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+require_once 'CiviTest/CiviMailUtils.php';
 
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
@@ -23,6 +24,10 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'financial_type_id' => $this->_financialTypeID,
       'currency' => 'USD',
       'payment_processor' => $this->_paymentProcessorID,
+      'max_amount' => 1000,
+      'receipt_from_email' => 'gaia@the.cosmos',
+      'receipt_from_name' => 'Pachamama',
+      'is_email_receipt' => TRUE,
     ));
     $this->_contributionPageID = $contributionPage['id'];
   }
@@ -85,9 +90,66 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test IPN response mails don't leak.
    */
-  public function getRecurTransaction() {
-    return array(
+  public function testIPNPaymentMembershipRecurSuccessNoLeakage() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
+    $this->addProfile('supporter_profile', $this->_contributionPageID);
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
+    $IPN->main();
+    $mut->checkAllMailLog(array(
+      'Membership Type: General',
+      'Mr. Anthony Anderson II" <anthony_anderson@civicrm.org>',
+      'Amount: $ 200.00',
+      'Membership Start Date:',
+      'Supporter Profile',
+      'First Name: Anthony',
+      'Last Name: Anderson',
+      'Email Address: anthony_anderson@civicrm.org',
+      'This membership will be automatically renewed every',
+      'Dear Mr. Anthony Anderson II',
+      'Thanks for your auto renew membership sign-up',
+    ));
+    $mut->clearMessages();
+    $this->_contactID = $this->individualCreate(array('first_name' => 'Antonia', 'prefix_id' => 'Mrs.', 'email' => 'antonia_anderson@civicrm.org'));
+    $this->_invoiceID = uniqid();
+
+    $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(array('x_trans_id' => 'hers')));
+    $IPN->main();
+
+    $mut->checkAllMailLog(array(
+      'Membership Type: General',
+      'Mrs. Antonia Anderson II',
+      'antonia_anderson@civicrm.org',
+      'Amount: $ 200.00',
+      'Membership Start Date:',
+      'Transaction #: hers',
+      'Supporter Profile',
+      'First Name: Antonia',
+      'Last Name: Anderson',
+      'Email Address: antonia_anderson@civicrm.org',
+      'This membership will be automatically renewed every',
+      'Dear Mrs. Antonia Anderson II',
+      'Thanks for your auto renew membership sign-up',
+    ));
+
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
+   * Get detail for recurring transaction.
+   *
+   * @param array $params
+   *   Additional parameters.
+   *
+   * @return array
+   *   Parameters like AuthorizeNet silent post paramters.
+   */
+  public function getRecurTransaction($params = array()) {
+    return array_merge(array(
       "x_amount" => "200.00",
       "x_country" => 'US',
       "x_phone" => "",
@@ -112,7 +174,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       "x_cvv2_resp_code" => "",
       "x_cavv_response" => "",
       "x_test_request" => "false",
-      "x_subscription_id" => $this->_contributionRecurID,
+      "x_subscription_id" => $this->_contactID,
       "x_subscription_paynum" => "1",
       'x_first_name' => 'Robert',
       'x_zip' => '90210',
@@ -132,7 +194,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'x_response_reason_text' => 'This transaction has been approved.',
       'x_response_reason_code' => '1',
       'x_response_code' => '1',
-    );
+    ), $params);
   }
 
   /**
