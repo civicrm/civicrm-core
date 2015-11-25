@@ -118,6 +118,9 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    */
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
+    if (isset($this->_caseId)) {
+      $tokens += CRM_Core_SelectValues::caseTokens();
+    }
     return $tokens;
   }
 
