@@ -131,13 +131,13 @@
             {* Display the overwrite/add/add new label *}
             <span id="main_{$blockName}_{$blockId}_overwrite">
               {if $row.main}
-                <span class="action_label">(overwrite)</span>&nbsp;
+                <span class="action_label">({ts}overwrite{/ts})</span>&nbsp;
                  {if $blockName eq 'email' || $blockName eq 'phone' }
                    {$form.location.$blockName.$blockId.operation.html}&nbsp;
                  {/if}
                  <br />
               {else}
-                <span class="action_label">(add)</span>&nbsp;
+                <span class="action_label">({ts}add{/ts})</span>&nbsp;
               {/if}
             </span>
           </td>
@@ -161,11 +161,11 @@
             {if isset($row.main) || isset($row.other)}
               <span id="main_{$blockName}_{$blockId}_overwrite">
                 {if $row.main == $row.other}
-                  <span class="action_label">(match)</span><br />
+                  <span class="action_label">({ts}match{/ts})</span><br />
                 {elseif $row.main}
-                  <span class="action_label">(overwrite)</span><br />
+                  <span class="action_label">({ts}overwrite{/ts})</span><br />
                  {else}
-                   <span class="action_label">(add)</span>
+                   <span class="action_label">({ts}add{/ts})</span>
                 {/if}
               </span>
             {/if}
@@ -243,7 +243,7 @@ You will need to manually delete that user (click on the link to open Drupal Use
 
     // Create appropriate label / add new link after changing the block
     if (typeof block == 'undefined') {
-      label = '<span class="action_label">(add)</span>';
+      label = '<span class="action_label">({/literal}{ts}add{/ts}{literal})</span>';
     }
     else {
 
@@ -252,10 +252,10 @@ You will need to manually delete that user (click on the link to open Drupal Use
       mainBlockId = block['id'];
 
       // Set label
-      var label = '<span class="action_label">(overwrite)</span> ';
+      var label = '<span class="action_label">({/literal}{ts}overwrite{/ts}{literal})</span> ';
       if (blockname == 'email' || blockname == 'phone') {
         var opLabel = 'location[' + blockname + '][' + blockId + '][operation]';
-        label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">add new</label><br />';
+        label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">{/literal}{ts}add new{/ts}{literal}</label><br />';
       }
       label += '<br>';
     }
@@ -271,10 +271,10 @@ You will need to manually delete that user (click on the link to open Drupal Use
     $('body').on('change', "input[id*='[operation]']", function() {
       var originalHtml = $(this).prevAll('span.action_label').html();
       if ($(this).is(":checked")) {
-        $(this).prevAll('span.action_label').html(originalHtml.replace('(overwrite)', '(add new)'));
+        $(this).prevAll('span.action_label').html(originalHtml.replace('({/literal}{ts}overwrite{/ts}{literal})', '({/literal}{ts}add new{/ts}{literal})'));
       }
       else {
-        $(this).prevAll('span.action_label').html(originalHtml.replace('(add new)', '(overwrite)'));
+        $(this).prevAll('span.action_label').html(originalHtml.replace('({/literal}{ts}add new{/ts}{literal})', '({/literal}{ts}overwrite{/ts}{literal})'));
       }
     });
 
