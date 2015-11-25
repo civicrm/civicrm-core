@@ -507,6 +507,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           ),
         )
       );
+    $pre = array();
     if (!$this->_single) {
       $pre = array(
         array('desc' => ts('Contact Type')),
@@ -516,8 +517,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
       );
-      self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
     }
+    $pre[] = array(
+      array(
+        'desc' => '',
+        array(),
+      ),
+    );
+    self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
     if ($this->_includeSoftCredits) {
       self::$_columnHeaders = array_merge(
         self::$_columnHeaders,

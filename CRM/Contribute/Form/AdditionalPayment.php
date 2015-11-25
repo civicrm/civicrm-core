@@ -85,6 +85,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
     $this->assign('component', $this->_component);
     $this->assign('id', $this->_id);
+    $this->assign('suppressPaymentFormButtons', $this->isBeingCalledFromSelectorContext());
 
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, TRUE);
@@ -145,6 +146,15 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('paymentAmt', abs($paymentAmt));
 
     $this->setPageTitle($this->_refund ? ts('Refund') : ts('Payment'));
+  }
+
+  /**
+   * Is this function being called from a datatable selector.
+   *
+   * If so we don't want to show the buttons.
+   */
+  protected function isBeingCalledFromSelectorContext() {
+    return CRM_Utils_Request::retrieve('selector', 'Positive');
   }
 
   /**
