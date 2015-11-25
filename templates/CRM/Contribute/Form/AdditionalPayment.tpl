@@ -51,12 +51,19 @@
      {else}
        {assign var='entity' value=$component}
      {/if}
-    {ts 1=$entity}No additional payments found for this %1 record{/ts}
+    {if $suppressPaymentFormButtons}
+      {ts 1=$entity}No payments found for this %1 record{/ts}
+    {else}
+      {* Am unsure where this appears so unsure if above text could apply *}
+      {ts 1=$entity}No Additional payments found for this %1 record{/ts}
+    {/if}
   {/if}
- <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
- </div>
-{elseif $formType}
+  {if !$suppressPaymentFormButtons}
+    <div class="crm-submit-buttons">
+       {include file="CRM/common/formButtons.tpl"}
+    </div>
+  {/if}
+ {elseif $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
