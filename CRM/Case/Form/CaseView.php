@@ -232,6 +232,11 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $emailActivityType = array_search('Email', $allActTypes);
     $pdfActivityType = array_search('Print PDF Letter', $allActTypes);
 
+    if ($pdfActivityType) {
+      $this->assign('exportDoc', CRM_Utils_System::url('civicrm/activity/pdf/add',
+        "action=add&context=standalone&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=$pdfActivityType"));
+    }
+
     // remove Open Case activity type since we're inside an existing case
     if ($openActTypeId = array_search('Open Case', $allActTypes)) {
       unset($aTypes[$openActTypeId]);

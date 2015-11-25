@@ -120,6 +120,10 @@
           <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><i class="crm-i fa-print"></i> {ts}Print Report{/ts}</a>
         {/if}
 
+        {if !empty($exportDoc)}
+          <a class="crm-hover-button action-item" href="{$exportDoc}"><i class="crm-i fa-file-pdf-o"></i> {ts}Export Document{/ts}</a>
+        {/if}
+
         {if $mergeCases}
           <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><i class="crm-i fa-compress"></i> {ts}Merge Case{/ts}</a>
           {$form._qf_CaseView_next_merge_case.html}
