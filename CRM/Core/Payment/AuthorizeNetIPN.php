@@ -272,10 +272,10 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       $ids['contact'] = $contRecur->contact_id;
     }
     if (!$ids['contributionRecur']) {
-      $message = ts("Could not find contributionRecur id: %1", array(1 => htmlspecialchars(print_r($input, TRUE))));
-      CRM_Core_Error::debug_log_message($message);
-      echo "Failure: $message<p>";
-      exit();
+      $message = ts("Could not find contributionRecur id");
+      $log = new CRM_Utils_SystemLogger();
+      $log->error('payment_notification', array('message' => $message, 'ids' => $ids, 'input' => $input));
+      throw new CRM_Core_Exception($message);
     }
 
     // get page id based on contribution id
@@ -331,10 +331,14 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
   }
 
   /**
-   * @param $ids
-   * @param $input
+   * Check that the MDs is valid.
    *
-   * @return bool
+   * Note that this only checks if it is provided.
+   *
+   * @param array $ids
+   * @param array $input
+   *
+   * @throws CRM_Core_Exception
    */
   public function checkMD5($ids, $input) {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ids['paymentProcessor'],
@@ -343,11 +347,11 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $paymentObject = CRM_Core_Payment::singleton($input['is_test'] ? 'test' : 'live', $paymentProcessor);
 
     if (!$paymentObject->checkMD5($input['MD5_Hash'], $input['trxn_id'], $input['amount'], TRUE)) {
-      CRM_Core_Error::debug_log_message("MD5 Verification failed.");
-      echo "Failure: Security verification failed<p>";
-      exit();
+      $message = "Failure: Security verification failed";
+      $log = new CRM_Utils_SystemLogger();
+      $log->error('payment_notification', array('message' => $message, 'ids' => $ids, 'input' => $input));
+      throw new CRM_Core_Exception($message);
     }
-    return TRUE;
   }
 
 }
