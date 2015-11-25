@@ -3991,7 +3991,7 @@ WHERE con.id = {$contributionId}
     $contribution_status_id,
     $original_contribution_status_id
   ) {
-    if (!$pledgePaymentID || $action & CRM_Core_Action::ADD && !$contributionID) {
+    if (!$pledgePaymentID && $action & CRM_Core_Action::ADD && !$contributionID) {
       return;
     }
 
@@ -4005,6 +4005,10 @@ WHERE con.id = {$contributionId}
         'id',
         'contribution_id'
       );
+    }
+
+    if (!$pledgePaymentID) {
+      return;
     }
     $pledgeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
       $contributionID,
