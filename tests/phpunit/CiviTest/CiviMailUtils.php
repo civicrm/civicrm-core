@@ -260,13 +260,24 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    */
   public function checkMailLog($strings, $absentStrings = array(), $prefix = '') {
     $mail = $this->getMostRecentEmail('raw');
-    foreach ($strings as $string) {
-      $this->_ut->assertContains($string, $mail, "$string .  not found in  $mail  $prefix");
-    }
-    foreach ($absentStrings as $string) {
-      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");;
-    }
-    return $mail;
+    return $this->checkMailForStrings($strings, $absentStrings, $prefix, $mail);
+  }
+
+  /**
+   * Check contents of mail log.
+   *
+   * @param array $strings
+   *   Strings that should be included.
+   * @param array $absentStrings
+   *   Strings that should not be included.
+   * @param string $prefix
+   *
+   * @return \ezcMail|string
+   */
+  public function checkAllMailLog($strings, $absentStrings = array(), $prefix = '') {
+    $mails = $this->getAllMessages('raw');
+    $mail = implode(',', $mails);
+    return $this->checkMailForStrings($strings, $absentStrings, $prefix, $mail);
   }
 
   /**
@@ -327,6 +338,23 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     $mail = $parser->parseMail($set);
     $this->_ut->assertNotEmpty($mail, 'Cannot parse mail');
     return $mail[0];
+  }
+
+  /**
+   * @param $strings
+   * @param $absentStrings
+   * @param $prefix
+   * @param $mail
+   * @return mixed
+   */
+  public function checkMailForStrings($strings, $absentStrings, $prefix, $mail) {
+    foreach ($strings as $string) {
+      $this->_ut->assertContains($string, $mail, "$string .  not found in  $mail  $prefix");
+    }
+    foreach ($absentStrings as $string) {
+      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");;
+    }
+    return $mail;
   }
 
 }
