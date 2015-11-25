@@ -26,7 +26,7 @@
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
-
+require_once 'CiviTest/CiviMailUtils.php';
 
 /**
  *  Test APIv3 civicrm_contribute_recur* functions
@@ -71,6 +71,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'goal_amount' => $this->testAmount,
       'is_pay_later' => 1,
       'is_monetary' => TRUE,
+      'is_email_receipt' => TRUE,
+      'receipt_from_email' => 'yourconscience@donate.com',
+      'receipt_from_name' => 'Ego Freud',
     );
 
     $this->_priceSetParams = array(
@@ -432,7 +435,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit recurring membership with immediate confirmation (IATS style)
+   * Test submit recurring membership with immediate confirmation (IATS style).
+   *
    * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
    * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
@@ -592,7 +596,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * The default data set does not include a complete default membership price set - not quite sure why
+   * The default data set does not include a complete default membership price set - not quite sure why.
+   *
    * This function ensures it exists & populates $this->_ids with it's data
    */
   public function setUpMembershipBlockPriceSet() {
@@ -611,6 +616,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'sequential' => 1,
     ));
     $this->_ids['price_field'][] = $priceField['id'];
+
     foreach ($this->_ids['membership_type'] as $membershipTypeID) {
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
         'name' => 'membership_amount',
