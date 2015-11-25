@@ -2450,25 +2450,22 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 /* crm-summary-group appears outside crm-container for contact summary icon overlay */
-#crm-container .crm-summary-group .crm-section .label,
 .crm-container .crm-summary-group .crm-section .label {
   text-align: left;
   width: 40%;
   font-size: 11px;
   color: #A7A7A7;
+  background-color: transparent;
 }
 
-#crm-container .crm-summary-group .crm-section .content,
 .crm-container .crm-summary-group .crm-section .content {
   margin-left: 41%;
 }
 
-#crm-container .crm-tooltip table .crm-summary-col-1,
 .crm-container .crm-tooltip table .crm-summary-col-1 {
   width: 350px;
 }
 
-#crm-container .crm-tooltip table .crm-summary-col-1 div,
 .crm-container .crm-tooltip table .crm-summary-col-1 div {
   width: auto;
 }
