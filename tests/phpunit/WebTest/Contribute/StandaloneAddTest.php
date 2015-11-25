@@ -78,13 +78,14 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
     // Assign the created Financial Account $financialAccountTitle to $financialType
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span/a[text()='Accounts']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
     $this->select('account_relationship', "label=Sales Tax Account is");
+    $this->waitForAjaxContent();
     $this->select('financial_account_id', "label=" . $financialAccountTitle);
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
 
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
@@ -104,7 +105,9 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("total_amount", "100");
 
     // select payment instrument type = Check and enter chk number
-    $this->select("payment_instrument_id", "label=Cash");
+    $this->select("payment_instrument_id", "value=4");
+    $this->waitForElementPresent("check_number");
+    $this->type("check_number", "check #1041");
     $this->click("is_email_receipt");
     $this->assertTrue($this->isChecked("is_email_receipt"), 'Send Receipt checkbox should be checked.');
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
@@ -154,7 +157,6 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       'Contribution Status' => 'Completed',
       'Payment Method' => 'Check',
       'Check Number' => 'check #1041',
-      'Paid By' => 'Cash',
     );
 
     foreach ($expected as $label => $value) {

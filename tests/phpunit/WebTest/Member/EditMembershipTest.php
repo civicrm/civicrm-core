@@ -78,13 +78,14 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
 
     // Assign the created Financial Account $financialAccountTitle to $financialType
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span/a[text()='Accounts']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
     $this->select('account_relationship', "label=Sales Tax Account is");
+    $this->waitForAjaxContent();
     $this->select('financial_account_id', "label=" . $financialAccountTitle);
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()=' Assign Account']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
 
     // add membership type
     $membershipTypes = $this->webtestAddMembershipType('rolling', 1, 'year', 'no', 100, $financialType['name']);
