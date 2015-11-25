@@ -57,11 +57,11 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     //we only get invoice num as a key player from payment gateway response.
     //for ARB we get x_subscription_id and x_subscription_paynum
     $x_subscription_id = $this->retrieve('x_subscription_id', 'String');
+    $ids = $objects = $input = array();
 
     if ($x_subscription_id) {
       //Approved
 
-      $ids = $objects = array();
       $input['component'] = $component;
 
       // load post vars in $input

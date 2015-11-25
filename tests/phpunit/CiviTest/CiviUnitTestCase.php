@@ -3227,8 +3227,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    * Set up initial recurring payment allowing subsequent IPN payments.
    */
-  public function setupRecurringPaymentProcessorTransaction() {
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+  public function setupRecurringPaymentProcessorTransaction($params = array()) {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
       'contact_id' => $this->_contactID,
       'amount' => 1000,
       'sequential' => 1,
@@ -3250,7 +3250,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'payment_processor_id' => $this->_paymentProcessorID,
         'is_test' => 0,
       ),
-    ));
+    ), $params));
     $this->_contributionRecurID = $contributionRecur['id'];
     $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
   }
@@ -3261,10 +3261,16 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function setupMembershipRecurringPaymentProcessorTransaction() {
     $this->ids['membership_type'] = $this->membershipTypeCreate();
     //create a contribution so our membership & contribution don't both have id = 1
-    $this->contributionCreate(array(
-      'contact_id' => $this->_contactID,
-      'is_test' => 1),
-      1, 'abcd', '345j');
+    if ($this->callAPISuccess('Contribution', 'getcount', array()) == 0) {
+      $this->contributionCreate(array(
+        'contact_id' => $this->_contactID,
+        'is_test' => 1,
+        'financial_type_id' => 1,
+        'invoice_id' => 'abcd',
+        'trxn_id' => 345,
+      ));
+    }
+
     $this->setupRecurringPaymentProcessorTransaction();
 
     $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(
@@ -3288,10 +3294,12 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', array(
         'return' => 'id',
         'label' => 'Membership Amount',
+        'options' => array('limit' => 1, 'sort' => 'id DESC'),
       )),
       'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', array(
         'return' => 'id',
         'label' => 'General',
+        'options' => array('limit' => 1, 'sort' => 'id DESC'),
       )),
     ));
     $this->callAPISuccess('membership_payment', 'create', array(
