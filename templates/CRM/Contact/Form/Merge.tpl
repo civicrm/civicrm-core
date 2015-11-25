@@ -28,6 +28,20 @@
 {ts}Click <strong>Merge</strong> to move data from the Duplicate Contact on the left into the Main Contact. In addition to the contact data (address, phone, email...), you may choose to move all or some of the related activity records (groups, contributions, memberships, etc.).{/ts} {help id="intro"}
 </div>
 
+<div class="message status">
+  <div class="icon inform-icon"></div>
+  <strong>{ts}WARNING: The duplicate contact record WILL BE DELETED after the merge is complete.{/ts}</strong>
+</div>
+
+{if $user}
+  <div class="message status">
+    <div class="icon inform-icon"></div>
+    <strong>{ts 1=$config->userFramework}WARNING: There are %1 user accounts associated with both the original and duplicate contacts. Ensure that the %1 user you want to retain is on the right - if necessary use the 'Flip between original and duplicate contacts.' option at top to swap the positions of the two records before doing the merge.
+The user record associated with the duplicate contact will not be deleted, but will be unlinked from the associated contact record (which will be deleted).
+You will need to manually delete that user (click on the link to open the %1 user account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong>
+  </div>
+{/if}
+
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="top"}
   {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><i class="crm-i fa-chevron-left"></i> {ts}Previous{/ts}</a>{/if}
@@ -193,14 +207,6 @@
 <div class='form-item'>
   <!--<p>{$form.moveBelongings.html} {$form.moveBelongings.label}</p>-->
   <!--<p>{$form.deleteOther.html} {$form.deleteOther.label}</p>-->
-</div>
-<div class="message status">
-    <p><strong>{ts}WARNING: The duplicate contact record WILL BE DELETED after the merge is complete.{/ts}</strong></p>
-    {if $user}
-      <p><strong>{ts 1=$config->userFramework}There are %1 user accounts associated with both the original and duplicate contacts. Ensure that the Drupal User you want to retain is on the right - if necessary use the 'Flip between original and duplicate contacts.' option at top to swap the positions of the two records before doing the merge.
-The user record associated with the duplicate contact will not be deleted, but will be un-linked from the associated contact record (which will be deleted).
-You will need to manually delete that user (click on the link to open Drupal User account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong></p>
-    {/if}
 </div>
 
 <div class="crm-submit-buttons">
