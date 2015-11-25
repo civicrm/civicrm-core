@@ -808,6 +808,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     if (!$params['is_online_registration']) {
       $params['is_email_confirm'] = FALSE;
     }
+    if (!empty($params['allow_selfcancelxfer'])) {
+      $params['selfcancelxfer_time'] = !empty($params['selfcancelxfer_time']) ? $params['selfcancelxfer_time'] : 0;
+    }
 
     if (!$this->_isTemplate) {
       $params['registration_start_date'] = CRM_Utils_Date::processDate($params['registration_start_date'],

@@ -260,7 +260,6 @@
      <title>Self Service Update</title>
      <page_callback>CRM_Event_Form_SelfSvcUpdate</page_callback>
      <access_callback>1</access_callback>
-     <is_public>true</is_public>
      <page_type>1</page_type>
      <weight>880</weight>
   </item>
@@ -270,7 +269,6 @@
      <page_callback>CRM_Event_Form_SelfSvcTransfer</page_callback>
      <page_type>1</page_type>
      <access_callback>1</access_callback>
-     <is_public>true</is_public>
      <weight>890</weight>
   </item>
   <item>

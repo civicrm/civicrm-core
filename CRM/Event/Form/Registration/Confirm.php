@@ -907,6 +907,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           if ($participantNum = array_search('participant', $participantCount)) {
             unset($participantCount[$participantNum]);
           }
+          // Change $this->_values['participant'] to include additional participant values
+          $ids = $participantValues = array();
+          $participantParams = array('id' => $participantID);
+          CRM_Event_BAO_Participant::getValues($participantParams, $participantValues, $ids);
+          $this->_values['participant'] = $participantValues[$participantID];
+
           $this->assign('isPrimary', 0);
           $this->assign('customProfile', NULL);
           //Additional Participant should get only it's payment information

@@ -125,6 +125,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->set('values', $this->_part_values);
     //fetch Event by event_id, verify that this event can still be xferred/cancelled
     $this->_event_id = $this->_part_values['event_id'];
+    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}&noFullMsg=true");
     $this->_contact_id = $this->_part_values['participant_contact_id'];
     $this->assign('action', $this->_action);
     if ($this->_participant_id) {
@@ -140,11 +141,14 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_contact_email = $email;
     $details = array();
     $details = CRM_Event_BAO_Participant::participantDetails($this->_participant_id);
+    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
+    $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_participant_id, 'contribution_id', 'participant_id');
+    $this->assign('contributionId', $contributionId);
     $query = "
       SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id
       FROM civicrm_participant cp
       LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
-      LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = 13
+      LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
       WHERE cp.id = {$this->_participant_id}";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     while ($dao->fetch()) {
@@ -157,7 +161,8 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     //verify participant status is still Registered
     if ($details['status'] != "Registered") {
       $status = "You are no longer registered for " . $this->_event_title;
-      $session->setStatus($status, ts('Event status error.'), 'alert');
+      CRM_Core_Session::setStatus($status, ts('Event status error.'), 'alert');
+      CRM_Utils_System::redirect($url);
     }
     $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $this->_event_id;
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
@@ -165,15 +170,21 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $time_limit  = $dao->time;
       $start_date = $dao->start;
     }
+    $start_time = new Datetime($start_date);
+    $timenow = new Datetime();
+    if (!empty($start_time) && $start_time < $timenow) {
+      $status = ts("The event has been started, cannot transfer or cancel this event");
+      $session->setStatus($status, ts('Oops.'), 'alert');
+      CRM_Utils_System::redirect($url);
+    }
     if (!empty($time_limit) && $time_limit > 0) {
-      $timenow = new Datetime("");
-      $start_time = new Datetime($start_date);
       $interval = $timenow->diff($start_time);
       $days = $interval->format('%d');
       $hours   = $interval->format('%h');
       if ($hours <= $time_limit && $days < 1) {
-        $status = ts("Less than ") . $time_limit . ts(" hours to start time, cannot transfer or cancel this event");
+        $status = ts("Less than %1 hours to start time, cannot transfer or cancel this event", array(1 => $time_limit));
         $session->setStatus($status, ts('Oops.'), 'alert');
+        CRM_Utils_System::redirect($url);
       }
     }
     $this->assign('details', $details);
@@ -328,6 +339,8 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $this->_contact_name));
     $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', array(1 => $this->_contact_email));
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
+    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}&noFullMsg=true");
+    CRM_Utils_System::redirect($url);
   }
 
 }
