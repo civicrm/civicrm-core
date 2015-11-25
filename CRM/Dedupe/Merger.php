@@ -961,14 +961,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   public static function getRowsElementsAndInfo($mainId, $otherId) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
 
-    $listOptions = array(
-      'location_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
-      'phone_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
-      'provider_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'),
-      'website_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
-      'gender_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-    );
-
     // Fetch contacts
     foreach (array('main' => $mainId, 'other' => $otherId) as $moniker => $cid) {
       $params = array(
@@ -1070,7 +1062,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $field = 'suffix_id';
         }
         elseif ($field == 'gender_id' && !empty($value)) {
-          $label = $listOptions['gender_id'][$value];
+          $genderOptions = civicrm_api3('contact', 'getoptions', array('field' => 'gender_id'));
+          $label = $genderOptions['values'][$value];
         }
         elseif ($field == 'current_employer_id' && !empty($value)) {
           $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
@@ -1237,6 +1230,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           if ($blockInfo['hasLocation']) {
 
+            // Load the location options for this entity
+            $locationOptions = civicrm_api3($blockName, 'getoptions', array('field' => 'location_type_id'));
+
             // JS lookup 'main' contact's location (if there are any)
             if (!empty($locations['main'][$blockName])) {
               $js = array('onChange' => "mergeBlock('$blockName', this, $count, 'locTypeId' );");
@@ -1245,7 +1241,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $thisLocId = $value['location_type_id'];
 
             // Put this field's location type at the top of the list
-            $tmpIdList = $listOptions['location_type_id'];
+            $tmpIdList = $locationOptions['values'];
             $defaultLocId = array($thisLocId => $tmpIdList[$thisLocId]);
             unset($tmpIdList[$thisLocId]);
 
@@ -1273,12 +1269,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // Provide a select drop-down for the location's type/provider
           // eg websites: Google+, Facebook...
 
-          // CRM-17556 Set up JS lookup of 'main' contact's value by type
           $js = NULL;
 
           if ($blockInfo['hasType']) {
 
-            // JS lookup 'main' contact's location (if there are any)
+            // Load the type options for this entity
+            $typeOptions = civicrm_api3($blockName, 'getoptions', array('field' => $blockInfo['hasType']));
+
+            // CRM-17556 Set up JS lookup of 'main' contact's value by type
             if (!empty($locations['main'][$blockName])) {
               $js = array('onChange' => "mergeBlock('$blockName', this, $count, 'typeTypeId' );");
             }
@@ -1286,7 +1284,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $thisTypeId = $value[$blockInfo['hasType']];
 
             // Put this field's location type at the top of the list
-            $tmpIdList = $listOptions[$blockInfo['hasType']];
+            $tmpIdList = $typeOptions['values'];
             $defaultTypeId = array($thisTypeId => $tmpIdList[$thisTypeId]);
             unset($tmpIdList[$thisTypeId]);
 
@@ -1307,10 +1305,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // Set the label for this row
           $rowTitle = $blockInfo['label'] . ' ' . ($count + 1);
           if (!empty($thisLocId)) {
-            $rowTitle .= ' (' . $listOptions['location_type_id'][$thisLocId] . ')';
+            $rowTitle .= ' (' . $locationOptions['values'][$thisLocId] . ')';
           }
           if (!empty($thisTypeId)) {
-            $rowTitle .= ' (' . $listOptions[$blockInfo['hasType']][$thisTypeId] . ')';
+            $rowTitle .= ' (' . $typeOptions['values'][$thisTypeId] . ')';
           }
           $rows["move_location_{$blockName}_$count"]['title'] = $rowTitle;
 
