@@ -393,6 +393,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       ),
       'civicrm_participant' => array(
         0 => 'contact_id',
+        1 => 'transferred_to_contact_id', //CRM-16761
       ),
       'civicrm_payment_token' => array(
         0 => 'contact_id',
