@@ -3187,7 +3187,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'frequency_interval' => 1,
       'invoice_id' => $this->_invoiceID,
       'contribution_status_id' => 2,
-      'processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->_paymentProcessorID,
+      // processor provided ID - use contact ID as proxy.
+      'processor_id' => $this->_contactID,
       'api.contribution.create' => array(
         'total_amount' => '200',
         'invoice_id' => $this->_invoiceID,
@@ -3382,6 +3384,22 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     CRM_Price_BAO_PriceField::create($paramsField);
 
     return $priceSetId;
+  }
+
+  /**
+   * Add a profile to a contribution page.
+   *
+   * @param string $name
+   * @param int $contributionPageID
+   */
+  protected function addProfile($name, $contributionPageID) {
+    $this->callAPISuccess('UFJoin', 'create', array(
+      'uf_group_id' => $name,
+      'module' => 'CiviContribute',
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contributionPageID,
+      'weight' => 1,
+    ));
   }
 
 }
