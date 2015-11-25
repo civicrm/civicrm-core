@@ -27,3 +27,5 @@ ALTER TABLE civicrm_participant
 
 INSERT INTO civicrm_participant_status_type(name, {localize field='label'}label{/localize}, class, is_reserved, is_active, is_counted, weight, visibility_id)
 VALUES ('Transferred', {localize}'{ts escape="sql"}Transferred{/ts}'{/localize}, 'Negative', 1, 1, 0, 16, 2);
+
+{include file='../CRM/Upgrade/4.7.beta1.msg_template/civicrm_msg_template.tpl'}
