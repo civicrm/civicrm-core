@@ -1621,14 +1621,63 @@ class CRM_Utils_Token {
       return $str;
     }
 
-    $fn = 'get' . ucfirst($entity) . 'tokenReplacement';
+    $fn = 'get' . ucfirst($entity) . 'TokenReplacement';
+    $fn = is_callable(array('CRM_Utils_Token', $fn)) ? $fn : 'getApiTokenReplacement';
     // since we already know the tokens lets just use them & do str_replace which is faster & simpler than preg_replace
     foreach ($knownTokens[$entity] as $token) {
-      $replaceMent = CRM_Utils_Token::$fn($token, $entityArray, $escapeSmarty);
-      $str = str_replace('{' . $entity . '.' . $token . '}', $replaceMent, $str);
+      $replacement = self::$fn($entity, $token, $entityArray);
+      if ($escapeSmarty) {
+        $replacement = self::tokenEscapeSmarty($replacement);
+      }
+      $str = str_replace('{' . $entity . '.' . $token . '}', $replacement, $str);
     }
-    $str = preg_replace('/\\\\|\{(\s*)?\}/', ' ', $str);
-    return $str;
+    return preg_replace('/\\\\|\{(\s*)?\}/', ' ', $str);
+  }
+
+  /**
+   * @param int $caseId
+   * @param int $str
+   * @param array $knownTokens
+   * @param bool $escapeSmarty
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function replaceCaseTokens($caseId, $str, $knownTokens = array(), $escapeSmarty = FALSE) {
+    if (!$knownTokens || empty($knownTokens['case'])) {
+      return $str;
+    }
+    $case = civicrm_api3('case', 'getsingle', array('id' => $caseId));
+    return self::replaceEntityTokens('case', $case, $str, $knownTokens, $escapeSmarty);
+  }
+
+  /**
+   * Generic function for formatting token replacement for an api field
+   *
+   * @param string $entity
+   * @param string $token
+   * @param array $entityArray
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getApiTokenReplacement($entity, $token, $entityArray) {
+    if (!isset($entityArray[$token])) {
+      return '';
+    }
+    $field = civicrm_api3($entity, 'getfield', array('action' => 'get', 'name' => $token, 'get_options' => 'get'));
+    $field = $field['values'];
+    // Match pseudoconstants
+    if (!empty($field['options'])) {
+      $ret = array();
+      foreach ((array) $entityArray[$token] as $val) {
+        $ret[] = $field['options'][$val];
+      }
+      return implode(', ', $ret);
+    }
+    // Format special fields
+    elseif ($entityArray[$token] && CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_DATE) {
+      return CRM_Utils_Date::customFormat($entityArray[$token]);
+    }
+    return $entityArray[$token];
   }
 
   /**
@@ -1712,8 +1761,7 @@ class CRM_Utils_Token {
    * @return string
    *   token replacement
    */
-  public static function getMembershipTokenReplacement($token, $membership, $escapeSmarty = FALSE) {
-    $entity = 'membership';
+  public static function getMembershipTokenReplacement($entity, $token, $membership) {
     self::_buildMembershipTokens();
     switch ($token) {
       case 'type':
@@ -1750,9 +1798,6 @@ class CRM_Utils_Token {
         break;
     }
 
-    if ($escapeSmarty) {
-      $value = self::tokenEscapeSmarty($value);
-    }
     return $value;
   }
 

@@ -16,8 +16,6 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    * @param $skipOnHold
    * @param $skipDeceased
    * @param $contactIDs
-   *
-   * @return void
    */
   public static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
 
@@ -50,14 +48,15 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    * @param array $returnProperties
    * @param bool $skipOnHold
    * @param bool $skipDeceased
-   * @param unknown_type $messageToken
+   * @param array $messageToken
    * @param $html_message
    * @param $categories
    *
-   * @return unknown
+   * @return array
    */
   public static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
+    $html = array();
 
     foreach ($membershipIDs as $membershipID) {
       $membership = $memberships[$membershipID];
