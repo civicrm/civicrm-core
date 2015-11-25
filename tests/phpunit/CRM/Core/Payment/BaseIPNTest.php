@@ -49,6 +49,16 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   protected $input;
   protected $ids;
   protected $objects;
+
+  /**
+   * @var int
+   */
+  protected $_membershipTypeID;
+
+  /**
+   * @var int
+   */
+  protected $_membershipStatusID;
   public $DBResetRequired = FALSE;
 
   public function setUp() {
@@ -80,13 +90,12 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $processorEntity = $this->paymentProcessor->create($paymentProcessorParams);
 
     $this->_processorId = $processorEntity->id;
-    $this->_contributionTypeId = 1;
+    $this->_financialTypeId = 1;
 
     $this->_contributionParams = array(
       'contact_id' => $this->_contactId,
-      'version' => 3,
-      'financial_type_id' => $this->_contributionTypeId,
-      'recieve_date' => date('Ymd'),
+      'financial_type_id' => $this->_financialTypeId,
+      'receive_date' => date('Ymd'),
       'total_amount' => 150.00,
       'invoice_id' => 'c8acb91e080ad7bd8a2adc119c192885',
       'currency' => 'USD',
@@ -128,6 +137,24 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with recurring membership data.
    */
+  public function testLoadMembershipObjectsNoLeakage() {
+    $this->_setUpMembershipObjects();
+    $this->_setUpRecurringContribution();
+    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
+    $this->assertEquals('Anthony', $this->objects['contact']->first_name);
+
+    $this->ids['contact'] = $this->_contactId = $this->individualCreate(array('first_name' => 'Donald', 'last_name' => 'Duck', 'email' => 'the-don@duckville.com'));
+    $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, array('invoice_id' => 'abc')));
+    $this->_contributionId = $contribution['id'];
+    $this->_setUpMembershipObjects();
+    $this->input['invoiceID'] = 'abc';
+    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
+    $this->assertEquals('Donald', $this->objects['contact']->first_name);
+  }
+
+  /**
+   * Test the LoadObjects function with recurring membership data.
+   */
   public function testLoadMembershipObjectsLoadAll() {
     $this->_setUpMembershipObjects();
     $this->_setUpRecurringContribution();
@@ -156,6 +183,33 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertContains('<p>Please print this confirmation for your records.</p>', $msg['html']);
     $this->assertContains('Membership Type: General', $msg['body']);
+  }
+
+  /**
+   * Test the LoadObjects function data does not leak.
+   *
+   * If more than one iteration takes place the variables should not leak.
+   */
+  public function testSendMailMembershipObjectsNoLeakage() {
+    $this->_setUpMembershipObjects();
+    $values = array();
+    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
+    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
+    $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
+    $this->assertContains('Membership Type: General', $msg['body']);
+
+    $this->ids['contact'] = $this->_contactId = $this->individualCreate(array('prefix_id' => 'Dr.', 'first_name' => 'Donald', 'last_name' => 'Duck', 'email' => 'the-don@duckville.com'));
+    $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, array('invoice_id' => 'abc')));
+    $this->_contributionId = $contribution['id'];
+
+    $this->_membershipTypeID = $this->membershipTypeCreate(array('name' => 'Fowl'));
+    $this->_setUpMembershipObjects();
+    $this->input['invoiceID'] = 'abc';
+    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
+    $this->assertEquals('Donald', $this->objects['contact']->first_name);
+    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
+    $this->assertEquals('Dr. Donald Duck II', $msg['to']);
+    $this->assertContains('Membership Type: Fowl', $msg['body']);
   }
 
   /**
@@ -471,8 +525,12 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function _setUpMembershipObjects() {
     try {
-      $this->_membershipTypeID = $this->membershipTypeCreate();
-      $this->_membershipStatusID = $this->membershipStatusCreate('test status');
+      if (!$this->_membershipTypeID) {
+        $this->_membershipTypeID = $this->membershipTypeCreate();
+      }
+      if (!$this->_membershipStatusID) {
+        $this->_membershipStatusID = $this->membershipStatusCreate('test status');
+      }
     }
     catch (Exception$e) {
       echo $e->getMessage();
@@ -492,7 +550,12 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     );
 
     $membership = $this->callAPISuccess('membership', 'create', $this->_membershipParams);
-
+    if ($this->objects['contribution']->id != $this->_contributionId) {
+      $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->id = $this->_contributionId;
+      $contribution->find(TRUE);
+      $this->objects = array('contribution' => $contribution);
+    }
     $this->_membershipId = $membership['id'];
     //we'll create membership payment here because to make setup more re-usable
     civicrm_api('membership_payment', 'create', array(
@@ -510,7 +573,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'total_amount' => 150.00,
       'invoiceID' => "c8acb91e080ad7bd8a2adc119c192885",
       'contactID' => $this->_contactId,
-      'contributionID' => $this->objects['contribution']->id,
+      'contributionID' => $this->_contributionId,
       'membershipID' => $this->_membershipId,
     );
 
