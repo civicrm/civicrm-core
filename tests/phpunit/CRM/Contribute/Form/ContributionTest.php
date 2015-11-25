@@ -229,7 +229,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       ), CRM_Core_Action::ADD);
     }
     catch (Civi\Payment\Exception\PaymentProcessorException $e) {
-      $this->assertEquals('10544: Transaction cannot be processed. Please use a different payment card.',
+      $this->assertEquals('Transaction cannot be processed. Please use a different payment card.',
         $e->getMessage());
     }
     $this->callAPISuccessGetCount('Contribution', array(
