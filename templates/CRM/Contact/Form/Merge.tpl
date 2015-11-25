@@ -194,12 +194,12 @@ You will need to manually delete that user (click on the link to open the %1 use
     {if $paramName eq 'move_rel_table_users'}
       <tr class="{cycle values="even-row,odd-row"}">
       <td><strong>{ts}Move related...{/ts}</strong></td><td>{if $otherUfId}<a target="_blank" href="{$params.other_url}">{$otherUfName}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;{else}<td style='white-space: nowrap'></td>{/if}</td><td>{if $mainUfId}<a target="_blank" href="{$params.main_url}">{$mainUfName}</a>{/if}</td>
-      <td>(migrate)</td>
+      <td>({ts}migrate{/ts})</td>
     </tr>
     {else}
     <tr class="{cycle values="even-row,odd-row"}">
       <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
-       <td>(migrate)</td>
+       <td>({ts}migrate{/ts})</td>
     </tr>
     {/if}
   {/foreach}
