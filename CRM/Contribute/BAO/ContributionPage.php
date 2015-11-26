@@ -347,7 +347,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
       $title = isset($values['title']) ? $values['title'] : CRM_Contribute_PseudoConstant::contributionPage($values['contribution_page_id']);
 
-      // set email in the template here
+      // Set email variables explicitly to avoid leaky smarty variables.
+      // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
       $tplParams = array(
         'email' => $email,
         'receiptFromEmail' => CRM_Utils_Array::value('receipt_from_email', $values),

@@ -2615,10 +2615,17 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
+   * Assign message variables to template but try to break the habit.
+   *
+   * In order to get away from leaky variables it is better to ensure variables are set in values and assign them
+   * from the send function. Otherwise smarty variables can leak if this is called more than once - e.g. processing
+   * multiple recurring payments for processors like IATS that use tokens.
+   *
    * Apply variables for message to smarty template - this function is part of analysing what is in the huge
    * function & breaking it down into manageable chunks. Eventually it will be refactored into something else
-   * Note we send directly from this function in some cases because it is only partly refactored
-   * Don't call this function directly as the signature will change
+   * Note we send directly from this function in some cases because it is only partly refactored.
+   *
+   * Don't call this function directly as the signature will change.
    *
    * @param $values
    * @param $input
