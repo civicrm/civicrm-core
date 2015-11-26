@@ -326,6 +326,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     // configure default mail-box
     $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
+    $this->waitForElementPresent('name');
     $this->type('name', 'Test Domain');
     $this->type('domain', 'example.com');
     $this->select('protocol', 'value=1');
@@ -348,6 +349,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("~1 recipient");
 
     // fill subject for mailing
+    $this->waitForElementPresent("xpath=//input[@name='subject']");
     $this->type("xpath=//input[@name='subject']", "Test subject {$mailingName} for Webtest");
 
     // HTML format message

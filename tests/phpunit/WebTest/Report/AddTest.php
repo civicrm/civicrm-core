@@ -103,7 +103,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Summary_submit_save');
 
     // Fill Email Subject
-    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[text()='Title and Format']");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[text()='Email Delivery']");
     $this->waitForAjaxContent();
     $this->type("email_subject", $emaiSubject);
 
@@ -116,7 +116,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->type("email_cc", $emailCC);
 
     // We want navigation menu
-    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[text()='Email Delivery']");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[text()='Access']");
     $this->click("is_navigation");
 
     // Navigation menu under Reports section
@@ -140,7 +140,8 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     // Visit report
     $this->click("xpath=//div[@id='Contact']//table/tbody//tr/td/a/strong[text() = '$reportName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->click("_qf_Summary_submit");
+    $this->waitForAjaxContent();
     // Is filter statistics present?
     $this->assertElementContainsText("xpath=//tr/th[@class='statistics'][text()='Contact Name']/../td", "Contains $firstName", "Statistics did not found!");
 
