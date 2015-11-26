@@ -2602,7 +2602,7 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create'
     return $meta[$fieldName]['name'];
   }
   foreach ($meta as $info) {
-    if ($fieldName == CRM_Utils_Array::value('uniqueName', $info)) {
+    if ($fieldName == $info['name'] || $fieldName == CRM_Utils_Array::value('uniqueName', $info)) {
       return $info['name'];
     }
     if (array_search($fieldName, CRM_Utils_Array::value('api.aliases', $info, array())) !== FALSE) {

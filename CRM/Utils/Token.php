@@ -1621,14 +1621,68 @@ class CRM_Utils_Token {
       return $str;
     }
 
-    $fn = 'get' . ucfirst($entity) . 'tokenReplacement';
+    $fn = 'get' . ucfirst($entity) . 'TokenReplacement';
+    $fn = is_callable(array('CRM_Utils_Token', $fn)) ? $fn : 'getApiTokenReplacement';
     // since we already know the tokens lets just use them & do str_replace which is faster & simpler than preg_replace
     foreach ($knownTokens[$entity] as $token) {
-      $replaceMent = CRM_Utils_Token::$fn($token, $entityArray, $escapeSmarty);
-      $str = str_replace('{' . $entity . '.' . $token . '}', $replaceMent, $str);
+      $replacement = self::$fn($entity, $token, $entityArray);
+      if ($escapeSmarty) {
+        $replacement = self::tokenEscapeSmarty($replacement);
+      }
+      $str = str_replace('{' . $entity . '.' . $token . '}', $replacement, $str);
     }
-    $str = preg_replace('/\\\\|\{(\s*)?\}/', ' ', $str);
-    return $str;
+    return preg_replace('/\\\\|\{(\s*)?\}/', ' ', $str);
+  }
+
+  /**
+   * @param int $caseId
+   * @param int $str
+   * @param array $knownTokens
+   * @param bool $escapeSmarty
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function replaceCaseTokens($caseId, $str, $knownTokens = array(), $escapeSmarty = FALSE) {
+    if (!$knownTokens || empty($knownTokens['case'])) {
+      return $str;
+    }
+    $case = civicrm_api3('case', 'getsingle', array('id' => $caseId));
+    return self::replaceEntityTokens('case', $case, $str, $knownTokens, $escapeSmarty);
+  }
+
+  /**
+   * Generic function for formatting token replacement for an api field
+   *
+   * @param string $entity
+   * @param string $token
+   * @param array $entityArray
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getApiTokenReplacement($entity, $token, $entityArray) {
+    if (!isset($entityArray[$token])) {
+      return '';
+    }
+    $field = civicrm_api3($entity, 'getfield', array('action' => 'get', 'name' => $token, 'get_options' => 'get'));
+    $field = $field['values'];
+    $fieldType = CRM_Utils_Array::value('type', $field);
+    // Boolean fields
+    if ($fieldType == CRM_Utils_Type::T_BOOLEAN && empty($field['options'])) {
+      $field['options'] = array(ts('No'), ts('Yes'));
+    }
+    // Match pseudoconstants
+    if (!empty($field['options'])) {
+      $ret = array();
+      foreach ((array) $entityArray[$token] as $val) {
+        $ret[] = $field['options'][$val];
+      }
+      return implode(', ', $ret);
+    }
+    // Format date fields
+    elseif ($entityArray[$token] && $fieldType == CRM_Utils_Type::T_DATE) {
+      return CRM_Utils_Date::customFormat($entityArray[$token]);
+    }
+    return implode(', ', (array) $entityArray[$token]);
   }
 
   /**
@@ -1683,7 +1737,7 @@ class CRM_Utils_Token {
    * @param string $knownTokens
    * @param bool|string $escapeSmarty
    *
-   * @return \Ambigous|mixed|string|\unknown
+   * @return string
    */
   public static function replaceMultipleContributionTokens($separator, $str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
     if (empty($knownTokens['contribution'])) {
@@ -1705,15 +1759,15 @@ class CRM_Utils_Token {
   /**
    * Get replacement strings for any membership tokens (only a small number of tokens are implemnted in the first instance
    * - this is used by the pdfLetter task from membership search
+   * @param string $entity
+   *   should always be "membership"
    * @param string $token
+   *   field name
    * @param array $membership
    *   An api result array for a single membership.
-   * @param bool $escapeSmarty
-   * @return string
-   *   token replacement
+   * @return string token replacement
    */
-  public static function getMembershipTokenReplacement($token, $membership, $escapeSmarty = FALSE) {
-    $entity = 'membership';
+  public static function getMembershipTokenReplacement($entity, $token, $membership) {
     self::_buildMembershipTokens();
     switch ($token) {
       case 'type':
@@ -1750,9 +1804,6 @@ class CRM_Utils_Token {
         break;
     }
 
-    if ($escapeSmarty) {
-      $value = self::tokenEscapeSmarty($value);
-    }
     return $value;
   }
 
@@ -1798,7 +1849,7 @@ class CRM_Utils_Token {
 
   /**
    * @return array
-   *   legacy_token => new_token
+   *   [legacy_token => new_token]
    */
   public static function legacyContactTokens() {
     return array(
