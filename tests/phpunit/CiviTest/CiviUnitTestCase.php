@@ -1440,6 +1440,35 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create test Authorize.net instance.
+   *
+   * @param array $params
+   *
+   * @return mixed
+   */
+  public function paymentProcessorAuthorizeNetCreate($params = array()) {
+    $params = array_merge(array(
+      'name' => 'Authorize',
+      'domain_id' => CRM_Core_Config::domainID(),
+      'payment_processor_type_id' => 'AuthNet',
+      'title' => 'AuthNet',
+      'is_active' => 1,
+      'is_default' => 0,
+      'is_test' => 1,
+      'is_recur' => 1,
+      'user_name' => '4y5BfuW7jm',
+      'password' => '4cAmW927n8uLf5J8',
+      'url_site' => 'https://test.authorize.net/gateway/transact.dll',
+      'url_recur' => 'https://apitest.authorize.net/xml/v1/request.api',
+      'class_name' => 'Payment_AuthorizeNet',
+      'billing_mode' => 1,
+    ), $params);
+
+    $result = $this->callAPISuccess('PaymentProcessor', 'create', $params);
+    return $result['id'];
+  }
+
+  /**
    * Create Participant.
    *
    * @param array $params
@@ -1474,7 +1503,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create Payment Processor.
    *
    * @return CRM_Financial_DAO_PaymentProcessor
-   *   instance of Payment Processsor
+   *   instance of Payment Processor
    */
   public function processorCreate() {
     $processorParams = array(
@@ -1490,6 +1519,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($processorParams);
     return $paymentProcessor;
+  }
+
+
+  /**
+   * Create Payment Processor.
+   *
+   * @param array $processorParams
+   *
+   * @return \CRM_Core_Payment_Dummy
+   *    Instance of Dummy Payment Processor
+   */
+  public function dummyProcessorCreate($processorParams = array()) {
+    $paymentProcessorID = $this->processorCreate($processorParams);
+    return Civi\Payment\System::singleton()->getById($paymentProcessorID);
   }
 
   /**
@@ -1513,6 +1556,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     return $contributionPage;
+  }
+
+  /**
+   * Create a sample batch.
+   */
+  public function batchCreate() {
+    $params = $this->_params;
+    $params['name'] = $params['title'] = 'Batch_433397';
+    $params['status_id'] = 1;
+    $result = $this->callAPISuccess('batch', 'create', $params);
+    return $result['id'];
   }
 
   /**
@@ -1606,38 +1660,34 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create contribution.
    *
-   * @param int $cID
-   *   Contact_id.
+   * @param array $params
+   *   Array of parameters.
    * @param int $cTypeID
    *   Id of financial type.
    * @param int $invoiceID
    * @param int $trxnID
    * @param int $paymentInstrumentID
-   * @param bool $isFee
    *
    * @return int
    *   id of created contribution
    */
-  public function contributionCreate($cID, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID = 1, $isFee = TRUE) {
-    $params = array(
+  public function contributionCreate($params, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345,
+    $paymentInstrumentID = 1) {
+
+    $params = array_merge(array(
       'domain_id' => 1,
-      'contact_id' => $cID,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
-      'financial_type_id' => empty($cTypeID) ? 1 : $cTypeID,
+      'fee_amount' => 5.00,
+      'net_ammount' => 95.00,
+      'financial_type_id' => $cTypeID,
       'payment_instrument_id' => empty($paymentInstrumentID) ? 1 : $paymentInstrumentID,
       'non_deductible_amount' => 10.00,
       'trxn_id' => $trxnID,
       'invoice_id' => $invoiceID,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      // 'note'                   => 'Donating for Nobel Cause', *Fixme
-    );
-
-    if ($isFee) {
-      $params['fee_amount'] = 5.00;
-      $params['net_amount'] = 95.00;
-    }
+    ), $params);
 
     $result = $this->callAPISuccess('contribution', 'create', $params);
     return $result['id'];
@@ -1719,7 +1769,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'registration_end_date' => 20081015,
       'max_participants' => 100,
       'event_full_text' => 'Sorry! We are already full',
-      'is_monetory' => 0,
+      'is_monetary' => 0,
       'is_active' => 1,
       'is_show_location' => 0,
     ), $params);
@@ -2322,7 +2372,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $description
    *   Descriptive text for the example file.
    * @param string $exampleName
-   *   Name for this example file (CamelCase) - if ommitted the action name will be substituted.
+   *   Name for this example file (CamelCase) - if omitted the action name will be substituted.
    */
   private function documentMe($entity, $action, $params, $result, $testFunction, $testFile, $description = "", $exampleName = NULL) {
     if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
@@ -2571,8 +2621,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   public function quickCleanUpFinancialEntities() {
     $tablesToTruncate = array(
+      'civicrm_activity',
+      'civicrm_activity_contact',
       'civicrm_contribution',
       'civicrm_contribution_soft',
+      'civicrm_contribution_product',
       'civicrm_financial_trxn',
       'civicrm_financial_item',
       'civicrm_contribution_recur',
@@ -2602,6 +2655,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   public function restoreDefaultPriceSetConfig() {
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_price_set WHERE id > 2');
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
   }
@@ -2609,7 +2663,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned
    * Default behaviour is to also delete the entity
    * @param array $params
-   *   Params array to check agains.
+   *   Params array to check against.
    * @param int $id
    *   Id of the entity concerned.
    * @param string $entity
@@ -3024,6 +3078,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *  $this->createLoggedInUser();
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
+   *
+   * @param bool $isProfile
    */
   public function setupACL($isProfile = FALSE) {
     global $_REQUEST;
@@ -3133,7 +3189,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @todo this isn't a great place to put it - but really it belongs on a class that extends
    * this parent class & we don't have a structure for that yet
    * There is another function to this effect on the PaypalPro test but it appears to be silently failing
-   * & the best protection agains that is the functions this class affords
+   * & the best protection against that is the functions this class affords
    * @param array $params
    * @return int $result['id'] payment processor id
    */
@@ -3171,8 +3227,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    * Set up initial recurring payment allowing subsequent IPN payments.
    */
-  public function setupRecurringPaymentProcessorTransaction() {
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+  public function setupRecurringPaymentProcessorTransaction($params = array()) {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
       'contact_id' => $this->_contactID,
       'amount' => 1000,
       'sequential' => 1,
@@ -3181,7 +3237,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'frequency_interval' => 1,
       'invoice_id' => $this->_invoiceID,
       'contribution_status_id' => 2,
-      'processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->_paymentProcessorID,
+      // processor provided ID - use contact ID as proxy.
+      'processor_id' => $this->_contactID,
       'api.contribution.create' => array(
         'total_amount' => '200',
         'invoice_id' => $this->_invoiceID,
@@ -3190,8 +3248,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'contact_id' => $this->_contactID,
         'contribution_page_id' => $this->_contributionPageID,
         'payment_processor_id' => $this->_paymentProcessorID,
+        'is_test' => 0,
       ),
-    ));
+    ), $params));
     $this->_contributionRecurID = $contributionRecur['id'];
     $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
   }
@@ -3202,7 +3261,16 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function setupMembershipRecurringPaymentProcessorTransaction() {
     $this->ids['membership_type'] = $this->membershipTypeCreate();
     //create a contribution so our membership & contribution don't both have id = 1
-    $this->contributionCreate($this->_contactID, 1, 'abcd', '345j');
+    if ($this->callAPISuccess('Contribution', 'getcount', array()) == 0) {
+      $this->contributionCreate(array(
+        'contact_id' => $this->_contactID,
+        'is_test' => 1,
+        'financial_type_id' => 1,
+        'invoice_id' => 'abcd',
+        'trxn_id' => 345,
+      ));
+    }
+
     $this->setupRecurringPaymentProcessorTransaction();
 
     $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(
@@ -3226,10 +3294,12 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', array(
         'return' => 'id',
         'label' => 'Membership Amount',
+        'options' => array('limit' => 1, 'sort' => 'id DESC'),
       )),
       'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', array(
         'return' => 'id',
         'label' => 'General',
+        'options' => array('limit' => 1, 'sort' => 'id DESC'),
       )),
     ));
     $this->callAPISuccess('membership_payment', 'create', array(
@@ -3305,7 +3375,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * @param $exists
+   * Assert the attachment exists.
+   *
+   * @param bool $exists
    * @param array $apiResult
    */
   protected function assertAttachmentExistence($exists, $apiResult) {
@@ -3317,6 +3389,67 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     ));
     $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', array(
       1 => array($fileId, 'Int'),
+    ));
+  }
+
+  /**
+   * Create a price set for an event.
+   *
+   * @param int $feeTotal
+   *
+   * @return int
+   *   Price Set ID.
+   */
+  protected function eventPriceSetCreate($feeTotal) {
+    // creating price set, price field
+    $paramsSet['title'] = 'Price Set';
+    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
+    $paramsSet['is_active'] = FALSE;
+    $paramsSet['extends'] = 1;
+
+    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
+    $priceSetId = $priceset->id;
+
+    //Checking for priceset added in the table.
+    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
+      'id', $paramsSet['title'], 'Check DB for created priceset'
+    );
+    $paramsField = array(
+      'label' => 'Price Field',
+      'name' => CRM_Utils_String::titleToVar('Price Field'),
+      'html_type' => 'Text',
+      'price' => $feeTotal,
+      'option_label' => array('1' => 'Price Field'),
+      'option_value' => array('1' => $feeTotal),
+      'option_name' => array('1' => $feeTotal),
+      'option_weight' => array('1' => 1),
+      'option_amount' => array('1' => 1),
+      'is_display_amounts' => 1,
+      'weight' => 1,
+      'options_per_line' => 1,
+      'is_active' => array('1' => 1),
+      'price_set_id' => $priceset->id,
+      'is_enter_qty' => 1,
+      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+    );
+    CRM_Price_BAO_PriceField::create($paramsField);
+
+    return $priceSetId;
+  }
+
+  /**
+   * Add a profile to a contribution page.
+   *
+   * @param string $name
+   * @param int $contributionPageID
+   */
+  protected function addProfile($name, $contributionPageID) {
+    $this->callAPISuccess('UFJoin', 'create', array(
+      'uf_group_id' => $name,
+      'module' => 'CiviContribute',
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contributionPageID,
+      'weight' => 1,
     ));
   }
 

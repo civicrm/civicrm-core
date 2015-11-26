@@ -214,7 +214,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
     );
-    $this->_contribution = $this->callAPISuccess('contribution', 'create', $p);
+    $this->_contribution = $this->callAPISuccess('Contribution', 'create', $p);
 
     $params = array(
       'contribution_id' => $this->_contribution['id'],
@@ -1142,7 +1142,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateUpdateContribution() {
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'idofsh', 212355);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId,
+    'idofsh', 212355);
     $old_params = array(
       'contribution_id' => $contributionID,
 
@@ -1233,7 +1234,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   public function testDeleteContribution() {
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'dfsdf', 12389);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId, 'dfsdf', 12389);
     $params = array(
       'id' => $contributionID,
     );
@@ -1511,7 +1512,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'receipt_date' => 'now'));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id']));
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id'], 'trxn_date' => date('Y-m-d')));
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1));
     $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
     $mut->checkMailLog(array(
@@ -1576,7 +1577,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function cleanUpAfterPriceSets() {
     $this->quickCleanUpFinancialEntities();
     $this->contactDelete($this->_ids['contact']);
-    $this->callAPISuccess('price_set', 'delete', array('id' => $this->_ids['price_set']));
   }
 
 
