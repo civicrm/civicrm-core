@@ -355,7 +355,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
               'type' => 'next',
               'name' => ts('Skip Participant'),
               'subName' => 'skip',
-              'icon' => 'seek-next',
+              'icon' => 'fa-fast-forward',
             ),
           )
         );

@@ -180,7 +180,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         'type' => 'submit',
         'name' => ts('Preview'),
         'subName' => 'preview',
-        'icon' => 'search',
+        'icon' => 'fa-search',
         'isDefault' => FALSE,
       );
     }
