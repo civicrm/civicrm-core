@@ -329,7 +329,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
     $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
     $mut->checkMailLog(array(
-      'Membership Type: General',
+      'Membership',
     ));
     $mut->stop();
     $mut->clearMessages();
@@ -400,12 +400,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testSubmitMembershipBlockIsSeparatePaymentWithEmail() {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setUpMembershipContributionPage(TRUE);
+    $this->addOtherAmountFieldToMembershipPriceSet();
     $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'price_' . $this->_ids['price_field']['other_amount'] => 8,
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
+      'amount' => 8,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
@@ -421,8 +423,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
     $mut->checkMailLog(array(
-      'General Membership: $ 2.00',
-      'Membership Fee',
+      '$ 8.00',
     ));
     $mut->stop();
     $mut->clearMessages();
@@ -809,7 +810,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'membership_type_id' => $membershipTypeID,
         'price_field_id' => $priceField['id'],
       ));
-      $this->_ids['price_field_value'][] = $priceFieldValue['id'];
+      $this->_ids['price_field_value'][] = $priceFieldValue;
     }
   }
 
@@ -903,6 +904,22 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_mode' => 1,
     ));
     $this->_paymentProcessor = $this->callAPISuccess('payment_processor', 'getsingle', array('id' => $this->params['payment_processor_id']));
+  }
+
+  /**
+   * Add a profile to a contribution page.
+   *
+   * @param string $name
+   * @param int $contributionPageID
+   */
+  protected function addProfile($name, $contributionPageID) {
+    $this->callAPISuccess('UFJoin', 'create', array(
+      'uf_group_id' => $name,
+      'module' => 'civicrm_contribution_page',
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contributionPageID,
+      'weight' => 1,
+    ));
   }
 
 }

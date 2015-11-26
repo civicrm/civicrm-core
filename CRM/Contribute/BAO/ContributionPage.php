@@ -350,11 +350,30 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'title' => $title,
         'isShare' => CRM_Utils_Array::value('is_share', $values),
         'thankyou_title' => CRM_Utils_Array::value('thankyou_title', $values),
+        // The meaning of this parameter seems to have a weak correlation with the variable name.
+        'useForMember' => TRUE,
       );
 
+      // This next section sets tplParams for these parameters if they exist.
+      // There is some leakage around these parameters so ideally they would always be passed in
+      // to ensure that multiple iterations of this code (e.g via the api) don't cause parameter
+      // leakage.
+      // It might make sense to mae these e-noticy to encourage consistency .....
+      $parametersThatWeThinkShouldAlwaysBePassedIn = array(
+        'amount',
+        'membership_assign',
+        'useForMember',
+        'membership_amount',
+      );
+      foreach ($parametersThatWeThinkShouldAlwaysBePassedIn as $parameter) {
+        if (isset($values[$parameter])) {
+          $tplParams[$parameter] = $values[$parameter];
+        }
+      }
+
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {
-        $tplParams['contributionTypeId'] = $contributionTypeId;
-        $tplParams['contributionTypeName'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
+        $tplParams['financialTypeId'] = $tplParams['contributionTypeId'] = $contributionTypeId;
+        $tplParams['financialTypeName'] = $tplParams['contributionTypeName'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
           $contributionTypeId);
       }
 

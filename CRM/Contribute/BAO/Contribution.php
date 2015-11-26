@@ -2391,9 +2391,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
             $values['isMembership'] = TRUE;
-
-            // need to set the membership values here
-            $template->assign('membership_assign', 1);
+            $values['membership_assign'] = TRUE;
             $template->assign('membership_name',
               CRM_Member_PseudoConstant::membershipType($membership->membership_type_id)
             );

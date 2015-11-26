@@ -1376,7 +1376,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->postProcessMembership($membershipParams, $contactID,
       $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
       $membershipLineItems, $isPayLater, $isPending);
-
+    $this->assign('is_separate_membership_payment', $isProcessSeparateMembershipTransaction);
     $this->assign('membership_assign', TRUE);
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1421,6 +1421,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $errors = $createdMemberships = $paymentResults = array();
 
     $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_values, CRM_Utils_Array::value('is_recur', $membershipParams));
+    $membershipAmount = $amount = $membershipParams['amount'];
 
     if ($isPaidMembership) {
       if ($isProcessSeparateMembershipTransaction) {
@@ -1455,8 +1456,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (empty($form->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
           unset($membershipParams['is_recur']);
         }
+        $membershipAmount = CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0);
+        $form->set('membership_amount', $membershipAmount);
+        $form->assign('membership_amount', $membershipAmount);
         list($membershipContribution, $secondPaymentResult) = $this->processSecondaryFinancialTransaction($contactID, $form, $membershipParams,
-          $isTest, $membershipLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
+          $isTest, $membershipLineItems, $membershipAmount, CRM_Utils_Array::value('financial_type_id', $membershipDetails));
         $paymentResults[] = array('contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult);
       }
       catch (CRM_Core_Exception $e) {
@@ -1514,6 +1518,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $numTerms, $membershipID, $pending,
           $contributionRecurID, $membershipSource, $isPayLater, $campaignId
         );
+        $createdMemberships[] = $membership;
         $form->set('renewal_mode', $renewalMode);
         if (!empty($dates)) {
           $form->assign('mem_start_date',
@@ -1594,14 +1599,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $paymentParams = array_merge($form->_params, array('contributionID' => $form->_values['contribution_other_id']));
       $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
       $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
-      // Do not send an email if Recurring transaction is done via Direct Mode
-      // Email will we sent when the IPN is received.
       foreach ($paymentResults as $result) {
         $this->completeTransaction($result['result'], $result['contribution_id']);
       }
       return;
     }
 
+    $form->_values['membership_amount'] = $membershipAmount;
+    $form->_values['amount'] = $amount;
+    if ($amount == 0) {
+      // This feels like a bizarre hack as the variable name doesn't seem to be directly connected to it's use in the template.
+      $form->_values['useForMember'] = 0;
+    }
     //finally send an email receipt
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $form->_values,
@@ -1641,12 +1650,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws Exception
    * @return CRM_Contribute_BAO_Contribution
    */
-  protected function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee,
+  protected function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $membershipAmount,
                                                    $financialTypeID) {
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
-    $tempParams['amount'] = $minimumFee;
+    $tempParams['amount'] = $membershipAmount;
     $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
     $isRecur = CRM_Utils_Array::value('is_recur', $tempParams);
 
@@ -1659,9 +1668,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->set('params', $form->_params);
       $form->assign('receive_date', $receiveDate);
     }
-
-    $form->set('membership_amount', $minimumFee);
-    $form->assign('membership_amount', $minimumFee);
 
     // we don't need to create the user twice, so lets disable cms_create_account
     // irrespective of the value, CRM-2888
@@ -1698,7 +1704,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     );
 
     $result = array();
-    if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
+    if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $membershipAmount > 0.0) {
       // At the moment our tests are calling this form in a way that leaves 'object' empty. For
       // now we compensate here.
       if (empty($form->_paymentProcessor['object'])) {
@@ -1844,6 +1850,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params['invoiceID'] = md5(uniqid(rand(), TRUE));
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
     $form->_amount = $params['amount'];
+    $form->_bltID = CRM_Core_BAO_LocationType::getBilling();
+
     // hack these in for test support.
     $form->_fields['billing_first_name'] = 1;
     $form->_fields['billing_last_name'] = 1;
