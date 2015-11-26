@@ -157,8 +157,17 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     // We are trying to fight the good fight against leaky variables (CRM-17519) so let's get really explicit
     // about ensuring the variables we want for the template are defined.
     // @todo add to this until all tpl params are explicit in this function and not waltzing around the codebase.
-    $valuesRequiredForTemplate = array('customPre', 'customPost', 'customPre_grouptitle', 'customPost_grouptitle',
-      'useForMember');
+    // Next stage is to remove this & ensure there are no e-notices - ie. all are set before they hit this fn.
+    $valuesRequiredForTemplate = array(
+      'customPre',
+      'customPost',
+      'customPre_grouptitle',
+      'customPost_grouptitle',
+      'useForMember',
+      'membership_assign',
+      'amount',
+    );
+
     foreach ($valuesRequiredForTemplate as $valueRequiredForTemplate) {
       if (!isset($values[$valueRequiredForTemplate])) {
         $values[$valueRequiredForTemplate] = NULL;
@@ -369,6 +378,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'customPost' => $values['customPost'],
         'customPost_grouptitle' => $values['customPost_grouptitle'],
         'useForMember' => $values['useForMember'],
+        'membership_assign' => $values['membership_assign'],
+        'amount' => $values['amount'],
       );
 
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {

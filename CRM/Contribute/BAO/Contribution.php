@@ -2386,9 +2386,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
             $values['isMembership'] = TRUE;
+            $values['membership_assign'] = TRUE;
 
             // need to set the membership values here
-            $template->assign('membership_assign', 1);
             $template->assign('membership_name',
               CRM_Member_PseudoConstant::membershipType($membership->membership_type_id)
             );
@@ -2688,11 +2688,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('sku', $productDAO->sku);
     }
     $template->assign('title', CRM_Utils_Array::value('title', $values));
-    $amount = CRM_Utils_Array::value('total_amount', $input, (CRM_Utils_Array::value('amount', $input)), NULL);
-    if (empty($amount) && isset($this->total_amount)) {
-      $amount = $this->total_amount;
+    $values['amount'] = CRM_Utils_Array::value('total_amount', $input, (CRM_Utils_Array::value('amount', $input)), NULL);
+    if (!$values['amount'] && isset($this->total_amount)) {
+      $values['amount'] = $this->total_amount;
     }
-    $template->assign('amount', $amount);
+
     // add the new contribution values
     if (strtolower($this->_component) == 'contribute') {
       //PCP Info
