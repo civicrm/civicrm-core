@@ -73,10 +73,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
   /**
    * Class constructor.
-   *
-   * @return \CRM_Contribute_DAO_Contribution
-   */
-  /**
    */
   public function __construct() {
     parent::__construct();
@@ -231,8 +227,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Given the list of params in the params array, fetch the object
-   * and store the values in the values array
+   * Fetch the object and store the values in the values array.
    *
    * @param array $params
    *   Input parameters to find object.
