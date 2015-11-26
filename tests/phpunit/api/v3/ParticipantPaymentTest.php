@@ -42,7 +42,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $_participantID;
   protected $_eventID;
   protected $_participantPaymentID;
-  protected $_contributionTypeId;
+  protected $_financialTypeId;
 
   public function setUp() {
     parent::setUp();
@@ -52,6 +52,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->_contactID = $this->individualCreate();
     $this->_createdParticipants = array();
     $this->_individualId = $this->individualCreate();
+    $this->_financialTypeId = 1;
 
     $this->_participantID = $this->participantCreate(array(
         'contactID' => $this->_contactID,
@@ -74,14 +75,12 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       ));
   }
 
-  ///////////////// civicrm_participant_payment_create methods
-
   /**
    * Test civicrm_participant_payment_create with wrong params type.
    */
   public function testPaymentCreateWrongParamsType() {
     $params = 'a string';
-    $result = $this->callAPIFailure('participant_payment', 'create', $params);
+    $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -89,7 +88,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentCreateEmptyParams() {
     $params = array();
-    $result = $this->callAPIFailure('participant_payment', 'create', $params);
+    $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -100,8 +99,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'participant_id' => $this->_participantID,
     );
-
-    $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
+    $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -109,7 +107,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentCreate() {
     //Create Contribution & get contribution ID
-    $contributionID = $this->contributionCreate($this->_contactID);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_contactID));
 
     //Create Participant Payment record With Values
     $params = array(
@@ -118,7 +116,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('participant_payment', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertTrue(array_key_exists('id', $result), 'in line ' . __LINE__);
+    $this->assertTrue(array_key_exists('id', $result));
 
     //delete created contribution
     $this->contributionDelete($contributionID);
@@ -133,7 +131,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentUpdateWrongParamsType() {
     $params = 'a string';
     $result = $this->callAPIFailure('participant_payment', 'create', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
+    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
 
   /**
@@ -169,7 +167,13 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentOffline() {
 
     // create contribution w/o fee
-    $contributionID = $this->contributionCreate($this->_contactID, $this->_contributionTypeId, NULL, NULL, 4, FALSE);
+    $contributionID = $this->contributionCreate(array(
+      'contact_id' => $this->_contactID,
+      'financial_type_id' => $this->_financialTypeId,
+      'payment_instrument_id' => 4,
+      'fee_amount' => 0,
+      'net_amount' => 100,
+    ));
 
     $this->_participantPaymentID = $this->participantPaymentCreate($this->_participantID, $contributionID);
     $params = array(
@@ -293,27 +297,24 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    * Check with valid array.
    */
   public function testPaymentDelete() {
-
-    // create contribution
-    $contributionID = $this->contributionCreate($this->_contactID, $this->_contributionTypeId);
+    $contributionID = $this->contributionCreate(array(
+      'contact_id' => $this->_contactID,
+    ));
 
     $this->_participantPaymentID = $this->participantPaymentCreate($this->_participantID, $contributionID);
 
     $params = array(
       'id' => $this->_participantPaymentID,
     );
-
-    $result = $this->callAPIAndDocument('participant_payment', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('participant_payment', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
-  ///////////////// civicrm_participantPayment_get methods
   /**
    * Test civicrm_participantPayment_get - success expected.
    */
   public function testGet() {
-    //Create Contribution & get contribution ID
-    $contributionID = $this->contributionCreate($this->_contactID3, $this->_contributionTypeId);
-    $participantPaymentID = $this->participantPaymentCreate($this->_participantID4, $contributionID);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_contactID3));
+    $this->participantPaymentCreate($this->_participantID4, $contributionID);
 
     //Create Participant Payment record With Values
     $params = array(
