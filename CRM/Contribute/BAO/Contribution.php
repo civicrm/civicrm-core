@@ -2638,7 +2638,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('last_name', $this->_relatedObjects['contact']->last_name);
     $template->assign('displayName', $this->_relatedObjects['contact']->display_name);
     if (!empty($values['lineItem']) && !empty($this->_relatedObjects['membership'])) {
-      $template->assign('useForMember', TRUE);
+      $values['useForMember'] = TRUE;
     }
     //assign honor information to receipt message
     $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
