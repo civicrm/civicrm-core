@@ -454,7 +454,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           $recipients->phone_id,
         );
         $count++;
-        if ($count % CRM_Core_DAO::BULK_MAIL_INSERT_COUNT == 0) {
+        if ($count % CRM_Mailing_Config::BULK_MAIL_INSERT_COUNT == 0) {
           CRM_Mailing_Event_BAO_Queue::bulkCreate($params, $now);
           $count = 0;
           $params = array();
@@ -757,7 +757,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $targetParams[] = $field['contact_id'];
 
         $count++;
-        if ($count % CRM_Core_DAO::BULK_MAIL_INSERT_COUNT == 0) {
+        if ($count % CRM_Mailing_Config::BULK_MAIL_INSERT_COUNT == 0) {
           $this->writeToDB(
             $deliveredParams,
             $targetParams,
