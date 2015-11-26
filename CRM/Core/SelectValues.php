@@ -693,6 +693,25 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * @param int $caseTypeId
+   * @return array
+   */
+  public static function caseTokens($caseTypeId = NULL) {
+    static $tokens = NULL;
+    if (!$tokens) {
+      foreach (CRM_Case_BAO_Case::fields() as $field) {
+        $tokens["{case.{$field['name']}}"] = $field['title'];
+      }
+
+      $customFields = CRM_Core_BAO_CustomField::getFields('Case', FALSE, FALSE, $caseTypeId);
+      foreach ($customFields as $id => $field) {
+        $tokens["{case.custom_$id}"] = "{$field['label']} :: {$field['groupTitle']}";
+      }
+    }
+    return $tokens;
+  }
+
+  /**
    * CiviCRM supported date input formats.
    *
    * @return array
