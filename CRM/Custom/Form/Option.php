@@ -223,7 +223,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
         $this->addElement('button',
           'done',
           ts('Done'),
-          array('onclick' => "location.href='$url'", 'class' => 'crm-form-submit cancel', 'crm-icon' => 'close')
+          array('onclick' => "location.href='$url'", 'class' => 'crm-form-submit cancel', 'crm-icon' => 'fa-times')
         );
       }
     }

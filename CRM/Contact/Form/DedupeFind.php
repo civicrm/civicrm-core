@@ -61,7 +61,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
         array(
           'type' => 'submit',
           'class' => 'cancel',
-          'icon' => 'close',
+          'icon' => 'fa-times',
           'name' => ts('Cancel'),
         ),
       )
