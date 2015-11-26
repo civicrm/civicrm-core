@@ -278,7 +278,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $buttons[] = array(
         'type' => 'done',
         'name' => ts('Merge and View Result'),
-        'icon' => 'circle-check',
+        'icon' => 'fa-check-circle',
       );
     }
 
