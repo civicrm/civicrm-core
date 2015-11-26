@@ -91,10 +91,10 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param string $statusFieldName
    * @param int $onDuplicate
    * @param int $statusID
-   * @param null $totalRowCount
+   * @param int $totalRowCount
    * @param bool $doGeocodeAddress
    * @param int $timeout
-   * @param null $contactSubType
+   * @param string $contactSubType
    * @param int $dedupeRuleGroupID
    *
    * @return mixed
@@ -145,8 +145,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     $this->_conflicts = array();
     $this->_unparsedAddresses = array();
 
-    $status = '';
-
     $this->_tableName = $tableName;
     $this->_primaryKeyName = $primaryKeyName;
     $this->_statusFieldName = $statusFieldName;
@@ -196,8 +194,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       $this->_rowCount++;
 
       /* trim whitespace around the values */
-
-      $empty = TRUE;
       foreach ($values as $k => $v) {
         $values[$k] = trim($v, " \t\r\n");
       }
