@@ -348,7 +348,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       throw new Exception("Not implementated: clearMessages for WebTest");
     }
     else {
-      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_spool ORDER BY id DESC LIMIT '. $limit);
+      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_spool ORDER BY id DESC LIMIT ' . $limit);
     }
   }
 

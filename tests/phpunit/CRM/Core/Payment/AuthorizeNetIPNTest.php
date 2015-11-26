@@ -181,14 +181,14 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'This membership will be automatically renewed every',
       'Dear Mrs. Antonia Anderson II',
       'Thanks for your auto renew membership sign-up',
-    ), array(
-        'First Name: Anthony',
-        'First Name: Antonia',
-        'Last Name: Anderson',
-        'Supporter Profile',
-        'Email Address: antonia_anderson@civicrm.org',
-      )
-    );
+    ),
+    array(
+      'First Name: Anthony',
+      'First Name: Antonia',
+      'Last Name: Anderson',
+      'Supporter Profile',
+      'Email Address: antonia_anderson@civicrm.org',
+    ));
 
     $mut->stop();
     $mut->clearMessages();
