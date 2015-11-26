@@ -309,6 +309,70 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test submit with a membership block in place.
    */
+  public function testSubmitMembershipBlockNotSeparatePaymentWithEmail() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->setUpMembershipContributionPage();
+    $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
+
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+      'email-Primary' => 'billy-goat@the-bridge.net',
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $mut->checkMailLog(array(
+      'Membership Type: General',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
+   * Test submit with a membership block in place.
+   */
+  public function testSubmitMembershipBlockNotSeparatePaymentZeroDollarsWithEmail() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 0)));
+    $this->setUpMembershipContributionPage();
+    $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
+
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 0,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruffier',
+      'selectMembership' => $this->_ids['membership_type'],
+      'email-Primary' => 'billy-goat@the-new-bridge.net',
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $mut->checkMailLog(array(
+         'Membership Type: General',
+         'Gruffier',
+      ),
+      array(
+        'Amount',
+      )
+    );
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
+   * Test submit with a membership block in place.
+   */
   public function testSubmitMembershipBlockIsSeparatePayment() {
     $this->setUpMembershipContributionPage(TRUE);
     $submitParams = array(
@@ -328,6 +392,77 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+  }
+
+  /**
+   * Test submit with a membership block in place.
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentWithEmail() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->setUpMembershipContributionPage(TRUE);
+    $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
+
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+      'email-Primary' => 'billy-goat@the-bridge.net',
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->assertCount(2, $contributions['values']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+    $mut->checkMailLog(array(
+      'General Membership: $ 2.00',
+      'Membership Fee',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
+   * Test submit with a membership block in place.
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentZeroDollarsPayLaterWithEmail() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 0)));
+    $this->setUpMembershipContributionPage(TRUE);
+    $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
+
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 0,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruffalo',
+      'selectMembership' => $this->_ids['membership_type'],
+      'payment_processor_id' => 0,
+      'email-Primary' => 'gruffalo@the-bridge.net',
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->assertCount(2, $contributions['values']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+    $mut->checkMailLog(array(
+      'Gruffalo',
+      'General Membership: $ 0.00',
+      'Membership Fee',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
   }
 
   /**
@@ -629,6 +764,27 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       ));
       $this->_ids['price_field_value'][] = $priceFieldValue['id'];
     }
+  }
+
+  /**
+   * Add text field other amount to the price set.
+   */
+  public function addOtherAmountFieldToMembershipPriceSet() {
+    $this->_ids['price_field']['other_amount'] = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => reset($this->_ids['price_set']),
+      'name' => 'other_amount',
+      'label' => 'Other Amount',
+      'html_type' => 'Text',
+      'format.only_id' => TRUE,
+      'sequential' => 1,
+    ));
+    $this->_ids['price_field_value']['other_amount'] = $this->callAPISuccess('price_field_value', 'create', array(
+      'financial_type_id' => 'Donation',
+      'format.only_id' => TRUE,
+      'label' => 'Other Amount',
+      'amount' => 1,
+      'price_field_id' => $this->_ids['price_field']['other_amount'],
+    ));
   }
 
   /**
