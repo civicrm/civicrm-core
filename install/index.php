@@ -1415,6 +1415,8 @@ class Installer extends InstallRequirements {
           $settingsParams['domain_id'] = 'current_domain';
           $settingsParams['lcMessages'] = $config['seedLanguage'];
 
+          civicrm_api3('Setting', 'create', $settingsParams);
+
         }
 
         $output .= '</ul>';
