@@ -1057,7 +1057,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $invoiceID = md5(uniqid(rand(), TRUE));
       $this->set('invoiceID', $invoiceID);
 
-      if (is_array($this->_paymentProcessor)) {
+      if ($this->_paymentProcessor) {
         $payment = $this->_paymentProcessor['object'];
         $payment->setBaseReturnUrl('civicrm/event/register');
       }
