@@ -1394,7 +1394,7 @@ class Installer extends InstallRequirements {
           $fileName = $crmPath . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $config['seedLanguage'] . DIRECTORY_SEPARATOR . 'settings.json';
           if (file_exists($fileName)) {
             $json = file_get_contents($fileName);
-            $settings = json_decode($json, true);
+            $settings = json_decode($json, TRUE);
 
             if (!empty($settings)) {
 
