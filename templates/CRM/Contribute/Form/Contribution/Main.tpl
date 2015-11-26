@@ -25,9 +25,7 @@
 *}
 {* Callback snippet: On-behalf profile *}
 {if $snippet and !empty($isOnBehalfCallback)}
-<div class="crm-public-form-item crm-section">
-  {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl" context="front-end"}
-</div>
+{include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl" context="front-end"}
 {* Callback snippet: Load payment processor *}
 {elseif $snippet}
 {include file="CRM/Core/BillingBlock.tpl"}
