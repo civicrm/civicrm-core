@@ -259,7 +259,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     //CRM-16950
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-    $taxRate = CRM_Utils_Array::value($allMemberships[$defaults['membership_type_id']]['financial_type_id'], $taxRates);
+    $taxRate = CRM_Utils_Array::value($this->allMembershipTypeDetails[$defaults['membership_type_id']]['financial_type_id'], $taxRates);
 
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
 
