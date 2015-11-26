@@ -1428,7 +1428,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           ),
           $financialType,
           FALSE,
-          $this->_bltID
+          $this->_bltID,
+          TRUE
         );
 
         //create new soft-credit record, CRM-13981

@@ -45,7 +45,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $contributionTypeId
    *   Financial type id.
    * @param int|string $component component id
-   * @param $isTest
+   * @param bool $isTest
+   * @param bool $isRecur
    *
    * @throws CRM_Core_Exception
    * @throws Exception
@@ -59,7 +60,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $contactID,
     $contributionTypeId,
     $component = 'contribution',
-    $isTest
+    $isTest,
+    $isRecur
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
     $lineItems = $form->_lineItem;
@@ -88,19 +90,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
     if ($isPaymentTransaction) {
-      // Fix for CRM-14354. If the membership is recurring, don't create a
-      // civicrm_contribution_recur record for the additional contribution
-      // (i.e., the amount NOT associated with the membership). Temporarily
-      // cache the is_recur values so we can process the additional gift as a
-      // one-off payment.
-      if (!empty($form->_values['is_recur'])) {
-        if ($form->_membershipBlock['is_separate_payment'] && !empty($form->_params['auto_renew'])) {
-          $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
-          $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
-          unset($form->_values['is_recur']);
-          unset($paymentParams['is_recur']);
-        }
-      }
 
       $contributionParams = array(
         'contact_id' => $contactID,
@@ -124,7 +113,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $contributionParams,
         $financialType,
         TRUE,
-        $form->_bltID
+        $form->_bltID,
+        $isRecur
       );
 
       $paymentParams['contributionTypeID'] = $contributionTypeId;
@@ -138,12 +128,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $paymentParams['qfKey'] = $form->controller->_key;
       if ($component == 'membership') {
         return array('contribution' => $contribution);
-      }
-
-      // restore cached values (part of fix for CRM-14354)
-      if (!empty($cachedFormValue)) {
-        $form->_values['is_recur'] = $cachedFormValue;
-        $paymentParams['is_recur'] = $cachedParamValue;
       }
 
       $paymentParams['contributionID'] = $contribution->id;
