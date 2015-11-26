@@ -48,19 +48,14 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that the import parser will do an update when external identifier is set.
+   * Test import parser will update based on a rule match.
+   *
+   * In this case the contact has no external identifier.
    *
    * @throws \Exception
    */
   public function testImportParserWithUpdateWithoutExternalIdentifier() {
-    $originalValues = array(
-      'first_name' => 'Bill',
-      'last_name' => 'Gates',
-      'email' => 'bill.gates@microsoft.com',
-      'nick_name' => 'Billy-boy',
-    );
-    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
-    $result = $this->callAPISuccessGetSingle('Contact', $originalValues);
+    list($originalValues, $result) = $this->setUpBaseContact();
     $originalValues['nick_name'] = 'Old Bill';
     $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
     $originalValues['id'] = $result['id'];
@@ -69,43 +64,33 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that the import parser will do an update when external identifier is set.
+   * Test import parser will update contacts with an external identifier.
+   *
+   * This is the basic test where the identifier matches the import parameters.
    *
    * @throws \Exception
    */
   public function testImportParserWithUpdateWithExternalIdentifier() {
-    $originalValues = array(
-      'first_name' => 'Bill',
-      'last_name' => 'Gates',
-      'email' => 'bill.gates@microsoft.com',
-      'external_identifier' => 'windows',
-      'nick_name' => 'Billy-boy',
-    );
-    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
-    $result = $this->callAPISuccessGetSingle('Contact', $originalValues);
+    list($originalValues, $result) = $this->setUpBaseContact(array('external_identifier' => 'windows'));
+
     $this->assertEquals($result['id'], CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', 'windows', 'id', 'external_identifier', TRUE));
     $this->assertEquals('windows', $result['external_identifier']);
+
     $originalValues['nick_name'] = 'Old Bill';
     $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
     $originalValues['id'] = $result['id'];
+
     $this->assertEquals('Old Bill', $this->callAPISuccessGetValue('Contact', array('id' => $result['id'], 'return' => 'nick_name')));
     $this->callAPISuccessGetSingle('Contact', $originalValues);
   }
 
   /**
-   * Test that the import parser updates when a new external identifier is set.
+   * Test that the import parser adds the external identifier where none is set.
    *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithNewExternalIdentifier() {
-    $originalValues = array(
-      'first_name' => 'Bill',
-      'last_name' => 'Gates',
-      'email' => 'bill.gates@microsoft.com',
-      'nick_name' => 'Billy-boy',
-    );
-    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
-    $result = $this->callAPISuccessGetSingle('Contact', $originalValues);
+  public function testImportParserWithUpdateWithNoExternalIdentifier() {
+    list($originalValues, $result) = $this->setUpBaseContact();
     $originalValues['nick_name'] = 'Old Bill';
     $originalValues['external_identifier'] = 'windows';
     $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
@@ -130,6 +115,27 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $parser->_onDuplicate = $onDuplicateAction;
     $parser->init();
     $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values));
+  }
+
+  /**
+   * Set up the underlying contact.
+   *
+   * @param array $params
+   *   Optional extra parameters to set.
+   *
+   * @return array
+   * @throws \Exception
+   */
+  protected function setUpBaseContact($params = array()) {
+    $originalValues = array_merge(array(
+      'first_name' => 'Bill',
+      'last_name' => 'Gates',
+      'email' => 'bill.gates@microsoft.com',
+      'nick_name' => 'Billy-boy',
+    ), $params);
+    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $result = $this->callAPISuccessGetSingle('Contact', $originalValues);
+    return array($originalValues, $result);
   }
 
 }
