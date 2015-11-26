@@ -32,8 +32,8 @@
 
 {if $profileDisplay}
 <div class="messages status no-popup">
-    <img src="{$config->resourceBase}i/Eyeball.gif" alt="{ts}Profile{/ts}"/>
-      <p><strong>{ts}Profile is not configured with Email address.{/ts}</strong></p>
+  <i class="crm-i fa-exclamation-triangle"></i>
+  <strong>{ts}Profile is not configured with Email address.{/ts}</strong>
 </div>
 {else}
 <div class="form-item">
