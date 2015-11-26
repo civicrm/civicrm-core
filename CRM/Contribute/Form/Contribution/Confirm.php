@@ -807,7 +807,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contributionParams,
     $financialType,
     $online,
-    $billingLocationID
+    $billingLocationID,
+    $isRecur
   ) {
     $transaction = new CRM_Core_Transaction();
     $contactID = $contributionParams['contact_id'];
@@ -837,7 +838,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!isset($params['is_email_receipt']) && $isEmailReceipt) {
       $params['is_email_receipt'] = $isEmailReceipt;
     }
-    $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType, $online);
+    $params['is_recur'] = $isRecur;
+    $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType);
     $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online);
 
     $now = date('YmdHis');
@@ -1045,16 +1047,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $params
    * @param int $contactID
    * @param string $contributionType
-   * @param bool $online
    *
-   * @return mixed
+   * @return int|null
    */
-  public static function processRecurringContribution(&$form, &$params, $contactID, $contributionType, $online = TRUE) {
-    // return if this page is not set for recurring
-    // or the user has not chosen the recurring option
+  public static function processRecurringContribution(&$form, &$params, $contactID, $contributionType) {
 
-    //this is online case validation.
-    if ((empty($form->_values['is_recur']) && $online) || empty($params['is_recur'])) {
+    if (empty($params['is_recur'])) {
       return NULL;
     }
 
@@ -1100,16 +1098,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params, $params['invoiceID']);
     $recurParams['financial_type_id'] = $contributionType->id;
 
-    if (!$online || $form->_values['is_monetary']) {
+    if ($form->_values['is_monetary']) {
       $recurParams['payment_instrument_id'] = 1;
     }
 
-    $campaignId = CRM_Utils_Array::value('campaign_id', $params);
-    if ($online) {
-      if (!array_key_exists('campaign_id', $params)) {
-        $campaignId = CRM_Utils_Array::value('campaign_id', $form->_values);
-      }
-    }
+    $campaignId = CRM_Utils_Array::value('campaign_id', $params, CRM_Utils_Array::value('campaign_id', $form->_values));
     $recurParams['campaign_id'] = $campaignId;
 
     $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
@@ -1427,17 +1420,23 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = $paymentResults = array();
 
+    $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_values, CRM_Utils_Array::value('is_recur', $membershipParams));
+
     if ($isPaidMembership) {
       if ($isProcessSeparateMembershipTransaction) {
         // If we have 2 transactions only one can use the invoice id.
         $membershipParams['invoiceID'] .= '-2';
+        if (!empty($membershipParams['auto_renew'])) {
+          $isRecurForFirstTransaction = FALSE;
+        }
       }
 
       $paymentResult = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $contactID,
         $financialTypeID,
         'membership',
-        $isTest
+        $isTest,
+        $isRecurForFirstTransaction
       );
 
       if (!empty($paymentResult['contribution'])) {
@@ -1649,6 +1648,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $financialType->find(TRUE);
     $tempParams['amount'] = $minimumFee;
     $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $isRecur = CRM_Utils_Array::value('is_recur', $tempParams);
 
     //assign receive date when separate membership payment
     //and contribution amount not selected.
@@ -1693,7 +1693,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contributionParams,
       $financialType,
       TRUE,
-      $form->_bltID
+      $form->_bltID,
+      $isRecur
     );
 
     $result = array();
@@ -2157,12 +2158,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
       }
-
+      $isRecur = CRM_Utils_Array::value('is_recur', $this->_values, CRM_Utils_Array::value('is_recur', $paymentParams));
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
         $contactID,
         $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
         'contribution',
-        ($this->_mode == 'test') ? 1 : 0
+        ($this->_mode == 'test') ? 1 : 0,
+        $isRecur
       );
 
       if (empty($result['is_payment_failure'])) {

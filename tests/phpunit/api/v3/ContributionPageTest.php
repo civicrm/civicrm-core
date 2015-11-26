@@ -634,6 +634,53 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test submit recurring membership with immediate confirmation (IATS style).
+   *
+   * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
+   * processor (IATS style - denoted by returning trxn_id)
+   * - the first creates a new membership, completed contribution, in progress recurring. Check these
+   * - create another - end date should be extended
+   */
+  public function testSubmitMembershipPriceSetPaymentPaymentProcessorSeparatePaymentRecurInstantPayment() {
+
+    $this->setUpMembershipContributionPage(TRUE);
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
+
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+      'payment_processor_id' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
+      'is_recur' => 1,
+      'auto_renew' => TRUE,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 1,
+    ));
+
+    $this->assertEquals(2, $contribution['count']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertNotEmpty($contribution['values'][$membershipPayment['contribution_id']]['contribution_recur_id']);
+    $this->callAPISuccess('contribution_recur', 'getsingle', array());
+  }
+
+  /**
    * Test submit recurring membership with delayed confirmation (Authorize.net style)
    * - we process 2 membership transactions against with a recurring contribution against a contribution page with a delayed
    * processor (Authorize.net style - denoted by NOT returning trxn_id)
