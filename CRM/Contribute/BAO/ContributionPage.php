@@ -615,7 +615,12 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Add the custom fields for contribution page (ie profile)
+   * Add the custom fields for contribution page (ie profile).
+   *
+   * @deprecated assigning values to smarty like this is risky because
+   *  - it is hard to debug since $name is used in the assign
+   *  - it is potentially 'leaky' - it's better to do this on the form
+   *  or close to where it is used / required. See CRM-17519 for leakage e.g.
    *
    * @param int $gid
    *   Uf group id.
