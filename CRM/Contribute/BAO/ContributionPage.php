@@ -150,8 +150,20 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $fieldTypes
    */
   public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
-    $gIds = $params = array();
+    $gIds = array();
+    $params = array('custom_pre_id' => array(), 'custom_post_id' => array());
     $email = NULL;
+
+    // We are trying to fight the good fight against leaky variables (CRM-17519) so let's get really explicit
+    // about ensuring the variables we want for the template are defined.
+    // @todo add to this until all tpl params are explicit in this function and not waltzing around the codebase.
+    $valuesRequiredForTemplate = array('customPre', 'customPost', 'customPre_grouptitle', 'customPost_grouptitle');
+    foreach ($valuesRequiredForTemplate as $valueRequiredForTemplate) {
+      if (!isset($values[$valueRequiredForTemplate])) {
+        $values[$valueRequiredForTemplate] = NULL;
+      }
+    }
+
     if (isset($values['custom_pre_id'])) {
       $preProfileType = CRM_Core_BAO_UFField::getProfileType($values['custom_pre_id']);
       if ($preProfileType == 'Membership' && !empty($values['membership_id'])) {
@@ -310,7 +322,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
             $userID = CRM_Utils_Array::value('related_contact', $values);
           }
         }
-        self::buildCustomDisplay($preID, 'customPre', $userID, $template, $params['custom_pre_id']);
+        list($values['customPre_grouptitle'], $values['customPre']) = self::getProfileNameAndFields($preID, $userID, $params['custom_pre_id']);
       }
       $userID = $contactID;
       if ($postID = CRM_Utils_Array::value('custom_post_id', $values)) {
@@ -321,7 +333,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
             $userID = CRM_Utils_Array::value('related_contact', $values);
           }
         }
-        self::buildCustomDisplay($postID, 'customPost', $userID, $template, $params['custom_post_id']);
+        list($values['customPost_grouptitle'], $values['customPost']) = self::getProfileNameAndFields($postID, $userID, $params['custom_post_id']);
       }
       if (isset($values['honor'])) {
         $honorValues = $values['honor'];
@@ -350,6 +362,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'title' => $title,
         'isShare' => CRM_Utils_Array::value('is_share', $values),
         'thankyou_title' => CRM_Utils_Array::value('thankyou_title', $values),
+        'customPre' => $values['customPre'],
+        'customPre_grouptitle' => $values['customPre_grouptitle'],
+        'customPost' => $values['customPost'],
+        'customPost_grouptitle' => $values['customPost_grouptitle'],
       );
 
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {
@@ -445,6 +461,46 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
     }
+  }
+
+  /**
+   * Get the profile title and fields.
+   *
+   * @param int $gid
+   * @param int $cid
+   * @param array $params
+   * @param array $fieldTypes
+   *
+   * @return array
+   */
+  protected static function getProfileNameAndFields($gid, $cid, &$params, $fieldTypes = array()) {
+    $groupTitle = NULL;
+    $values = array();
+    if ($gid) {
+      if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
+        $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
+        foreach ($fields as $k => $v) {
+          if (!$groupTitle) {
+            $groupTitle = $v["groupTitle"];
+          }
+          // suppress all file fields from display and formatting fields
+          if (
+            CRM_Utils_Array::value('data_type', $v, '') == 'File' ||
+            CRM_Utils_Array::value('name', $v, '') == 'image_URL' ||
+            CRM_Utils_Array::value('field_type', $v) == 'Formatting'
+          ) {
+            unset($fields[$k]);
+          }
+
+          if (!empty($fieldTypes) && (!in_array($v['field_type'], $fieldTypes))) {
+            unset($fields[$k]);
+          }
+        }
+
+        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
+      }
+    }
+    return array($groupTitle, $values);
   }
 
   /**
@@ -548,7 +604,12 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Add the custom fields for contribution page (ie profile)
+   * Add the custom fields for contribution page (ie profile).
+   *
+   * @deprecated assigning values to smarty like this is risky because
+   *  - it is hard to debug since $name is used in the assign
+   *  - it is potentially 'leaky' - it's better to do this on the form
+   *  or close to where it is used / required. See CRM-17519 for leakage e.g.
    *
    * @param int $gid
    *   Uf group id.
@@ -559,43 +620,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $params
    *   Params to build component whereclause.
    *
-   * @param array $fieldTypes
+   * @param array|null $fieldTypes
    */
-  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = array()) {
-    if ($gid) {
-      if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
-        $values = array();
-        $groupTitle = NULL;
-        $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
-        foreach ($fields as $k => $v) {
-          if (!$groupTitle) {
-            $groupTitle = $v["groupTitle"];
-          }
-          // suppress all file fields from display and formatting fields
-          if (
-            CRM_Utils_Array::value('data_type', $v, '') == 'File' ||
-            CRM_Utils_Array::value('name', $v, '') == 'image_URL' ||
-            CRM_Utils_Array::value('field_type', $v) == 'Formatting'
-          ) {
-            unset($fields[$k]);
-          }
-
-          if (!empty($fieldTypes) && (!in_array($v['field_type'], $fieldTypes))) {
-            unset($fields[$k]);
-          }
-        }
-
-        if ($groupTitle) {
-          $template->assign($name . "_grouptitle", $groupTitle);
-        }
-
-        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
-
-        if (count($values)) {
-          $template->assign($name, $values);
-        }
-      }
+  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
+    list($groupTitle, $values) = self::getProfileNameAndFields($gid, $cid, $params, $fieldTypes);
+    if (!empty($values)) {
+      $template->assign($name, $values);
     }
+    $template->assign($name . "_grouptitle", $groupTitle);
   }
 
   /**
