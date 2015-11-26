@@ -140,6 +140,61 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test IPN response mails don't leak.
+   */
+  public function testIPNPaymentMembershipRecurSuccessNoLeakageOnlineThenOffline() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
+    $this->addProfile('supporter_profile', $this->_contributionPageID);
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
+    $IPN->main();
+    $mut->checkAllMailLog(array(
+      'Membership Type: General',
+      'Mr. Anthony Anderson II" <anthony_anderson@civicrm.org>',
+      'Amount: $ 200.00',
+      'Membership Start Date:',
+      'Supporter Profile',
+      'First Name: Anthony',
+      'Last Name: Anderson',
+      'Email Address: anthony_anderson@civicrm.org',
+      'This membership will be automatically renewed every',
+      'Dear Mr. Anthony Anderson II',
+      'Thanks for your auto renew membership sign-up',
+    ));
+
+    $this->_contactID = $this->individualCreate(array('first_name' => 'Antonia', 'prefix_id' => 'Mrs.', 'email' => 'antonia_anderson@civicrm.org'));
+    $this->_invoiceID = uniqid();
+    $this->_contributionPageID = NULL;
+
+    $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
+    $mut->clearMessages(99999);
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(array('x_trans_id' => 'hers')));
+    $IPN->main();
+
+    $mut->checkAllMailLog(array(
+      'Membership Type: General',
+      'Mrs. Antonia Anderson II',
+      'antonia_anderson@civicrm.org',
+      'Amount: $ 200.00',
+      'Membership Start Date:',
+      'Transaction #: hers',
+      'This membership will be automatically renewed every',
+      'Dear Mrs. Antonia Anderson II',
+      'Thanks for your auto renew membership sign-up',
+    ),
+    array(
+      'First Name: Anthony',
+      'First Name: Antonia',
+      'Last Name: Anderson',
+      'Supporter Profile',
+      'Email Address: antonia_anderson@civicrm.org',
+    ));
+
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
    * Get detail for recurring transaction.
    *
    * @param array $params
