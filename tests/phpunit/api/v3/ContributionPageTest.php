@@ -323,6 +323,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'selectMembership' => $this->_ids['membership_type'],
       'email-Primary' => 'billy-goat@the-bridge.net',
+      'payment_processor_id' => $this->_paymentProcessor['id'],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
@@ -367,7 +372,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       )
     );
     $mut->stop();
-    $mut->clearMessages();
+    $mut->clearMessages(999);
   }
 
   /**
@@ -375,6 +380,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipBlockIsSeparatePayment() {
     $this->setUpMembershipContributionPage(TRUE);
+    $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 2)));
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
@@ -411,6 +417,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'selectMembership' => $this->_ids['membership_type'],
       'email-Primary' => 'billy-goat@the-bridge.net',
+      'payment_processor_id' => $this->_paymentProcessor['id'],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
@@ -420,12 +431,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
-    $mut->checkMailLog(array(
-      'General Membership: $ 2.00',
+    $mut->checkAllMailLog(array(
+      '$ 2.00',
       'Membership Fee',
     ));
     $mut->stop();
-    $mut->clearMessages();
+    $mut->clearMessages(999);
   }
 
   /**
