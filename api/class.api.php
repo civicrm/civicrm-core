@@ -97,7 +97,6 @@ class civicrm_api3 {
       else {
         $this->uri .= '/sites/all/modules/civicrm/extern/rest.php';
       }
-      $this->uri .= '?json=1';
       if (isset($config['key'])) {
         $this->key = $config['key'];
       }
@@ -175,15 +174,15 @@ class civicrm_api3 {
    * @return \stdClass
    */
   public function remoteCall($entity, $action, $params = array()) {
-    $fields = "key={$this->key}&api_key={$this->api_key}";
-    $query = $this->uri . "&entity=$entity&action=$action";
-    $fields .= '&' . http_build_query($params);
+    $fields = "key={$this->key}&api_key={$this->api_key}&json=" . urlencode(json_encode($params));
+    $query = $this->uri . "?entity=$entity&action=$action";
+
     if (function_exists('curl_init')) {
       // To facilitate debugging without leaking info, entity & action
       // are GET, other data is POST.
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $query);
-      curl_setopt($ch, CURLOPT_POST, count($params) + 2);
+      curl_setopt($ch, CURLOPT_POST, TRUE);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
       $result = curl_exec($ch);
