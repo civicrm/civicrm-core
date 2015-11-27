@@ -1419,8 +1419,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = $paymentResults = array();
-
+    $form->_values['isMembership'] = TRUE;
     $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_values, CRM_Utils_Array::value('is_recur', $membershipParams));
+    $totalAmount = $membershipParams['amount'];
 
     if ($isPaidMembership) {
       if ($isProcessSeparateMembershipTransaction) {
@@ -1602,9 +1603,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       return;
     }
 
-    //finally send an email receipt
+    $emailValues = $form->_values;
+    // Finally send an email receipt for pay-later scenario (although it might sometimes be caught above!)
+    if ($totalAmount == 0) {
+      // This feels like a bizarre hack as the variable name doesn't seem to be directly connected to it's use in the template.
+      $emailValues['useForMember'] = 0;
+      $emailValues['membership_assign'] = 1;
+      $emailValues['amount'] = 0;
+    }
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
-      $form->_values,
+      $emailValues,
       $isTest, FALSE,
       $includeFieldTypes
     );
@@ -1914,6 +1922,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function processFormSubmission($contactID) {
     $isPayLater = $this->_params['is_pay_later'];
+    if (!isset($this->_params['payment_processor_id'])) {
+      // If there is no processor we are using the pay-later manual pseudo-processor.
+      // (note it might make sense to make this a row in the processor table in the db).
+      $this->_params['payment_processor_id'] = 0;
+    }
     if (isset($this->_params['payment_processor_id']) && $this->_params['payment_processor_id'] == 0) {
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
     }
