@@ -640,6 +640,7 @@ abstract class CRM_Utils_Hook {
    *   The contactID for whom the dashboard is being rendered.
    *
    * @return null
+   * @deprecated Use tabset() instead.
    */
   public static function tabs(&$tabs, $contactID) {
     return self::singleton()->invoke(2, $tabs, $contactID,
