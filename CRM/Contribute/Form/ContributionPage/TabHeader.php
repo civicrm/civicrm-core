@@ -134,6 +134,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     );
 
     $contribPageId = $form->getVar('_id');
+    CRM_Utils_Hook::tabset('civicrm/admin/contribute', $tabs, array('contribution_page_id' => $contribPageId));
     $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
 
