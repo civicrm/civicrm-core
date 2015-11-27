@@ -556,41 +556,4 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Case_BAO_Query::buildSearchForm($form);
   }
 
-  /**
-   * @param $form
-   */
-  public static function recurringcontribution(&$form) {
-    $form->add('hidden', 'hidden_recurringcontribution', 1);
-    // Add field to check if payment is made for recurring contribution
-    $recurringPaymentOptions = array(
-      0 => ts(' All recurring contributions'),
-      1 => ts(' Recurring contributions with at least one payment'),
-    );
-    $form->addRadio('contribution_recur_payment_made', ts(''), $recurringPaymentOptions, array('allowClear' => TRUE));
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_start_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_end_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_modified_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_next_sched_contribution_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_failure_retry_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_cancel_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    $form->addElement('text', 'contribution_recur_processor_id', ts('Processor ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'processor_id'));
-    $form->addElement('text', 'contribution_recur_trxn_id', ts('Transaction ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'trxn_id'));
-    $contributionRecur = array('ContributionRecur');
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $contributionRecur);
-    if ($groupDetails) {
-      $form->assign('contributeRecurGroupTree', $groupDetails);
-      foreach ($groupDetails as $group) {
-        foreach ($group['fields'] as $field) {
-          $fieldId = $field['id'];
-          $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form,
-            $elementName,
-            $fieldId,
-            FALSE, FALSE, TRUE
-          );
-        }
-      }
-    }
-  }
-
 }
