@@ -105,14 +105,14 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
 
     //Is greater than or equal to 100
     //check for criteria
-    $this->assertElementContainsText('css=table.statistics-table', "Is greater than or equal to 10", "Criteria is not selected");
+    $this->verifyText("xpath=//table[@class='report-layout statistics-table']/tbody/tr[3]/td", "Is greater than or equal to 10");
 
     //click on next link
-    $this->click("_qf_Detail_submit_save");
+    $this->click("_qf_Detail_submit");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // check if criteria still exits
-    $this->assertElementContainsText('css=table.statistics-table', "Is greater than or equal to 10", "Criteria is not selected");
+    $this->verifyText("xpath=//table[@class='report-layout statistics-table']/tbody/tr[3]/td", "Is greater than or equal to 10");
   }
 
 }
