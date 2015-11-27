@@ -166,11 +166,12 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_contact_email = $email;
     $details = array();
     $details = CRM_Event_BAO_Participant::participantDetails($this->_from_participant_id);
+    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
     $query = "
       SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date
       FROM civicrm_participant cp
       LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
-      LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = 13
+      LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
       WHERE cp.id = {$this->_from_participant_id}";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     while ($dao->fetch()) {
@@ -227,7 +228,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //check that either an email or firstname+lastname is included in the form(CRM-9587)
     $to_contact_id = self::checkProfileComplete($fields, $errors, $self);
     //To check if the user is already registered for the event(CRM-2426)
-    self::checkRegistration($fields, $self, $to_contact_id);
+    self::checkRegistration($fields, $self, $to_contact_id, $errors);
     //return parent::formrule($fields, $files, $self);
     return empty($errors) ? TRUE : $errors;
   }
@@ -269,9 +270,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    *
    * return @void
    */
-  public static function checkRegistration($fields, $self, $contact_id) {
+  public static function checkRegistration($fields, $self, $contact_id, &$errors) {
     // verify whether this contact already registered for this event
-    $session = CRM_Core_Session::singleton();
     $contact_details = CRM_Contact_BAO_Contact::getContactDetails($contact_id);
     $display_name = $contact_details[0];
     $query = "select event_id from civicrm_participant where contact_id = " . $contact_id;
@@ -282,8 +282,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     if (!empty($to_event_id)) {
       foreach ($to_event_id as $id) {
         if ($id == $self->_event_id) {
-          $status = $display_name . ts(" is already registered for this event");
-          $session->setStatus($status, ts('Oops.'), 'alert');
+          $errors['email'] = $display_name . ts(" is already registered for this event");
         }
       }
     }
