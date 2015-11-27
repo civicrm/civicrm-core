@@ -184,7 +184,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       );
       $context = array(
         'urlString' => $urlString,
-        'urlParams' => $urlParams
+        'urlParams' => $urlParams,
       );
       CRM_Utils_Hook::tabset('civicrm/admin/contribute', self::$_configureActionLinks, $context);
     }
