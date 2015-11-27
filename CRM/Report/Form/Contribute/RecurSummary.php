@@ -84,7 +84,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
     parent::__construct();
   }
 
-	/**
+  /**
    * @param bool $freeze
    *
    * @return array
@@ -343,11 +343,12 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
     }
     // Add total line only if results are available
     if (count($rows) > 0) {
-      $lastRow = array('civicrm_contribution_recur_payment_instrument_id' => '',
-                      'civicrm_contribution_recur_start_date' => $started,
-                      'civicrm_contribution_recur_cancel_date' => $cancelled,
-                      'civicrm_contribution_recur_contribution_status_id' => $active,
-                      'civicrm_contribution_recur_amount' => CRM_Utils_Money::format($total),
+      $lastRow = array(
+        'civicrm_contribution_recur_payment_instrument_id' => '',
+        'civicrm_contribution_recur_start_date' => $started,
+        'civicrm_contribution_recur_cancel_date' => $cancelled,
+        'civicrm_contribution_recur_contribution_status_id' => $active,
+        'civicrm_contribution_recur_amount' => CRM_Utils_Money::format($total),
       );
       $rows[] = $lastRow;
     }
