@@ -533,7 +533,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->setOutputMode();
 
       if ($this->_outputMode == 'copy') {
-        $this->_createNew = ($this->_outputMode == 'copy');
+        $this->_createNew = TRUE;
         $this->_params = $this->_formValues;
         $this->_params['view_mode'] = 'criteria';
         $this->_params['title'] = ts('(copy)') . $this->getTitle();
