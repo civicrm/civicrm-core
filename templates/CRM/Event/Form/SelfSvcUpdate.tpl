@@ -26,17 +26,17 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <div>
     <table class="form-layout">
-         <tr class="crm-selfsvcupdate-form-block-email">
+        <tr class="crm-selfsvcupdate-form-block-email">
           <td class="label">{$form.email.label}</td>
-            <td>{$form.email.html}</td>
+          <td>{$form.email.html}</td>
         </tr>
-	<tr class="crm-selfsvcupdate-form-block-participant">
+        <tr class="crm-selfsvcupdate-form-block-participant">
           <td class="label">{$form.participant.label}</td>
-            <td>{$form.participant.html}</td>
+          <td>{$form.participant.html}</td>
         </tr>
           <tr class="crm-selfsvcupdate-form-block-participant">
             <td class="label">{$form.action.label}</td>
-             <td>{$form.action.html}</td>
+            <td>{$form.action.html}</td>
         </tr>
       <table class="crm-selfsvcupdate-form-details"><col width="30"><col width="50"><col width="20"><col width="10"><col width="10"><col width="12"><col width="10">
          <tr><th>Participant</th><th>Event</th><th>Fee Level</th><th>Fee Amt</th><th>Reg Date</th><th>Status</th><th>Role</th>
@@ -52,3 +52,16 @@
    </table>
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
+{literal}
+<script type="text/javascript">
+  var contributionID = {/literal}'{$contributionId}'{literal};
+  CRM.$(function($) {
+    $('#action').on('change', function() {
+      selected = $(this).find("option:selected").text();
+      if (selected == 'Cancel' && contributionID) {
+        CRM.alert(ts('Cancellations are not refundable.'), 'Warning', 'alert');
+      }
+    });
+  });
+</script>
+{/literal}
