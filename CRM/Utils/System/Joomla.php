@@ -686,7 +686,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     $userRecordUrl = NULL;
     // if logged in user has user edit access, then allow link to other users joomla profile
-    if (JFactory::getUser()->authorise('core.admin', 'com_users')) {
+    if (JFactory::getUser()->authorise('core.edit', 'com_users')) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
     }
     elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
