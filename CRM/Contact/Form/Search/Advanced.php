@@ -110,13 +110,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     foreach ($componentPanes as $name => $pane) {
       // FIXME: we should change the use of $name here to keyword
       $paneNames[$pane['title']] = $pane['name'];
-      if ($pane['name'] == 'CiviContribute') {
-        $paneNames[ts('Recurring Contributions')] = 'recurringcontribution';
-        if (array_key_exists('CiviContribute', $this->_searchOptions)
-          && CRM_Core_Permission::access('CiviContribute')) {
-          $this->_searchOptions['recurringcontribution'] = 1;
-        }
-      }
     }
 
     $hookPanes = array();
