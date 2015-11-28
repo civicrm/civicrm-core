@@ -162,9 +162,13 @@ class civicrm_api3 {
    *
    * @return \stdClass
    */
-  public function remoteCall($entity, $action, $params = array()) {
-    $fields = "key={$this->key}&api_key={$this->api_key}&json=" . urlencode(json_encode($params));
+  private function remoteCall($entity, $action, $params = array()) {
     $query = $this->uri . "?entity=$entity&action=$action";
+    $fields = http_build_query(array(
+      'key' => $this->key,
+      'api_key' => $this->api_key,
+      'json' => json_encode($params),
+    ));
 
     if (function_exists('curl_init')) {
       // To facilitate debugging without leaking info, entity & action
@@ -211,7 +215,7 @@ class civicrm_api3 {
    *
    * @return bool
    */
-  public function call($entity, $action = 'Get', $params = array()) {
+  private function call($entity, $action = 'Get', $params = array()) {
     if (is_int($params)) {
       $params = array('id' => $params);
     }
