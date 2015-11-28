@@ -555,14 +555,14 @@ abstract class CRM_Utils_System_Base {
       $tzObj = new DateTimeZone($timezone);
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
-
-      if (empty($tz)) {
+      // Europe/London in winter has an offset of zero.
+      if ($tz===false) {
         return FALSE;
       }
 
       $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
 
-      if ($timeZoneOffset > 0) {
+      if ($timeZoneOffset >= 0) {
         $timeZoneOffset = '+' . $timeZoneOffset;
       }
       return $timeZoneOffset;
