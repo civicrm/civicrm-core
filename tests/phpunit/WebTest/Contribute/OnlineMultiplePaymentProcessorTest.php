@@ -174,6 +174,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $xpath = "xpath=//label[text() = '{$payLaterText}']/preceding-sibling::input[1]";
     $this->click($xpath);
 
+    $this->waitForAjaxContent();
     $this->click("_qf_Main_upload-bottom");
     $this->waitForElementPresent("xpath=//div[@class='bold pay_later_receipt-section']");
 

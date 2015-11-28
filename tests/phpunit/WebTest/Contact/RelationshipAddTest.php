@@ -92,9 +92,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship created.');
-
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[1][text()='View']");
-    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->click("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
@@ -161,6 +160,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->select('relationship_type_id', "label={$params['label_b_a']}");
 
     //fill in the individual
+    $this->waitForElementPresent("related_contact_id");
     $this->select2('related_contact_id', $sortName, TRUE);
 
     //fill in the relationship start date
@@ -173,8 +173,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //save the relationship
     $this->click('_qf_Relationship_upload-bottom');
 
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[1][text()='View']");
-    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->click("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
@@ -265,8 +265,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //save the relationship
     $this->click('_qf_Relationship_upload-bottom');
 
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[1][text()='View']");
-    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->click("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
@@ -306,11 +306,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //choose the created relationship type
     $this->waitForElementPresent("relationship_type_id");
     $this->select('relationship_type_id', "label={$params['label_a_b']}");
-
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: wait until new contact dialog select is built
-    sleep(2);
+    $this->waitForAjaxContent();
 
     // create a new organization
     $orgName = 'WestsideCoop' . substr(sha1(rand()), 0, 7);
@@ -383,11 +379,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //choose the created relationship type
     $this->waitForElementPresent("relationship_type_id");
     $this->select('relationship_type_id', "label=Employee of");
-
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: wait until new contact dialog select is built
-    sleep(2);
+    $this->waitForAjaxContent();
 
     // create a new organization
 
@@ -414,8 +406,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship created.');
 
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[1][text()='View']");
-    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->click("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(

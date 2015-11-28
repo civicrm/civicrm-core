@@ -291,6 +291,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of participants records and total participant count
+    $this->waitForAjaxContent();
     $this->assertStringsPresent(array('2 Results', 'Actual participant count : 24'));
 
     // CRM-7953, check custom search Price Set Details for Event
@@ -306,6 +307,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
+    $this->waitForElementPresent("title");
     $this->type('title', $setTitle);
     $this->check('extends[1]');
     $this->select("css=select.crm-form-select", "label={$financialType}");

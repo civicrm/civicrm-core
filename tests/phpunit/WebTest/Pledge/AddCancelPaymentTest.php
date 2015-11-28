@@ -90,12 +90,12 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
 
     //Check whether the next two payments are done or not
     $this->waitForAjaxContent();
-    $this->waitForElementPresent("xpath=//form[@id='Search']//div/table/tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']//div/table/tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]", "Completed");
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]", "Completed");
 
     //Cancel the contribution made for amount of 300.00
-    $this->waitForElementPresent("xpath=//form[@id='Search']//div/table/tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']//div/table/tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
     $this->click("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='ContributionView']//div[2]/div/div/a");
     $this->click("xpath=//form[@id='ContributionView']//div[2]/div/div/a");
