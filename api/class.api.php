@@ -154,17 +154,6 @@ class civicrm_api3 {
   }
 
   /**
-   * As of PHP 5.3.0.
-   *
-   * @param $name
-   * @param $arguments
-   */
-  public static function __callStatic($name, $arguments) {
-    // Should we implement it ?
-    echo "Calling static method '$name' " . implode(', ', $arguments) . "\n";
-  }
-
-  /**
    * Call via rest.
    *
    * @param $entity
