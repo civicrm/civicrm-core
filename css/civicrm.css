@@ -749,14 +749,9 @@ input.crm-form-entityref {
   padding-left: 1em;
 }
 
-/* Following styles are used to remove the white bullets from the Garland Theme */
+/* Remove any weird list styles from the cms */
 .crm-container ul li {
   background-image: none;
-}
-
-/* But allow them for the help at the top of forms */
-.crm-container .help ul li {
-  background-image: url(menu-leaf.png);
 }
 
 .crm-container .crm-form-block .crm-loading-element {
