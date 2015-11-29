@@ -1439,22 +1439,26 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     // accordingly.
     $status = self::CURRENT;
     $targetContact = $targetContact = CRM_Utils_Array::value('contact_check', $params, array());
+    $today = date('Ymd');
+
+    // If a relationship hasn't yet started, just return for now
+    // TODO: handle edge-case of updating start_date of an existing relationship
+    if (!empty($params['start_date'])) {
+      $startDate = substr(CRM_Utils_Date::format($params['start_date']), 0, 8);
+      if ($today < $startDate) {
+        return;
+      }
+    }
 
     if (!empty($params['end_date'])) {
-      $endDate = CRM_Utils_Date::setDateDefaults(CRM_Utils_Date::format($params['end_date']), NULL, 'Ymd');
-      $today = date('Ymd');
-
+      $endDate = substr(CRM_Utils_Date::format($params['end_date']), 0, 8);
       if ($today > $endDate) {
         $status = self::PAST;
       }
     }
 
-    if (($action & CRM_Core_Action::ADD) &&
-      ($status & self::PAST)
-    ) {
-      // if relationship is PAST and action is ADD, no qustion
-      // of creating RELATED membership and return back to
-      // calling method
+    if (($action & CRM_Core_Action::ADD) && ($status & self::PAST)) {
+      // If relationship is PAST and action is ADD, do nothing.
       return;
     }
 
