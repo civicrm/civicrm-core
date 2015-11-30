@@ -55,11 +55,9 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   public static function create(&$params) {
     // CRM-14756: If the user gives the id, uf_group_id is retrieved and then set.
     if (!empty($params['id']) && empty($params['uf_group_id'])) {
-      $groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['id'], 'uf_group_id', 'id');
+      $params['uf_group_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['id'], 'uf_group_id', 'id');
     }
-    else {
-      $groupId = CRM_Utils_Array::value('uf_group_id', $params);
-    }
+    $groupId = CRM_Utils_Array::value('uf_group_id', $params);
 
     $field_name = CRM_Utils_Array::value('field_name', $params);
     if (
@@ -72,9 +70,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
       throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
     }
 
-    if (!(CRM_Utils_Array::value('group_id', $params))) {
-      $params['group_id'] = $groupId;
-    }
 
     // @todo why is this even optional? Surely weight should just be 'managed' ??
     if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
@@ -291,7 +286,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     if (!empty($params['id'])) {
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['id'], 'weight', 'id');
     }
-    $fieldValues = array('uf_group_id' => $params['group_id']);
+    $fieldValues = array('uf_group_id' => $params['uf_group_id']);
     return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
   }
 
