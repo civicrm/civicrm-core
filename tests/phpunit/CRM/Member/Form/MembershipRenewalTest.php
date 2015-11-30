@@ -234,7 +234,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '1',
       'source' => '',
       'total_amount' => '77.00',
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'soft_credit_type_id' => 11,
       'soft_credit_contact_id' => '',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -254,17 +255,30 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'billing_state_province_id-5' => '1003',
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
+      'send_receipt' => 1,
     );
     $form->_mode = 'test';
     $form->_contactID = $this->_individualId;
 
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
-    $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 1);
-    $contribution = $this->callAPISuccess('Contribution', 'get', array(
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array('contact_id' => $this->_individualId));
+    $this->assertEquals(1, $contributionRecur['is_email_receipt']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contributionRecur['modified_date'])));
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contributionRecur['modified_date'])));
+    $this->assertNotEmpty($contributionRecur['invoice_id']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
+      'Pending'), $contributionRecur['contribution_status_id']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
+      'Credit Card'), $contributionRecur['payment_instrument_id']);
+
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', array(
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
+
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
+      'Credit Card'), $contribution['payment_instrument_id']);
 
     $this->callAPISuccessGetCount('LineItem', array(
       'entity_id' => $membership['id'],
@@ -309,11 +323,26 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array('contact_id' => $this->_individualId));
     $this->assertEquals($contributionRecur['id'], $membership['contribution_recur_id']);
+    $this->assertEquals(0, $contributionRecur['is_email_receipt']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contributionRecur['modified_date'])));
+    $this->assertNotEmpty($contributionRecur['invoice_id']);
+    print_r($contributionRecur);
+    // @todo fix this part!
+    /*
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
+     'In Progress'), $contributionRecur['contribution_status_id']);
+    $this->assertNotEmpty($contributionRecur['next_sched_contribution_date']);
+    */
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
+      'Credit Card'), $contributionRecur['payment_instrument_id']);
+
 
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array(
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
+      'Credit Card'), $contribution['payment_instrument_id']);
 
     $this->assertEquals('kettles boil water', $contribution['trxn_id']);
     $this->assertEquals(.29, $contribution['fee_amount']);
