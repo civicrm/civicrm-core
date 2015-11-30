@@ -330,12 +330,11 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     // @todo fix this part!
     /*
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
-     'In Progress'), $contributionRecur['contribution_status_id']);
+    'In Progress'), $contributionRecur['contribution_status_id']);
     $this->assertNotEmpty($contributionRecur['next_sched_contribution_date']);
-    */
+     */
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
       'Credit Card'), $contributionRecur['payment_instrument_id']);
-
 
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array(
       'contact_id' => $this->_individualId,
