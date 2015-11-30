@@ -180,13 +180,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
     $script = '';
-    $separator = $htmlize ? '&amp;' : '&';
+    $separator = '&';
     $wpPageParam = '';
     $fragment = isset($fragment) ? ('#' . $fragment) : '';
 

@@ -147,7 +147,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
@@ -162,7 +161,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
-    $separator = $htmlize ? '&amp;' : '&';
+    $separator = '&';
 
     if (!$config->cleanURL) {
       if (isset($path)) {
