@@ -240,9 +240,9 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   public static function add(&$params) {
     // set values for uf field properties and save
     $ufField = new CRM_Core_DAO_UFField();
+    $ufField->copyValues($params);
 
     if (isset($params['field_name']) && !is_string($params['field_name'])) {
-      $ufField->copyValues($params);
 
       $field_type       = CRM_Utils_Array::value('field_type', $params);
       $field_name       = CRM_Utils_Array::value('field_name', $params);
@@ -270,9 +270,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       }
 
       $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
-      return $ufField->save();
     }
-    $ufField->copyValues($params);
 
     return $ufField->save();
   }
