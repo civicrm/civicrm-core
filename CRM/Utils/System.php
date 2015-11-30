@@ -269,13 +269,33 @@ class CRM_Utils_System {
   ) {
     $query = self::makeQueryString($query);
 
-    // we have a valid query and it has not yet been transformed
-    if ($htmlize && !empty($query) && strpos($query, '&amp;') === FALSE) {
-      $query = htmlentities($query);
+    // Legacy handling for when the system passes around html escaped strings
+    if (strstr($query, '&amp;')) {
+      $query = html_entity_decode($query);
+    }
+
+    // Extract fragment from path or query if munged together
+    if ($query && strstr($query, '#')) {
+      list($path, $fragment) = explode('#', $query);
+    }
+    if ($path && strstr($path, '#')) {
+      list($path, $fragment) = explode('#', $path);
+    }
+
+    // Extract query from path if munged together
+    if ($path && strstr($path, '?')) {
+      list($path, $extraQuery) = explode('?', $path);
+      $query = $extraQuery . ($query ? "&$query" : '');
     }
 
     $config = CRM_Core_Config::singleton();
-    return $config->userSystem->url($path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend);
+    $url = $config->userSystem->url($path, $query, $absolute, $fragment, $frontend, $forceBackend);
+
+    if ($htmlize) {
+      $url = htmlentities($url);
+    }
+
+    return $url;
   }
 
   /**
