@@ -70,15 +70,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
       throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
     }
 
-    if (
-      ((empty($params['id']) && empty($params['weight']))
-      || !empty($params['weight']))
-      // The auto-weight concept came from the old api. It is tested in the context of
-      // replace & perhaps still has some value in that context? Or else it
-      // was just a hack on a hack to suppress some odd behaviour?
-      && (!isset($params['option.autoweight']) || $params['option.autoweight'])) {
-      $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
-    }
+    $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
+
     $ufField = CRM_Core_BAO_UFField::add($params);
 
     $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($groupId, TRUE);
@@ -279,11 +272,23 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Automatically determine one weight and modify others.
    *
+   * If there is a specific legacy-stype opt-out of autoweight then return early.
+   * This is from an early version of api v3 but is still used & tested in the replace function.
+   *
+   * Also return early if this is an update and weight has not been set - in that case
+   * weight does not need to be tampered with.
+   *
    * @param array $params
    *   UFField record, e.g. with 'weight', 'uf_group_id', and 'field_id'.
    * @return int
    */
   public static function autoWeight($params) {
+    if (isset($params['option.autoweight']) || !$params['option.autoweight']) {
+      return CRM_Utils_Array::value('weight', $params);
+    }
+    if (!empty($params['id']) && empty($params['weight'])) {
+      return NULL;
+    }
     // fix for CRM-316
     $oldWeight = NULL;
 

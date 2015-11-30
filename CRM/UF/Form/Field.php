@@ -536,51 +536,51 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $name = $this->_selectFields[$params['field_name'][1]];
     }
 
-    // Hack for Formatting Field Name.
+    //Hack for Formatting Field Name
     if ($params['field_name'][0] == 'Formatting') {
       $params['field_name'][1] = 'formatting_' . rand(1000, 9999);
     }
 
-    try {
-      $ufField = CRM_Core_BAO_UFField::create($params);
+    //check for duplicate fields
+    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, array('uf_group' => $params['uf_group_id'], 'uf_field' => $params['id']))) {
+      CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
+      return;
     }
-    catch (CRM_Core_Exception $e) {
-      if ($e->getMessage() == "The field was not added. It already exists in this profile.") {
-        CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
-        return;
+    else {
+      $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
+      $ufField = CRM_Core_BAO_UFField::add($params);
+
+      //reset other field is searchable and in selector settings, CRM-4363
+      if ($this->_hasSearchableORInSelector &&
+        in_array($ufField->field_type, array('Participant', 'Contribution', 'Membership', 'Activity', 'Case'))
+      ) {
+        CRM_Core_BAO_UFField::resetInSelectorANDSearchable($this->_gid);
       }
-    }
 
-    // Reset other field is searchable and in selector settings, CRM-4363.
-    if ($this->_hasSearchableORInSelector &&
-      in_array($ufField->field_type, array('Participant', 'Contribution', 'Membership', 'Activity', 'Case'))
-    ) {
-      CRM_Core_BAO_UFField::resetInSelectorANDSearchable($this->_gid);
-    }
-
-    $config = CRM_Core_Config::singleton();
-    $showBestResult = FALSE;
-    if (in_array($ufField->field_name, array(
-        'country',
-        'state_province',
-      )) && count($config->countryLimit) > 1
-    ) {
-      // get state or country field weight if exists
-      $field = 'state_province';
-      if ($ufField->field_name == 'state_province') {
-        $field = 'country';
-      }
-      $ufFieldDAO = new CRM_Core_DAO_UFField();
-      $ufFieldDAO->field_name = $field;
-      $ufFieldDAO->location_type_id = $ufField->location_type_id;
-      $ufFieldDAO->uf_group_id = $ufField->uf_group_id;
-
-      if ($ufFieldDAO->find(TRUE)) {
-        if ($field == 'country' && $ufFieldDAO->weight > $ufField->weight) {
-          $showBestResult = TRUE;
+      $config = CRM_Core_Config::singleton();
+      $showBestResult = FALSE;
+      if (in_array($ufField->field_name, array(
+          'country',
+          'state_province',
+        )) && count($config->countryLimit) > 1
+      ) {
+        // get state or country field weight if exists
+        $field = 'state_province';
+        if ($ufField->field_name == 'state_province') {
+          $field = 'country';
         }
-        elseif ($field == 'state_province' && $ufFieldDAO->weight < $ufField->weight) {
-          $showBestResult = TRUE;
+        $ufFieldDAO = new CRM_Core_DAO_UFField();
+        $ufFieldDAO->field_name = $field;
+        $ufFieldDAO->location_type_id = $ufField->location_type_id;
+        $ufFieldDAO->uf_group_id = $ufField->uf_group_id;
+
+        if ($ufFieldDAO->find(TRUE)) {
+          if ($field == 'country' && $ufFieldDAO->weight > $ufField->weight) {
+            $showBestResult = TRUE;
+          }
+          elseif ($field == 'state_province' && $ufFieldDAO->weight < $ufField->weight) {
+            $showBestResult = TRUE;
+          }
         }
       }
 
