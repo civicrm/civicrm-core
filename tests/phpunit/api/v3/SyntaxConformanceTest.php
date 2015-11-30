@@ -647,6 +647,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'ignore_severity',
         ),
       ),
+      'UFField' => array(
+        // This is validated against options that can't be generated in an automated test context.
+        'cant_update' => array(
+          'field_name',
+        ),
+      ),
     );
     if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])) {
       return array();
