@@ -98,6 +98,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       CRM_Utils_Hook::post('create', 'ContributionRecur', $recurring->id, $recurring);
     }
 
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution_recur', $recurring->id);
+    }
+
     return $result;
   }
 
@@ -691,6 +697,77 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     // update pledge and corresponding payment statuses
     CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId, $paymentIDs, $contribution->contribution_status_id,
       NULL, $contribution->total_amount
+    );
+  }
+
+  /**
+   * @param $form
+   */
+  public static function recurringContribution(&$form) {
+    // Recurring contribution fields
+    foreach (self::getRecurringFields() as $key => $label) {
+      if ($key == 'contribution_recur_payment_made' &&
+        !CRM_Utils_System::isNull(CRM_Utils_Array::value($key, $form->_formValues))
+      ) {
+        $form->assign('contribution_recur_pane_open', TRUE);
+        break;
+      }
+      CRM_Core_Form_Date::buildDateRange($form, $key, 1, '_low', '_high');
+      // If data has been entered for a recurring field, tell the tpl layer to open the pane
+      if (!empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
+        $form->assign('contribution_recur_pane_open', TRUE);
+        break;
+      }
+    }
+
+    $form->add('hidden', 'hidden_recurringcontribution', 1);
+    // Add field to check if payment is made for recurring contribution
+    $recurringPaymentOptions = array(
+      0 => ts(' All recurring contributions'),
+      1 => ts(' Recurring contributions with at least one payment'),
+    );
+    $form->addRadio('contribution_recur_payment_made', ts(''), $recurringPaymentOptions, array('allowClear' => TRUE));
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_start_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_end_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_modified_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_next_sched_contribution_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_failure_retry_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_cancel_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
+    $form->addElement('text', 'contribution_recur_processor_id', ts('Processor ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'processor_id'));
+    $form->addElement('text', 'contribution_recur_trxn_id', ts('Transaction ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'trxn_id'));
+    $contributionRecur = array('ContributionRecur');
+    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $contributionRecur);
+    if ($groupDetails) {
+      $form->assign('contributeRecurGroupTree', $groupDetails);
+      foreach ($groupDetails as $group) {
+        foreach ($group['fields'] as $field) {
+          $fieldId = $field['id'];
+          $elementName = 'custom_' . $fieldId;
+          CRM_Core_BAO_CustomField::addQuickFormElement($form,
+            $elementName,
+            $fieldId,
+            FALSE, FALSE, TRUE
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Get fields for recurring contributions.
+   *
+   * @return array
+   */
+  public static function getRecurringFields() {
+    return array(
+      'contribution_recur_payment_made' => ts(''),
+      'contribution_recur_start_date' => ts('Recurring Contribution Start Date'),
+      'contribution_recur_next_sched_contribution_date' => ts('Next Scheduled Recurring Contribution'),
+      'contribution_recur_cancel_date' => ts('Recurring Contribution Cancel Date'),
+      'contribution_recur_end_date' => ts('Recurring Contribution End Date'),
+      'contribution_recur_create_date' => ('Recurring Contribution Create Date'),
+      'contribution_recur_modified_date' => ('Recurring Contribution Modified Date'),
+      'contribution_recur_failure_retry_date' => ts('Failed Recurring Contribution Retry Date'),
     );
   }
 

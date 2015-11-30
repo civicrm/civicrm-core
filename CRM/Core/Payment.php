@@ -1279,4 +1279,13 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     return substr(implode('-', $validParts), 0, $length);
   }
 
+  /**
+   * Checks if backoffice recurring edit is allowed
+   *
+   * @return bool
+   */
+  public function supportsEditRecurringContribution() {
+    return FALSE;
+  }
+
 }

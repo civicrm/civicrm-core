@@ -32,6 +32,9 @@
   <div class="crm-accordion-body">
     <table class="form-layout-compressed">
       <tr>
+        <td colspan="4">{$form.contribution_recur_payment_made.html}</td>
+      </tr>
+      <tr>
         <td>{ts}Start Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_start_date" from='_low' to='_high'}
@@ -67,9 +70,17 @@
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
         </td>
       </tr>
+      {if $contributeRecurGroupTree}
+        <tr>
+          <td colspan="4">
+            {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributeRecurGroupTree showHideLinks=false}
+          </td>
+        </tr>
+      {/if}
     </table>
   </div>
-  <!-- /.crm-accordion-body -->
+<!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
+
 
 
