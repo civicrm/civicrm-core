@@ -278,11 +278,13 @@
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
             <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1 ?{/ts} {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
+            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
           </tr>
           {elseif $context eq 'standalone' and $outBound_option != 2 }
           <tr id="email-receipt" style="display:none;">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
             <span class="description">{ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>? {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
+            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
           </tr>
         {/if}
         <tr id="fromEmail" style="display:none;">
