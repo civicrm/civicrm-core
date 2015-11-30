@@ -160,7 +160,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       $this->add('select', 'payment_processor_id',
         ts('Payment Processor'),
         $this->_processors, TRUE,
-        array('onChange' => "buildAutoRenew( null, this.value );")
+        array('onChange' => "buildAutoRenew( null, this.value, '{$this->_mode}');")
       );
       CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
     }
@@ -181,9 +181,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       $this->assign('recurProcessor', json_encode($this->_recurPaymentProcessors));
       $this->addElement('checkbox',
         'auto_renew',
-        ts('Membership renewed automatically'),
-        NULL,
-        array('onclick' => "buildReceiptANDNotice( );")
+        ts('Membership renewed automatically')
       );
 
       $this->assignPaymentRelatedVariables();
