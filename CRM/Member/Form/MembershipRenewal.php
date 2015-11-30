@@ -597,15 +597,16 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->_params['amount'] = $formValues['total_amount'];
       $this->_params['currencyID'] = $config->defaultCurrency;
       $this->_params['payment_action'] = 'Sale';
-      $paymentParams['invoiceID'] = $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
-
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the passed params
       // so we copy stuff over to first_name etc.
       $paymentParams = $this->_params;
+      $paymentParams['invoiceID'] = $paymentParams['invoice_id'] = $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+
       if (!empty($this->_params['send_receipt'])) {
         $paymentParams['email'] = $this->_contributorEmail;
       }
+      $paymentParams['is_email_receipt'] = !empty($this->_params['send_receipt']);
 
       $paymentParams['contactID'] = $this->_contributorContactID;
 
