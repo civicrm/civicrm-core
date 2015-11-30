@@ -62,7 +62,9 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     }
 
     $field_name = CRM_Utils_Array::value('field_name', $params);
-    if (!CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
+    if (
+      (!$field_name && empty($params['id'])) ||
+      ($field_name && !CRM_Core_BAO_UFField::isValidFieldName($field_name))) {
       throw new CRM_Core_Exception('The field_name is not valid');
     }
 
