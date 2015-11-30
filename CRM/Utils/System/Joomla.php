@@ -251,12 +251,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
-    $separator = $htmlize ? '&amp;' : '&';
+    $separator = '&';
     $Itemid = '';
     $script = '';
     $path = CRM_Utils_String::stripPathChars($path);

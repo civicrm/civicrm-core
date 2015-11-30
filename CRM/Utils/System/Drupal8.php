@@ -328,7 +328,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $query = '',
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = FALSE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
@@ -338,11 +337,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", [
+      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", array(
         'query' => $url['query'],
         'fragment' => $fragment,
         'absolute' => $absolute,
-      ])->toString();
+      ))->toString();
     }
     catch (Exception $e) {
       // @Todo: log to watchdog
@@ -357,9 +356,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       $url = urldecode($url);
     }
 
-    if ($htmlize) {
-      $url = htmlentities($url);
-    }
     return $url;
   }
 
