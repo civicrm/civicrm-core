@@ -328,7 +328,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $query = '',
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = FALSE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
@@ -357,9 +356,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       $url = urldecode($url);
     }
 
-    if ($htmlize) {
-      $url = htmlentities($url);
-    }
     return $url;
   }
 
