@@ -41,6 +41,8 @@ class CRM_Contribute_BAO_Query {
 
   static $_contribOrSoftCredit = "only_contribs";
 
+  static $_contribRecurPayment = NULL;
+
   /**
    * Function get the import/export fields for contribution.
    *
@@ -301,7 +303,10 @@ class CRM_Contribute_BAO_Query {
     }
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-    foreach (self::getRecurringFields() as $dateField => $dateFieldTitle) {
+
+    $recurrringFields = CRM_Contribute_BAO_ContributionRecur::getRecurringFields();
+    unset($recurrringFields['contribution_recur_payment_made']);
+    foreach ($recurrringFields as $dateField => $dateFieldTitle) {
       if (self::buildDateWhere($values, $query, $name, $dateField, $dateFieldTitle)) {
         return;
       }
@@ -503,6 +508,28 @@ class CRM_Contribute_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
+      case 'contribution_recur_processor_id':
+      case 'contribution_recur_trxn_id':
+        $fieldName = str_replace('contribution_recur_', '', $name);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.{$fieldName}",
+          $op, $value, "String"
+        );
+        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
+        return;
+
+      case 'contribution_recur_payment_made':
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.id", 'IS NOT EMPTY');
+        if ($value) {
+          $query->_qill[$grouping][] = ts("Recurring contributions with at least one payment");
+          self::$_contribRecurPayment = TRUE;
+        }
+        else {
+          $query->_qill[$grouping][] = ts("All recurring contributions regardless of payments");
+          self::$_contribRecurPayment = FALSE;
+        }
+        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
+        return;
+
       case 'contribution_note':
         $value = $strtolower(CRM_Core_DAO::escapeString($value));
         if ($wildcard) {
@@ -615,8 +642,11 @@ class CRM_Contribute_BAO_Query {
 
       case 'civicrm_contribution_recur':
         if ($mode == 1) {
-          // in contact mode join directly onto profile - in case no contributions exist yet
+          // 'Made payment for the recurring contributions?' is ticked yes
           $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
+          if (self::$_contribRecurPayment == TRUE) {
+            $from .= " AND civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id ";
+          }
         }
         else {
           $from = " $side JOIN civicrm_contribution_recur ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id ";
@@ -945,15 +975,6 @@ class CRM_Contribute_BAO_Query {
     $form->addYesNo('contribution_pay_later', ts('Contribution is Pay Later?'), TRUE);
     $form->addYesNo('contribution_recurring', ts('Contribution is Recurring?'), TRUE);
 
-    // Recurring contribution fields
-    foreach (self::getRecurringFields() as $key => $label) {
-      CRM_Core_Form_Date::buildDateRange($form, $key, 1, '_low', '_high');
-      // If data has been entered for a recurring field, tell the tpl layer to open the pane
-      if (!empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
-        $form->assign('contribution_recur_pane_open', TRUE);
-      }
-    }
-
     $form->addYesNo('contribution_test', ts('Contribution is a Test?'), TRUE);
 
     // Add field for transaction ID search
@@ -1022,6 +1043,8 @@ class CRM_Contribute_BAO_Query {
 
     $form->assign('validCiviContribute', TRUE);
     $form->setDefaults(array('contribution_test' => 0));
+
+    CRM_Contribute_BAO_ContributionRecur::recurringContribution($form);
   }
 
   /**
@@ -1079,23 +1102,6 @@ class CRM_Contribute_BAO_Query {
       'civicrm_' . $table, $field, $fieldName[1], $title
     );
     return TRUE;
-  }
-
-  /**
-   * Get fields for recurring contributions.
-   *
-   * @return array
-   */
-  public static function getRecurringFields() {
-    return array(
-      'contribution_recur_start_date' => ts('Recurring Contribution Start Date'),
-      'contribution_recur_next_sched_contribution_date' => ts('Next Scheduled Recurring Contribution'),
-      'contribution_recur_cancel_date' => ts('Recurring Contribution Cancel Date'),
-      'contribution_recur_end_date' => ts('Recurring Contribution End Date'),
-      'contribution_recur_create_date' => ('Recurring Contribution Create Date'),
-      'contribution_recur_modified_date' => ('Recurring Contribution Modified Date'),
-      'contribution_recur_failure_retry_date' => ts('Failed Recurring Contribution Retry Date'),
-    );
   }
 
 }

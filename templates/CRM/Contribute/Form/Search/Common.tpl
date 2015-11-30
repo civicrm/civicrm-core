@@ -160,9 +160,11 @@
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
 campaignTrClass='' campaignTdClass=''}
 
+{* contribution recurring search *}
 <tr>
   <td colspan="2">
-{include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+    {include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+  </td>
 </tr>
 
 {if $contributeGroupTree}
@@ -171,6 +173,7 @@ campaignTrClass='' campaignTdClass=''}
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributeGroupTree showHideLinks=false}</td>
 </tr>
 {/if}
+
 {literal}
 <script type="text/javascript">
   cj('#contribution_payment_instrument_id').change(function() {
