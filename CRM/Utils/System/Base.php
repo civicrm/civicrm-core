@@ -118,8 +118,6 @@ abstract class CRM_Utils_System_Base {
    *   Useful for links that will be displayed outside the site, such as in an RSS feed.
    * @param string $fragment
    *   A fragment identifier (named anchor) to append to the link.
-   * @param bool $htmlize
-   *   Whether to encode special html characters such as &.
    * @param bool $frontend
    *   This link should be to the CMS front end (applies to WP & Joomla).
    * @param bool $forceBackend
