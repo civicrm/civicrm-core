@@ -70,9 +70,13 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
       throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
     }
 
-
-    // @todo why is this even optional? Surely weight should just be 'managed' ??
-    if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
+    if (
+      ((empty($params['id']) && empty($params['weight']))
+      || !empty($params['weight']))
+      // The auto-weight concept came from the old api. It is tested in the context of
+      // replace & perhaps still has some value in that context? Or else it
+      // was just a hack on a hack to suppress some odd behaviour?
+      && (!isset($params['option.autoweight']) || $params['option.autoweight'])) {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
     }
     $ufField = CRM_Core_BAO_UFField::add($params);
