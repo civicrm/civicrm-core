@@ -389,9 +389,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       $weight += 10;
     }
 
-    $context = array('contact_id' => $this->_contactId);
     // see if any other modules want to add any tabs
-    CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
+    CRM_Utils_Hook::tabs($allTabs, $this->_contactId);
 
     // now sort the tabs based on weight
     usort($allTabs, array('CRM_Utils_Sort', 'cmpFunc'));
