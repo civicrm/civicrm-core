@@ -30,7 +30,7 @@
  * FIXME: Why are we not just using the dynamic form tpl to display this profile?
  *}
 {if $form.is_for_organization}
-  <div class="crm-section {$form.is_for_organization.name}-section">
+  <div class="crm-public-form-item crm-section {$form.is_for_organization.name}-section">
     <div class="label">&nbsp;</div>
     <div class="content">
       {$form.is_for_organization.html}&nbsp;{$form.is_for_organization.label}
@@ -39,13 +39,13 @@
   </div>
 {/if}
 
-<div id="on-behalf-block">
+<div class="crm-public-form-item" id="on-behalf-block">
   {crmRegion name="onbehalf-block"}
     {if $onBehalfOfFields|@count}
       <fieldset>
       <legend>{$fieldSetTitle}</legend>
       {if $form.org_option}
-        <div id='orgOptions' class="section crm-section">
+        <div id='orgOptions' class="section crm-public-form-item crm-section">
           <div class="content">
             {$form.org_option.html}
           </div>
