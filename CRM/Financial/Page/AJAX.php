@@ -517,7 +517,7 @@ class CRM_Financial_Page_AJAX {
     $batchID = CRM_Utils_Type::escape($_REQUEST['batchID'], 'String');
     $params = array('id' => $batchID);
 
-    $batchSummary = makeBatchSummary($batchID, $params);
+    $batchSummary = self::makeBatchSummary($batchID, $params);
 
     CRM_Utils_JSON::output($batchSummary);
   }
