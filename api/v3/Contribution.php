@@ -241,18 +241,29 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 function civicrm_api3_contribution_get($params) {
 
   $mode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
-  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Contribution');
+  $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties($mode);
 
-  $contribution = array();
-  while ($dao->fetch()) {
-    //CRM-8662
-    $contribution_details = $query->store($dao);
-    $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dao->contribution_id, TRUE);
-    $contribution[$dao->contribution_id] = array_merge($contribution_details, $softContribution);
+  $contributions = _civicrm_api3_get_using_query_object('Contribution', $params, array(), NULL, $mode, $returnProperties);
+
+  foreach ($contributions as $id => $contribution) {
+    $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($id, TRUE);
+    $contributions[$id] = array_merge($contribution, $softContribution);
     // format soft credit for backward compatibility
-    _civicrm_api3_format_soft_credit($contribution[$dao->contribution_id]);
+    _civicrm_api3_format_soft_credit($contributions[$id]);
   }
-  return civicrm_api3_create_success($contribution, $params, 'Contribution', 'get', $dao);
+  return civicrm_api3_create_success($contributions, $params, 'Contribution', 'get');
+}
+
+/**
+ * Get number of contacts matching the supplied criteria.
+ *
+ * @param array $params
+ *
+ * @return int
+ */
+function civicrm_api3_contribution_getcount($params) {
+  $count = _civicrm_api3_get_using_query_object('Contribution', $params, array(), TRUE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
+  return (int) $count;
 }
 
 /**

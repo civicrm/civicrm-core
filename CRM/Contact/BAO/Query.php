@@ -1320,7 +1320,7 @@ class CRM_Contact_BAO_Query {
         // we add distinct to get the right count for components
         // for the more complex result set, we use GROUP BY the same id
         // CRM-9630
-        $select = "SELECT count( DISTINCT {$this->_distinctComponentClause} )";
+        $select = "SELECT count( DISTINCT {$this->_distinctComponentClause} ) as rowCount";
       }
       else {
         $select = 'SELECT count(DISTINCT contact_a.id) as rowCount';
@@ -4239,7 +4239,8 @@ civicrm_relationship.is_permission_a_b = 0
    *   Return count obnly.
    * @param bool $skipPermissions
    *   Should permissions be ignored or should the logged in user's permissions be applied.
-   *
+   * @param int $mode
+   *   This basically correlates to the component.
    *
    * @return array
    */
@@ -4252,12 +4253,13 @@ civicrm_relationship.is_permission_a_b = 0
     $row_count = 25,
     $smartGroupCache = TRUE,
     $count = FALSE,
-    $skipPermissions = TRUE
+    $skipPermissions = TRUE,
+    $mode = 1
   ) {
 
     $query = new CRM_Contact_BAO_Query(
       $params, $returnProperties,
-      NULL, TRUE, FALSE, 1,
+      NULL, TRUE, FALSE, $mode,
       $skipPermissions,
       TRUE, $smartGroupCache
     );
@@ -4295,11 +4297,14 @@ civicrm_relationship.is_permission_a_b = 0
     }
     if ($row_count > 0 && $offset >= 0) {
       $offset = CRM_Utils_Type::escape($offset, 'Int');
-      $rowCount = CRM_Utils_Type::escape($row_count, 'Int');
+      $row_count = CRM_Utils_Type::escape($row_count, 'Int');
       $sql .= " LIMIT $offset, $row_count ";
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql);
+
+    // @todo derive this from the component class rather than hard-code two options.
+    $entityIDField = ($mode == CRM_Contact_BAO_Query::MODE_CONTRIBUTE) ? 'contribution_id' : 'contact_id';
 
     $values = array();
     while ($dao->fetch()) {
@@ -4314,7 +4319,7 @@ civicrm_relationship.is_permission_a_b = 0
       if (!empty($convertedVals)) {
         $val = array_replace_recursive($val, $convertedVals);
       }
-      $values[$dao->contact_id] = $val;
+      $values[$dao->$entityIDField] = $val;
     }
     $dao->free();
     return array($values, $options);
