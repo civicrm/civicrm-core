@@ -3747,6 +3747,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         }
       }
     }
+    else {
+      $contributionId = $id;
+      $entity = 'contribution';
+      $entityTable = 'civicrm_contribution';
+    }
+
     $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $baseTrxnId = !empty($total['trxn_id']) ? $total['trxn_id'] : NULL;
     $isBalance = NULL;
