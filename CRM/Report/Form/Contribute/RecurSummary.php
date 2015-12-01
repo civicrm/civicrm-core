@@ -75,7 +75,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
           'start_date' => array(
             'title' => ts('Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_TIME,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
       ),
