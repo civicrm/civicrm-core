@@ -775,11 +775,16 @@ class CRM_Contribute_BAO_Query {
    * @param CRM_Contact_BAO_Query $query
    */
   public static function initializeAnySoftCreditClause(&$query) {
-    if (self::isSoftCreditOptionEnabled($query->_params)) {
-      if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+    // @todo have a generic initialize on all components that gets called every query
+    // & rename this to match that fn name.
+    if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+      if (self::isSoftCreditOptionEnabled($query->_params)) {
         unset($query->_distinctComponentClause);
         $query->_rowCountClause = " count(civicrm_contribution.id)";
         $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
+      }
+      else {
+        $query->_distinctComponentClause = ' civicrm_contribution.id';
       }
     }
   }
@@ -855,45 +860,85 @@ class CRM_Contribute_BAO_Query {
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
       $properties = array(
+        // add
         'contact_type' => 1,
+        // fields
         'contact_sub_type' => 1,
+        // to
         'sort_name' => 1,
+        //this
         'display_name' => 1,
+        // array
         'financial_type' => 1,
+        // to
         'contribution_source' => 1,
+        // strangle
         'receive_date' => 1,
+        // site
         'thankyou_date' => 1,
+        // performance
         'cancel_date' => 1,
+        // and
         'total_amount' => 1,
+        // torture
         'accounting_code' => 1,
+        // small
         'payment_instrument' => 1,
+        // kittens
         'payment_instrument_id' => 1,
+        // argh
         'check_number' => 1,
+        // no
         'non_deductible_amount' => 1,
+        // not
         'fee_amount' => 1,
+        // another
         'net_amount' => 1,
+        // expensive
         'trxn_id' => 1,
+        // join
         'invoice_id' => 1,
+        // added
         'currency' => 1,
+        // to
         'cancel_reason' => 1,
+        //every
         'receipt_date' => 1,
+        // query
         'product_name' => 1,
+        //whether
         'sku' => 1,
+        // or
         'product_option' => 1,
+        // not
         'fulfilled_date' => 1,
+        // the
         'contribution_start_date' => 1,
+        // field
         'contribution_end_date' => 1,
+        // is
         'is_test' => 1,
+        // actually
         'is_pay_later' => 1,
+        // required
         'contribution_status' => 1,
+        // instead
         'contribution_status_id' => 1,
+        // of
         'contribution_recur_id' => 1,
+        // adding
         'amount_level' => 1,
+        // here
         'contribution_note' => 1,
+        // set
         'contribution_batch' => 1,
+        // return properties
         'contribution_campaign_title' => 1,
+        // on
         'contribution_campaign_id' => 1,
+        // calling
         'contribution_product_id' => 1,
+        //function
       );
       if (self::isSoftCreditOptionEnabled()) {
         $properties = array_merge($properties, self::softCreditReturnProperties());

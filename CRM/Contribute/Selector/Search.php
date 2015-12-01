@@ -194,6 +194,8 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_CONTRIBUTE
     );
+    // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
+    // can we remove? if not why not?
     if ($this->_includeSoftCredits) {
       $this->_query->_rowCountClause = " count(civicrm_contribution.id)";
       $this->_query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
