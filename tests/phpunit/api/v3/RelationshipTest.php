@@ -1265,6 +1265,16 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ));
     $contactAMembership = $this->callAPISuccessGetSingle('membership', array('contact_id' => $this->_cId_a));
     $this->assertEquals($originalMembership['id'], $contactAMembership['owner_membership_id']);
+
+    // Adding a relationship with a future start date should NOT create a membership
+    $this->callAPISuccess('Relationship', 'create', array(
+      'relationship_type_id' => $this->_relTypeID,
+      'contact_id_a' => $this->_cId_a_2,
+      'contact_id_b' => $this->_cId_b,
+      'start_date' => 'now + 1 week',
+    ));
+    $this->callAPISuccessGetCount('membership', array('contact_id' => $this->_cId_a_2), 0);
+
     // Deleting the organization should cause the related membership to be deleted.
     $this->callAPISuccess('contact', 'delete', array('id' => $this->_cId_b));
     $this->callAPISuccessGetCount('membership', array('contact_id' => $this->_cId_a), 0);
