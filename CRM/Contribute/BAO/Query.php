@@ -775,11 +775,15 @@ class CRM_Contribute_BAO_Query {
    * @param CRM_Contact_BAO_Query $query
    */
   public static function initializeAnySoftCreditClause(&$query) {
-    if (self::isSoftCreditOptionEnabled($query->_params)) {
-      if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+
+    if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+      if (self::isSoftCreditOptionEnabled($query->_params)) {
         unset($query->_distinctComponentClause);
         $query->_rowCountClause = " count(civicrm_contribution.id)";
         $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
+      }
+      else {
+        $query->_distinctComponentClause = ' civicrm_contribution.id';
       }
     }
   }
