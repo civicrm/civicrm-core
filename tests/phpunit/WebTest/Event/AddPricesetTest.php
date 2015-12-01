@@ -538,7 +538,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
-
+    $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $email = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
     $eventDescription = 'Here is a description for this conference.';
@@ -681,7 +681,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/price/field', "reset=1&action=browse&sid={$sid}", 'newPriceField');
     $this->click("xpath=//table[@id='options']/tbody/tr[3]/td[8]/a[text()='Edit Price Options']");
     $this->waitForElementPresent("xpath=//span[contains(text(), 'Done')]");
-    $this->click("xpath=//tr/td/div[text()='First Night']/../following-sibling::td[8]/span/a[text()='Edit Option']");
+    $this->click("xpath=//table[@id='options']/tbody/tr/td/div[text()='First Night']/../following-sibling::td[8]/span/a[text()='Edit Option']");
     $this->waitForElementPresent("_qf_Option_cancel");
     $this->type('label', 'First Night Edited');
     $this->click('_qf_Option_next');

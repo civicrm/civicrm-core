@@ -44,6 +44,7 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("admin/messageTemplates/add", "action=add&reset=1");
 
+    $this->waitForElementPresent("_qf_MessageTemplates_cancel-bottom");
     // Fill message title.
     if (!$msgTitle) {
       $msgTitle = 'msg_' . substr(sha1(rand()), 0, 7);
