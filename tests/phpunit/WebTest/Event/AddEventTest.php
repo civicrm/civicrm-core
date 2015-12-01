@@ -502,7 +502,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    * @param $registerIntro
    * @param bool $multipleRegistrations
    */
-  public function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
+  public function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE, $allowSelfService = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
@@ -520,6 +520,14 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
+    //enable 'Allow self-service'
+    if ($allowSelfService) {
+      $isChecked = $this->isChecked('allow_selfcancelxfer');
+      if (!$isChecked) {
+        $this->click("allow_selfcancelxfer");
+      }
+      $this->assertChecked("allow_selfcancelxfer");
+    }
     $this->fillRichTextField("intro_text", $registerIntro, 'CKEditor', TRUE);
 
     // enable confirmation email
@@ -1093,6 +1101,105 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->waitForElementPresent("xpath=//div[@id='event_status_id']/div[@class='dataTables_wrapper no-footer']");
     $this->verifyText("xpath=//div[@id='event_status_id']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td", "None found.");
     $this->webtestLogout();
+  }
+
+  /**
+   * CRM-16761: Self service view, update and cancel for CiviEvent
+   */
+  public function testAllowSelfService() {
+    $this->webtestLogin('admin');
+
+    // Create Individual
+    $contact1 = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($contact1, "Anderson", "{$contact1}@example.com");
+
+    // Add event
+    $this->openCiviPage("event/add", "reset=1&action=add");
+    $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $eventDescription = "Here is a description for this conference.";
+    $registerIntro = "Fill in all the fields below and click Continue.";
+    $multipleRegistrations = TRUE;
+    $allowSelfService = TRUE;
+    $this->_testAddEventInfo($eventTitle, $eventDescription);
+    $streetAddress = "100 Main Street";
+    $this->_testAddLocation($streetAddress);
+    $this->_testAddFees(FALSE, FALSE, "Test Processor", FALSE, TRUE);
+    $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations, $allowSelfService);
+
+    // Register participant
+    $id = $this->urlArg('id');
+    $this->openCiviPage("event/register", "reset=1&id=$id&action=preview", '_qf_Register_upload-bottom');
+    $this->type('first_name', $contact1);
+    $this->type('last_name', "Anderson");
+    $this->type('email-Primary', "{$contact1}@example.com");
+
+    // Fill card details
+    $this->select("credit_card_type", "value=Visa");
+    $this->type("credit_card_number", "4111111111111111");
+    $this->type("cvv2", "000");
+    $this->select("credit_card_exp_date[M]", "value=1");
+    $this->select("credit_card_exp_date[Y]", "value=2020");
+
+    // Add billing Address
+    $this->webtestAddBillingDetails($contact1, NULL, 'Anderson');
+    $this->click("_qf_Register_upload-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Confirm_next-top");
+    $this->click("_qf_Confirm_next-top");
+
+    // Find Participant.
+    $this->openCiviPage("event/search", "reset=1");
+    $this->waitForElementPresent("_qf_Search_refresh");
+    $this->type('sort_name', "Anderson, $contact1");
+    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[9]/td[1]/label[text()='Yes']");
+    $this->click("_qf_Search_refresh");
+    $this->waitForElementPresent("xpath=//div[@id='participantSearch']");
+
+    // Get the id of primary participant
+    $primaryParticipantId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody/tr/td[3]/a[text()='Anderson, $contact1']/../../td[11]/span/a[1][text()='View']@href"));
+    $this->webtestLogout();
+
+    // Self Service Transfer of event
+    $this->openCiviPage("event/selfsvcupdate", "reset=1&pid=$primaryParticipantId");
+    $this->waitForElementPresent("xpath=//table[@class='crm-selfsvcupdate-form-details']");
+    $this->verifyText("xpath=//table[@class='crm-selfsvcupdate-form-details']/tbody/tr/td[1]", preg_quote("Anderson, $contact1"));
+    $this->verifyText("xpath=//table[@class='crm-selfsvcupdate-form-details']/tbody/tr/td[2]", preg_quote("$eventTitle"));
+    $this->select("action", "value=1");
+    $this->click("_qf_SelfSvcUpdate_submit-bottom");
+    $this->waitForElementPresent("_qf_SelfSvcTransfer_cancel-bottom");
+    $newParticipantFirstName = substr(sha1(rand()), 0, 5);
+    $newParticipantLastName = "Smith";
+    $newParticipantEmail = "{$newParticipantFirstName}@example.com";
+    $this->type('email', $newParticipantEmail);
+    $this->type('last_name', $newParticipantLastName);
+    $this->type('first_name', $newParticipantFirstName);
+    $this->click("_qf_SelfSvcTransfer_submit-bottom");
+
+    // Cancel registration.
+    $this->webtestLogin('admin');
+    $this->openCiviPage("event/search", "reset=1");
+    $this->type('sort_name', "Smith, $newParticipantFirstName");
+    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[9]/td[1]/label[text()='Yes']");
+    $this->click("_qf_Search_refresh");
+    $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody/tr/td[3]/a[text()='Smith, $newParticipantFirstName']/../../td[11]/span/a[1][text()='View']");
+    $newParticipantId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody/tr/td[3]/a[text()='Smith, $newParticipantFirstName']/../../td[11]/span/a[1][text()='View']@href"));
+    $this->webtestLogout();
+    $this->openCiviPage("event/selfsvcupdate", "reset=1&pid=$newParticipantId");
+    $this->verifyText("xpath=//table[@class='crm-selfsvcupdate-form-details']/tbody/tr/td[1]", preg_quote("Smith, $newParticipantFirstName"));
+    $this->verifyText("xpath=//table[@class='crm-selfsvcupdate-form-details']/tbody/tr/td[2]", preg_quote("$eventTitle"));
+    $this->select("action", "value=2");
+    $this->click("_qf_SelfSvcUpdate_submit-bottom");
+
+    // Check the status of participant
+    $this->webtestLogin('admin');
+    $this->openCiviPage("event/search", "reset=1");
+    $this->waitForElementPresent('_qf_Search_refresh');
+    $this->select2("event_id", $eventTitle);
+    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[9]/td[1]/label[text()='Yes']");
+    $this->click("_qf_Search_refresh");
+    $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody");
+    $this->assertElementContainsText("xpath=//div[@id='participantSearch']/table/tbody/tr[@id='rowid$primaryParticipantId']/td[9]", "Transferred (test)");
+    $this->assertElementContainsText("xpath=//div[@id='participantSearch']/table/tbody/tr[@id='rowid$newParticipantId']/td[9]", "Cancelled (test)");
   }
 
 }
