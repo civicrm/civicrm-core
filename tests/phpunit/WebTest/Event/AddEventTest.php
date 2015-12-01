@@ -1133,19 +1133,15 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->type('last_name', "Anderson");
     $this->type('email-Primary', "{$contact1}@example.com");
 
-    // Add billing Address
+    // Fill card details
     $this->select("credit_card_type", "value=Visa");
     $this->type("credit_card_number", "4111111111111111");
     $this->type("cvv2", "000");
     $this->select("credit_card_exp_date[M]", "value=1");
     $this->select("credit_card_exp_date[Y]", "value=2020");
-    $this->type("billing_first_name", $contact1);
-    $this->type("billing_last_name", "Anderson");
-    $this->type("billing_street_address-5", "15 Main St.");
-    $this->type(" billing_city-5", "San Jose");
-    $this->select("billing_country_id-5", "value=1228");
-    $this->select("billing_state_province_id-5", "value=1004");
-    $this->type("billing_postal_code-5", "94129");
+
+    // Add billing Address
+    $this->webtestAddBillingDetails($contact1, NULL, 'Anderson');
     $this->click("_qf_Register_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Confirm_next-top");
