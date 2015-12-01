@@ -137,8 +137,8 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Membership_upload");
 
     //View Membership
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='memberships']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody/tr[1]/td[9]/span/a[text()='View']");
+    $this->click("xpath=xpath=//table[@class='display dataTable no-footer']/tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     // verify soft credit data
