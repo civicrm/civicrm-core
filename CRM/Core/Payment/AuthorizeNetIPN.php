@@ -223,7 +223,9 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     if ($input['trxn_id']) {
       $input['is_test'] = 0;
     }
-    else {
+    // Only assume trxn_id 'should' have been returned for success.
+    // Per CRM-17611 it would also not be passed back for a decline.
+    elseif ($input['response_code'] == 1) {
       $input['is_test'] = 1;
       $input['trxn_id'] = md5(uniqid(rand(), TRUE));
     }
@@ -341,6 +343,10 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * @throws CRM_Core_Exception
    */
   public function checkMD5($ids, $input) {
+    if (empty($input['trxn_id'])) {
+      // For decline we have nothing to check against.
+      return;
+    }
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ids['paymentProcessor'],
       $input['is_test'] ? 'test' : 'live'
     );
