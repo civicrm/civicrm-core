@@ -124,6 +124,8 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
       $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_CONTRIBUTE
       );
+      // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
+      // can we remove? if not why not?
       if ($form->_includesSoftCredits) {
         $contactIds = $contributionContactIds = array();
         $query->_rowCountClause = " count(civicrm_contribution.id)";
