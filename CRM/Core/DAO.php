@@ -1175,7 +1175,7 @@ FROM   civicrm_domain
     $params = array(),
     $abort = TRUE,
     $daoName = NULL,
-    $freeDAO = FALSE,
+    $freeDAO = TRUE,
     $i18nRewrite = TRUE,
     $trapException = FALSE
   ) {
