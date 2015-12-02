@@ -16,6 +16,19 @@ VALUES
 
 UPDATE civicrm_contact SET is_deceased = 0 WHERE is_deceased IS NULL;
 
+-- CRM-16597
+UPDATE civicrm_option_value
+SET label_{$locale} = '{ts escape="sql"}Pledge Detail Report{/ts}', description_{$locale} = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}'
+WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Detail';
+
+UPDATE civicrm_option_value
+SET description_{$locale} = '{ts escape="sql"}Groups and totals pledges by criteria including contact, time period, pledge status, location, etc.{/ts}'
+WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Summary';
+
+UPDATE civicrm_report_instance
+SET title = '{ts escape="sql"}Pledge Detail{/ts}', description_{$locale} = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}'
+WHERE  report_id = 'pledge/detail';
+
 -- CRM-17503 PayPal Express processor type can support recurring payments
 UPDATE civicrm_payment_processor_type pp
 LEFT JOIN civicrm_payment_processor p ON p.payment_processor_type_id = pp.id
