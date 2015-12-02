@@ -377,64 +377,11 @@
     }
   }
 
-  {/literal}
-  {if $form.is_pay_later and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
-  showHidePayPalExpressOption();
-  {/if}
-  {literal}
-
   CRM.$(function($) {
     enableHonorType();
     showRecurHelp();
     skipPaymentMethod();
   });
-
-  function showHidePayPalExpressOption() {
-    if (cj('input[name="is_pay_later"]').is(':checked')) {
-      cj("#crm-submit-buttons").show();
-      cj("#paypalExpress").hide();
-    }
-    else {
-      cj("#paypalExpress").show();
-      cj("#crm-submit-buttons").hide();
-    }
-  }
-
-  function showHidePayment(flag) {
-    var payment_options = cj(".payment_options-group");
-    var payment_processor = cj("div.payment_processor-section");
-    var payment_information = cj("div#payment_information");
-    if (flag) {
-      payment_options.hide();
-      payment_processor.hide();
-      payment_information.hide();
-    }
-    else {
-      payment_options.show();
-      payment_processor.show();
-      payment_information.show();
-    }
-  }
-
-  function skipPaymentMethod() {
-    var flag = false;
-    cj('.price-set-option-content input[data-amount]').each( function(){
-      currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
-      if( cj(this).is(':checked') && currentTotal == 0 ) {
-          flag = true;
-      }
-    });
-
-    cj('.price-set-option-content input[data-amount]').change( function () {
-      if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
-        flag = true;
-      } else {
-        flag = false;
-      }
-      showHidePayment(flag);
-    });
-    showHidePayment(flag);
-  }
 
   CRM.$(function($) {
     // highlight price sets
@@ -445,21 +392,6 @@
     $('#priceset input[type="radio"]').change(updatePriceSetHighlight);
     updatePriceSetHighlight();
 
-    function toggleBillingBlockIfFree(){
-      var total_amount_tmp =  $(this).data('raw-total');
-      // Hide billing questions if this is free
-      if (total_amount_tmp == 0){
-        $("#billing-payment-block").hide();
-        $(".payment_options-group").hide();
-      }
-      else {
-        $("#billing-payment-block").show();
-        $(".payment_options-group").show();
-      }
-    }
-
-    $('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
-  
     // Update pledge contribution amount when pledge checkboxes change
     $("input[name^='pledge_amount']").on('change', function() {
       var total = 0;

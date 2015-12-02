@@ -126,6 +126,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    */
   public function setDefaultValues() {
     $this->_defaults = array();
+    if (!$this->_allowConfirmation && $this->_requireApproval) {
+      $this->_defaults['bypass_payment'] = 1;
+    }
     $contactID = $this->getContactID();
     CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
 
@@ -331,6 +334,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
+    if (!$this->_allowConfirmation) {
+      $bypassPayment = TRUE;
+    }
+
     //hack to allow group to register w/ waiting
     if ((!empty($this->_values['event']['is_multiple_registrations']) ||
         $this->_priceSetId
@@ -366,9 +373,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('allowGroupOnWaitlist', $allowGroupOnWaitlist);
     $this->assign('isAdditionalParticipants', $isAdditionalParticipants);
 
-    //lets get js on two different qf elements.
-    $showHidePayfieldName = NULL;
-    $showHidePaymentInformation = FALSE;
     if ($this->_values['event']['is_monetary']) {
       self::buildAmount($this);
     }
@@ -408,12 +412,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
-    //lets add some qf element to bypass payment validations, CRM-4320
-    if ($bypassPayment) {
-      $this->addElement('hidden', 'bypass_payment', NULL, array('id' => 'bypass_payment'));
-    }
+    $this->addElement('hidden', 'bypass_payment', NULL, array('id' => 'bypass_payment'));
+
     $this->assign('bypassPayment', $bypassPayment);
-    $this->assign('showHidePaymentInformation', $showHidePaymentInformation);
 
     $userID = $this->getContactID();
 
@@ -799,7 +800,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     //don't allow to register w/ waiting if enough spaces available.
-    if (!empty($fields['bypass_payment'])) {
+    if (!empty($fields['bypass_payment']) && $self->_allowConfirmation) {
       if (!is_numeric($self->_availableRegistrations) ||
         (empty($fields['priceSetId']) && CRM_Utils_Array::value('additional_participants', $fields) < $self->_availableRegistrations)
       ) {

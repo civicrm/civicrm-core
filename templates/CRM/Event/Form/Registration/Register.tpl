@@ -141,13 +141,7 @@
       </fieldset>
     {/if}
 
-    <div id="billing-payment-block">
-      {* If we have a payment processor, load it - otherwise it happens via ajax *}
-      {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
-        {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
-      {/if}
-    </div>
-    {include file="CRM/common/paymentBlock.tpl"}
+    {include file='CRM/Core/BillingBlockWrapper.tpl'}
 
     <div class="crm-public-form-item crm-section custom_pre-section">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
@@ -174,52 +168,11 @@
       skipPaymentMethod();
     });
 
-    CRM.$(function($) {
-      skipPaymentMethod();
-    });
-
-    // Hides billing and payment options block - but only if a price set is used.
-    // Called from display() in Calculate.tpl, depends on display() having been called.
-    function skipPaymentMethod() {
-      // If we're in quick-config price set, we do not have the pricevalue hidden element, so just return.
-      if (cj('#pricevalue').length == 0) {
-        return;
-      }
-      // CRM-15433 Remove currency symbol, decimal separator so we can check for zero numeric total regardless of localization.
-      currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
-      var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
-
-      var flag = 1;
-      var payment_options = cj(".payment_options-group");
-      var payment_processor = cj("div.payment_processor-section");
-      var payment_information = cj("div#payment_information");
-
-      // Do not hide billing and payment blocks if user is registering additional participants, since we do not know total owing.
-      if (isMultiple && cj("#additional_participants").val() && currentTotal == 0) {
-        flag = 0;
-      }
-
-      if (currentTotal == 0 && flag) {
-        payment_options.hide();
-        payment_processor.hide();
-        payment_information.hide();
-        // also unset selected payment methods
-        cj('input[name="payment_processor_id"]').removeProp('checked');
-      }
-      else {
-        payment_options.show();
-        payment_processor.show();
-        payment_information.show();
-      }
-    }
-
-    {/literal}
-  </script>
-
-{literal}
-<script type="text/javascript">
-  {/literal}{if $pcp && $is_honor_roll }pcpAnonymous();
-  {/if}{literal}
+  {/literal}
+  {if $pcp && $is_honor_roll }
+    pcpAnonymous();
+  {/if}
+  {literal}
 
   function allowParticipant() {
     {/literal}{if $allowGroupOnWaitlist}{literal}
@@ -231,35 +184,6 @@
 
     allowGroupOnWaitlist(additionalParticipants, pricesetParticipantCount);
     {/literal}{/if}{literal}
-  }
-
-  {/literal}{if ($bypassPayment) and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
-  {literal}
-  showHidePayPalExpressOption();
-  {/literal}{/if}{literal}
-
-  function showHidePayPalExpressOption() {
-    if (( cj("#bypass_payment").val() == 1 )) {
-      cj("#crm-submit-buttons").show();
-      cj("#paypalExpress").hide();
-    }
-    else {
-      cj("#paypalExpress").show();
-      cj("#crm-submit-buttons").hide();
-    }
-  }
-
-  {/literal}{if ($bypassPayment and $showHidePaymentInformation)}{literal}
-  showHidePaymentInfo();
-  {/literal} {/if}{literal}
-
-  function showHidePaymentInfo() {
-    if (( cj("#bypass_payment").val() == 1 )) {
-      cj('#billing-payment-block').hide();
-    }
-    else {
-      cj('#billing-payment-block').show();
-    }
   }
 
   {/literal}{if $allowGroupOnWaitlist}{literal}
@@ -300,24 +224,15 @@
       if (isrequireApproval) {
         cj("#id-waitlist-approval-msg").show();
         cj("#id-waitlist-msg").hide();
+        cj("#bypass_payment").val(1);
       }
       else {
         cj("#id-waitlist-approval-msg").hide();
+        cj("#bypass_payment").val(0);
       }
       //reset value since user don't want or not eligible for waitlist
-      cj("#bypass_payment").val(0);
+      skipPaymentMethod();
     }
-
-    //now call showhide payment info.
-    {/literal}
-    {if ($bypassPayment) and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}{literal}
-    showHidePayPalExpressOption();
-    {/literal}{/if}
-    {literal}
-
-    {/literal}{if ($bypassPayment) and $showHidePaymentInformation}{literal}
-    showHidePaymentInfo();
-    {/literal}{/if}{literal}
   }
 
   {/literal}
