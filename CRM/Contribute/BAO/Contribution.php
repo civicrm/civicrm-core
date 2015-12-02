@@ -2959,6 +2959,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $balanceTrxnParams['status_id'] = $statusId;
         $balanceTrxnParams['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
+        if ($toFinancialAccount == NULL && 
+(!$params['contribution']->is_pay_later || $statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially Paid', $contributionStatuses))) {
+          $balanceTrxnParams['is_payment'] = 1;
+        }
         if (!empty($params['payment_processor'])) {
           $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
         }
@@ -3014,11 +3018,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
-      if (!empty($trxnParams['payment_instrument_id'])) {
-        $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
-        if ($params['payment_instrument_id'] != array_search('Check', $paymentInstruments)) {
-          $trxnParams['is_payment'] = 1;
-        }
+      if (!$params['contribution']->is_pay_later || !in_array(CRM_Utils_Array::value('contribution_status_id', $params), $pendingStatus)) {
+        $trxnParams['is_payment'] = 1;
       }
 
       if (!empty($params['payment_processor'])) {

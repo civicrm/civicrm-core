@@ -78,6 +78,8 @@ function civicrm_api3_payment_create(&$params) {
       (isset($params['contribution_id']) && !CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'id'))) {
     return civicrm_api3_create_error(ts('You need to supply a valid contribution ID to create a payment'));
   }
+  // Get paid lineitems
+  $lineItems = CRM_Contribute_BAO_Contribution::getPaidLineItems($params);
   $params['id'] = $params['contribution_id'];
 
   if (!empty($params['contribution_id']) && !empty($params['contribution_status_id'])) {
@@ -101,6 +103,9 @@ function civicrm_api3_payment_create(&$params) {
 
   // Make sure tax calculation is handled via api.
   $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
+  CRM_Core_Error::debug( '$params', $params );
+  
+  $contribution = civicrm_api3('Contribution', 'get', $params);
 
   return _civicrm_api3_basic_create('CRM_Contribute_BAO_Contribution', $params, 'Contribution');
 }
@@ -114,9 +119,7 @@ function civicrm_api3_payment_create(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_payment_create_spec(&$params) {
-  $params['contribution_id']['api.required'] = 1;  
-  $params['total_amount']['api.required'] = 1; 
-  $params['payment_instrument_id']['api.required'] = 0; // if not provided, Financial Account of default Asset account will be used  
-  $params['payment_processor_id']['api.required'] = 0; // offline payments do not involve a payment processor
+  $params['contribution_id']['api.required'] = 1;   
+  $params['total_amount']['api.required'] = 1;  
   $params['payment_processor_id']['description'] = 'Payment processor ID - required for payment processor payments'; 
 }
