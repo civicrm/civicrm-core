@@ -74,8 +74,8 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
         'filters' => array(
           'start_date' => array(
             'title' => ts('Start Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE,
+            'operatorType' => CRM_Report_Form::OP_DATETIME,
+            'type' => CRM_Utils_Type::T_TIME,
           ),
         ),
       ),
@@ -241,15 +241,15 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
     $entryFound = FALSE;
 
-    $startDateFrom = $startDateTo = '';
+    $startDateFrom = CRM_Utils_Array::value("start_date_to", $this->_params);
+    $startDateTo = CRM_Utils_Array::value("start_date_from", $this->_params);
+    $startDateRelative = CRM_Utils_Array::value("start_date_relative", $this->_params);
 
-    if (isset($_POST['start_date_from']) && !empty($_POST['start_date_from'])) {
-      $startDateFrom = CRM_Utils_Date::processDate($_POST['start_date_from']);
-    }
+    $startedDateSql = $this->dateClause('start_date', $startDateRelative, $startDateFrom, $startDateTo);
+    $startedDateSql = $startedDateSql ? $startedDateSql : " ( 1 ) ";
 
-    if (isset($_POST['start_date_to']) && !empty($_POST['start_date_to'])) {
-      $startDateTo = CRM_Utils_Date::processDate($_POST['start_date_to']);
-    }
+    $cancelledDateSql = $this->dateClause('cancel_date', $startDateRelative, $startDateFrom, $startDateTo);
+    $cancelledDateSql = $cancelledDateSql ? $cancelledDateSql : " ( cancel_date IS NOT NULL ) ";
 
     $started = $cancelled = $active = $total = 0;
 
@@ -261,13 +261,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $rows[$rowNum]['civicrm_contribution_recur_cancel_date'] = 0;
       $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = 0;
 
-      $startedSql = "SELECT count(*) as count FROM civicrm_contribution_recur WHERE payment_instrument_id = $paymentInstrumentId";
-      if (!empty($startDateFrom)) {
-        $startedSql .= " AND start_date >= '{$startDateFrom}'";
-      }
-      if (!empty($startDateTo)) {
-        $startedSql .= " AND start_date <= '{$startDateTo}'";
-      }
+      $startedSql = "SELECT count(*) as count FROM civicrm_contribution_recur WHERE payment_instrument_id = $paymentInstrumentId AND $startedDateSql ";
 
       $startedDao = CRM_Core_DAO::executeQuery($startedSql);
       $startedDao->fetch();
@@ -275,13 +269,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $rows[$rowNum]['civicrm_contribution_recur_start_date'] = $startedDao->count;
       $started = $started + $startedDao->count;
 
-      $cancelledSql = "SELECT count(*) as count FROM civicrm_contribution_recur WHERE payment_instrument_id = $paymentInstrumentId";
-      if (!empty($startDateFrom)) {
-        $cancelledSql .= " AND cancel_date >= '{$startDateFrom}'";
-      }
-      if (!empty($startDateTo)) {
-        $cancelledSql .= " AND cancel_date <= '{$startDateTo}'";
-      }
+      $cancelledSql = "SELECT count(*) as count FROM civicrm_contribution_recur WHERE payment_instrument_id = $paymentInstrumentId AND $cancelledDateSql ";
 
       $cancelledDao = CRM_Core_DAO::executeQuery($cancelledSql);
       $cancelledDao->fetch();
@@ -291,13 +279,17 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $cancelled = $cancelled + $cancelledDao->count;
 
       $activeSql = "SELECT count(*) as count FROM civicrm_contribution_recur WHERE payment_instrument_id = $paymentInstrumentId";
-      if (!empty($startDateFrom)) {
-        //$activeSql .= " AND start_date >= '{$startDateFrom}'";
-        //$activeSql .= " AND end_date >= '{$startDateFrom}'";
+      list($from, $to) = $this->getFromTo($startDateRelative, $startDateFrom, $startDateTo);
+      // To find active recurring contribution start date must be >= to start of selected date-range AND
+      // end date or cancel date must be >= to end of selected date-range if NOT null OR end date is null
+      if (!empty($from)) {
+        $activeSql .= " AND start_date >= '{$from}'";
       }
-      if (!empty($startDateTo)) {
-        $activeSql .= " AND start_date <= '{$startDateTo}'";
-        $activeSql .= " AND (end_date <= '{$startDateTo}' OR end_date IS NULL)";
+      if (!empty($to)) {
+        $activeSql .= " AND (
+        ( end_date >= '{$to}' AND end_date IS NOT NULL ) OR
+        ( cancel_date >= '{$to}' AND cancel_date IS NOT NULL ) OR
+        end_date IS NULL )";
       }
 
       $activeDao = CRM_Core_DAO::executeQuery($activeSql);
@@ -311,14 +303,8 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $amountSql = "
 	SELECT SUM(cc.total_amount) as amount FROM `civicrm_contribution` cc
 	INNER JOIN civicrm_contribution_recur cr ON (cr.id = cc.contribution_recur_id AND cr.payment_instrument_id = {$paymentInstrumentId})
-	WHERE cc.contribution_status_id = 1 AND cc.is_test = 0";
-      if (!empty($startDateFrom)) {
-        $amountSql .= " AND cc.`receive_date` >= '{$startDateFrom}'";
-      }
-      if (!empty($startDateTo)) {
-        $amountSql .= " AND cc.`receive_date` <= '{$startDateTo}'";
-      }
-
+	WHERE cc.contribution_status_id = 1 AND cc.is_test = 0 AND ";
+      $amountSql .= str_replace("start_date", "cc.`receive_date`", $startedDateSql);
       $amountDao = CRM_Core_DAO::executeQuery($amountSql);
       $amountDao->fetch();
       if ($amountDao->amount) {

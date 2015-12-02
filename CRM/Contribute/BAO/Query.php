@@ -519,7 +519,7 @@ class CRM_Contribute_BAO_Query {
 
       case 'contribution_recur_payment_made':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.id", 'IS NOT EMPTY');
-        if ($value) {
+        if ($value == 2) {
           $query->_qill[$grouping][] = ts("Recurring contributions with at least one payment");
           self::$_contribRecurPayment = TRUE;
         }
@@ -645,7 +645,7 @@ class CRM_Contribute_BAO_Query {
           // 'Made payment for the recurring contributions?' is ticked yes
           $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
           if (self::$_contribRecurPayment == TRUE) {
-            $from .= " AND civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id ";
+            $from .= " INNER JOIN civicrm_contribution cr ON cr.contribution_recur_id = civicrm_contribution_recur.id ";
           }
         }
         else {

@@ -3078,7 +3078,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE &&
+          if ((CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE ||
+              CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_TIME) &&
             CRM_Utils_Array::value('operatorType', $field) !=
             CRM_Report_Form::OP_MONTH
           ) {
