@@ -31,8 +31,22 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for field options
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
+
+  /** @var  CRM_Utils_Hook_UnitTests */
+  public $hookClass;
+
+  /** @var array */
+  public $replaceOptions;
+
+  /** @var array */
+  public $appendOptions;
+
+  /** @var string */
+  public $targetField;
+
   public function setUp() {
     parent::setUp();
+    $this->hookClass = CRM_Utils_Hook::singleton();
   }
 
   /**
@@ -89,6 +103,51 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
         // Ensure count of optionValues is not extraordinarily high.
         $max = CRM_Utils_Array::value('max', $field, 10);
         $this->assertLessThanOrEqual($max, count($optionValues), $message);
+      }
+    }
+  }
+
+  /**
+   * Ensure hook_civicrm_fieldOptions is working
+   */
+  public function testHookFieldOptions() {
+    $this->hookClass->setHook('civicrm_fieldOptions', array($this, 'hook_civicrm_fieldOptions'));
+    CRM_Core_PseudoConstant::flush();
+
+    // Test replacing all options with a hook
+    $this->targetField = 'case_type_id';
+    $this->replaceOptions = array('foo' => 'Foo', 'bar' => 'Bar');
+    $result = $this->callAPISuccess('case', 'getoptions', array('field' => 'case_type_id'));
+    $this->assertEquals($result['values'], $this->replaceOptions);
+
+    // TargetField doesn't match - should get unmodified option list
+    $originalGender = CRM_Contact_BAO_Contact::buildOptions('gender_id');
+    $this->assertNotEquals($originalGender, $this->replaceOptions);
+
+    // This time we should get foo bar appended to the list
+    $this->targetField = 'gender_id';
+    $this->appendOptions = array('foo' => 'Foo', 'bar' => 'Bar');
+    $this->replaceOptions = NULL;
+    CRM_Core_PseudoConstant::flush();
+    $result = CRM_Contact_BAO_Contact::buildOptions('gender_id');
+    $this->assertEquals($result, $originalGender + $this->appendOptions);
+  }
+
+  /**
+   * Implements hook_civicrm_fieldOptions
+   *
+   * @param $entity
+   * @param $field
+   * @param $options
+   * @param $params
+   */
+  public function hook_civicrm_fieldOptions($entity, $field, &$options, $params) {
+    if ($field == $this->targetField) {
+      if (is_array($this->replaceOptions)) {
+        $options = $this->replaceOptions;
+      }
+      if ($this->appendOptions) {
+        $options += $this->appendOptions;
       }
     }
   }
