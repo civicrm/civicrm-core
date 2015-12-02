@@ -373,4 +373,28 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->customGroupDelete($custom_ids['custom_group_id']);
   }
 
+  public function testCaseGetByStatus() {
+    // Create 2 cases with different status ids.
+    $case1 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => 17,
+      'subject' => "Test case 1",
+      'case_type_id' => $this->caseTypeId,
+      'status_id' => "Open",
+      'sequential' => 1,
+    ));
+    $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => 17,
+      'subject' => "Test case 2",
+      'case_type_id' => $this->caseTypeId,
+      'status_id' => "Urgent",
+      'sequential' => 1,
+    ));
+    $result = $this->callAPISuccessGetSingle('Case', array(
+      'sequential' => 1,
+      'contact_id' => 17,
+      'status_id' => "Open",
+    ));
+    $this->assertEquals($case1['id'], $result['id']);
+  }
+
 }
