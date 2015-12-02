@@ -36,7 +36,7 @@ class CRM_Utils_VersionCheck {
   const
     PINGBACK_URL = 'http://latest.civicrm.org/stable.php?format=json',
     // timeout for when the connection or the server is slow
-    CHECK_TIMEOUT = 5,
+    CHECK_TIMEOUT = 1,
     // relative to $civicrm_root
     LOCALFILE_NAME = 'civicrm-version.php',
     // relative to $config->uploadDir
