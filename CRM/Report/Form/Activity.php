@@ -664,7 +664,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     }
   }
 
-    /**
+  /**
    * @param $fields
    * @param $files
    * @param $self
