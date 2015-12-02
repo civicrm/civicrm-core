@@ -182,7 +182,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $details['fee_level']   = $dao->fee_level;
       $details['fee_amount'] = $dao->fee_amount;
       $details['register_date'] = $dao->register_date;
-      $details['event_start_date'] = $dao->start_date; 
+      $details['event_start_date'] = $dao->start_date;
     }
     $this->assign('details', $details);
     //This participant row will be cancelled.  Get line item(s) to cancel
