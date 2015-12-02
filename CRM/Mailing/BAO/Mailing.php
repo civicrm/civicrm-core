@@ -2864,9 +2864,11 @@ WHERE  civicrm_mailing_job.id = %1
     $mailerJobsMax = Civi::settings()->get('mailerJobsMax');
     if (is_numeric($mailerJobsMax) && $mailerJobsMax > 0) {
       $lockArray = range(1, $mailerJobsMax);
+
+      // Shuffle the array to improve chances of quickly finding an open thread
       shuffle($lockArray);
 
-      // check if we are using global locks
+      // Check if we are using global locks
       foreach ($lockArray as $lockID) {
         $cronLock = Civi::lockManager()->acquire("worker.mailing.send.{$lockID}");
         if ($cronLock->isAcquired()) {
@@ -2875,9 +2877,9 @@ WHERE  civicrm_mailing_job.id = %1
         }
       }
 
-      // exit here since we have enuf cronjobs running
+      // Exit here since we have enough mailing processes running
       if (!$gotCronLock) {
-        CRM_Core_Error::debug_log_message('Returning early, since max number of cronjobs running');
+        CRM_Core_Error::debug_log_message('Returning early, since the maximum number of mailing processes are running');
         return TRUE;
       }
 
@@ -2887,15 +2889,13 @@ WHERE  civicrm_mailing_job.id = %1
       }
     }
 
-    // load bootstrap to call hooks
-
     // Split up the parent jobs into multiple child jobs
     $mailerJobSize = Civi::settings()->get('mailerJobSize');
     CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs_post($mode);
 
-    // lets release the global cron lock if we do have one
+    // Release the global lock if we do have one
     if ($gotCronLock) {
       $cronLock->release();
     }
