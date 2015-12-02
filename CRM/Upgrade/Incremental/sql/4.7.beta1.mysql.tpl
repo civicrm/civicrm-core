@@ -37,3 +37,6 @@ INSERT INTO civicrm_participant_status_type(name, {localize field='label'}label{
 VALUES ('Transferred', {localize}'{ts escape="sql"}Transferred{/ts}'{/localize}, 'Negative', 1, 1, 0, 16, 2);
 
 {include file='../CRM/Upgrade/4.7.beta1.msg_template/civicrm_msg_template.tpl'}
+
+-- CRM-16259 Added is_payment flag
+ALTER TABLE civicrm_financial_trxn ADD COLUMN is_payment tinyint(4) DEFAULT '0' COMMENT 'Is this entry either a payment or a reversal of a payment?';
