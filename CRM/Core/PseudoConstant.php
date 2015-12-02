@@ -180,12 +180,6 @@ class CRM_Core_PseudoConstant {
   private static $accountOptionValues;
 
   /**
-   * Tax Rates
-   * @var array
-   */
-  private static $taxRates;
-
-  /**
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
@@ -1848,8 +1842,8 @@ WHERE  id = %1
    *   array list of tax rates with the financial type
    */
   public static function getTaxRates() {
-    if (!self::$taxRates) {
-      self::$taxRates = array();
+    if (!isset(Civi::$statics[__CLASS__]['taxRates'])) {
+      Civi::$statics[__CLASS__]['taxRates'] = array();
       $sql = "
         SELECT fa.tax_rate, efa.entity_id
         FROM civicrm_entity_financial_account efa
@@ -1862,11 +1856,11 @@ WHERE  id = %1
         AND fa.is_active = 1";
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
-        self::$taxRates[$dao->entity_id] = $dao->tax_rate;
+        Civi::$statics[__CLASS__]['taxRates'][$dao->entity_id] = $dao->tax_rate;
       }
     }
 
-    return self::$taxRates;
+    return Civi::$statics[__CLASS__]['taxRates'];
   }
 
 }
