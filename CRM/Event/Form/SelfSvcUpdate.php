@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                          |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -145,10 +144,11 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_participant_id, 'contribution_id', 'participant_id');
     $this->assign('contributionId', $contributionId);
     $query = "
-      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id
+      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id, civicrm_event.start_date
       FROM civicrm_participant cp
       LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
       LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
+      LEFT JOIN civicrm_event ON civicrm_event.id = cp.event_id
       WHERE cp.id = {$this->_participant_id}";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     while ($dao->fetch()) {
@@ -157,6 +157,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $details['fee_level']   = $dao->fee_level;
       $details['fee_amount'] = $dao->fee_amount;
       $details['register_date'] = $dao->register_date;
+      $details['event_start_date'] = $dao->start_date; 
     }
     //verify participant status is still Registered
     if ($details['status'] != "Registered") {
@@ -202,21 +203,16 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * return @void
    */
   public function buildQuickForm() {
-    $this->add('text', 'email', ts('Email'), ts($this->_contact_email), TRUE);
-    $this->add('text', 'participant', ts('Participant name'), ts($this->_contact_name), TRUE);
-    $this->add('select', 'action', 'Action', array('-select-', 'Transfer', 'Cancel'));
+    $this->add('select', 'action', ts('Transfer or Cancel Registration'), array(ts('-select-'), ts('Transfer'), ts('Cancel')), TRUE);
     $this->addButtons(array(
       array(
         'type' => 'submit',
         'name' => ts('Submit'),
       ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
     ));
     parent::buildQuickForm();
   }
+
   /**
    * Set default values for contact
    *
@@ -224,11 +220,10 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $this->_defaults = array();
-    $this->_defaults['email'] = $this->_contact_email;
-    $this->_defaults['participant'] = $this->_contact_name;
     $this->_defaults['details'] = $this->_details;
     return $this->_defaults;
   }
+
   /**
    * Process submit form - based on user selection of action
    * transfer or cancel the event
@@ -249,6 +244,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $this->cancelParticipant($params);
     }
   }
+
   /**
    * Transfer to a new form, allowing selection of a new contact
    * based on email and name. The Event will be transferred to this new participant
@@ -262,6 +258,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext($url);
   }
+
   /**
    * Cancel this participant and finish, send cancellation email. At this point no
    * auto-cancellation of payment is handled, so payment needs to be manually cancelled
