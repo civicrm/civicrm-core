@@ -794,6 +794,23 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Hook for modifying field options
+   *
+   * @param string $entity
+   * @param string $field
+   * @param array $options
+   * @param array $params
+   *
+   * @return mixed
+   */
+  public static function fieldOptions($entity, $field, &$options, $params) {
+    return self::singleton()->invoke(5, $entity, $field, $options, $params,
+      self::$_nullObject, self::$_nullObject,
+      'civicrm_fieldOptions'
+    );
+  }
+
+  /**
    *
    * This hook is called to display the list of actions allowed after doing a search.
    * This allows the module developer to inject additional actions or to remove existing actions.
