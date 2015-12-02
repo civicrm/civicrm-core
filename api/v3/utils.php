@@ -847,8 +847,12 @@ SELECT f.id, f.label, f.data_type,
  *   Are we just after the count.
  * @param int $mode
  *   This basically correlates to the component.
+ * @param null|array $defaultReturnProperties
+ *   Default return properties for the entity
+ *  (used if return not set - but don't do that - set return!).
  *
  * @return array
+ * @throws API_Exception
  */
 function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL, $mode = 1, $defaultReturnProperties = NULL) {
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
