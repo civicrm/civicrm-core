@@ -46,7 +46,7 @@ var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
 var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
 var symbol         = '{/literal}{$currencySymbol}{literal}';
 var optionSep      = '|';
-var priceSet = price = Array();
+
 cj("#priceset [price]").each(function () {
 
     var elementType =  cj(this).attr('type');
@@ -185,13 +185,14 @@ function display(totalfee) {
     totalfee = Math.round(totalfee*100)/100;
     var totalEventFee  = formatMoney( totalfee, 2, separator, thousandMarker);
     document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
-    scriptfee   = totalfee;
 
     cj('#total_amount').val( totalfee );
     cj('#pricevalue').data('raw-total', totalfee).trigger('change');
 
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
     if (typeof skipPaymentMethod == 'function') {
+      // Advice to anyone who, like me, feels hatred towards this if construct ... if you remove the if you
+      // get an error on participant 2 of a event that requires approval & permits multiple registrants.
       skipPaymentMethod();
     }
 }
