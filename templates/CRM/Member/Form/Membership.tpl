@@ -174,15 +174,17 @@
         {/if}
         {include file="CRM/Member/Form/MembershipCommon.tpl"}
 
-        {if $emailExists and $outBound_option != 2}
+        {if $emailExists and $isEmailEnabledForSite}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
             <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1 ?{/ts} {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
+            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
           </tr>
-          {elseif $context eq 'standalone' and $outBound_option != 2}
+          {elseif $context eq 'standalone' and $isEmailEnabledForSite}
           <tr id="email-receipt" style="display:none;">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
             <span class="description">{ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>? {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
+            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
           </tr>
         {/if}
         <tr id="fromEmail" style="display:none;">
@@ -377,35 +379,36 @@
       }
     }
 
+    function showEmailOptions() {
+      {/literal}
+      // @todo emailExists refers to the primary contact for the page.
+      // elsewhere some script determines if there is a paying contact the
+      // email should go to instead (e.g gift membership). This should be checked for here
+      // and that merged into that code as currently behaviour is inconsistent.
+      var emailExists = '{$emailExists}';
+      var isStandalone = ('{$context}' == 'standalone');
+      var isEmailEnabledForSite = {$isEmailEnabledForSite};
+
+      {literal}
+      var isEmailable = (isEmailEnabledForSite && (emailExists || isStandalone));
+
+      if (isEmailable && cj('#send_receipt').prop('checked') && !cj('#auto_renew').prop('checked')) {
+        // Hide extra message and from email for recurring as they cannot be stored until use.
+        cj('#notice').show();
+        cj('#fromEmail').show();
+      }
+      else {
+        cj('#notice').hide();
+        cj('#fromEmail').hide();
+      }
+    }
     </script>
-    {/literal}
-
-    {if ($emailExists and $outBound_option != 2) OR $context eq 'standalone' }
-    {include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="send_receipt"
-    trigger_value       =""
-    target_element_id   ="notice"
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-    }
-    {include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="send_receipt"
-    trigger_value       =""
-    target_element_id   ="fromEmail"
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-    }
-    {/if}
-    {literal}
-
     <script type="text/javascript">
 
     {/literal}{if !$membershipMode}{literal}
     showHideMemberStatus();
     function showHideMemberStatus() {
-      if ( cj( "#is_override" ).prop('checked' ) ) {
+      if ( cj( "#is_override" ).prop('checked') ) {
         cj('#memberStatus').show( );
         cj('#memberStatus_show').hide( );
       }
@@ -416,7 +419,7 @@
     }
     {/literal}{/if}
 
-    {if $context eq 'standalone' and $outBound_option != 2 }
+    {if $context eq 'standalone' and $isEmailEnabledForSite }
     {literal}
     CRM.$(function($) {
       var $form = $("form.{/literal}{$form.formClass}{literal}");
@@ -452,6 +455,7 @@
           if ( $(this).attr( 'readonly' ) ) {
             $(this).prop('checked', true );
           }
+          showEmailOptions();
         });
       }
 
@@ -498,12 +502,10 @@
     {/literal}
 
     {if $membershipMode or $action eq 2}
+
+    buildAutoRenew( null, null, '{$membershipMode}');
     {literal}
-
-    buildAutoRenew( null, null );
-
-    function buildAutoRenew( membershipType, processorId ) {
-      var mode   = {/literal}'{$membershipMode}'{literal};
+    function buildAutoRenew( membershipType, processorId, mode ) {
       var action = {/literal}'{$action}'{literal};
 
       //for update lets hide it when not already recurring.
@@ -528,6 +530,7 @@
       if ( !processorId || !membershipType ) {
         cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide( );
+        showEmailOptions();
         return;
       }
 
@@ -537,7 +540,7 @@
 
       if ( !currentOption || !recurProcessors[processorId] ) {
         cj("#auto_renew").prop('checked', false );
-        cj("#autoRenew").hide( );
+        cj("#autoRenew").hide();
         return;
       }
 
@@ -557,36 +560,12 @@
         cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide( );
       }
-
-      //play w/ receipt option.
-      if ( cj("#auto_renew").prop('checked' ) ) {
-        cj("#notice").hide( );
-        cj("#send_receipt").prop('checked', false );
-        cj("#send-receipt").hide( );
-      }
-      else {
-        cj("#send-receipt").show( );
-        if ( cj("#send_receipt").prop('checked' ) ) {
-          cj("#notice").show( );
-        }
-      }
+      showEmailOptions();
     }
     {/literal}
     {/if}
 
     {literal}
-    function buildReceiptANDNotice( ) {
-      if ( cj("#auto_renew").prop('checked' ) ) {
-        cj("#notice").hide( );
-        cj("#send-receipt").hide( );
-      }
-      else {
-        cj("#send-receipt").show( );
-        if ( cj("#send_receipt").prop('checked' ) ) {
-          cj("#notice").show( );
-        }
-      }
-    }
 
     var customDataType = '{/literal}{$customDataType}{literal}';
 

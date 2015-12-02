@@ -563,7 +563,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     );
 
     if (!empty($this->_recurPaymentProcessors)) {
-      $memTypeJs['onChange'] = "" . $memTypeJs['onChange'] . 'buildAutoRenew(this.value, null);';
+      $memTypeJs['onChange'] = "" . $memTypeJs['onChange'] . "buildAutoRenew(this.value, null, '{$this->_mode}');";
     }
 
     $this->add('text', 'max_related', ts('Max related'),
@@ -681,7 +681,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->addElement('checkbox',
       'send_receipt',
       ts('Send Confirmation and Receipt?'), NULL,
-      array('onclick' => "showHideByValue( 'send_receipt', '', 'notice', 'table-row', 'radio', false); showHideByValue( 'send_receipt', '', 'fromEmail', 'table-row', 'radio', false);")
+      array('onclick' => "showEmailOptions()")
     );
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
@@ -718,8 +718,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('isRecur', $isRecur);
 
     $this->addFormRule(array('CRM_Member_Form_Membership', 'formRule'), $this);
-
-    $this->assign('outBound_option', Civi::settings()->get('mailing_backend'));
+    $mailingInfo = Civi::settings()->get('mailing_backend');
+    $this->assign('isEmailEnabledForSite', ($mailingInfo['outBound_option'] != 2));
 
     parent::buildQuickForm();
   }
