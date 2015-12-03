@@ -507,7 +507,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    */
   public function postProcess() {
 
-    $ids = array();
+    $contributionRecurID = NULL;
     $config = CRM_Core_Config::singleton();
 
     // get the submitted form values.
@@ -616,7 +616,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       if (!empty($paymentParams['auto_renew'])) {
         $contributionRecurParams = $this->processRecurringContribution($paymentParams);
-        $this->_params['contributionRecurID'] = $contributionRecurParams['contributionRecurID'];
+        $contributionRecurID = $this->_params['contributionRecurID'] = $contributionRecurParams['contributionRecurID'];
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
       }
       $result = $payment->doDirectPayment($paymentParams);
@@ -735,7 +735,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // not a great pattern & ideally it would not receive as a reference. We assign our params as a
       // temporary variable to avoid e-notice & to make it clear to future refactorer that
       // this function is NOT reliant on that var being set
-      $temporaryParams = array_merge($formValues, array('membership_id' => $renewMembership->id));
+      $temporaryParams = array_merge($formValues, array('membership_id' => $renewMembership->id, 'contribution_recur_id' => $contributionRecurID));
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
