@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,31 +23,43 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-<div>
-    <table class="form-layout">
-         <tr class="crm-selfsvctransfer-form-block-email">
-          <td class="label">{$form.email.label}</td>
-            <td>{$form.email.html}</td>
-        </tr>
-	<tr class="crm-selfsvctransfer-form-block-participant">
-          <td class="label">{$form.last_name.label}</td>
-            <td>{$form.last_name.html}</td>
-  	<tr class="crm-selfsvctransfer-form-block-participant">
-          <td class="label">{$form.first_name.label}</td>
-            <td>{$form.first_name.html}</td>
-        </tr>
-      <table class="crm-selfsvctransfer-form-details"><col width="30"><col width="50"><col width="20"><col width="10"><col width="10"><col width="12"><col width="10">
-         <tr><th>Participant</th><th>Event</th><th>Fee Level</th><th>Fee Amt</th><th>Reg Date</th><th>Status</th><th>Role</th>
-         </tr>
-          <tr class="crm-selfsvctransfer-form-details">
-            <td>{$details.name}</td><td>{$details.title}</td>
-            <td class="crm-participant-participant_fee_level">{$details.fee_level}</td>
-            <td class="right nowrap crm-paticipant-participant_fee_amount">{$details.fee_amount}</td>
-            <td>{$details.register_date|truncate:10:''|crmDate}</td>
-            <td>{$details.status}</td><td class="crm-participant-participant_role">{$details.role}</td>
-         </tr>
-       </table>
-   </table>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+<div class="crm-selfsvctransfer-form">
+  <table class="crm-selfsvctransfer-form-details">
+    <tr>
+      <th>{ts}Current<br />Participant{/ts}</th>
+      <th>{ts}Event{/ts}</th>
+      <th>{ts}Fee Level{/ts}</th>
+      <th>{ts}Amount{/ts}</th>
+      <th>{ts}Registered{/ts}</th>
+      <th>{ts}Status{/ts}</th>
+      <th>{ts}Role{/ts}</th>
+    </tr>
+    <tr class="crm-selfsvctransfer-form-details">
+      <td>{$details.name}</td>
+      <td>{$details.title}<br />{$details.event_start_date|truncate:10:''|crmDate}</td>
+      <td class="crm-participant-participant_fee_level">{$details.fee_level}</td>
+      <td class="right nowrap crm-paticipant-participant_fee_amount">{$details.fee_amount}</td>
+      <td>{$details.register_date|truncate:10:''|crmDate}</td>
+      <td>{$details.status}</td>
+      <td class="crm-participant-participant_role">{$details.role}</td>
+    </tr>
+  </table>
+  <div class="crm-public-form-item crm-section selfsvctransfer-section">
+    <div class="crm-public-form-item crm-section selfsvctransfer-firstname-section">
+      <div class="label">{$form.first_name.label}</div>
+      <div class="content">{$form.first_name.html}</div>
+      <div class="clear"></div>
+    </div>
+    <div class="crm-public-form-item crm-section selfsvctransfer-lastname-section">
+      <div class="label">{$form.last_name.label}</div>
+      <div class="content">{$form.last_name.html}</div>
+      <div class="clear"></div>
+   </div>
+   <div class="crm-public-form-item crm-section selfsvctransfer-email-section">
+     <div class="label">{$form.email.label}</div>
+     <div class="content">{$form.email.html}</div>
+     <div class="clear"></div>
+   </div>
+  </div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
