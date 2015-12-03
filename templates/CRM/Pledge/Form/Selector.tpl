@@ -57,7 +57,7 @@
                 <td>{$form.$cbName.html}</td>
             {/if}
             <td>
-                <a class="crm-expand-row" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
+                <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
             </td>
             {if ! $single }
                 <td>
