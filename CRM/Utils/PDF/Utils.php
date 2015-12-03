@@ -84,12 +84,18 @@ class CRM_Utils_PDF_Utils {
     $margins = array($metric, $t, $r, $b, $l);
 
     $config = CRM_Core_Config::singleton();
+
+    // Add a special region for the HTML header of PDF files:
+    $pdfHeaderRegion = CRM_Core_Region::instance('pdf-header', FALSE);
+    $htmlHeader = ($pdfHeaderRegion) ? $pdfHeaderRegion->render('', FALSE) : '';
+
     $html = "
 <html>
   <head>
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
     <style>@page { margin: {$t}{$metric} {$r}{$metric} {$b}{$metric} {$l}{$metric}; }</style>
     <style type=\"text/css\">@import url({$config->userFrameworkResourceURL}css/print.css);</style>
+    {$htmlHeader}
   </head>
   <body>
     <div id=\"crm-container\">\n";
