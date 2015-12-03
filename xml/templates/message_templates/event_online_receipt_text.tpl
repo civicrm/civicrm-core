@@ -303,6 +303,7 @@ You were registered by: {$payer.name}
 {/foreach}
 {/foreach}
 {/if}
+
 {if $event.allow_selfcancelxfer }
 {ts 1=$event.selfcancelxfer_time}You may transfer your registration to another participant or cancel your registration up to %1 hours before the event.{/ts} {if $totalAmount}{ts}Cancellations are not refundable.{/ts}{/if}
    {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
