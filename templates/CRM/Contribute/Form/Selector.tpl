@@ -62,21 +62,16 @@
           <td>{$form.$cbName.html}</td>
    {/if}
 
-    <td>{$row.contact_type}</td>
-      <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+      <td>{$row.contact_type} &nbsp; <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
     {/if}
-    <td>
-      <a class="crm-expand-row" href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$row.contact_id`&id=`$row.contribution_id`&selector=1"}"></a>
+    <td class="crm-contribution-amount">
+      <a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$row.contact_id`&id=`$row.contribution_id`&selector=1"}">
+      &nbsp;
+      {if !$row.contribution_soft_credit_amount}{$row.total_amount|crmMoney:$row.currency}{/if}
+      </a>
+      {if $row.amount_level }<br /> ({$row.amount_level}){/if}
+      {if $row.contribution_recur_id}<br /> {ts}(Recurring Contribution){/ts}{/if}
     </td>
-    {if $row.contribution_soft_credit_amount}
-      <td class="right bold crm-contribution-amount">&nbsp;</td>
-    {else}
-      <td class="right bold crm-contribution-amount"><span class="nowrap">{$row.total_amount|crmMoney:$row.currency}</span> {if $row.amount_level }<br /> ({$row.amount_level}){/if}
-      {if $row.contribution_recur_id}
-  <br /> {ts}(Recurring Contribution){/ts}
-      {/if}
-      </td>
-    {/if}
     {if $softCreditColumns}
       <td class="right bold crm-contribution-soft_credit_amount"><span class="nowrap">{$row.contribution_soft_credit_amount|crmMoney:$row.currency}</span></td>
     {/if}
