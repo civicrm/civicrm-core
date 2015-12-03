@@ -118,16 +118,16 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_userContext = $session->readUserContext();
     $participant = $values = array();
     $this->_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
-    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
+    $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
     $params = array('id' => $this->_participant_id);
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
     $this->_part_values = $values[$this->_participant_id];
     $this->set('values', $this->_part_values);
     //fetch Event by event_id, verify that this event can still be xferred/cancelled
     $this->_event_id = $this->_part_values['event_id'];
-    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}&noFullMsg=true");
+    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
     $this->_contact_id = $this->_part_values['participant_contact_id'];
-    $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contact_id, $userChecksum);
+    $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contact_id, $this->_userChecksum);
     if (!$validUser && !CRM_Core_Permission::check('edit all events')) {
       CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
     }
@@ -275,7 +275,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    */
   public function transferParticipant($params) {
     $transferUrl = 'civicrm/event/form/selfsvctransfer';
-    $url = CRM_Utils_System::url('civicrm/event/selfsvctransfer', 'reset=1&action=add&pid=' . $this->_participant_id);
+    $url = CRM_Utils_System::url('civicrm/event/selfsvctransfer', 'reset=1&action=add&pid=' . $this->_participant_id . '&cs=' . $this->_userChecksum);
     $this->controller->setDestination($url);
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext($url);
