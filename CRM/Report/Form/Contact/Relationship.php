@@ -504,7 +504,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         //for displaying relationship type filter
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
-          $op = CRM_Utils_array::value('relationship_type_id_op', $this->_params) == 'in' ? 
+          $op = CRM_Utils_array::value('relationship_type_id_op', $this->_params) == 'in' ?
             ts('Is one of') . ' ' : ts('Is not one of') . ' ';
           $relationshipTypes = array();
           foreach ($this->_params['relationship_type_id_value'] as $relationship) {
