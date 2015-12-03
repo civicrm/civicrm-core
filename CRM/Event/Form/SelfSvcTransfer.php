@@ -134,6 +134,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * @array string
    */
   protected $contact_id;
+
   /**
    * Get source values for transfer based on participant id in URL. Line items will
    * be transferred to this participant - at this point no transaction changes processed
@@ -168,10 +169,11 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $details = CRM_Event_BAO_Participant::participantDetails($this->_from_participant_id);
     $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
     $query = "
-      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date
+      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, civicrm_event.start_date
       FROM civicrm_participant cp
       LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
       LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
+      LEFT JOIN civicrm_event ON civicrm_event.id = cp.event_id
       WHERE cp.id = {$this->_from_participant_id}";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     while ($dao->fetch()) {
@@ -180,6 +182,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $details['fee_level']   = $dao->fee_level;
       $details['fee_amount'] = $dao->fee_amount;
       $details['register_date'] = $dao->register_date;
+      $details['event_start_date'] = $dao->start_date;
     }
     $this->assign('details', $details);
     //This participant row will be cancelled.  Get line item(s) to cancel
@@ -188,6 +191,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->selfsvctransferText = ts('Update');
     $this->selfsvctransferButtonText = ts('Update');
   }
+
   /**
    * Build form for input of transferree email, name
    *
@@ -195,20 +199,18 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->add('text', 'email', ts('To Email'), ts($this->_contact_email), TRUE);
-    $this->add('text', 'last_name', ts('To Last name'), ts($this->_to_contact_last_name), TRUE);
-    $this->add('text', 'first_name', ts('To First name'), ts($this->_to_contact_first_name), TRUE);
+    $this->add('text', 'last_name', ts('To Last Name'), ts($this->_to_contact_last_name), TRUE);
+    $this->add('text', 'first_name', ts('To First Name'), ts($this->_to_contact_first_name), TRUE);
     $this->addButtons(array(
       array(
         'type' => 'submit',
-        'name' => ts('Submit'),),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),),
+        'name' => ts('Transfer Registration'),),
       )
     );
     $this->addFormRule(array('CRM_Event_Form_SelfSvcTransfer', 'formRule'), $this);
     parent::buildQuickForm();
   }
+
   /**
    * Set defaults
    *
@@ -218,6 +220,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_defaults = array();
     return $this->_defaults;
   }
+
   /**
    * Validate email and name input
    *
@@ -232,6 +235,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //return parent::formrule($fields, $files, $self);
     return empty($errors) ? TRUE : $errors;
   }
+
   /**
    * Check whether profile (name, email) is complete
    *
@@ -265,6 +269,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     return $contact_id;
   }
+
   /**
    * Check contact details
    *
@@ -287,6 +292,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       }
     }
   }
+
   /**
    * Process transfer - first add the new participant to the event, then cancel
    * source participant - send confirmation email to transferee
@@ -350,8 +356,9 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contact_id);
     $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $displayName));
     $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', array(1 => $email));
-    CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
+    CRM_Core_Session::setStatus($statusMsg, ts('Registration Transferred'), 'success');
   }
+
   /**
    * Based on input, create participant row for transferee and send email
    *
@@ -414,6 +421,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //now registered_id can be updated (mail won't be send if it is set
     return $res;
   }
+
   /**
    * Send confirmation of cancellation to source participant
    *
