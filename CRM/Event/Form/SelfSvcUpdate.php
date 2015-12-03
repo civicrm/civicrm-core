@@ -118,14 +118,19 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_userContext = $session->readUserContext();
     $participant = $values = array();
     $this->_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
+    $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
     $params = array('id' => $this->_participant_id);
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
     $this->_part_values = $values[$this->_participant_id];
     $this->set('values', $this->_part_values);
     //fetch Event by event_id, verify that this event can still be xferred/cancelled
     $this->_event_id = $this->_part_values['event_id'];
-    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}&noFullMsg=true");
+    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
     $this->_contact_id = $this->_part_values['participant_contact_id'];
+    $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contact_id, $this->_userChecksum);
+    if (!$validUser && !CRM_Core_Permission::check('edit all events')) {
+      CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
+    }
     $this->assign('action', $this->_action);
     if ($this->_participant_id) {
       $this->assign('participantId', $this->_participant_id);
@@ -175,8 +180,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $timenow = new Datetime();
     if (!empty($start_time) && $start_time < $timenow) {
       $status = ts("The event has been started, cannot transfer or cancel this event");
-      $session->setStatus($status, ts('Oops.'), 'alert');
-      CRM_Utils_System::redirect($url);
+      CRM_Core_Error::statusBounce($status, $url, ts('Oops'));
     }
     if (!empty($time_limit) && $time_limit > 0) {
       $interval = $timenow->diff($start_time);
@@ -184,8 +188,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $hours   = $interval->format('%h');
       if ($hours <= $time_limit && $days < 1) {
         $status = ts("Less than %1 hours to start time, cannot transfer or cancel this event", array(1 => $time_limit));
-        $session->setStatus($status, ts('Oops.'), 'alert');
-        CRM_Utils_System::redirect($url);
+        CRM_Core_Error::statusBounce($status, $url, ts('Oops'));
       }
     }
     $this->assign('details', $details);
@@ -210,6 +213,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
         'name' => ts('Submit'),
       ),
     ));
+    $this->addFormRule(array('CRM_Event_Form_SelfSvcUpdate', 'formRule'), $this);
     parent::buildQuickForm();
   }
 
@@ -222,6 +226,24 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_defaults = array();
     $this->_defaults['details'] = $this->_details;
     return $this->_defaults;
+  }
+
+  /**
+   * Validate action input
+   * @param array $fields
+   *   Posted fields of the form.
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   *   list of errors to be posted back to the form
+   */
+  public static function formRule($fields, $files, $self) {
+    $errors = array();
+    if (empty($fields['action'])) {
+      $errors['action'] = ts("Please select Transfer OR Cancel action.");
+    }
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**
@@ -253,7 +275,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    */
   public function transferParticipant($params) {
     $transferUrl = 'civicrm/event/form/selfsvctransfer';
-    $url = CRM_Utils_System::url('civicrm/event/selfsvctransfer', 'reset=1&action=add&pid=' . $this->_participant_id);
+    $url = CRM_Utils_System::url('civicrm/event/selfsvctransfer', 'reset=1&action=add&pid=' . $this->_participant_id . '&cs=' . $this->_userChecksum);
     $this->controller->setDestination($url);
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext($url);
