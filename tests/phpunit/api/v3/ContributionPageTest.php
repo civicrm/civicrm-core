@@ -641,7 +641,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
-    $this->assertEquals(2, $recurringContribution['contribution_status_id']);
+    $this->assertEquals(5, $recurringContribution['contribution_status_id']);
   }
 
   /**
