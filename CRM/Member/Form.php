@@ -239,13 +239,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $contributionRecurParams = array(
       'contact_id' => $paymentParams['contactID'],
       'amount' => $paymentParams['total_amount'],
+      'contribution_status_id' => 'Pending',
       'payment_processor_id' => $paymentParams['payment_processor_id'],
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams),
       'financial_type_id' => $paymentParams['financial_type_id'],
-      'is_email_receipt' => CRM_Utils_Array::value('is_email_receipt', $paymentParams),
-      // This is not great as it could also be direct debit - but is consistent with elsewhere & all need fixing.
+      'is_email_receipt' => $paymentParams['is_email_receipt'],
       'payment_instrument_id' => 1,
-      'invoice_id' => CRM_Utils_Array::value('invoiceID ', $paymentParams),
+      'invoice_id' => $paymentParams['invoice_id'],
     );
 
     $mapping = array(
