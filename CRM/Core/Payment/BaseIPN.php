@@ -141,14 +141,14 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @input array information from Payment processor
    *
-   * @param $input
+   * @param array $input
    * @param array $ids
    * @param array $objects
    * @param bool $required
    * @param int $paymentProcessorID
    * @param array $error_handling
    *
-   * @return bool
+   * @return bool|array
    */
   public function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {
@@ -221,7 +221,7 @@ class CRM_Core_Payment_BaseIPN {
     }
     $participant = &$objects['participant'];
 
-    //CRM-15546
+    // CRM-15546
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
         'labelColumn' => 'name',
         'flip' => 1,
@@ -297,8 +297,8 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Process cancelled payment outcome.
    *
-   * @param $objects
-   * @param $transaction
+   * @param array $objects
+   * @param CRM_Core_Transaction $transaction
    * @param array $input
    *
    * @return bool
@@ -375,8 +375,8 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Rollback unhandled outcomes.
    *
-   * @param $objects
-   * @param $transaction
+   * @param array $objects
+   * @param CRM_Core_Transaction $transaction
    *
    * @return bool
    */
@@ -437,7 +437,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $input
    * @param array $ids
    * @param array $objects
-   * @param $transaction
+   * @param CRM_Core_Transaction $transaction
    * @param bool $recur
    */
   public function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
@@ -478,7 +478,7 @@ class CRM_Core_Payment_BaseIPN {
    *   Incoming data from Payment processor.
    * @param array $ids
    *   Related object IDs.
-   * @param $objects
+   * @param array $objects
    * @param array $values
    *   Values related to objects that have already been loaded.
    * @param bool $recur
