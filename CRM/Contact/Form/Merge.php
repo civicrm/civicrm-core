@@ -44,9 +44,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
   var $_contactType = NULL;
 
-  // variable to keep all location block ids.
-  protected $_locBlockIds = array();
-
   // FIXME: QuickForm can't create advcheckboxes with value set to 0 or '0' :(
   // see HTML_QuickForm_advcheckbox::setValues() - but patching that doesn't
   // help, as QF doesn't put the 0-value elements in exportValues() anyway...
@@ -213,11 +210,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $this->assign('mainLocBlock', json_encode($rowsElementsAndInfo['main_loc_block']));
     $this->assign('rows', $rowsElementsAndInfo['rows']);
-
-    $this->_locBlockIds = array(
-      'main' => $rowsElementsAndInfo['main_details']['loc_block_ids'],
-      'other' => $rowsElementsAndInfo['other_details']['loc_block_ids'],
-    );
 
     // add elements
     foreach ($rowsElementsAndInfo['elements'] as $element) {

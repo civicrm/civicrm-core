@@ -3161,6 +3161,14 @@ div.m ul#civicrm-menu,
 }
 
 /* table row highlightng */
+.crm-container .crm-row-ok {
+  background-color: #EFFFE7;
+  border-bottom: 1px solid #ccc;
+}
+.crm-container .crm-row-error {
+  background-color: #FFECEC;
+  border-bottom: 1px solid #ccc;
+}
 .crm-container table.row-highlight tr:hover,
 .crm-container .crm-row-selected {
   background-color: #FFFFCC;
