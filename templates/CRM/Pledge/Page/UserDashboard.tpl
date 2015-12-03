@@ -44,25 +44,17 @@
     <td class="crm-pledge-pledge_next_pay_date">{$row.pledge_next_pay_date|truncate:10:''|crmDate}</td>
     <td class="crm-pledge-pledge_next_pay_amount">{$row.pledge_next_pay_amount|crmMoney:$row.pledge_currency}</td>
     <td class="crm-pledge-pledge_status crm-pledge-pledge_status_{$row.pledge_status}">{$row.pledge_status}</td>
-    <td>{if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ( $row.contact_id eq $loggedUserID ) }<a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$row.pledge_contribution_page_id`&pledgeId=`$row.pledge_id`"}">{ts}Make Payment{/ts}</a><br/>{/if}
-  <div id="{$row.pledge_id}_show">
-      <a href="#" onclick="cj('#paymentDetails{$row.pledge_id}').show(); buildPaymentDetails('{$row.pledge_id}','{$row.contact_id}'); cj('#{$row.pledge_id}_show').hide();cj('#{$row.pledge_id}_hide').show();return false;"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}open section{/ts}"/>{ts}Payments{/ts}</a>
-  </div>
+    <td>
+      {if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ( $row.contact_id eq $loggedUserID ) }
+        <a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$row.pledge_contribution_page_id`&pledgeId=`$row.pledge_id`"}">{ts}Make Payment{/ts}</a><br/>
+      {/if}
+      <a class="crm-expand-row" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}">{ts}Payments{/ts}</a>
     </td>
    </tr>
-   <tr id="{$row.pledge_id}_hide">
-     <td colspan="11">
-         <a href="#" onclick="cj('#{$row.pledge_id}_show').show();cj('#{$row.pledge_id}_hide').hide();return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}open section{/ts}"/>{ts}Payments{/ts}</a>
-       <br/>
-       <div id="paymentDetails{$row.pledge_id}"></div>
-     </td>
-  </tr>
- <script type="text/javascript">
-     cj('#{$row.pledge_id}_hide').hide();
- </script>
   {/foreach}
 </table>
 {/strip}
+{crmScript file='js/crm.expandRow.js'}
 {else}
 <div class="messages status no-popup">
          <div class="icon inform-icon"></div>
@@ -107,26 +99,3 @@
 </div>
 {* main if close*}
 {/if}
-
-{* Build pledge payment details*}
-{literal}
-<script type="text/javascript">
-
-function buildPaymentDetails( pledgeId, contactId )
-{
-    var dataUrl = {/literal}"{crmURL p='civicrm/pledge/payment' h=0 q="action=browse&context=`$context`&snippet=4&pledgeId="}"{literal} + pledgeId + '&cid=' + contactId;
-
-     cj.ajax({
-               url     : dataUrl,
-               dataType: "html",
-               timeout : 5000, //Time in milliseconds
-               success : function( data ){
-                              cj( '#paymentDetails' + pledgeId ).html( data ).trigger('crmLoad');
-                         },
-               error   : function( XMLHttpRequest, textStatus, errorThrown ) {
-                                 CRM.console('error', 'Error: ', textStatus);
-                        }
-         });
-}
-</script>
-{/literal}

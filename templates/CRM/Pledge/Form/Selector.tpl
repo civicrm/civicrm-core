@@ -57,23 +57,13 @@
                 <td>{$form.$cbName.html}</td>
             {/if}
             <td>
-                {if ! $single }
-                    &nbsp;{$row.contact_type}<br/>
-                {/if}
-                <span id="{$row.pledge_id}_show" title="{ts}Show payments{/ts}">
-                    <a href="#" onclick="cj('#paymentDetails{$row.pledge_id},#minus{$row.pledge_id}_hide,#{$row.pledge_id}_hide').show();
-                        buildPaymentDetails('{$row.pledge_id}','{$row.contact_id}');
-                        cj('#{$row.pledge_id}_show').hide();
-                        return false;"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="&gt;"/></a>
-                </span>
-                <span id="minus{$row.pledge_id}_hide" title="{ts}Hide payments{/ts}">
-                    <a href="#" onclick="cj('#paymentDetails{$row.pledge_id},#{$row.pledge_id}_hide,#minus{$row.pledge_id}_hide').hide();
-                            cj('#{$row.pledge_id}_show').show();
-                            return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="^"/></a>
-                </span>
+                <a class="crm-expand-row" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
             </td>
             {if ! $single }
-                <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+                <td>
+                    {$row.contact_type} &nbsp;
+                    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a>
+                </td>
             {/if}
             <td class="right">{$row.pledge_amount|crmMoney:$row.pledge_currency}</td>
             <td class="right">{$row.pledge_total_paid|crmMoney:$row.pledge_currency}</td>
@@ -85,14 +75,6 @@
             <td>{$row.pledge_status}</td>
             <td>{$row.action|replace:'xx':$row.pledge_id}</td>
         </tr>
-        <tr id="{$row.pledge_id}_hide" class='{$rowClass}'>
-            <td style="border-right: none;"></td>
-            <td colspan= {if $context EQ 'Search'} "10" {else} "8" {/if} class="enclosingNested" id="paymentDetails{$row.pledge_id}">&nbsp;</td>
-        </tr>
-        <script type="text/javascript">
-            cj('#{$row.pledge_id}_hide').hide();
-            cj('#minus{$row.pledge_id}_hide').hide();
-        </script>
     {/foreach}
 
     {* Dashboard only lists 10 most recent pledges. *}
@@ -107,17 +89,4 @@
 
     {include file="CRM/common/pager.tpl" location="bottom"}
 
-{* Build pledge payment details*}
-{literal}
-<script type="text/javascript">
-  (function($) {
-    // FIXME global function
-    window.buildPaymentDetails = function(pledgeId, contactId) {
-      var dataUrl = {/literal}"{crmURL p='civicrm/pledge/payment' h=0 q="action=browse&snippet=4&context=`$context`&pledgeId="}"{literal} + pledgeId + '&cid=' + contactId;
-      $('#paymentDetails' + pledgeId).load(dataUrl, function() {
-        $(this).trigger('crmLoad');
-      });
-    };
-  })(CRM.$);
-</script>
-{/literal}
+{crmScript file='js/crm.expandRow.js'}
