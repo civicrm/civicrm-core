@@ -133,3 +133,32 @@ li.menu-separator{
   height: 16px;
   vertical-align:middle;
 }
+
+#civicrm-menu .ui-autocomplete-input,
+.crm-container .ui-autocomplete-input {
+  background: white url("../bower_components/select2/select2.png") no-repeat scroll right -23px;
+  padding-right: 16px;
+  /* so that text doesn't flow on top of icon */
+}
+
+#civicrm-menu #crm-qsearch {
+  padding: 1px 3px 1px 2px;
+  background-color: #000 !important;
+}
+
+#civicrm-menu #crm-qsearch input {
+  background-color: #eaeaea;
+  border: 1px solid black;
+  margin: 0;
+  padding: 2px 16px 3px 2px;
+  height: 16px;
+}
+#civicrm-menu #crm-qsearch input:hover,
+#civicrm-menu #crm-qsearch input:focus,
+#civicrm-menu #crm-qsearch.activetarget input {
+  background-color: #ffffff;
+}
+/* This ensures the drop-down menus appear at the right height */
+#civicrm-menu > li.menumain {
+  height: 19px !important;
+}
