@@ -57,7 +57,7 @@ function civicrm_api3_payment_get($params) {
       $values['contribution_id'] = $map[$values['id']];
     }
   }
-  return civicrm_api3_create_success($financialTrxn['values'], $params, 'Payment', 'cancel');
+  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $financialTrxn), $params, 'Payment', 'get');
 }
 
 /**
