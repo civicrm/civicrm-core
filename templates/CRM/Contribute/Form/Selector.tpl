@@ -65,8 +65,9 @@
     <td>{$row.contact_type}</td>
       <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
     {/if}
-    {assign var="targetRowID" value="paymentDetails"|cat:$row.contribution_id}
-    {include file='CRM/common/expandRow.tpl' rowEntityID=$row.contribution_id rowEntity='contribution' targetRowID=$targetRowID baseUrl='payment'}
+    <td>
+      <a class="crm-expand-row" href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$row.contact_id`&id=`$row.contribution_id`&selector=1"}"></a>
+    </td>
     {if $row.contribution_soft_credit_amount}
       <td class="right bold crm-contribution-amount">&nbsp;</td>
     {else}
@@ -96,14 +97,11 @@
     {/if}
     <td>{$row.action|replace:'xx':$row.contribution_id}</td>
   </tr>
-    <tr id="{$targetRowID}_row" class='{$rowClass} hiddenElement'>
-      <td style="border-right: none;"></td>
-      <td colspan= {if $context EQ 'Search'} "10" {else} "8" {/if} class="enclosingNested" id="{$targetRowID}">&nbsp;</td>
-    </tr>
   {/foreach}
 
 </table>
 {/strip}
 
 {include file="CRM/common/pager.tpl" location="bottom"}
+{crmScript ext='civicrm' file='js/crm.expandRow.js'}
 
