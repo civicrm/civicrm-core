@@ -217,9 +217,16 @@ function _civicrm_api3_payment_get_spec(&$params) {
       'title' => 'Contribution ID',
       'type' => CRM_Utils_Type::T_INT,
     ),
+    'entity_table' => array(
+      'title' => 'Entity Table',
+      'api.default' => 'civicrm_contribution',
+    ),
+    'entity_id' => array(
+      'title' => 'Entity ID',
+      'type' => CRM_Utils_Type::T_INT,
+      'api.aliases' => array('contribution_id'),
+    ),
   );
-  $params['entity_table']['api.default'] = 'civicrm_contribution';
-  $params['entity_id']['api.aliases'] = array('contribution_id');
 }
 
 /**
