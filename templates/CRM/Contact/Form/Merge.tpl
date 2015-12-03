@@ -28,6 +28,20 @@
 {ts}Click <strong>Merge</strong> to move data from the Duplicate Contact on the left into the Main Contact. In addition to the contact data (address, phone, email...), you may choose to move all or some of the related activity records (groups, contributions, memberships, etc.).{/ts} {help id="intro"}
 </div>
 
+<div class="message status">
+  <div class="icon inform-icon"></div>
+  <strong>{ts}WARNING: The duplicate contact record WILL BE DELETED after the merge is complete.{/ts}</strong>
+</div>
+
+{if $user}
+  <div class="message status">
+    <div class="icon inform-icon"></div>
+    <strong>{ts 1=$config->userFramework}WARNING: There are %1 user accounts associated with both the original and duplicate contacts. Ensure that the %1 user you want to retain is on the right - if necessary use the 'Flip between original and duplicate contacts.' option at top to swap the positions of the two records before doing the merge.
+The user record associated with the duplicate contact will not be deleted, but will be unlinked from the associated contact record (which will be deleted).
+You will need to manually delete that user (click on the link to open the %1 user account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong>
+  </div>
+{/if}
+
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="top"}
 </div>
@@ -48,67 +62,104 @@
   </a>
 </div>
 
+<div class="action-link">
+  <a href="javascript:void(0);" class="action-item crm-hover-button toggle_equal_rows">
+    <i class="crm-i fa-eye-slash"></i>
+    {ts}Show/hide rows with the same data on each contact record.{/ts}
+  </a>
+</div>
+
 <table class="row-highlight">
   <tr class="columnheader">
     <th>&nbsp;</th>
     <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}</a> ({ts}duplicate{/ts})</th>
     <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
     <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name}</a></th>
+    <th width="300">Add/overwrite?</th>
   </tr>
+
+  {crmAPI var='other_result' entity='Contact' action='get' return="modified_date" id=$other_cid}
+
+  {crmAPI var='main_result' entity='Contact' action='get' return="modified_date" id=$main_cid}
+
+  <tr>
+    <td>Last modified</td>
+    <td>{$other_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} (Most recent) {/if}</td>
+    <td></td>
+    <td>{$main_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $main_result.values.0.modified_date gt $other_result.values.0.modified_date} (Most recent) {/if}</td>
+    <td></td>
+  </tr>
+
   {foreach from=$rows item=row key=field}
-     <tr class="{cycle values="odd-row,even-row"}">
-        <td>{$row.title}</td>
+
+    {if !isset($row.main) && !isset($row.other)}
+      <tr style="background-color: #fff !important; border-bottom:1px solid #ccc !important;" class="no-data">
         <td>
-          {if !is_array($row.other)}
-            {$row.other}
-          {elseif $row.other.fileName}
-            {$row.other.fileName}
-          {else}
-            {', '|implode:$row.other}
-          {/if}
+          <strong>{$row.title}</strong>
         </td>
-        <td style='white-space: nowrap'>{if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}</td>
-        <td>
-            {if $row.title|substr:0:5 == "Email"   OR
-                $row.title|substr:0:7 == "Address" OR
-                $row.title|substr:0:2 == "IM"      OR
-                $row.title|substr:0:6 == "OpenID"  OR
-                $row.title|substr:0:5 == "Phone"}
-
-          {assign var=position  value=$field|strrpos:'_'}
-                {assign var=blockId   value=$field|substr:$position+1}
-                {assign var=blockName value=$field|substr:14:$position-14}
-
-                {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
-                {if $blockName eq 'email' || $blockName eq 'phone' }
-     <span id="main_{$blockName}_{$blockId}_overwrite">{if $row.main}(overwrite){$form.location.$blockName.$blockId.operation.html}&nbsp;<br />{else}(add){/if}</span>
-    {literal}
-    <script type="text/javascript">
-    function mergeBlock(blockname, element, blockId) {
-        var allBlock = {/literal}{$mainLocBlock}{literal};
-        var block    = eval( "allBlock." + 'main_'+ blockname + element.value);
-        if(blockname == 'email' || blockname == 'phone'){
-           var label = '(overwrite)'+ '<span id="main_blockname_blockId_overwrite">{/literal}{$form.location.$blockName.$blockId.operation.html}{literal}<br /></span>';
-        }
-        else {
-          label = '(overwrite)<br />';
-        }
-
-        if ( !block ) {
-                  block = '';
-           label   = '(add)';
-           }
-         cj( "#main_"+ blockname +"_" + blockId ).html( block );
-         cj( "#main_"+ blockname +"_" + blockId +"_overwrite" ).html( label );
-    }
-    </script>
-    {/literal}
     {else}
-    <span id="main_{$blockName}_{$blockId}_overwrite">{if $row.main}(overwrite)<br />{else}(add){/if}</span>
-                {/if}
+      {if $row.main eq $row.other}
+         <tr class="merge-row-equal crm-row-ok {cycle values="odd-row,even-row"}">
+      {else}
+         <tr class="crm-row-error {cycle values="odd-row,even-row"}">
+      {/if}
+        <td>
+          {$row.title}
+        </td>
+      {/if}
 
+        <td>
+          {if $row.title|substr:0:7 == "Address"}<span id="other_{$blockName}_{$blockId}" style="white-space:pre">{else}<span id="other_{$blockName}_{$blockId}">{/if}{if !is_array($row.other)}{$row.other}{elseif $row.other.fileName}{$row.other.fileName}{else}{', '|implode:$row.other}{/if}</span>
+        </td>
+
+        <td style='white-space: nowrap'>
+           {if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
+        </td>
+
+        {assign var=position  value=$field|strrpos:'_'}
+        {assign var=blockId   value=$field|substr:$position+1}
+        {assign var=blockName value=$field|substr:14:$position-14}
+
+        {* For location blocks *}
+        {if $row.title|substr:0:5 == "Email"   OR
+            $row.title|substr:0:7 == "Address" OR
+            $row.title|substr:0:2 == "IM"      OR
+            $row.title|substr:0:7 == "Website" OR
+            $row.title|substr:0:5 == "Phone"}
+
+          <td>
+            {if $row.title|substr:0:7 == "Address"}<span id="main_{$blockName}_{$blockId}" style="white-space:pre">{else}<span id="main_{$blockName}_{$blockId}">{/if}{if !is_array($row.main)}{$row.main}{elseif $row.main.fileName}{$row.main.fileName}{else}{', '|implode:$row.main}{/if}</span>
+          </td>
+
+          <td>
+            {* Display location for fields with locations *}
+            {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
+              {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
             {/if}
-            {*NYSS 5546*}
+
+            {* Display other_type_id for websites, ims and phones *}
+            {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
+              {$form.location.$blockName.$blockId.typeTypeId.html}&nbsp;
+            {/if}
+
+            {* Display the overwrite/add/add new label *}
+            <span id="main_{$blockName}_{$blockId}_overwrite">
+              {if $row.main}
+                <span class="action_label">({ts}overwrite{/ts})</span>&nbsp;
+                 {if $blockName eq 'email' || $blockName eq 'phone' }
+                   {$form.location.$blockName.$blockId.operation.html}&nbsp;
+                 {/if}
+                 <br />
+              {else}
+                <span class="action_label">({ts}add{/ts})</span>&nbsp;
+              {/if}
+            </span>
+          </td>
+
+        {* For non-location blocks *}
+        {else}
+
+          <td>
             <span id="main_{$blockName}_{$blockId}">
               {if !is_array($row.main)}
                 {$row.main}
@@ -118,7 +169,24 @@
                 {', '|implode:$row.main}
               {/if}
             </span>
-        </td>
+          </td>
+
+          <td>
+            {if isset($row.main) || isset($row.other)}
+              <span id="main_{$blockName}_{$blockId}_overwrite">
+                {if $row.main == $row.other}
+                  <span class="action_label">({ts}match{/ts})</span><br />
+                {elseif $row.main}
+                  <span class="action_label">({ts}overwrite{/ts})</span><br />
+                 {else}
+                   <span class="action_label">({ts}add{/ts})</span>
+                {/if}
+              </span>
+            {/if}
+          </td>
+
+        {/if}
+
      </tr>
   {/foreach}
 
@@ -126,10 +194,12 @@
     {if $paramName eq 'move_rel_table_users'}
       <tr class="{cycle values="even-row,odd-row"}">
       <td><strong>{ts}Move related...{/ts}</strong></td><td>{if $otherUfId}<a target="_blank" href="{$params.other_url}">{$otherUfName}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;{else}<td style='white-space: nowrap'></td>{/if}</td><td>{if $mainUfId}<a target="_blank" href="{$params.main_url}">{$mainUfName}</a>{/if}</td>
+      <td>({ts}migrate{/ts})</td>
     </tr>
     {else}
     <tr class="{cycle values="even-row,odd-row"}">
       <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+       <td>({ts}migrate{/ts})</td>
     </tr>
     {/if}
   {/foreach}
@@ -137,14 +207,6 @@
 <div class='form-item'>
   <!--<p>{$form.moveBelongings.html} {$form.moveBelongings.label}</p>-->
   <!--<p>{$form.deleteOther.html} {$form.deleteOther.label}</p>-->
-</div>
-<div class="message status">
-    <p><strong>{ts}WARNING: The duplicate contact record WILL BE DELETED after the merge is complete.{/ts}</strong></p>
-    {if $user}
-      <p><strong>{ts 1=$config->userFramework}There are %1 user accounts associated with both the original and duplicate contacts. Ensure that the Drupal User you want to retain is on the right - if necessary use the 'Flip between original and duplicate contacts.' option at top to swap the positions of the two records before doing the merge.
-The user record associated with the duplicate contact will not be deleted, but will be un-linked from the associated contact record (which will be deleted).
-You will need to manually delete that user (click on the link to open Drupal User account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong></p>
-    {/if}
 </div>
 
 <div class="crm-submit-buttons">
@@ -154,29 +216,102 @@ You will need to manually delete that user (click on the link to open Drupal Use
 {literal}
 <script type="text/javascript">
 
+  function mergeBlock(blockname, element, blockId, type) {
+    var allBlock = {/literal}{$mainLocBlock}{literal};
+
+    // Get type of select list that's been changed (location or type)
+    var locTypeId = '';
+    var typeTypeId = '';
+
+    // If the location was changed, lookup the type if it exists
+    if (type == 'locTypeId') {
+      locTypeId = element.value;
+      typeTypeId = CRM.$( 'select#type_' + blockname + '_' + blockId + '_typeTypeId' ).val();
+    }
+
+    // Otherwise the type was changed, lookup the location if it exists
+    else {
+      locTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_locTypeId' ).val();
+      typeTypeId = element.value;
+    }
+
+    // @todo Fix this 'special handling' for websites (no location id)
+    if (!locTypeId) { locTypeId = 0; }
+
+    // Get the matching block, based on location and type, from the main contact record
+    var blockQuery = "allBlock.main_" + blockname + "_" + locTypeId;
+    if (typeTypeId) {
+      blockQuery += "_" + typeTypeId;
+    }
+    var block = eval( blockQuery );
+    var mainBlockId = 0;
+    var mainBlockDisplay = '';
+
+    // Create appropriate label / add new link after changing the block
+    if (typeof block == 'undefined') {
+      label = '<span class="action_label">({/literal}{ts}add{/ts}{literal})</span>';
+    }
+    else {
+
+      // Set display and ID
+      mainBlockDisplay = block['display'];
+      mainBlockId = block['id'];
+
+      // Set label
+      var label = '<span class="action_label">({/literal}{ts}overwrite{/ts}{literal})</span> ';
+      if (blockname == 'email' || blockname == 'phone') {
+        var opLabel = 'location[' + blockname + '][' + blockId + '][operation]';
+        label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">{/literal}{ts}add new{/ts}{literal}</label><br />';
+      }
+      label += '<br>';
+    }
+
+    // Update DOM
+    CRM.$( "input[name='location[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
+    CRM.$( "#main_" + blockname + "_" + blockId ).html( mainBlockDisplay );
+    CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
+  }
+
   CRM.$(function($) {
-    $('table td input.form-checkbox').each(function() {
-       var ele = null;
-       var element = $(this).attr('id').split('_',3);
 
-       switch ( element['1'] ) {
-           case 'addressee':
-                 ele = '#' + element['0'] + '_' + element['1'];
-                 break;
-
-           case 'email':
-           case 'postal':
-                 ele = '#' + element['0'] + '_' + element['1'] + '_' + element['2'];
-                 break;
-       }
-
-       if( ele ) {
-          $(this).on('click', function() {
-            var val = $(this).prop('checked');
-            $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
-          });
-       }
+    $('body').on('change', "input[id*='[operation]']", function() {
+      var originalHtml = $(this).prevAll('span.action_label').html();
+      if ($(this).is(":checked")) {
+        $(this).prevAll('span.action_label').html(originalHtml.replace('({/literal}{ts}overwrite{/ts}{literal})', '({/literal}{ts}add new{/ts}{literal})'));
+      }
+      else {
+        $(this).prevAll('span.action_label').html(originalHtml.replace('({/literal}{ts}add new{/ts}{literal})', '({/literal}{ts}overwrite{/ts}{literal})'));
+      }
     });
+
+    $('table td input.form-checkbox').each(function() {
+      var ele = null;
+      var element = $(this).attr('id').split('_',3);
+
+      switch ( element['1'] ) {
+        case 'addressee':
+          ele = '#' + element['0'] + '_' + element['1'];
+          break;
+
+         case 'email':
+         case 'postal':
+           ele = '#' + element['0'] + '_' + element['1'] + '_' + element['2'];
+           break;
+      }
+
+      if( ele ) {
+        $(this).on('click', function() {
+          var val = $(this).prop('checked');
+          $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
+        });
+      }
+    });
+
+    // Show/hide matching data rows
+    $('.toggle_equal_rows').click(function() {
+      $('tr.merge-row-equal').toggle();
+    });
+
   });
 
 </script>
