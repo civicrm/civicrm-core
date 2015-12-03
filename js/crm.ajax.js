@@ -464,7 +464,7 @@
             label = $el.is('input') ? $el.attr('value') : $el.text(),
             identifier = $el.attr('name') || $el.attr('href');
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
-            var $icon = $el.find('.icon'),
+            var $icon = $el.find('.icon, .crm-i'),
               button = {'data-identifier': identifier, text: label, click: function() {
                 $el[0].click();
               }};
