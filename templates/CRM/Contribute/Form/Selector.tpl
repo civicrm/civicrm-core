@@ -103,5 +103,5 @@
 {/strip}
 
 {include file="CRM/common/pager.tpl" location="bottom"}
-{crmScript ext='civicrm' file='js/crm.expandRow.js'}
+{crmScript file='js/crm.expandRow.js'}
 
