@@ -641,7 +641,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // not a great pattern & ideally it would not receive as a reference. We assign our params as a
       // temporary variable to avoid e-notice & to make it clear to future refactorer that
       // this function is NOT reliant on that var being set
-      $temporaryParams = array_merge($this->_params, array('membership_id' => $renewMembership->id));
+      $temporaryParams = array_merge($this->_params, array(
+        'membership_id' => $renewMembership->id,
+        'contribution_recur_id' => $contributionRecurID,
+      ));
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
