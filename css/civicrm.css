@@ -2245,9 +2245,17 @@ div.crm-master-accordion-header a.helpicon {
   display: none;
 }
 
+.crm-container .crm-expand-row {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  background-image: url("../i/TreePlus.gif");
+}
+
 .crm-container .crm-accordion-inner .crm-accordion-header,
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header,
-.crm-container .crm-collapsible .collapsible-title {
+.crm-container .crm-collapsible .collapsible-title,
+.crm-container .crm-expand-row.expanded {
   background-image: url("../i/TreeMinus.gif");
   background-color: transparent;
   color: #3E3E3E;
