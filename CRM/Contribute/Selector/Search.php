@@ -470,6 +470,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
+    $pre = array();
     self::$_columnHeaders = array(
       array(
         'name' => $this->_includeSoftCredits ? ts('Contribution Amount') : ts('Amount'),
