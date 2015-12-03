@@ -279,6 +279,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
       'Credit Card'), $contribution['payment_instrument_id']);
+    $this->assertEquals($contributionRecur['id'], $contribution['contribution_recur_id']);
 
     $this->callAPISuccessGetCount('LineItem', array(
       'entity_id' => $membership['id'],

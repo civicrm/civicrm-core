@@ -2384,6 +2384,7 @@ WHERE      civicrm_membership.is_test = 0";
       'membership_id',
       'tax_amount',
       'skipLineItem',
+      'contribution_recur_id',
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
