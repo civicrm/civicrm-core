@@ -146,13 +146,19 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
     $this->_from_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
+    $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
     $params = array('id' => $this->_from_participant_id);
     $participant = $values = array();
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
     $this->_part_values = $values[$this->_from_participant_id];
     $this->set('values', $this->_part_values);
     $this->_event_id = $this->_part_values['event_id'];
+    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
     $this->_from_contact_id = $this->_part_values['participant_contact_id'];
+    $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_from_contact_id, $this->_userChecksum);
+    if (!$validUser && !CRM_Core_Permission::check('edit all events')) {
+      CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
+    }
     $this->assign('action', $this->_action);
     if ($this->_from_participant_id) {
       $this->assign('participantId', $this->_from_participant_id);
@@ -231,7 +237,9 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //check that either an email or firstname+lastname is included in the form(CRM-9587)
     $to_contact_id = self::checkProfileComplete($fields, $errors, $self);
     //To check if the user is already registered for the event(CRM-2426)
-    self::checkRegistration($fields, $self, $to_contact_id, $errors);
+    if ($to_contact_id) {
+      self::checkRegistration($fields, $self, $to_contact_id, $errors);
+    }
     //return parent::formrule($fields, $files, $self);
     return empty($errors) ? TRUE : $errors;
   }
@@ -257,7 +265,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($email, "");
     $contact_id = empty($contact->contact_id) ? NULL : $contact->contact_id;
-    if (empty($contact_id)) {
+    if (!CRM_Utils_Rule::email($fields['email'])) {
+      $errors['email'] = ts('Enter valid email address.');
+    }
+    if (empty($errors) && empty($contact_id)) {
       $params = array(
         'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
         'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
@@ -325,11 +336,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //first create the new participant row -don't set registered_by yet or email won't be sent
     $participant = CRM_Event_BAO_Participant::create($value_to);
     //send a confirmation email to the new participant
-    $err = $this->participantTransfer($participant);
-    if (!$err) {
-      $statusMsg = "Failed to send confirmation email";
-      CRM_Core_Session::setStatus($statusMsg, ts('Error'), 'error');
-    }
+    $this->participantTransfer($participant);
     //now update registered_by_id
     $query = "UPDATE civicrm_participant cp SET cp.registered_by_id = %1 WHERE  cp.id = ({$participant->id})";
     $params = array(1 => array($this->_from_participant_id, 'Integer'));
@@ -357,6 +364,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $displayName));
     $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', array(1 => $email));
     CRM_Core_Session::setStatus($statusMsg, ts('Registration Transferred'), 'success');
+    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
+    CRM_Utils_System::redirect($url);
   }
 
   /**
@@ -408,18 +417,43 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     $eventDetails = array();
     $eventParams = array('id' => $participant->event_id);
-    CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails[$participant->event_id]);
+    CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails);
     //get default participant role.
-    $eventDetails[$participant->event_id]['participant_role'] = CRM_Utils_Array::value($eventDetails[$participant->event_id]['default_role_id'], $participantRoles);
+    $eventDetails['participant_role'] = CRM_Utils_Array::value($eventDetails['default_role_id'], $participantRoles);
     //get the location info
     $locParams = array(
       'entity_id' => $participant->event_id,
       'entity_table' => 'civicrm_event',
     );
-    $eventDetails[$participant->event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
-    $res = CRM_Event_BAO_Participant::sendTransitionParticipantMail($participant->id, $participantDetails[$participant->id], $eventDetails[$participant->event_id], $contactDetails[$participant->contact_id], $domainValues, "Confirm", TRUE);
-    //now registered_id can be updated (mail won't be send if it is set
-    return $res;
+    $eventDetails['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
+    $toEmail = CRM_Utils_Array::value('email', $contactDetails[$participant->contact_id]);
+    if ($toEmail) {
+      //take a receipt from as event else domain.
+      $receiptFrom = $domainValues['name'] . ' <' . $domainValues['email'] . '>';
+      if (!empty($eventDetails['confirm_from_name']) && !empty($eventDetails['confirm_from_email'])) {
+        $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
+      }
+      $participantName = $contactDetails[$participant->contact_id]['display_name'];
+      $tplParams = array(
+        'event' => $eventDetails,
+        'participant' => $participantDetails[$participant->id],
+        'participantID' => $participant->id,
+        'participant_status' => 'Registered',
+      );
+
+      $sendTemplateParams = array(
+        'groupName' => 'msg_tpl_workflow_event',
+        'valueName' => 'event_online_receipt',
+        'contactId' => $participantDetails[$participant->id]['contact_id'],
+        'tplParams' => $tplParams,
+        'from' => $receiptFrom,
+        'toName' => $participantName,
+        'toEmail' => $toEmail,
+        'cc' => CRM_Utils_Array::value('cc_confirm', $eventDetails),
+        'bcc' => CRM_Utils_Array::value('bcc_confirm', $eventDetails),
+      );
+      CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+    }
   }
 
   /**
