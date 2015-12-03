@@ -57,6 +57,9 @@ div.crm-container fieldset label{
   background: none transparent;
 }
 
+  tr.crm-entity.disabled td { opacity: .3; }
+    tr.crm-entity.disabled td:last-child { opacity: 1; }
+
 .crm-container th,
 .crm-container table.display thead th,
 .crm-container table thead.sticky th,
