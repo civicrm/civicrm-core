@@ -48,20 +48,17 @@
  * @throws Exception
  */
 function smarty_function_crmScript($params, &$smarty) {
-  $res = CRM_Core_Resources::singleton();
-
-  if (empty($params['weight'])) {
-    $params['weight'] = CRM_Core_Resources::DEFAULT_WEIGHT;
-  }
-  if (empty($params['region'])) {
-    $params['region'] = CRM_Core_Resources::DEFAULT_REGION;
-  }
+  $params += array(
+    'weight' => CRM_Core_Resources::DEFAULT_WEIGHT,
+    'region' => CRM_Core_Resources::DEFAULT_REGION,
+    'ext' => 'civicrm',
+  );
 
   if (array_key_exists('file', $params)) {
-    $res->addScriptFile($params['ext'], $params['file'], $params['weight'], $params['region']);
+    Civi::resources()->addScriptFile($params['ext'], $params['file'], $params['weight'], $params['region']);
   }
   elseif (array_key_exists('url', $params)) {
-    $res->addScriptUrl($params['url'], $params['weight'], $params['region']);
+    Civi::resources()->addScriptUrl($params['url'], $params['weight'], $params['region']);
   }
   else {
     CRM_Core_Error::debug_var('crmScript_params', $params);

@@ -2245,6 +2245,12 @@ div.crm-master-accordion-header a.helpicon {
   display: none;
 }
 
+.crm-container .crm-expand-row {
+  min-width: 16px;
+  min-height: 16px;
+  display: inline-block;
+}
+
 .crm-container .crm-accordion-inner .crm-accordion-header,
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header,
 .crm-container .crm-collapsible .collapsible-title {
@@ -2317,34 +2323,8 @@ div.crm-master-accordion-header a.helpicon {
   color: #0200A0;
 }
 
-/* civicrm admin menu */
-#civicrm-menu .ui-autocomplete-input,
-.crm-container .ui-autocomplete-input {
-  background: white url("../bower_components/select2/select2.png") no-repeat scroll right -23px;
-  padding-right: 16px;
-  /* so that text doesn't flow on top of icon */
-}
-
-#civicrm-menu #crm-qsearch {
-  padding: 1px 3px 1px 2px;
-  background-color: #000 !important;
-}
-
-#civicrm-menu #crm-qsearch input {
-  background-color: #eaeaea;
-  border: 1px solid black;
-  margin: 0;
-  padding: 2px 16px 3px 2px;
-  height: 16px;
-}
-#civicrm-menu #crm-qsearch input:hover,
-#civicrm-menu #crm-qsearch input:focus,
-#civicrm-menu #crm-qsearch.activetarget input {
-  background-color: #ffffff;
-}
-/* This ensures the drop-down menus appear at the right height */
-#civicrm-menu > li.menumain {
-  height: 19px !important;
+.crm-container .crm-child-row > td {
+  padding-left: 1.8em;
 }
 
 /* Status message box */
@@ -3394,15 +3374,16 @@ div.m ul#civicrm-menu,
   padding-left: 20px;
 }
 
-#crm-container span.collapsed,
-#crm-container a.collapsed {
+.crm-container span.collapsed,
+.crm-container a.collapsed,
+.crm-container .crm-expand-row {
   background: url("../i/TreePlus.gif") no-repeat 0 0;
   padding-left: 19px;
   cursor: pointer;
 }
 
-#crm-container span.expanded,
-#crm-container a.expanded {
+.crm-container span.expanded,
+.crm-container a.expanded {
   background: url("../i/TreeMinus.gif") no-repeat 0 0;
   padding-left: 19px;
   cursor: pointer;
