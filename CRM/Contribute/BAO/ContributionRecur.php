@@ -770,4 +770,79 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     );
   }
 
+  /**
+   * Update recurring contribution based on incoming payment.
+   *
+   * Do not rename or move this function without updating https://issues.civicrm.org/jira/browse/CRM-17655.
+   *
+   * @param int $recurringContributionID
+   * @param string $paymentStatus
+   *   Payment status - this correlates to the machine name of the contribution status ID ie
+   *   - Completed
+   *   - Failed
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function updateOnNewPayment($recurringContributionID, $paymentStatus) {
+    if (!in_array($paymentStatus, array('Completed', 'Failed'))) {
+      return;
+    }
+    $params = array(
+      'id' => $recurringContributionID,
+      'return' => array(
+        'contribution_status_id',
+        'next_sched_contribution_date',
+        'frequency_unit',
+        'frequency_interval',
+        'installments',
+        'failure_count',
+      ),
+    );
+
+    $existing = civicrm_api3('ContributionRecur', 'getsingle', $params);
+
+    if ($paymentStatus == 'Completed'
+      && CRM_Contribute_PseudoConstant::contributionStatus($existing['contribution_status_id'], 'name') == 'Pending') {
+      $params['contribution_status_id'] = 'In Progress';
+    }
+    if ($paymentStatus == 'Failed') {
+      $params['failure_count'] = $existing['failure_count'];
+    }
+    $params['modified_date'] = date('Y-m-d H:i:s');
+
+    if (!empty($existing['installments']) && self::isComplete($recurringContributionID, $existing['installments'])) {
+      $params['contribution_status_id'] = 'Completed';
+    }
+    else {
+      // Only update next sched date if it's empty or 'just now' because payment processors may be managing
+      // the scheduled date themselves as core did not previously provide any help.
+      if (empty($params['next_sched_contribution_date']) || strtotime($params['next_sched_contribution_date']) ==
+        strtotime(date('Y-m-d'))) {
+        $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit']));
+      }
+    }
+    civicrm_api3('ContributionRecur', 'create', $params);
+  }
+
+  /**
+   * Is this recurring contribution now complete.
+   *
+   * Have all the payments expected been received now.
+   *
+   * @param int $recurringContributionID
+   * @param int $installments
+   *
+   * @return bool
+   */
+  protected static function isComplete($recurringContributionID, $installments) {
+    $paidInstallments = CRM_Core_DAO::singleValueQuery(
+      'SELECT count(*) FROM civicrm_contribution WHERE id = %1',
+      array(1 => array($recurringContributionID, 'Integer'))
+    );
+    if ($paidInstallments >= $installments) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
