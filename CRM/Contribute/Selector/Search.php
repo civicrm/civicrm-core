@@ -526,10 +526,8 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           ),
         )
       );
-    $pre = array();
     if (!$this->_single) {
       $pre = array(
-        array('desc' => ts('Contact Type')),
         array(
           'name' => ts('Name'),
           'sort' => 'sort_name',
@@ -537,12 +535,6 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         ),
       );
     }
-    $pre[] = array(
-      array(
-        'desc' => '',
-        array(),
-      ),
-    );
     self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
     if ($this->_includeSoftCredits) {
       self::$_columnHeaders = array_merge(
