@@ -4,11 +4,11 @@
 SELECT @option_group_id_report := max(id) from civicrm_option_group where name = 'report_template';
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 INSERT INTO
-   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+   civicrm_option_value (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, {localize field='description'}description{/localize}, is_optgroup, is_reserved, is_active, component_id, visibility_id)
 VALUES
    (@option_group_id_report, {localize}'{ts escape="sql"}Recurring Contributions Summary{/ts}'{/localize}, 'contribute/recursummary', 'CRM_Report_Form_Contribute_RecurSummary',               NULL, 0, NULL, 49, {localize}'{ts escape="sql"}Provides simple summary for each payment instrument for which there are recurring contributions (e.g. Credit Card, Standing Order, Direct Debit etc.), showing within a given date range.{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL);
 
-SELECT @parent_id := id from `civicrm_navigation` where name = 'Administration Console' AND domain_id = {$domainID};
+SELECT @parent_id := id from civicrm_navigation where name = 'Administration Console' AND domain_id = {$domainID};
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
@@ -17,37 +17,11 @@ VALUES
 UPDATE civicrm_contact SET is_deceased = 0 WHERE is_deceased IS NULL;
 
 -- CRM-16597
-{if $multilingual}
-  {foreach from=$locales item=locale}
-    UPDATE civicrm_option_value
-    SET label_{$locale} = '{ts escape="sql"}Pledge Detail Report{/ts}',
-        description_{$locale} = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}'
-    WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Detail';
+UPDATE civicrm_option_value SET {localize field="label"}label = '{ts escape="sql"}Pledge Detail Report{/ts}'{/localize}, {localize field="description"}description = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}'{/localize} WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Detail';
 
-    UPDATE civicrm_option_value
-    SET description_{$locale} = '{ts escape="sql"}Groups and totals pledges by criteria including contact, time period, pledge status, location, etc.{/ts}'
-    WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Summary';
+UPDATE civicrm_option_value SET {localize field="description"}description = '{ts escape="sql"}Groups and totals pledges by criteria including contact, time period, pledge status, location, etc.{/ts}'{/localize} WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Summary';
 
-    UPDATE civicrm_report_instance
-    SET title_{$locale} = '{ts escape="sql"}Pledge Detail{/ts}',
-        description_{$locale} = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}'
-    WHERE report_id = 'pledge/detail';
-  {/foreach}
-{else}
-  UPDATE civicrm_option_value
-  SET label = '{ts escape="sql"}Pledge Detail Report{/ts}',
-      description = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}'
-  WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Detail';
-
-  UPDATE civicrm_option_value
-  SET description = '{ts escape="sql"}Groups and totals pledges by criteria including contact, time period, pledge status, location, etc.{/ts}'
-  WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Summary';
-
-  UPDATE civicrm_report_instance
-  SET title = '{ts escape="sql"}Pledge Detail{/ts}',
-      description = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}'
-  WHERE report_id = 'pledge/detail';
-{/if}
+UPDATE civicrm_report_instance SET title = '{ts escape="sql"}Pledge Detail{/ts}', description = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}' WHERE report_id = 'pledge/detail';
 
 -- CRM-17503 PayPal Express processor type can support recurring payments
 UPDATE civicrm_payment_processor_type pp
