@@ -1363,7 +1363,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
             NULL,
             FALSE
           );
-          $url .= " <a href='$attachmentViewUrl' ><span class='icon paper-icon'></span></a>";
+          $url .= " <a href='$attachmentViewUrl' ><i class='crm-i fa-paperclip'></i></a>";
         }
       }
 

@@ -691,26 +691,27 @@ AND       CEF.entity_id    = %2";
     $currentAttachmentInfo = self::getEntityFile($entityTable, $entityID);
     foreach ($currentAttachmentInfo as $fileKey => $fileValue) {
       $fileID = $fileValue['fileID'];
-      $fileType = $fileValue['mime_type'];
       if ($fileID) {
+        $fileType = $fileValue['mime_type'];
+        $url = $fileValue['url'];
+        $title = $fileValue['cleanName'];
         if ($fileType == 'image/jpeg' ||
           $fileType == 'image/pjpeg' ||
           $fileType == 'image/gif' ||
           $fileType == 'image/x-png' ||
           $fileType == 'image/png'
         ) {
-          $url = $fileValue['url'];
-          $alt = $fileValue['cleanName'];
           $file_url[$fileID] = "
-              <a href=\"$url\" class='crm-image-popup'>
-              <div class='icon paper-icon' title=\"$alt\" alt=\"$alt\"></div>
+              <a href='$url' class='crm-image-popup' title='$title'>
+                <i class='crm-i fa-file-image-o'></i>
               </a>";
-          // for non image files
         }
+        // for non image files
         else {
-          $url = $fileValue['url'];
-          $alt = $fileValue['cleanName'];
-          $file_url[$fileID] = "<a href=\"$url\"><div class='icon paper-icon' title=\"$alt\" alt=\"$alt\"></div></a>";
+          $file_url[$fileID] = "
+              <a href='$url' title='$title'>
+                <i class='crm-i fa-paperclip'></i>
+              </a>";
         }
       }
     }
