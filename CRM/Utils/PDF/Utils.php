@@ -88,7 +88,7 @@ class CRM_Utils_PDF_Utils {
     $config = CRM_Core_Config::singleton();
 
     // Add a special region for the HTML header of PDF files:
-    $pdfHeaderRegion = CRM_Core_Region::instance('pdf-header', FALSE);
+    $pdfHeaderRegion = CRM_Core_Region::instance('export-document-header', FALSE);
     $htmlHeader = ($pdfHeaderRegion) ? $pdfHeaderRegion->render('', FALSE) : '';
 
     $html = "
