@@ -221,11 +221,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'relationship_type_id' => array(
             'title' => ts('Relationship'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array(
-              '' => '- any relationship type -',
-            ) +
-            CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
@@ -482,9 +479,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         //for displaying relationship type filter
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
-          $statistics['filters'][$id]['value'] = 'Is equal to ' .
-            $relTypes[$this->_params['relationship_type_id_value']]['label_' .
-            $this->relationType];
+          $op = 'Is one of ';
+          $relationshipTypes = array();
+          foreach ($this->_params['relationship_type_id_value'] as $relationship) {
+            $relationshipTypes[] = $relTypes[$relationship]['label_' . $this->relationType];
+          }
+          $statistics['filters'][$id]['value'] = $op .
+            implode(', ', $relationshipTypes);
         }
 
         //for displaying relationship status
@@ -533,10 +534,17 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->relationType = NULL;
     $relType = array();
     if (!empty($this->_params['relationship_type_id_value'])) {
-      $relType = explode('_', $this->_params['relationship_type_id_value']);
-
-      $this->relationType = $relType[1] . '_' . $relType[2];
-      $this->_params['relationship_type_id_value'] = intval($relType[0]);
+      $relationshipTypes = array();
+      $direction = array();
+      foreach ($this->_params['relationship_type_id_value'] as $relationship_type) {
+        $relType = explode('_', $relationship_type);
+        $direction[] = $relType[1] . '_' . $relType[2];
+        $relationshipTypes[] = intval($relType[0]);
+      }
+      // Lets take the first relationship type to guide us in the relationship direction
+      // we should use.
+      $this->relationType = $direction[0];
+      $this->_params['relationship_type_id_value'] = $relationshipTypes;
     }
 
     $this->buildACLClause(array(
