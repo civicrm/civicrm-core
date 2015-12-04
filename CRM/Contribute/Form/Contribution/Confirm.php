@@ -796,6 +796,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param int $billingLocationID
    *   ID of billing location type.
+   * @param bool $isRecur
+   *   Is this recurring?
    *
    * @return \CRM_Contribute_DAO_Contribution
    * @throws \Exception
@@ -2171,13 +2173,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
       }
-      $isRecur = CRM_Utils_Array::value('is_recur', $this->_values, CRM_Utils_Array::value('is_recur', $paymentParams));
+
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
         $contactID,
         $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
         'contribution',
         ($this->_mode == 'test') ? 1 : 0,
-        $isRecur
+        CRM_Utils_Array::value('is_recur', $paymentParams)
       );
 
       if (empty($result['is_payment_failure'])) {
