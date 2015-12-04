@@ -31,8 +31,6 @@
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 
-use Civi\Payment\System;
-
 /**
  * This class generates form components for processing a contribution.
  */

@@ -62,7 +62,7 @@ class CRM_Core_Payment_ProcessorForm {
       return;
     }
     $form->set('paymentProcessor', $form->_paymentProcessor);
-    $form->_paymentObject = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
+    $form->_paymentObject = System::singleton()->getByProcessor($form->_paymentProcessor);
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
