@@ -873,6 +873,9 @@ class CRM_Core_SelectValues {
    */
   public static function getJobFrequency() {
     return array(
+      'Yearly' => ts('Yearly'),
+      'Monthly' => ts('Monthly'),
+      'Weekly' => ts('Weekly'),
       'Daily' => ts('Daily'),
       'Hourly' => ts('Hourly'),
       'Always' => ts('Every time cron job is run'),
