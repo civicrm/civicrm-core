@@ -67,10 +67,15 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     // table. However, at this stage we have both - there is still quite a bit of refactoring to do to set the line_iten entity_id right the first time
     // however, we can assume at this stage that any contribution id will have only one line item with that membership type in the line item table
     // OR the caller will have taken responsibility for updating the line items themselves so we will update using SQL here
-    $membershipTypeID = civicrm_api3('membership', 'getvalue', array(
+    if (!isset($params['membership_type_id'])) {
+      $membership_type_id = civicrm_api3('membership', 'getvalue', array(
         'id' => $dao->membership_id,
         'return' => 'membership_type_id',
       ));
+    }
+    else {
+      $membership_type_id = $params['membership_type_id'];
+    }
     $sql = "UPDATE civicrm_line_item li
       LEFT JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
       SET entity_table = 'civicrm_membership', entity_id = %1
@@ -78,7 +83,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
       AND contribution_id = %3";
     CRM_Core_DAO::executeQuery($sql, array(
         1 => array($dao->membership_id, 'Integer'),
-        2 => array($membershipTypeID, 'Integer'),
+        2 => array($membership_type_id, 'Integer'),
         3 => array($dao->contribution_id, 'Integer'),
       ));
     return $dao;
