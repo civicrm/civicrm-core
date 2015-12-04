@@ -523,7 +523,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     );
     $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $this->_contact_name));
     $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', array(1 => $this->_contact_email));
-    CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
+    CRM_Core_Session::setStatus($statusMsg, ts('Thanks'), 'success');
   }
 
 }
