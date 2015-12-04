@@ -166,8 +166,8 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     }
     //verify participant status is still Registered
     if ($details['status'] != "Registered") {
-      $status = "You are no longer registered for " . $this->_event_title;
-      CRM_Core_Session::setStatus($status, ts('Event status error.'), 'alert');
+      $status = "You cannot transfer or cancel your registration for " . $this->_event_title . ' as you are not currently registered for this event.';
+      CRM_Core_Session::setStatus($status, ts('Sorry'), 'alert');
       CRM_Utils_System::redirect($url);
     }
     $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $this->_event_id;
@@ -179,16 +179,16 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $start_time = new Datetime($start_date);
     $timenow = new Datetime();
     if (!empty($start_time) && $start_time < $timenow) {
-      $status = ts("The event has been started, cannot transfer or cancel this event");
-      CRM_Core_Error::statusBounce($status, $url, ts('Oops'));
+      $status = ts("Registration for this event cannot be cancelled or transferred once the event has begun. Contact the event organizer if you have questions.");
+      CRM_Core_Error::statusBounce($status, $url, ts('Sorry'));
     }
     if (!empty($time_limit) && $time_limit > 0) {
       $interval = $timenow->diff($start_time);
       $days = $interval->format('%d');
       $hours   = $interval->format('%h');
       if ($hours <= $time_limit && $days < 1) {
-        $status = ts("Less than %1 hours to start time, cannot transfer or cancel this event", array(1 => $time_limit));
-        CRM_Core_Error::statusBounce($status, $url, ts('Oops'));
+        $status = ts("Registration for this event cannot be cancelled or transferred less than %1 hours prior to the event's start time. Contact the event organizer if you have questions.", array(1 => $time_limit));
+        CRM_Core_Error::statusBounce($status, $url, ts('Sorry'));
       }
     }
     $this->assign('details', $details);
@@ -357,7 +357,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     );
     $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $this->_contact_name));
     $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', array(1 => $this->_contact_email));
-    CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
+    CRM_Core_Session::setStatus($statusMsg, ts('Thanks'), 'success');
     $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}&noFullMsg=true");
     CRM_Utils_System::redirect($url);
   }
