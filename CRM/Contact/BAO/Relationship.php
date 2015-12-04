@@ -622,8 +622,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     //or between individual and organization
     if (($action & CRM_Core_Action::DISABLE) || ($action & CRM_Core_Action::DELETE)) {
       $relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
-      if ($relationship->relationship_type_id == $relTypes['Employee of']['id'] ||
-        $relationship->relationship_type_id == $relTypes['Household Member of']['id']
+      if (
+        (isset($relTypes['Employee of']) && $relationship->relationship_type_id == $relTypes['Employee of']['id']) ||
+        (isset ($relTypes['Household Member of']) && $relationship->relationship_type_id == $relTypes['Household Member of']['id'])
       ) {
         $sharedContact = new CRM_Contact_DAO_Contact();
         $sharedContact->id = $relationship->contact_id_a;
