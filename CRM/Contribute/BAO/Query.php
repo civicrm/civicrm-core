@@ -579,6 +579,10 @@ class CRM_Contribute_BAO_Query {
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $operator, 3 => $productValue));
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_product.id", $op, $value);
         $query->_tables['civicrm_product'] = $query->_whereTables['civicrm_product'] = 1;
+
+      case 'contribution_is_payment':
+        $query->_where[$grouping][] = " civicrm_financial_trxn.is_payment $op $value";
+        $query->_tables['contribution_financial_trxn'] = $query->_whereTables['contribution_financial_trxn'] = 1;
         return;
 
       default:

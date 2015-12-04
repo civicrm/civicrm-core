@@ -82,7 +82,28 @@
             {ts}There are no contributions on record for you.{/ts}
         </div>
     {/if}
-
+    
+    {if $payments}
+    	{strip}	
+	<div class="header-dark">Your Payment(s)</div>
+	<table class="selector">
+	    <tr class="columnheader">
+	        <th>{ts}Date{/ts}</th>
+                <th>{ts}Item Description{/ts}</th>
+                <th>{ts}Paid amount{/ts}</th>
+                <th>{ts}Total Amount{/ts}</th>
+            </tr>
+            {foreach from=$payments item=row key=trxnid}
+                <tr id='rowid{$row.trxnid}' class="{cycle values="odd-row,even-row"}">
+                    <td>{$row.date}</td>
+                    <td>{$row.source}</td>
+                    <td>{$row.amount}</td>
+                    <td>{$row.total_amount}</td>
+                </tr>
+            {/foreach}
+	</table>
+        {/strip}
+    {/if}
 
     {if $honor}
         {if $honorRows}
