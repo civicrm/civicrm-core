@@ -342,6 +342,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     if (!empty($params['relate_contribution_id'])) {
       CRM_Member_BAO_MembershipPayment::create(array(
         'membership_id' => $membership->id,
+        'membership_type_id' => $membership->membership_type_id,
         'contribution_id' => $params['relate_contribution_id'],
       ));
     }
@@ -1783,6 +1784,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function linkMembershipPayment($membership, $membershipContribution) {
     CRM_Member_BAO_MembershipPayment::create(array(
       'membership_id' => $membership->id,
+      'membership_type_id' => $membership->membership_type_id,
       'contribution_id' => $membershipContribution->id,
     ));
   }
