@@ -14,8 +14,6 @@ INSERT INTO civicrm_navigation
 VALUES
 ( {$domainID}, 'civicrm/a/#/status', '{ts escape="sql" skip="true"}System Status{/ts}', 'System Status', 'administer CiviCRM', '', @parent_id, '1', NULL, 0 );
 
-UPDATE civicrm_contact SET is_deceased = 0 WHERE is_deceased IS NULL;
-
 -- CRM-16597
 UPDATE civicrm_option_value SET {localize field="label"}label = '{ts escape="sql"}Pledge Detail Report{/ts}'{/localize}, {localize field="description"}description = '{ts escape="sql"}List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.{/ts}'{/localize} WHERE option_group_id = @option_group_id_report AND name = 'CRM_Report_Form_Pledge_Detail';
 
