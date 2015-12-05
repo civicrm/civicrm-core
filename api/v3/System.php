@@ -190,6 +190,7 @@ function civicrm_api3_system_get($params) {
         'version' => CRM_Core_DAO::singleValueQuery('SELECT @@version'),
       ),
       'cms' => array(
+        'version' => $config->userSystem->getVersion(),
         'type' => CIVICRM_UF,
         'modules' => CRM_Core_Module::collectStatuses($config->userSystem->getModules()),
       ),
