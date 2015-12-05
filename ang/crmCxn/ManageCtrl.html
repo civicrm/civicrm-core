@@ -51,6 +51,12 @@
                 </li>
                 <li>
                   <a class="action-item crm-hover-button"
+                     crm-confirm='{width: "65%", resizable: true, title:ts("Reconnect"), templateUrl: "~/crmCxn/ConfirmReconnectCtrl.html", export: {cxn: cxn}}'
+                     on-yes="reregister(cxn.app_meta)"
+                      >{{ts('Reconnect')}}</a>
+                </li>
+                <li>
+                  <a class="action-item crm-hover-button"
                      crm-confirm='{width: "65%", resizable: true, title: ts("Disconnect"), message: ts("Are you sure you want to disconnect \"%1?\". Doing so may permanently destroy data linkage.", {1: cxn.app_meta.title})}'
                      on-yes="unregister(cxn.app_meta)">
                     {{ts('Disconnect')}}
