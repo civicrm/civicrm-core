@@ -1619,6 +1619,7 @@ INSERT INTO `civicrm_contact_type`
 INSERT INTO `civicrm_job`
     ( domain_id, run_frequency, last_run, name, description, api_entity, api_action, parameters, is_active )
 VALUES
+    ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}CiviCRM Update Check{/ts}', '{ts escape="sql" skip="true"}Checks for CiviCRM version updates. Important for keeping the database secure. Also sends anonymous usage statistics to civicrm.org to to assist in prioritizing ongoing development efforts.{/ts}', 'job', 'version_check', NULL, 1),
     ( @domainID, 'Always' , NULL, '{ts escape="sql" skip="true"}Send Scheduled Mailings{/ts}', '{ts escape="sql" skip="true"}Sends out scheduled CiviMail mailings{/ts}', 'job', 'process_mailing', NULL, 0),
     ( @domainID, 'Hourly' , NULL, '{ts escape="sql" skip="true"}Fetch Bounces{/ts}', '{ts escape="sql" skip="true"}Fetches bounces from mailings and writes them to mailing statistics{/ts}', 'job', 'fetch_bounces', NULL, 0),
     ( @domainID, 'Hourly' , NULL, '{ts escape="sql" skip="true"}Process Inbound Emails{/ts}', '{ts escape="sql" skip="true"}Inserts activity for a contact or a case by retrieving inbound emails from a mail directory{/ts}', 'job', 'fetch_activities', NULL, 0),
