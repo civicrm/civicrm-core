@@ -59,6 +59,9 @@ class CRM_Utils_VersionCheck {
    */
   public $versionInfo = array();
 
+  /** @var bool */
+  public $isInfoAvailable;
+
   /**
    * Pingback params
    *
@@ -90,7 +93,7 @@ class CRM_Utils_VersionCheck {
 
     // Populate remote $versionInfo from cache file
     $this->cacheFile = Civi::paths()->getPath(self::CACHEFILE_NAME);
-    $this->readCacheFile();
+    $this->isInfoAvailable = $this->readCacheFile();
   }
 
   /**
