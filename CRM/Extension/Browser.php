@@ -53,6 +53,9 @@ class CRM_Extension_Browser {
    */
   const CACHE_JSON_FILE = 'extensions.json';
 
+  // timeout for when the connection or the server is slow
+  const CHECK_TIMEOUT = 5;
+
   /**
    * @param string $repoUrl
    *   URL of the remote repository.
@@ -230,7 +233,7 @@ class CRM_Extension_Browser {
    */
   private function grabRemoteJson() {
 
-    ini_set('default_socket_timeout', CRM_Utils_VersionCheck::CHECK_TIMEOUT);
+    ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
     set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
 
     if (!ini_get('allow_url_fopen')) {
