@@ -345,7 +345,7 @@ ALTER TABLE civicrm_dashboard
     $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact WHERE image_URL IS NOT NULL');
     for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
       $endId = $startId + self::BATCH_SIZE - 1;
-      $title = ts('Upgrade image_urls (%1 => %2)', array(1 => $startId, 2 => $endId));
+      $title = "Upgrade image_urls ($startId => $endId)";
       $this->addTask($title, 'upgradeImageUrls', $startId, $endId);
     }
   }
@@ -366,7 +366,7 @@ ALTER TABLE civicrm_dashboard
       $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact WHERE image_URL IS NOT NULL');
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
-        $title = ts('Upgrade image_urls (%1 => %2)', array(1 => $startId, 2 => $endId));
+        $title = "Upgrade image_urls ($startId => $endId)";
         $this->addTask($title, 'cleanupBackendImageUrls', $startId, $endId);
       }
     }
