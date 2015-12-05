@@ -59,9 +59,9 @@ class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_Base 
    */
   public function upgrade_4_5_alpha1($rev) {
     // task to process sql
-    $this->addTask(ts('Migrate honoree information to module_data'), 'migrateHonoreeInfo');
+    $this->addTask('Migrate honoree information to module_data', 'migrateHonoreeInfo');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.alpha1')), 'runSql', $rev);
-    $this->addTask(ts('Set default for Individual name fields configuration'), 'addNameFieldOptions');
+    $this->addTask('Set default for Individual name fields configuration', 'addNameFieldOptions');
 
     // CRM-14522 - The below schema checking is done as foreign key name
     // for pdf_format_id column varies for different databases
@@ -290,7 +290,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    */
   public function upgrade_4_5_9($rev) {
     // Task to process sql.
-    $this->addTask(ts('Upgrade DB to 4.5.9: Fix saved searches consisting of multi-choice custom field(s)'), 'updateSavedSearch');
+    $this->addTask('Upgrade DB to 4.5.9: Fix saved searches consisting of multi-choice custom field(s)', 'updateSavedSearch');
 
     return TRUE;
   }

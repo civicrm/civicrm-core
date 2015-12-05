@@ -349,7 +349,7 @@ SET    version = '$version'
     foreach ($sqlFiles as $file) {
       if (preg_match($sqlFilePattern, $file, $matches)) {
         if ($matches[2] == '4.0') {
-          CRM_Core_Error::fatal(ts("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731."));
+          CRM_Core_Error::fatal("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731.");
         }
         if (!in_array($matches[1], $revList)) {
           $revList[] = $matches[1];

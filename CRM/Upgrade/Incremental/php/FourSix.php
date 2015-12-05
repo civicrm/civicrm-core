@@ -58,7 +58,7 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_4_6_alpha3($rev) {
     // Task to process sql.
-    $this->addTask(ts('Add and update reference_date column for Schedule Reminders'), 'updateReferenceDate');
+    $this->addTask('Add and update reference_date column for Schedule Reminders', 'updateReferenceDate');
   }
 
   /**
@@ -129,7 +129,7 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_4_6_1($rev) {
     // CRM-16289 - Fix invalid data in log_civicrm_case.case_type_id.
-    $this->addTask(ts('Cleanup case type id data in log table.'), 'fixCaseLog');
+    $this->addTask('Cleanup case type id data in log table.', 'fixCaseLog');
   }
 
   /**
