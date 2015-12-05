@@ -182,12 +182,14 @@ function civicrm_api3_system_get($params) {
       'uf' => CIVICRM_UF, // deprecated in favor of cms.type
       'php' => array(
         'version' => phpversion(),
+        'time' => time(),
         'tz' => date_default_timezone_get(),
         'extensions' => get_loaded_extensions(),
         'ini' => _civicrm_api3_system_get_redacted_ini(),
       ),
       'mysql' => array(
         'version' => CRM_Core_DAO::singleValueQuery('SELECT @@version'),
+        'time' => CRM_Core_DAO::singleValueQuery('SELECT unix_timestamp()'),
         'vars' => _civicrm_api3_system_get_redacted_mysql(),
       ),
       'cms' => array(
