@@ -648,4 +648,5 @@ function civicrm_api3_job_group_rebuild($params) {
 function civicrm_api3_job_version_check() {
   $vc = new CRM_Utils_VersionCheck();
   $vc->fetch();
+  return civicrm_api3_create_success();
 }
