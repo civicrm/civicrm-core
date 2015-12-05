@@ -293,7 +293,7 @@ class CRM_Utils_Check_Env {
     $messages = array();
 
     if (Civi::settings()->get('versionCheck')) {
-      $vc = CRM_Utils_VersionCheck::singleton();
+      $vc = new CRM_Utils_VersionCheck();
       $newerVersion = $vc->isNewerVersionAvailable();
 
       if ($newerVersion['version']) {

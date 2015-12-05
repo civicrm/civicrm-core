@@ -43,14 +43,6 @@ class CRM_Utils_VersionCheck {
     CACHEFILE_EXPIRE = 86400;
 
   /**
-   * We only need one instance of this object, so we use the
-   * singleton pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
-
-  /**
    * The version of the current (local) installation
    *
    * @var string
@@ -117,21 +109,6 @@ class CRM_Utils_VersionCheck {
       // Sort version info in ascending order for easier comparisons
       ksort($this->versionInfo, SORT_NUMERIC);
     }
-  }
-
-  /**
-   * Static instance provider.
-   *
-   * Method providing static instance of CRM_Utils_VersionCheck,
-   * as in Singleton pattern
-   *
-   * @return CRM_Utils_VersionCheck
-   */
-  public static function &singleton() {
-    if (!isset(self::$_singleton)) {
-      self::$_singleton = new CRM_Utils_VersionCheck();
-    }
-    return self::$_singleton;
   }
 
   /**
