@@ -292,63 +292,75 @@ class CRM_Utils_Check_Env {
   public function checkVersion() {
     $messages = array();
 
-    if (Civi::settings()->get('versionCheck')) {
-      $vc = new CRM_Utils_VersionCheck();
-      $newerVersion = $vc->isNewerVersionAvailable();
+    $vc = new CRM_Utils_VersionCheck();
+    $newerVersion = $vc->isNewerVersionAvailable();
 
-      if ($newerVersion['version']) {
-        $vInfo = array(
-          1 => $newerVersion['version'],
-          2 => $vc->localVersion,
-        );
-        // LTS = long-term support version
-        if ($newerVersion['status'] == 'lts') {
-          $vInfo[1] .= ' ' . ts('(long-term support)');
-        }
+    if ($newerVersion['version']) {
+      $vInfo = array(
+        1 => $newerVersion['version'],
+        2 => $vc->localVersion,
+      );
+      // LTS = long-term support version
+      if ($newerVersion['status'] == 'lts') {
+        $vInfo[1] .= ' ' . ts('(long-term support)');
+      }
 
-        if ($newerVersion['upgrade'] == 'security') {
-          // Security
-          $severity = \Psr\Log\LogLevel::CRITICAL;
-          $title = ts('CiviCRM Security Update Required');
-          $message = ts('New security release %1 is available. The site is currently running %2.', $vInfo);
-        }
-        elseif ($newerVersion['status'] == 'eol') {
-          // Warn about EOL
-          $severity = \Psr\Log\LogLevel::WARNING;
-          $title = ts('CiviCRM Update Needed');
-          $message = ts('New version %1 is available. The site is currently running %2, which has reached its end of life.', $vInfo);
-        }
-        else {
-          // For most new versions, just make them notice
-          $severity = \Psr\Log\LogLevel::NOTICE;
-          $title = ts('CiviCRM Update Available');
-          $message = ts('New version %1 is available. The site is currently running %2.', $vInfo);
-        }
+      if ($newerVersion['upgrade'] == 'security') {
+        // Security
+        $severity = \Psr\Log\LogLevel::CRITICAL;
+        $title = ts('CiviCRM Security Update Required');
+        $message = ts('New security release %1 is available. The site is currently running %2.', $vInfo);
+      }
+      elseif ($newerVersion['status'] == 'eol') {
+        // Warn about EOL
+        $severity = \Psr\Log\LogLevel::WARNING;
+        $title = ts('CiviCRM Update Needed');
+        $message = ts('New version %1 is available. The site is currently running %2, which has reached its end of life.', $vInfo);
       }
       else {
-        $vNum = $vc->localVersion;
-        // LTS = long-term support version
-        if ($newerVersion['status'] == 'lts') {
-          $vNum .= ' ' . ts('(long-term support)');
-        }
-
-        $severity = \Psr\Log\LogLevel::INFO;
-        $title = ts('CiviCRM Up-to-Date');
-        $message = ts('CiviCRM version %1 is up-to-date.', array(1 => $vNum));
+        // For most new versions, just make them notice
+        $severity = \Psr\Log\LogLevel::NOTICE;
+        $title = ts('CiviCRM Update Available');
+        $message = ts('New version %1 is available. The site is currently running %2.', $vInfo);
       }
-
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $message,
-        $title,
-        $severity,
-        'fa-cloud-upload'
-      );
     }
     else {
+      $vNum = $vc->localVersion;
+      // LTS = long-term support version
+      if ($newerVersion['status'] == 'lts') {
+        $vNum .= ' ' . ts('(long-term support)');
+      }
+
+      $severity = \Psr\Log\LogLevel::INFO;
+      $title = ts('CiviCRM Up-to-Date');
+      $message = ts('CiviCRM version %1 is up-to-date.', array(1 => $vNum));
+    }
+
+    $messages[] = new CRM_Utils_Check_Message(
+      __FUNCTION__,
+      $message,
+      $title,
+      $severity,
+      'fa-cloud-upload'
+    );
+
+    // Make sure the version_check job is enabled
+    $jobs = civicrm_api3('Job', 'get', array(
+      'sequential' => 1,
+      'api_action' => "version_check",
+      'api_entity' => "job",
+    ));
+    if (!$jobs['count'] || empty($jobs['values'][0]['is_active'])) {
+      $args = array('reset' => 1);
+      if (!empty($jobs['id'])) {
+        $args += array(
+          'action' => 'update',
+          'id' => $jobs['id'],
+        );
+      }
       $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the setting</a> to receive important security update notifications.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1') . '"')),
+        'checkVersionDisabled',
+        ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the scheduled job</a> to receive important security update notifications.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/job', $args) . '"')),
         ts('Update Check Disabled'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-times-circle-o'
