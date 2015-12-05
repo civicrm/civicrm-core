@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ef9002cf84b250ea5201b6ce0c5baa56",
-    "content-hash": "a02a7a13793c8f4f6d5e053690a8aedc",
+    "hash": "b8d71552b9a60526a0aab8db1242831a",
+    "content-hash": "21f4bbca7424a246cf5e48c89aa88022",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
-            "version": "v0.15.07.27",
+            "version": "v0.15.12.04",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-                "reference": "b6738943aec5b94be5bdc157453142c87851b684"
+                "reference": "6e3a0f956860908a240758ab8c80a020549a6f03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/b6738943aec5b94be5bdc157453142c87851b684",
-                "reference": "b6738943aec5b94be5bdc157453142c87851b684",
+                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/6e3a0f956860908a240758ab8c80a020549a6f03",
+                "reference": "6e3a0f956860908a240758ab8c80a020549a6f03",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
                 }
             ],
             "description": "RPC library for CiviConnect",
-            "time": "2015-07-28 02:17:20"
+            "time": "2015-12-05 04:41:02"
         },
         {
             "name": "dompdf/dompdf",
