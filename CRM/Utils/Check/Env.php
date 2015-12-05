@@ -348,7 +348,7 @@ class CRM_Utils_Check_Env {
     else {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the setting</a> to receive important security update notifications.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1'))),
+        ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the setting</a> to receive important security update notifications.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1') . '"')),
         ts('Update Check Disabled'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-times-circle-o'
