@@ -59,7 +59,9 @@ class CRM_Utils_VersionCheck {
    */
   public $versionInfo = array();
 
-  /** @var bool */
+  /**
+   * @var bool
+   */
   public $isInfoAvailable;
 
   /**
