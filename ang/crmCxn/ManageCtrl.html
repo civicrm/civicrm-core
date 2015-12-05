@@ -90,7 +90,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="appMeta in appMetas | orderBy:availOrder.get()" ng-show="!findCxnByAppId(appMeta.appId)">
+    <tr ng-repeat="appMeta in appMetas | orderBy:availOrder.get()" ng-show="!findCxnByAppId(appMeta.appId)" ng-class-even="'even-row even'" ng-class-odd="'odd-row odd'">
       <td>
         <a crm-confirm='{width: "65%", resizable: true, title:ts("%1: About", {1: appMeta.title}), templateUrl: "~/crmCxn/AboutCtrl.html", export: {appMeta: appMeta}}'
             >{{appMeta.title}}</a>
