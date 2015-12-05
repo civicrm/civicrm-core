@@ -125,6 +125,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_beta2($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Delete unused file', 'deleteVersionCheckCacheFile');
+  }
+
+  /**
    * CRM-16354
    *
    * @return int
@@ -329,6 +339,22 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
       CRM_Core_DAO::executeQuery("UPDATE civicrm_saved_search SET form_values = %1 WHERE id = {$dao->id}", array(1 => array(serialize($formValues), 'String')));
     }
 
+    return TRUE;
+  }
+
+  /**
+   * CRM-17637 - Ths file location has been moved; delete the old one
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function deleteVersionCheckCacheFile(CRM_Queue_TaskContext $ctx) {
+    $config = CRM_Core_Config::singleton();
+    $cacheFile = $config->uploadDir . 'version-info-cache.json';
+    if (file_exists($cacheFile)) {
+      unlink($cacheFile);
+    }
     return TRUE;
   }
 
