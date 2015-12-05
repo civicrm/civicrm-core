@@ -55,13 +55,13 @@
                 </li>
                 <li>
                   <a class="action-item crm-hover-button"
-                     crm-confirm='{width: "65%", resizable: true, title:ts("Reconnect"), templateUrl: "~/crmCxn/ConfirmReconnectCtrl.html", export: {cxn: cxn}}'
+                     crm-confirm='{width: "65%", resizable: true, title:ts("%1: Reconnect", {1: cxn.app_meta.title}), templateUrl: "~/crmCxn/ConfirmReconnectCtrl.html", export: {cxn: cxn}}'
                      on-yes="reregister(cxn.app_meta)"
                       >{{ts('Reconnect')}}</a>
                 </li>
                 <li>
                   <a class="action-item crm-hover-button"
-                     crm-confirm='{width: "65%", resizable: true, title: ts("Disconnect"), message: ts("Are you sure you want to disconnect \"%1?\". Doing so may permanently destroy data linkage.", {1: cxn.app_meta.title})}'
+                     crm-confirm='{width: "65%", resizable: true, title: ts("%1: Disconnect", {1: cxn.app_meta.title}), message: ts("Are you sure you want to disconnect \"%1?\". Doing so may permanently destroy data linkage.", {1: cxn.app_meta.title})}'
                      on-yes="unregister(cxn.app_meta)">
                     {{ts('Disconnect')}}
                   </a>
@@ -98,7 +98,7 @@
       <td><div ng-bind-html="appMeta.desc"></div></td>
       <td>
         <a class="action-item crm-hover-button"
-           crm-confirm='{width: "65%", resizable: true, title:ts("Connect"), templateUrl: "~/crmCxn/ConfirmConnectCtrl.html", export: {appMeta: appMeta}}'
+           crm-confirm='{width: "65%", resizable: true, title:ts("%1: Connect", {1: appMeta.title}), templateUrl: "~/crmCxn/ConfirmConnectCtrl.html", export: {appMeta: appMeta}}'
            on-yes="register(appMeta)"
           >{{ts('Connect')}}</a>
       </td>
