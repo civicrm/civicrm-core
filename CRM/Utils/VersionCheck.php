@@ -33,14 +33,10 @@
 class CRM_Utils_VersionCheck {
   const
     PINGBACK_URL = 'http://latest.civicrm.org/stable.php?format=json',
-    // timeout for when the connection or the server is slow
-    CHECK_TIMEOUT = 5,
     // relative to $civicrm_root
-    LOCALFILE_NAME = 'civicrm-version.php',
+    LOCALFILE_NAME = '[civicrm.root]/civicrm-version.php',
     // relative to $config->uploadDir
-    CACHEFILE_NAME = 'version-info-cache.json',
-    // cachefile expiry time (in seconds) - one day
-    CACHEFILE_EXPIRE = 86400;
+    CACHEFILE_NAME = '[civicrm.files]/persist/version-info-cache.json';
 
   /**
    * The version of the current (local) installation
@@ -81,12 +77,8 @@ class CRM_Utils_VersionCheck {
    * Class constructor.
    */
   public function __construct() {
-    global $civicrm_root;
-    $config = CRM_Core_Config::singleton();
-
-    $localFile = $civicrm_root . DIRECTORY_SEPARATOR . self::LOCALFILE_NAME;
-    $this->cacheFile = $config->uploadDir . self::CACHEFILE_NAME;
-
+    // Populate local version
+    $localFile = Civi::paths()->getPath(self::LOCALFILE_NAME);
     if (file_exists($localFile)) {
       require_once $localFile;
     }
@@ -95,20 +87,10 @@ class CRM_Utils_VersionCheck {
       $this->localVersion = trim($info['version']);
       $this->localMajorVersion = $this->getMajorVersion($this->localVersion);
     }
-    // Populate $versionInfo
-    if (Civi::settings()->get('versionCheck')) {
-      // Use cached data if available and not stale
-      if (!$this->readCacheFile()) {
-        // Collect stats for pingback
-        $this->getSiteStats();
 
-        // Get the latest version and send site info
-        $this->pingBack();
-      }
-
-      // Sort version info in ascending order for easier comparisons
-      ksort($this->versionInfo, SORT_NUMERIC);
-    }
+    // Populate remote $versionInfo from cache file
+    $this->cacheFile = Civi::paths()->getPath(self::CACHEFILE_NAME);
+    $this->readCacheFile();
   }
 
   /**
@@ -212,6 +194,14 @@ class CRM_Utils_VersionCheck {
     }
 
     return $return;
+  }
+
+  /**
+   * Called by version_check cron job
+   */
+  public function fetch() {
+    $this->getSiteStats();
+    $this->pingBack();
   }
 
   /**
@@ -354,11 +344,9 @@ class CRM_Utils_VersionCheck {
 
   /**
    * Send the request to civicrm.org
-   * Set timeout and suppress errors
    * Store results in the cache file
    */
   private function pingBack() {
-    ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
     $params = array(
       'http' => array(
         'method' => 'POST',
@@ -367,7 +355,7 @@ class CRM_Utils_VersionCheck {
       ),
     );
     $ctx = stream_context_create($params);
-    $rawJson = @file_get_contents(self::PINGBACK_URL, FALSE, $ctx);
+    $rawJson = file_get_contents(self::PINGBACK_URL, FALSE, $ctx);
     $versionInfo = $rawJson ? json_decode($rawJson, TRUE) : NULL;
     // If we couldn't fetch or parse the data $versionInfo will be NULL
     // Otherwise it will be an array and we'll cache it.
@@ -376,18 +364,16 @@ class CRM_Utils_VersionCheck {
       $this->writeCacheFile($rawJson);
       $this->versionInfo = $versionInfo;
     }
-    ini_restore('default_socket_timeout');
   }
 
   /**
    * @return bool
    */
   private function readCacheFile() {
-    $expiryTime = time() - self::CACHEFILE_EXPIRE;
-
-    // if there's a cachefile and it's not stale, use it
-    if (file_exists($this->cacheFile) && (filemtime($this->cacheFile) > $expiryTime)) {
+    if (file_exists($this->cacheFile)) {
       $this->versionInfo = (array) json_decode(file_get_contents($this->cacheFile), TRUE);
+      // Sort version info in ascending order for easier comparisons
+      ksort($this->versionInfo, SORT_NUMERIC);
       return TRUE;
     }
     return FALSE;
@@ -398,15 +384,7 @@ class CRM_Utils_VersionCheck {
    * @param string $contents
    */
   private function writeCacheFile($contents) {
-    $fp = @fopen($this->cacheFile, 'w');
-    if (!$fp) {
-      if (CRM_Core_Permission::check('administer CiviCRM')) {
-        CRM_Core_Session::setStatus(
-          ts('Unable to write file') . ": $this->cacheFile<br />" . ts('Please check your system file permissions.'),
-          ts('File Error'), 'error');
-      }
-      return;
-    }
+    $fp = fopen($this->cacheFile, 'w');
     fwrite($fp, $contents);
     fclose($fp);
   }
