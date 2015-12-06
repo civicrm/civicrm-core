@@ -93,7 +93,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $title
    * @param string $funcName
    */
-  protected function addTask($title, $funcName) {
+  public function addTask($title, $funcName) {
     $queue = CRM_Queue_Service::singleton()->load(array(
       'type' => 'Sql',
       'name' => CRM_Upgrade_Form::QUEUE_NAME,

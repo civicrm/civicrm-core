@@ -131,7 +131,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * @param $version
    *
-   * @return mixed
+   * @return CRM_Upgrade_Incremental_Base
    */
   public static function &incrementalPhpObject($version) {
     static $incrementalPhpObject = array();
@@ -672,7 +672,7 @@ SET    version = '$version'
       if (is_callable(array($versionObject, $preFunction))) {
         $versionObject->$preFunction($rev, $originalVer, $latestVer);
       }
-      $upgrade->processSQL($rev);
+      $versionObject->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
       if (is_callable(array($versionObject, $postFunction))) {
         $versionObject->$postFunction($rev, $originalVer, $latestVer);
       }
