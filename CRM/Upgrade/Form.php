@@ -656,11 +656,26 @@ SET    version = '$version'
 
     $upgrade->setSchemaStructureTables($rev);
 
-    if (is_callable(array($versionObject, $phpFunctionName))) {
-      $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
+    // CRM-16860 prior to 4.7 the upgrade function would have to manually call processSQL
+    if (version_compare($rev, '4.7.alpha1', '<')) {
+      if (is_callable(array($versionObject, $phpFunctionName))) {
+        $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
+      }
+      else {
+        $upgrade->processSQL($rev);
+      }
     }
+    // In 4.7+ processSQL runs unconditionally with optional pre/post processingz
     else {
+      $preFunction = $phpFunctionName . '_pre';
+      $postFunction = $phpFunctionName . '_post';
+      if (is_callable(array($versionObject, $preFunction))) {
+        $versionObject->$preFunction($rev, $originalVer, $latestVer);
+      }
       $upgrade->processSQL($rev);
+      if (is_callable(array($versionObject, $postFunction))) {
+        $versionObject->$postFunction($rev, $originalVer, $latestVer);
+      }
     }
 
     // set post-upgrade-message if any
