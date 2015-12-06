@@ -640,11 +640,7 @@ SET    version = '$version'
 
     // pre-db check for major release.
     if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
-      if (!(is_callable(array(
-        $versionObject,
-        'verifyPreDBstate',
-      )))
-      ) {
+      if (!(is_callable(array($versionObject, 'verifyPreDBstate')))) {
         CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
       }
 
@@ -660,10 +656,7 @@ SET    version = '$version'
 
     $upgrade->setSchemaStructureTables($rev);
 
-    if (is_callable(array(
-      $versionObject,
-      $phpFunctionName,
-    ))) {
+    if (is_callable(array($versionObject, $phpFunctionName))) {
       $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
     }
     else {
@@ -671,10 +664,7 @@ SET    version = '$version'
     }
 
     // set post-upgrade-message if any
-    if (is_callable(array(
-      $versionObject,
-      'setPostUpgradeMessage',
-    ))) {
+    if (is_callable(array($versionObject, 'setPostUpgradeMessage'))) {
       $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
       $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
       file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
