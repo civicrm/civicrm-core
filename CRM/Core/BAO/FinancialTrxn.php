@@ -58,10 +58,9 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   public static function create(&$params, $trxnEntityTable = NULL) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
-    $fids = array();
+
     if (!CRM_Utils_Rule::currencyCode($trxn->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $trxn->currency = $config->defaultCurrency;
+      $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
     $trxn->save();
