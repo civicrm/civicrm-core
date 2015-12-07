@@ -100,6 +100,18 @@ class CRM_Core_ScheduledJob {
       case 'Always':
         return TRUE;
 
+      case 'Yearly':
+        $offset = '+1 year';
+        break;
+
+      case 'Monthly':
+        $offset = '+1 month';
+        break;
+
+      case 'Weekly':
+        $offset = '+1 week';
+        break;
+
       case 'Hourly':
         $format = 'YmdH';
         break;
@@ -133,10 +145,21 @@ class CRM_Core_ScheduledJob {
     }
 
     $now = CRM_Utils_Date::currentDBDate();
-    $lastTime = date($format, strtotime($this->last_run));
-    $thisTime = date($format, strtotime($now));
 
-    return ($lastTime <> $thisTime);
+    if (!empty($format)) {
+      $lastTime = date($format, strtotime($this->last_run));
+      $thisTime = date($format, strtotime($now));
+
+      return ($lastTime <> $thisTime);
+    }
+
+    if (!empty($offset)) {
+      $now = strtotime($now);
+      $lastTime = strtotime($this->last_run);
+      $nextTime = strtotime($offset, $lastTime);
+
+      return ($now >= $nextTime);
+    }
   }
 
   public function __destruct() {
