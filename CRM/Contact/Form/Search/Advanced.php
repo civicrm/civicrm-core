@@ -339,7 +339,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contribution_source',
       'membership_status_id',
       'participant_status_id',
-      'contribution_trxn_id',
+      // 'contribution_trxn_id',
       'activity_type_id',
       'status_id',
       'activity_subject',

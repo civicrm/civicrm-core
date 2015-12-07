@@ -275,7 +275,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'contribution_soft_credit_type_id',
         'contribution_status_id',
         'contribution_source',
-        'contribution_trxn_id',
+        //'contribution_trxn_id',
         'contribution_page_id',
         'contribution_product_id',
         'invoice_id',
