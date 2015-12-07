@@ -177,8 +177,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       }
     }
 
-    // TODO Should drop config_backend, but keeping it during alpha/beta cycle in case we miss something.
-    // CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_domain DROP COLUMN config_backend');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_domain DROP COLUMN config_backend');
 
     return TRUE;
   }
