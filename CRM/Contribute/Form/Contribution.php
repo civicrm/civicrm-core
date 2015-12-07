@@ -1622,7 +1622,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         || $params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name')
       ) {
         if (CRM_Utils_System::isNull(CRM_Utils_Array::value('cancel_date', $params))) {
-          $params['cancel_date'] = date('Y-m-d');
+          $params['cancel_date'] = date('YmdHis');
         }
       }
       else {
