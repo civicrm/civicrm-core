@@ -1495,7 +1495,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addRadio($name, $label, $options, $props, $separator, $required);
 
       case 'Select':
-        if (empty($props['multiple'])) {
+        unset($props['size']);
+        if (empty($props['multiple']) && !empty($props['placeholder'])) {
           $options = array('' => $props['placeholder']) + $options;
         }
         if (!empty($props['data-api-field']) && (in_array($props['data-api-field'], array('state_province_id', 'county_id')))) {
