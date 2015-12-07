@@ -40,12 +40,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
-  protected $_customGroupExtends = array(
-    'Contact',
-    'Individual',
-    'Contribution',
-  );
-
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   protected $lifeTime_from = NULL;
