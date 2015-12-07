@@ -338,6 +338,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $qfKey = $this->_key;
     $componentId = $componentContext = NULL;
     if ($this->_context != 'contribute') {
+      // @todo explain the significance of context & why we do not get these i that context.
       $qfKey = CRM_Utils_Request::retrieve('key', 'String', CRM_Core_DAO::$_nullObject);
       $componentId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject);
       $componentAction = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
@@ -346,7 +347,15 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       if (!$componentContext &&
         $this->_compContext
       ) {
+        // @todo explain when this condition might occur.
         $componentContext = $this->_compContext;
+        $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', CRM_Core_DAO::$_nullObject, NULL, FALSE, 'REQUEST');
+      }
+      // CRM-17628 for some reason qfKey is not always set when searching from contribution search.
+      // as a result if the edit link is opened using right-click + open in new tab
+      // then the browser is not returned to the search results on save.
+      // This is an effort to getting the qfKey without, sadly, understanding the intent of those who came before me.
+      if (empty($qfKey)) {
         $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', CRM_Core_DAO::$_nullObject, NULL, FALSE, 'REQUEST');
       }
     }
