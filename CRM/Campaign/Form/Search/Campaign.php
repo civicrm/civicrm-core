@@ -106,7 +106,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     $this->assign('campaignStatus', json_encode($campaignStatus));
 
     //active campaigns
-    $this->addElement('select', 'is_active', ts('Is Actief?'), array(
+    $this->addElement('select', 'is_active', ts('Is Active?'), array(
       '' => ts('- select -'),
       '0' => ts('Yes'),
       '1' => ts('No'),
