@@ -127,7 +127,7 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
       if (!in_array($displayValue, $viewOptions)) {
         $existingViewOptions .= $displayValue . CRM_Core_DAO::VALUE_SEPARATOR;
 
-        CRM_Core_BAO_Setting::setItem($existingViewOptions, CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'contact_view_options');
+        Civi::settings()->set('contact_view_options', $existingViewOptions);
         CRM_Core_Session::setStatus(ts('We have automatically enabled the Mailings tab for the Contact Summary screens
         so that you can view mailings sent to each contact.'), ts('Saved'), 'success');
       }

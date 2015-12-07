@@ -173,7 +173,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     $params = $this->controller->exportValues($this->_name);
     unset($params['qfKey']);
     unset($params['entryURL']);
-    $setInvoiceSettings = CRM_Core_BAO_Setting::setItem($params, CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    Civi::settings()->set('contribution_invoice_settings', $params);
 
     // to set default value for 'Invoices / Credit Notes' checkbox on display preferences
     $values = CRM_Core_BAO_Setting::getItem("CiviCRM Preferences");
@@ -185,8 +185,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
       $setInvoice = CRM_Core_DAO::VALUE_SEPARATOR .
         implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($value)) .
         CRM_Core_DAO::VALUE_SEPARATOR;
-      CRM_Core_BAO_Setting::setItem($values['user_dashboard_options'] .
-        $setInvoice, 'CiviCRM Preferences', 'user_dashboard_options');
+      Civi::settings()->set('user_dashboard_options', $values['user_dashboard_options'] . $setInvoice);
     }
     else {
       $setting = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($values['user_dashboard_options'], 1, -1));
@@ -195,7 +194,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
       $settingName = CRM_Core_DAO::VALUE_SEPARATOR .
         implode(CRM_Core_DAO::VALUE_SEPARATOR, array_values($setting)) .
         CRM_Core_DAO::VALUE_SEPARATOR;
-      CRM_Core_BAO_Setting::setItem($settingName, 'CiviCRM Preferences', 'user_dashboard_options');
+      Civi::settings()->set('user_dashboard_options', $settingName);
     }
     //CRM-16691: Changes made related to settings of 'CVV'.
     $settings = array_intersect_key($params, $this->_settings);

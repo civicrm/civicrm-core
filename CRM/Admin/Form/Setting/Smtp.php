@@ -187,10 +187,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       $formValues['smtpPassword'] = CRM_Utils_Crypt::encrypt($formValues['smtpPassword']);
     }
 
-    CRM_Core_BAO_Setting::setItem($formValues,
-      CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
+    Civi::settings()->set('mailing_backend', $formValues);
   }
 
   /**

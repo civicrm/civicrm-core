@@ -557,7 +557,7 @@ class CRM_Core_Resources {
   public function setCacheCode($value) {
     $this->cacheCode = $value;
     if ($this->cacheCodeKey) {
-      CRM_Core_BAO_Setting::setItem($value, CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, $this->cacheCodeKey);
+      Civi::settings()->set($this->cacheCodeKey, $value);
     }
     return $this;
   }
