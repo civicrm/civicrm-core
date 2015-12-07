@@ -200,19 +200,13 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
     // verify ssl peer option
     if (isset($params['verifySSL'])) {
-      CRM_Core_BAO_Setting::setItem($params['verifySSL'],
-        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'verifySSL'
-      );
+      Civi::settings()->set('verifySSL', $params['verifySSL']);
       unset($params['verifySSL']);
     }
 
     // force secure URLs
     if (isset($params['enableSSL'])) {
-      CRM_Core_BAO_Setting::setItem($params['enableSSL'],
-        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'enableSSL'
-      );
+      Civi::settings()->set('enableSSL', $params['enableSSL']);
       unset($params['enableSSL']);
     }
     $settings = array_intersect_key($params, $this->_settings);
