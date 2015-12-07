@@ -182,14 +182,18 @@ function civicrm_api3_system_get($params) {
       'uf' => CIVICRM_UF, // deprecated in favor of cms.type
       'php' => array(
         'version' => phpversion(),
+        'time' => time(),
         'tz' => date_default_timezone_get(),
         'extensions' => get_loaded_extensions(),
         'ini' => _civicrm_api3_system_get_redacted_ini(),
       ),
       'mysql' => array(
         'version' => CRM_Core_DAO::singleValueQuery('SELECT @@version'),
+        'time' => CRM_Core_DAO::singleValueQuery('SELECT unix_timestamp()'),
+        'vars' => _civicrm_api3_system_get_redacted_mysql(),
       ),
       'cms' => array(
+        'version' => $config->userSystem->getVersion(),
         'type' => CIVICRM_UF,
         'modules' => CRM_Core_Module::collectStatuses($config->userSystem->getModules()),
       ),
@@ -234,13 +238,7 @@ function civicrm_api3_system_get($params) {
 function _civicrm_api3_system_get_redacted_ini() {
   static $whitelist = NULL;
   if ($whitelist === NULL) {
-    $whitelistFile = __DIR__ . '/System/ini-whitelist.txt';
-    $whitelist = array_filter(
-      explode("\n", file_get_contents($whitelistFile)),
-      function ($k) {
-        return !empty($k) && !preg_match('/^\s*#/', $k);
-      }
-    );
+    $whitelist = _civicrm_api3_system_get_whitelist(__DIR__ . '/System/ini-whitelist.txt');
   }
 
   $inis = ini_get_all(NULL, FALSE);
@@ -255,4 +253,48 @@ function _civicrm_api3_system_get_redacted_ini() {
   }
 
   return $result;
+}
+
+/**
+ * Generate ae sanitized/anonymized/redacted dump of MySQL configuration.
+ *
+ * @return array
+ * @see _civicrm_api3_system_get_redacted_ini
+ */
+function _civicrm_api3_system_get_redacted_mysql() {
+  static $whitelist = NULL;
+  if ($whitelist === NULL) {
+    $whitelist = _civicrm_api3_system_get_whitelist(__DIR__ . '/System/mysql-whitelist.txt');
+  }
+
+  $inis = ini_get_all(NULL, FALSE);
+  $result = array();
+  $dao = CRM_Core_DAO::executeQuery('SHOW VARIABLES');
+  while ($dao->fetch()) {
+    if (empty($dao->Variable_name) || in_array($dao->Variable_name, $whitelist)) {
+      $result[$dao->Variable_name] = $dao->Value;
+    }
+    else {
+      $result[$dao->Variable_name] = 'REDACTED';
+    }
+  }
+
+  return $result;
+}
+
+/**
+ * Read a whitelist.
+ *
+ * @param string $whitelistFile
+ *   Name of a file. Each line is a field name. Comments begin with "#".
+ * @return array
+ */
+function _civicrm_api3_system_get_whitelist($whitelistFile) {
+  $whitelist = array_filter(
+    explode("\n", file_get_contents($whitelistFile)),
+    function ($k) {
+      return !empty($k) && !preg_match('/^\s*#/', $k);
+    }
+  );
+  return $whitelist;
 }
