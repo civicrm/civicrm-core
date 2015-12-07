@@ -144,8 +144,8 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
     $this->type("sort_name", "$lastName $firstName");
     $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+    $this->clickLink("_qf_Search_refresh", "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']");
+    $this->clickLink("xpath=xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     //View Contribution Record and verify data
     $expected = array(
@@ -307,8 +307,8 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='crm-accordion-wrapper crm-contribution_search_form-accordion ']/div[2]/table/tbody/tr[8]/td[1]/table/tbody/tr[3]/td[2]/label[1]");
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", FALSE);
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+    $this->clickLink("_qf_Search_refresh", "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", FALSE);
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     //View Contribution Record and verify data
     $expected = array(
@@ -482,8 +482,8 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->type("sort_name", "$lastName $firstName");
     $this->multiselect2('contribution_product_id', array('Coffee Mug'));
     $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']/table/tbody//tr/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[3]/a[text()='{$lastName}, {$firstName}']/../../td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody//tr/td[10]/span//a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody//tr/td[2]/a[text()='{$lastName}, {$firstName}']/../../td[10]/span//a[text()='View']");
     $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
 
     //View Contribution Record and verify data

@@ -519,8 +519,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       );
     }
     //check if the membership amount is correct
-    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr/td[1]/span[text()='{$amount}']");
-    $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr/td[1]/span[text()='{$amount}']"));
+    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr/td[1]/span/a[text()='{$amount}']");
+    $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr/td[1]/span/a[text()='{$amount}']"));
   }
 
 }
