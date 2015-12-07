@@ -68,7 +68,6 @@ class CRM_Contact_Form_Edit_Address {
 
     //make location type required for inline edit
     $form->addField("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight') + $js, $inlineEdit);
-
     if (!$inlineEdit) {
       $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
     }
@@ -86,8 +85,8 @@ class CRM_Contact_Form_Edit_Address {
     $form->addField(
       "address[$blockId][is_billing]", array(
         'entity' => 'address',
-        'label' => ts('Primary location for this contact'),
-        'text' => ts('Primary location for this contact')) + $js);
+        'label' => ts('Billing location for this contact'),
+        'text' => ts('Billing location for this contact')) + $js);
 
     // hidden element to store master address id
     $form->addField("address[$blockId][master_id]", array('entity' => 'address', 'type' => 'hidden'));
