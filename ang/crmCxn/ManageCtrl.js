@@ -56,6 +56,11 @@
       return block(crmStatus({start: ts('Connecting...'), success: ts('Connected')}, reg));
     };
 
+    $scope.reregister = function(appMeta) {
+      var reg = crmApi('Cxn', 'register', {app_guid: appMeta.appId}).then($scope.refreshCxns);
+      return block(crmStatus({start: ts('Reconnecting...'), success: ts('Reconnected')}, reg));
+    };
+
     $scope.unregister = function(appMeta) {
       var reg = crmApi('Cxn', 'unregister', {app_guid: appMeta.appId, debug: 1}).then($scope.refreshCxns);
       return block(crmStatus({start: ts('Disconnecting...'), success: ts('Disconnected')}, reg));
