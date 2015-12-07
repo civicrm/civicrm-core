@@ -110,7 +110,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         'order_bys' => array(
           'sort_name' => array(
             'title' => ts('Last Name, First Name'),
-            'default' => '1',
+            'default' => '0',
             'default_weight' => '0',
             'default_order' => 'ASC',
           ),
@@ -226,6 +226,15 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array('1'),
+          ),
+        ),
+        'order_bys' => array(
+          'total_amount' => array(
+            'title' => ts('Total amount last year (affects available columns)'),
+            'description' => ts('When ordering by this life time amount cannot be calculated'),
+            'default' => '0',
+            'default_weight' => '0',
+            'default_order' => 'DESC',
           ),
         ),
       ),
@@ -375,10 +384,42 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     }
   }
 
+  /**
+   * Generate where clause for last calendar year or fiscal year.
+   *
+   * @todo must be possible to re-use relative dates stuff.
+   *
+   * @param string $fieldName
+   *
+   * @return null|string
+   */
+  public function whereClauseLastYear($fieldName) {
+    $current_year = $this->_params['yid_value'];
+    $previous_year = $current_year - 1;
+    if (CRM_Utils_Array::value('yid_op', $this->_params) == 'calendar') {
+      $firstDateOfYear = "{$previous_year}-01-01";
+      $lastDateOfYear =  "{$previous_year}-12-31 23:11:59";
+    }
+    else {
+      $fiscalYear = CRM_Core_Config::singleton()->fiscalYearStart;
+      $firstDateOfYear = "{$previous_year}-{$fiscalYear['M']}-{$fiscalYear['d']}";
+      $lastDateOfYear =  date('Ymdhis', strtotime(date($current_year . '-m-d'), '- 1 second'));
+    }
+    return "$fieldName BETWEEN '{$firstDateOfYear}' AND '{$lastDateOfYear}'";
+  }
+
+
   public function groupBy() {
-    $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id, " .
-      self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
-        '.receive_date') . " " . $this->_rollup;
+    $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
+
+    if (!$this->isOrderByLastYearTotal()) {
+      // If we are ordering by last year total we can't also get the lifetime total
+      // in the same query without significant re-work so we may as well drop the
+      // expensive clause that supports it.
+      $this->_groupBy .= ', ' . self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
+          '.receive_date');
+    }
+
     $this->assign('chartSupported', TRUE);
   }
 
@@ -413,12 +454,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     // get ready with post process params
     $this->beginPostProcess();
 
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-    $this->select();
-    $this->from();
-    $this->where();
-    $this->groupBy();
+    $this->buildQuery();
+    $this->resetFormSql();
 
     $this->getPermissionedFTQuery($this);
 
@@ -437,8 +474,23 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     }
 
     if (!empty($this->_contactIds) || !empty($this->_params['charts'])) {
-      $sql = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
-        AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
+      $this->_where = "WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
+       AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause}";
+
+      if ($this->isOrderByLastYearTotal()) {
+        $this->_rollup = '';
+        $this->_where .= " AND " . $this->whereClauseLastYear('receive_date');
+        unset($this->_columnHeaders['civicrm_life_time_total']);
+      }
+
+      $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_rollup}";
+
+      if (!empty($this->_orderByArray)) {
+        $this->_orderBy = str_replace('contact_civireport.', 'civicrm_contact_', "ORDER BY " . implode(', ', $this->_orderByArray));
+        $this->_orderBy = str_replace('contribution_civireport.', 'civicrm_contribution_', $this->_orderBy);
+        $sql = "SELECT * FROM ( $sql ) as inner_query {$this->_orderBy}";
+      }
+
       $this->addToDeveloperTab($sql);
       $dao = CRM_Core_DAO::executeQuery($sql);
       $current_year = $this->_params['yid_value'];
@@ -476,6 +528,33 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
     // do print / pdf / instance stuff if needed
     $this->endPostProcess($rows);
+  }
+
+  /**
+   * Reset the form sql to prevent misleading developer tab info.
+   */
+  function resetFormSql() {
+    $this->sql = '';
+  }
+
+  /**
+   * Are we ordering by the latest year total.
+   *
+   * If we are we need to drop the rollup to do the ordering.
+   *
+   * Without bigger changes we can't get the lifetime total and order by
+   * the latest year total in the same query.
+   *
+   * @return bool
+   */
+  public function isOrderByLastYearTotal() {
+    $this->storeOrderByArray();
+    foreach ($this->_orderByArray as $orderBy) {
+      if (stristr($orderBy, 'contribution_civireport.total_amount')) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
