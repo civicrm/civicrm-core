@@ -187,12 +187,12 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
 
     //login to check contribution
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
-
+    $this->waitForAjaxContent();
     $this->type('sort_name', "$lastName $firstName");
     $this->check('contribution_test');
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $expected = array(
       'From' => "{$firstName} {$lastName}",

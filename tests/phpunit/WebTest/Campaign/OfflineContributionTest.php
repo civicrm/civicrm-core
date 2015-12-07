@@ -197,8 +197,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     // Is status message correct?
     $this->checkCRMAlert("The contribution record has been saved.");
-
-    $this->waitForElementPresent("xpath=//*[@id='Search']//div[2]//table[2]/tbody/tr/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//div[2]//table[2]/tbody/tr/td[8]/span//a[text()='View']");
 
     // click through to the Contribution view screen
     $this->click("xpath=//*[@id='Search']//div[2]//table[2]/tbody/tr/td[8]/span/a[text()='View']");
@@ -221,8 +220,8 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
       $this->type('sort_name', $firstName);
       $this->click("_qf_Search_refresh");
-      $this->waitForElementPresent("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span//a[text()='Edit']");
-      $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span//a[text()='Edit']");
+      $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr/td[10]/span//a[text()='Edit']");
+      $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr/td[10]/span//a[text()='Edit']");
       $this->waitForElementPresent("_qf_Contribution_cancel-bottom");
       $this->assertTrue($this->isTextPresent("$campaignTitle"));
     }
