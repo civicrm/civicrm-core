@@ -106,10 +106,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       $this->_outBound_option = $mailingBackend['outBound_option'];
       $mailingBackend['outBound_option'] = CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB;
 
-      CRM_Core_BAO_Setting::setItem($mailingBackend,
-        CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'mailing_backend'
-      );
+      Civi::settings()->set('mailing_backend', $mailingBackend);
 
       $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
         'mailing_backend'
@@ -138,10 +135,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
 
       $mailingBackend['outBound_option'] = $this->_outBound_option;
 
-      CRM_Core_BAO_Setting::setItem($mailingBackend,
-        CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'mailing_backend'
-      );
+      Civi::settings()->set('mailing_backend', $mailingBackend);
     }
   }
 

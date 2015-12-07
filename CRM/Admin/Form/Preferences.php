@@ -288,10 +288,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {
         $settingValue = isset($this->_config->$settingName) ? $this->_config->$settingName : NULL;
-        CRM_Core_BAO_Setting::setItem($settingValue,
-          $groupName,
-          $settingName
-        );
+        Civi::settings()->set($settingName, $settingValue);
       }
     }
     // Update any settings stored in dynamic js

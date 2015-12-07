@@ -154,7 +154,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'tax_term' => 'Sales Tax',
       'tax_display_settings' => 'Inclusive',
     );
-    $setInvoiceSettings = CRM_Core_BAO_Setting::setItem($contributeSetting, CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $setInvoiceSettings = Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
 
     // Payment Processor
     $paymentProceParams = array(
