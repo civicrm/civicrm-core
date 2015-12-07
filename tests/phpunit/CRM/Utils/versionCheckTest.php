@@ -108,7 +108,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
    * @param mixed $expectedResult
    */
   public function testNewerVersion($localVersion, $versionInfo, $expectedResult) {
-    $vc = CRM_Utils_VersionCheck::singleton();
+    $vc = new CRM_Utils_VersionCheck();
     // These values are set by the constructor but for testing we override them
     $vc->localVersion = $localVersion;
     $vc->localMajorVersion = $vc->getMajorVersion($localVersion);
@@ -154,7 +154,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
    * @param bool $expectedResult
    */
   public function testSecurityUpdate($localVersion, $versionInfo, $expectedResult) {
-    $vc = CRM_Utils_VersionCheck::singleton();
+    $vc = new CRM_Utils_VersionCheck();
     // These values are set by the constructor but for testing we override them
     $vc->localVersion = $localVersion;
     $vc->localMajorVersion = $vc->getMajorVersion($localVersion);

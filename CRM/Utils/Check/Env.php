@@ -292,10 +292,28 @@ class CRM_Utils_Check_Env {
   public function checkVersion() {
     $messages = array();
 
-    if (Civi::settings()->get('versionCheck')) {
-      $vc = CRM_Utils_VersionCheck::singleton();
-      $newerVersion = $vc->isNewerVersionAvailable();
+    // See if the version_check job is enabled
+    $jobs = civicrm_api3('Job', 'get', array(
+      'sequential' => 1,
+      'api_action' => "version_check",
+      'api_entity' => "job",
+    ));
+    $jobEnabled = !empty($jobs['values'][0]['is_active']);
+    if (!$jobEnabled) {
+      $args = empty($josb['id']) ? array('reset' => 1) : array('reset' => 1, 'action' => 'update', 'id' => $jobs['id']);
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkVersionDisabled',
+        ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the scheduled job</a> to receive important security update notifications.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/job', $args) . '"')),
+        ts('Update Check Disabled'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-times-circle-o'
+      );
+    }
 
+    $vc = new CRM_Utils_VersionCheck();
+    $newerVersion = $vc->isNewerVersionAvailable();
+
+    if ($vc->isInfoAvailable) {
       if ($newerVersion['version']) {
         $vInfo = array(
           1 => $newerVersion['version'],
@@ -325,7 +343,7 @@ class CRM_Utils_Check_Env {
           $message = ts('New version %1 is available. The site is currently running %2.', $vInfo);
         }
       }
-      else {
+      elseif ($jobEnabled) {
         $vNum = $vc->localVersion;
         // LTS = long-term support version
         if ($newerVersion['status'] == 'lts') {
@@ -337,22 +355,15 @@ class CRM_Utils_Check_Env {
         $message = ts('CiviCRM version %1 is up-to-date.', array(1 => $vNum));
       }
 
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $message,
-        $title,
-        $severity,
-        'fa-cloud-upload'
-      );
-    }
-    else {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the setting</a> to receive important security update notifications.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1') . '"')),
-        ts('Update Check Disabled'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-times-circle-o'
-      );
+      if (!empty($message)) {
+        $messages[] = new CRM_Utils_Check_Message(
+          __FUNCTION__,
+          $message,
+          $title,
+          $severity,
+          'fa-cloud-upload'
+        );
+      }
     }
 
     return $messages;

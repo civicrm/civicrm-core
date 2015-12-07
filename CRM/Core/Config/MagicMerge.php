@@ -172,7 +172,6 @@ class CRM_Core_Config_MagicMerge {
       'userFrameworkLogging' => array('setting'),
       'userFrameworkUsersTableName' => array('setting'),
       'verpSeparator' => array('setting'),
-      'versionCheck' => array('setting'),
       'wkhtmltopdfPath' => array('setting'),
       'wpBasePage' => array('setting'),
       'wpLoadPhp' => array('setting'),
