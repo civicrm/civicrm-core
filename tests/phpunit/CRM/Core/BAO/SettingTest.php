@@ -87,7 +87,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     Civi::service('settings_manager')->useMandatory();
     $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
     $this->assertEquals('/test/override', $values['overrideSetting']);
-    CRM_Core_BAO_Setting::setItem('/test/database', 'Test Preferences', 'databaseSetting');
+    Civi::settings()->set('databaseSetting', '/test/database');
     $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
     $this->assertEquals('/test/override', $values['overrideSetting']);
     $this->assertEquals('/test/database', $values['databaseSetting']);
@@ -153,22 +153,14 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
 
     // set initial value
     $_testOnChange_hookCalls = array('count' => 0);
-    CRM_Core_BAO_Setting::setItem(
-      array('First', 'Value'),
-      'CiviCRM Preferences',
-      'onChangeExample'
-    );
+    Civi::settings()->set('onChangeExample', array('First', 'Value'));
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['newValue']);
     $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
 
     // change value
     $_testOnChange_hookCalls = array('count' => 0);
-    CRM_Core_BAO_Setting::setItem(
-      array('Second', 'Value'),
-      'CiviCRM Preferences',
-      'onChangeExample'
-    );
+    Civi::settings()->set('onChangeExample', array('Second', 'Value'));
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['oldValue']);
     $this->assertEquals(array('Second', 'Value'), $_testOnChange_hookCalls['newValue']);

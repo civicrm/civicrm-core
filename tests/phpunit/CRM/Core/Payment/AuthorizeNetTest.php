@@ -165,10 +165,10 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     );
 
     // turn verifySSL off
-    CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
+    Civi::settings()->set('verifySSL', '0');
     $this->doPayment($params);
     // turn verifySSL on
-    CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
+    Civi::settings()->set('verifySSL', '0');
 
     // if subscription was successful, processor_id / subscription-id must not be null
     $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id',
@@ -306,10 +306,10 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $smarty->assign('subscriptionType', 'create');
 
     // turn verifySSL off
-    CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
+    Civi::settings()->set('verifySSL', '0');
     $this->doPayment($params);
     // turn verifySSL on
-    CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
+    Civi::settings()->set('verifySSL', '0');
 
     // if subscription was successful, processor_id / subscription-id must not be null
     $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id',
