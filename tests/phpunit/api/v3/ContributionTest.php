@@ -1049,7 +1049,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
     $newParams = array_merge($contribParams, array(
         'id' => $contribution['id'],
-        'contribution_status_id' => 7,
+        'contribution_status_id' => 'Refunded',
+        'cancel_date' => '2015-01-01 09:00',
       )
     );
 
@@ -1988,6 +1989,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'to_financial_account_id' => 6,
         'total_amount' => -100,
         'status_id' => 7,
+        'trxn_date' => '2015-01-01 09:00:00',
       );
     }
     elseif ($context == 'cancelPending') {
