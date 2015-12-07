@@ -166,7 +166,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
-    $this->processor->doPayment($params);
+    $this->doPayment($params);
     // turn verifySSL on
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
 
@@ -307,7 +307,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
-    $result = $this->processor->doPayment($params);
+    $this->doPayment($params);
     // turn verifySSL on
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
 
@@ -321,6 +321,25 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $message = '';
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
+  }
+
+  /**
+   * Process payment against the Authorize.net test server.
+   *
+   * Skip the test if the server is unresponsive.
+   *
+   * @param array $params
+   *
+   * @throws PHPUnit_Framework_SkippedTestError
+   */
+  public function doPayment($params) {
+    try {
+      $this->processor->doPayment($params);
+    }
+    catch (Exception $e) {
+      $this->assertEquals('E00001: Internal Error Occurred.', $e->getMessage(), 'AuthorizeNet failed for unknown reason.');
+      $this->markTestSkipped('AuthorizeNet test server is not in a good mood so we can\'t test this right now');
+    }
   }
 
 }
