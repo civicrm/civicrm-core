@@ -92,6 +92,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ReportTemplate',
       'System',
       'Setting',
+      'Payment',
     );
     $this->toBeImplemented['create'] = array(
       'Cxn',
@@ -106,6 +107,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ReportTemplate',
       'System',
       'User',
+      'Payment',
     );
     $this->toBeImplemented['delete'] = array(
       'Cxn',
@@ -118,6 +120,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFMatch',
       'Extension',
       'System',
+      'Payment',
     );
     $this->onlyIDNonZeroCount['get'] = array(
       'ActivityType',
