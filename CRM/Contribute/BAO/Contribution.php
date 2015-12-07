@@ -2701,6 +2701,7 @@ WHERE  contribution_id = %1 ";
 
     $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatus = empty($params['contribution_status_id']) ? NULL : $contributionStatuses[$params['contribution_status_id']];
 
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'participant') {
       $entityId = $params['participant_id'];
@@ -2819,6 +2820,9 @@ WHERE  contribution_id = %1 ";
         'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
+      if ($contributionStatus == 'Refunded') {
+        $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
+      }
 
       if (!empty($params['payment_processor'])) {
         $trxnParams['payment_processor_id'] = $params['payment_processor'];
