@@ -697,32 +697,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   }
 
   /**
-   * Syntactic sugar for adding a task which (a) is in this class and (b) has a high priority.
-   *
-   * After passing the $funcName, you can also pass parameters that will go to
-   * the function. Note that all params must be serializable.
-   *
-   * @param string $title
-   * @param string $funcName
-   */
-  protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load(array(
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ));
-
-    $args = func_get_args();
-    $title = array_shift($args);
-    $funcName = array_shift($args);
-    $task = new CRM_Queue_Task(
-      array(get_class($this), $funcName),
-      $args,
-      $title
-    );
-    $queue->createItem($task, array('weight' => -1));
-  }
-
-  /**
    * Get all the word-replacements stored in config-arrays
    * and convert them to params for the WordReplacement.create API.
    *
