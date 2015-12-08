@@ -196,4 +196,72 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * CRM-17656 - Test Activity using Custom Data
+   */
+  public function testActivityCustomData() {
+    $this->webtestLogin();
+
+    // Create new Custom Field Set
+    $this->openCiviPage('admin/custom/group', 'reset=1');
+    $this->click("css=#newCustomDataGroup > span");
+    $this->waitForElementPresent('_qf_Group_next-bottom');
+    $customFieldSet = 'ActivityFieldset' . rand();
+    $this->type("id=title", $customFieldSet);
+    $this->select("id=extends_0", "label=Activities");
+    $this->addSelection("extends_1", "- Any -");
+    $this->click("id=collapse_display");
+    $this->clickLink("id=_qf_Group_next-bottom");
+    $this->waitForText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
+    $this->waitForElementPresent('_qf_Field_done-bottom');
+
+    // Add field to fieldset
+    $customField = 'TestCustomField' . rand();
+    $this->type("id=label", $customField);
+    $this->select("id=data_type_0", "value=0");
+    $this->click("is_required");
+    $this->click("id=_qf_Field_done-bottom");
+    $this->waitForText('crm-notification-container', "Custom field '$customField' has been saved.");
+    $textFieldId = explode('&id=', $this->getAttribute("xpath=//table[@id='options']/tbody//tr/td[1]/div[text()='$customField']/../../td[8]/span/a[1][text()='Edit Field']/@href"));
+    $textFieldId = $textFieldId[1];
+
+    $fname = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact("$fname", "Anderson", $fname . "@anderson.com");
+
+    $this->openCiviPage("activity", "reset=1&action=add&context=standalone", "_qf_Activity_upload");
+    $this->select("activity_type_id", "value=1");
+    $this->select2('target_contact_id', $fname, TRUE);
+    $subject = "This is subject of test activity being added through standalone screen.";
+    $this->type("subject", $subject);
+    $textField = 'This is test custom data';
+    $this->type("custom_{$textFieldId}_-1", $textField);
+    // Clicking save.
+    $this->clickLink('_qf_Activity_upload');
+    $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.");
+
+    $this->openCiviPage("activity/search", "reset=1", "_qf_Search_refresh");
+    $this->type("sort_name", $fname);
+    $this->click("_qf_Search_refresh");
+
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody//tr/td[5]/a[text()='Anderson, {$fname}']/../../td[9]/span/a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody//tr/td[5]/a[text()='Anderson, {$fname}']/../../td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
+
+    $this->VerifyTabularData(
+      array(
+        'Subject' => $subject,
+        'Activity Status' => 'Scheduled',
+      ),
+      "/label"
+    );
+    $this->verifyText("xpath=//td[text()='{$customField}']/following-sibling::td", preg_quote($textField), 'In line ' . __LINE__);
+
+    $this->clickAjaxLink("xpath=//button//span[contains(text(),'Edit')]", "xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[contains(text(),'Save')]");
+
+    $editedTextField = 'This is test custom data - Edited';
+    $this->type("custom_{$textFieldId}_1", $editedTextField);
+    $this->clickAjaxLink("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[contains(text(),'Save')]", "xpath=//button//span[contains(text(),'Edit')]");
+    $this->verifyText("xpath=//td[text()='{$customField}']/following-sibling::td", preg_quote($editedTextField), 'In line ' . __LINE__);
+  }
+
 }
