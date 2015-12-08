@@ -241,8 +241,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     $this->type('sort_name', "$lastName $firstName");
     $this->select('financial_type_id', "label=Member Dues");
-    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
+    $this->clickLink('_qf_Search_refresh', "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", FALSE);
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Member Dues',
@@ -253,15 +253,14 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_ContributionView_cancel-bottom');
 
     //View Contribution for separate contribution
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']");
     // Open search criteria again
     $this->click("xpath=id('Search')/div[2]/div/div[1]");
     $this->waitForElementPresent("financial_type_id");
     $this->type("sort_name", $firstName);
     $this->select('financial_type_id', "label=Donation");
-    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
+    $this->clickLink('_qf_Search_refresh', "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", FALSE);
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',

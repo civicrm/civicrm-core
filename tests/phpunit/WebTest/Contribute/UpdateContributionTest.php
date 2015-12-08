@@ -276,8 +276,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
     $amount = 100.00;
     $this->_testOfflineContribution($amount);
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
-    $this->clickAjaxLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom');
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span//a[text()='Edit']");
+    $this->clickAjaxLink("xpath=//form[@class='CRM_Contribute_Form_Search crm-search-form']/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom');
     //Contribution status
     $this->select("contribution_status_id", "label=Refunded");
     $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
@@ -487,7 +487,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->checkCRMAlert("The contribution record has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Contribute_Form_Search crm-search-form']/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span//a[text()='View']");
     // verify if Membership is created
 
     //click through to the Membership view screen
