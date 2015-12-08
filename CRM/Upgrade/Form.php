@@ -349,7 +349,7 @@ SET    version = '$version'
     foreach ($sqlFiles as $file) {
       if (preg_match($sqlFilePattern, $file, $matches)) {
         if ($matches[2] == '4.0') {
-          CRM_Core_Error::fatal(ts("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731."));
+          CRM_Core_Error::fatal("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731.");
         }
         if (!in_array($matches[1], $revList)) {
           $revList[] = $matches[1];
@@ -640,11 +640,7 @@ SET    version = '$version'
 
     // pre-db check for major release.
     if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
-      if (!(is_callable(array(
-        $versionObject,
-        'verifyPreDBstate',
-      )))
-      ) {
+      if (!(is_callable(array($versionObject, 'verifyPreDBstate')))) {
         CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
       }
 
@@ -660,10 +656,7 @@ SET    version = '$version'
 
     $upgrade->setSchemaStructureTables($rev);
 
-    if (is_callable(array(
-      $versionObject,
-      $phpFunctionName,
-    ))) {
+    if (is_callable(array($versionObject, $phpFunctionName))) {
       $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
     }
     else {
@@ -671,10 +664,7 @@ SET    version = '$version'
     }
 
     // set post-upgrade-message if any
-    if (is_callable(array(
-      $versionObject,
-      'setPostUpgradeMessage',
-    ))) {
+    if (is_callable(array($versionObject, 'setPostUpgradeMessage'))) {
       $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
       $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
       file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
