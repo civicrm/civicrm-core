@@ -1852,9 +1852,10 @@ WHERE cefa.account_relationship = 1; ";
 
   private function addParticipantFinancialItem() {
 
-    $sql = " SELECT cpp.contribution_id, cli.id as line_item_id, cp.contact_id, now() as receive_date, cp.fee_amount as total_amount, cp.fee_currency as currency, cli.label, cli.financial_type_id, cefa.financial_account_id, 4 as payment_instrument_id, NULL as check_number, NULL as trxn_id
-FROM `civicrm_participant` cp
+    $sql = " SELECT cpp.contribution_id, cli.id as line_item_id, cp.contact_id, now() as receive_date, cp.fee_amount as total_amount, cp.fee_currency as currency, cli.label, cli.financial_type_id, cefa.financial_account_id, cc.payment_instrument_id, NULL as check_number, NULL as trxn_id
+ FROM `civicrm_participant` cp
 INNER JOIN civicrm_participant_payment cpp ON cpp.participant_id = cp.id
+INNER JOIN civicrm_contribution cc on cc.id = cpp.contribution_id
 INNER JOIN civicrm_line_item cli ON cli.entity_id = cp.id and cli.entity_table = 'civicrm_participant'
 INNER JOIN civicrm_entity_financial_account cefa ON cefa.entity_id =  cli.financial_type_id
 WHERE cefa.account_relationship = 1";
