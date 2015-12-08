@@ -48,12 +48,12 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->click("_qf_Search_refresh");
 
     $this->waitForElementPresent("xpath=//*[@id='Search']//div[@id='contributionSearch']");
-    $contriIDOff = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[1]@href"));
+    $contriIDOff = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']//table[@class='selector row-highlight']/tbody/tr[1]//td//span/a[1]@href"));
     if (!empty($contriIDOff)) {
       $contriIDOff = substr($contriIDOff[1], (strrpos($contriIDOff[1], '=') + 1));
     }
 
-    $this->clickLink("xpath=//tr[@id='rowid{$contriIDOff}']/td[11]/span/a[2]", "total_amount", FALSE);
+    $this->clickLink("xpath=//tr[@id='rowid{$contriIDOff}']//td//span/a[2]", "total_amount", FALSE);
     $this->waitForAjaxContent();
     $this->type("total_amount", "90");
     $this->clickLink('_qf_Contribution_upload', '', FALSE);

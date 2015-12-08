@@ -385,7 +385,9 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']");
     $this->click("xpath=//a[text()='$firstName $lastName']/../../td[8]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
-    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']", FALSE);
+    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a");
+
+    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']");
     $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[5]/td[4]/span[text()='(add)']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
 
