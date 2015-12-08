@@ -131,7 +131,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * @param $version
    *
-   * @return mixed
+   * @return CRM_Upgrade_Incremental_Base
    */
   public static function &incrementalPhpObject($version) {
     static $incrementalPhpObject = array();
@@ -349,7 +349,7 @@ SET    version = '$version'
     foreach ($sqlFiles as $file) {
       if (preg_match($sqlFilePattern, $file, $matches)) {
         if ($matches[2] == '4.0') {
-          CRM_Core_Error::fatal(ts("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731."));
+          CRM_Core_Error::fatal("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731.");
         }
         if (!in_array($matches[1], $revList)) {
           $revList[] = $matches[1];
@@ -640,11 +640,7 @@ SET    version = '$version'
 
     // pre-db check for major release.
     if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
-      if (!(is_callable(array(
-        $versionObject,
-        'verifyPreDBstate',
-      )))
-      ) {
+      if (!(is_callable(array($versionObject, 'verifyPreDBstate')))) {
         CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
       }
 
@@ -660,21 +656,30 @@ SET    version = '$version'
 
     $upgrade->setSchemaStructureTables($rev);
 
-    if (is_callable(array(
-      $versionObject,
-      $phpFunctionName,
-    ))) {
-      $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
+    // CRM-16860 prior to 4.7 the upgrade function would have to manually call processSQL
+    if (version_compare($rev, '4.7.alpha1', '<')) {
+      if (is_callable(array($versionObject, $phpFunctionName))) {
+        $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
+      }
+      else {
+        $upgrade->processSQL($rev);
+      }
     }
+    // In 4.7+ processSQL runs unconditionally with optional pre/post processingz
     else {
-      $upgrade->processSQL($rev);
+      $preFunction = $phpFunctionName . '_pre';
+      $postFunction = $phpFunctionName . '_post';
+      if (is_callable(array($versionObject, $preFunction))) {
+        $versionObject->$preFunction($rev, $originalVer, $latestVer);
+      }
+      $versionObject->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+      if (is_callable(array($versionObject, $postFunction))) {
+        $versionObject->$postFunction($rev, $originalVer, $latestVer);
+      }
     }
 
     // set post-upgrade-message if any
-    if (is_callable(array(
-      $versionObject,
-      'setPostUpgradeMessage',
-    ))) {
+    if (is_callable(array($versionObject, 'setPostUpgradeMessage'))) {
       $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
       $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
       file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);

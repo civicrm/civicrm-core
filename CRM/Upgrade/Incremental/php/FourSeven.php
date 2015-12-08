@@ -102,24 +102,24 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
-   * Upgrade function.
-   *
-   * @param string $rev
+   * Pre-SQL upgrade function.
    */
-  public function upgrade_4_7_alpha1($rev) {
-    $this->addTask(ts('Migrate \'on behalf of\' information to module_data'), 'migrateOnBehalfOfInfo');
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask(ts('Migrate Settings to %1', array(1 => $rev)), 'migrateSettings', $rev);
-    $this->addTask(ts('Add Getting Started dashlet to %1: SQL', array(1 => $rev)), 'addGettingStartedDashlet', $rev);
+  public function upgrade_4_7_alpha1_pre() {
+    $this->addTask('Migrate "on behalf of" information to module_data', 'migrateOnBehalfOfInfo');
   }
 
   /**
-   * Upgrade function.
-   *
-   * @param string $rev
+   * Post-SQL upgrade function.
    */
-  public function upgrade_4_7_alpha4($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  public function upgrade_4_7_alpha1_post() {
+    $this->addTask('Migrate Settings to 4.7', 'migrateSettings');
+    $this->addTask('Add Getting Started dashlet', 'addGettingStartedDashlet');
+  }
+
+  /**
+   * Post-SQL upgrade function.
+   */
+  public function upgrade_4_7_alpha4_post() {
     $this->addTask(ts('Remove %1', array(1 => 'Moneris')), 'removePaymentProcessorType', 'Moneris');
     $this->addTask('Update Smart Groups', 'fixContactTypeInSmartGroups');
   }
