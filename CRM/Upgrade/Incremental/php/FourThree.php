@@ -255,7 +255,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact');
     for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
       $endId = $startId + self::BATCH_SIZE - 1;
-      $title = ts('Upgrade timestamps (%1 => %2)', array(1 => $startId, 2 => $endId));
+      $title = "Upgrade timestamps ($startId => $endId)";
       $this->addTask($title, 'convertTimestamps', $startId, $endId);
     }
 
