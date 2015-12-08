@@ -897,6 +897,7 @@ class CRM_Core_SelectValues {
       '1stOfMth' => ts('1st day of every month'),
       'Mondays' => ts('Monday of every week'),
       'Yearly' => ts('Yearly'),
+      'Quarterly' => ts('Quarterly'),
       'Monthly' => ts('Monthly'),
       'Weekly' => ts('Weekly'),
       'Daily' => ts('Daily'),

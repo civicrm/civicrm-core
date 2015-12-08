@@ -104,6 +104,10 @@ class CRM_Core_ScheduledJob {
         $offset = '+1 year';
         break;
 
+      case 'Quarterly':
+        $offset = '+3 months';
+        break;
+
       case 'Monthly':
         $offset = '+1 month';
         break;
