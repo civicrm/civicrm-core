@@ -340,6 +340,8 @@ SET    version = '$version'
    */
   public function getRevisionSequence() {
     $revList = array();
+
+    // Old style: Detect versions from CRM/Upgrade/Incremental/sql/{{VERSION}}.mysql.tpl
     $sqlDir = implode(DIRECTORY_SEPARATOR,
       array(dirname(__FILE__), 'Incremental', 'sql')
     );
@@ -354,6 +356,26 @@ SET    version = '$version'
         if (!in_array($matches[1], $revList)) {
           $revList[] = $matches[1];
         }
+      }
+    }
+
+    // New style: Detect versions from CRM/Upgrade/Incremental/any/{{VERSION}/}
+    $incDir = implode(DIRECTORY_SEPARATOR,
+      array(dirname(__FILE__), 'Incremental', 'any')
+    );
+    $incDirItems = scandir($incDir);
+    $incDirPattern = '/^((\d{1,2}\.\d{1,2})\.(\d{1,2}\.)?(\d{1,2}|\w{4,7}))$/i';
+    foreach ($incDirItems as $incDirItem) {
+      if (!is_dir($incDir . DIRECTORY_SEPARATOR . $incDirItem) || $incDirItem{0} === '.') {
+        continue;
+      }
+      if (preg_match($incDirPattern, $incDirItem, $matches)) {
+        if (!in_array($matches[1], $revList)) {
+          $revList[] = $matches[1];
+        }
+      }
+      else {
+        CRM_Core_Error::fatal("Found subdirectory with malformed version name ($incDirItem).");
       }
     }
 
@@ -420,12 +442,10 @@ SET    version = '$version'
     if (file_exists($tplFile)) {
       $this->processLocales($tplFile, $rev);
     }
-    else {
-      if (!file_exists($sqlFile)) {
-        CRM_Core_Error::fatal("sqlfile - $rev.mysql not found.");
-      }
+    elseif (file_exists($sqlFile)) {
       $this->source($sqlFile);
     }
+    // else: Version probably uses newer file structure.
   }
 
   /**
