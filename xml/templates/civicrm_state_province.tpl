@@ -4001,5 +4001,11 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 -- CRM-17184
 (NULL, 1066, "LI", "La Libertad"),
 (NULL, 1066, "PA", "La Paz"),
-(NULL, 1066, "UN", "La Union");
+(NULL, 1066, "UN", "La Union"),
+ 
+-- CRM-17660 Add missing Cameroon Provinces
+(NULL, 1038, "LT", "Littoral"),
+(NULL, 1038, "NW", "Nord-Ouest"),
 
+-- Add Indian province of Telangana
+(NULL, 1101, "TG", "Telangana");
