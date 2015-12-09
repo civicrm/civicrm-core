@@ -82,27 +82,6 @@
                 {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
                 {if $blockName eq 'email' || $blockName eq 'phone' }
      <span id="main_{$blockName}_{$blockId}_overwrite">{if $row.main}(overwrite){$form.location.$blockName.$blockId.operation.html}&nbsp;<br />{else}(add){/if}</span>
-    {literal}
-    <script type="text/javascript">
-    function mergeBlock(blockname, element, blockId) {
-        var allBlock = {/literal}{$mainLocBlock}{literal};
-        var block    = eval( "allBlock." + 'main_'+ blockname + element.value);
-        if(blockname == 'email' || blockname == 'phone'){
-           var label = '(overwrite)'+ '<span id="main_blockname_blockId_overwrite">{/literal}{$form.location.$blockName.$blockId.operation.html}{literal}<br /></span>';
-        }
-        else {
-          label = '(overwrite)<br />';
-        }
-
-        if ( !block ) {
-                  block = '';
-           label   = '(add)';
-           }
-         cj( "#main_"+ blockname +"_" + blockId ).html( block );
-         cj( "#main_"+ blockname +"_" + blockId +"_overwrite" ).html( label );
-    }
-    </script>
-    {/literal}
     {else}
     <span id="main_{$blockName}_{$blockId}_overwrite">{if $row.main}(overwrite)<br />{else}(add){/if}</span>
                 {/if}
@@ -153,6 +132,29 @@ You will need to manually delete that user (click on the link to open Drupal Use
 
 {literal}
 <script type="text/javascript">
+
+  function mergeBlock(blockname, element, blockId) {
+    var allBlock = {/literal}{$mainLocBlock}{literal};
+    var block    = eval( "allBlock." + 'main_'+ blockname + element.value);
+    var label    = '';
+
+    // Create appropriate label / add new link after changing the block
+    if (!block) {
+      block = '';
+      label = '(add)';
+    }
+    else {
+      label = '(overwrite) ';
+      if (blockname == 'email' || blockname == 'phone') {
+        var opLabel = 'location[' + blockname + '][' + blockId + '][operation]';
+        label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">add new</label>';
+      }
+      label += '<br />';
+    }
+
+    CRM.$( "#main_"+ blockname +"_" + blockId ).html( block );
+    CRM.$( "#main_"+ blockname +"_" + blockId +"_overwrite" ).html( label );
+  }
 
   CRM.$(function($) {
     $('table td input.form-checkbox').each(function() {
