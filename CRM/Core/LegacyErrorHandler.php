@@ -26,6 +26,7 @@ class CRM_Core_LegacyErrorHandler {
       // you should log a ticket for it to be removed with details about the form you were on.
       if (!empty($params['legacy_redirect_path'])) {
         if (CRM_Utils_System::isDevelopment()) {
+          $intentionalENotice = "How did you get HERE?! - Please log in JIRA";
           // here we could set a message telling devs to log it per above
         }
         CRM_Utils_System::redirect($params['legacy_redirect_path'], $params['legacy_redirect_query']);

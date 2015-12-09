@@ -272,7 +272,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           'legacy_redirect_path' => 'civicrm/contact/view',
           'legacy_redirect_query' => "reset=1&force=1&cid={$params['contact_id']}&selectedChild=member",
         );
-        throw new CRM_Core_Exception(ts('The membership cannot be saved because the status cannot be calculated.'), 0, $errorParams);
+        throw new CRM_Core_Exception(ts(
+          "The membership cannot be saved because the status cannot be calculated for start_date: $start_date end_date $end_date join_date $join_date as at " . date('Y-m-d H:i:s')),
+          0,
+          $errorParams
+        );
       }
       $params['status_id'] = $calcStatus['id'];
     }
