@@ -1557,6 +1557,40 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test completing first transaction in a recurring series.
+   *
+   * The status should be set to 'in progress' and the next scheduled payment date calculated.
+   */
+  public function testCompleteTransactionSetStatusToInProgress() {
+    $paymentProcessorID = $this->paymentProcessorCreate();
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '500',
+      'contribution_status_id' => 'Pending',
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $paymentProcessorID,
+    ));
+    $contribution = $this->callAPISuccess('contribution', 'create', array_merge(
+      $this->_params,
+      array(
+        'contribution_recur_id' => $contributionRecur['id'],
+        'contribution_status_id' => 'Pending',
+      ))
+    );
+    $this->callAPISuccess('Contribution', 'completetransaction', array('id' => $contribution));
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array(
+      'id' => $contributionRecur['id'],
+      'return' => array('next_sched_contribution_date', 'contribution_status_id'),
+    ));
+    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+    $this->assertEquals(date('Y-m-d 00:00:00', strtotime('+1 month')), $contributionRecur['next_sched_contribution_date']);
+  }
+
+  /**
    * Test completing a transaction with an event via the API.
    *
    * Note that we are creating a logged in user because email goes out from
