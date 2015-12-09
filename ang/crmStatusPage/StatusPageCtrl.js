@@ -3,7 +3,7 @@
   angular.module('statuspage').controller('statuspageStatusPage',
     function($scope, crmApi, crmStatus, statusData) {
       $scope.ts = CRM.ts();
-      $scope.alert = CRM.alert;
+      $scope.help = CRM.help;
       $scope.formatDate = CRM.utils.formatDate;
       $scope.statuses = statusData.values;
 
