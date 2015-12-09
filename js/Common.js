@@ -1006,21 +1006,29 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   var helpDisplay, helpPrevious;
+  // Non-ajax example:
+  //   CRM.help('Example title', 'Here is some text to describe this example');
+  // Ajax example (will load help id "foo" from templates/CRM/bar.tpl):
+  //   CRM.help('Example title', {id: 'foo', file: 'CRM/bar'});
   CRM.help = function (title, params, url) {
+    var ajax = typeof params !== 'string';
     if (helpDisplay && helpDisplay.close) {
-      // If the same link is clicked twice, just close the display - todo use underscore method for this comparison
-      if (helpDisplay.isOpen && helpPrevious === JSON.stringify(params)) {
+      // If the same link is clicked twice, just close the display
+      if (helpDisplay.isOpen && _.isEqual(helpPrevious, params)) {
         helpDisplay.close();
         return;
       }
       helpDisplay.close();
     }
-    helpPrevious = JSON.stringify(params);
-    params.class_name = 'CRM_Core_Page_Inline_Help';
-    params.type = 'page';
-    helpDisplay = CRM.alert('...', title, 'crm-help crm-msg-loading', {expires: 0});
-    $.ajax(url || CRM.url('civicrm/ajax/inline'),
-      {
+    helpPrevious = _.cloneDeep(params);
+    helpDisplay = CRM.alert(ajax ? '...' : params, title, 'crm-help ' + (ajax ? 'crm-msg-loading' : 'info'), {expires: 0});
+    if (ajax) {
+      if (!url) {
+        url = CRM.url('civicrm/ajax/inline');
+        params.class_name = 'CRM_Core_Page_Inline_Help';
+        params.type = 'page';
+      }
+      $.ajax(url, {
         data: params,
         dataType: 'html',
         success: function (data) {
@@ -1031,8 +1039,8 @@ if (!CRM.vars) CRM.vars = {};
           $('#crm-notification-container .crm-help .notify-content:last').html('Unable to load help file.');
           $('#crm-notification-container .crm-help').removeClass('crm-msg-loading').addClass('error');
         }
-      }
-    );
+      });
+    }
   };
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
