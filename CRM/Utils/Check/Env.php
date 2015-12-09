@@ -223,7 +223,11 @@ class CRM_Utils_Check_Env {
         \Psr\Log\LogLevel::WARNING,
         'fa-envelope'
       );
-      $message->addHelp(ts('Learn more in the <a href="%1">user guide</a>', array(1 => 'http://book.civicrm.org/user/advanced-configuration/email-system-configuration/')));
+      $docUrl = 'target="_blank" href="' . CRM_Utils_System::docURL(array('page' => 'user/advanced-configuration/email-system-configuration/', 'URLonly' => TRUE)) . '""';
+      $message->addHelp(
+        ts('A default mailbox must be configured for email bounce processing.') . '<br />' .
+        ts("Learn more in the <a %1>online documentation</a>.", array(1 => $docUrl))
+      );
       $messages[] = $message;
     }
 
@@ -259,26 +263,19 @@ class CRM_Utils_Check_Env {
         'fa-clock-o'
       );
     }
-    elseif ($lastCron > gmdate('U') - 86400) {
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Cron Not Running'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-clock-o'
-      );
-      $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Managing+Scheduled+Jobs')));
-      $messages[] = $message;
-    }
     else {
       $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $msg,
         ts('Cron Not Running'),
-        \Psr\Log\LogLevel::ERROR,
+        ($lastCron > gmdate('U') - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR,
         'fa-clock-o'
       );
-      $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Managing+Scheduled+Jobs')));
+      $docUrl = 'target="_blank" href="' . CRM_Utils_System::docURL(array('resource' => 'wiki', 'page' => 'Managing Scheduled Jobs', 'URLonly' => TRUE)) . '""';
+      $message->addHelp(
+        ts('Configuring cron on your server is necessary for running scheduled jobs such as sending mail and scheduled reminders.') . '<br />' .
+        ts("Learn more in the <a %1>online documentation</a>.", array(1 => $docUrl))
+      );
       $messages[] = $message;
     }
 
