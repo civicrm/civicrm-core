@@ -685,7 +685,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $title = substr(sha1(rand()), 0, 7);
     $membershipTypeTitle = "Membership Type $title";
     $this->type('name', "Membership Type $title");
-
+    $this->waitForAjaxContent();
     $this->select2('member_of_contact_id', 'Default Organization');
 
     $this->type('minimum_fee', '100');

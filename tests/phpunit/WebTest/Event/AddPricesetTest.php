@@ -619,9 +619,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText("crm-notification-container", "Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//form[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='Search']/table/tbody/tr[1]/td[8]/span//a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//form[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@id='Search']/table/tbody/tr[1]/td[8]/span//a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -662,7 +662,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->_checkLineItems($expectedLineItems);
     // check contribution record as well
     // click through to the contribution view screen
-    $this->click("xpath=//*[@id='ParticipantView']/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span//a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -681,7 +681,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/price/field', "reset=1&action=browse&sid={$sid}", 'newPriceField');
     $this->click("xpath=//table[@id='options']/tbody/tr[3]/td[8]/a[text()='Edit Price Options']");
     $this->waitForElementPresent("xpath=//span[contains(text(), 'Done')]");
-    $this->click("xpath=//table[@id='options']/tbody/tr/td/div[text()='First Night']/../following-sibling::td[8]/span/a[text()='Edit Option']");
+    $this->click("xpath=//table[@id='options']/tbody/tr/td/div[text()='First Night']/../following-sibling::td[8]/span//a[text()='Edit Option']");
     $this->waitForElementPresent("_qf_Option_cancel");
     $this->type('label', 'First Night Edited');
     $this->click('_qf_Option_next');
@@ -689,8 +689,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('event/search', "reset=1", '_qf_Search_refresh');
     $this->select2('participant_fee_id', 'First Night Edited');
-    $this->clickLink('_qf_Search_refresh');
-    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "xpath=//span[contains(text(), 'Done')]", FALSE);
+    $this->click('_qf_Search_refresh');
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span//a[text()='View']", "xpath=//span[contains(text(), 'Done')]", FALSE);
     $expectedLineItems[4][1] = 'Evening Sessions - First Night Edited';
     $this->_checkLineItems($expectedLineItems);
   }

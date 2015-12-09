@@ -168,6 +168,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", 'Anderson, ' . $firstName3, 'Contact not found in line ' . __LINE__);
 
     //filling the second target Contact
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@id='s2id_target_contact_id']/ul/li/input");
     $this->keyDown("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", " ");
     $this->type("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", $firstName1);
@@ -183,6 +184,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", "$firstName1", 'Contact not found in line ' . __LINE__);
 
     //filling the third target contact
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@id='s2id_target_contact_id']/ul/li/input");
     $this->keyDown("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", " ");
     $this->type("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", $firstName2);
@@ -204,6 +206,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->type("subject", $subject);
 
     $this->webtestFillDateTime('activity_date_time', '+1 month 11:10PM');
+    $this->waitForAjaxContent();
     $this->select("status_id", "value=1");
 
     // Clicking save.

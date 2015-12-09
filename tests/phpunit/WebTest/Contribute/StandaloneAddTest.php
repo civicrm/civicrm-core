@@ -77,15 +77,15 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->addeditFinancialType($financialType);
 
     // Assign the created Financial Account $financialAccountTitle to $financialType
-    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span/a[text()='Accounts']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
+    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]//span//a[text()='Accounts']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button//span[contains(text(), 'Assign Account')]");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[contains(text(), 'Assign Account')]");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
     $this->select('account_relationship', "label=Sales Tax Account is");
     $this->waitForAjaxContent();
     $this->select('financial_account_id', "label=" . $financialAccountTitle);
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button/span[contains(text(), 'Assign Account')]");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button//span[contains(text(), 'Assign Account')]");
 
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
@@ -142,13 +142,13 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForText("crm-notification-container", "The contribution record has been saved.");
 
     // verify if Membership is created
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='View']");
 
-    $contriID = $this->urlArg('id', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
-    $contactID = $this->urlArg('cid', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+    $contriID = $this->urlArg('id', $this->getAttribute("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='Edit']@href"));
+    $contactID = $this->urlArg('cid', $this->getAttribute("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='Edit']@href"));
 
     //click through to the Membership view screen
-    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     $expected = array(
