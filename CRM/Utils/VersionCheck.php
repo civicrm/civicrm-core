@@ -97,6 +97,8 @@ class CRM_Utils_VersionCheck {
 
   /**
    * Self-populates version info
+   *
+   * @throws \Exception
    */
   public function initialize() {
     $this->getJob();
@@ -109,6 +111,12 @@ class CRM_Utils_VersionCheck {
     if (!empty($this->cronJob['is_active']) &&
       (!$this->isInfoAvailable || filemtime($this->cacheFile) < $expiryTime)
     ) {
+      // First try updating the files modification time, for 2 reasons:
+      //  - if the file is not writeable, this saves the trouble of pinging back
+      //  - if the remote server is down, this will prevent an immediate retry
+      if (touch($this->cacheFile) === FALSE) {
+        throw new Exception('File not writable');
+      }
       $this->fetch();
     }
   }
@@ -412,11 +420,12 @@ class CRM_Utils_VersionCheck {
   /**
    * Save version info to file.
    * @param string $contents
+   * @throws \Exception
    */
   private function writeCacheFile($contents) {
-    $fp = fopen($this->cacheFile, 'w');
-    fwrite($fp, $contents);
-    fclose($fp);
+    if (file_put_contents($this->cacheFile, $contents) === FALSE) {
+      throw new Exception('File not writable');
+    }
   }
 
   /**

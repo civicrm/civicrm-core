@@ -288,8 +288,21 @@ class CRM_Utils_Check_Env {
    */
   public function checkVersion() {
     $messages = array();
-    $vc = new CRM_Utils_VersionCheck();
-    $vc->initialize();
+    try {
+      $vc = new CRM_Utils_VersionCheck();
+      $vc->initialize();
+    }
+    catch (Exception $e) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkVersionError',
+        ts('Directory %1 is not writable.  Please change your file permissions.',
+          array(1 => dirname($vc->cacheFile))),
+        ts('Directory not writable'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-times-circle-o'
+      );
+      return $messages;
+    }
 
     // Show a notice if the version_check job is disabled
     if (empty($vc->cronJob['is_active'])) {
@@ -380,7 +393,7 @@ class CRM_Utils_Check_Env {
         __FUNCTION__,
         ts('Your extensions directory is not set.  Click <a href="%1">here</a> to set the extensions directory.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/path', 'reset=1'))),
-        ts('Extensions directory not writable'),
+        ts('Directory not writable'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-plug'
       );
@@ -401,9 +414,9 @@ class CRM_Utils_Check_Env {
     elseif (!is_writable($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Your extensions directory, %1, is not writable.  Please change your file permissions.',
+        ts('Directory %1 is not writable.  Please change your file permissions.',
           array(1 => $basedir)),
-        ts('Extensions directory not writable'),
+        ts('Directory not writable'),
         \Psr\Log\LogLevel::ERROR,
         'fa-plug'
       );
