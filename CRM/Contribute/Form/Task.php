@@ -143,6 +143,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
           $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
         }
       }
+      $result->free();
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
     }
 
