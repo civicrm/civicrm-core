@@ -851,7 +851,45 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * @param $mode
+   * Get the list of fields required to populate the selector.
+   *
+   * The default return properties array returns far too many fields for 'everyday use. Every field you add to this array
+   * kills a small kitten so add carefully.
+   */
+  public static function selectorReturnProperties() {
+    return array(
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'financial_type' => 1,
+      'contribution_source' => 1,
+      'is_test' => 1,
+      'receive_date' => 1,
+      'is_pay_later' => 1,
+      'thankyou_date' => 1,
+      'total_amount' => 1,
+      'contribution_status_id' => 1,
+      // @todo return this & fix query to do pseudoconstant thing.
+      'contribution_status' => 1,
+      // @todo the product field got added because it suited someone's use case.
+      // ideally we would have some configurability here because I think 90% of sites would
+      // disagree this is the right field to show - but they wouldn't agree with each other
+      // on what field to show instead.
+      'contribution_product_id' => 1,
+      'product_name' => 1,
+    );
+  }
+
+  /**
+   * Function you should avoid.
+   *
+   * This function returns default properties for contribution queries. However, they are
+   * far more than are required in 'most' cases and you should always try to return the return properties
+   * you actually require.
+   *
+   * It would be nice to throw an e-notice when this is called but it would trash the tests :-(.
+   *
+   * @param int $mode
    * @param bool $includeCustomFields
    *
    * @return array|NULL
