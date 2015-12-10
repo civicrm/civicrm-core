@@ -33,8 +33,9 @@
 class CRM_Utils_VersionCheck {
   const
     PINGBACK_URL = 'http://latest.civicrm.org/stable.php?format=json',
-    // relative to $config->uploadDir
-    CACHEFILE_NAME = '[civicrm.files]/persist/version-info-cache.json';
+    CACHEFILE_NAME = '[civicrm.files]/persist/version-info-cache.json',
+    // after this length of time we fall back on poor-man's cron (7+ days)
+    CACHEFILE_EXPIRE = 605000;
 
   /**
    * The version of the current (local) installation
@@ -87,12 +88,36 @@ class CRM_Utils_VersionCheck {
   public function __construct() {
     $this->localVersion = CRM_Utils_System::version();
     $this->localMajorVersion = $this->getMajorVersion($this->localVersion);
+    $this->cacheFile = Civi::paths()->getPath(self::CACHEFILE_NAME);
+  }
 
+  /**
+   * Self-populates version info
+   */
+  public function initialize() {
     $this->getJob();
 
     // Populate remote $versionInfo from cache file
-    $this->cacheFile = Civi::paths()->getPath(self::CACHEFILE_NAME);
     $this->isInfoAvailable = $this->readCacheFile();
+
+    // Poor-man's cron fallback if scheduled job is enabled but has failed to run
+    $expiryTime = time() - self::CACHEFILE_EXPIRE;
+    if (!empty($this->cronJob['is_active']) &&
+      (!$this->isInfoAvailable || filemtime($this->cacheFile) < $expiryTime)
+    ) {
+      $this->fetch();
+    }
+  }
+
+  /**
+   * Sets $versionInfo
+   *
+   * @param $info
+   */
+  public function setVersionInfo($info) {
+    $this->versionInfo = (array) $info;
+    // Sort version info in ascending order for easier comparisons
+    ksort($this->versionInfo, SORT_NUMERIC);
   }
 
   /**
@@ -362,9 +387,10 @@ class CRM_Utils_VersionCheck {
     // If we couldn't fetch or parse the data $versionInfo will be NULL
     // Otherwise it will be an array and we'll cache it.
     // Note the array may be empty e.g. in the case of a pre-alpha with no releases
-    if ($versionInfo !== NULL) {
+    $this->isInfoAvailable = $versionInfo !== NULL;
+    if ($this->isInfoAvailable) {
       $this->writeCacheFile($rawJson);
-      $this->versionInfo = $versionInfo;
+      $this->setVersionInfo($versionInfo);
     }
   }
 
@@ -373,9 +399,7 @@ class CRM_Utils_VersionCheck {
    */
   private function readCacheFile() {
     if (file_exists($this->cacheFile)) {
-      $this->versionInfo = (array) json_decode(file_get_contents($this->cacheFile), TRUE);
-      // Sort version info in ascending order for easier comparisons
-      ksort($this->versionInfo, SORT_NUMERIC);
+      $this->setVersionInfo(json_decode(file_get_contents($this->cacheFile), TRUE));
       return TRUE;
     }
     return FALSE;
