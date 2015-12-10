@@ -694,10 +694,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       ),
       'CRM_Core_DAO_MappingField' => array(
         array(
-          'fieldName' => 'contact_type',
-          'sample' => 'Individual',
-        ),
-        array(
           'fieldName' => 'website_type_id',
           'sample' => 'Facebook',
         ),

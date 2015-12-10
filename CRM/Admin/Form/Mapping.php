@@ -95,6 +95,7 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
     if ($this->_action == CRM_Core_Action::DELETE) {
       if ($this->_id) {
         CRM_Core_BAO_Mapping::del($this->_id);
+        CRM_Core_Session::setStatus(ts('Selected mapping has been deleted successfully.'), ts('Deleted'), 'success');
       }
     }
     else {
