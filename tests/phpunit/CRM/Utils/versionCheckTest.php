@@ -197,4 +197,41 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     return $data;
   }
 
+  public function testCronFallback() {
+    // Fake "remote" source data
+    $tmpSrc = '/tmp/versionCheckTestFile.json';
+    file_put_contents($tmpSrc, json_encode($this->sampleVersionInfo));
+
+    $vc = new CRM_Utils_VersionCheck();
+    $vc->pingbackUrl = $tmpSrc;
+
+    // If the cachefile doesn't exist, fallback should kick in
+    if (file_exists($vc->cacheFile)) {
+      unlink($vc->cacheFile);
+    }
+    $vc->initialize();
+    $this->assertEquals($this->sampleVersionInfo, $vc->versionInfo);
+    unset($vc);
+
+    // Update "remote" source data
+    $remoteData = array('4.3' => $this->sampleVersionInfo['4.3']);
+    file_put_contents($tmpSrc, json_encode($remoteData));
+
+    // Cache was just updated, so fallback should not happen - assert we are still using cached data
+    $vc = new CRM_Utils_VersionCheck();
+    $vc->pingbackUrl = $tmpSrc;
+    $vc->initialize();
+    $this->assertEquals($this->sampleVersionInfo, $vc->versionInfo);
+    unset($vc);
+
+    // Ensure fallback happens if file is too old
+    $vc = new CRM_Utils_VersionCheck();
+    $vc->pingbackUrl = $tmpSrc;
+    // Set cachefile to be 1 minute older than expire time
+    touch($vc->cacheFile, time() - 60 - $vc::CACHEFILE_EXPIRE);
+    clearstatcache();
+    $vc->initialize();
+    $this->assertEquals($remoteData, $vc->versionInfo);
+  }
+
 }
