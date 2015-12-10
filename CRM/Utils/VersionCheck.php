@@ -33,8 +33,6 @@
 class CRM_Utils_VersionCheck {
   const
     PINGBACK_URL = 'http://latest.civicrm.org/stable.php?format=json',
-    // relative to $civicrm_root
-    LOCALFILE_NAME = '[civicrm.root]/civicrm-version.php',
     // relative to $config->uploadDir
     CACHEFILE_NAME = '[civicrm.files]/persist/version-info-cache.json';
 
@@ -65,6 +63,11 @@ class CRM_Utils_VersionCheck {
   public $isInfoAvailable;
 
   /**
+   * @var array
+   */
+  public $cronJob = array();
+
+  /**
    * Pingback params
    *
    * @var array
@@ -82,16 +85,10 @@ class CRM_Utils_VersionCheck {
    * Class constructor.
    */
   public function __construct() {
-    // Populate local version
-    $localFile = Civi::paths()->getPath(self::LOCALFILE_NAME);
-    if (file_exists($localFile)) {
-      require_once $localFile;
-    }
-    if (function_exists('civicrmVersion')) {
-      $info = civicrmVersion();
-      $this->localVersion = trim($info['version']);
-      $this->localMajorVersion = $this->getMajorVersion($this->localVersion);
-    }
+    $this->localVersion = CRM_Utils_System::version();
+    $this->localMajorVersion = $this->getMajorVersion($this->localVersion);
+
+    $this->getJob();
 
     // Populate remote $versionInfo from cache file
     $this->cacheFile = Civi::paths()->getPath(self::CACHEFILE_NAME);
@@ -392,6 +389,18 @@ class CRM_Utils_VersionCheck {
     $fp = fopen($this->cacheFile, 'w');
     fwrite($fp, $contents);
     fclose($fp);
+  }
+
+  /**
+   * Lookup version_check scheduled job
+   */
+  private function getJob() {
+    $jobs = civicrm_api3('Job', 'get', array(
+      'sequential' => 1,
+      'api_action' => "version_check",
+      'api_entity' => "job",
+    ));
+    $this->cronJob = CRM_Utils_Array::value(0, $jobs['values'], array());
   }
 
 }

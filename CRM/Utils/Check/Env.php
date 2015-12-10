@@ -288,16 +288,11 @@ class CRM_Utils_Check_Env {
    */
   public function checkVersion() {
     $messages = array();
+    $vc = new CRM_Utils_VersionCheck();
 
-    // See if the version_check job is enabled
-    $jobs = civicrm_api3('Job', 'get', array(
-      'sequential' => 1,
-      'api_action' => "version_check",
-      'api_entity' => "job",
-    ));
-    $jobEnabled = !empty($jobs['values'][0]['is_active']);
-    if (!$jobEnabled) {
-      $args = empty($josb['id']) ? array('reset' => 1) : array('reset' => 1, 'action' => 'update', 'id' => $jobs['id']);
+    // Show a notice if the version_check job is disabled
+    if (empty($vc->cronJob['is_active'])) {
+      $args = empty($vc->cronJob['id']) ? array('reset' => 1) : array('reset' => 1, 'action' => 'update', 'id' => $vc->cronJob['id']);
       $messages[] = new CRM_Utils_Check_Message(
         'checkVersionDisabled',
         ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the scheduled job</a> to receive important security update notifications.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/job', $args) . '"')),
@@ -307,10 +302,8 @@ class CRM_Utils_Check_Env {
       );
     }
 
-    $vc = new CRM_Utils_VersionCheck();
-    $newerVersion = $vc->isNewerVersionAvailable();
-
     if ($vc->isInfoAvailable) {
+      $newerVersion = $vc->isNewerVersionAvailable();
       if ($newerVersion['version']) {
         $vInfo = array(
           1 => $newerVersion['version'],
@@ -340,7 +333,7 @@ class CRM_Utils_Check_Env {
           $message = ts('New version %1 is available. The site is currently running %2.', $vInfo);
         }
       }
-      elseif ($jobEnabled) {
+      elseif (!empty($vc->cronJob['is_active'])) {
         $vNum = $vc->localVersion;
         // LTS = long-term support version
         if ($newerVersion['status'] == 'lts') {
