@@ -9,6 +9,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
+    <title>Mapping Field ID</title>
     <required>true</required>
     <comment>Mapping Field ID</comment>
     <add>1.2</add>
@@ -21,6 +22,7 @@
   <field>
     <name>mapping_id</name>
     <type>int unsigned</type>
+    <title>Mapping ID</title>
     <required>true</required>
     <comment>Mapping to which this field belongs</comment>
     <add>1.2</add>
@@ -43,11 +45,6 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Contact Type in mapping</comment>
-    <pseudoconstant>
-      <table>civicrm_contact_type</table>
-      <keyColumn>name</keyColumn>
-      <labelColumn>label</labelColumn>
-    </pseudoconstant>
     <html>
       <type>Select</type>
     </html>
@@ -63,6 +60,7 @@
   <field>
     <name>location_type_id</name>
     <type>int unsigned</type>
+    <title>Location type ID</title>
     <comment>Location type of this mapping, if required</comment>
     <add>1.2</add>
   </field>
@@ -83,12 +81,14 @@
   <field>
     <name>phone_type_id</name>
     <type>int unsigned</type>
+    <title>Phone type ID</title>
     <comment>Which type of phone does this number belongs.</comment>
     <add>2.2</add>
   </field>
   <field>
     <name>im_provider_id</name>
     <type>int unsigned</type>
+    <title>IM provider ID</title>
     <comment>Which type of IM Provider does this name belong.</comment>
     <add>3.0</add>
     <pseudoconstant>
@@ -101,6 +101,7 @@
   <field>
     <name>website_type_id</name>
     <type>int unsigned</type>
+    <title>Website type ID</title>
     <comment>Which type of website does this site belong</comment>
     <add>3.2</add>
     <pseudoconstant>
@@ -113,6 +114,7 @@
   <field>
     <name>relationship_type_id</name>
     <type>int unsigned</type>
+    <title>Relationship type ID</title>
     <comment>Relationship type, if required</comment>
     <add>1.2</add>
   </field>

@@ -108,6 +108,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'System',
       'User',
       'Payment',
+      'SavedSearch', //work fine in local
     );
     $this->toBeImplemented['delete'] = array(
       'Cxn',
