@@ -32,7 +32,6 @@
  */
 class CRM_Utils_VersionCheck {
   const
-    PINGBACK_URL = 'http://latest.civicrm.org/stable.php?format=json',
     CACHEFILE_NAME = '[civicrm.files]/persist/version-info-cache.json',
     // after this length of time we fall back on poor-man's cron (7+ days)
     CACHEFILE_EXPIRE = 605000;
@@ -69,6 +68,11 @@ class CRM_Utils_VersionCheck {
   public $cronJob = array();
 
   /**
+   * @var string
+   */
+  public $pingbackUrl = 'http://latest.civicrm.org/stable.php?format=json';
+
+  /**
    * Pingback params
    *
    * @var array
@@ -80,7 +84,7 @@ class CRM_Utils_VersionCheck {
    *
    * @var string
    */
-  protected $cacheFile;
+  public $cacheFile;
 
   /**
    * Class constructor.
@@ -382,7 +386,7 @@ class CRM_Utils_VersionCheck {
       ),
     );
     $ctx = stream_context_create($params);
-    $rawJson = file_get_contents(self::PINGBACK_URL, FALSE, $ctx);
+    $rawJson = file_get_contents($this->pingbackUrl, FALSE, $ctx);
     $versionInfo = $rawJson ? json_decode($rawJson, TRUE) : NULL;
     // If we couldn't fetch or parse the data $versionInfo will be NULL
     // Otherwise it will be an array and we'll cache it.
