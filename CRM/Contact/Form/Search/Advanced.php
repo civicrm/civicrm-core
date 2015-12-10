@@ -373,7 +373,11 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       foreach ($taglist as $value) {
         if ($value) {
           $value = explode(',', $value);
-          $this->_formValues['contact_tags'] = (array) $value;
+          foreach ($value as $tId) {
+            if (is_numeric($tId)) {
+              $this->_formValues['contact_tags'][] = $tId;
+            }
+          }
         }
       }
     }
