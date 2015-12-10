@@ -112,7 +112,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     // These values are set by the constructor but for testing we override them
     $vc->localVersion = $localVersion;
     $vc->localMajorVersion = $vc->getMajorVersion($localVersion);
-    $vc->versionInfo = $versionInfo;
+    $vc->setVersionInfo($versionInfo);
     $available = $vc->isNewerVersionAvailable();
     $this->assertEquals($available['version'], $expectedResult);
   }
@@ -158,7 +158,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     // These values are set by the constructor but for testing we override them
     $vc->localVersion = $localVersion;
     $vc->localMajorVersion = $vc->getMajorVersion($localVersion);
-    $vc->versionInfo = $versionInfo;
+    $vc->setVersionInfo($versionInfo);
     $available = $vc->isNewerVersionAvailable();
     $this->assertEquals($available['upgrade'], $expectedResult);
   }

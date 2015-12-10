@@ -289,6 +289,7 @@ class CRM_Utils_Check_Env {
   public function checkVersion() {
     $messages = array();
     $vc = new CRM_Utils_VersionCheck();
+    $vc->initialize();
 
     // Show a notice if the version_check job is disabled
     if (empty($vc->cronJob['is_active'])) {
