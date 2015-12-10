@@ -209,7 +209,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  public function testAdedPledgePaymentWithAdjustTotalPledgeAmount() {
+  public function testAddPledgePaymentWithAdjustTotalPledgeAmount() {
     $this->webtestLogin();
     // Disable pop-ups for this test. Running test w/ pop-ups causes a spurious failure. dgg
     $this->enableDisablePopups(FALSE);

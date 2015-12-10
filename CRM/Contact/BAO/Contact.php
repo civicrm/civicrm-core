@@ -2529,8 +2529,10 @@ AND       civicrm_openid.is_primary = 1";
       $values['preferred_communication_method'] = $preffComm;
       $values['preferred_communication_method_display'] = CRM_Utils_Array::value('preferred_communication_method_display', $temp);
 
-      $preferredMailingFormat = CRM_Core_SelectValues::pmf();
-      $values['preferred_mail_format'] = $preferredMailingFormat[$contact->preferred_mail_format];
+      if ($contact->preferred_mail_format) {
+        $preferredMailingFormat = CRM_Core_SelectValues::pmf();
+        $values['preferred_mail_format'] = $preferredMailingFormat[$contact->preferred_mail_format];
+      }
 
       // get preferred languages
       if (!empty($contact->preferred_language)) {
