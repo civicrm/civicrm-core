@@ -85,6 +85,31 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test import parser will fallback to external identifier.
+   *
+   * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.
+   *
+   * CRM-17275
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWithUpdateWithExternalIdentifierButNoPrimaryMatch() {
+    list($originalValues, $result) = $this->setUpBaseContact(array(
+      'external_identifier' => 'windows',
+      'email' => NULL,
+    ));
+
+    $this->assertEquals('windows', $result['external_identifier']);
+
+    $originalValues['nick_name'] = 'Old Bill';
+    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $originalValues['id'] = $result['id'];
+
+    $this->assertEquals('Old Bill', $this->callAPISuccessGetValue('Contact', array('id' => $result['id'], 'return' => 'nick_name')));
+    $this->callAPISuccessGetSingle('Contact', $originalValues);
+  }
+
+  /**
    * Test that the import parser adds the external identifier where none is set.
    *
    * @throws \Exception
@@ -97,6 +122,22 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $originalValues['id'] = $result['id'];
     $this->assertEquals('Old Bill', $this->callAPISuccessGetValue('Contact', array('id' => $result['id'], 'return' => 'nick_name')));
     $this->callAPISuccessGetSingle('Contact', $originalValues);
+  }
+
+  /**
+   * Test that the import parser changes the external identifier when there is a dedupe match.
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWithUpdateWithChangedExternalIdentifier() {
+    list($contactValues, $result) = $this->setUpBaseContact(array('external_identifier' => 'windows'));
+    $contact_id = $result['id'];
+    $contactValues['nick_name'] = 'Old Bill';
+    $contactValues['external_identifier'] = 'android';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $contactValues['id'] = $contact_id;
+    $this->assertEquals('Old Bill', $this->callAPISuccessGetValue('Contact', array('id' => $contact_id, 'return' => 'nick_name')));
+    $this->callAPISuccessGetSingle('Contact', $contactValues);
   }
 
   /**
@@ -114,7 +155,7 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $parser->_contactType = 'Individual';
     $parser->_onDuplicate = $onDuplicateAction;
     $parser->init();
-    $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values));
+    $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');
   }
 
   /**
