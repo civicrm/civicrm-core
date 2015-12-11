@@ -414,7 +414,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // Make sure the DB connection is setup properly
     $config->userSystem->setMySQLTimeZone();
-    $env = new CRM_Utils_Check_Env();
+    $env = new CRM_Utils_Check_Component_Env();
     CRM_Utils_Check::singleton()->assertValid($env->checkMysqlTime());
 
     // clear permissions stub to not check permissions
