@@ -461,11 +461,11 @@ class CRM_Activity_Page_AJAX {
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
 
-    foreach ($activities as $key => $value) {
+    foreach ($activities['data'] as $key => $value) {
       // Check if recurring activity.
       if (!empty($value['is_recurring_activity'])) {
         $repeat = $value['is_recurring_activity'];
-        $activities[$key]['activity_type'] .= '<br/><span class="bold">' . ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1])) . '</span>';
+        $activities['data'][$key]['activity_type'] .= '<br/><span class="bold">' . ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1])) . '</span>';
       }
     }
 
