@@ -5896,9 +5896,6 @@ AND   displayRelType.is_active = 1
    * @return string
    */
   public static function getWildCardedValue($wildcard, $op, $value) {
-    if (!$value) {
-      return;
-    }
     if ($wildcard && $op == 'LIKE') {
       if (CRM_Core_Config::singleton()->includeWildCardInName && (substr($value, 0, 1) != '%')) {
         return "%$value%";
@@ -5935,9 +5932,7 @@ AND   displayRelType.is_active = 1
         else {
           // if wildcard is already present return searchString as it is OR append and/or prepend with wildcard
           $isWilcard = strstr($value, '%') ? FALSE : CRM_Core_Config::singleton()->includeWildCardInName;
-          $formValues[$element] = array(
-            'LIKE' => self::getWildCardedValue($isWilcard, 'LIKE', $value)
-          );
+          $formValues[$element] = array('LIKE' => self::getWildCardedValue($isWilcard, 'LIKE', $value));
         }
       }
     }
