@@ -44,6 +44,25 @@ require_once 'api/api.php';
  * Class CRM_Core_Config
  *
  * @property CRM_Utils_System_Base $userSystem
+ * @property array $enableComponents
+ * @property array $languageLimit
+ * @property bool $debug
+ * @property bool $doNotResetCache
+ * @property string $maxFileSize
+ * @property string $defaultCurrency
+ * @property string $defaultCurrencySymbol
+ * @property string $lcMessages
+ * @property string $fieldSeparator
+ * @property string $userFramework
+ * @property string $verpSeparator
+ * @property string $dateFormatFull
+ * @property string $resourceBase
+ * @property string $dsn
+ * @property string $customTemplateDir
+ * @property string $defaultContactCountry
+ * @property string $defaultContactStateProvince
+ * @property string $monetaryDecimalPoint
+ * @property string $monetaryThousandSeparator
  */
 class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
