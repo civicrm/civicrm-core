@@ -197,14 +197,9 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   public function preProcess() {
-    CRM_Utils_System::setTitle($this->getTitle());
-    if (!$this->verifyPreDBState($errorMessage)) {
-      if (!isset($errorMessage)) {
-        $errorMessage = 'pre-condition failed for current upgrade step';
-      }
-      CRM_Core_Error::fatal($errorMessage);
-    }
-    $this->assign('recentlyViewed', FALSE);
+    // This function should be deleted, but I want to ensure it's not actually used, and
+    // deleting it would pass requests up to parent::preProcess().
+    CRM_Core_Error::fatal(sprintf("The function %s::%s should not be called.", __CLASS__, __FUNCTION__));
   }
 
   public function buildQuickForm() {
