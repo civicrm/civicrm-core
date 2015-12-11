@@ -195,7 +195,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $specialParams = array(
         'activity_type_id',
         'status_id',
-        'activity_subject'
+        'activity_subject',
       );
       $changeNames = array('status_id' => 'activity_status_id');
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
