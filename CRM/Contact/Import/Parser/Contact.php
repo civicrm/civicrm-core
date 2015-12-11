@@ -31,10 +31,6 @@
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 
-//@todo calling api functions directly is not supported
-require_once 'api/v3/utils.php';
-require_once 'api/v3/Contact.php';
-
 /**
  * class to parse contact csv files
  */
@@ -62,6 +58,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   protected $_allEmails;
 
   protected $_phoneIndex;
+
+  /**
+   * Is update only permitted on an id match.
+   *
+   * Note this historically was true for when id or external identifier was
+   * present. However, CRM-17275 determined that a dedupe-match could over-ride
+   * external identifier.
+   *
+   * @var bool
+   */
   protected $_updateWithId;
   protected $_retCode;
 
@@ -135,7 +141,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * The initializer code, called before the processing.
+   * The initializer code, called before processing.
    */
   public function init() {
     $contactFields = CRM_Contact_BAO_Contact::importableFields($this->_contactType);
@@ -284,7 +290,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boo
+   * @return bool
    *   the result of this processing
    */
   public function summary(&$values) {
