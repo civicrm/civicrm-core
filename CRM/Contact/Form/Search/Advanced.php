@@ -350,21 +350,8 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contact_tags',
       'preferred_communication_method',
     );
-    foreach ($specialParams as $element) {
-      $value = CRM_Utils_Array::value($element, $this->_formValues);
-      if ($value) {
-        if (is_array($value)) {
-          if ($element == 'status_id') {
-            unset($this->_formValues[$element]);
-            $element = 'activity_' . $element;
-          }
-          $this->_formValues[$element] = array('IN' => $value);
-        }
-        elseif (strstr($value, '%')) {
-          $this->_formValues[$element] = array('LIKE' => $value);
-        }
-      }
-    }
+    $changeNames = array('status_id' => 'activity_status_id');
+    CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
 
     $taglist = CRM_Utils_Array::value('contact_taglist', $this->_formValues);
 
