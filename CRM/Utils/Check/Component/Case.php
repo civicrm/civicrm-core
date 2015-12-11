@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
-class CRM_Utils_Check_Case {
+class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
 
   /**
    * @var CRM_Case_XMLRepository
@@ -46,27 +46,23 @@ class CRM_Utils_Check_Case {
    * @param CRM_Case_XMLRepository $xmlRepo
    * @param array <string> $caseTypeNames
    */
-  public function __construct($xmlRepo, $caseTypeNames) {
-    $this->caseTypeNames = $caseTypeNames;
-    $this->xmlRepo = $xmlRepo;
+  public function __construct() {
+    $this->caseTypeNames = CRM_Case_PseudoConstant::caseType('name');
+    $this->xmlRepo = CRM_Case_XMLRepository::singleton();
   }
 
   /**
-   * Run all checks in this class.
-   *
-   * @return array<CRM_Utils_Check_Message>
+   * @inheritDoc
    */
-  public function checkAll() {
-    $messages = array_merge(
-      $this->checkCaseTypeNameConsistency()
-    );
-    return $messages;
+  public function isEnabled() {
+    return CRM_Case_BAO_Case::enabled();
   }
 
   /**
    * Check that the case-type names don't rely on double-munging.
    *
-   * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
+   * @return array<CRM_Utils_Check_Message>
+   *   An empty array, or a list of warnings
    */
   public function checkCaseTypeNameConsistency() {
     $messages = array();
@@ -80,7 +76,7 @@ class CRM_Utils_Check_Case {
       }
       elseif ($normalFile && $mungedFile) {
         $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
+          __FUNCTION__ . $caseTypeName,
           ts('Case type "%1" has duplicate XML files ("%2" and "%3")', array(
             1 => $caseTypeName,
             2 => $normalFile,
@@ -99,7 +95,7 @@ class CRM_Utils_Check_Case {
       }
       elseif (!$normalFile && $mungedFile) {
         $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
+          __FUNCTION__ . $caseTypeName,
           ts('Case type "%1" corresponds to XML file ("%2") The XML file should be named "%3".', array(
             1 => $caseTypeName,
             2 => $mungedFile,

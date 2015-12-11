@@ -30,13 +30,12 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
-class CRM_Utils_Check_Security {
+class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
   /**
    * CMS have a different pattern to their default file path and URL.
    *
-   * @todo This function might be better shared in CRM_Utils_Check
-   * class, but that class doesn't yet exist.
+   * @todo Use Civi::paths instead?
    */
   public function getFilePathMarker() {
     $config = CRM_Core_Config::singleton();
@@ -47,22 +46,6 @@ class CRM_Utils_Check_Security {
       default:
         return '/files/';
     }
-  }
-
-  /**
-   * Run all checks in this class.
-   *
-   * @return array<CRM_Utils_Check_Message>
-   */
-  public function checkAll() {
-    $messages = array_merge(
-      $this->checkCxnOverrides(),
-      $this->checkLogFileIsNotAccessible(),
-      $this->checkUploadsAreNotAccessible(),
-      $this->checkDirectoriesAreNotBrowseable(),
-      $this->checkFilesAreNotPresent()
-    );
-    return $messages;
   }
 
   /**

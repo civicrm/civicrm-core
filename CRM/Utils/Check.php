@@ -194,24 +194,14 @@ class CRM_Utils_Check {
    *   Array of CRM_Utils_Check_Message objects
    */
   public static function checkAll($max = FALSE) {
-    $checks = array();
-    $checks[] = new CRM_Utils_Check_Security();
-    $checks[] = new CRM_Utils_Check_Env();
-
-    $compInfo = CRM_Core_Component::getEnabledComponents();
-    foreach ($compInfo as $compObj) {
-      switch ($compObj->info['name']) {
-        case 'CiviCase':
-          $checks[] = new CRM_Utils_Check_Case(CRM_Case_XMLRepository::singleton(), CRM_Case_PseudoConstant::caseType('name'));
-          break;
-
-        default:
-      }
-    }
-
     $messages = array();
-    foreach ($checks as $check) {
-      $messages = array_merge($messages, $check->checkAll());
+    foreach (glob(__DIR__ . '/Check/Component/*.php') as $filePath) {
+      $className = 'CRM_Utils_Check_Component_' . basename($filePath, '.php');
+      /* @var CRM_Utils_Check_Component $check */
+      $check = new $className();
+      if ($check->isEnabled()) {
+        $messages = array_merge($messages, $check->checkAll());
+      }
     }
 
     CRM_Utils_Hook::check($messages);

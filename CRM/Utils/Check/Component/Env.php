@@ -30,30 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
-class CRM_Utils_Check_Env {
-
-  /**
-   * Run all checks in this class.
-   *
-   * @return array<CRM_Utils_Check_Message>
-   */
-  public function checkAll() {
-    $messages = array_merge(
-      $this->checkPhpVersion(),
-      $this->checkMysqlTime(),
-      $this->checkDebug(),
-      $this->checkOutboundMail(),
-      $this->checkDomainNameEmail(),
-      $this->checkDefaultMailbox(),
-      $this->checkLastCron(),
-      $this->checkVersion(),
-      $this->checkExtensions(),
-      $this->checkExtensionUpgrades(),
-      $this->checkDbVersion(),
-      $this->checkDbEngine()
-    );
-    return $messages;
-  }
+class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * @return array
