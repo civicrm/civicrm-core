@@ -111,25 +111,15 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * @return array
-   *   Array(CRM_Upgrade_Incremental_Interface).
+   * @return CRM_Upgrade_Steps
    */
-  protected static function getUpgradeObjects() {
-    $majors = array(
-      'FourOne',
-      'FourTwo',
-      'FourThree',
-      'FourFour',
-      'FourFive',
-      'FourSix',
-      'FourSeven',
-    );
-    $upgradeObjects = array();
-    foreach ($majors as $major) {
-      $class = "CRM_Upgrade_Incremental_php_$major";
-      $upgradeObjects[] = new $class();
+  public static function getSteps() {
+    if (!isset(Civi::$statics[__CLASS__]['steps'])) {
+      Civi::$statics[__CLASS__]['steps'] = new CRM_Upgrade_Steps('civicrm', array(
+        __DIR__ . DIRECTORY_SEPARATOR . 'Steps' => 'CRM_Upgrade_Steps_',
+      ));
     }
-    return $upgradeObjects;
+    return Civi::$statics[__CLASS__]['steps'];
   }
 
   /**
@@ -476,7 +466,7 @@ SET    version = '$version'
       'reset' => TRUE,
     ));
 
-    $upgradeObjects = self::getUpgradeObjects();
+    $upgradeObjects = self::getSteps()->getPendingObjects();
     foreach ($upgradeObjects as $obj) {
       /** @var CRM_Upgrade_Incremental_RevisionBase $obj */
       $obj->buildQueue($queue, $postUpgradeMessageFile, $currentVer, $latestVer);
@@ -526,7 +516,7 @@ SET    version = '$version'
     // Scan through all php files and see if any file is interested in setting pre-upgrade-message
     // based on $currentVer, $latestVer.
     // Please note, at this point upgrade hasn't started executing queries.
-    $upgradeObjects = self::getUpgradeObjects();
+    $upgradeObjects = self::getSteps()->getPendingObjects();
     foreach ($upgradeObjects as $upgradeObject) {
       /** @var CRM_Upgrade_Incremental_Interface $upgradeObject */
       $preUpgradeMessage .= $upgradeObject->createPreUpgradeMessage($currentVer, $latestVer);

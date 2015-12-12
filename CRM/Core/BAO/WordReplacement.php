@@ -209,7 +209,7 @@ WHERE  domain_id = %1
    * and convert them to params for the WordReplacement.create API.
    *
    * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
-   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * CRM_Upgrade_Steps_44_All to ensure that the incremental upgrade
    * step behaves consistently even as the BAO evolves in future versions.
    * However, if there's a bug in here prior to 4.4.0, we should apply the
    * bug-fix in both places.
@@ -265,7 +265,7 @@ WHERE  domain_id = %1
    * and write them out as records in civicrm_word_replacement.
    *
    * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
-   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * CRM_Upgrade_Steps_44_All to ensure that the incremental upgrade
    * step behaves consistently even as the BAO evolves in future versions.
    * However, if there's a bug in here prior to 4.4.0, we should apply the
    * bug-fix in both places.

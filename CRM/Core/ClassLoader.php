@@ -168,6 +168,17 @@ class CRM_Core_ClassLoader {
       // intelligible errors.
       if (FALSE != stream_resolve_include_path($file)) {
         require_once $file;
+        return;
+      }
+
+      // CRM/Upgrade/Steps/{NUM}_{TextName}.up.php
+      // CRM/Upgrade/Steps/{NUM}/{NUM}_{TextName}.up.php
+      if (preg_match('/_[0-9]+_/', $class)) {
+        $file = preg_replace('/\/([0-9]+)\/([A-Z][a-zA-Z0-9]+)$/', '/\1_\2', strtr($class, '_', '/')) . '.up.php';
+        if (FALSE != stream_resolve_include_path($file)) {
+          require_once $file;
+          return;
+        }
       }
     }
   }

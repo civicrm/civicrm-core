@@ -37,7 +37,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @see self::triggerInfo()
    *
    * Note that this is also used by the 4.3 upgrade script.
-   * @see CRM_Upgrade_Incremental_php_FourThree
+   * @see CRM_Upgrade_Steps_43_All
    */
   const DROP_STRIP_FUNCTION_43 = "DROP FUNCTION IF EXISTS civicrm_strip_non_numeric";
   const CREATE_STRIP_FUNCTION_43 = "

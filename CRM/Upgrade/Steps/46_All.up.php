@@ -28,7 +28,7 @@
 /**
  * Upgrade logic for 4.6
  */
-class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_RevisionBase {
+class CRM_Upgrade_Steps_46_All extends CRM_Upgrade_Incremental_RevisionBase {
 
   /**
    * @return array
@@ -223,7 +223,7 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Revisi
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('domainID', CRM_Core_Config::domainID());
 
-    $fileName = dirname(__DIR__) . "/sql/$rev.mysql.tpl";
+    $fileName = dirname(__DIR__) . "/Incremental/sql/$rev.mysql.tpl";
 
     $upgrade->source($smarty->fetch($fileName), TRUE);
 

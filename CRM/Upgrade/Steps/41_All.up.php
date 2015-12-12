@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Upgrade_Incremental_php_FourOne extends CRM_Upgrade_Incremental_RevisionBase {
+class CRM_Upgrade_Steps_41_All extends CRM_Upgrade_Incremental_RevisionBase {
 
   // This was changed in 4.3 so we define it locally for compatibility with older dbs
   const NAVIGATION_NAME = "Navigation Menu";

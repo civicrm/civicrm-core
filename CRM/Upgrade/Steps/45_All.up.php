@@ -28,7 +28,7 @@
 /**
  * Upgrade logic for 4.5
  */
-class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_RevisionBase {
+class CRM_Upgrade_Steps_45_All extends CRM_Upgrade_Incremental_RevisionBase {
 
   /**
    * @return array
