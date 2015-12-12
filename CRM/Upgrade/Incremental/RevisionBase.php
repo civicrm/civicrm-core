@@ -65,6 +65,20 @@ abstract class CRM_Upgrade_Incremental_RevisionBase extends CRM_Upgrade_Incremen
   }
 
   /**
+   * Compute any messages which should be displayed before upgrade.
+   *
+   * Note: This function is called iteratively for each upcoming
+   * revision to the database.
+   *
+   * @param $preUpgradeMessage
+   * @param string $rev
+   *   a version number, e.g. '4.8.alpha1', '4.8.beta3', '4.8.0'.
+   * @param null $currentVer
+   */
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  }
+
+  /**
    * Compute any messages which should be displayed after upgrade.
    *
    * @param string $postUpgradeMessage
@@ -78,6 +92,26 @@ abstract class CRM_Upgrade_Incremental_RevisionBase extends CRM_Upgrade_Incremen
   // --------------------------------------------
 
   /**
+   * Adapt from new-style `createPreUpgradeMessage()` to old-style
+   * `setPreUpgradeMessage(&$message)`.
+   *
+   * @param string $currentVer
+   * @param string $endVer
+   * @return string
+   */
+  public function createPreUpgradeMessage($currentVer, $endVer) {
+    $preUpgradeMessage = '';
+    foreach ($this->getRevisions() as $rev) {
+      if (version_compare($currentVer, $rev) < 0) {
+        $this->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
+      }
+    }
+    return $preUpgradeMessage;
+  }
+
+  /**
+   * Enqueue upgrade tasks for each revision.
+   *
    * @param \CRM_Queue_Queue $queue
    * @param $postUpgradeMessageFile
    * @param $startVer

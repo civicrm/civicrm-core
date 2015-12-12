@@ -31,22 +31,20 @@
 abstract class CRM_Upgrade_Incremental_Base {
   const BATCH_SIZE = 5000;
 
-  public abstract function buildQueue(CRM_Queue_Queue $queue, $postUpgradeMessageFile, $startVer, $endVer);
-
+  /**
+   * @param string $startVer
+   * @param string $endVer
+   * @return string
+   */
+  public abstract function createPreUpgradeMessage($startVer, $endVer);
 
   /**
-   * Compute any messages which should be displayed before upgrade.
-   *
-   * Note: This function is called iteratively for each upcoming
-   * revision to the database.
-   *
-   * @param $preUpgradeMessage
-   * @param string $rev
-   *   a version number, e.g. '4.8.alpha1', '4.8.beta3', '4.8.0'.
-   * @param null $currentVer
+   * @param \CRM_Queue_Queue $queue
+   * @param string $postUpgradeMessageFile
+   * @param string $startVer
+   * @param string $endVer
    */
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-  }
+  public abstract function buildQueue(CRM_Queue_Queue $queue, $postUpgradeMessageFile, $startVer, $endVer);
 
   /**
    * (Queue Task Callback)

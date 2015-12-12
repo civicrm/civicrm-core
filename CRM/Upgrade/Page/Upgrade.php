@@ -107,8 +107,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     // cleanup only the templates_c directory
     $config->cleanup(1, FALSE);
 
-    $preUpgradeMessage = NULL;
-    $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+    $preUpgradeMessage = $upgrade->createPreUpgradeMessage($currentVer, $latestVer);
 
     $template->assign('currentVersion', $currentVer);
     $template->assign('newVersion', $latestVer);

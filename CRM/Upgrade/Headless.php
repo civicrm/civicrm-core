@@ -56,8 +56,7 @@ class CRM_Upgrade_Headless {
     CRM_Core_DAO::dropTriggers();
 
     // CRM-11156
-    $preUpgradeMessage = NULL;
-    $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+    $preUpgradeMessage = $upgrade->createPreUpgradeMessage($currentVer, $latestVer);
 
     $postUpgradeMessageFile = CRM_Utils_File::tempnam('civicrm-post-upgrade');
     $queueRunner = new CRM_Queue_Runner(array(

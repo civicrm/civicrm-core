@@ -129,6 +129,27 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
+   * @return array
+   */
+  protected static function getUpgradeObjects() {
+    $majors = array(
+      'FourOne',
+      'FourTwo',
+      'FourThree',
+      'FourFour',
+      'FourFive',
+      'FourSix',
+      'FourSeven',
+    );
+    $upgradeObjects = array();
+    foreach ($majors as $major) {
+      $class = "CRM_Upgrade_Incremental_php_$major";
+      $upgradeObjects[] = new $class();
+    }
+    return $upgradeObjects;
+  }
+
+  /**
    * @param $version
    *
    * @return mixed
@@ -556,10 +577,9 @@ SET    version = '$version'
       'reset' => TRUE,
     ));
 
-    foreach (array('FourOne', 'FourTwo', 'FourThree', 'FourFour', 'FourFive', 'FourSix', 'FourSeven') as $major) {
-      $class = "CRM_Upgrade_Incremental_php_$major";
+    $upgradeObjects = self::getUpgradeObjects();
+    foreach ($upgradeObjects as $obj) {
       /** @var CRM_Upgrade_Incremental_RevisionBase $obj */
-      $obj = new $class();
       $obj->buildQueue($queue, $postUpgradeMessageFile, $currentVer, $latestVer);
     }
 
@@ -592,12 +612,13 @@ SET    version = '$version'
    * by calling the 'setPreUpgradeMessage' on each incremental upgrade
    * object.
    *
-   * @param string $preUpgradeMessage
-   *   alterable.
    * @param $currentVer
    * @param $latestVer
+   * @return string
    */
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
+  public function createPreUpgradeMessage($currentVer, $latestVer) {
+    $preUpgradeMessage = NULL;
+
     // check for changed message templates
     CRM_Upgrade_Incremental_General::checkMessageTemplate($preUpgradeMessage, $latestVer, $currentVer);
     // set global messages
@@ -606,15 +627,13 @@ SET    version = '$version'
     // Scan through all php files and see if any file is interested in setting pre-upgrade-message
     // based on $currentVer, $latestVer.
     // Please note, at this point upgrade hasn't started executing queries.
-    $revisions = $this->getRevisionSequence();
-    foreach ($revisions as $rev) {
-      if (version_compare($currentVer, $rev) < 0) {
-        $versionObject = $this->incrementalPhpObject($rev);
-        if (is_callable(array($versionObject, 'setPreUpgradeMessage'))) {
-          $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
-        }
-      }
+    $upgradeObjects = self::getUpgradeObjects();
+    foreach ($upgradeObjects as $upgradeObject) {
+      /** @var CRM_Upgrade_Incremental_Base $upgradeObject */
+      $preUpgradeMessage .= $upgradeObject->createPreUpgradeMessage($currentVer, $latestVer);
     }
+
+    return $preUpgradeMessage;
   }
 
 }
