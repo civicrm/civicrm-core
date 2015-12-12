@@ -143,34 +143,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $constraints
-   *
-   * @return array
-   */
-  public function checkSQLConstraints(&$constraints) {
-    $pass = $fail = 0;
-    foreach ($constraints as $constraint) {
-      if ($this->checkSQLConstraint($constraint)) {
-        $pass++;
-      }
-      else {
-        $fail++;
-      }
-      return array($pass, $fail);
-    }
-  }
-
-  /**
-   * @param $constraint
-   *
-   * @return bool
-   */
-  public function checkSQLConstraint($constraint) {
-    // check constraint here
-    return TRUE;
-  }
-
-  /**
    * @param string $fileName
    * @param bool $isQueryString
    */
