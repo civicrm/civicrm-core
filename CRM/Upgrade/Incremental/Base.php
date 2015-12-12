@@ -28,7 +28,7 @@
 /**
  * Base class for incremental upgrades
  */
-abstract class CRM_Upgrade_Incremental_Base {
+abstract class CRM_Upgrade_Incremental_Base implements CRM_Upgrade_Incremental_Interface {
   const BATCH_SIZE = 5000;
 
   /**

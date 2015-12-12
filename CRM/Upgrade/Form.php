@@ -112,6 +112,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
 
   /**
    * @return array
+   *   Array(CRM_Upgrade_Incremental_Interface).
    */
   protected static function getUpgradeObjects() {
     $majors = array(
@@ -527,7 +528,7 @@ SET    version = '$version'
     // Please note, at this point upgrade hasn't started executing queries.
     $upgradeObjects = self::getUpgradeObjects();
     foreach ($upgradeObjects as $upgradeObject) {
-      /** @var CRM_Upgrade_Incremental_Base $upgradeObject */
+      /** @var CRM_Upgrade_Incremental_Interface $upgradeObject */
       $preUpgradeMessage .= $upgradeObject->createPreUpgradeMessage($currentVer, $latestVer);
     }
 
