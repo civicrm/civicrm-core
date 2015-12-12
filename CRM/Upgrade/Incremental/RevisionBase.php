@@ -134,7 +134,7 @@ abstract class CRM_Upgrade_Incremental_RevisionBase extends CRM_Upgrade_Incremen
         // callback
           array('CRM_Upgrade_Incremental_RevisionBase', 'doIncrementalUpgradeStep'),
           // arguments
-          array($rev, $startVer, $endVer, $postUpgradeMessageFile),
+          array(get_class($this), $rev, $startVer, $endVer, $postUpgradeMessageFile),
           "Upgrade DB to $rev"
         );
         $queue->createItem($task);
@@ -185,12 +185,12 @@ abstract class CRM_Upgrade_Incremental_RevisionBase extends CRM_Upgrade_Incremen
    *
    * @return bool
    */
-  public static function doIncrementalUpgradeStep(CRM_Queue_TaskContext $ctx, $rev, $originalVer, $latestVer, $postUpgradeMessageFile) {
+  public static function doIncrementalUpgradeStep(CRM_Queue_TaskContext $ctx, $thisClass, $rev, $originalVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
 
     $phpFunctionName = 'upgrade_' . str_replace('.', '_', $rev);
 
-    $versionObject = $upgrade->incrementalPhpObject($rev);
+    $versionObject = new $thisClass();
 
     // pre-db check for major release.
     if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
