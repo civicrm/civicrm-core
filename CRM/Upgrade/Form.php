@@ -263,15 +263,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $query
-   *
-   * @return Object
-   */
-  public function runQuery($query) {
-    return CRM_Core_DAO::executeQuery($query);
-  }
-
-  /**
    * @param $version
    *
    * @return Object
@@ -283,7 +274,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
 UPDATE civicrm_domain
 SET    version = '$version'
 ";
-    return $this->runQuery($query);
+    return CRM_Core_DAO::executeQuery($query);
   }
 
   /**
