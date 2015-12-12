@@ -556,141 +556,14 @@ SET    version = '$version'
       'reset' => TRUE,
     ));
 
-    $revisions = $upgrade->getRevisionSequence();
-    foreach ($revisions as $rev) {
-      // proceed only if $currentVer < $rev
-      if (version_compare($currentVer, $rev) < 0) {
-        $beginTask = new CRM_Queue_Task(
-        // callback
-          array('CRM_Upgrade_Form', 'doIncrementalUpgradeStart'),
-          // arguments
-          array($rev),
-          "Begin Upgrade to $rev"
-        );
-        $queue->createItem($beginTask);
-
-        $task = new CRM_Queue_Task(
-        // callback
-          array('CRM_Upgrade_Form', 'doIncrementalUpgradeStep'),
-          // arguments
-          array($rev, $currentVer, $latestVer, $postUpgradeMessageFile),
-          "Upgrade DB to $rev"
-        );
-        $queue->createItem($task);
-
-        $task = new CRM_Queue_Task(
-        // callback
-          array('CRM_Upgrade_Form', 'doIncrementalUpgradeFinish'),
-          // arguments
-          array($rev, $currentVer, $latestVer, $postUpgradeMessageFile),
-          "Finish Upgrade DB to $rev"
-        );
-        $queue->createItem($task);
-      }
+    foreach (array('FourOne', 'FourTwo', 'FourThree', 'FourFour', 'FourFive', 'FourSix', 'FourSeven') as $major) {
+      $class = "CRM_Upgrade_Incremental_php_$major";
+      /** @var CRM_Upgrade_Incremental_RevisionBase $obj */
+      $obj = new $class();
+      $obj->buildQueue($queue, $postUpgradeMessageFile, $currentVer, $latestVer);
     }
 
     return $queue;
-  }
-
-  /**
-   * Perform an incremental version update.
-   *
-   * @param CRM_Queue_TaskContext $ctx
-   * @param string $rev
-   *   the target (intermediate) revision e.g '3.2.alpha1'.
-   *
-   * @return bool
-   */
-  public static function doIncrementalUpgradeStart(CRM_Queue_TaskContext $ctx, $rev) {
-    $upgrade = new CRM_Upgrade_Form();
-
-    // as soon as we start doing anything we append ".upgrade" to version.
-    // this also helps detect any partial upgrade issues
-    $upgrade->setVersion($rev . '.upgrade');
-
-    return TRUE;
-  }
-
-  /**
-   * Perform an incremental version update.
-   *
-   * @param CRM_Queue_TaskContext $ctx
-   * @param string $rev
-   *   the target (intermediate) revision e.g '3.2.alpha1'.
-   * @param string $originalVer
-   *   the original revision.
-   * @param string $latestVer
-   *   the target (final) revision.
-   * @param string $postUpgradeMessageFile
-   *   path of a modifiable file which lists the post-upgrade messages.
-   *
-   * @return bool
-   */
-  public static function doIncrementalUpgradeStep(CRM_Queue_TaskContext $ctx, $rev, $originalVer, $latestVer, $postUpgradeMessageFile) {
-    $upgrade = new CRM_Upgrade_Form();
-
-    $phpFunctionName = 'upgrade_' . str_replace('.', '_', $rev);
-
-    $versionObject = $upgrade->incrementalPhpObject($rev);
-
-    // pre-db check for major release.
-    if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
-      if (!(is_callable(array($versionObject, 'verifyPreDBstate')))) {
-        CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
-      }
-
-      $error = NULL;
-      if (!($versionObject->verifyPreDBstate($error))) {
-        if (!isset($error)) {
-          $error = "post-condition failed for current upgrade for $rev";
-        }
-        CRM_Core_Error::fatal($error);
-      }
-
-    }
-
-    $upgrade->setSchemaStructureTables($rev);
-
-    if (is_callable(array($versionObject, $phpFunctionName))) {
-      $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
-    }
-    else {
-      $upgrade->processSQL($rev);
-    }
-
-    // set post-upgrade-message if any
-    if (is_callable(array($versionObject, 'setPostUpgradeMessage'))) {
-      $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
-      $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
-      file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Perform an incremental version update.
-   *
-   * @param CRM_Queue_TaskContext $ctx
-   * @param string $rev
-   *   the target (intermediate) revision e.g '3.2.alpha1'.
-   * @param string $currentVer
-   *   the original revision.
-   * @param string $latestVer
-   *   the target (final) revision.
-   * @param string $postUpgradeMessageFile
-   *   path of a modifiable file which lists the post-upgrade messages.
-   *
-   * @return bool
-   */
-  public static function doIncrementalUpgradeFinish(CRM_Queue_TaskContext $ctx, $rev, $currentVer, $latestVer, $postUpgradeMessageFile) {
-    $upgrade = new CRM_Upgrade_Form();
-    $upgrade->setVersion($rev);
-    CRM_Utils_System::flushCache();
-
-    $config = CRM_Core_Config::singleton();
-    $config->userSystem->flush();
-    return TRUE;
   }
 
   public static function doFinish() {

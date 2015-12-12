@@ -28,19 +28,11 @@
 /**
  * Base class for incremental upgrades
  */
-class CRM_Upgrade_Incremental_Base {
+abstract class CRM_Upgrade_Incremental_Base {
   const BATCH_SIZE = 5000;
 
-  /**
-   * Verify DB state.
-   *
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
+  public abstract function buildQueue(CRM_Queue_Queue $queue, $postUpgradeMessageFile, $startVer, $endVer);
+
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -54,17 +46,6 @@ class CRM_Upgrade_Incremental_Base {
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-  }
-
-  /**
-   * Compute any messages which should be displayed after upgrade.
-   *
-   * @param string $postUpgradeMessage
-   *   alterable.
-   * @param string $rev
-   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   */
-  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
   }
 
   /**

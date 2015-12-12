@@ -28,8 +28,26 @@
 /**
  * Upgrade logic for 4.4
  */
-class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_RevisionBase {
   const MAX_WORD_REPLACEMENT_SIZE = 255;
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.4.alpha1",
+      "4.4.beta1",
+      "4.4.0",
+      "4.4.1",
+      "4.4.2",
+      "4.4.3",
+      "4.4.4",
+      "4.4.5",
+      "4.4.6",
+      "4.4.7",
+    );
+  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.

@@ -28,7 +28,33 @@
 /**
  * Upgrade logic for 4.3
  */
-class CRM_Upgrade_Incremental_php_FourThree extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Incremental_php_FourThree extends CRM_Upgrade_Incremental_RevisionBase {
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.3.alpha1",
+      "4.3.alpha2",
+      "4.3.alpha3",
+      "4.3.beta1",
+      "4.3.beta2",
+      "4.3.beta3",
+      "4.3.beta4",
+      "4.3.beta5",
+      "4.3.0",
+      "4.3.1",
+      "4.3.2",
+      "4.3.3",
+      "4.3.4",
+      "4.3.5",
+      "4.3.6",
+      "4.3.7",
+      "4.3.8",
+      "4.3.9",
+    );
+  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.

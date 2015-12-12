@@ -27,7 +27,23 @@
 /**
  * Upgrade logic for 4.7
  */
-class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_RevisionBase {
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.7.alpha1",
+      "4.7.alpha2",
+      "4.7.alpha3",
+      "4.7.alpha4",
+      "4.7.alpha5",
+      "4.7.beta1",
+      "4.7.beta2",
+      "4.7.beta3",
+    );
+  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.
