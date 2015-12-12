@@ -44,7 +44,8 @@
  *
  * @deprecated
  */
-abstract class CRM_Upgrade_Incremental_RevisionBase extends CRM_Upgrade_Incremental_Base {
+abstract class CRM_Upgrade_Incremental_RevisionBase implements CRM_Upgrade_Incremental_Interface {
+  const BATCH_SIZE = 5000;
 
   /**
    * Get a list of incremental revisions.
@@ -249,6 +250,71 @@ abstract class CRM_Upgrade_Incremental_RevisionBase extends CRM_Upgrade_Incremen
 
     $config = CRM_Core_Config::singleton();
     $config->userSystem->flush();
+    return TRUE;
+  }
+
+  /**
+   * Syntactic sugar for adding a task.
+   *
+   * Task is (a) in this class and (b) has a high priority.
+   *
+   * After passing the $funcName, you can also pass parameters that will go to
+   * the function. Note that all params must be serializable.
+   *
+   * @param string $title
+   * @param string $funcName
+   */
+  protected function addTask($title, $funcName) {
+    $queue = CRM_Queue_Service::singleton()->load(array(
+      'type' => 'Sql',
+      'name' => CRM_Upgrade_Form::QUEUE_NAME,
+    ));
+
+    $args = func_get_args();
+    $title = array_shift($args);
+    $funcName = array_shift($args);
+    $task = new CRM_Queue_Task(
+      array(get_class($this), $funcName),
+      $args,
+      $title
+    );
+    $queue->createItem($task, array('weight' => -1));
+  }
+
+  /**
+   * (Queue Task Callback)
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $rev
+   *
+   * @return bool
+   */
+  public static function runSql(CRM_Queue_TaskContext $ctx, $rev) {
+    $upgrade = new CRM_Upgrade_Form();
+    $upgrade->processSQL($rev);
+
+    return TRUE;
+  }
+
+  /**
+   * Remove a payment processor if not in use
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $name
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function removePaymentProcessorType(CRM_Queue_TaskContext $ctx, $name) {
+    $processors = civicrm_api3('PaymentProcessor', 'getcount', array('payment_processor_type_id' => $name));
+    if (empty($processors['result'])) {
+      $result = civicrm_api3('PaymentProcessorType', 'get', array(
+        'name' => $name,
+        'return' => 'id',
+      ));
+      if (!empty($result['id'])) {
+        civicrm_api3('PaymentProcessorType', 'delete', array('id' => $result['id']));
+      }
+    }
     return TRUE;
   }
 
