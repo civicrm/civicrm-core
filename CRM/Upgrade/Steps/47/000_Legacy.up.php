@@ -27,7 +27,7 @@
 /**
  * Upgrade logic for 4.7
  */
-class CRM_Upgrade_Steps_47_All extends CRM_Upgrade_Incremental_RevisionBase {
+class CRM_Upgrade_Steps_47_000_Legacy extends CRM_Upgrade_Incremental_RevisionBase {
 
   /**
    * @return array
@@ -179,7 +179,7 @@ class CRM_Upgrade_Steps_47_All extends CRM_Upgrade_Incremental_RevisionBase {
 
     $domainDao = CRM_Core_DAO::executeQuery('SELECT id, config_backend FROM civicrm_domain');
     while ($domainDao->fetch()) {
-      $settings = CRM_Upgrade_Steps_47_All::convertBackendToSettings($domainDao->id, $domainDao->config_backend);
+      $settings = CRM_Upgrade_Steps_47_000_Legacy::convertBackendToSettings($domainDao->id, $domainDao->config_backend);
       CRM_Core_Error::debug_var('convertBackendToSettings', array(
         'domainId' => $domainDao->id,
         'backend' => $domainDao->config_backend,

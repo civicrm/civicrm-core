@@ -142,7 +142,7 @@ class SettingsBag {
     if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_DAO::checkFieldExists('civicrm_domain', 'config_backend', FALSE)) {
       $config_backend = \CRM_Core_DAO::singleValueQuery('SELECT config_backend FROM civicrm_domain WHERE id = %1',
         array(1 => array($this->domainId, 'Positive')));
-      $oldSettings = \CRM_Upgrade_Steps_47_All::convertBackendToSettings($this->domainId, $config_backend);
+      $oldSettings = \CRM_Upgrade_Steps_47_000_Legacy::convertBackendToSettings($this->domainId, $config_backend);
       \CRM_Utils_Array::extend($this->values, $oldSettings);
     }
 
