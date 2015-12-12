@@ -217,7 +217,7 @@ CRM.$(function($) {
     var
       token = $(this).val(),
       field = $(this).data('field');
-    if (field !== 'html_message') {
+    if (field.indexOf('html') < 0) {
       field = textMsgID($(this));
     }
     CRM.wysiwyg.insert('#' + field, token);
