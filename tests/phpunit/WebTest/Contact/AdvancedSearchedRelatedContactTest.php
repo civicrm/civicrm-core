@@ -92,7 +92,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type("sort_name", $sortName);
     $this->select("contact_type", "value=Individual");
-    $this->clickLink("_qf_Basic_refresh", "//div[@class='crm-search-results']/table[@class='selector row-highlight']/tbody/tr/", FALSE);
+    $this->clickLink("_qf_Basic_refresh", "//table[@class='selector row-highlight']/tbody//tr/td[11]/span/a[text()='View']", FALSE);
 
     // click through to the Relationship view screen
     $this->click("xpath=//table[@class='selector row-highlight']/tbody//tr/td[11]/span/a[text()='View']");
