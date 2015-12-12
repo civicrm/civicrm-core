@@ -68,7 +68,7 @@
         </div><!-- /.crm-accordion-header -->
          <div class="crm-accordion-body">
            <div class="helpIcon" id="helphtml">
-             <input class="crm-token-selector big" data-field="html_message" />
+             <input class="crm-token-selector big" data-field="msg_html" />
              {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
            </div>
                 <div class="clear"></div>
