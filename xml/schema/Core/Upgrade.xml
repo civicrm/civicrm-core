@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Upgrade</class>
+  <name>civicrm_upgrade</name>
+  <comment>Track individual upgrade steps</comment>
+  <add>4.7</add>
+  <field>
+    <name>id</name>
+    <title>Step ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>4.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>module</name>
+    <title>Upgrade Module</title>
+    <type>varchar</type>
+    <length>127</length>
+    <required>true</required>
+    <comment>The module or extension for which upgrades were handled.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Upgrade Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Unique name for upgrade</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <title>Upgrade Created Date</title>
+    <type>timestamp</type>
+    <comment>When was the upgrade executed</comment>
+    <required>false</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>4.7</add>
+  </field>
+  <index>
+    <name>index_module_name</name>
+    <fieldName>module</fieldName>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
+</table>
