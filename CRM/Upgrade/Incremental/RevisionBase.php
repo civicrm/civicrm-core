@@ -93,6 +93,13 @@ abstract class CRM_Upgrade_Incremental_RevisionBase implements CRM_Upgrade_Incre
   // --------------------------------------------
 
   /**
+   * @return string
+   */
+  public function getName() {
+    return get_class($this);
+  }
+
+  /**
    * Adapt from new-style `createPreUpgradeMessage()` to old-style
    * `setPreUpgradeMessage(&$message)`.
    *

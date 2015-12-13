@@ -31,6 +31,13 @@
 interface CRM_Upgrade_Incremental_Interface {
 
   /**
+   * Get a symbolic name for this incremental upgrade step.
+   *
+   * @return string
+   */
+  public function getName();
+
+  /**
    * @param string $startVer
    * @param string $endVer
    * @return string
@@ -38,6 +45,10 @@ interface CRM_Upgrade_Incremental_Interface {
   public function createPreUpgradeMessage($startVer, $endVer);
 
   /**
+   * Enqueue a set of tasks for this upgrade.
+   *
+   * In addition to performing the actual upgrade,
+   *
    * @param \CRM_Queue_Queue $queue
    * @param string $postUpgradeMessageFile
    * @param string $startVer

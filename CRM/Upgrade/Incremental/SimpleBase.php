@@ -39,6 +39,13 @@
 class CRM_Upgrade_Incremental_SimpleBase extends CRM_Queue_MultiTasker implements CRM_Upgrade_Incremental_Interface {
 
   /**
+   * @return string
+   */
+  public function getName() {
+    return get_class($this);
+  }
+
+  /**
    * @param string $startVer
    * @param string $endVer
    * @return null
