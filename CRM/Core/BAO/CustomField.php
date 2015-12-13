@@ -2235,63 +2235,6 @@ ORDER BY html_type";
   }
 
   /**
-   * Build option.
-   *
-   * @param array $field
-   * @param array $options
-   *
-   * @throws Exception
-   */
-  public static function buildOption($field, &$options) {
-    // Fixme - adding anything but options to the $options array is a bad idea
-    // What if an option had the key 'attributes'?
-    $options['attributes'] = array(
-      'label' => $field['label'],
-      'data_type' => $field['data_type'],
-      'html_type' => $field['html_type'],
-    );
-
-    $optionGroupID = NULL;
-    if (($field['html_type'] == 'CheckBox' ||
-      $field['html_type'] == 'Radio' ||
-      $field['html_type'] == 'Select' ||
-      $field['html_type'] == 'AdvMulti-Select' ||
-      $field['html_type'] == 'Multi-Select' ||
-      ($field['html_type'] == 'Autocomplete-Select' && $field['data_type'] != 'ContactReference')
-    )
-    ) {
-      if ($field['option_group_id']) {
-        $optionGroupID = $field['option_group_id'];
-      }
-      elseif ($field['data_type'] != 'Boolean') {
-        CRM_Core_Error::fatal();
-      }
-    }
-
-    // build the cache for custom values with options (label => value)
-    if ($optionGroupID != NULL) {
-      $query = "
-SELECT label, value
-  FROM civicrm_option_value
- WHERE option_group_id = $optionGroupID
-";
-
-      $dao = CRM_Core_DAO::executeQuery($query);
-      while ($dao->fetch()) {
-        if ($field['data_type'] == 'Int' || $field['data_type'] == 'Float') {
-          $num = round($dao->value, 2);
-          $options["$num"] = $dao->label;
-        }
-        else {
-          $options[$dao->value] = $dao->label;
-        }
-      }
-
-      CRM_Utils_Hook::customFieldOptions($field['id'], $options);
-    }
-  }
-
-  /**
    * Get custom field ID.
    *
    * @param string $fieldLabel
