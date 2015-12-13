@@ -468,11 +468,26 @@ SET    version = '$version'
 
     $upgradeObjects = self::getSteps()->getPendingObjects();
     foreach ($upgradeObjects as $obj) {
-      /** @var CRM_Upgrade_Incremental_RevisionBase $obj */
+      /** @var CRM_Upgrade_Incremental_Interface $obj */
       $obj->buildQueue($queue, $postUpgradeMessageFile, $currentVer, $latestVer);
+
+      // It would be nice if the doFinishUpgradeObject/setExecuted were done within
+      // the enqueued steps, but it's a little messy to pass around the necessary
+      // details.
+      $task = new CRM_Queue_Task(
+        array('CRM_Upgrade_Form', 'doFinishUpgradeObject'),
+        array($obj->getName()),
+        "Mark finished: " . $obj->getName()
+      );
+      $queue->createItem($task);
     }
 
     return $queue;
+  }
+
+  public static function doFinishUpgradeObject(CRM_Queue_TaskContext $ctx, $name) {
+    CRM_Upgrade_Form::getSteps()->setExecuted($name, TRUE);
+    return TRUE;
   }
 
   public static function doFinish() {

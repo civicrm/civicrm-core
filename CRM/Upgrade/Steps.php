@@ -26,11 +26,12 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
+ * The `CRM_Upgrade_Steps` class tracks upgrade files (eg `CRM/Upgrade/Steps/*.up.php`).
+ * It can report a list of pending upgrade steps and toggle the "pending" flag.
  */
 class CRM_Upgrade_Steps {
 
@@ -53,6 +54,9 @@ class CRM_Upgrade_Steps {
    *   Array(string $fullPath => string $classPrefix).
    */
   public function __construct($module, $paths = array()) {
+    if (!self::findCreateTable()) {
+      CRM_Core_Error::fatal(ts('Failed to find or create upgrade table'));
+    }
     $this->module = $module;
     $this->paths = $paths;
   }
@@ -98,7 +102,7 @@ class CRM_Upgrade_Steps {
   public function getPendingObjects() {
     $result = array();
     foreach ($this->getAllClasses() as $file => $className) {
-      if ($this->isPending($className)) {
+      if (!$this->isExecuted($className)) {
         $result[] = new $className();
       }
     }
@@ -106,11 +110,40 @@ class CRM_Upgrade_Steps {
   }
 
   /**
-   * @param string $className
+   * Determine whether the step has been executed before.
+   *
+   * @param string $name
    * @return bool
    */
-  public function isPending($className) {
-    return TRUE;
+  public function isExecuted($name) {
+    return (bool) CRM_Core_DAO::singleValueQuery(
+      'SELECT count(*) FROM civicrm_upgrade WHERE module = %1 AND name = %2',
+      array(
+        1 => array($this->module, 'String'),
+        2 => array($name, 'String'),
+      )
+    );
+  }
+
+  /**
+   * Specify whether the step has been executed before.
+   *
+   * @param string $name
+   * @param bool $value
+   * @return $this
+   */
+  public function setExecuted($name, $value) {
+    $sqlParams = array(
+      1 => array($this->module, 'String'),
+      2 => array($name, 'String'),
+    );
+    if ($value) {
+      CRM_Core_DAO::executeQuery('INSERT IGNORE INTO civicrm_upgrade (module, name) VALUES (%1,%2)', $sqlParams);
+    }
+    else {
+      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_upgrade WHERE module = %1 AND name = %2', $sqlParams);
+    }
+    return $this;
   }
 
   /**
@@ -131,6 +164,29 @@ class CRM_Upgrade_Steps {
     $relFile = CRM_Utils_File::relativize($absFile, CRM_Utils_File::addTrailingSlash($absPath, '/'));
     $relFile = preg_replace('/\.up\.php$/', '', $relFile);
     return $classPrefix . strtr($relFile, '/', '_');
+  }
+
+  /**
+   * Ensure that the required SQL table exists.
+   *
+   * @return bool
+   *   TRUE if table now exists
+   */
+  private static function findCreateTable() {
+    $checkTableSql = "show tables like 'civicrm_upgrade'";
+    $foundName = CRM_Core_DAO::singleValueQuery($checkTableSql);
+    if ($foundName == 'civicrm_upgrade') {
+      return TRUE;
+    }
+
+    $fileName = dirname(__FILE__) . '/../../sql/civicrm_upgrade.mysql';
+
+    $config = CRM_Core_Config::singleton();
+    CRM_Utils_File::sourceSQLFile($config->dsn, $fileName);
+
+    // Make sure it succeeded
+    $foundName = CRM_Core_DAO::singleValueQuery($checkTableSql);
+    return ($foundName == 'civicrm_upgrade');
   }
 
 }
