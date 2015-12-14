@@ -560,7 +560,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->doTemplateAssignment($rows);
 
     if (!empty($originalRelationshipTypeIdValue)) {
-      $type = array();
       // store its old value, CRM-5837
       $this->_params['relationship_type_id_value'] = $originalRelationshipTypeIdValue;
     }
