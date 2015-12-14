@@ -134,7 +134,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addElement('text', 'newGroupName', ts('Name for new group'));
+    $this->addElement('text', 'newGroupName', ts('Name for new group'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'));
     $this->addElement('text', 'newGroupDesc', ts('Description of new group'));
 
     $groups = $this->get('groups');
@@ -147,8 +147,8 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     //display new tag
-    $this->addElement('text', 'newTagName', ts('Tag'));
-    $this->addElement('text', 'newTagDesc', ts('Description'));
+    $this->addElement('text', 'newTagName', ts('Tag'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'name'));
+    $this->addElement('text', 'newTagDesc', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description'));
 
     $tag = $this->get('tag');
     if (!empty($tag)) {
