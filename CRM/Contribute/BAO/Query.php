@@ -49,11 +49,11 @@ class CRM_Contribute_BAO_Query {
    * @return array
    *   self::$_contributionFields  associative array of contribution fields
    */
-  public static function &getFields() {
+  public static function &getFields($checkPermission = TRUE) {
     if (!self::$_contributionFields) {
       self::$_contributionFields = array();
 
-      $fields = CRM_Contribute_BAO_Contribution::exportableFields();
+      $fields = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
 
       unset($fields['contribution_contact_id']);
 
