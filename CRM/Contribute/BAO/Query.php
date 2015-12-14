@@ -868,6 +868,8 @@ class CRM_Contribute_BAO_Query {
       'is_pay_later' => 1,
       'thankyou_date' => 1,
       'total_amount' => 1,
+      // Without this value here we get an e-notice BUT the value does not appear to be rendered anywhere.
+      'contribution_campaign_id' => 1,
       'contribution_status_id' => 1,
       // @todo return this & fix query to do pseudoconstant thing.
       'contribution_status' => 1,
