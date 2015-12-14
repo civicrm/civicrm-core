@@ -187,10 +187,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $this->_includeSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_queryParams);
     $this->_query = new CRM_Contact_BAO_Query(
       $this->_queryParams,
-      CRM_Contribute_BAO_Query::defaultReturnProperties(
-        CRM_Contact_BAO_Query::MODE_CONTRIBUTE,
-        FALSE
-      ),
+      CRM_Contribute_BAO_Query::selectorReturnProperties(),
       NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_CONTRIBUTE
     );
@@ -409,6 +406,8 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       }
 
       //carry campaign on selectors.
+      // @todo - I can't find any evidence that 'carrying' the campaign on selectors actually
+      // results in it being displayed anywhere so why do we do this???
       $row['campaign'] = CRM_Utils_Array::value($result->contribution_campaign_id, $allCampaigns);
       $row['campaign_id'] = $result->contribution_campaign_id;
 
