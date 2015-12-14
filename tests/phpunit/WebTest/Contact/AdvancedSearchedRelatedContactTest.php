@@ -109,6 +109,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
 
     $this->openCiviPage('contact/search/advanced', 'reset=1');
 
+    $this->waitForElementPresent("sort_name");
     $this->type("sort_name", $sortName);
     $this->click('_qf_Advanced_refresh');
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
@@ -117,7 +118,9 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->assertElementContainsText('search-status', '1 Contact');
 
     $this->click('css=div.crm-advanced_search_form-accordion div.crm-accordion-header');
+    $this->waitForElementPresent("component_mode");
     $this->select("component_mode", "label=Related Contacts");
+    $this->waitForElementPresent("display_relationship_type");
     $this->select("display_relationship_type", $relType);
     $this->click('_qf_Advanced_refresh');
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
