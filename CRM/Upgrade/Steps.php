@@ -30,8 +30,9 @@
  * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
- * The `CRM_Upgrade_Steps` class tracks upgrade files (eg `CRM/Upgrade/Steps/*.up.php`).
- * It can report a list of pending upgrade steps and toggle the "pending" flag.
+ * The `CRM_Upgrade_Steps` class tracks upgrade files (eg `CRM/Upgrade/Steps/*.up.php`
+ * or `CRM/Upgrade/Steps/*.mysql.tpl`). It can report a list of pending upgrade steps
+ * and toggle the "executed" flag.
  */
 class CRM_Upgrade_Steps {
 
@@ -62,26 +63,6 @@ class CRM_Upgrade_Steps {
   }
 
   /**
-   * Get a list of all upgrade steps (as class names).
-   *
-   * @return array
-   *   Array(string $file => string $className).
-   */
-  public function getAllClasses() {
-    $result = array();
-    foreach ($this->paths as $path => $classPrefix) {
-      if (is_dir($path)) {
-        $files = CRM_Utils_File::findFiles($path, '*.up.php');
-        foreach ($files as $file) {
-          $result[$file] = $this->toClassName($path, $classPrefix, $file);
-        }
-      }
-    }
-    ksort($result);
-    return $result;
-  }
-
-  /**
    * Get a list of all upgrade steps (as objects/instances).
    *
    * @return array
@@ -89,9 +70,22 @@ class CRM_Upgrade_Steps {
    */
   public function getAllObjects() {
     $result = array();
-    foreach ($this->getAllClasses() as $file => $className) {
-      $result[$className] = new $className();
+    foreach ($this->paths as $path => $classPrefix) {
+      if (is_dir($path)) {
+        $phpFiles = CRM_Utils_File::findFiles($path, '*.up.php');
+        foreach ($phpFiles as $phpFile) {
+          $className = $this->toClassName($path, $classPrefix, $phpFile);
+          $result[$phpFile] = new $className();
+        }
+        $sqlFiles = CRM_Utils_File::findFiles($path, '*.mysql.tpl');
+        foreach ($sqlFiles as $sqlFile) {
+          $result[$sqlFile] = new CRM_Upgrade_Incremental_SqlStep($sqlFile,
+             'SqlStep:' . CRM_Utils_File::relativize($sqlFile, CRM_Utils_File::addTrailingSlash($path))
+          );
+        }
+      }
     }
+    ksort($result);
     return $result;
   }
 
@@ -101,9 +95,10 @@ class CRM_Upgrade_Steps {
    */
   public function getPendingObjects() {
     $result = array();
-    foreach ($this->getAllClasses() as $file => $className) {
-      if (!$this->isExecuted($className)) {
-        $result[] = new $className();
+    foreach ($this->getAllObjects() as $upgrade) {
+      /** @var CRM_Upgrade_Incremental_Interface $upgrade */
+      if (!$this->isExecuted($upgrade->getName())) {
+        $result[] = $upgrade;
       }
     }
     return $result;
