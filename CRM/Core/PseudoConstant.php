@@ -224,35 +224,9 @@ class CRM_Core_PseudoConstant {
 
     // Custom fields are not in the schema
     if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
-      $customField = new CRM_Core_DAO_CustomField();
+      $customField = new CRM_Core_BAO_CustomField();
       $customField->id = (int) substr($fieldName, 7);
-      $customField->find(TRUE);
-      $options = FALSE;
-
-      if (!empty($customField->option_group_id)) {
-        $options = CRM_Core_OptionGroup::valuesByID($customField->option_group_id,
-          FALSE,
-          $params['grouping'],
-          $params['localize'],
-          // Note: for custom fields the 'name' column is NULL
-          CRM_Utils_Array::value('labelColumn', $params, 'label'),
-          $params['onlyActive'],
-          $params['fresh']
-        );
-      }
-      else {
-        if ($customField->data_type === 'StateProvince') {
-          $options = self::stateProvince();
-        }
-        elseif ($customField->data_type === 'Country') {
-          $options = $context == 'validate' ? self::countryIsoCode() : self::country();
-        }
-        elseif ($customField->data_type === 'Boolean') {
-          $options = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
-        }
-      }
-      CRM_Utils_Hook::customFieldOptions($customField->id, $options, FALSE);
-      CRM_Utils_Hook::fieldOptions($entity, "custom_{$customField->id}", $options, $params);
+      $options = $customField->getOptions();
       if ($options && $flip) {
         $options = array_flip($options);
       }

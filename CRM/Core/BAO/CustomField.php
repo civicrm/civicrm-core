@@ -363,6 +363,49 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
+   * @param string $context
+   * @return array|bool
+   */
+  public function getOptions($context = 'get') {
+    CRM_Core_DAO::buildOptionsContext($context);
+    $options = FALSE;
+
+    if (!$this->id) {
+      return FALSE;
+    }
+    if (!$this->data_type || !$this->custom_group_id) {
+      $this->find(TRUE);
+    }
+
+    if (!empty($this->option_group_id)) {
+      $options = CRM_Core_OptionGroup::valuesByID(
+        $this->option_group_id,
+        FALSE,
+        FALSE,
+        FALSE,
+        'label',
+        !($context == 'validate' || $context == 'get')
+      );
+    }
+    else {
+      if ($this->data_type === 'StateProvince') {
+        $options = CRM_Core_Pseudoconstant::stateProvince();
+      }
+      elseif ($this->data_type === 'Country') {
+        $options = $context == 'validate' ? CRM_Core_Pseudoconstant::countryIsoCode() : CRM_Core_Pseudoconstant::country();
+      }
+      elseif ($this->data_type === 'Boolean') {
+        $options = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
+      }
+    }
+    CRM_Utils_Hook::customFieldOptions($this->id, $options, FALSE);
+    $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
+    $entity = in_array($entity, array('Individual', 'Household', 'Organization')) ? 'Contact' : $entity;
+    CRM_Utils_Hook::fieldOptions($entity, "custom_{$this->id}", $options, array('context' => $context));
+    return $options;
+  }
+
+  /**
    * Store and return an array of all active custom fields.
    *
    * @param string $customDataType
@@ -2233,6 +2276,10 @@ ORDER BY html_type";
     }
     return $customData;
   }
+
+  /**
+   *
+   */
 
   /**
    * Get custom field ID.
