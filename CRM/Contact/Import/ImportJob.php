@@ -411,7 +411,6 @@ class CRM_Contact_Import_ImportJob {
 
       $tagParams = array(
         'name' => $newTagName,
-        'title' => $newTagName,
         'description' => $newTagDesc,
         'is_selectable' => TRUE,
         'used_for' => 'civicrm_contact',
