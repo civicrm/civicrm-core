@@ -264,7 +264,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('Source for this registration (if applicable).'));
 
     // Select an event fee
-    $this->waitForElementPresent('priceset');
+    $this->waitForElementPresent("xpath=//div[@class='crm-event-form-fee-block']");
 
     $this->click("xpath=//input[@class='crm-form-radio']");
 
@@ -282,9 +282,9 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->checkCRMAlert("Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->clickAjaxLink("xpath=//*[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
+    $this->clickAjaxLink("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
       array(

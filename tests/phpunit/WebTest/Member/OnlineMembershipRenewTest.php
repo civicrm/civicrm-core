@@ -923,7 +923,6 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->assertTrue($this->isTextPresent("I want to contribute this amount every month."));
     $this->click("_qf_Confirm_next-bottom");
-    sleep(10);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $expectedParams = array(
