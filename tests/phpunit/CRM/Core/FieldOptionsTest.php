@@ -49,6 +49,11 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $this->hookClass = CRM_Utils_Hook::singleton();
   }
 
+  public function tearDown() {
+    parent::tearDown();
+    $this->quickCleanup(array('civicrm_custom_field', 'civicrm_custom_group'));
+  }
+
   /**
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
@@ -131,6 +136,78 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     CRM_Core_PseudoConstant::flush();
     $result = CRM_Contact_BAO_Contact::buildOptions('gender_id');
     $this->assertEquals($result, $originalGender + $this->appendOptions);
+  }
+
+  /**
+   * Ensure hook_civicrm_fieldOptions works with custom fields
+   */
+  public function testHookFieldOptionsWithCustomFields() {
+    $this->hookClass->setHook('civicrm_fieldOptions', array($this, 'hook_civicrm_fieldOptions'));
+
+    // Create a custom field group for testing.
+    $custom_group_name = md5(microtime());
+    $api_params = array(
+      'title' => $custom_group_name,
+      'extends' => 'Individual',
+      'is_active' => TRUE,
+    );
+    $customGroup = $this->callAPISuccess('customGroup', 'create', $api_params);
+
+    // Add a custom select field.
+    $api_params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => $custom_group_name . 1,
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'option_values' => array(
+        'foo' => 'Foo',
+        'bar' => 'Bar',
+      ),
+    );
+    $result = $this->callAPISuccess('custom_field', 'create', $api_params);
+    $customField1 = $result['id'];
+
+    // Add a custom country field.
+    $api_params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => $custom_group_name . 2,
+      'html_type' => 'Select Country',
+      'data_type' => 'Country',
+    );
+    $result = $this->callAPISuccess('custom_field', 'create', $api_params);
+    $customField2 = $result['id'];
+
+    // Add a custom boolean field.
+    $api_params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => $custom_group_name . 3,
+      'html_type' => 'Radio',
+      'data_type' => 'Boolean',
+    );
+    $result = $this->callAPISuccess('custom_field', 'create', $api_params);
+    $customField3 = $result['id'];
+
+    $this->targetField = 'custom_' . $customField1;
+    $this->replaceOptions = NULL;
+    $this->appendOptions = array('baz' => 'Baz');
+    $field = new CRM_Core_BAO_CustomField();
+    $field->id = $customField1;
+    $this->assertEquals(array('foo' => 'Foo', 'bar' => 'Bar', 'baz' => 'Baz'), $field->getOptions());
+
+    $this->targetField = 'custom_' . $customField2;
+    $this->replaceOptions = array('nowhere' => 'Nowhere');
+    $field = new CRM_Core_BAO_CustomField();
+    $field->id = $customField2;
+    $this->assertEquals($this->replaceOptions + $this->appendOptions, $field->getOptions());
+
+    $this->targetField = 'custom_' . $customField3;
+    $this->replaceOptions = NULL;
+    $this->appendOptions = array(2 => 'Maybe');
+    $field = new CRM_Core_BAO_CustomField();
+    $field->id = $customField3;
+    $this->assertEquals(array(1 => 'Yes', 0 => 'No', 2 => 'Maybe'), $field->getOptions());
+
+    $field->free();
   }
 
   /**
