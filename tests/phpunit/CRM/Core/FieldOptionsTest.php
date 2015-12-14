@@ -32,9 +32,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
 
-  /** @var  CRM_Utils_Hook_UnitTests */
-  public $hookClass;
-
   /** @var array */
   public $replaceOptions;
 
@@ -46,7 +43,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->hookClass = CRM_Utils_Hook::singleton();
+    CRM_Utils_Hook::singleton()->setHook('civicrm_fieldOptions', array($this, 'hook_civicrm_fieldOptions'));
   }
 
   public function tearDown() {
@@ -116,7 +113,6 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
    * Ensure hook_civicrm_fieldOptions is working
    */
   public function testHookFieldOptions() {
-    $this->hookClass->setHook('civicrm_fieldOptions', array($this, 'hook_civicrm_fieldOptions'));
     CRM_Core_PseudoConstant::flush();
 
     // Test replacing all options with a hook
@@ -142,8 +138,6 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
    * Ensure hook_civicrm_fieldOptions works with custom fields
    */
   public function testHookFieldOptionsWithCustomFields() {
-    $this->hookClass->setHook('civicrm_fieldOptions', array($this, 'hook_civicrm_fieldOptions'));
-
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
     $api_params = array(
@@ -203,9 +197,8 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $this->targetField = 'custom_' . $customField3;
     $this->replaceOptions = NULL;
     $this->appendOptions = array(2 => 'Maybe');
-    $field = new CRM_Core_BAO_CustomField();
-    $field->id = $customField3;
-    $this->assertEquals(array(1 => 'Yes', 0 => 'No', 2 => 'Maybe'), $field->getOptions());
+    $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', $this->targetField);
+    $this->assertEquals(array(1 => 'Yes', 0 => 'No', 2 => 'Maybe'), $options);
 
     $field->free();
   }
