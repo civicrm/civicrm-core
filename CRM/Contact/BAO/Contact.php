@@ -1383,7 +1383,7 @@ WHERE id={$id}; ";
    * @return array
    *   array of exportable Fields
    */
-  public static function &exportableFields($contactType = 'Individual', $status = FALSE, $export = FALSE, $search = FALSE, $withMultiRecord = FALSE) {
+  public static function &exportableFields($contactType = 'Individual', $status = FALSE, $export = FALSE, $search = FALSE, $withMultiRecord = FALSE, $checkPermissions = TRUE) {
     if (empty($contactType)) {
       $contactType = 'All';
     }
@@ -1476,7 +1476,7 @@ WHERE id={$id}; ";
 
         if ($contactType != 'All') {
           $fields = array_merge($fields,
-            CRM_Core_BAO_CustomField::getFieldsForImport($contactType, $status, FALSE, $search, TRUE, $withMultiRecord)
+            CRM_Core_BAO_CustomField::getFieldsForImport($contactType, $status, FALSE, $search, $checkPermissions, $withMultiRecord)
           );
         }
         else {
@@ -1486,7 +1486,7 @@ WHERE id={$id}; ";
                      'Organization',
                    ) as $type) {
             $fields = array_merge($fields,
-              CRM_Core_BAO_CustomField::getFieldsForImport($type, FALSE, FALSE, $search, TRUE, $withMultiRecord)
+              CRM_Core_BAO_CustomField::getFieldsForImport($type, FALSE, FALSE, $search, $checkPermissions, $withMultiRecord)
             );
           }
         }
