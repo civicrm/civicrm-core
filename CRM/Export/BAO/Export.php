@@ -117,6 +117,9 @@ class CRM_Export_BAO_Export {
     elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
       $property = 'activity_id';
     }
+    elseif ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
+      $property = 'contact_id';
+    }
     return $property;
   }
 
