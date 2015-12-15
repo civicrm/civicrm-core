@@ -425,10 +425,24 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @return Object
    */
   public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
-    $params = array();
-    $sql = $this->_search->contactIDs($params);
+    // $action, $displayRelationshipType and $queryOperator are unused. I have
+    // no idea why they are there.
 
-    return CRM_Core_DAO::executeQuery($sql, $params);
+    // I wonder whether there is some helper function for this:
+    $matches = array();
+    if (preg_match('/([0-9]*)(_(u|d))?/', $sortID, $matches)) {
+      $columns = array_values($this->_search->columns());
+      $sort = $columns[$matches[1] - 1];
+      if (array_key_exists(3, $matches) && $matches[3] == 'd') {
+        $sort .= " DESC";
+      }
+    }
+    else {
+      $sort = NULL;
+    }
+
+    $sql = $this->_search->contactIDs(0, 0, $sort);
+    return CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
