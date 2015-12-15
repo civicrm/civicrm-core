@@ -1490,8 +1490,7 @@ WHERE id={$id}; ";
             );
           }
         }
-
-	$fields['current_employer_id']['title'] = ts('Current Employer ID');
+        $fields['current_employer_id']['title'] = ts('Current Employer ID');
         //fix for CRM-791
         if ($export) {
           $fields = array_merge($fields, array(
