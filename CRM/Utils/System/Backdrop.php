@@ -830,6 +830,12 @@ AND    u.status = 1
     );
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function clearResourceCache() {
+    _backdrop_flush_css_js();
+  }
 
   /**
    * Get all the contact emails for users that have a specific permission.
