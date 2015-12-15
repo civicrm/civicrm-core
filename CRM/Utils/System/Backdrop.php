@@ -343,8 +343,8 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       // Contact CiviSMTP folks if we run into issues with this :)
       $cmsPath = $config->userSystem->cmsRootPath($realPath);
 
-      require_once "$cmsPath/includes/bootstrap.inc";
-      require_once "$cmsPath/includes/password.inc";
+      require_once "$cmsPath/core/includes/bootstrap.inc";
+      require_once "$cmsPath/core/includes/password.inc";
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $name = $dbDrupal->escapeSimple($strtolower($name));
@@ -465,7 +465,7 @@ AND    u.status = 1
     //take the cms root path.
     $cmsPath = $this->cmsRootPath($realPath);
 
-    if (!file_exists("$cmsPath/includes/bootstrap.inc")) {
+    if (!file_exists("$cmsPath/core/includes/bootstrap.inc")) {
       if ($throwError) {
         echo '<br />Sorry, could not locate bootstrap.inc\n';
         exit();
@@ -474,7 +474,7 @@ AND    u.status = 1
     }
     // load drupal bootstrap
     chdir($cmsPath);
-    define('DRUPAL_ROOT', $cmsPath);
+    define('BACKDROP_ROOT', $cmsPath);
 
     // For drupal multi-site CRM-11313
     if ($realPath && strpos($realPath, 'sites/all/modules/') === FALSE) {
@@ -483,9 +483,9 @@ AND    u.status = 1
         $_SERVER['HTTP_HOST'] = $matches[1];
       }
     }
-    require_once 'includes/bootstrap.inc';
+    require_once 'core/includes/bootstrap.inc';
     // @ to suppress notices eg 'DRUPALFOO already defined'.
-    @drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+    @backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
 
     // explicitly setting error reporting, since we cannot handle drupal related notices
     error_reporting(1);
@@ -597,9 +597,8 @@ AND    u.status = 1
     // work for multisite installation.
     do {
       $cmsRoot = $firstVar . '/' . implode('/', $pathVars);
-      $cmsIncludePath = "$cmsRoot/includes";
-      // Stop if we find bootstrap.
-      if (file_exists("$cmsIncludePath/bootstrap.inc")) {
+      // Stop if we find backdrop signature file.
+      if (file_exists("$cmsRoot/core/misc/backdrop.js")) {
         $valid = TRUE;
         break;
       }
@@ -829,6 +828,21 @@ AND    u.status = 1
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
     );
+  }
+
+
+  /**
+   * Get all the contact emails for users that have a specific permission.
+   *
+   * @param string $permissionName
+   *   Name of the permission we are interested in.
+   *
+   * @return string
+   *   a comma separated list of email addresses
+   */
+  public function permissionEmails($permissionName) {
+    // FIXME!!!!
+    return array();
   }
 
 }
