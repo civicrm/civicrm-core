@@ -334,27 +334,6 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
   }
 
   /**
-   * @param int $customFieldID
-   * @param int $optionGroupID
-   *
-   * @return array
-   */
-  public static function valuesByID($customFieldID, $optionGroupID = NULL) {
-    if (!$optionGroupID) {
-      $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
-        $customFieldID,
-        'option_group_id'
-      );
-    }
-
-    $options = $optionGroupID ? CRM_Core_OptionGroup::valuesByID($optionGroupID) : array();
-
-    CRM_Utils_Hook::customFieldOptions($customFieldID, $options, FALSE);
-
-    return $options;
-  }
-
-  /**
    * When changing the value of an option this is called to update all corresponding custom data
    *
    * @param int $optionId
