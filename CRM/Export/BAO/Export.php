@@ -1465,12 +1465,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 break;
 
               default:
-                $sqlColumns[$fieldName] = "$fieldName varchar(64)";
+                $sqlColumns[$fieldName] = "$fieldName varchar(255)";
                 break;
             }
           }
           else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(64)";
+            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
           }
         }
       }
