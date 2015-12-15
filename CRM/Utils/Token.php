@@ -326,6 +326,11 @@ class CRM_Utils_Token {
   /**
    * Replace all the org-level tokens in $str
    *
+   * @fixme: This function appears to be broken, as it depends on
+   * nonexistant method: CRM_Core_BAO_CustomValue::getContactValues()
+   * Marking as deprecated until this is fixed
+   * @deprecated
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param object $org
@@ -369,7 +374,7 @@ class CRM_Utils_Token {
         }
         foreach ($cv as $cvFieldID => $value) {
           if ($cvFieldID == $cfID) {
-            $value = CRM_Core_BAO_CustomOption::getOptionLabel($cfID, $value);
+            $value = CRM_Core_BAO_CustomField::displayValue($value, $cfID);
             break;
           }
         }

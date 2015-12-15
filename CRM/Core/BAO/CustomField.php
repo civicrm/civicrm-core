@@ -1179,64 +1179,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Legacy display value formatter.
-   *
-   * @deprecated
-   *
-   * @param string $value
-   * @param array $option
-   * @param string $html_type
-   * @param string $data_type
-   * @param int $contactID
-   * @param int $fieldID
-   *
-   * @return array|mixed|null|string
-   */
-  public static function getDisplayValueCommon(
-    $value,
-    $option,
-    $html_type,
-    $data_type,
-    $contactID = NULL,
-    $fieldID = NULL
-  ) {
-
-    if ($fieldID &&
-      (($html_type == 'Radio' && $data_type != 'Boolean') ||
-        ($html_type == 'Autocomplete-Select' && $data_type != 'ContactReference') ||
-        $html_type == 'Select' ||
-        $html_type == 'CheckBox' ||
-        $html_type == 'AdvMulti-Select' ||
-        $html_type == 'Multi-Select'
-      )
-    ) {
-      CRM_Utils_Hook::customFieldOptions($fieldID, $option);
-    }
-
-    if ($data_type == 'Boolean') {
-      $option = CRM_Core_SelectValues::boolean();
-    }
-
-    if ($data_type == 'Country') {
-      $option = CRM_Core_PseudoConstant::country(FALSE, FALSE);
-    }
-
-    if ($data_type == 'StateProvince') {
-      $option = CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE);
-    }
-    
-    $field = array(
-      'id' => $fieldID,
-      'html_type' => $html_type,
-      'data_type' => $data_type,
-      'options' => $option,
-    );
-
-    return self::formatDisplayValue($value, $field, $contactID);
-  }
-
-
-  /**
    * Lower-level logic for rendering a custom field value
    *
    * @param string|array $value
