@@ -160,7 +160,7 @@ class CRM_Export_BAO_Export {
   }
 
   /**
-   * Generate Query Group By By Clause
+   * Get Query Group By Clause
    * @param int $exportMode
    *   Export Mode
    * @param string $queryMode
@@ -449,7 +449,7 @@ class CRM_Export_BAO_Export {
       $extraReturnProperties = array();
       $paymentFields = FALSE;
 
-      $extraProperties = defineExtraProperties($queryMode);
+      $extraProperties = self::defineExtraProperties($queryMode);
       $paymentFields = $extraProperties['paymentFields'];
       $extraReturnProperties = $extraProperties['extraReturnProperties'];
       $paymentTableID = $extraProperties['paymentTableID'];
