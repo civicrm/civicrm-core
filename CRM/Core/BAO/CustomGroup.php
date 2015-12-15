@@ -1976,7 +1976,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *
    * @return array|null|string
    */
-  public static function formatCustomValues(&$values, &$field, $dncOptionPerLine = FALSE) {
+  public static function formatCustomValues($values, $field, $dncOptionPerLine = FALSE) {
     $value = $values['data'];
 
     //changed isset CRM-4601
@@ -2041,7 +2041,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
         break;
 
       case 'ContactReference':
-        if (!empty($values['data'])) {
+        if ($value) {
           $retValue = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['data'], 'display_name');
         }
         break;
@@ -2082,7 +2082,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           case 'Select Country':
             $customData = $value;
             if (!is_array($value)) {
-              $customData = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+              $customData = CRM_Utils_Array::explodePadded($value);
             }
             $query = "
                     SELECT id as value, name as label
@@ -2094,7 +2094,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           case 'Multi-Select State/Province':
             $customData = $value;
             if (!is_array($value)) {
-              $customData = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+              $customData = CRM_Utils_Array::explodePadded($value);
             }
 
             $query = "
@@ -2104,7 +2104,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
             break;
 
           case 'Select':
-            $customData = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+            $customData = CRM_Utils_Array::explodePadded($value);
             if ($option_group_id) {
               $options = CRM_Core_BAO_OptionValue::getOptionValuesAssocArray($option_group_id);
             }
@@ -2113,7 +2113,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           case 'CheckBox':
           case 'AdvMulti-Select':
           case 'Multi-Select':
-            $customData = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+            $customData = CRM_Utils_Array::explodePadded($value);
           default:
             if ($option_group_id) {
               $options = CRM_Core_BAO_OptionValue::getOptionValuesAssocArray($option_group_id);
