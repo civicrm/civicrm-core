@@ -42,14 +42,12 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     parent::__construct($formValues);
 
     $this->_columns = array(
-      // The only alias you can (and should!) use in the
-      // columns, is contact_id. Because contact_id is used
-      // in a lot of places, and it seems to be important that
-      // it is called contact_id_a.
-      //
-      // For the other fields, if possible, you should prefix
-      // their names with the table alias you are selecting them
-      // from. This way, you can work around CRM-16587.
+      // If possible, you should prefix all column names with the
+      // table alias you are selecting them from. This includes
+      // contact_id: if you can select it from another table than
+      // contact_a, you should.
+      // All this is needed if you want to work around CRM-16587 with
+      // the patch that can be found over there.
       //
       // This approach wil not work if you want to select fields
       // with the same name from different tables, this will generate
@@ -57,7 +55,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
       // use column aliases in your SELECT clause and in the array
       // below, but you will still hit CRM-16587 when sorting on these
       // fields.
-      ts('Contact ID') => 'contact_id',
+      ts('Contact ID') => 'address.contact_id',
       ts('Address') => 'address.street_address',
       ts('Contact Type') => 'contact_a.contact_type',
       ts('Name') => 'contact_a.sort_name',
