@@ -333,8 +333,10 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
       // the columns we are interested in
       foreach ($columnNames as $property) {
-        $row[$property] = $dao->$property;
-        if (!empty($dao->$property)) {
+        // Get part of name after last . (if any)
+        $unqualified_property = CRM_Utils_Array::First(array_slice(explode('.', $property), -1));
+        $row[$property] = $dao->$unqualified_property;
+        if (!empty($dao->$unqualified_property)) {
           $empty = FALSE;
         }
       }
