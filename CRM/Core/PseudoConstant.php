@@ -407,7 +407,7 @@ class CRM_Core_PseudoConstant {
 
     // Return "Yes" and "No" for boolean fields
     elseif (CRM_Utils_Array::value('type', $fieldSpec) === CRM_Utils_Type::T_BOOLEAN) {
-      $output = $context == 'validate' ? array(0, 1) : array(1 => ts('Yes'), 0 => ts('No'));
+      $output = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
       CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
       return $flip ? array_flip($output) : $output;
     }
@@ -591,6 +591,7 @@ class CRM_Core_PseudoConstant {
     }
     if ($name == 'cache') {
       CRM_Core_OptionGroup::flushAll();
+      CRM_Core_BAO_CustomField::$displayInfoCache = array();
     }
   }
 
