@@ -341,15 +341,15 @@ SELECT label, value
         $qillValue = NULL;
         if (!is_array($value)) {
           $value = CRM_Core_DAO::escapeString(trim($value));
-          $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
+          $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
         }
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
-          $qillValue = strstr($op, 'NULL') ? NULL : CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
+          $qillValue = strstr($op, 'NULL') ? NULL : CRM_Core_BAO_CustomField::displayValue($value[$op], $id);
         }
         else {
           $op = strstr($op, 'IN') ? $op : 'IN';
-          $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
+          $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
         }
 
         $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);

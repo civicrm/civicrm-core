@@ -162,7 +162,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     foreach ($contactIDs as $value) {
       foreach ($custom as $cfID) {
         if (isset($details[$value]["custom_{$cfID}"])) {
-          $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::getDisplayValue($details[$value]["custom_{$cfID}"], $cfID, $details[1]);
+          $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[$value]["custom_{$cfID}"], $cfID);
         }
       }
       $contact = CRM_Utils_Array::value($value, $details);

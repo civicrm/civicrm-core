@@ -1664,9 +1664,8 @@ WHERE  id = $cfID
                 //take the custom field options
                 $returnProperties = array($name => 1);
                 $query = new CRM_Contact_BAO_Query($params, $returnProperties, $fields);
-                $options = &$query->_options;
                 if (!$skip) {
-                  $displayValue = CRM_Core_BAO_CustomField::getDisplayValue($customVal, $cfID, $options);
+                  $displayValue = CRM_Core_BAO_CustomField::displayValue($customVal, $cfID);
                 }
                 //Hack since we dont have function to check empty.
                 //FIXME in 2.3 using crmIsEmptyArray()

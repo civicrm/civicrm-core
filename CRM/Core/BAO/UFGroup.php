@@ -973,7 +973,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
 
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, $fields);
-    $options = &$query->_options;
 
     $details = $query->searchQuery(0, 0, NULL, FALSE, FALSE,
       FALSE, FALSE, FALSE, $additionalWhereClause);
@@ -1166,10 +1165,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
                 }
 
                 $params[$index] = $customVal;
-                $values[$index] = CRM_Core_BAO_CustomField::getDisplayValue($customVal,
-                  $cfID,
-                  $options
-                );
+                $values[$index] = CRM_Core_BAO_CustomField::displayValue($customVal, $cfID);
                 if ($field['data_type'] == 'ContactReference') {
                   $params[$index] = $values[$index];
                 }

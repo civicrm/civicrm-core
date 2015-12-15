@@ -1172,37 +1172,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Legacy display value getter.
-   *
-   * @deprecated
-   *
-   * @param mixed $value
-   *   The custom field value.
-   * @param int $fieldID
-   *   The custom field id.
-   * @param array $options
-   *   The assoc array of option name/value pairs.
-   * @param int $contactID
-   *
-   * @return string
-   *   the display value
-   */
-  public static function getDisplayValue($value, $fieldID, &$options, $contactID = NULL) {
-    $option = &$options[$fieldID];
-    $attributes = &$option['attributes'];
-    $html_type = $attributes['html_type'];
-    $data_type = $attributes['data_type'];
-
-    return self::getDisplayValueCommon($value,
-      $option,
-      $html_type,
-      $data_type,
-      $contactID,
-      $fieldID
-    );
-  }
-
-  /**
    * Legacy display value formatter.
    *
    * @deprecated
