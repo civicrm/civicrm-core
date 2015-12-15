@@ -5923,7 +5923,7 @@ AND   displayRelType.is_active = 1
       $value = CRM_Utils_Array::value($element, $formValues);
       if ($value) {
         if (is_array($value)) {
-          if (in_array($element, $changeNames)) {
+          if (in_array($element, array_keys($changeNames))) {
             unset($formValues[$element]);
             $element = $changeNames[$element];
           }
