@@ -612,9 +612,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
       foreach ($names as $name) {
         if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name)) {
-          $row[] = CRM_Core_BAO_CustomField::getDisplayValue($result->$name,
+          $row[] = CRM_Core_BAO_CustomField::displayValue($result->$name,
             $cfID,
-            $this->_options,
             $result->contact_id
           );
         }

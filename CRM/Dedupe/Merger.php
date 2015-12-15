@@ -1647,7 +1647,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           case 'Select Country':
           case 'Select State/Province':
-            $submitted[$key] = CRM_Core_BAO_CustomField::getDisplayValue($value, $fid, $cFields);
+            $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fid);
             break;
 
           case 'CheckBox':

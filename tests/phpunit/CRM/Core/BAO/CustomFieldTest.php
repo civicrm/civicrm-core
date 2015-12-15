@@ -132,13 +132,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $customFieldID1 = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customGroup->id, 'id', 'custom_group_id',
       'Database check for created CustomField.'
     );
-    $options = array();
-    $options[$customFieldID1]['attributes'] = array(
-      'label' => 'testCountryFld1',
-      'data_type' => 'Country',
-      'html_type' => 'Select Country',
-    );
-    $display = CRM_Core_BAO_CustomField::getDisplayValue($fields['default_value'], $customFieldID1, $options);
+    $display = CRM_Core_BAO_CustomField::displayValue($fields['default_value'], $customFieldID1);
 
     $this->assertEquals('UNITED STATES', $display, 'Confirm Country display Name');
 

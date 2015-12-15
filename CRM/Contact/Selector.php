@@ -663,10 +663,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           continue;
         }
         if ($cfID = CRM_Core_BAO_CustomField::getKeyID($property)) {
-          $row[$property] = CRM_Core_BAO_CustomField::getDisplayValue(
+          $row[$property] = CRM_Core_BAO_CustomField::displayValue(
             $result->$property,
             $cfID,
-            $this->_options,
             $result->contact_id
           );
         }
