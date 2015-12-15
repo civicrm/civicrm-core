@@ -42,7 +42,10 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
     parent::__construct($formValues);
 
     $this->_columns = array(
-      ts('Contact ID') => 'contact_id',
+      // If contact_id exists in another table than contact_a, you
+      // should select from there, if you want to use the
+      // workaround form CRM-16587.
+      ts('Contact ID') => 'email.contact_id',
       ts('Name') => 'sort_name',
       ts('Email') => 'email',
       ts('Zip') => 'postal_code',
