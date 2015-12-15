@@ -732,41 +732,61 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // format params and add links
     $groupList = array();
-    if (!empty($groups)) {
-      foreach ($groups as $id => $value) {
-        $groupList[$id]['group_id'] = $value['id'];
-        $groupList[$id]['count'] = $value['count'];
-        $groupList[$id]['group_name'] = $value['title'];
+    foreach ($groups as $id => $value) {
+      $group = array();
+      $group['group_id'] = $value['id'];
+      $group['count'] = $value['count'];
+      $group['title'] = $value['title'];
 
-        // append parent names if in search mode
-        if (empty($params['parent_id']) && !empty($value['parents'])) {
-          $groupIds = explode(',', $value['parents']);
-          $title = array();
-          foreach ($groupIds as $gId) {
-            $title[] = $allGroups[$gId];
-          }
-          $groupList[$id]['group_name'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . implode(', ', $title) . '</div>';
-          $value['class'] = array_diff($value['class'], array('crm-row-parent'));
+      // append parent names if in search mode
+      if (empty($params['parent_id']) && !empty($value['parents'])) {
+        $group['parent_id'] = $value['parents'];
+        $groupIds = explode(',', $value['parents']);
+        $title = array();
+        foreach ($groupIds as $gId) {
+          $title[] = $allGroups[$gId];
         }
-        $value['class'][] = 'crm-entity';
-        $groupList[$id]['class'] = $value['id'] . ',' . implode(' ', $value['class']);
-
-        $groupList[$id]['group_description'] = CRM_Utils_Array::value('description', $value);
-        if (!empty($value['group_type'])) {
-          $groupList[$id]['group_type'] = $value['group_type'];
-        }
-        else {
-          $groupList[$id]['group_type'] = '';
-        }
-        $groupList[$id]['visibility'] = $value['visibility'];
-        $groupList[$id]['links'] = $value['action'];
-        $groupList[$id]['org_info'] = CRM_Utils_Array::value('org_info', $value);
-        $groupList[$id]['created_by'] = CRM_Utils_Array::value('created_by', $value);
-
-        $groupList[$id]['is_parent'] = $value['is_parent'];
+        $group['title'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . implode(', ', $title) . '</div>';
+        $value['class'] = array_diff($value['class'], array('crm-row-parent'));
       }
-      return $groupList;
+      $group['DT_RowId'] = 'row_' . $value['id'];
+      if (!$params['parentsOnly']) {
+        foreach($value['class'] as $id => $class) {
+          if ($class = 'crm-group-parent') {
+            unset($value['class'][$id]);
+          }
+        }
+      }
+      $group['DT_RowClass'] = 'crm-entity ' . implode(' ', $value['class']);
+      $group['DT_RowAttr'] = array();
+      $group['DT_RowAttr']['data-id'] = $value['id'];
+      $group['DT_RowAttr']['data-entity'] = 'group';
+
+      $group['description'] = CRM_Utils_Array::value('description', $value);
+
+      if (!empty($value['group_type'])) {
+        $group['group_type'] = $value['group_type'];
+      }
+      else {
+        $group['group_type'] = '';
+      }
+
+      $group['visibility'] = $value['visibility'];
+      $group['links'] = $value['action'];
+      $group['org_info'] = CRM_Utils_Array::value('org_info', $value);
+      $group['created_by'] = CRM_Utils_Array::value('created_by', $value);
+
+      $group['is_parent'] = $value['is_parent'];
+
+      array_push($groupList, $group);
     }
+
+    $groupsDT = array();
+    $groupsDT['data'] = $groupList;
+    $groupsDT['recordsTotal'] = $params['total'];
+    $groupsDT['recordsFiltered'] = $params['total'];
+
+    return $groupsDT;
   }
 
   /**
@@ -864,10 +884,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           'count' => '0',
         );
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
-        // Wrap with crm-editable. Not an ideal solution.
-        if (in_array(CRM_Core_Permission::EDIT, $groupPermissions)) {
-          $values[$object->id]['title'] = '<span class="crm-editable crmf-title">' . $values[$object->id]['title'] . '</span>';
-        }
 
         if ($object->saved_search_id) {
           $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';
