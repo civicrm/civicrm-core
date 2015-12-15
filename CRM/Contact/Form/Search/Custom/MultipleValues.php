@@ -290,8 +290,7 @@ contact_a.sort_name    as sort_name,
   public function alterRow(&$row) {
     foreach ($row as $fieldName => &$field) {
       if (strpos($fieldName, 'custom_') === 0) {
-        list(, $id) = explode('_', $fieldName);
-        $field = CRM_Core_BAO_CustomGroup::formatCustomValues(array('data' => $field), $this->fieldInfo[$id]);
+        $field = CRM_Core_BAO_CustomField::displayValue($field, $fieldName);
       }
     }
   }

@@ -1147,13 +1147,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
   /**
    * @param string|int|array|null $value
-   * @param CRM_Core_BAO_CustomField|int $field
+   * @param CRM_Core_BAO_CustomField|int|string $field
    * @param $contactId
    *
-   * @return array|int|null|string
+   * @return string
+   * @throws \Exception
    */
   public static function displayValue($value, $field, $contactId = NULL) {
-    $fieldId = is_object($field) ? $field->id : $field;
+    $fieldId = is_object($field) ? $field->id : (int) str_replace('custom_', '', $field);
+
+    if (!$fieldId) {
+      throw new Exception('CRM_Core_BAO_CustomField::displayValue requires a field id');
+    }
 
     if (!isset(self::$displayInfoCache[$fieldId])) {
       if (!is_a($field, 'CRM_Core_BAO_CustomField')) {
@@ -1165,6 +1170,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'id' => $fieldId,
         'html_type' => $field->html_type,
         'data_type' => $field->data_type,
+        'date_format' => $field->date_format,
+        'time_format' => $field->time_format,
         'options' => $options,
       );
     }
@@ -1236,11 +1243,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $field
    * @param int|null $contactID
    *
-   * @return string|array|int|null
+   * @return string
    */
   private static function formatDisplayValue($value, $field, $contactID = NULL) {
-    $display = $value;
-    
+
     if (self::isSerialized($field) && !is_array($value)) {
       $value = (array) CRM_Utils_Array::explodePadded($value);
     }
@@ -1248,7 +1254,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if ($field['html_type'] == 'CheckBox') {
       CRM_Utils_Array::formatArrayKeys($value);
     }
-    
+
+    $display = is_array($value) ? implode(', ', $value) : (string) $value;
+
     switch ($field['html_type']) {
 
       case 'Select':
@@ -1272,23 +1280,36 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = implode(', ', $v);
         }
         else {
-          $display = CRM_Utils_Array::value($value, $field['options']);
+          $display = CRM_Utils_Array::value($value, $field['options'], '');
         }
         break;
 
       case 'Select Date':
-        if (is_array($value)) {
-          foreach ($value as $key => $val) {
-            $display[$key] = CRM_Utils_Date::customFormat($val);
+        $customFormat = NULL;
+
+        $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats();
+        $format = CRM_Utils_Array::value('date_format', $field);
+
+        if ($format) {
+          if (array_key_exists($format, $actualPHPFormats)) {
+            $customTimeFormat = (array) $actualPHPFormats[$format];
+            switch (CRM_Utils_Array::value('time_format', $field)) {
+              case 1:
+                $customTimeFormat[] = 'g:iA';
+                break;
+
+              case 2:
+                $customTimeFormat[] = 'G:i';
+                break;
+
+              default:
+                // if time is not selected remove time from value
+                $value = substr($value, 0, 10);
+            }
+            $customFormat = implode(" ", $customTimeFormat);
           }
         }
-        else {
-          // remove time element display if time is not set
-          if (empty($field['options']['attributes']['time_format'])) {
-            $value = substr($value, 0, 10);
-          }
-          $display = CRM_Utils_Date::customFormat($value);
-        }
+        $display = CRM_Utils_Date::processDate($value, NULL, FALSE, $customFormat);
         break;
 
       case 'File':
@@ -1307,19 +1328,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'TextArea':
-        if (empty($value)) {
-          $display = '';
-        }
-        else {
-          $display = is_array($value) ? nl2br(implode(', ', $value)) : nl2br($value);
-        }
+        $display = nl2br($display);
         break;
-
-      case 'Link':
-      case 'Text':
-        $display = is_array($value) ? implode(', ', $value) : $value;
     }
-    return $display ? $display : $value;
+    return $display;
   }
 
   /**
