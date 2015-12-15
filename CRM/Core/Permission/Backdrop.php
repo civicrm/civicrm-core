@@ -126,10 +126,13 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
     if (empty($permissions)) {
       throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
     }
+    // FIXME!!!!
+    /*
     $query = db_delete('role_permission')
-      ->condition('module', 'civicrm')
-      ->condition('permission', array_keys($permissions), 'NOT IN');
+    ->condition('module', 'civicrm')
+    ->condition('permission', array_keys($permissions), 'NOT IN');
     $query->execute();
+     */
   }
 
   /**
@@ -148,6 +151,8 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
       return $_cache[$permissionName];
     }
 
+    // FIXME!!!!
+    /**
     $uids = array();
     $sql = "
       SELECT {users}.uid, {role_permission}.permission
@@ -167,6 +172,8 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
 
     $_cache[$permissionName] = self::getContactEmails($uids);
     return $_cache[$permissionName];
+    */
+    return array();
   }
 
 }
