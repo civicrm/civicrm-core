@@ -1147,13 +1147,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
   /**
    * @param string|int|array|null $value
-   * @param CRM_Core_BAO_CustomField|int|string $field
+   * @param CRM_Core_BAO_CustomField|int|array|string $field
    * @param $contactId
    *
    * @return string
    * @throws \Exception
    */
   public static function displayValue($value, $field, $contactId = NULL) {
+    $field = is_array($field) ? $field['id'] : $field;
     $fieldId = is_object($field) ? $field->id : (int) str_replace('custom_', '', $field);
 
     if (!$fieldId) {

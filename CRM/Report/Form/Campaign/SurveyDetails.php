@@ -841,10 +841,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
           $value = implode(' | ', array_keys($options));
         }
         else {
-          $value = $this->formatCustomValues($value,
-            $responseFields[$name],
-            $fieldValueMap
-          );
+          $value = CRM_Core_BAO_CustomField::displayValue($value, $responseFields[$name]['id']);
         }
       }
 

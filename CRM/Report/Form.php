@@ -2031,21 +2031,11 @@ class CRM_Report_Form extends CRM_Core_Form {
       return;
     }
 
-    $customFields = $fieldValueMap = array();
-    $customFieldCols = array(
-      'column_name',
-      'data_type',
-      'html_type',
-      'option_group_id',
-      'id',
-    );
-
     // skip for type date and ContactReference since date format is already handled
     $query = "
-SELECT cg.table_name, cf." . implode(", cf.", $customFieldCols) . ", ov.value, ov.label
+SELECT cg.table_name, cf.id
 FROM  civicrm_custom_field cf
 INNER JOIN civicrm_custom_group cg ON cg.id = cf.custom_group_id
-LEFT JOIN civicrm_option_value ov ON cf.option_group_id = ov.option_group_id
 WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       cg.is_active = 1 AND
       cf.is_active = 1 AND
@@ -2055,13 +2045,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      foreach ($customFieldCols as $key) {
-        $customFields[$dao->table_name . '_custom_' .
-        $dao->id][$key] = $dao->$key;
-      }
-      if ($dao->option_group_id) {
-        $fieldValueMap[$dao->option_group_id][$dao->value] = $dao->label;
-      }
+      $customFields[$dao->table_name . '_custom_' . $dao->id] = $dao->id;
     }
     $dao->free();
 
@@ -2069,7 +2053,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     foreach ($rows as $rowNum => $row) {
       foreach ($row as $tableCol => $val) {
         if (array_key_exists($tableCol, $customFields)) {
-          $rows[$rowNum][$tableCol] = $this->formatCustomValues($val, $customFields[$tableCol], $fieldValueMap);
+          $rows[$rowNum][$tableCol] = CRM_Core_BAO_CustomField::displayValue($val, $customFields[$tableCol]);
           $entryFound = TRUE;
         }
       }
@@ -2080,128 +2064,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         break;
       }
     }
-  }
-
-  /**
-   * Format custom values.
-   *
-   * @param mixed $value
-   * @param array $customField
-   * @param array $fieldValueMap
-   *
-   * @return float|string|void
-   */
-  public function formatCustomValues($value, $customField, $fieldValueMap) {
-    if (CRM_Utils_System::isNull($value)) {
-      return NULL;
-    }
-
-    $htmlType = $customField['html_type'];
-
-    switch ($customField['data_type']) {
-      case 'Boolean':
-        if ($value == '1') {
-          $retValue = ts('Yes');
-        }
-        else {
-          $retValue = ts('No');
-        }
-        break;
-
-      case 'Link':
-        $retValue = CRM_Utils_System::formatWikiURL($value);
-        break;
-
-      case 'File':
-        $retValue = $value;
-        break;
-
-      case 'Memo':
-        $retValue = $value;
-        break;
-
-      case 'Float':
-        if ($htmlType == 'Text') {
-          $retValue = (float) $value;
-          break;
-        }
-      case 'Money':
-        if ($htmlType == 'Text') {
-          $retValue = CRM_Utils_Money::format($value, NULL, '%a');
-          break;
-        }
-      case 'String':
-      case 'Int':
-        if (in_array($htmlType, array(
-          'Text',
-          'TextArea',
-        ))) {
-          $retValue = $value;
-          break;
-        }
-      case 'StateProvince':
-      case 'Country':
-
-        switch ($htmlType) {
-          case 'Multi-Select Country':
-            $value = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-            $customData = array();
-            foreach ($value as $val) {
-              if ($val) {
-                $customData[] = CRM_Core_PseudoConstant::country($val, FALSE);
-              }
-            }
-            $retValue = implode(', ', $customData);
-            break;
-
-          case 'Select Country':
-            $retValue = CRM_Core_PseudoConstant::country($value, FALSE);
-            break;
-
-          case 'Select State/Province':
-            $retValue = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-            break;
-
-          case 'Multi-Select State/Province':
-            $value = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-            $customData = array();
-            foreach ($value as $val) {
-              if ($val) {
-                $customData[] = CRM_Core_PseudoConstant::stateProvince($val, FALSE);
-              }
-            }
-            $retValue = implode(', ', $customData);
-            break;
-
-          case 'Select':
-          case 'Radio':
-          case 'Autocomplete-Select':
-            $retValue = $fieldValueMap[$customField['option_group_id']][$value];
-            break;
-
-          case 'CheckBox':
-          case 'AdvMulti-Select':
-          case 'Multi-Select':
-            $value = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-            $customData = array();
-            foreach ($value as $val) {
-              if ($val) {
-                $customData[] = $fieldValueMap[$customField['option_group_id']][$val];
-              }
-            }
-            $retValue = implode(', ', $customData);
-            break;
-
-          default:
-            $retValue = $value;
-        }
-        break;
-
-      default:
-        $retValue = $value;
-    }
-
-    return $retValue;
   }
 
   /**
