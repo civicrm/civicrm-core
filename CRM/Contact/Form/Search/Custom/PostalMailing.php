@@ -106,7 +106,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
   ) {
     if ($justIDs) {
       $selectClause = "contact_a.id as contact_id";
-      $sort = 'contact_a.id';
+      //$sort = 'contact_a.id';
     }
     else {
       $selectClause = "
