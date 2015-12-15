@@ -34,7 +34,7 @@
  */
 
 /**
- * This class contains the funtions for Component export
+ * This class contains the functions for Component export
  *
  */
 class CRM_Export_BAO_Export {
@@ -49,7 +49,8 @@ class CRM_Export_BAO_Export {
    * @param int $exportMode
    *   Export mode.
    *
-   * return string Querymode
+   * @return string $Querymode
+   *   Query Mode
    */
   public static function getQueryMode($exportMode) {
     $queryMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
@@ -92,10 +93,11 @@ class CRM_Export_BAO_Export {
    * @param int $exportMode
    *   Export mode.
    *
-   * return string $property
+   * @return string $property
+   *   Default Return property
    */
   public static function defaultReturnProperty($exportMode) {
-    // hack to add default returnproperty based on export mode
+    // hack to add default return property based on export mode
     if ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT) {
       $property = 'contribution_id';
     }
@@ -129,7 +131,8 @@ class CRM_Export_BAO_Export {
    * @param int $exportMode
    *   Export mode.
    *
-   * return string component
+   * @return string $component
+   *   CiviCRM Export Component
    */
   public static function exportComponent($exportMode) {
     switch ($exportMode) {
@@ -154,6 +157,97 @@ class CRM_Export_BAO_Export {
         break;
     }
     return $component;
+  }
+
+  /**
+   * Generate Query Group By By Clause
+   * @param int $exportMode
+   *   Export Mode
+   * @param string $queryMode
+   *   Query Mode
+   * @param array $returnProperties
+   *   Return Properties
+   * @return string $groupBy
+   *   Group By Clause
+   */
+  public static function getGroupBy($exportMode, $queryMode, $returnProperties) {
+    if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
+      CRM_Utils_Array::value('notes', $returnProperties) ||
+      // CRM-9552
+      ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)
+    ) {
+      $groupBy = " GROUP BY contact_a.id";
+    }
+
+    switch ($exportMode) {
+      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
+        $groupBy = 'GROUP BY civicrm_contribution.id';
+        if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
+          // especial group by  when soft credit columns are included
+          $groupBy = 'GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.scredit_id';
+        }
+        break;
+
+      case CRM_Export_Form_Select::EVENT_EXPORT:
+        $groupBy = 'GROUP BY civicrm_participant.id';
+        break;
+
+      case CRM_Export_Form_Select::MEMBER_EXPORT:
+        $groupBy = " GROUP BY civicrm_membership.id";
+        break;
+    }
+
+    if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
+      $groupBy = " GROUP BY civicrm_activity.id ";
+    }
+    return $groupBy;
+  }
+
+  /**
+   * Define extra properties for the export based on query mode
+   *
+   * @param string $queryMode
+   *   Query Mode
+   * @return array $extraProperties
+   *   Extra Properties
+   */
+  public static function defineExtraProperties($queryMode) {
+    switch ($queryMode) {
+      case CRM_Contact_BAO_Query::MODE_EVENT:
+        $paymentFields = TRUE;
+        $paymentTableId = 'participant_id';
+        $extraReturnProperties = array();
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_MEMBER:
+        $paymentFields = TRUE;
+        $paymentTableId = 'membership_id';
+        $extraReturnProperties = array();
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_PLEDGE:
+        $extraReturnProperties = CRM_Pledge_BAO_Query::extraReturnProperties($queryMode);
+        $paymentFields = TRUE;
+        $paymentTableId = 'pledge_payment_id';
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_CASE:
+        $extraReturnProperties = CRM_Case_BAO_Query::extraReturnProperties($queryMode);
+        $paymentFields = FALSE;
+        $paymentTableID = '';
+        break;
+
+      default:
+        $paymentFields = FALSE;
+        $paymentTableID = '';
+        $extraReturnProperties = array();
+    }
+    $extraProperties = array(
+      'paymentFields' => $paymentFields,
+      'paymentTableID' => $paymentTableId,
+      'extraReturnProperties' => $extraReturnProperties,
+    );
+    return $extraProperties;
   }
 
   /**
@@ -355,27 +449,10 @@ class CRM_Export_BAO_Export {
       $extraReturnProperties = array();
       $paymentFields = FALSE;
 
-      switch ($queryMode) {
-        case CRM_Contact_BAO_Query::MODE_EVENT:
-          $paymentFields = TRUE;
-          $paymentTableId = 'participant_id';
-          break;
-
-        case CRM_Contact_BAO_Query::MODE_MEMBER:
-          $paymentFields = TRUE;
-          $paymentTableId = 'membership_id';
-          break;
-
-        case CRM_Contact_BAO_Query::MODE_PLEDGE:
-          $extraReturnProperties = CRM_Pledge_BAO_Query::extraReturnProperties($queryMode);
-          $paymentFields = TRUE;
-          $paymentTableId = 'pledge_payment_id';
-          break;
-
-        case CRM_Contact_BAO_Query::MODE_CASE:
-          $extraReturnProperties = CRM_Case_BAO_Query::extraReturnProperties($queryMode);
-          break;
-      }
+      $extraProperties = defineExtraProperties($queryMode);
+      $paymentFields = $extraProperties['paymentFields'];
+      $extraReturnProperties = $extraProperties['extraReturnProperties'];
+      $paymentTableID = $extraProperties['paymentTableID'];
 
       if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
@@ -617,35 +694,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $queryString = "$select $from $where $having";
 
     $groupBy = "";
-    if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
-      CRM_Utils_Array::value('notes', $returnProperties) ||
-      // CRM-9552
-      ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)
-    ) {
-      $groupBy = " GROUP BY contact_a.id";
-    }
 
-    switch ($exportMode) {
-      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        $groupBy = 'GROUP BY civicrm_contribution.id';
-        if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
-          // especial group by  when soft credit columns are included
-          $groupBy = 'GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.scredit_id';
-        }
-        break;
+    $groupBy = self::getGroupBy($exportMode, $queryMode, $returnProperties);
 
-      case CRM_Export_Form_Select::EVENT_EXPORT:
-        $groupBy = 'GROUP BY civicrm_participant.id';
-        break;
-
-      case CRM_Export_Form_Select::MEMBER_EXPORT:
-        $groupBy = " GROUP BY civicrm_membership.id";
-        break;
-    }
-
-    if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
-      $groupBy = " GROUP BY civicrm_activity.id ";
-    }
     $queryString .= $groupBy;
 
     // always add contact_a.id to the ORDER clause
