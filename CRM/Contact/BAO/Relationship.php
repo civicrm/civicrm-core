@@ -2038,14 +2038,15 @@ AND cc.sort_name LIKE '%$name%'";
       foreach ($relationships as $relationshipId => $values) {
         $relationship = array();
 
+        $relationship['DT_RowId'] = $values['id'];
         $relationship['DT_RowClass'] = 'crm-entity';
         if ($values['is_active'] == 0) {
           $relationship['DT_RowClass'] .= ' disabled';
         }
 
-        $relationship['DT_RowData'] = array();
-        $relationship['DT_RowData']['entity'] = 'relationship';
-        $relationship['DT_RowData']['id'] = $values['id'];
+        $relationship['DT_RowAttr'] = array();
+        $relationship['DT_RowAttr']['data-entity'] = 'relationship';
+        $relationship['DT_RowAttr']['data-id'] = $values['id'];
 
         //Add image icon for related contacts: CRM-14919
         $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],

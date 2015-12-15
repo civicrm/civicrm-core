@@ -2491,6 +2491,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
 
       foreach ($activities as $activityId => $values) {
         $activity = array();
+        $activity['DT_RowId'] = $activityId;
         // Add class to this row if overdue.
         $activity['DT_RowClass'] = 'crm-entity';
         if (CRM_Utils_Date::overdue(CRM_Utils_Array::value('activity_date_time', $values))
@@ -2502,9 +2503,9 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $activity['DT_RowClass'] .= ' status-ontime';
         }
 
-        $activity['DT_RowData'] = array();
-        $activity['DT_RowData']['entity'] = 'activity';
-        $activity['DT_RowData']['id'] = $activityId;
+        $activity['DT_RowAttr'] = array();
+        $activity['DT_RowAttr']['data-entity'] = 'activity';
+        $activity['DT_RowAttr']['data-id'] = $activityId;
 
         $activity['activity_type'] = $values['activity_type'];
         $activity['subject'] = $values['subject'];
