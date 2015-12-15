@@ -42,11 +42,26 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     parent::__construct($formValues);
 
     $this->_columns = array(
+      // The only alias you can (and should!) use in the
+      // columns, is contact_id. Because contact_id is used
+      // in a lot of places, and it seems to be important that
+      // it is called contact_id_a.
+      //
+      // For the other fields, if possible, you should prefix
+      // their names with the table alias you are selecting them
+      // from. This way, you can work around CRM-16587.
+      //
+      // This approach wil not work if you want to select fields
+      // with the same name from different tables, this will generate
+      // an invalid query somewhere. In that case, you can
+      // use column aliases in your SELECT clause and in the array
+      // below, but you will still hit CRM-16587 when sorting on these
+      // fields.
       ts('Contact ID') => 'contact_id',
-      ts('Address') => 'address',
-      ts('Contact Type') => 'contact_type',
-      ts('Name') => 'sort_name',
-      ts('State') => 'state_province',
+      ts('Address') => 'address.street_address',
+      ts('Contact Type') => 'contact_a.contact_type',
+      ts('Name') => 'contact_a.sort_name',
+      ts('State') => 'state_province.name',
     );
   }
 
@@ -95,11 +110,11 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     }
     else {
       $selectClause = "
-DISTINCT contact_a.id  as contact_id  ,
-contact_a.contact_type  as contact_type,
-contact_a.sort_name     as sort_name,
-address.street_address  as address,
-state_province.name     as state_province
+DISTINCT contact_a.id  as contact_id,
+contact_a.contact_type,
+contact_a.sort_name,
+address.street_address,
+state_province.name
 ";
     }
 
