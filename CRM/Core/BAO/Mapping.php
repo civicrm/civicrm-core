@@ -341,7 +341,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     //get the current employer for mapping.
     if ($mappingType == 'Export') {
-      $fields['Individual']['current_employer']['title'] = ts('Current Employer');
+      $fields['Individual']['current_employer_id']['title'] = ts('Current Employer ID');
     }
 
     // add component fields
