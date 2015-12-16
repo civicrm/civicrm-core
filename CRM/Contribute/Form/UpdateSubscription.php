@@ -132,6 +132,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $this->_defaults = array();
     $this->_defaults['amount'] = $this->_subscriptionDetails->amount;
     $this->_defaults['installments'] = $this->_subscriptionDetails->installments;
+    $this->_defaults['campaign_id'] = $this->_subscriptionDetails->campaign_id;
     $this->_defaults['is_notify'] = 1;
 
     return $this->_defaults;
@@ -155,6 +156,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
     if ($this->_donorEmail) {
       $this->add('checkbox', 'is_notify', ts('Notify Contributor?'));
+    }
+
+    if (CRM_Core_Permission::check('edit contributions')) {
+      $this->addEntityRef('campaign_id', 'Campaign', array('entity' => 'Campaign'));
     }
 
     $type = 'next';

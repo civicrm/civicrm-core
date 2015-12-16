@@ -39,6 +39,7 @@
           <span class="description">{ts}Total number of payments to be made. Set this to 0 if this is an open-ended commitment i.e. no set end date.{/ts}</span></td></tr>
     {if !$self_service}
     <tr><td class="label">{$form.is_notify.label}</td><td>{$form.is_notify.html}</td></tr>
+    <tr><td class="label">{$form.campaign_id.label}</td><td>{$form.campaign_id.html}</td></tr>
     {/if}
 
     {* Currently changes to interval, unit and cycle day are not supported. *}
