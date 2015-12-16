@@ -34,6 +34,9 @@
  *
  * CiviCRM can be hosted in either Drupal 6 or 7, Joomla or WordPress.
  *
+ * Settings for Backdrop CMS:
+ *      define( 'CIVICRM_UF'        , 'Backdrop' );
+ *
  * Settings for Drupal 7.x:
  *      define( 'CIVICRM_UF'        , 'Drupal' );
  *
