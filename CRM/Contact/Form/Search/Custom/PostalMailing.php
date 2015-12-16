@@ -42,23 +42,22 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     parent::__construct($formValues);
 
     $this->_columns = array(
-      // If possible, you should prefix all column names with the
-      // table alias you are selecting them from. This includes
-      // contact_id: if you can select it from another table than
-      // contact_a, you should.
-      // All this is needed if you want to work around CRM-16587 with
-      // the patch that can be found over there.
+      // If possible, don't use aliases for the columns you select.
+      // You can prefix columns with table aliases, if needed.
       //
-      // This approach wil not work if you want to select fields
-      // with the same name from different tables, this will generate
-      // an invalid query somewhere. In that case, you can
-      // use column aliases in your SELECT clause and in the array
-      // below, but you will still hit CRM-16587 when sorting on these
-      // fields.
-      ts('Contact ID') => 'address.contact_id',
-      ts('Address') => 'address.street_address',
-      ts('Contact Type') => 'contact_a.contact_type',
-      ts('Name') => 'contact_a.sort_name',
+      // If you don't do this, selecting individual records from the
+      // custom search result won't work if your results are sorted on the
+      // aliased colums.
+      // (This is why we map Contact ID on contact_a.id, and not on contact_id).
+      ts('Contact ID') => 'contact_a.id',
+      ts('Address') => 'street_address',
+      ts('Contact Type') => 'contact_type',
+      ts('Name') => 'sort_name',
+      // You need to provide a table alias if there field exists in multiple
+      // tables of your join. Name is also a field of address, so we prefix it
+      // by state_province.
+      // If you don't do this, the patch of CRM-16587 might cause database
+      // errors.
       ts('State') => 'state_province.name',
     );
   }
@@ -107,8 +106,14 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
       //$sort = 'contact_a.id';
     }
     else {
+      // YOU NEED to select contact_a.id as contact_id, if you want to be able
+      // to select individual records from the result.
+      // But if you want to display the contact ID in your result set, you
+      // also need to select contact_a.id. This is because of the patch we
+      // use for CRM-16587.
       $selectClause = "
-DISTINCT contact_a.id  as contact_id,
+DISTINCT contact_a.id as contact_id,
+contact_a.id,
 contact_a.contact_type,
 contact_a.sort_name,
 address.street_address,
