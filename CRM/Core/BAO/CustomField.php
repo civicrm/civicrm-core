@@ -401,7 +401,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $options = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
     }
     else {
-      return false;
+      return FALSE;
     }
     CRM_Utils_Hook::customFieldOptions($this->id, $options, FALSE);
     $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
