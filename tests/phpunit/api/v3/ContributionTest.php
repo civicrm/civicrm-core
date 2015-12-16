@@ -1602,6 +1602,56 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-17718 test appropriate action if financial type has changed for single line items.
+   */
+  public function testRepeatTransactionUpdatedFinancialType() {
+    $originalContribution = $this->setUpRecurringContribution(array(), array('financial_type_id' => 2));
+
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_recur_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+    $lineItemParams = array(
+      'entity_id' => $originalContribution['id'],
+      'sequential' => 1,
+      'return' => array(
+        'entity_table',
+        'qty',
+        'unit_price',
+        'line_total',
+        'label',
+        'financial_type_id',
+        'deductible_amount',
+        'price_field_value_id',
+        'price_field_id',
+      ),
+    );
+
+    $this->callAPISuccessGetSingle('contribution', array(
+      'total_amount' => 100,
+      'financial_type_id' => 2,
+    ));
+    $lineItem1 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
+      'entity_id' => $originalContribution['id'],
+    )));
+    $expectedLineItem = array_merge(
+      $lineItem1['values'][0], array(
+        'line_total' => '100.00',
+        'unit_price' => '100.00',
+        'financial_type_id' => 2,
+      )
+    );
+
+    $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
+      'entity_id' => $originalContribution['id'] + 1,
+    )));
+    unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
+    unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
+    $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
+  }
+
+  /**
    * CRM-16397 test appropriate action if campaign has been passed in.
    */
   public function testRepeatTransactionPassedInCampaign() {
@@ -2357,11 +2407,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @param array $generalParams
    *   Parameters that can be merged into the recurring AND the contribution.
-   *   (potentially add extra params if later we only want to merge to one).
+   *
+   * @param array $recurParams
+   *   Parameters to merge into the recur only.
    *
    * @return array|int
    */
-  protected function setUpRecurringContribution($generalParams = array()) {
+  protected function setUpRecurringContribution($generalParams = array(), $recurParams = array()) {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
       'contact_id' => $this->_individualId,
       'installments' => '12',
@@ -2372,7 +2424,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'frequency_unit' => 'month',
       'payment_processor_id' => $this->paymentProcessorID,
-    ), $generalParams));
+    ), $generalParams, $recurParams));
     $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
       $this->_params,
       array(
