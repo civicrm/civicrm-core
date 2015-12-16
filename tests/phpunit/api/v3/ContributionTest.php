@@ -49,6 +49,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   protected $_params;
   protected $_ids = array();
   protected $_pageParams = array();
+  /**
+   * Payment processor ID (dummy processor).
+   *
+   * @var int
+   */
+  protected $paymentProcessorID;
 
   /**
    * Parameters to create payment processor.
@@ -94,12 +100,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
     );
+    $this->paymentProcessorID = $this->processorCreate();
     $this->_pageParams = array(
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
       'financial_account_id' => 1,
-      'payment_processor' => $this->processorCreate(),
+      'payment_processor' => $this->paymentProcessorID,
       'is_active' => 1,
       'is_allow_other_amount' => 1,
       'min_amount' => 10,
@@ -1447,6 +1454,35 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test repeat contribution accepts recur_id instead of original_contribution_id.
+   */
+  public function testRepeatTransactionAcceptRecurID() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '100',
+      'contribution_status_id' => 1,
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $this->paymentProcessorID,
+    ));
+    $this->callAPISuccess('contribution', 'create', array_merge(
+        $this->_params,
+        array('contribution_recur_id' => $contributionRecur['id']))
+    );
+
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_recur_id' => $contributionRecur['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+
+    $this->quickCleanUpFinancialEntities();
+  }
+
+  /**
    * CRM-16397 test appropriate action if total amount has changed for single line items.
    */
   public function testRepeatTransactionAlteredAmount() {
@@ -1515,7 +1551,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-16397 test appropriate action if total amount has changed for single line items.
+   * CRM-16397 test appropriate action if campaign has been passed in.
    */
   public function testRepeatTransactionPassedInCampaign() {
     $paymentProcessorID = $this->paymentProcessorCreate();
