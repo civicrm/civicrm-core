@@ -2036,10 +2036,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if (!empty($input['amount'])) {
         $contribution->total_amount = $contributionParams['total_amount'] = $input['amount'];
       }
-      $templateContribution = civicrm_api3('Contribution', 'getsingle', array(
-        'contribution_recur_id' => $contributionParams['contribution_recur_id'],
-        'options' => array('limit' => 1),
-      ));
+      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionParams['contribution_recur_id']);
       if (!empty($contributionParams['contribution_recur_id'])) {
         $recurringContribution = civicrm_api3('ContributionRecur', 'getsingle', array(
           'id' => $contributionParams['contribution_recur_id'],
@@ -4188,7 +4185,7 @@ WHERE con.id = {$contributionId}
    * @throws \CiviCRM_API3_Exception
    */
   public static function isSingleLineItem($id) {
-    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('id' => $id));
+    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('contribution_id' => $id));
     return ($lineItemCount == 1);
   }
 
@@ -4634,14 +4631,14 @@ LIMIT 1;";
   }
 
   /**
-  * Get the description (source field) for the recurring contribution.
-  *
-  * @param CRM_Contribute_BAO_Contribution $contribution
-  * @param CRM_Event_DAO_Event|null $event
-  *
-  * @return array
-  * @throws \CiviCRM_API3_Exception
-  */
+   * Get the description (source field) for the recurring contribution.
+   *
+   * @param CRM_Contribute_BAO_Contribution $contribution
+   * @param CRM_Event_DAO_Event|null $event
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   protected static function getRecurringContributionDescription($contribution, $event) {
     if (!empty($contribution->contribution_page_id)) {
       $contributionPageTitle = civicrm_api3('ContributionPage', 'getvalue', array(
@@ -4650,7 +4647,7 @@ LIMIT 1;";
       ));
       return ts('Online Contribution') . ': ' . $contributionPageTitle;
     }
-    .elseif ($event) {
+    elseif ($event) {
       return ts('Online Event Registration') . ': ' . $event->title;
     }
     return 'recurring contribution';

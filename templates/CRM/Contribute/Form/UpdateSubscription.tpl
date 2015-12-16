@@ -40,6 +40,7 @@
     {if !$self_service}
     <tr><td class="label">{$form.is_notify.label}</td><td>{$form.is_notify.html}</td></tr>
     <tr><td class="label">{$form.campaign_id.label}</td><td>{$form.campaign_id.html}</td></tr>
+    <tr><td class="label">{$form.financial_type_id.label}</td><td>{$form.financial_type_id.html}</td></tr>
     {/if}
 
     {* Currently changes to interval, unit and cycle day are not supported. *}
