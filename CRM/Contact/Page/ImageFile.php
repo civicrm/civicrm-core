@@ -60,7 +60,7 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
     }
     if ($cid) {
       $config = CRM_Core_Config::singleton();
-      $fileExtension = pathinfo($_GET['photo'], PATHINFO_EXTENSION);
+      $fileExtension = strtolower(pathinfo($_GET['photo'], PATHINFO_EXTENSION));
       $this->download(
         $config->customFileUploadDir . $_GET['photo'],
         'image/' . ($fileExtension == 'jpg' ? 'jpeg' : $fileExtension),
