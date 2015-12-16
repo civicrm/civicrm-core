@@ -32,13 +32,19 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
 
-  /** @var array */
+  /**
+   * @var array
+   */
   public $replaceOptions;
 
-  /** @var array */
+  /**
+   * @var array
+   */
   public $appendOptions;
 
-  /** @var string */
+  /**
+   * @var string
+   */
   public $targetField;
 
   public function setUp() {
@@ -204,12 +210,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Implements hook_civicrm_fieldOptions
-   *
-   * @param $entity
-   * @param $field
-   * @param $options
-   * @param $params
+   * Implements hook_civicrm_fieldOptions().
    */
   public function hook_civicrm_fieldOptions($entity, $field, &$options, $params) {
     if ($field == $this->targetField) {

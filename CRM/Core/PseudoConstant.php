@@ -238,10 +238,10 @@ class CRM_Core_PseudoConstant {
     $dao = new $daoName();
     $fieldSpec = $dao->getFieldSpec($fieldName);
     $dao->free();
-    
+
     // Ensure we have the canonical name for this field
     $fieldName = CRM_Utils_Array::value('name', $fieldSpec, $fieldName);
-    
+
     // Return false if field doesn't exist.
     if (empty($fieldSpec)) {
       return FALSE;
