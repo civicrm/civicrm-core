@@ -590,6 +590,10 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
     if (count($lineItems) == 1) {
       foreach ($lineItems as $index => $lineItem) {
+        if (isset($contribution->financial_type_id)) {
+          // CRM-17718 allow for possibility of changed financial type ID having been set prior to calling this.
+          $lineItems[$index]['financial_type_id'] = $contribution->financial_type_id;
+        }
         if ($lineItem['line_total'] != $contribution->total_amount) {
           // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
           // if there is only one line item, and the UI should prevent this situation for those with more than one.

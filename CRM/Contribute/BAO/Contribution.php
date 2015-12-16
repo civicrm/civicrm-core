@@ -2052,7 +2052,13 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
       $contributionParams['skipLineItem'] = TRUE;
       $contributionParams['status_id'] = 'Pending';
-      $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
+      if (isset($contributionParams['financial_type_id'])) {
+        // Give precedence to passed in type.
+        $contribution->financial_type_id = $contributionParams['financial_type_id'];
+      }
+      else {
+        $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
+      }
       $contributionParams['contact_id'] = $templateContribution['contact_id'];
       $contributionParams['source'] = empty($templateContribution['source']) ? ts('Recurring contribution') : $templateContribution['source'];
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
@@ -4170,6 +4176,20 @@ WHERE con.id = {$contributionId}
   }
 
   /**
+   * Is there only one line item attached to the contribution.
+   *
+   * @param int $id
+   *   Contribution ID.
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function isSingleLineItem($id) {
+    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('id' => $id));
+    return ($lineItemCount == 1);
+  }
+
+  /**
    * Complete an order.
    *
    * Do not call this directly - use the contribution.completetransaction api as this function is being refactored.
@@ -4206,6 +4226,9 @@ WHERE con.id = {$contributionId}
       'campaign_id',
       'receive_date',
     );
+    if (self::isSingleLineItem($primaryContributionID)) {
+      $inputContributionWhiteList[] = 'financial_type_id';
+    }
 
     $contributionParams = array_merge(array(
       'contribution_status_id' => 'Completed',
