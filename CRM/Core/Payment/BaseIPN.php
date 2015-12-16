@@ -450,7 +450,6 @@ class CRM_Core_Payment_BaseIPN {
       elseif ($recurContrib && $recurContrib->id) {
         $contribution->contribution_page_id = NULL;
         $values['amount'] = $recurContrib->amount;
-        $values['financial_type_id'] = $objects['contributionType']->id;
         $values['title'] = $source = ts('Offline Recurring Contribution');
         $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
         $values['receipt_from_name'] = $domainValues[0];
@@ -649,6 +648,11 @@ LIMIT 1;";
       elseif (!empty($recurContrib->campaign_id)) {
         $contribution->campaign_id = $recurContrib->campaign_id;
       }
+      // CRM-17718 the campaign id on the contribution recur record should get precedence.
+      if (CRM_Contribute_BAO_Contribution::isSingleLineItem($primaryContributionID) && !empty($recurContrib->financial_type_id)) {
+        $contribution->financial_type_id = $recurContrib->financial_type_id;
+      }
+
       if (CRM_Contribute_BAO_Contribution::isSingleLineItem($primaryContributionID) && !empty($input['financial_type_id'])) {
         $contribution->financial_type_id = $input['financial_type_id'];
       }
