@@ -79,28 +79,14 @@ class CRM_Core_BAO_CustomOption {
       return $options;
     }
 
-    $field = CRM_Core_BAO_CustomField::getFieldObject($fieldID);
+    $optionValues = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $fieldID, array(), $inactiveNeeded ? 'get' : 'create');
 
-    // get the option group id
-    $optionGroupID = $field->option_group_id;
-    if (!$optionGroupID) {
-      return $options;
+    foreach ($optionValues as $value => $label) {
+      $options[] = array(
+        'label' => $label,
+        'value' => $value,
+      );
     }
-
-    $optionValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroupID);
-
-    foreach ($optionValues as $id => $value) {
-      if (!$inactiveNeeded && empty($value['is_active'])) {
-        continue;
-      }
-
-      $options[$id] = array();
-      $options[$id]['id'] = $id;
-      $options[$id]['label'] = $value['label'];
-      $options[$id]['value'] = $value['value'];
-    }
-
-    CRM_Utils_Hook::customFieldOptions($fieldID, $options, TRUE);
 
     return $options;
   }
