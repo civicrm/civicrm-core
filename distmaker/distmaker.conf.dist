@@ -16,6 +16,7 @@ DM_VERSION= <Set this to whatever the version number should be>
 
 ## Git banch/tag name
 DM_REF_CORE=master
+DM_REF_BACKDROP=1.x-${DM_REF_CORE}
 DM_REF_DRUPAL=7.x-${DM_REF_CORE}
 DM_REF_DRUPAL6=6.x-${DM_REF_CORE}
 DM_REF_JOOMLA=${DM_REF_CORE}
