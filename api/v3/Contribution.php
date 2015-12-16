@@ -596,6 +596,16 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
     'name' => 'trxn_id',
     'type' => CRM_Utils_Type::T_STRING,
   );
+  $params['campaign_id'] = array(
+    'title' => 'Campaign ID',
+    'name' => 'campaign_id',
+    'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_campaign',
+      'keyColumn' => 'id',
+      'labelColumn' => 'title',
+    ),
+  );
   $params['payment_processor_id'] = array(
     'description' => ts('Payment processor ID, will be loaded from contribution_recur if not provided'),
     'title' => 'Payment processor ID',
