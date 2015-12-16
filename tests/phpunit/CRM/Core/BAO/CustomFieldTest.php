@@ -120,21 +120,73 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
   public function testGetDisplayedValues() {
     $customGroup = Custom::createGroup(array(), 'Individual');
-    $fields = array(
-      'label' => 'testCountryFld1',
-      'data_type' => 'Country',
-      'html_type' => 'Select Country',
-      'is_active' => 1,
-      'default_value' => 1228,
-      'custom_group_id' => $customGroup->id,
+    $fieldsToCreate = array(
+      array(
+        'data_type' => 'Country',
+        'html_type' => 'Select Country',
+        'tests' => array(
+          'UNITED STATES' => 1228,
+          '' => NULL,
+        ),
+      ),
+      array(
+        'data_type' => 'StateProvince',
+        'html_type' => 'Multi-Select State/Province',
+        'tests' => array(
+          '' => 0,
+          'Alabama' => 1000,
+          'Alabama, Alaska' => array(1000, 1001),
+        ),
+      ),
+      array(
+        'data_type' => 'String',
+        'html_type' => 'Radio',
+        'option_values' => array(
+          'key' => 'KeyLabel',
+        ),
+        'tests' => array(
+          'KeyLabel' => 'key',
+        ),
+      ),
+      array(
+        'data_type' => 'String',
+        'html_type' => 'CheckBox',
+        'option_values' => array(
+          'key1' => 'Label1',
+          'key2' => 'Label2',
+          'key3' => 'Label3',
+          'key4' => 'Label4',
+        ),
+        'tests' => array(
+          'Label1' => array('key1'),
+          'Label2' => 'key2',
+          'Label2, Label3' => array('key2', 'key3'),
+          'Label3, Label4' => CRM_Utils_Array::implodePadded(array('key3', 'key4')),
+          'Label1, Label4' => array('key1' => 1, 'key4' => 1),
+        ),
+      ),
+      array(
+        'data_type' => 'Date',
+        'html_type' => 'Select Date',
+        'date_format' => 'd M yy',
+        'time_format' => 1,
+        'tests' => array(
+          '1 Jun 1999 1:30PM' => '1999-06-01 13:30',
+          '' => '',
+        ),
+      ),
     );
-    $customField1 = CRM_Core_BAO_CustomField::create($fields);
-    $customFieldID1 = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customGroup->id, 'id', 'custom_group_id',
-      'Database check for created CustomField.'
-    );
-    $display = CRM_Core_BAO_CustomField::displayValue($fields['default_value'], $customFieldID1);
-
-    $this->assertEquals('UNITED STATES', $display, 'Confirm Country display Name');
+    foreach ($fieldsToCreate as $num => $field) {
+      $params = $field + array(
+        'label' => 'test field ' . $num,
+        'custom_group_id' => $customGroup->id,
+      );
+      unset($params['tests']);
+      $createdField = $this->callAPISuccess('customField', 'create', $params);
+      foreach ($field['tests'] as $expected => $input) {
+        $this->assertEquals($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
+      }
+    }
 
     Custom::deleteGroup($customGroup);
   }
