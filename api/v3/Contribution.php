@@ -483,6 +483,14 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  */
 function civicrm_api3_contribution_repeattransaction(&$params) {
   $input = $ids = array();
+  civicrm_api3_verify_one_mandatory($params, NULL, array('contribution_recur_id', 'original_contribution_id'));
+  if (empty($params['original_contribution_id'])) {
+    $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', array(
+      'return' => 'id',
+      'contribution_recur_id' => $params['contribution_recur_id'],
+      'options' => array('limit' => 1, 'sort' => 'id DESC'),
+    ));
+  }
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['original_contribution_id'];
   if (!$contribution->find(TRUE)) {
@@ -565,8 +573,12 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
 function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
   $params['original_contribution_id'] = array(
     'title' => 'Original Contribution ID',
+    'description' => 'Contribution ID to copy (will be calculated from recurring contribution if not provided)',
     'type' => CRM_Utils_Type::T_INT,
-    'api.required' => TRUE,
+  );
+  $params['contribution_recur_id'] = array(
+    'title' => 'Recurring contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
   );
   $params['trxn_id'] = array(
     'title' => 'Transaction ID',
