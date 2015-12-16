@@ -2040,6 +2040,16 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         'contribution_recur_id' => $contributionParams['contribution_recur_id'],
         'options' => array('limit' => 1),
       ));
+      if (!empty($contributionParams['contribution_recur_id'])) {
+        $recurringContribution = civicrm_api3('ContributionRecur', 'getsingle', array(
+          'id' => $contributionParams['contribution_recur_id'],
+        ));
+        if (!empty($recurringContribution['campaign_id'])) {
+          // CRM-17718 the campaign id on the contribution recur record should get precedence.
+          $contributionParams['campaign_id'] = $recurringContribution['campaign_id'];
+        }
+      }
+
       $contributionParams['skipLineItem'] = TRUE;
       $contributionParams['status_id'] = 'Pending';
       $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
