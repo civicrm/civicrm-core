@@ -32,7 +32,7 @@
  */
 
 /**
- * Drupal specific stuff goes here
+ * Backdrop-specific logic that differs from Drupal.
  */
 class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
 
@@ -49,7 +49,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     );
 
     $admin = user_access('administer users');
-    if (!variable_get('user_email_verification', TRUE) || $admin) {
+    if (!config_get('system.core', 'user_email_verification') || $admin) {
       $form_state['input']['pass'] = array('pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']);
     }
 
@@ -91,13 +91,13 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
-  public function updateCMSName($ufID, $ufName) {
+  public function updateCMSName($ufID, $email) {
     // CRM-5555
     if (function_exists('user_load')) {
       $user = user_load($ufID);
-      if ($user->mail != $ufName) {
-        user_save($user, array('mail' => $ufName));
-        $user = user_load($ufID);
+      if ($user->mail != $email) {
+        $user->mail = $email;
+        $user->save();
       }
     }
   }
@@ -113,11 +113,6 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    *   Field label for the 'email'.
    */
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
-    $config = CRM_Core_Config::singleton();
-
-    $dao = new CRM_Core_DAO();
-    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
-    $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
     $errors = form_get_errors();
     if ($errors) {
       // unset drupal messages to avoid twice display of errors
@@ -129,10 +124,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         $errors['cms_name'] = $nameError;
       }
       else {
-        $uid = db_query(
-          "SELECT uid FROM {users} WHERE name = :name",
-          array(':name' => $params['name'])
-        )->fetchField();
+        $uid = db_query("SELECT uid FROM {users} WHERE name = :name", array(':name' => $params['name']))->fetchField();
         if ((bool) $uid) {
           $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.', array(1 => $params['name']));
         }
@@ -140,16 +132,13 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     }
 
     if (!empty($params['mail'])) {
-      if ($emailError = user_validate_mail($params['mail'])) {
-        $errors[$emailName] = $emailError;
+      if (!valid_email_address($params['mail'])) {
+        $errors[$emailName] = ts('The e-mail address %1 is not valid.', array('%1' => $params['mail']));
       }
       else {
-        $uid = db_query(
-          "SELECT uid FROM {users} WHERE mail = :mail",
-          array(':mail' => $params['mail'])
-        )->fetchField();
+        $uid = db_query("SELECT uid FROM {users} WHERE mail = :mail", array(':mail' => $params['mail']))->fetchField();
         if ((bool) $uid) {
-          $resetUrl = $config->userFrameworkBaseURL . 'user/password';
+          $resetUrl = url('user/password');
           $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
             array(1 => $params['mail'], 2 => $resetUrl)
           );
@@ -163,7 +152,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? array('destination' => $destination) : array();
-    return url('user', array('query' => $query), TRUE);
+    return url('user', array('query' => $query, 'absolute' => TRUE));
   }
 
   /**
@@ -311,13 +300,11 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    require_once 'DB.php';
-
     $config = CRM_Core_Config::singleton();
 
-    $dbDrupal = DB::connect($config->userFrameworkDSN);
-    if (DB::isError($dbDrupal)) {
-      CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
+    $dbBackdrop = DB::connect($config->userFrameworkDSN);
+    if (DB::isError($dbBackdrop)) {
+      CRM_Core_Error::fatal("Cannot connect to Backdrop database via $config->userFrameworkDSN, " . $dbBackdrop->getMessage());
     }
 
     $account = $userUid = $userMail = NULL;
@@ -341,13 +328,13 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       // CRM-8638
       // SOAP cannot load drupal bootstrap and hence we do it the old way
       // Contact CiviSMTP folks if we run into issues with this :)
-      $cmsPath = $config->userSystem->cmsRootPath($realPath);
+      $cmsPath = $this->cmsRootPath();
 
       require_once "$cmsPath/core/includes/bootstrap.inc";
       require_once "$cmsPath/core/includes/password.inc";
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $name = $dbDrupal->escapeSimple($strtolower($name));
+      $name = $dbBackdrop->escapeSimple($strtolower($name));
       $userFrameworkUsersTableName = $this->getUsersTableName();
       $sql = "
 SELECT u.*
@@ -356,14 +343,14 @@ WHERE  LOWER(u.name) = '$name'
 AND    u.status = 1
 ";
 
-      $query = $dbDrupal->query($sql);
+      $query = $dbBackdrop->query($sql);
       $row = $query->fetchRow(DB_FETCHMODE_ASSOC);
 
       if ($row) {
-        $fakeDrupalAccount = drupal_anonymous_user();
-        $fakeDrupalAccount->name = $name;
-        $fakeDrupalAccount->pass = $row['pass'];
-        $passwordCheck = user_check_password($password, $fakeDrupalAccount);
+        $fakeAccount = backdrop_anonymous_user();
+        $fakeAccount->name = $name;
+        $fakeAccount->pass = $row['pass'];
+        $passwordCheck = user_check_password($password, $fakeAccount);
         if ($passwordCheck) {
           $userUid = $row['uid'];
           $userMail = $row['mail'];
@@ -372,7 +359,7 @@ AND    u.status = 1
     }
 
     if ($userUid && $userMail) {
-      CRM_Core_BAO_UFMatch::synchronizeUFMatch($account, $userUid, $userMail, 'Drupal');
+      CRM_Core_BAO_UFMatch::synchronizeUFMatch($account, $userUid, $userMail, 'Backdrop');
       $contactID = CRM_Core_BAO_UFMatch::getContactId($userUid);
       if (!$contactID) {
         return FALSE;
@@ -406,12 +393,11 @@ AND    u.status = 1
 
   /**
    * Perform any post login activities required by the UF -
-   * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
-   * calls hook_user op 'login' and generates a new session.
+   * For Backdrop this could mean recording a watchdog message about the new
+   * session, saving the login timestamp, calling hook_user_login(), etc.
    *
    * @param array $params
-   *
-   * FIXME: Document values accepted/required by $params
+   *   The array of form values submitted by the user.
    */
   public function userLoginFinalize($params = array()) {
     user_login_finalize($params);
@@ -436,7 +422,7 @@ AND    u.status = 1
    */
   public function logout() {
     module_load_include('inc', 'user', 'user.pages');
-    return user_logout();
+    user_logout();
   }
 
   /**
@@ -449,7 +435,7 @@ AND    u.status = 1
   }
 
   /**
-   * Load drupal bootstrap.
+   * Load Backdrop bootstrap.
    *
    * @param array $params
    *   Either uid, or name & pass.
@@ -462,7 +448,6 @@ AND    u.status = 1
    * @return bool
    */
   public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
-    //take the cms root path.
     $cmsPath = $this->cmsRootPath($realPath);
 
     if (!file_exists("$cmsPath/core/includes/bootstrap.inc")) {
@@ -483,26 +468,26 @@ AND    u.status = 1
         $_SERVER['HTTP_HOST'] = $matches[1];
       }
     }
-    require_once 'core/includes/bootstrap.inc';
-    // @ to suppress notices eg 'DRUPALFOO already defined'.
-    @backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
+    require_once "$cmsPath/core/includes/bootstrap.inc";
+    backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
 
-    // explicitly setting error reporting, since we cannot handle drupal related notices
+    // Explicitly setting error reporting, since we cannot handle Backdrop
+    // related notices.
     error_reporting(1);
     if (!function_exists('module_exists') || !module_exists('civicrm')) {
       if ($throwError) {
-        echo '<br />Sorry, could not load drupal bootstrap.';
+        echo '<br />Sorry, could not load Backdrop bootstrap.';
         exit();
       }
       return FALSE;
     }
 
-    // seems like we've bootstrapped drupal
+    // Backdrop successfully bootstrapped.
     $config = CRM_Core_Config::singleton();
 
     // lets also fix the clean url setting
     // CRM-6948
-    $config->cleanURL = (int) variable_get('clean_url', '0');
+    $config->cleanURL = (int) config_get('system.core', 'clean_url');
 
     // we need to call the config hook again, since we now know
     // all the modules that are listening on it, does not apply
@@ -516,7 +501,7 @@ AND    u.status = 1
 
     $uid = CRM_Utils_Array::value('uid', $params);
     if (!$uid) {
-      //load user, we need to check drupal permissions.
+      // Load the user we need to check Backdrop permissions.
       $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
       $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
 
@@ -550,23 +535,21 @@ AND    u.status = 1
     // which means that define(CIVICRM_CLEANURL) was correctly set.
     // So we correct it
     $config = CRM_Core_Config::singleton();
-    $config->cleanURL = (int) variable_get('clean_url', '0');
+    $config->cleanURL = (int) config_get('system.core', 'clean_url');
 
-    // CRM-8655: Drupal wasn't available during bootstrap, so hook_civicrm_config never executes
+    // CRM-8655: Backdrop wasn't available during bootstrap, so
+    // hook_civicrm_config() never executes.
     CRM_Utils_Hook::config($config);
 
     return FALSE;
   }
 
   /**
-   * Get CMS root path.
-   *
-   * @param string $scriptFilename
-   *
-   * @return null|string
+   * @inheritDoc
    */
   public function cmsRootPath($scriptFilename = NULL) {
-    $cmsRoot = $valid = NULL;
+    $cmsRoot = NULL;
+    $valid = NULL;
 
     if (!is_null($scriptFilename)) {
       $path = $scriptFilename;
@@ -575,10 +558,6 @@ AND    u.status = 1
       $path = $_SERVER['SCRIPT_FILENAME'];
     }
 
-    if (function_exists('drush_get_context')) {
-      // drush anyway takes care of multisite install etc
-      return drush_get_context('DRUSH_DRUPAL_ROOT');
-    }
     // CRM-7582
     $pathVars = explode('/',
       str_replace('//', '/',
@@ -586,11 +565,10 @@ AND    u.status = 1
       )
     );
 
-    //lets store first var,
-    //need to get back for windows.
+    // Keep the first directory name for later.
     $firstVar = array_shift($pathVars);
 
-    //lets remove sript name to reduce one iteration.
+    // Remove script name to reduce one iteration.
     array_pop($pathVars);
 
     // CRM-7429 -- do check for uppermost 'includes' dir, which would
@@ -602,7 +580,7 @@ AND    u.status = 1
         $valid = TRUE;
         break;
       }
-      //remove one directory level.
+      // Remove one directory level.
       array_pop($pathVars);
     } while (count($pathVars));
 
@@ -644,21 +622,18 @@ AND    u.status = 1
       return $url;
     }
 
-    //CRM-7803 -from d7 onward.
-    $config = CRM_Core_Config::singleton();
-    if (function_exists('variable_get') &&
+    if (function_exists('config_get') &&
       module_exists('locale') &&
       function_exists('language_negotiation_get')
     ) {
       global $language;
 
-      //does user configuration allow language
-      //support from the URL (Path prefix or domain)
+      // Check if language support from the URL (Path prefix or domain) is set.
       if (language_negotiation_get('language') == 'locale-url') {
-        $urlType = variable_get('locale_language_negotiation_url_part');
+        $urlType = config_get('locale.settings', 'locale_language_negotiation_url_part');
 
-        //url prefix
-        if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_PREFIX) {
+        // URL prefix negotiation.
+        if ($urlType == LANGUAGE_NEGOTIATION_URL_PREFIX) {
           if (isset($language->prefix) && $language->prefix) {
             if ($addLanguagePart) {
               $url .= $language->prefix . '/';
@@ -668,12 +643,13 @@ AND    u.status = 1
             }
           }
         }
-        //domain
-        if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN) {
+        // Domain negotiation.
+        if ($urlType == LANGUAGE_NEGOTIATION_URL_DOMAIN) {
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
               $cleanedUrl = preg_replace('#^https?://#', '', $language->domain);
-              // drupal function base_path() adds a "/" to the beginning and end of the returned path
+              // Backdrop function base_path() adds a "/" to the beginning and
+              // end of the returned path.
               if (substr($cleanedUrl, -1) == '/') {
                 $cleanedUrl = substr($cleanedUrl, 0, -1);
               }
@@ -724,21 +700,21 @@ AND    u.status = 1
    *
    * @param int $ogID
    *   Organic Group ID.
-   * @param int $drupalID
-   *   Drupal User ID.
+   * @param int $userID
+   *   Backdrop User ID.
    */
-  public function og_membership_create($ogID, $drupalID) {
+  public function og_membership_create($ogID, $userID) {
     if (function_exists('og_entity_query_alter')) {
       // sort-of-randomly chose a function that only exists in the // 7.x-2.x branch
       //
       // @TODO Find more solid way to check - try system_get_info('module', 'og').
       //
       // Also, since we don't know how to get the entity type of the // group, we'll assume it's 'node'
-      og_group('node', $ogID, array('entity' => user_load($drupalID)));
+      og_group('node', $ogID, array('entity' => user_load($userID)));
     }
     else {
       // Works for the OG 7.x-1.x branch
-      og_group($ogID, array('entity' => user_load($drupalID)));
+      og_group($ogID, array('entity' => user_load($userID)));
     }
   }
 
@@ -747,19 +723,19 @@ AND    u.status = 1
    *
    * @param int $ogID
    *   Organic Group ID.
-   * @param int $drupalID
-   *   Drupal User ID.
+   * @param int $userID
+   *   Backdrop User ID.
    */
-  public function og_membership_delete($ogID, $drupalID) {
+  public function og_membership_delete($ogID, $userID) {
     if (function_exists('og_entity_query_alter')) {
       // sort-of-randomly chose a function that only exists in the 7.x-2.x branch
       // TODO: Find a more solid way to make this test
       // Also, since we don't know how to get the entity type of the group, we'll assume it's 'node'
-      og_ungroup('node', $ogID, 'user', user_load($drupalID));
+      og_ungroup('node', $ogID, 'user', user_load($userID));
     }
     else {
       // Works for the OG 7.x-1.x branch
-      og_ungroup($ogID, 'user', user_load($drupalID));
+      og_ungroup($ogID, 'user', user_load($userID));
     }
   }
 
@@ -769,11 +745,11 @@ AND    u.status = 1
   public function getTimeZoneString() {
     global $user;
     // Note that 0 is a valid timezone (GMT) so we use strlen not empty to check.
-    if (variable_get('configurable_timezones', 1) && $user->uid && isset($user->timezone) && strlen($user->timezone)) {
+    if (config_get('system.date', 'user_configurable_timezones') && $user->uid && isset($user->timezone) && strlen($user->timezone)) {
       $timezone = $user->timezone;
     }
     else {
-      $timezone = variable_get('date_default_timezone', NULL);
+      $timezone = config_get('system.date', 'default_timezone');
     }
     if (!$timezone) {
       $timezone = parent::getTimeZoneString();
@@ -785,7 +761,7 @@ AND    u.status = 1
    * @inheritDoc
    */
   public function setHttpHeader($name, $value) {
-    drupal_add_http_header($name, $value);
+    backdrop_add_http_header($name, $value);
   }
 
   /**
