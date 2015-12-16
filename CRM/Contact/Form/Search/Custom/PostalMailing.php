@@ -112,10 +112,10 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
       // also need to select contact_a.id. This is because of the patch we
       // use for CRM-16587.
       $selectClause = "
-DISTINCT contact_a.id as contact_id,
+DISTINCT contact_a.id  as contact_id  ,
 contact_a.id,
-contact_a.contact_type,
-contact_a.sort_name,
+contact_a.contact_type  as contact_type,
+contact_a.sort_name     as sort_name,
 address.street_address,
 state_province.name
 ";
