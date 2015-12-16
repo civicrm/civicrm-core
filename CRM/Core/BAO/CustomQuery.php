@@ -205,7 +205,12 @@ SELECT f.id, f.label, f.data_type,
           'data_type' => $dao->data_type,
           'html_type' => $dao->html_type,
         ),
-      ) + CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, array(), 'search');
+      );
+
+      $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, array(), 'search');
+      if ($options) {
+        $this->_options[$dao->id] += $options;
+      }
 
       if ($dao->html_type == 'Select Date') {
         $this->_options[$dao->id]['attributes']['date_format'] = $dao->date_format;
