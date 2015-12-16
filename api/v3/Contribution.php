@@ -507,7 +507,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     $contribution->contribution_status_id = $params['contribution_status_id'];
     $contribution->receive_date = $params['receive_date'];
 
-    $passThroughParams = array('trxn_id', 'total_amount', 'campaign_id', 'fee_amount');
+    $passThroughParams = array('trxn_id', 'total_amount', 'campaign_id', 'fee_amount', 'financial_type_id');
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
     $params = _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
@@ -616,6 +616,16 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
       'table' => 'civicrm_campaign',
       'keyColumn' => 'id',
       'labelColumn' => 'title',
+    ),
+  );
+  $params['financial_type_id'] = array(
+    'title' => 'Financial ID (ignored if more than one line item)',
+    'name' => 'financial_type_id',
+    'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_financial_type',
+      'keyColumn' => 'id',
+      'labelColumn' => 'name',
     ),
   );
   $params['payment_processor_id'] = array(

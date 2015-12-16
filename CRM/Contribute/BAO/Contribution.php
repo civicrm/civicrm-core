@@ -3767,6 +3767,20 @@ WHERE con.id = {$contributionId}
   }
 
   /**
+   * Is there only one line item attached to the contribution.
+   *
+   * @param int $id
+   *   Contribution ID.
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function isSingleLineItem($id) {
+    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('contribution_id' => $id));
+    return ($lineItemCount == 1);
+  }
+
+  /**
    * Generate credit note id with next avaible number
    *
    * @return string
