@@ -16,6 +16,7 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
 
   public function setupCms() {
     if (!in_array($this->config->cms, array(
+      'backdrop',
       'drupal',
       'drupal8',
       'joomla',
@@ -51,6 +52,12 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
   public function findConfigTemplate($cms) {
     $candidates = array();
     switch ($cms) {
+      case 'backdrop':
+        // FIXME!!!!
+        $candidates[] = "../drupal/civicrm.config.php.backdrop";
+        $candidates[] = "../../drupal/civicrm.config.php.backdrop";
+        break;
+
       case 'drupal':
         $candidates[] = "../drupal/civicrm.config.php.drupal";
         $candidates[] = "../../drupal/civicrm.config.php.drupal";
