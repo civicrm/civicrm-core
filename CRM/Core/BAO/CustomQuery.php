@@ -79,7 +79,8 @@ class CRM_Core_BAO_CustomQuery {
   public $_qill;
 
   /**
-   * The cache to translate the option values into labels.
+   * @deprecated
+   * No longer needed due to CRM-17646 refactoring, but still used in some places
    *
    * @var array
    */
@@ -197,56 +198,18 @@ SELECT f.id, f.label, f.data_type,
         'option_group_id' => $dao->option_group_id,
       );
 
-      // store it in the options cache to make things easier
-      // during option lookup
-      $this->_options[$dao->id] = array();
-      $this->_options[$dao->id]['attributes'] = array(
-        'label' => $dao->label,
-        'data_type' => $dao->data_type,
-        'html_type' => $dao->html_type,
-      );
+      // Deprecated (and poorly named) cache of field attributes
+      $this->_options[$dao->id] = array(
+        'attributes' => array(
+          'label' => $dao->label,
+          'data_type' => $dao->data_type,
+          'html_type' => $dao->html_type,
+        ),
+      ) + CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, array(), 'search');
 
-      $optionGroupID = NULL;
-      $htmlTypes = array('CheckBox', 'Radio', 'Select', 'Multi-Select', 'AdvMulti-Select', 'Autocomplete-Select');
-      if (in_array($dao->html_type, $htmlTypes) && $dao->data_type != 'ContactReference') {
-        if ($dao->option_group_id) {
-          $optionGroupID = $dao->option_group_id;
-        }
-        elseif ($dao->data_type != 'Boolean') {
-          $errorMessage = ts("The custom field %1 is corrupt. Please delete and re-build the field",
-            array(1 => $dao->label)
-          );
-          CRM_Core_Error::fatal($errorMessage);
-        }
-      }
-      elseif ($dao->html_type == 'Select Date') {
+      if ($dao->html_type == 'Select Date') {
         $this->_options[$dao->id]['attributes']['date_format'] = $dao->date_format;
         $this->_options[$dao->id]['attributes']['time_format'] = $dao->time_format;
-      }
-
-      // build the cache for custom values with options (label => value)
-      if ($optionGroupID != NULL) {
-        $query = "
-SELECT label, value
-  FROM civicrm_option_value
- WHERE option_group_id = $optionGroupID
-";
-
-        $option = CRM_Core_DAO::executeQuery($query);
-        while ($option->fetch()) {
-          $dataType = $this->_fields[$dao->id]['data_type'];
-          if ($dataType == 'Int' || $dataType == 'Float') {
-            $num = round($option->value, 2);
-            $this->_options[$dao->id]["$num"] = $option->label;
-          }
-          else {
-            $this->_options[$dao->id][$option->value] = $option->label;
-          }
-        }
-        $options = $this->_options[$dao->id];
-        //unset attributes to avoid confussion
-        unset($options['attributes']);
-        CRM_Utils_Hook::customFieldOptions($dao->id, $options, FALSE);
       }
     }
   }
@@ -409,7 +372,7 @@ SELECT label, value
                 //FIX for custom data query fired against no value(NULL/NOT NULL)
                 $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
               }
-              $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
+              $this->_qill[$grouping][] = $field['label'] . " $qillOp $qillValue";
             }
             break;
 
