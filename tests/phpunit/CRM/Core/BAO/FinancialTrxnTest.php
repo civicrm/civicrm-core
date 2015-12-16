@@ -70,6 +70,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    * Create() method (create and update modes).
    */
   public function testIsPaymentFlagForPending() {
+    require_once 'CiviTest/Contact.php';
     $contactId = Contact::createIndividual();
     $ids = array('contribution' => NULL);
 
@@ -97,7 +98,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
     $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
 
-    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id, $contribution->financial_type_id);
+    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
     $this->assertEquals(0, $totalPaymentAmount, 'Amount not matching.');
     //update contribution amount
     $ids = array('contribution' => $contribution->id);
@@ -108,10 +109,11 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id .');
     $this->assertEquals($params['contribution_status_id'], $contribution->contribution_status_id, 'Check for status updation.');
   
-    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id, $contribution->financial_type_id);
+    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
     $this->assertEquals('200.00', $totalPaymentAmount, 'Amount not matching.');
     //Delete Contribution
     $this->contributionDelete($contribution->id);
+    Contact::delete($contactId);
   }
 
 }
