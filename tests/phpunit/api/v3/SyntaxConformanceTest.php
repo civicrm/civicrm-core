@@ -759,6 +759,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testCustomDataGet($entityName) {
     $this->createLoggedInUser();// so subsidiary activities are created
+    // We are not passing 'check_permissions' so the the more limited permissions *should* be
+    // ignored but per CRM-17700 there is a history of custom data applying permissions when it shouldn't.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view my contact');
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, $entityName . 'Test.php');
     $customFieldName = 'custom_' . $ids['custom_field_id'];
     $objects = $this->getMockableBAOObjects($entityName, 1);
