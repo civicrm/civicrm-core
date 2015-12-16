@@ -674,17 +674,8 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);
 
-    $form->add('select', 'case_type_id',
-      ts('Case Type'),
-      CRM_Case_PseudoConstant::caseType('title', FALSE),
-      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
-    );
-
-    $form->add('select', 'case_status_id',
-      ts('Case Status'),
-      CRM_Case_PseudoConstant::caseStatus('label', FALSE),
-      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
-    );
+    $form->addField('case_type_id', array('context' => 'search', 'entity' => 'Case'));
+    $form->addField('case_status_id', array('context' => 'search', 'entity' => 'Case'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);
