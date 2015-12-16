@@ -505,4 +505,67 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 
+  /**
+   * Create() method (create and update modes).
+   */
+  public function testIsPaymentFlag() {
+    $contactId = Contact::createIndividual();
+    $ids = array('contribution' => NULL);
+
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 1,
+      'payment_instrument_id' => 1,
+      'source' => 'STUDENT',
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'non_deductible_amount' => 0.00,
+      'total_amount' => 200.00,
+      'fee_amount' => 5,
+      'net_amount' => 195,
+      'trxn_id' => '22ereerwww4444xx',
+      'invoice_id' => '86ed39c9e9ee6ef6541621ce0eafe7eb81',
+      'thankyou_date' => '20080522',
+    );
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+
+    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
+    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+
+    $trxnArray = array(
+      'trxn_id' => $params['trxn_id'],
+      'is_payment' => 1,
+    );
+    $defaults = array();
+    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
+    //update contribution amount
+    $ids = array('contribution' => $contribution->id);
+    $params['total_amount'] = 150;
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+
+    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id .');
+    $this->assertEquals($params['total_amount'], $contribution->total_amount, 'Check for Amount updation.');
+    $trxnArray = array(
+      'trxn_id' => $params['trxn_id'],
+      'is_payment' => 1,
+    );
+    $defaults = array();
+    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $this->assertEquals(3, $financialTrxn->N, 'Mismatch count for is payment flag.');
+    $trxnArray['is_payment'] = 0;
+    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $this->assertEquals(NULL, $financialTrxn, 'Mismatch count for is payment flag.');
+    
+    //Delete Contribution
+    $this->contributionDelete($contribution->id);
+
+    //Delete Contact
+    Contact::delete($contactId);
+  }
+
 }
