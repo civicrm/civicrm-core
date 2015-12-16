@@ -167,10 +167,13 @@ class CRM_Export_BAO_Export {
    *   Query Mode
    * @param array $returnProperties
    *   Return Properties
+   * @param object $query
+   *   CRM_Contact_BAO_Query
+   *
    * @return string $groupBy
    *   Group By Clause
    */
-  public static function getGroupBy($exportMode, $queryMode, $returnProperties) {
+  public static function getGroupBy($exportMode, $queryMode, $returnProperties, $query) {
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
       CRM_Utils_Array::value('notes', $returnProperties) ||
       // CRM-9552
@@ -200,6 +203,9 @@ class CRM_Export_BAO_Export {
     if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
       $groupBy = " GROUP BY civicrm_activity.id ";
     }
+    
+    $groupBy = !empty($groupBy) ? $groupBy : '';
+    
     return $groupBy;
   }
 
@@ -695,7 +701,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $groupBy = "";
 
-    $groupBy = self::getGroupBy($exportMode, $queryMode, $returnProperties);
+    $groupBy = self::getGroupBy($exportMode, $queryMode, $returnProperties, $query);
 
     $queryString .= $groupBy;
 
