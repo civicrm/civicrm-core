@@ -159,7 +159,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     }
 
     if (CRM_Core_Permission::check('edit contributions')) {
-      $this->addEntityRef('campaign_id', 'Campaign', array('entity' => 'Campaign'));
+      CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
     }
 
     $type = 'next';
