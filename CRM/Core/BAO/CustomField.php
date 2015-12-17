@@ -2194,6 +2194,7 @@ ORDER BY html_type";
    * @param int $entityID
    * @param string $customFieldExtends
    * @param bool $inline
+   * @param bool $checkPermissions
    *
    * @return array
    */
@@ -2201,7 +2202,8 @@ ORDER BY html_type";
     &$params,
     $entityID,
     $customFieldExtends,
-    $inline = FALSE
+    $inline = FALSE,
+    $checkPermissions = TRUE
   ) {
     $customData = array();
 
@@ -2224,7 +2226,8 @@ ORDER BY html_type";
           $customFieldExtends,
           $customFieldInfo[1],
           $entityID,
-          $inline
+          $inline,
+          $checkPermissions
         );
       }
     }

@@ -135,8 +135,9 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @return CRM_Core_BAO_Address|null
    */
   public static function add(&$params, $fixAddress) {
-    static $customFields = NULL;
+
     $address = new CRM_Core_DAO_Address();
+    $checkPermissions = isset($params['check_permissions']) ? $params['check_permissions'] : TRUE;
 
     // fixAddress mode to be done
     if ($fixAddress) {
@@ -150,20 +151,20 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id'])) {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
     }
-    $config = CRM_Core_Config::singleton();
+
     $address->copyValues($params);
 
     $address->save();
 
     if ($address->id) {
-      if (!$customFields) {
-        $customFields = CRM_Core_BAO_CustomField::getFields('Address', FALSE, TRUE);
-      }
+      $customFields = CRM_Core_BAO_CustomField::getFields('Address', FALSE, TRUE, NULL, NULL, FALSE, FALSE, $checkPermissions);
+
       if (!empty($customFields)) {
         $addressCustom = CRM_Core_BAO_CustomField::postProcess($params,
           $address->id,
           'Address',
-          TRUE
+          FALSE,
+          $checkPermissions
         );
       }
       if (!empty($addressCustom)) {

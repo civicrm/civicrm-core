@@ -32,10 +32,14 @@
  */
 class CRM_Pledge_BAO_Query {
   /**
+   * Get pledge fields.
+   *
+   * @param bool $checkPermission
+   *
    * @return array
    */
-  public static function &getFields() {
-    $fields = CRM_Pledge_BAO_Pledge::exportableFields();
+  public static function &getFields($checkPermission = TRUE) {
+    $fields = CRM_Pledge_BAO_Pledge::exportableFields($checkPermission);
     return $fields;
   }
 
