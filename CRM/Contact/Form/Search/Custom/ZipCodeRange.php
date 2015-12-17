@@ -119,7 +119,7 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
   ) {
     if ($justIDs) {
       $selectClause = "contact_a.id as contact_id";
-      $sort = "contact_a.id";
+      // Don't change sort order when $justIDs is TRUE, see CRM-14920.
     }
     else {
       // We select contact_a.id twice. Once as contact_a.id,
