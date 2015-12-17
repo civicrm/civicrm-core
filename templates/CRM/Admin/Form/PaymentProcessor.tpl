@@ -56,6 +56,9 @@
         {/if}
       </td>
     </tr>
+    <tr class="crm-paymentProcessor-form-block-payment-instrument-id">
+      <td class="label">{$form.payment_instrument_id.label}</td><td>{$form.payment_instrument_id.html}</td>
+    </tr>
     <tr class="crm-paymentProcessor-form-block-is_active">
         <td></td><td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
     </tr>

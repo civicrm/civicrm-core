@@ -50,7 +50,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @throws Exception
    */
   public static function create($params) {
-    // FIXME Reconcile with CRM_Admin_Form_PaymentProcessor::updatePaymentProcessor
     $processor = new CRM_Financial_DAO_PaymentProcessor();
     $processor->copyValues($params);
 
@@ -79,6 +78,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       );
       CRM_Financial_BAO_FinancialTypeAccount::add($values);
     }
+
     Civi\Payment\System::singleton()->flushProcessors();
     return $processor;
   }
