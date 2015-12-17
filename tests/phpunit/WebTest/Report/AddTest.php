@@ -70,7 +70,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=td.crm-report-civicrm_email_email', $emailId, "Email did not found!");
 
     // check criteria
-    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[text()='Filters']");
+    $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul//li/a[text()='Filters']");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']");
 
     // Is Contact Name filter?
@@ -88,7 +88,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $reportDescription = "New Contact Summary Report";
     $emaiSubject = "Contact Summary Report";
     $emailCC = "tesmail@example.org";
-    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[text()='Developer']");
+    $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul//li/a[text()='Developer']");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']");
     $this->click("_qf_Summary_submit_save");
 
@@ -103,7 +103,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Summary_submit_save');
 
     // Fill Email Subject
-    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[text()='Email Delivery']");
+    $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul//li/a[text()='Email Delivery']");
     $this->waitForAjaxContent();
     $this->type("email_subject", $emaiSubject);
 
@@ -116,7 +116,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->type("email_cc", $emailCC);
 
     // We want navigation menu
-    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[text()='Access']");
+    $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul//li/a[text()='Access']");
     $this->click("is_navigation");
 
     // Navigation menu under Reports section
@@ -165,7 +165,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertEquals("on", $this->getValue("fields[phone]"));
 
     // Check Report settings
-    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[4]/a");
+    $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul/li[4]/a");
     $this->waitForElementPresent("title");
 
     // Is correct Report Title?
@@ -176,7 +176,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
 
     // Is correct email Subject?
     $this->waitForElementPresent("mainTabContainer");
-    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[5]/a");
+    $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul/li[5]/a");
     $this->waitForAjaxContent();
     $this->assertContains($emaiSubject, $this->getValue("email_subject"), "Email Subject expected $emaiSubject");
 
@@ -187,7 +187,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertContains($emailCC, $this->getValue("email_cc"), "Email CC expected $emailCC");
 
     // Is Navigation?
-    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[6]/a");
+    $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul/li[6]/a");
     $this->assertEquals("on", $this->getValue("is_navigation"));
 
     // Is correct Navigation Parent?
