@@ -170,7 +170,15 @@ dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
 dm_git_checkout "$DM_SOURCEDIR/packages" "$DM_REF_PACKAGES"
 
 ## in theory, this shouldn't matter, but GenCode is CMS-dependent, and we've been doing our past builds based on D7
-dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
+GENCODE_CMS=
+if [ -d "$DM_SOURCEDIR/backdrop" ]; then
+  dm_git_checkout "$DM_SOURCEDIR/backdrop" "$DM_REF_BACKDROP"
+  GENCODE_CMS=Backdrop
+fi
+if [ -d "$DM_SOURCEDIR/drupal" ]; then
+  dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
+  GENCODE_CMS=Drupal
+fi
 
 ## Get latest dependencies
 dm_generate_vendor "$DM_SOURCEDIR"
@@ -179,7 +187,7 @@ dm_generate_bower "$DM_SOURCEDIR"
 # Before anything - regenerate DAOs
 
 cd $DM_SOURCEDIR/xml
-${DM_PHP:-php} GenCode.php schema/Schema.xml $DM_VERSION
+${DM_PHP:-php} GenCode.php schema/Schema.xml $DM_VERSION $GENCODE_CMS
 
 cd $ORIGPWD
 
@@ -190,7 +198,7 @@ fi
 
 if [ "$BPACK" = 1 ]; then
   echo; echo "Packaging for Backdrop, PHP5 version"; echo;
-  dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_BACKDROP"
+  dm_git_checkout "$DM_SOURCEDIR/backdrop" "$DM_REF_BACKDROP"
   bash $P/dists/backdrop_php5.sh
 fi
 
