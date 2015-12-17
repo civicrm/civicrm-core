@@ -1191,7 +1191,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   private static function formatDisplayValue($value, $field, $contactID = NULL) {
 
     if (self::isSerialized($field) && !is_array($value)) {
-      $value = (array) CRM_Utils_Array::explodePadded($value);
+      $value = CRM_Utils_Array::explodePadded($value);
     }
     // CRM-12989 fix
     if ($field['html_type'] == 'CheckBox') {
@@ -1229,6 +1229,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Select Date':
         $customFormat = NULL;
+
+        // FIXME: Are there any legitimate reasons why $value would be an array?
+        // Or should we throw an exception here if it is?
+        $value = is_array($value) ? CRM_Utils_Array::first($value) : $value;
 
         $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats();
         $format = CRM_Utils_Array::value('date_format', $field);
