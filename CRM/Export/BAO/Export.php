@@ -203,9 +203,9 @@ class CRM_Export_BAO_Export {
     if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
       $groupBy = " GROUP BY civicrm_activity.id ";
     }
-    
+
     $groupBy = !empty($groupBy) ? $groupBy : '';
-    
+
     return $groupBy;
   }
 
@@ -240,17 +240,17 @@ class CRM_Export_BAO_Export {
       case CRM_Contact_BAO_Query::MODE_CASE:
         $extraReturnProperties = CRM_Case_BAO_Query::extraReturnProperties($queryMode);
         $paymentFields = FALSE;
-        $paymentTableID = '';
+        $paymentTableId = '';
         break;
 
       default:
         $paymentFields = FALSE;
-        $paymentTableID = '';
+        $paymentTableId = '';
         $extraReturnProperties = array();
     }
     $extraProperties = array(
       'paymentFields' => $paymentFields,
-      'paymentTableID' => $paymentTableId,
+      'paymentTableId' => $paymentTableId,
       'extraReturnProperties' => $extraReturnProperties,
     );
     return $extraProperties;
@@ -458,7 +458,7 @@ class CRM_Export_BAO_Export {
       $extraProperties = self::defineExtraProperties($queryMode);
       $paymentFields = $extraProperties['paymentFields'];
       $extraReturnProperties = $extraProperties['extraReturnProperties'];
-      $paymentTableID = $extraProperties['paymentTableID'];
+      $paymentTableId = $extraProperties['paymentTableId'];
 
       if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
