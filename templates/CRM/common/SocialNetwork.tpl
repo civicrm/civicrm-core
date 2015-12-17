@@ -35,7 +35,7 @@
     <div class="crm-fb-tweet-buttons">
         {if $emailMode eq true}
             {*use images for email*}
-            <a href="http://twitter.com/share?url={$url}&amp;text={$title}" id="crm_tweet">
+            <a href="http://twitter.com/share?url={$url|escape:'url'}&amp;text={$title}" id="crm_tweet">
                 <img title="Twitter Tweet Button" src="{$config->userFrameworkResourceURL|replace:'https://':'http://'}/i/tweet.png" width="55px" height="20px"  alt="Tweet Button">
             </a>
             <a href="http://www.facebook.com/plugins/like.php?href={$url}" target="_blank">
