@@ -772,7 +772,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $params, $errors);
 
       $priceFieldIDS = array();
-      foreach ($self->_priceSet['fields'] as $priceIds => $dontCare) {
+      foreach ($self->_priceSet['fields'] as $priceIds => $field) {
 
         if (!empty($params['price_' . $priceIds])) {
           if (is_array($params['price_' . $priceIds])) {
@@ -782,7 +782,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
               }
             }
           }
-          else {
+          elseif (!$field['is_enter_qty']) {
             $priceFieldIDS[] = $params['price_' . $priceIds];
           }
         }
