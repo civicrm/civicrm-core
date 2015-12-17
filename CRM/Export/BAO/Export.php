@@ -1333,7 +1333,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $row = array();
 
       foreach ($fields as $field) {
-        $row[$field] = $dao->$field;
+        $unqualified_field = CRM_Utils_Array::First(array_slice(explode('.', $field), -1));
+        $row[$field] = $dao->$unqualified_field;
       }
       if ($alterRow) {
         $search->alterRow($row);
