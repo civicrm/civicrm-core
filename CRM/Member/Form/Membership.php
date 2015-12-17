@@ -144,10 +144,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @return array
    */
   public static function getPriceFieldIDs($params, $priceSet) {
-    $priceFieldIDS = $fieldIds = array();
+    $priceFieldIDS = array();
     if (isset($priceSet['fields']) && is_array($priceSet['fields'])) {
-      $fieldIds = array_keys($priceSet['fields']);
-      foreach ($fieldIds as $fieldId) {
+      foreach ($priceSet['fields'] as $fieldId => $field) {
         if (!empty($params['price_' . $fieldId])) {
           if (is_array($params['price_' . $fieldId])) {
             foreach ($params['price_' . $fieldId] as $priceFldVal => $isSet) {
@@ -156,7 +155,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
               }
             }
           }
-          else {
+          elseif (!$field['is_enter_qty']) {
             $priceFieldIDS[] = $params['price_' . $fieldId];
           }
         }
@@ -748,7 +747,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if (!empty($params['price_set_id'])) {
       CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $params, $errors);
 
-      $priceFieldIDS = self::getPriceFieldIDs($params, $priceSetDetails);
+      $priceFieldIDS = self::getPriceFieldIDs($params, $priceSetDetails[$priceSetId]);
 
       if (!empty($priceFieldIDS)) {
         $ids = implode(',', $priceFieldIDS);
