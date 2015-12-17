@@ -1200,8 +1200,7 @@ abstract class CRM_Core_Payment {
         break;
     }
 
-    $session = CRM_Core_Session::singleton();
-    $userId = $session->get('userID');
+    $userId = CRM_Core_Session::singleton()->get('userID');
     $contactID = 0;
     $checksumValue = '';
     $entityArg = '';
