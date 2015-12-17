@@ -286,6 +286,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     // Find Participant
     $this->openCiviPage('event/search', 'reset=1', 'participant_fee_amount_low');
+    $this->waitForElementPresent('event_id');
     $this->select2("event_id", $eventTitle);
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -311,6 +312,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->type('title', $setTitle);
     $this->check('extends[1]');
     $this->select("css=select.crm-form-select", "label={$financialType}");
+    $this->waitForElementPresent("help_pre");
     $this->type('help_pre', 'This is test priceset.');
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');

@@ -428,9 +428,9 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->waitForElementPresent("_qf_Contribution_upload");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']/div[2]/table/tbody/tr[1]/td[10]/span/a[text()='View']");
     //click through to the Pledge view screen
-    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']/div[2]/table/tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
