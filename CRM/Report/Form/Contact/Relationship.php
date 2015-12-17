@@ -225,6 +225,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'options' => CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
           ),
+          'end_date' => array(
+            'title' => ts('Relationship End Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'start_date' => array(
+            'title' => ts('Relationship Start Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
         ),
         'grouping' => 'relation-fields',
       ),
@@ -438,6 +448,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           }
         }
       }
+    }
+    if (CRM_Utils_Array::value('is_active_value', $this->_params) == '1') {
+      $now = date('Y-m-d');
+      $whereClauses[] = "({$this->_aliases['civicrm_relationship']}.end_date IS NULL
+        OR {$this->_aliases['civicrm_relationship']}.end_date > '$now')";
     }
 
     if (empty($whereClauses)) {
