@@ -720,7 +720,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * Combine all the exportable fields from the lower level objects.
+   *
+   * @param bool $checkPermission
+   *
    * @return array
+   *   array of exportable Fields
    */
   public static function &exportableFields($checkPermission = TRUE) {
     if (!self::$_exportableFields) {

@@ -46,8 +46,10 @@ class CRM_Contribute_BAO_Query {
   /**
    * Function get the import/export fields for contribution.
    *
+   * @param bool $checkPermission
+   *
    * @return array
-   *   self::$_contributionFields  associative array of contribution fields
+   *   Associative array of contribution fields
    */
   public static function &getFields($checkPermission = TRUE) {
     if (!self::$_contributionFields) {

@@ -69,6 +69,10 @@ function civicrm_api3_address_create(&$params) {
     }
   }
 
+  if (!isset($params['check_permissions'])) {
+    $params['check_permissions'] = 0;
+  }
+
   /**
    * Create array for BAO (expects address params in as an
    * element in array 'address'
