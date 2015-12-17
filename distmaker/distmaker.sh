@@ -31,6 +31,7 @@ ORIGPWD=`pwd`
 source "$P/dists/common.sh"
 
 # Set no actions by default
+BPACK=0
 D5PACK=0
 D56PACK=0
 J5PACK=0
@@ -46,13 +47,14 @@ display_usage()
   echo "  distmaker.sh OPTION"
   echo
   echo "Options available:"
-  echo "  all  - generate all available tarballs"
-  echo "  l10n - generate internationalization data"
-  echo "  d5   - generate Drupal7 PHP5 module"
-  echo "  d5.6 - generate Drupal6 PHP5 module"
-  echo "  j5   - generate Joomla PHP5 module"
-  echo "  wp5  - generate Wordpress PHP5 module"
-  echo "  sk - generate Drupal StarterKit module"
+  echo "  all            - generate all available tarballs"
+  echo "  l10n           - generate internationalization data"
+  echo "  Backdrop       - generate Backdrop PHP5 module"
+  echo "  Drupal|d5      - generate Drupal7 PHP5 module"
+  echo "  Drupal6|d5.6   - generate Drupal6 PHP5 module"
+  echo "  Joomla|j5      - generate Joomla PHP5 module"
+  echo "  WordPress|wp5  - generate Wordpress PHP5 module"
+  echo "  sk             - generate Drupal StarterKit module"
   echo
   echo "You also need to have distmaker.conf file in place."
   echo "See distmaker.conf.dist for example contents."
@@ -107,8 +109,14 @@ case $1 in
   L10NPACK=1
   ;;
 
+  # BACKDROP PHP5
+  Backdrop)
+  echo; echo "Generating Backdrop PHP5 module"; echo;
+  BPACK=1
+  ;;
+
   # DRUPAL7 PHP5
-  d5)
+  d5|Drupal)
   echo; echo "Generating Drupal7 PHP5 module"; echo;
   D5PACK=1
   ;;
@@ -120,19 +128,19 @@ case $1 in
   ;;
 
   # DRUPAL6 PHP5
-  d5.6)
+  d5.6|Drupal6)
   echo; echo "Generating Drupal6 PHP5 module"; echo;
   D56PACK=1
   ;;
 
   # JOOMLA PHP5
-  j5)
+  j5|Joomla)
   echo; echo "Generating Joomla PHP5 module"; echo;
   J5PACK=1
   ;;
 
   # WORDPRESS PHP5
-  wp5)
+  wp5|WordPress)
   echo; echo "Generating Wordpress PHP5 module"; echo;
   WP5PACK=1
   ;;
@@ -140,6 +148,7 @@ case $1 in
   # ALL
   all)
   echo; echo "Generating all we've got."; echo;
+  BPACK=1
   D5PACK=1
   D56PACK=1
   J5PACK=1
@@ -161,7 +170,15 @@ dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
 dm_git_checkout "$DM_SOURCEDIR/packages" "$DM_REF_PACKAGES"
 
 ## in theory, this shouldn't matter, but GenCode is CMS-dependent, and we've been doing our past builds based on D7
-dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
+GENCODE_CMS=
+if [ -d "$DM_SOURCEDIR/backdrop" ]; then
+  dm_git_checkout "$DM_SOURCEDIR/backdrop" "$DM_REF_BACKDROP"
+  GENCODE_CMS=Backdrop
+fi
+if [ -d "$DM_SOURCEDIR/drupal" ]; then
+  dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
+  GENCODE_CMS=Drupal
+fi
 
 ## Get latest dependencies
 dm_generate_vendor "$DM_SOURCEDIR"
@@ -170,13 +187,19 @@ dm_generate_bower "$DM_SOURCEDIR"
 # Before anything - regenerate DAOs
 
 cd $DM_SOURCEDIR/xml
-${DM_PHP:-php} GenCode.php schema/Schema.xml $DM_VERSION
+${DM_PHP:-php} GenCode.php schema/Schema.xml $DM_VERSION $GENCODE_CMS
 
 cd $ORIGPWD
 
 if [ "$L10NPACK" = 1 ]; then
   echo; echo "Packaging for L10N"; echo;
   bash $P/dists/l10n.sh
+fi
+
+if [ "$BPACK" = 1 ]; then
+  echo; echo "Packaging for Backdrop, PHP5 version"; echo;
+  dm_git_checkout "$DM_SOURCEDIR/backdrop" "$DM_REF_BACKDROP"
+  bash $P/dists/backdrop_php5.sh
 fi
 
 if [ "$D56PACK" = 1 ]; then

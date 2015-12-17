@@ -1,5 +1,6 @@
 *~
 *.bak
+backdrop/
 bower_components
 CRM/ACL/DAO
 CRM/Activity/DAO
