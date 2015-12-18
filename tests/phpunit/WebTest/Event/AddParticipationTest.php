@@ -269,6 +269,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->click("xpath=//input[@class='crm-form-radio']");
 
     // Enter amount to be paid (note: this should default to selected fee level amount, s/b fixed during 3.2 cycle)
+    $this->waitForElementPresent('total_amount');
     $this->type('total_amount', '800');
 
     // Select payment method = Check and enter chk number
