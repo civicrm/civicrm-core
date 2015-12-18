@@ -35,9 +35,14 @@
 class CRM_Event_BAO_Query {
 
   /**
+   * Function get the import/export fields for contribution.
+   *
+   * @param bool $checkPermission
+   *
    * @return array
+   *   Associative array of contribution fields
    */
-  public static function &getFields() {
+  public static function &getFields($checkPermission = TRUE) {
     $fields = array();
     $fields = array_merge($fields, CRM_Event_DAO_Event::import());
     $fields = array_merge($fields, self::getParticipantFields());

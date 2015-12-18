@@ -690,10 +690,12 @@ GROUP BY  currency
   /**
    * Combine all the exportable fields from the lower levels object.
    *
+   * @param bool $checkPermission
+   *
    * @return array
    *   array of exportable Fields
    */
-  public static function &exportableFields() {
+  public static function &exportableFields($checkPermission) {
     if (!self::$_exportableFields) {
       if (!self::$_exportableFields) {
         self::$_exportableFields = array();
@@ -744,7 +746,7 @@ GROUP BY  currency
       $fields = array_merge($fields, $pledgeFields, $calculatedFields);
 
       // add custom data
-      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Pledge'));
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Pledge', FALSE, FALSE, FALSE, $checkPermission));
       self::$_exportableFields = $fields;
     }
 

@@ -622,11 +622,13 @@ GROUP BY  participant.event_id
    * @param string $contactType
    * @param bool $status
    * @param bool $onlyParticipant
+   * @param bool $checkPermission
+   *   Is this a permissioned retrieval?
    *
    * @return array
    *   array of importable Fields
    */
-  public static function &importableFields($contactType = 'Individual', $status = TRUE, $onlyParticipant = FALSE) {
+  public static function &importableFields($contactType = 'Individual', $status = TRUE, $onlyParticipant = FALSE, $checkPermission = TRUE) {
     if (!self::$_importableFields) {
       if (!$onlyParticipant) {
         if (!$status) {
@@ -722,7 +724,7 @@ GROUP BY  participant.event_id
       $fields = array_merge($fields, $tmpContactField);
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, $note, $participantStatus, $participantRole, $eventType);
-      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant', FALSE, FALSE, FALSE, $checkPermission));
 
       self::$_importableFields = $fields;
     }
@@ -731,18 +733,18 @@ GROUP BY  participant.event_id
   }
 
   /**
-   * Combine all the exportable fields from the lower levels object.
+   * Combine all the exportable fields from the lower level objects.
+   *
+   * @param bool $checkPermission
    *
    * @return array
    *   array of exportable Fields
    */
-  public static function &exportableFields() {
+  public static function &exportableFields($checkPermission = TRUE) {
     if (!self::$_exportableFields) {
       if (!self::$_exportableFields) {
         self::$_exportableFields = array();
       }
-
-      $fields = array();
 
       $participantFields = CRM_Event_DAO_Participant::export();
       $eventFields = CRM_Event_DAO_Event::export();
@@ -775,7 +777,7 @@ GROUP BY  participant.event_id
       $fields = array_merge($participantFields, $participantStatus, $participantRole, $eventFields, $noteField, $discountFields);
 
       // add custom data
-      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant', FALSE, FALSE, FALSE, $checkPermission));
       self::$_exportableFields = $fields;
     }
 

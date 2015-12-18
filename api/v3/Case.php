@@ -217,7 +217,7 @@ function civicrm_api3_case_get($params) {
     }
     $cases = array();
     foreach ($ids as $id) {
-      if ($case = _civicrm_api3_case_read($id, $options)) {
+      if ($case = _civicrm_api3_case_read($id, $options, CRM_Utils_Array::value('check_permissions', $params))) {
         $cases[$id] = $case;
       }
     }
@@ -233,7 +233,7 @@ function civicrm_api3_case_get($params) {
     if (!$caseId) {
       return civicrm_api3_create_success(array(), $params, 'Case', 'get');
     }
-    $case = array($caseId => _civicrm_api3_case_read($caseId, $options));
+    $case = array($caseId => _civicrm_api3_case_read($caseId, $options, CRM_Utils_Array::value('check_permissions', $params)));
     return civicrm_api3_create_success($case, $params, 'Case', 'get');
   }
 
@@ -253,7 +253,7 @@ SELECT DISTINCT case_id
 
     $cases = array();
     while ($dao->fetch()) {
-      $cases[$dao->case_id] = _civicrm_api3_case_read($dao->case_id, $options);
+      $cases[$dao->case_id] = _civicrm_api3_case_read($dao->case_id, $options, CRM_Utils_Array::value('check_permissions', $params));
     }
     return civicrm_api3_create_success($cases, $params, 'Case', 'get');
   }
@@ -267,7 +267,7 @@ SELECT DISTINCT case_id
   $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
   $cases = array();
   foreach ($foundcases['values'] as $foundcase) {
-    if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
+    if ($case = _civicrm_api3_case_read($foundcase['id'], $options, CRM_Utils_Array::value('check_permissions', $params))) {
       $cases[$foundcase['id']] = $case;
     }
   }
@@ -404,12 +404,14 @@ function civicrm_api3_case_delete($params) {
  *
  * @param int $caseId
  *
- * @param $options
+ * @param array $options
+ *
+ * @param bool $checkPermission
  *
  * @return array
  *   case object
  */
-function _civicrm_api3_case_read($caseId, $options) {
+function _civicrm_api3_case_read($caseId, $options, $checkPermission) {
   $return = CRM_Utils_Array::value('return', $options, array());
   $dao = new CRM_Case_BAO_Case();
   $dao->id = $caseId;
@@ -417,7 +419,7 @@ function _civicrm_api3_case_read($caseId, $options) {
     $case = array();
     _civicrm_api3_object_to_array($dao, $case);
 
-    _civicrm_api3_custom_data_get($case, 'Case', $caseId);
+    _civicrm_api3_custom_data_get($case, $checkPermission, 'Case', $caseId);
 
     // Legacy support for client_id - TODO: in apiv4 remove 'client_id'
     $case['client_id'] = $case['contact_id'] = $dao->retrieveContactIdsByCaseId($caseId);

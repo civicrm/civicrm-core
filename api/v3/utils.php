@@ -1331,7 +1331,7 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
     $result[$dao->id] = $tmp;
 
     if (_civicrm_api3_custom_fields_are_required($entity, $params)) {
-      _civicrm_api3_custom_data_get($result[$dao->id], $entity, $dao->id);
+      _civicrm_api3_custom_data_get($result[$dao->id], $params['check_permissions'], $entity, $dao->id);
     }
   }
 
@@ -1793,7 +1793,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  * @param string $subName
  *   Subtype of entity.
  */
-function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
+function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
   $groupTree = CRM_Core_BAO_CustomGroup::getTree($entity,
     CRM_Core_DAO::$_nullObject,
     $entity_id,
@@ -1802,7 +1802,8 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
     $subName,
     TRUE,
     NULL,
-    TRUE
+    TRUE,
+    $checkPermission
   );
   $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, CRM_Core_DAO::$_nullObject);
   $customValues = array();
