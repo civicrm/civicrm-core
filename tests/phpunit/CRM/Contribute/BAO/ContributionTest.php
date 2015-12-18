@@ -560,7 +560,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $trxnArray['is_payment'] = 0;
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(NULL, $financialTrxn, 'Mismatch count for is payment flag.');
-    
+
     //Delete Contribution
     $this->contributionDelete($contribution->id);
 
@@ -627,7 +627,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $trxnArray['is_payment'] = 0;
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
-    
+
     //Delete Contribution
     $this->contributionDelete($contribution->id);
 
