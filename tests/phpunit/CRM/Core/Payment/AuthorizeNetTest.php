@@ -337,7 +337,8 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       $this->processor->doPayment($params);
     }
     catch (Exception $e) {
-      $this->assertEquals('E00001: Internal Error Occurred.', $e->getMessage(), 'AuthorizeNet failed for unknown reason.');
+      $this->assertTrue(substr($e->getMessage(), 0, 32) == 'E00001: Internal Error Occurred.',
+        'AuthorizeNet failed for unknown reason.');
       $this->markTestSkipped('AuthorizeNet test server is not in a good mood so we can\'t test this right now');
     }
   }
