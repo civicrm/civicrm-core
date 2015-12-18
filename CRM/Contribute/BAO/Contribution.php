@@ -4777,7 +4777,7 @@ LIMIT 1;";
   }
 
   /**
-   * Function use to store line item proportionaly in 
+   * Function use to store line item proportionaly in
    * in entity financial trxn table
    *
    * @param array $params
