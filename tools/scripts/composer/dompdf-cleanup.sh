@@ -112,6 +112,7 @@ EOREADME
 ##############################################################################
 ## Remove example/CLI scripts. They're not needed and increase the attack-surface.
 safe_delete vendor/dompdf/dompdf/dompdf.php
+safe_delete vendor/dompdf/dompdf/load_font.php
 safe_delete vendor/dompdf/dompdf/www
 safe_delete vendor/phenx/php-font-lib/www
 
