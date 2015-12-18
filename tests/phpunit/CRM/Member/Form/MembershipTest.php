@@ -37,6 +37,7 @@
  *  Include class definitions
  */
 require_once 'CiviTest/CiviUnitTestCase.php';
+require_once 'CiviTest/CiviMailUtils.php';
 
 require_once 'HTML/QuickForm/Page.php';
 
@@ -581,7 +582,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testSubmitRecurCompleteInstant() {
     $form = $this->getForm();
-
+    $mut = new CiviMailUtils($this, TRUE);
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
     $processor->setDoDirectPaymentResult(array(
       'payment_status_id' => 1,
@@ -616,6 +617,28 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
     ), 1);
+    $mut->checkMailLog(array(
+        '===========================================================
+Billing Name and Address
+===========================================================
+Test
+10 Test St
+Test, AR 90210
+US',
+        '===========================================================
+Membership Information
+===========================================================
+Membership Type: AnnualFixed
+Membership Start Date: ',
+        '===========================================================
+Credit Card Information
+===========================================================
+Visa
+************1111
+Expires: ',
+      )
+    );
+    $mut->stop();
 
   }
 
@@ -673,6 +696,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'billing_state_province_id-5' => '1003',
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
+      'send_receipt' => 1,
     );
     return $params;
   }
