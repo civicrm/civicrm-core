@@ -269,13 +269,13 @@ class CRM_Core_Component {
   /**
    * @return array
    */
-  public static function &getQueryFields() {
+  public static function &getQueryFields($checkPermission = TRUE) {
     $info = self::_info();
     $fields = array();
     foreach ($info as $name => $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
-        $flds = $bqr->getFields();
+        $flds = $bqr->getFields($checkPermission);
         $fields = array_merge($fields, $flds);
       }
     }

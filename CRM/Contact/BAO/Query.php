@@ -440,9 +440,9 @@ class CRM_Contact_BAO_Query {
       $this->_skipPermission = TRUE;
     }
     else {
-      $this->_fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE, TRUE);
+      $this->_fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE, TRUE, FALSE, !$skipPermission);
 
-      $fields = CRM_Core_Component::getQueryFields();
+      $fields = CRM_Core_Component::getQueryFields(!$this->_skipPermission);
       unset($fields['note']);
       $this->_fields = array_merge($this->_fields, $fields);
 

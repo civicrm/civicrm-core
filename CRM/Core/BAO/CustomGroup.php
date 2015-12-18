@@ -329,7 +329,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
    *   api - through which it is properly tested - so can be refactored with some comfort.)
    *
+   * @param bool $checkPermission
+   *
    * @return array
+   *   Custom field 'tree'.
+   *
    *   The returned array is keyed by group id and has the custom group table fields
    *   and a subkey 'fields' holding the specific custom fields.
    *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
@@ -348,7 +352,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $subName = NULL,
     $fromCache = TRUE,
     $onlySubType = NULL,
-    $returnAll = FALSE
+    $returnAll = FALSE,
+    $checkPermission = TRUE
   ) {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
@@ -495,12 +500,13 @@ WHERE civicrm_custom_group.is_active = 1
       // since groupID is false we need to show all Inline groups
       $strWhere .= " AND civicrm_custom_group.style = 'Inline'";
     }
-
-    // ensure that the user has access to these custom groups
-    $strWhere .= " AND " .
-      CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW,
-        'civicrm_custom_group.'
-      );
+    if ($checkPermission) {
+      // ensure that the user has access to these custom groups
+      $strWhere .= " AND " .
+        CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW,
+          'civicrm_custom_group.'
+        );
+    }
 
     $orderBy = "
 ORDER BY civicrm_custom_group.weight,
