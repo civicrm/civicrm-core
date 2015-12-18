@@ -183,15 +183,16 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
    * @return array
    *   array of default values
    */
   public function setDefaultValues() {
-    $defaults = array('is_notify' => 1);
-    return $defaults;
+    return array(
+      'is_notify' => 1,
+      'send_cancel_request' => 1,
+    );
   }
 
   /**
