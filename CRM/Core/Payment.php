@@ -1137,7 +1137,7 @@ abstract class CRM_Core_Payment {
    *
    * @return bool
    */
-  public function isSupported($method = 'cancelSubscription') {
+  public function isSupported($method) {
     return method_exists(CRM_Utils_System::getClassName($this), $method);
   }
 

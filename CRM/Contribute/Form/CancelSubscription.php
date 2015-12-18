@@ -130,7 +130,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     // Determine if we can cancel recurring contribution via API with this processor
-    $cancelSupported = $this->_paymentProcessorObj->isSupported('cancelSubscription');
+    $cancelSupported = $this->_paymentProcessorObj->supports('CancelRecurring');
     if ($cancelSupported) {
       $searchRange = array();
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
@@ -197,7 +197,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
     if ($this->_selfService) {
       // for self service force sending-request & notify
-      if ($this->_paymentProcessorObj->isSupported('cancelSubscription')) {
+      if ($this->_paymentProcessorObj->supports('cancelRecurring')) {
         $params['send_cancel_request'] = 1;
       }
 

@@ -80,11 +80,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
 
     if ($recurID) {
       $paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($recurID, 'recur', 'obj');
-      if (is_object($paymentProcessorObj) && $paymentProcessorObj->isSupported('cancelSubscription')) {
+      if (is_object($paymentProcessorObj) && $paymentProcessorObj->supports('cancelRecurring')) {
         unset(self::$_links[CRM_Core_Action::DISABLE]['extra'], self::$_links[CRM_Core_Action::DISABLE]['ref']);
         self::$_links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
         self::$_links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
       }
+
       if (is_object($paymentProcessorObj) && $paymentProcessorObj->isSupported('updateSubscriptionBillingInfo')) {
         self::$_links[CRM_Core_Action::RENEW] = array(
           'name' => ts('Change Billing Details'),
