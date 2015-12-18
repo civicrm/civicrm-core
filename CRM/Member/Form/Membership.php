@@ -1701,7 +1701,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
 
-    $receiptSent = false;
+    $receiptSent = FALSE;
     if (!empty($formValues['send_receipt']) && $receiptSend) {
       $formValues['contact_id'] = $this->_contactID;
       $formValues['contribution_id'] = $contributionId;
@@ -1712,7 +1712,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // send email receipt
       $this->assignBillingName();
       $mailSend = self::emailReceipt($this, $formValues, $membership);
-      $receiptSent = true;
+      $receiptSent = TRUE;
     }
 
     // finally set membership id if already not set
