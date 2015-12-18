@@ -224,8 +224,8 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     // select group
     $this->select("financial_type_id", "label={$financialType['name']}");
     $this->clickLink("_qf_Search_refresh");
-    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
-    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type ID In {$financialType['name']}");
+    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
+    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type ID In {$financialType['name']}");
 
     $this->openCiviPage("contact/search/advanced", "reset=1", "_qf_Advanced_refresh-top");
     $this->clickAjaxLink('CiviContribute', "financial_type_id");
@@ -233,8 +233,8 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     // select group
     $this->select("financial_type_id", "label={$financialType['name']}");
     $this->clickLink("_qf_Advanced_refresh-top");
-    $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[1]", "2 Contacts");
-    $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type ID In {$financialType['name']}");
+    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']//table/tbody/tr[1]/td[1]", "2 Contacts");
+    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type ID In {$financialType['name']}");
   }
 
   /**
@@ -271,6 +271,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("thankyou_date");
 
     $this->type("note", "This is a test note.");
+    $this->waitForElementPresent("non_deductible_amount");
     $this->type("non_deductible_amount", "10");
     $this->type("fee_amount", "0");
     $this->type("net_amount", "0");
@@ -278,7 +279,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('thankyou_date');
 
     // Clicking save.
-    $this->clickLink("_qf_Contribution_upload");
+    $this->click("_qf_Contribution_upload");
 
     // Is status message correct?
     $this->checkCRMAlert("The contribution record has been saved.");
