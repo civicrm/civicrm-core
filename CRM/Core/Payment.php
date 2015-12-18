@@ -249,6 +249,10 @@ abstract class CRM_Core_Payment {
   /**
    * Does this processor support cancelling recurring contributions through code.
    *
+   * If the processor returns true it must be possible to take action from within CiviCRM
+   * that will result in no further payments being processed. In the case of token processors (e.g
+   * IATS, eWay) updating the contribution_recur table is probably sufficient.
+   *
    * @return bool
    */
   protected function supportsCancelRecurring() {

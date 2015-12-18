@@ -596,7 +596,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         // like in PaypalPro, & therefore we set it here additionally.
         $template = CRM_Core_Smarty::singleton();
         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($recur->id, 'recur', 'obj');
-        $url = $paymentProcessor->subscriptionURL($recur->id, 'recur');
+        $url = $paymentProcessor->subscriptionURL($recur->id, 'recur', 'cancel');
         $template->assign('cancelSubscriptionUrl', $url);
 
         $url = $paymentProcessor->subscriptionURL($recur->id, 'recur', 'billing');
