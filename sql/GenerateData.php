@@ -1838,36 +1838,34 @@ order by cc.id; ";
     $this->_query($query);
   }
 
-  private function addContributionFinancialItem() {
-
-    $sql = " SELECT cc.id contribution_id, cli.id as line_item_id, cc.contact_id, cc.receive_date, cc.total_amount, cc.currency, cli.label, cli.financial_type_id,  cefa.financial_account_id, cc.payment_instrument_id, cc.check_number, cc.trxn_id
-FROM `civicrm_contribution` cc
-INNER JOIN civicrm_line_item cli ON cli.entity_id = cc.id and cli.entity_table = 'civicrm_contribution'
-INNER JOIN civicrm_entity_financial_account cefa ON cefa.entity_id =  cli.financial_type_id
-WHERE cefa.account_relationship = 1; ";
-    $result = CRM_Core_DAO::executeQuery($sql);
+  private function addAccountingEntries() {
+    $components = array('contribution', 'membership', 'participant');
+    $select = 'SELECT contribution.id contribution_id, cli.id as line_item_id, contribution.contact_id, contribution.receive_date, contribution.total_amount, contribution.currency, cli.label,
+      cli.financial_type_id,  cefa.financial_account_id, contribution.payment_instrument_id, contribution.check_number, contribution.trxn_id';
+    $where = 'WHERE cefa.account_relationship = 1';
     $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount();
-    $this->addFinancialItem($result, $financialAccountId);
-  }
-
-  private function addParticipantFinancialItem() {
-
-    $sql = " SELECT cpp.contribution_id, cli.id as line_item_id, cp.contact_id, now() as receive_date, cp.fee_amount as total_amount, cp.fee_currency as currency, cli.label, cli.financial_type_id, cefa.financial_account_id, cc.payment_instrument_id, NULL as check_number, NULL as trxn_id
- FROM `civicrm_participant` cp
-INNER JOIN civicrm_participant_payment cpp ON cpp.participant_id = cp.id
-INNER JOIN civicrm_contribution cc on cc.id = cpp.contribution_id
-INNER JOIN civicrm_line_item cli ON cli.entity_id = cp.id and cli.entity_table = 'civicrm_participant'
-INNER JOIN civicrm_entity_financial_account cefa ON cefa.entity_id =  cli.financial_type_id
-WHERE cefa.account_relationship = 1";
-    $result = CRM_Core_DAO::executeQuery($sql);
-    $this->addFinancialItem($result);
+    foreach ($components as $component) {
+      if ($component == 'contribution') {
+        $from = 'FROM `civicrm_contribution` contribution';
+      }
+      else {
+        $from = " FROM `civicrm_{$component}` {$component}
+          INNER JOIN civicrm_{$component}_payment cpp ON cpp.{$component}_id = {$component}.id
+          INNER JOIN civicrm_contribution contribution on contribution.id = cpp.contribution_id";
+      }
+      $from .= " INNER JOIN civicrm_line_item cli ON cli.entity_id = {$component}.id and cli.entity_table = 'civicrm_{$component}'
+        INNER JOIN civicrm_entity_financial_account cefa ON cefa.entity_id =  cli.financial_type_id ";
+      $sql = " {$select} {$from} {$where} ";
+      $result = CRM_Core_DAO::executeQuery($sql);
+      $this->addFinancialItem($result, $financialAccountId);
+    }
   }
 
   /**
    * @param $result
    * @param null $financialAccountId
    */
-  private function addFinancialItem($result, $financialAccountId = NULL) {
+  private function addFinancialItem($result, $financialAccountId) {
     $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
     while ($result->fetch()) {
       $trxnParams = array(
@@ -2018,9 +2016,8 @@ $gcd->generate('PCP');
 $gcd->generate('SoftContribution');
 $gcd->generate('Pledge');
 $gcd->generate('PledgePayment');
-$gcd->generate('ContributionFinancialItem');
 $gcd->generate('Participant');
 $gcd->generate('ParticipantPayment');
 $gcd->generate('LineItemParticipants');
-$gcd->generate('ParticipantFinancialItem');
+$gcd->generate('AccountingEntries');
 echo ("Ending data generation on " . date("F dS h:i:s A") . "\n");
