@@ -32,9 +32,27 @@
  * $Id$
  *
  */
-class CRM_Upgrade_Incremental_php_FourOne {
+class CRM_Upgrade_Steps_41_All extends CRM_Upgrade_Incremental_RevisionBase {
+
   // This was changed in 4.3 so we define it locally for compatibility with older dbs
   const NAVIGATION_NAME = "Navigation Menu";
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.1.alpha1",
+      "4.1.alpha2",
+      "4.1.beta1",
+      "4.1.beta2",
+      "4.1.beta3",
+      "4.1.0",
+      "4.1.1",
+      "4.1.2",
+      "4.1.3",
+    );
+  }
 
   /**
    * @param $errors

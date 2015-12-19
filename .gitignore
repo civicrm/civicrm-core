@@ -91,6 +91,7 @@ CRM/Core/DAO/UFField.php
 CRM/Core/DAO/UFGroup.php
 CRM/Core/DAO/UFJoin.php
 CRM/Core/DAO/UFMatch.php
+CRM/Core/DAO/Upgrade.php
 CRM/Core/DAO/Website.php
 CRM/Core/DAO/WordReplacement.php
 CRM/Core/DAO/Worldregion.php

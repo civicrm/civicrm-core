@@ -28,7 +28,36 @@
 /**
  * Upgrade logic for 4.5
  */
-class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Steps_45_All extends CRM_Upgrade_Incremental_RevisionBase {
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.5.alpha1",
+      "4.5.alpha2",
+      "4.5.beta1",
+      "4.5.beta2",
+      "4.5.beta3",
+      "4.5.beta4",
+      "4.5.beta5",
+      "4.5.beta6",
+      "4.5.beta7",
+      "4.5.beta8",
+      "4.5.beta9",
+      "4.5.0",
+      "4.5.1",
+      "4.5.2",
+      "4.5.3",
+      "4.5.4",
+      "4.5.5",
+      "4.5.6",
+      "4.5.7",
+      "4.5.8",
+      "4.5.9",
+    );
+  }
 
   /**
    * Compute any messages which should be displayed after upgrade.

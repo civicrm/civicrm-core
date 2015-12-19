@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.7.alpha1                                         |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,39 +26,34 @@
  */
 
 /**
- * Class CRM_Upgrade_Page_Cleanup
+ * Interface for incremental upgrade steps.
  */
-class CRM_Upgrade_Page_Cleanup extends CRM_Core_Page {
-  public function cleanup425() {
-    $rows = CRM_Upgrade_Steps_42_All::deleteInvalidPairs();
-    $template = CRM_Core_Smarty::singleton();
+interface CRM_Upgrade_Incremental_Interface {
 
-    $columnHeaders = array(
-      "Contact ID",
-      "ContributionID",
-      "Contribution Status",
-      "MembershipID",
-      "Membership Type",
-      "Start Date",
-      "End Date",
-      "Membership Status",
-      "Action",
-    );
-    $template->assign('columnHeaders', $columnHeaders);
-    $template->assign('rows', $rows);
+  /**
+   * Get a symbolic name for this incremental upgrade step.
+   *
+   * @return string
+   */
+  public function getName();
 
-    $preMessage = !empty($rows) ? ts('The following records have been processed. Membership records with action = Un-linked have been disconnected from the listed contribution record:') : ts('Could not find any records to process.');
-    $template->assign('preMessage', $preMessage);
+  /**
+   * @param string $startVer
+   * @param string $endVer
+   * @return string
+   */
+  public function createPreUpgradeMessage($startVer, $endVer);
 
-    $postMessage = ts('You can <a href="%1">click here</a> to try running the 4.2 upgrade script again. <a href="%2" target="_blank">(Review upgrade documentation)</a>',
-      array(
-        1 => CRM_Utils_System::url('civicrm/upgrade', 'reset=1'),
-        2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Upgrades',
-      ));
-    $template->assign('postMessage', $postMessage);
-
-    $content = $template->fetch('CRM/common/upgradeCleanup.tpl');
-    echo CRM_Utils_System::theme($content, FALSE, TRUE);
-  }
+  /**
+   * Enqueue a set of tasks for this upgrade.
+   *
+   * In addition to performing the actual upgrade,
+   *
+   * @param \CRM_Queue_Queue $queue
+   * @param string $postUpgradeMessageFile
+   * @param string $startVer
+   * @param string $endVer
+   */
+  public function buildQueue(CRM_Queue_Queue $queue, $postUpgradeMessageFile, $startVer, $endVer);
 
 }

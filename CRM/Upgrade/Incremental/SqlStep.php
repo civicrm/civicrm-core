@@ -26,61 +26,52 @@
  */
 
 /**
- * Perform an upgrade without using the web-frontend
+ * Class CRM_Upgrade_Incremental_SqlStep
+ *
+ * This classes requests any *.mysql.tpl steps.
  */
-class CRM_Upgrade_Headless {
+class CRM_Upgrade_Incremental_SqlStep implements CRM_Upgrade_Incremental_Interface {
+
+  private $file;
+
+  private $name;
 
   /**
-   * Perform an upgrade without using the web-frontend
-   *
-   * @param bool $enablePrint
-   *
-   * @throws Exception
-   * @return array, with keys:
-   *   - message: string, HTML-ish blob
+   * CRM_Upgrade_Incremental_SqlStep constructor.
+   * @param $file
+   * @param $name
    */
-  public function run($enablePrint = TRUE) {
-    // lets get around the time limit issue if possible for upgrades
-    if (!ini_get('safe_mode')) {
-      set_time_limit(0);
-    }
+  public function __construct($file, $name) {
+    $this->file = $file;
+    $this->name = $name;
+  }
 
-    $upgrade = new CRM_Upgrade_Form();
-    list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
+  public function createPreUpgradeMessage($startVer, $endVer) {
+    return NULL;
+  }
 
-    if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
-      throw new Exception($error);
-    }
+  public function getName() {
+    return $this->name;
+  }
 
-    // Disable our SQL triggers
-    CRM_Core_DAO::dropTriggers();
-
-    // CRM-11156
-    $preUpgradeMessage = $upgrade->createPreUpgradeMessage($currentVer, $latestVer);
-
-    $postUpgradeMessageFile = CRM_Utils_File::tempnam('civicrm-post-upgrade');
-    $queueRunner = new CRM_Queue_Runner(array(
-      'title' => ts('CiviCRM Upgrade Tasks'),
-      'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $postUpgradeMessageFile),
-    ));
-    $queueResult = $queueRunner->runAll();
-    if ($queueResult !== TRUE) {
-      $errorMessage = CRM_Core_Error::formatTextException($queueResult['exception']);
-      CRM_Core_Error::debug_log_message($errorMessage);
-      if ($enablePrint) {
-        print ($errorMessage);
-      }
-      throw $queueResult['exception']; // FIXME test
-    }
-
-    CRM_Upgrade_Form::doFinish();
-
-    $message = file_get_contents($postUpgradeMessageFile);
-    return array(
-      'latestVer' => $latestVer,
-      'message' => $message,
-      'text' => CRM_Utils_String::htmlToText($message),
+  public function buildQueue(CRM_Queue_Queue $queue, $postUpgradeMessageFile, $startVer, $endVer) {
+    $task = new CRM_Queue_Task(
+      array('CRM_Upgrade_Incremental_SqlStep', 'doSqlFile'),
+      array($this->file),
+      ts('Execute SQL: %1', array(
+        1 => $this->file,
+      ))
     );
+    $queue->createItem($task);
+  }
+
+  public static function doSqlFile(CRM_Queue_TaskContext $ctx, $sqlFile) {
+    $upgrade = new CRM_Upgrade_Form();
+    // FIXME: Multilingual and $rev
+    // $upgrade->setSchemaStructureTables($rev);
+    // $upgrade->processLocales($sqlFile, $rev);
+    // return TRUE;
+    throw new RuntimeException(sprintf("Not implemented: %s::%s for %s", __CLASS__, __FUNCTION__, $sqlFile));
   }
 
 }

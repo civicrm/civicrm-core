@@ -28,8 +28,26 @@
 /**
  * Upgrade logic for 4.4
  */
-class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Steps_44_All extends CRM_Upgrade_Incremental_RevisionBase {
   const MAX_WORD_REPLACEMENT_SIZE = 255;
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.4.alpha1",
+      "4.4.beta1",
+      "4.4.0",
+      "4.4.1",
+      "4.4.2",
+      "4.4.3",
+      "4.4.4",
+      "4.4.5",
+      "4.4.6",
+      "4.4.7",
+    );
+  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.
@@ -701,7 +719,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * and convert them to params for the WordReplacement.create API.
    *
    * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
-   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * CRM_Upgrade_Steps_44_All to ensure that the incremental upgrade
    * step behaves consistently even as the BAO evolves in future versions.
    * However, if there's a bug in here prior to 4.4.0, we should apply the
    * bugfix in both places.
@@ -757,7 +775,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * and write them out as records in civicrm_word_replacement.
    *
    * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
-   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * CRM_Upgrade_Steps_44_All to ensure that the incremental upgrade
    * step behaves consistently even as the BAO evolves in future versions.
    * However, if there's a bug in here prior to 4.4.0, we should apply the
    * bugfix in both places.

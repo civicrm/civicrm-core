@@ -28,7 +28,39 @@
 /**
  * Upgrade logic for 4.6
  */
-class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Steps_46_All extends CRM_Upgrade_Incremental_RevisionBase {
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.6.alpha1",
+      "4.6.alpha2",
+      "4.6.alpha3",
+      "4.6.alpha4",
+      "4.6.alpha5",
+      "4.6.alpha6",
+      "4.6.alpha7",
+      "4.6.beta1",
+      "4.6.beta2",
+      "4.6.beta3",
+      "4.6.beta4",
+      "4.6.beta5",
+      "4.6.0",
+      "4.6.1",
+      "4.6.2",
+      "4.6.3",
+      "4.6.4",
+      "4.6.5",
+      "4.6.6",
+      "4.6.7",
+      "4.6.8",
+      "4.6.9",
+      "4.6.10",
+      "4.6.11",
+    );
+  }
 
   /**
    * Compute any messages which should be displayed after upgrade.
@@ -191,7 +223,7 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('domainID', CRM_Core_Config::domainID());
 
-    $fileName = dirname(__DIR__) . "/sql/$rev.mysql.tpl";
+    $fileName = dirname(__DIR__) . "/Incremental/sql/$rev.mysql.tpl";
 
     $upgrade->source($smarty->fetch($fileName), TRUE);
 

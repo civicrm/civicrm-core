@@ -1,0 +1,27 @@
+-- This code has been copied from the auto-generated civicrm.mysql
+-- It is required to facilitate upgrades.
+
+-- /*******************************************************
+-- *
+-- * civicrm_upgrade
+-- *
+-- * Track individual upgrade steps
+-- *
+-- *******************************************************/
+CREATE TABLE `civicrm_upgrade` (
+
+
+     `id` int unsigned NOT NULL AUTO_INCREMENT  ,
+     `module` varchar(127) NOT NULL   COMMENT 'The module or extension for which upgrades were handled.',
+     `name` varchar(255)    COMMENT 'Unique name for upgrade',
+     `created_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the upgrade executed' 
+,
+    PRIMARY KEY ( `id` )
+ 
+    ,     UNIQUE INDEX `index_module_name`(
+        module
+      , name
+  )
+  
+ 
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;

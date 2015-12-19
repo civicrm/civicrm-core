@@ -28,9 +28,34 @@
 /**
  * Upgrade logic for 4.2
  */
-class CRM_Upgrade_Incremental_php_FourTwo extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Steps_42_All extends CRM_Upgrade_Incremental_RevisionBase {
   const SETTINGS_SNIPPET_PATTERN = '/CRM_Core_ClassLoader::singleton\(\)-\>register/';
   const SETTINGS_SNIPPET = "\nrequire_once 'CRM/Core/ClassLoader.php';\nCRM_Core_ClassLoader::singleton()->register();\n";
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.2.alpha1",
+      "4.2.alpha2",
+      "4.2.alpha3",
+      "4.2.beta1",
+      "4.2.beta2",
+      "4.2.beta3",
+      "4.2.beta5",
+      "4.2.beta6",
+      "4.2.0",
+      "4.2.1",
+      "4.2.2",
+      "4.2.3",
+      "4.2.5",
+      "4.2.6",
+      "4.2.7",
+      "4.2.8",
+      "4.2.9",
+    );
+  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.

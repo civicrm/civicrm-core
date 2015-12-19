@@ -41,6 +41,7 @@
   <xi:include href="UFField.xml"              parse="xml" />
   <xi:include href="UFMatch.xml"              parse="xml" />
   <xi:include href="UFJoin.xml"               parse="xml" />
+  <xi:include href="Upgrade.xml"              parse="xml" />
   <xi:include href="Timezone.xml"             parse="xml" />
   <xi:include href="Worldregion.xml"          parse="xml" />
   <xi:include href="OpenID.xml"               parse="xml" />

@@ -27,7 +27,23 @@
 /**
  * Upgrade logic for 4.7
  */
-class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Steps_47_000_Legacy extends CRM_Upgrade_Incremental_RevisionBase {
+
+  /**
+   * @return array
+   */
+  public function getRevisions() {
+    return array(
+      "4.7.alpha1",
+      "4.7.alpha2",
+      "4.7.alpha3",
+      "4.7.alpha4",
+      "4.7.alpha5",
+      "4.7.beta1",
+      "4.7.beta2",
+      "4.7.beta3",
+    );
+  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.
@@ -163,7 +179,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     $domainDao = CRM_Core_DAO::executeQuery('SELECT id, config_backend FROM civicrm_domain');
     while ($domainDao->fetch()) {
-      $settings = CRM_Upgrade_Incremental_php_FourSeven::convertBackendToSettings($domainDao->id, $domainDao->config_backend);
+      $settings = CRM_Upgrade_Steps_47_000_Legacy::convertBackendToSettings($domainDao->id, $domainDao->config_backend);
       CRM_Core_Error::debug_var('convertBackendToSettings', array(
         'domainId' => $domainDao->id,
         'backend' => $domainDao->config_backend,
