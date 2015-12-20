@@ -55,7 +55,7 @@
                 </li>
                 <li>
                   <a class="action-item crm-hover-button"
-                     crm-confirm='{width: "65%", resizable: true, title:ts("%1: Reconnect", {1: cxn.app_meta.title}), templateUrl: "~/crmCxn/ConfirmReconnectCtrl.html", export: {cxn: cxn}}'
+                     crm-confirm='{width: "65%", resizable: true, title:ts("%1: Reconnect", {1: cxn.app_meta.title}), templateUrl: "~/crmCxn/ConfirmReconnectCtrl.html", export: {cxn: cxn, appMeta: findAppByAppId(cxn.app_guid)}}'
                      on-yes="reregister(cxn.app_meta)"
                       >{{ts('Reconnect')}}</a>
                 </li>
