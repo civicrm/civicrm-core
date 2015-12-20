@@ -19,18 +19,30 @@
       crmUiAlert({text: alert.message, title: alert.title, type: 'error'});
     });
 
-    $scope.findCxnByAppId = function(appId) {
-      var result = _.where($scope.cxns, {
-        app_guid: appId
-      });
+    // Convert array [x] to x|null|error
+    function asOne(result, msg) {
       switch (result.length) {
         case 0:
           return null;
         case 1:
           return result[0];
         default:
-          throw "Error: Too many connections for appId: " + appId;
+          throw msg;
       }
+    }
+
+    $scope.findCxnByAppId = function(appId) {
+      var result = _.where($scope.cxns, {
+        app_guid: appId
+      });
+      return asOne(result, "Error: Too many connections for appId: " + appId);
+    };
+
+    $scope.findAppByAppId = function(appId) {
+      var result = _.where($scope.appMetas, {
+        appId: appId
+      });
+      return asOne(result, "Error: Too many apps for appId: " + appId);
     };
 
     $scope.hasAvailApps = function() {
