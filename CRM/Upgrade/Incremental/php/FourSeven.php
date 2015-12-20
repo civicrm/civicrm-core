@@ -157,6 +157,12 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @return bool
    */
   public function migrateSettings(CRM_Queue_TaskContext $ctx) {
+    // Tip: If there are problems with adding the new uniqueness index, try inspecting:
+    // SELECT name, domain_id, contact_id, count(*) AS dupes FROM civicrm_setting cs GROUP BY name, domain_id, contact_id HAVING dupes > 1;
+
+    // Nav records are expendable. https://forum.civicrm.org/index.php?topic=36933.0
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE contact_id IS NOT NULL AND name = "navigation"');
+
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP INDEX index_group_name');
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP COLUMN group_name');
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting ADD UNIQUE INDEX index_domain_contact_name (domain_id, contact_id, name)');
