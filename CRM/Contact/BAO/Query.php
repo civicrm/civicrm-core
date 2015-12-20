@@ -4597,6 +4597,9 @@ civicrm_relationship.is_permission_a_b = 0
 
     // CRM-15231
     $this->_sort = $sort;
+    
+    //CRM-15967
+    $this->includePseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
