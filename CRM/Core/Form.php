@@ -331,6 +331,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $attributes['class'] .= ' crm-form-wysiwyg';
       $type = "textarea";
     }
+    if ($type == 'datepicker') {
+      $attributes = ($attributes ? $attributes : array()) + array('class' => '');
+      $attributes['data-crm-datepicker'] = json_encode((array) $extra);
+      $type = "text";
+    }
     if ($type == 'select' && is_array($extra)) {
       // Normalize this property
       if (!empty($extra['multiple'])) {

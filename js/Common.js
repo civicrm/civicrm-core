@@ -925,6 +925,9 @@ if (!CRM.vars) CRM.vars = {};
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
       $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
+      $('.crm-form-text[data-crm-datepicker]', e.target).each(function() {
+        $(this).crmDatepicker($(this).data('crmDatepicker'));
+      });
       // Cache Form Input initial values
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
