@@ -185,8 +185,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (empty($contribution->id)) {
       // (only) on 'create', make sure that a valid currency is set (CRM-16845)
       if (!CRM_Utils_Rule::currencyCode($contribution->currency)) {
-        $config = CRM_Core_Config::singleton();
-        $contribution->currency = $config->defaultCurrency;
+        $contribution->currency = CRM_Core_Config::singleton()->defaultCurrency;
       }
     }
 
@@ -2971,7 +2970,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $statusId = $params['contribution']->contribution_status_id;
     // CRM-13964 partial payment
-    if (CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Partially paid', $contributionStatuses)
+    if ($contributionStatus == 'Partially paid'
       && !empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])
     ) {
       $partialAmtPay = $params['partial_amount_pay'];
@@ -3011,15 +3010,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable), $isRelatedId);
     }
 
-    if (CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Failed', $contributionStatuses) &&
-      !(CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', $contributionStatuses) && !$params['contribution']->is_pay_later)
+    if ($contributionStatus != 'Failed' &&
+      !($contributionStatus == 'Pending' && !$params['contribution']->is_pay_later)
     ) {
       $skipRecords = TRUE;
       $pendingStatus = array(
-        array_search('Pending', $contributionStatuses),
-        array_search('In Progress', $contributionStatuses),
+        'Pending',
+        'In Progress',
       );
-      if (in_array(CRM_Utils_Array::value('contribution_status_id', $params), $pendingStatus)) {
+      if (in_array($contributionStatus, $pendingStatus)) {
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
         $params['to_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $relationTypeId);
       }
