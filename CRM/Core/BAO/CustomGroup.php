@@ -1366,23 +1366,6 @@ ORDER BY civicrm_custom_group.weight,
             }
             break;
 
-          case 'Select Date':
-            if (isset($value)) {
-              if (empty($field['time_format'])) {
-                list($defaults[$elementName]) = CRM_Utils_Date::setDateDefaults($value, NULL,
-                  $field['date_format']
-                );
-              }
-              else {
-                $timeElement = $elementName . '_time';
-                if (substr($elementName, -1) == ']') {
-                  $timeElement = substr($elementName, 0, -1) . '_time]';
-                }
-                list($defaults[$elementName], $defaults[$timeElement]) = CRM_Utils_Date::setDateDefaults($value, NULL, $field['date_format'], $field['time_format']);
-              }
-            }
-            break;
-
           case 'Multi-Select Country':
           case 'Multi-Select State/Province':
             if (isset($value)) {
@@ -1560,9 +1543,6 @@ ORDER BY civicrm_custom_group.weight,
    */
   public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
-
-    // this is fix for date field
-    $form->assign('currentYear', date('Y'));
 
     foreach ($groupTree as $id => $group) {
       CRM_Core_ShowHideBlocks::links($form, $group['title'], '', '');

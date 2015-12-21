@@ -69,11 +69,7 @@
         <tr>
             <td class="label">{$form.address.$blockId.$element_name.label}</td>
             <td class="html-adjust">
-                {if $element.data_type neq 'Date'}
-                    {$form.address.$blockId.$element_name.html}&nbsp;
-                {elseif $element.skip_calendar NEQ true }
-                    {include file="CRM/common/jcalendar.tpl" blockId=$blockId blockSection='address' elementName=$element_name}
-                {/if}
+                {$form.address.$blockId.$element_name.html}&nbsp;
 
                 {if $element.data_type eq 'File'}
                     {if $element.element_value.data}

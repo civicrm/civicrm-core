@@ -643,8 +643,10 @@ if (!CRM.vars) CRM.vars = {};
         copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
         $dateField.addClass('crm-form-text crm-form-date');
         settings.date = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
-        settings.changeMonth = _.includes('m', settings.date);
-        settings.changeYear = _.includes('y', settings.date);
+        settings.changeMonth = _.includes(settings.date, 'm');
+        settings.changeYear = _.includes(settings.date, 'y');
+        settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
+        settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
         $dateField.datepicker(settings).change(updateDataField);
       }
       // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
