@@ -88,6 +88,7 @@ class CRM_Core_BAO_ConfigSetting {
    */
   public static function retrieve(&$defaults) {
     $domain = new CRM_Core_DAO_Domain();
+    $isUpgrade = CRM_Core_Config::isUpgradeMode();
 
     //we are initializing config, really can't use, CRM-7863
     $urlVar = 'q';
@@ -95,11 +96,11 @@ class CRM_Core_BAO_ConfigSetting {
       $urlVar = 'task';
     }
 
-    if (CRM_Core_Config::isUpgradeMode()) {
+    if ($isUpgrade && CRM_Core_DAO::checkFieldExists('civicrm_domain', 'config_backend')) {
       $domain->selectAdd('config_backend');
     }
     else {
-      $domain->selectAdd('config_backend, locales');
+      $domain->selectAdd('locales');
     }
 
     $domain->id = CRM_Core_Config::domainID();
@@ -117,7 +118,8 @@ class CRM_Core_BAO_ConfigSetting {
           unset($defaults[$skip]);
         }
       }
-
+    }
+    if (!$isUpgrade) {
       CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
     }
   }
