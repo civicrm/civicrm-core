@@ -326,10 +326,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
-    if ($type == 'wysiwyg') {
+    // Fudge some extra types that quickform doesn't support
+    if ($type == 'wysiwyg' || $type == 'number') {
       $attributes = ($attributes ? $attributes : array()) + array('class' => '');
-      $attributes['class'] .= ' crm-form-wysiwyg';
-      $type = "textarea";
+      $attributes['class'] = ltrim($attributes['class'] . " crm-form-$type");
+      $type = $type == 'wysiwyg' ? 'textarea' : 'text';
     }
     // @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
     if ($type == 'datepicker') {
