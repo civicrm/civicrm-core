@@ -99,6 +99,9 @@ class CRM_Core_BAO_ConfigSetting {
     if ($isUpgrade && CRM_Core_DAO::checkFieldExists('civicrm_domain', 'config_backend')) {
       $domain->selectAdd('config_backend');
     }
+    else {
+      $domain->selectAdd('locales');
+    }
 
     $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
@@ -115,10 +118,9 @@ class CRM_Core_BAO_ConfigSetting {
           unset($defaults[$skip]);
         }
       }
-
-      if (!$isUpgrade) {
-        CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
-      }
+    }
+    if (!$isUpgrade) {
+      CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
     }
   }
 
