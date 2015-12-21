@@ -111,7 +111,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('text', 'job_title', ts('Job Title'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'job_title'));
 
     //added internal ID
-    $form->addElement('text', 'contact_id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id'));
+    $form->add('number', 'contact_id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id') + array('min' => 1));
     $form->addRule('contact_id', ts('Please enter valid Contact ID'), 'positiveInteger');
 
     //added external ID

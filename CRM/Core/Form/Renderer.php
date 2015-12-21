@@ -192,6 +192,10 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     elseif (strpos($class, 'crm-form-contact-reference') !== FALSE) {
       self::preprocessContactReference($element);
     }
+    // Hack to support number fields
+    elseif (strpos($class, 'crm-form-number') !== FALSE) {
+      $element->setAttribute('type', 'number');
+    }
 
     if ($required) {
       $class .= ' required';
