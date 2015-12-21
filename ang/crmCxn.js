@@ -15,6 +15,7 @@
             var reqs = {};
             reqs.cxns = ['Cxn', 'get', {sequential: 1}];
             reqs.appMetas = ['CxnApp', 'get', {sequential: 1, return: ['id', 'title', 'desc', 'appId', 'appUrl', 'perm']}];
+            reqs.cfg = ['Cxn', 'getcfg', {}];
             reqs.sysCheck = ['System', 'check', {}]; // FIXME: filter on checkCxnOverrides
             return crmApi(reqs);
           }
