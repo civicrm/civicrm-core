@@ -200,6 +200,14 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       array('' => ts('- select -')) + $financialAccount,
       TRUE
     );
+    $this->addSelect('payment_instrument_id',
+      array(
+        'entity' => 'contribution',
+        'label' => ts('Payment Method'),
+        'placeholder'  => NULL,
+      )
+    );
+
     // is this processor active ?
     $this->add('checkbox', 'is_active', ts('Is this Payment Processor active?'));
     $this->add('checkbox', 'is_default', ts('Is this Payment Processor the default?'));
@@ -298,6 +306,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $defaults['test_url_api'] = $this->_ppDAO->url_api_test_default;
       $defaults['test_url_recur'] = $this->_ppDAO->url_recur_test_default;
       $defaults['test_url_button'] = $this->_ppDAO->url_button_test_default;
+      $defaults['payment_instrument_id'] = $this->_ppDAO->payment_instrument_id;
       // When user changes payment processor type, it is passed in via $this->_ppType so update defaults array.
       if ($this->_ppType) {
         $defaults['payment_processor_type_id'] = $this->_ppType;
@@ -341,7 +350,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Financial_DAO_PaymentProcessor');
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Financial_BAO_PaymentProcessor::del($this->_id);
@@ -370,46 +378,21 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param bool $test
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
-    // @todo remove this function (some or all) in favour or CRM_Financial_BAO_PaymentProcessor::create.
-    $dao = new CRM_Financial_DAO_PaymentProcessor();
-
-    $dao->id = $test ? $this->_testID : $this->_id;
-    $dao->domain_id = $domainID;
-    $dao->is_test = $test;
-    $dao->is_default = CRM_Utils_Array::value('is_default', $values, 0);
-
-    $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
-
-    $dao->name = $values['name'];
-    $dao->description = $values['description'];
-    $dao->payment_processor_type_id = $values['payment_processor_type_id'];
-
-    foreach ($this->_fields as $field) {
-      $fieldName = $test ? "test_{$field['name']}" : $field['name'];
-      $dao->{$field['name']} = trim(CRM_Utils_Array::value($fieldName, $values));
-      if (empty($dao->{$field['name']})) {
-        $dao->{$field['name']} = 'null';
-      }
-    }
-
-    // also copy meta fields from the info DAO
-    $dao->is_recur = $this->_ppDAO->is_recur;
-    $dao->billing_mode = $this->_ppDAO->billing_mode;
-    $dao->class_name = $this->_ppDAO->class_name;
-    $dao->payment_type = $this->_ppDAO->payment_type;
-
-    $dao->save();
-
-    //CRM-11515
-
-    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
-    $params = array(
-      'entity_table' => 'civicrm_payment_processor',
-      'entity_id' => $dao->id,
-      'account_relationship' => $relationTypeId,
+    $params  = array_merge(array(
+      'id' => $test ? $this->_testID : $this->_id,
+      'domain_id' => $domainID,
+      'is_test' => $test,
+      'is_active' => 0,
+      'is_default' => 0,
+      'is_recur' => $this->_ppDAO->is_recur,
+      'billing_mode' => $this->_ppDAO->billing_mode,
+      'class_name' => $this->_ppDAO->class_name,
+      'payment_type' => $this->_ppDAO->payment_type,
+      'payment_instrument_id' => $this->_ppDAO->payment_instrument_id,
       'financial_account_id' => $values['financial_account_id'],
-    );
-    CRM_Financial_BAO_FinancialTypeAccount::add($params);
+    ), $values);
+
+    civicrm_api3('PaymentProcessor', 'create', $params);
   }
 
 }
