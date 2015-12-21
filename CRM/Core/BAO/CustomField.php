@@ -835,7 +835,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array(
         'field' => "custom_$fieldId",
         'context' => $search ? 'search' : 'create',
-      ), array()));
+      )), array());
 
       // Consolidate widget types to simplify the below switch statement
       if ($search || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
@@ -909,37 +909,19 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Select Date':
+        $attr = array('data-crm-custom' => $dataCrmCustomVal);
+        $params = array(
+          'date' => $field->date_format,
+          'minDate' => isset($field->start_date_years) ? (date('Y') - $field->start_date_years) . '-01-01' : NULL,
+          'maxDate' => isset($field->end_date_years) ? (date('Y') + $field->end_date_years) . '-01-01' : NULL,
+          'time' => $field->time_format ? $field->time_format * 12 : FALSE,
+        );
         if ($field->is_search_range && $search) {
-          $qf->addDate($elementName . '_from', $label . ' - ' . ts('From'), FALSE,
-            array(
-              'format' => $field->date_format,
-              'timeFormat' => $field->time_format,
-              'startOffset' => $field->start_date_years,
-              'endOffset' => $field->end_date_years,
-              'data-crm-custom' => $dataCrmCustomVal,
-            )
-          );
-
-          $qf->addDate($elementName . '_to', ts('To'), FALSE,
-            array(
-              'format' => $field->date_format,
-              'timeFormat' => $field->time_format,
-              'startOffset' => $field->start_date_years,
-              'endOffset' => $field->end_date_years,
-              'data-crm-custom' => $dataCrmCustomVal,
-            )
-          );
+          $qf->add('datepicker', $elementName . '_from', $label, $attr + array('placeholder' => ts('From')), FALSE, $params);
+          $qf->add('datepicker', $elementName . '_to', NULL, $attr + array('placeholder' => ts('To')), FALSE, $params);
         }
         else {
-          $required = $useRequired && !$search;
-
-          $qf->addDate($elementName, $label, $required, array(
-            'format' => $field->date_format,
-            'timeFormat' => $field->time_format,
-            'startOffset' => $field->start_date_years,
-            'endOffset' => $field->end_date_years,
-            'data-crm-custom' => $dataCrmCustomVal,
-          ));
+          $qf->add('datepicker', $elementName, $label, $attr, $useRequired && !$search, $params);
         }
         break;
 
@@ -1367,17 +1349,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
               $defaults[$elementName][$val['value']] = $val['value'];
             }
           }
-        }
-        break;
-
-      case 'Select Date':
-        if ($value) {
-          list($defaults[$elementName], $defaults[$elementName . '_time']) = CRM_Utils_Date::setDateDefaults(
-            $value,
-            NULL,
-            $customField->date_format,
-            $customField->time_format
-          );
         }
         break;
 

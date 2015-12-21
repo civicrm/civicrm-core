@@ -1699,13 +1699,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add date.
    *
-   * @code
-   * // if you need time
-   * $attributes = array(
-   *   'addTime' => true,
-   *   'formatType' => 'relative' or 'birth' etc check advanced date settings
-   * );
-   * @endcode
+   * @deprecated
+   * Use $this->add('datepicker', ...) instead.
    *
    * @param string $name
    *   Name of the element.
@@ -1795,7 +1790,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   *  Function that will add date and time.
+   * Function that will add date and time.
+   *
+   * @deprecated
+   * Use $this->add('datepicker', ...) instead.
    *
    * @param string $name
    * @param string $label

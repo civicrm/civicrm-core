@@ -533,16 +533,11 @@ class CRM_Contact_Form_Search_Criteria {
       foreach ($group['fields'] as $field) {
         $fieldId = $field['id'];
         $elementName = 'custom_' . $fieldId;
-        if ($field['data_type'] == 'Date' && $field['is_search_range']) {
-          CRM_Core_Form_Date::buildDateRange($form, $elementName, 1, '_from', '_to', ts('From:'), FALSE);
-        }
-        else {
-          CRM_Core_BAO_CustomField::addQuickFormElement($form,
-            $elementName,
-            $fieldId,
-            FALSE, FALSE, TRUE
-          );
-        }
+        CRM_Core_BAO_CustomField::addQuickFormElement($form,
+          $elementName,
+          $fieldId,
+          FALSE, FALSE, TRUE
+        );
       }
     }
   }
