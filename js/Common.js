@@ -600,7 +600,7 @@ if (!CRM.vars) CRM.vars = {};
 
   function copyAttributes($source, $target, attributes) {
     _.each(attributes, function(name) {
-      if ($source.attr(name)) {
+      if ($source.attr(name) !== undefined) {
         $target.attr(name, $source.attr(name));
       }
     });
@@ -642,17 +642,22 @@ if (!CRM.vars) CRM.vars = {};
         $dateField = $('<input>').insertAfter($dataField);
         copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
         $dateField.addClass('crm-form-text crm-form-date');
-        settings.date = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
-        settings.changeMonth = _.includes(settings.date, 'm');
-        settings.changeYear = _.includes(settings.date, 'y');
+        settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
+        settings.changeMonth = _.includes(settings.dateFormat, 'm');
+        settings.changeYear = _.includes(settings.dateFormat, 'y');
         settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
         settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
         $dateField.datepicker(settings).change(updateDataField);
       }
       // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
       function isValidDate() {
+        // FIXME: parseDate doesn't work with incomplete date formats; skip validation if no month, day or year in format
+        var lowerFormat = settings.dateFormat.toLowerCase();
+        if (lowerFormat.indexOf('y') < 0 || lowerFormat.indexOf('m') < 0 || lowerFormat.indexOf('d') < 0) {
+          return true;
+        }
         try {
-          $.datepicker.parseDate(settings.date, $dateField.val());
+          $.datepicker.parseDate(settings.dateFormat, $dateField.val());
           return true;
         } catch (e) {
           return false;
