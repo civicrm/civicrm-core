@@ -331,8 +331,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $attributes['class'] .= ' crm-form-wysiwyg';
       $type = "textarea";
     }
+    // @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
     if ($type == 'datepicker') {
-      $attributes = ($attributes ? $attributes : array()) + array('class' => '');
+      $attributes = ($attributes ? $attributes : array());
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
       $type = "text";
     }
