@@ -371,6 +371,13 @@ class SettingsBag {
       $dao->value = serialize($value);
     }
 
+    if (!isset(\Civi::$statics[__CLASS__]['upgradeMode'])) {
+      \Civi::$statics[__CLASS__]['upgradeMode'] = \CRM_Core_Config::isUpgradeMode();
+    }
+    if (\Civi::$statics[__CLASS__]['upgradeMode'] && \CRM_Core_DAO::checkFieldExists('civicrm_setting', 'group_name')) {
+      $dao->group_name = 'placeholder';
+    }
+
     $dao->created_date = \CRM_Utils_Time::getTime('Ymdhis');
 
     $session = \CRM_Core_Session::singleton();
