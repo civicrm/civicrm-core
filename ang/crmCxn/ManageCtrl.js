@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('crmCxn').controller('CrmCxnManageCtrl', function CrmCxnManageCtrl($scope, apiCalls, crmApi, crmUiAlert, crmBlocker, crmStatus, $timeout, dialogService) {
+  angular.module('crmCxn').controller('CrmCxnManageCtrl', function CrmCxnManageCtrl($scope, apiCalls, crmApi, crmUiAlert, crmBlocker, crmStatus, $timeout, dialogService, crmCxnCheckAddr) {
     var ts = $scope.ts = CRM.ts(null);
     if (apiCalls.appMetas.is_error) {
       $scope.appMetas = [];
@@ -11,6 +11,17 @@
     }
     $scope.cxns = apiCalls.cxns.values;
     $scope.alerts = _.where(apiCalls.sysCheck.values, {name: 'checkCxnOverrides'});
+
+    crmCxnCheckAddr(apiCalls.cfg.values.siteCallbackUrl).then(function(response) {
+      if (response.valid) return;
+      crmUiAlert({
+        type: 'warning',
+        title: ts('Internet Access Required'),
+        templateUrl: '~/crmCxn/Connectivity.html',
+        scope: $scope.$new(),
+        options: {expires: false}
+      });
+    });
 
     $scope.filter = {};
     var block = $scope.block = crmBlocker();
