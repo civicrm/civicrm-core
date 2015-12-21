@@ -498,7 +498,7 @@
           flag = true;
         }
       });
-      cj('.price-set-option-content input, .other_amount-content input').change( function () {
+      cj('.price-set-option-content input, .other_amount-content input').on('input', function () {
         currentTotal = cj(this).is('[data-amount]') ? cj(this).attr('data-amount').replace(/[^\/\d]/g,'') : (cj(this).val() ? cj(this).val() : 0);
         if (currentTotal == 0 ) {
           flag = true;
