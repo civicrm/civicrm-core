@@ -1,6 +1,5 @@
 <?php
 namespace Civi\Token;
-use Civi\Token\Event\TokenRenderEvent;
 
 /**
  * Class TokenRow
