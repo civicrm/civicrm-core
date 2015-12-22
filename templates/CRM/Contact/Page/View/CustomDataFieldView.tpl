@@ -27,7 +27,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Edit{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="batch-edit"></span>{ts}Edit{/ts}
+        <span class="crm-i fa-pencil"></span> {ts}Edit{/ts}
       </div>
     {/if}
 
