@@ -66,4 +66,54 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals($result, 10, 'Verify financial trxn total_amount.');
   }
 
+  /**
+   * Create() method (create and update modes).
+   */
+  public function testIsPaymentFlagForPending() {
+    require_once 'CiviTest/Contact.php';
+    $contactId = Contact::createIndividual();
+    $ids = array('contribution' => NULL);
+
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 2,
+      'payment_instrument_id' => 1,
+      'source' => 'STUDENT',
+      'is_pay_later' => 1,
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'non_deductible_amount' => 0.00,
+      'total_amount' => 200.00,
+      'fee_amount' => 5,
+      'net_amount' => 195,
+      'trxn_id' => '22ereerwwe4444yy',
+      'invoice_id' => '86ed39e9e9yy6ef6541621ce0eafe7eb81',
+      'thankyou_date' => '20080522',
+    );
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+
+    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
+    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+
+    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
+    $this->assertEquals(0, $totalPaymentAmount, 'Amount not matching.');
+    //update contribution amount
+    $ids = array('contribution' => $contribution->id);
+    $params['contribution_status_id'] = 1;
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+
+    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id .');
+    $this->assertEquals($params['contribution_status_id'], $contribution->contribution_status_id, 'Check for status updation.');
+
+    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
+    $this->assertEquals('200.00', $totalPaymentAmount, 'Amount not matching.');
+    //Delete Contribution
+    $this->contributionDelete($contribution->id);
+    Contact::delete($contactId);
+  }
+
 }
