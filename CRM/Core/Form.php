@@ -377,20 +377,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add an element for inputting a month+day (partial date).
-   *
-   * @param string $name
-   * @param string $label
-   *
-   * @return HTML_QuickForm_Element
-   */
-  public function addMonthDay($name, $label) {
-    return $this->add('date', $name, $label,
-      CRM_Core_SelectValues::date(NULL, 'M d')
-    );
-  }
-
-  /**
    * Preprocess form.
    *
    * This is called before buildForm. Any pre-processing that
@@ -863,45 +849,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function setOptions($options) {
     $this->_options = $options;
-  }
-
-  /**
-   * Getter function for link.
-   *
-   * @return string
-   */
-  public function getLink() {
-    $config = CRM_Core_Config::singleton();
-    return CRM_Utils_System::url($_GET[$config->userFrameworkURLVar],
-      '_qf_' . $this->_name . '_display=true'
-    );
-  }
-
-  /**
-   * Boolean function to determine if this is a one form page.
-   *
-   * @return bool
-   */
-  public function isSimpleForm() {
-    return $this->_state->getType() & (CRM_Core_State::START | CRM_Core_State::FINISH);
-  }
-
-  /**
-   * Getter function for Form Action.
-   *
-   * @return string
-   */
-  public function getFormAction() {
-    return $this->_attributes['action'];
-  }
-
-  /**
-   * Setter function for Form Action.
-   *
-   * @param string $action
-   */
-  public function setFormAction($action) {
-    $this->_attributes['action'] = $action;
   }
 
   /**
@@ -1589,40 +1536,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param int $id
-   * @param $title
-   * @param null $required
-   * @param null $extra
-   */
-  public function addCountry($id, $title, $required = NULL, $extra = NULL) {
-    $this->addElement('select', $id, $title,
-      array(
-        '' => ts('- select -'),
-      ) + CRM_Core_PseudoConstant::country(), $extra
-    );
-    if ($required) {
-      $this->addRule($id, ts('Please select %1', array(1 => $title)), 'required');
-    }
-  }
-
-  /**
-   * @param string $name
-   * @param $label
-   * @param $options
-   * @param $attributes
-   * @param null $required
-   * @param null $javascriptMethod
-   */
-  public function addSelectOther($name, $label, $options, $attributes, $required = NULL, $javascriptMethod = NULL) {
-
-    $this->addElement('select', $name . '_id', $label, $options, $javascriptMethod);
-
-    if ($required) {
-      $this->addRule($name . '_id', ts('Please select %1', array(1 => $label)), 'required');
-    }
-  }
-
-  /**
    * @return null
    */
   public function getRootTitle() {
@@ -1669,16 +1582,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($uploadNames)) {
       $this->controller->addUploadAction($config->customFileUploadDir, $uploadNames);
     }
-  }
-
-  /**
-   * @return string
-   */
-  public function buttonType() {
-    $uploadNames = $this->get('uploadNames');
-    $buttonType = (is_array($uploadNames) && !empty($uploadNames)) ? 'upload' : 'next';
-    $this->assign('buttonType', $buttonType);
-    return $buttonType;
   }
 
   /**
