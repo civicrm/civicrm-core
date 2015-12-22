@@ -255,3 +255,32 @@ function civicrm_api3_cxn_getlink($params) {
     'page' => $params['page'],
   ));
 }
+
+/**
+ *
+ * @param array $params
+ * @return array
+ * @throws Exception
+ */
+function civicrm_api3_cxn_getcfg($params) {
+  $result = array(
+    'CIVICRM_CXN_CA' => defined('CIVICRM_CXN_CA') ? CIVICRM_CXN_CA : NULL,
+    'CIVICRM_CXN_VIA' => defined('CIVICRM_CXN_VIA') ? CIVICRM_CXN_VIA : NULL,
+    'CIVICRM_CXN_APPS_URL' => defined('CIVICRM_CXN_APPS_URL') ? CIVICRM_CXN_APPS_URL : NULL,
+    'siteCallbackUrl' => CRM_Cxn_BAO_Cxn::getSiteCallbackUrl(),
+  );
+  return civicrm_api3_create_success($result);
+
+  $cxnId = _civicrm_api3_cxn_parseCxnId($params);
+  $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
+
+  if (empty($params['page']) || !is_string($params['page'])) {
+    throw new API_Exception("Invalid page");
+  }
+
+  /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
+  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+  return $client->call($appMeta, 'Cxn', 'getlink', array(
+    'page' => $params['page'],
+  ));
+}
