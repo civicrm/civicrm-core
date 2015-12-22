@@ -379,7 +379,10 @@ class CRM_Event_BAO_Query {
 
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
         $tableName = empty($tableName) ? 'civicrm_participant' : $tableName;
-
+	 if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $op = key($value);
+          $value = $value[$op];
+	 }
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
 
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
