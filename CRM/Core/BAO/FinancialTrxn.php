@@ -494,4 +494,22 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
     return $value;
   }
 
+  /**
+   * @param int $contributionId
+   *
+   * @return array
+   */
+  public static function getTotalPayments($contributionId) {
+    $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $sql = "SELECT SUM(ft.total_amount) FROM civicrm_financial_trxn ft 
+      INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') 
+      WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id = %2";
+
+    $params = array(
+      1 => array($contributionId, 'Integer'),
+      2 => array($statusId, 'Integer'),
+    );
+    return CRM_Core_DAO::singleValueQuery($sql, $params);
+  }
+
 }
