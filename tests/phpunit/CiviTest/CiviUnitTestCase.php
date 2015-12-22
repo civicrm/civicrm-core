@@ -1519,7 +1519,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   public function dummyProcessorCreate($processorParams = array()) {
     $paymentProcessorID = $this->processorCreate($processorParams);
-    return Civi\Payment\System::singleton()->getById($paymentProcessorID);
+    return System::singleton()->getById($paymentProcessorID);
   }
 
   /**
@@ -2640,7 +2640,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->restoreDefaultPriceSetConfig();
     $var = TRUE;
     CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
-    Civi\Payment\System::singleton()->flushProcessors();
+    System::singleton()->flushProcessors();
   }
 
   public function restoreDefaultPriceSetConfig() {
