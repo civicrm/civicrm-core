@@ -792,6 +792,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   True if used for search else false.
    * @param string $label
    *   Label for custom field.
+   *
+   * @return HTML_QuickForm_Element|null
    */
   public static function addQuickFormElement(
     &$qf,
@@ -804,6 +806,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   ) {
     $field = self::getFieldObject($fieldId);
     $widget = $field->html_type;
+    $element = NULL;
 
     // Custom field HTML should indicate group+field name
     $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id);
@@ -876,7 +879,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->add('text', $elementName . '_to', ts('To'), $field->attributes);
         }
         else {
-          $element = &$qf->add('text', $elementName, $label,
+          $element = $qf->add('text', $elementName, $label,
             $field->attributes,
             $useRequired && !$search
           );
@@ -900,7 +903,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($field->text_length) {
           $attributes .= ' maxlength=' . $field->text_length;
         }
-        $element = &$qf->add('textarea',
+        $element = $qf->add('textarea',
           $elementName,
           $label,
           $attributes,
@@ -921,7 +924,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->add('datepicker', $elementName . '_to', NULL, $attr + array('placeholder' => ts('To')), FALSE, $params);
         }
         else {
-          $qf->add('datepicker', $elementName, $label, $attr, $useRequired && !$search, $params);
+          $element = $qf->add('datepicker', $elementName, $label, $attr, $useRequired && !$search, $params);
         }
         break;
 
@@ -930,12 +933,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         foreach ($options as $v => $l) {
           $choice[] = $qf->createElement('radio', NULL, '', $l, (string) $v, $field->attributes);
         }
-        $group = $qf->addGroup($choice, $elementName, $label);
+        $element = $qf->addGroup($choice, $elementName, $label);
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
         else {
-          $group->setAttribute('allowClear', TRUE);
+          $element->setAttribute('allowClear', TRUE);
         }
         break;
 
@@ -944,7 +947,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if (empty($selectAttributes['multiple'])) {
           $options = array('' => $placeholder) + $options;
         }
-        $qf->add('select', $elementName, $label, $options, $useRequired && !$search, $selectAttributes);
+        $element = $qf->add('select', $elementName, $label, $options, $useRequired && !$search, $selectAttributes);
 
         // Add and/or option for fields that store multiple values
         if ($search && self::isSerialized($field)) {
@@ -959,7 +962,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'AdvMulti-Select':
-        $include =& $qf->addElement(
+        $element = $qf->addElement(
           'advmultiselect',
           $elementName,
           $label, $options,
@@ -971,8 +974,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           )
         );
 
-        $include->setButtonAttributes('add', array('value' => ts('Add >>')));
-        $include->setButtonAttributes('remove', array('value' => ts('<< Remove')));
+        $element->setButtonAttributes('add', array('value' => ts('Add >>')));
+        $element->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
@@ -984,7 +987,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         foreach ($options as $v => $l) {
           $check[] = &$qf->addElement('advcheckbox', $v, NULL, $l, array('data-crm-custom' => $dataCrmCustomVal));
         }
-        $qf->addGroup($check, $elementName, $label);
+        $element = $qf->addGroup($check, $elementName, $label);
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
@@ -993,9 +996,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'File':
         // we should not build upload file in search mode
         if ($search) {
-          return;
+          return NULL;
         }
-        $qf->add(
+        $element = $qf->add(
           strtolower($field->html_type),
           $elementName,
           $label,
@@ -1014,7 +1017,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($field->text_length) {
           $attributes['maxlength'] = $field->text_length;
         }
-        $qf->add('wysiwyg', $elementName, $label, $attributes, $search);
+        $element = $qf->add('wysiwyg', $elementName, $label, $attributes, $search);
         break;
 
       case 'Autocomplete-Select':
@@ -1032,9 +1035,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($field->data_type == 'ContactReference') {
           $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] . ' ' : '') . 'crm-form-contact-reference huge';
           $attributes['data-api-entity'] = 'contact';
-          $qf->add('text', $elementName, $label, $attributes,
-            $useRequired && !$search
-          );
+          $element = $qf->add('text', $elementName, $label, $attributes, $useRequired && !$search);
 
           $urlParams = "context=customfield&id={$field->id}";
 
@@ -1054,7 +1055,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
               'params' => array('option_group_id' => $field->option_group_id),
             ),
           );
-          $qf->addEntityRef($elementName, $label, $attributes, $useRequired && !$search);
+          $element = $qf->addEntityRef($elementName, $label, $attributes, $useRequired && !$search);
         }
 
         $qf->assign('customUrls', $customUrls);
@@ -1101,6 +1102,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if ($field->is_view && !$search) {
       $qf->freeze($elementName);
     }
+    return $element;
   }
 
   /**
