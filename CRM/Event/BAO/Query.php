@@ -600,7 +600,7 @@ class CRM_Event_BAO_Query {
         'label' => ts('Participant Status'),
         'multiple' => 'multiple',
         'option_url' => NULL,
-        'placeholder' => ts('- any -')
+        'placeholder' => ts('- any -'),
       )
     );
 
@@ -610,7 +610,7 @@ class CRM_Event_BAO_Query {
         'label' => ts('Participant Role'),
         'multiple' => 'multiple',
         'option_url' => NULL,
-        'placeholder' => ts('- any -')
+        'placeholder' => ts('- any -'),
       )
     );
 
