@@ -134,6 +134,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
       $this->assign('profilePostMultiple', CRM_Utils_Array::value('custom_post', $defaults));
 
+      // CRM-17745: Make max additional participants configurable
+      if (empty($defaults['max_additional_participants'])) {
+        $defaults['max_additional_participants'] = 9;
+      }
+
       if (!empty($defaults['is_multiple_registrations'])) {
         // CRM-4377: set additional participants’ profiles – set to ‘none’ if explicitly unset (non-active)
 
@@ -263,6 +268,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'is_multiple_registrations',
       ts('Register multiple participants?')
     );
+
+    // CRM-17745: Make maximum additional participants configurable
+    $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 9);
+    $this->add('select', 'max_additional_participants', ts('Maximum additional participants'), $numericOptions, FALSE, array('class' => 'required'));
 
     $this->addElement('checkbox',
       'allow_same_participant_emails',

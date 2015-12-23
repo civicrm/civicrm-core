@@ -310,20 +310,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_values['event']['is_multiple_registrations']) {
       // don't allow to add additional during confirmation if not preregistered.
       if (!$this->_allowConfirmation || $this->_additionalParticipantIds) {
-        // Hardcode maximum number of additional participants here for now. May need to make this configurable per event.
+        // CRM-17745: Make maximum additional participants configurable
         // Label is value + 1, since the code sees this is ADDITIONAL participants (in addition to "self")
-        $additionalOptions = array(
-          '' => '1',
-          1 => '2',
-          2 => '3',
-          3 => '4',
-          4 => '5',
-          5 => '6',
-          6 => '7',
-          7 => '8',
-          8 => '9',
-          9 => '10',
-        );
+        $additionalOptions = array();
+        $additionalOptions[''] = 1;
+        for ($i=1; $i <= $this->_values['event']['max_additional_participants']; $i++) {
+          $additionalOptions[$i] = $i + 1;
+        }
         $this->add('select', 'additional_participants',
           ts('How many people are you registering?'),
           $additionalOptions,

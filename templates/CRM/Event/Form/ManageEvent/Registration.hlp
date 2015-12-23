@@ -67,6 +67,14 @@
 <p>{ts}You can use different profile for the person who is registering than for "Additional Participants". For example, you may want to require an email address from the person entering the registration while not requiring (or even requesting) emails for additional participants (i.e. their "guests").{/ts}</p>
 {/htxt}
 
+{htxt id="id-max_additional-title"}
+  {ts}Maximum Additional Participants{/ts}
+{/htxt}
+{htxt id="id-max_additional"}
+  <p>{ts}Limit the number of additional participants that can be registered in a single booking.{/ts}</p>
+  <p>{ts}Eg: if you choose '2' then the lead booker can bring 2 guests; there would be a limit of 3 participants in total per booking.{/ts}</p>
+{/htxt}
+
 {htxt id="id-allow_same_email-title"}
   {ts}Allow Shared Email{/ts}
 {/htxt}
