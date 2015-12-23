@@ -1473,15 +1473,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'File':
         // We should not build upload file in search mode.
-        if (isset($props['context']) && $props['context'] == 'search') {
+        if ($props['context'] == 'search') {
           return;
         }
         $file = $this->add('file', $name, $label, $props, $required);
         $this->addUploadElement($name);
         return $file;
 
-      //case 'RichTextEditor':
-      //TODO: Add javascript template for wysiwyg.
+      case 'RichTextEditor':
+        return $this->add('wysiwyg', $name, $label, $props, $required);
+
       case 'Autocomplete-Select':
       case 'EntityRef':
         return $this->addEntityRef($name, $label, $props, $required);
