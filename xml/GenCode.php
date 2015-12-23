@@ -1,5 +1,4 @@
 <?php
-ini_set('display_errors', 1);
 ini_set('include_path', '.' . PATH_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'packages' . PATH_SEPARATOR . '..');
 // make sure the memory_limit is at least 512 MB
 $memLimitString = trim(ini_get('memory_limit'));
