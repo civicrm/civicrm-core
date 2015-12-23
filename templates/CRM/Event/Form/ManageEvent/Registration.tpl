@@ -83,6 +83,10 @@
     <td scope="row" class="label" width="20%">{$form.is_multiple_registrations.label}</td>
     <td>{$form.is_multiple_registrations.html} {help id="id-allow_multiple"}</td>
   </tr>
+  <tr class="crm-event-manage-registration-form-block-maximum_additional_participants" id="id-max-additional-participants">
+    <td scope="row" class="label" width="20%">{$form.max_additional_participants.label}</td>
+    <td>{$form.max_additional_participants.html} {help id="id-max_additional"}</td>
+  </tr>
   <tr class="crm-event-manage-registration-form-block-allow_same_participant_emails">
     <td scope="row" class="label" width="20%">{$form.allow_same_participant_emails.label}</td>
     <td>{$form.allow_same_participant_emails.html} {help id="id-allow_same_email"}</td>
@@ -391,14 +395,6 @@ target_element_type ="block"
 field_type          ="radio"
 invert              = 0
 }
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="is_multiple_registrations"
-trigger_value       =""
-target_element_id   ="additional_profile_pre|additional_profile_post"
-target_element_type ="table-row"
-field_type          ="radio"
-invert              = 0
-}
 {if $form.requires_approval}
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="requires_approval"
@@ -473,18 +469,17 @@ $(function($) {
 
     var allow_multiple = $("#is_multiple_registrations");
     if ( !allow_multiple.prop('checked') ) {
-        $('#additional_profile_pre,#additional_profile_post').hide();
+        $('#additional_profile_pre,#additional_profile_post,#id-max-additional-participants').hide();
     }
     allow_multiple.change( function( ) {
         if ( !$(this).prop('checked') ) {
             $("#additional_custom_pre_id,#additional_custom_post_id").val('');
             $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
-            $('#additional_profile_pre,#additional_profile_post').hide();
+            $('#additional_profile_pre,#additional_profile_post,#id-max-additional-participants').hide();
         } else {
             $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").show();
-            $('#additional_profile_pre,#additional_profile_post').show();
+            $('#additional_profile_pre,#additional_profile_post,#id-max-additional-participants').show();
         }
-
     });
 
     var allow_selfCancel = $("#allow_selfcancelxfer");
