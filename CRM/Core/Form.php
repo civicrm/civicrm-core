@@ -1210,7 +1210,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
       return 'create';
     }
-    if ($action & (CRM_Core_Action::BROWSE)) {
+    if ($action & (CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
       return 'get';
     }
     // If you get this exception try adding more cases above.
@@ -1294,7 +1294,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
       if (CRM_Utils_Array::value('context', $props) != 'search') {
-        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
       }
     }
     $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
@@ -1380,19 +1380,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if ($props['context'] == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
         $widget = 'Select';
       }
-      // Set default options-url value.
-      if ((!isset($props['options-url']))) {
-        $props['options-url'] = TRUE;
-      }
 
       // Add data for popup link.
-      if ((isset($props['options-url']) && $props['options-url']) && ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
-        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+      if ((!empty($props['option_url']) || !array_key_exists('option_url', $props)) && ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
+        $props['data-option-edit-path'] = !empty($props['option_url']) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
         $props['data-api-entity'] = $props['entity'];
         $props['data-api-field'] = $props['name'];
-        if (isset($props['options-url'])) {
-          unset($props['options-url']);
-        }
       }
     }
     //Use select2 library for following widgets.
@@ -1405,7 +1398,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           'Multi-Select Country',
     )));
     if ($isSelect2) {
-      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
+      $props['class'] = (!empty($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
       if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
         $props['class'] .= ' huge';
         $props['multiple'] = 'multiple';
@@ -1416,7 +1409,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
-    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
+    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type', 'option_url');
+
     // TODO: refactor switch statement, to separate methods.
     switch ($widget) {
       case 'Text':
@@ -1432,7 +1426,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         //Set default columns and rows for textarea.
         $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
         $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
-        return $this->addElement('textarea', $name, $label, $props, $required);
+        return $this->add('textarea', $name, $label, $props, $required);
 
       case 'Select Date':
         //TODO: add range support
