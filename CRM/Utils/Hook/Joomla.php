@@ -77,7 +77,7 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
       //Invoke the Joomla plugin system to observe to civicrm events.
       jimport('joomla.plugin.helper');
       jimport('cms.plugin.helper');
-      JPluginHelper::importPlugin('civicrm');
+      FOFPlatform::getInstance()->importPlugin('civicrm');
 
       // get app based on cli or web
       if (PHP_SAPI != 'cli') {
