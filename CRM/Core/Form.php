@@ -202,6 +202,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   private $_chainSelectFields = array();
 
   /**
+   * Extra input types we support via the "add" method
+   * @var array
+   */
+  public static $html5Types = array(
+    'number',
+    'url',
+    'email',
+  );
+
+  /**
    * Constructor for the basic form page.
    *
    * We should not use QuickForm directly. This class provides a lot
@@ -327,7 +337,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
     // Fudge some extra types that quickform doesn't support
-    if ($type == 'wysiwyg' || $type == 'number') {
+    if ($type == 'wysiwyg' || in_array($type, self::$html5Types)) {
       $attributes = ($attributes ? $attributes : array()) + array('class' => '');
       $attributes['class'] = ltrim($attributes['class'] . " crm-form-$type");
       $type = $type == 'wysiwyg' ? 'textarea' : 'text';
@@ -1359,10 +1369,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $isSelect = (in_array($widget, array(
           'Select',
           'Multi-Select',
-          'Select State/Province',
-          'Multi-Select State/Province',
-          'Select Country',
-          'Multi-Select Country',
           'AdvMulti-Select',
           'CheckBoxGroup',
           'RadioGroup',
@@ -1391,16 +1397,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['data-api-field'] = $props['name'];
       }
     }
-    //Use select2 library for following widgets.
-    $isSelect2 = (in_array($widget, array(
-          'Select',
-          'Multi-Select',
-          'Select State/Province',
-          'Multi-Select State/Province',
-          'Select Country',
-          'Multi-Select Country',
-    )));
-    if ($isSelect2) {
+    // Use select2 library for following widgets.
+    if (in_array($widget, array('Select', 'Multi-Select'))) {
       $props['class'] = (!empty($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
       if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
         $props['class'] .= ' huge';
@@ -1417,10 +1415,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // TODO: refactor switch statement, to separate methods.
     switch ($widget) {
       case 'Text':
-      case 'Link':
+      case 'Url':
+      case 'Number':
+      case 'Email':
         //TODO: Autodetect ranges
         $props['size'] = isset($props['size']) ? $props['size'] : 60;
-        return $this->add('text', $name, $label, $props, $required);
+        return $this->add(strtolower($widget), $name, $label, $props, $required);
 
       case 'hidden':
         return $this->add('hidden', $name, NULL, $props, $required);
