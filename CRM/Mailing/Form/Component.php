@@ -59,7 +59,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->applyFilter('__ALL__', 'trim');
+    $this->applyFilter(array('name', 'subject', 'body_html'), 'trim');
 
     $this->add('text', 'name', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'name'), TRUE
