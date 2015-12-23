@@ -1323,10 +1323,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   public function addField($name, $props = array(), $required = FALSE) {
-    // TODO: Handle custom field
-    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
-      throw new Exception("Custom fields are not supported by the addField method. ");
-    }
     // Resolve context.
     if (!isset($props['context'])) {
       $props['context'] = $this->getDefaultContext();
@@ -1343,7 +1339,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['action'])) {
       $props['action'] = $this->getApiAction();
     }
-    // Get field metadata.
+
+    // Handle custom fields
+    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+      $fieldId = (int) substr($name, 7);
+      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, FALSE, $required, $props['context'] == 'search', CRM_Utils_Array::value('label', $props));
+    }
+
+    // Core field - get metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
     $label = CRM_Utils_Array::value('label', $props, isset($fieldSpec['title']) ? $fieldSpec['title'] : NULL);
