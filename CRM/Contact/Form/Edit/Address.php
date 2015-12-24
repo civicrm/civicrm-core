@@ -67,7 +67,7 @@ class CRM_Contact_Form_Edit_Address {
     }
 
     //make location type required for inline edit
-    $form->addField("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight') + $js, $inlineEdit);
+    $form->addField("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight', 'option_url' => NULL) + $js, $inlineEdit);
     if (!$inlineEdit) {
       $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
     }
