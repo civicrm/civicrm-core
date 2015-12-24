@@ -1353,7 +1353,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Handle custom fields
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       $fieldId = (int) substr($name, 7);
-      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, FALSE, $required, $props['context'] == 'search', CRM_Utils_Array::value('label', $props));
+      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $props['context'] == 'search', CRM_Utils_Array::value('label', $props));
     }
 
     // Core field - get metadata.

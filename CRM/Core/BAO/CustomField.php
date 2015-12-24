@@ -777,32 +777,24 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * This function for building custom fields.
+   * Add a custom field to an existing form.
    *
    * @param CRM_Core_Form $qf
    *   Form object (reference).
    * @param string $elementName
    *   Name of the custom field.
    * @param int $fieldId
-   * @param bool $inactiveNeeded
-   *   -deprecated.
    * @param bool $useRequired
    *   True if required else false.
    * @param bool $search
    *   True if used for search else false.
    * @param string $label
    *   Label for custom field.
-   *
-   * @return HTML_QuickForm_Element|null
+   * @return \HTML_QuickForm_Element|null
+   * @throws \CiviCRM_API3_Exception
    */
   public static function addQuickFormElement(
-    &$qf,
-    $elementName,
-    $fieldId,
-    $inactiveNeeded = FALSE,
-    $useRequired = TRUE,
-    $search = FALSE,
-    $label = NULL
+    $qf, $elementName, $fieldId, $useRequired = TRUE, $search = FALSE, $label = NULL
   ) {
     $field = self::getFieldObject($fieldId);
     $widget = $field->html_type;

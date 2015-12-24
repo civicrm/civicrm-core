@@ -1557,7 +1557,7 @@ ORDER BY civicrm_custom_group.weight,
 
         $fieldId = $field['id'];
         $elementName = $field['element_name'];
-        CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, $inactiveNeeded, $required);
+        CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, $required);
       }
     }
   }
