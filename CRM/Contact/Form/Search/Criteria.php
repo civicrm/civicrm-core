@@ -372,11 +372,7 @@ class CRM_Contact_Form_Search_Criteria {
       foreach ($groupDetails as $group) {
         foreach ($group['fields'] as $field) {
           $elementName = 'custom_' . $field['id'];
-          CRM_Core_BAO_CustomField::addQuickFormElement($form,
-            $elementName,
-            $field['id'],
-            FALSE, FALSE, TRUE
-          );
+          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $field['id'], FALSE, TRUE);
         }
       }
     }
@@ -452,11 +448,7 @@ class CRM_Contact_Form_Search_Criteria {
         foreach ($group['fields'] as $field) {
           $fieldId = $field['id'];
           $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form,
-            $elementName,
-            $fieldId,
-            FALSE, FALSE, TRUE
-          );
+          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
         }
       }
     }
@@ -533,11 +525,7 @@ class CRM_Contact_Form_Search_Criteria {
       foreach ($group['fields'] as $field) {
         $fieldId = $field['id'];
         $elementName = 'custom_' . $fieldId;
-        CRM_Core_BAO_CustomField::addQuickFormElement($form,
-          $elementName,
-          $fieldId,
-          FALSE, FALSE, TRUE
-        );
+        CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
       }
     }
   }
