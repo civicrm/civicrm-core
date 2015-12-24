@@ -356,6 +356,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         unset($extra['multiple']);
       }
+      unset($extra['size'], $extra['maxlength']);
       // Add placeholder option for select
       if (isset($extra['placeholder'])) {
         if ($extra['placeholder'] === TRUE) {
@@ -1270,6 +1271,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
+    if (!isset($props['context'])) {
+      try {
+        $props['context'] = $this->getDefaultContext();
+      }
+      // This is not a required param, so we'll ignore if this doesn't exist.
+      catch (Exception $e) {}
+    }
     // Fetch options from the api unless passed explicitly
     if (isset($props['options'])) {
       $options = $props['options'];
@@ -1368,8 +1376,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $isSelect = (in_array($widget, array(
           'Select',
-          'Multi-Select',
-          'AdvMulti-Select',
           'CheckBoxGroup',
           'RadioGroup',
           'Radio',
@@ -1379,15 +1385,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Fetch options from the api unless passed explicitly.
       if (isset($props['options'])) {
         $options = $props['options'];
-        // Else this get passed to the form->add method.
-        unset($props['options']);
       }
       else {
         $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
-      //@TODO AdvMulti-Select is deprecated, drop support.
-      if ($props['context'] == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
+      if ($props['context'] == 'search') {
         $widget = 'Select';
+        $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
       }
 
       // Add data for popup link.
@@ -1397,20 +1401,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['data-api-field'] = $props['name'];
       }
     }
-    // Use select2 library for following widgets.
-    if (in_array($widget, array('Select', 'Multi-Select'))) {
-      $props['class'] = (!empty($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
-      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
-        $props['class'] .= ' huge';
-        $props['multiple'] = 'multiple';
-      }
-      // The placeholder is only used for select-elements.
-      if (!array_key_exists('placeholder', $props)) {
-        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
-      }
-    }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
-    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type', 'option_url');
+    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type', 'option_url', 'options');
 
     // TODO: refactor switch statement, to separate methods.
     switch ($widget) {
@@ -1446,9 +1438,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addRadio($name, $label, $options, $props, $separator, $required);
 
       case 'Select':
-        unset($props['size']);
-        if (empty($props['multiple']) && !empty($props['placeholder'])) {
-          $options = array('' => $props['placeholder']) + $options;
+        $props['class'] = CRM_Utils_Array::value('class', $props, 'big');
+        $props['class'] .= ' crm-select2';
+        if (!array_key_exists('placeholder', $props)) {
+          $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
         }
         if (!empty($props['data-api-field']) && (in_array($props['data-api-field'], array('state_province_id', 'county_id')))) {
           return $this->addChainSelect($name, $props);
@@ -1462,7 +1455,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'RadioGroup':
         return $this->addRadio($name, $label, $options, $props, NULL, $required);
 
-      //case 'AdvMulti-Select':
       case 'CheckBox':
         $text = isset($props['text']) ? $props['text'] : NULL;
         unset($props['text']);
@@ -1486,7 +1478,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'RichTextEditor':
         return $this->add('wysiwyg', $name, $label, $props, $required);
 
-      case 'Autocomplete-Select':
       case 'EntityRef':
         return $this->addEntityRef($name, $label, $props, $required);
 
@@ -1494,7 +1485,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // case 'Int':
       //case 'Float':
       //case 'Money':
-      //case 'Link':
       //case read only fields
       default:
         throw new Exception("Unsupported html-element " . $widget);
