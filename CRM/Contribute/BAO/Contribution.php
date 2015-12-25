@@ -201,7 +201,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     if (self::isUpdateToRecurringContribution($params)) {
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
-        $params['contribution_recur_id'],
+        (!empty($params['contribution_recur_id']) ? $params['contribution_recur_id'] : $params['prevContribution']->contribution_recur_id),
         $contributionStatus[$params['contribution_status_id']]
       );
     }
@@ -4540,6 +4540,61 @@ LIMIT 1;";
         }
       }
     }
+  }
+
+  /**
+   * This function is used to record partial payments for contribution
+   *
+   * @param array $contribution
+   *
+   * @param array $params
+   *
+   * @return object
+   */
+  public static function recordPartialPayment($contribution, $params) {
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $pendingStatus = array(
+      array_search('Pending', $contributionStatuses),
+      array_search('In Progress', $contributionStatuses),
+    );
+    $statusId = array_search('Completed', $contributionStatuses);
+    if (in_array(CRM_Utils_Array::value('contribution_status_id', $contribution), $pendingStatus)) {
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+      $balanceTrxnParams['to_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType($contribution['financial_type_id'], $relationTypeId);
+    }
+    elseif (!empty($params['payment_processor'])) {
+      $balanceTrxnParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($contribution['payment_processor'], 'civicrm_payment_processor', 'financial_account_id');
+    }
+    elseif (!empty($params['payment_instrument_id'])) {
+      $balanceTrxnParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($contribution['payment_instrument_id']);
+    }
+    else {
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
+      $queryParams = array(1 => array($relationTypeId, 'Integer'));
+      $balanceTrxnParams['to_financial_account_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
+    }
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+    $fromFinancialAccountId = CRM_Contribute_PseudoConstant::financialAccountType($contribution['financial_type_id'], $relationTypeId);
+    $balanceTrxnParams['from_financial_account_id'] = $fromFinancialAccountId;
+    $balanceTrxnParams['total_amount'] = $params['total_amount'];
+    $balanceTrxnParams['contribution_id'] = $params['contribution_id'];
+    $balanceTrxnParams['trxn_date'] = !empty($params['contribution_receive_date']) ? $params['contribution_receive_date'] : date('YmdHis');
+    $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
+    $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
+    $balanceTrxnParams['currency'] = $contribution['currency'];
+    $balanceTrxnParams['trxn_id'] = CRM_Utils_Array::value('contribution_trxn_id', $params, NULL);
+    $balanceTrxnParams['status_id'] = $statusId;
+    $balanceTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
+    $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
+    if ($fromFinancialAccountId != NULL &&
+      ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially paid', $contributionStatuses))
+    ) {
+      $balanceTrxnParams['is_payment'] = 1;
+    }
+    if (!empty($params['payment_processor'])) {
+      $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
+    }
+    return CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
   }
 
 }
