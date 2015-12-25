@@ -141,6 +141,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         }
       }
     }
+    else {
+      // Since the fee amount is expecting this (later on) ensure it is always set.
+      // It would only not be set for an update where it is unchanged.
+      $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', array('id' => $params['id'], 'return' => 'contribution_status_id'));
+    }
 
     //set defaults in create mode
     if (!$contributionID) {

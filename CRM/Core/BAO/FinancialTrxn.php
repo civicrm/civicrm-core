@@ -395,7 +395,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
     $params['trxnParams']['total_amount'] = $amount;
     $params['trxnParams']['fee_amount'] = $params['trxnParams']['net_amount'] = 0;
-    $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $params['trxnParams']['status_id'] = $params['contribution_status_id'];
     $params['trxnParams']['contribution_id'] = $contributionId;
     $trxn = self::create($params['trxnParams']);
     if (empty($params['entity_id'])) {
@@ -500,15 +500,17 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
    * @return array
    */
   public static function getTotalPayments($contributionId) {
-    $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-    $sql = "SELECT SUM(ft.total_amount) FROM civicrm_financial_trxn ft 
-      INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') 
+    $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+
+    $sql = "SELECT SUM(ft.total_amount) FROM civicrm_financial_trxn ft
+      INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution')
       WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id = %2";
 
     $params = array(
       1 => array($contributionId, 'Integer'),
       2 => array($statusId, 'Integer'),
     );
+
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 

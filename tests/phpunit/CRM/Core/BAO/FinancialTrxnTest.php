@@ -67,12 +67,10 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create() method (create and update modes).
+   * Test getTotalPayments function.
    */
-  public function testIsPaymentFlagForPending() {
-    require_once 'CiviTest/Contact.php';
-    $contactId = Contact::createIndividual();
-    $ids = array('contribution' => NULL);
+  public function testGetTotalPayments() {
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -93,27 +91,24 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'thankyou_date' => '20080522',
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($params['trxn_id'], $contribution->trxn_id);
+    $this->assertEquals($contactId, $contribution->contact_id);
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
     $this->assertEquals(0, $totalPaymentAmount, 'Amount not matching.');
     //update contribution amount
-    $ids = array('contribution' => $contribution->id);
+    $params['id'] = $contribution->id;
     $params['contribution_status_id'] = 1;
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id .');
-    $this->assertEquals($params['contribution_status_id'], $contribution->contribution_status_id, 'Check for status updation.');
+    $this->assertEquals($params['trxn_id'], $contribution->trxn_id);
+    $this->assertEquals($params['contribution_status_id'], $contribution->contribution_status_id);
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
     $this->assertEquals('200.00', $totalPaymentAmount, 'Amount not matching.');
-    //Delete Contribution
-    $this->contributionDelete($contribution->id);
-    Contact::delete($contactId);
   }
 
 }
