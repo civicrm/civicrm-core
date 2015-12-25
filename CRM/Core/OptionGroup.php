@@ -363,6 +363,10 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * @deprecated
+   *
+   * This function is not cached.
+   *
    * @param string $groupName
    * @param $label
    * @param string $labelField
