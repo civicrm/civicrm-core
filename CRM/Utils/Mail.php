@@ -126,7 +126,7 @@ class CRM_Utils_Mail {
     else {
       $mailer = Mail::factory($driver, $params);
     }
-    CRM_Utils_Hook::alterMail($mailer, $driver, $params);
+    CRM_Utils_Hook::alterMailer($mailer, $driver, $params);
     return $mailer;
   }
 
