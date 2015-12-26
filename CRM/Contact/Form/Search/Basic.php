@@ -65,10 +65,9 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
     // add select for groups
     if (!empty($searchOptions['groups'])) {
-      $this->addSelect('group', array(
+      $this->addField('group', array(
           'entity' => 'group_contact',
           'label' => ts('in'),
-          'context' => 'search',
           'placeholder' => ts('- any group -'),
         ));
     }
@@ -76,10 +75,9 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     if (!empty($searchOptions['tags'])) {
       // tag criteria
       if (!empty($this->_tag)) {
-        $this->addSelect('tag', array(
+        $this->addField('tag', array(
             'entity' => 'entity_tag',
             'label' => ts('with'),
-            'context' => 'search',
             'placeholder' => ts('- any tag -'),
           ));
       }

@@ -13,10 +13,13 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   protected $_permissionedGroup;
   /**
    * AS disabled group the contact has permission to.
-   * @var unknown
+   * @var int
    */
   protected $_permissionedDisabledGroup;
 
+  /**
+   * @var CRM_Utils_Hook_UnitTests
+   */
   public $hookClass;
 
   protected $_params = array();

@@ -56,8 +56,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
   /**
    */
-  /**
-   */
   public function __construct() {
     $this->case_statuses = CRM_Core_OptionGroup::values('case_status');
     $this->case_types = CRM_Case_PseudoConstant::caseType();
@@ -120,12 +118,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'status_id' => array(
             'title' => ts('Case Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->case_statuses,
+            'options' => CRM_Case_BAO_Case::buildOptions('status_id', 'search'),
           ),
           'case_type_id' => array(
             'title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->case_types,
+            'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
           ),
           'is_deleted' => array(
             'title' => ts('Deleted?'),

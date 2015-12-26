@@ -79,28 +79,14 @@ class CRM_Core_BAO_CustomOption {
       return $options;
     }
 
-    $field = CRM_Core_BAO_CustomField::getFieldObject($fieldID);
+    $optionValues = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $fieldID, array(), $inactiveNeeded ? 'get' : 'create');
 
-    // get the option group id
-    $optionGroupID = $field->option_group_id;
-    if (!$optionGroupID) {
-      return $options;
+    foreach ($optionValues as $value => $label) {
+      $options[] = array(
+        'label' => $label,
+        'value' => $value,
+      );
     }
-
-    $optionValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroupID);
-
-    foreach ($optionValues as $id => $value) {
-      if (!$inactiveNeeded && empty($value['is_active'])) {
-        continue;
-      }
-
-      $options[$id] = array();
-      $options[$id]['id'] = $id;
-      $options[$id]['label'] = $value['label'];
-      $options[$id]['value'] = $value['value'];
-    }
-
-    CRM_Utils_Hook::customFieldOptions($fieldID, $options, TRUE);
 
     return $options;
   }
@@ -211,68 +197,6 @@ class CRM_Core_BAO_CustomOption {
     }
 
     return $options;
-  }
-
-  /**
-   * Returns the option label for a custom field with a specific value. Handles all
-   * custom field data and html types
-   *
-   * @param int $fieldId
-   *   the custom field ID.
-   * @pram  $value    string the value (typically from the DB) of this custom field
-   * @param $value
-   * @param string $htmlType
-   *   the html type of the field (optional).
-   * @param string $dataType
-   *   the data type of the field (optional).
-   *
-   * @return string
-   *   the label to display for this custom field
-   */
-  public static function getOptionLabel($fieldId, $value, $htmlType = NULL, $dataType = NULL) {
-    if (!$fieldId) {
-      return NULL;
-    }
-
-    if (!$htmlType || !$dataType) {
-      $sql = "
-SELECT html_type, data_type
-FROM   civicrm_custom_field
-WHERE  id = %1
-";
-      $params = array(1 => array($fieldId, 'Integer'));
-      $dao = CRM_Core_DAO::executeQuery($sql, $params);
-      if ($dao->fetch()) {
-        $htmlType = $dao->html_type;
-        $dataType = $dao->data_type;
-      }
-      else {
-        CRM_Core_Error::fatal();
-      }
-    }
-
-    $options = NULL;
-    switch ($htmlType) {
-      case 'CheckBox':
-      case 'Multi-Select':
-      case 'AdvMulti-Select':
-      case 'Select':
-      case 'Radio':
-      case 'Autocomplete-Select':
-        if (!in_array($dataType, array(
-          'Boolean',
-          'ContactReference',
-        ))
-        ) {
-          $options = self::valuesByID($fieldId);
-        }
-    }
-
-    return CRM_Core_BAO_CustomField::getDisplayValueCommon($value,
-      $options,
-      $htmlType,
-      $dataType
-    );
   }
 
   /**
@@ -393,27 +317,6 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
       }
       $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     }
-  }
-
-  /**
-   * @param int $customFieldID
-   * @param int $optionGroupID
-   *
-   * @return array
-   */
-  public static function valuesByID($customFieldID, $optionGroupID = NULL) {
-    if (!$optionGroupID) {
-      $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
-        $customFieldID,
-        'option_group_id'
-      );
-    }
-
-    $options = $optionGroupID ? CRM_Core_OptionGroup::valuesByID($optionGroupID) : array();
-
-    CRM_Utils_Hook::customFieldOptions($customFieldID, $options, FALSE);
-
-    return $options;
   }
 
   /**

@@ -973,7 +973,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
 
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, $fields);
-    $options = &$query->_options;
 
     $details = $query->searchQuery(0, 0, NULL, FALSE, FALSE,
       FALSE, FALSE, FALSE, $additionalWhereClause);
@@ -1166,10 +1165,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
                 }
 
                 $params[$index] = $customVal;
-                $values[$index] = CRM_Core_BAO_CustomField::getDisplayValue($customVal,
-                  $cfID,
-                  $options
-                );
+                $values[$index] = CRM_Core_BAO_CustomField::displayValue($customVal, $cfID);
                 if ($field['data_type'] == 'ContactReference') {
                   $params[$index] = $values[$index];
                 }
@@ -2103,14 +2099,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif (substr($fieldName, 0, 6) === 'custom') {
       $customFieldID = CRM_Core_BAO_CustomField::getKeyID($fieldName);
       if ($customFieldID) {
-        CRM_Core_BAO_CustomField::addQuickFormElement($form, $name, $customFieldID, FALSE, $required, $search, $title);
+        CRM_Core_BAO_CustomField::addQuickFormElement($form, $name, $customFieldID, $required, $search, $title);
       }
     }
     elseif (substr($fieldName, 0, 14) === 'address_custom') {
       list($fName, $locTypeId) = CRM_Utils_System::explode('-', $fieldName, 2);
       $customFieldID = CRM_Core_BAO_CustomField::getKeyID(substr($fName, 8));
       if ($customFieldID) {
-        CRM_Core_BAO_CustomField::addQuickFormElement($form, $name, $customFieldID, FALSE, $required, $search, $title);
+        CRM_Core_BAO_CustomField::addQuickFormElement($form, $name, $customFieldID, $required, $search, $title);
       }
     }
     elseif (in_array($fieldName, array(

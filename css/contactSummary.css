@@ -48,7 +48,7 @@ div#crm-contact-thumbnail {
   right: 0;
   top: 0;
   opacity: .8;
-  padding: .4em;
+  padding: .4em .9em;
   border-bottom-left-radius: 1em;
 }
 

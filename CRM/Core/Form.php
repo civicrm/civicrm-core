@@ -202,6 +202,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   private $_chainSelectFields = array();
 
   /**
+   * Extra input types we support via the "add" method
+   * @var array
+   */
+  public static $html5Types = array(
+    'number',
+    'url',
+    'email',
+  );
+
+  /**
    * Constructor for the basic form page.
    *
    * We should not use QuickForm directly. This class provides a lot
@@ -326,10 +336,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
-    if ($type == 'wysiwyg') {
+    // Fudge some extra types that quickform doesn't support
+    if ($type == 'wysiwyg' || in_array($type, self::$html5Types)) {
       $attributes = ($attributes ? $attributes : array()) + array('class' => '');
-      $attributes['class'] .= ' crm-form-wysiwyg';
-      $type = "textarea";
+      $attributes['class'] = ltrim($attributes['class'] . " crm-form-$type");
+      $type = $type == 'wysiwyg' ? 'textarea' : 'text';
+    }
+    // @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
+    if ($type == 'datepicker') {
+      $attributes = ($attributes ? $attributes : array());
+      $attributes['data-crm-datepicker'] = json_encode((array) $extra);
+      $type = "text";
     }
     if ($type == 'select' && is_array($extra)) {
       // Normalize this property
@@ -339,6 +356,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         unset($extra['multiple']);
       }
+      unset($extra['size'], $extra['maxlength']);
       // Add placeholder option for select
       if (isset($extra['placeholder'])) {
         if ($extra['placeholder'] === TRUE) {
@@ -367,20 +385,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     return $element;
-  }
-
-  /**
-   * Add an element for inputting a month+day (partial date).
-   *
-   * @param string $name
-   * @param string $label
-   *
-   * @return HTML_QuickForm_Element
-   */
-  public function addMonthDay($name, $label) {
-    return $this->add('date', $name, $label,
-      CRM_Core_SelectValues::date(NULL, 'M d')
-    );
   }
 
   /**
@@ -859,45 +863,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for link.
-   *
-   * @return string
-   */
-  public function getLink() {
-    $config = CRM_Core_Config::singleton();
-    return CRM_Utils_System::url($_GET[$config->userFrameworkURLVar],
-      '_qf_' . $this->_name . '_display=true'
-    );
-  }
-
-  /**
-   * Boolean function to determine if this is a one form page.
-   *
-   * @return bool
-   */
-  public function isSimpleForm() {
-    return $this->_state->getType() & (CRM_Core_State::START | CRM_Core_State::FINISH);
-  }
-
-  /**
-   * Getter function for Form Action.
-   *
-   * @return string
-   */
-  public function getFormAction() {
-    return $this->_attributes['action'];
-  }
-
-  /**
-   * Setter function for Form Action.
-   *
-   * @param string $action
-   */
-  public function setFormAction($action) {
-    $this->_attributes['action'] = $action;
-  }
-
-  /**
    * Render form and return contents.
    *
    * @return string
@@ -1256,7 +1221,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
       return 'create';
     }
-    if ($action & (CRM_Core_Action::BROWSE)) {
+    if ($action & (CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
       return 'get';
     }
     // If you get this exception try adding more cases above.
@@ -1306,6 +1271,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
+    if (!isset($props['context'])) {
+      try {
+        $props['context'] = $this->getDefaultContext();
+      }
+      // This is not a required param, so we'll ignore if this doesn't exist.
+      catch (Exception $e) {}
+    }
     // Fetch options from the api unless passed explicitly
     if (isset($props['options'])) {
       $options = $props['options'];
@@ -1340,7 +1312,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
       if (CRM_Utils_Array::value('context', $props) != 'search') {
-        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
       }
     }
     $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
@@ -1369,10 +1341,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   public function addField($name, $props = array(), $required = FALSE) {
-    // TODO: Handle custom field
-    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
-      throw new Exception("Custom fields are not supported by the addField method. ");
-    }
     // Resolve context.
     if (!isset($props['context'])) {
       $props['context'] = $this->getDefaultContext();
@@ -1389,7 +1357,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['action'])) {
       $props['action'] = $this->getApiAction();
     }
-    // Get field metadata.
+
+    // Handle custom fields
+    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+      $fieldId = (int) substr($name, 7);
+      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $props['context'] == 'search', CRM_Utils_Array::value('label', $props));
+    }
+
+    // Core field - get metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
     $label = CRM_Utils_Array::value('label', $props, isset($fieldSpec['title']) ? $fieldSpec['title'] : NULL);
@@ -1401,12 +1376,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $isSelect = (in_array($widget, array(
           'Select',
-          'Multi-Select',
-          'Select State/Province',
-          'Multi-Select State/Province',
-          'Select Country',
-          'Multi-Select Country',
-          'AdvMulti-Select',
           'CheckBoxGroup',
           'RadioGroup',
           'Radio',
@@ -1416,60 +1385,34 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Fetch options from the api unless passed explicitly.
       if (isset($props['options'])) {
         $options = $props['options'];
-        // Else this get passed to the form->add method.
-        unset($props['options']);
       }
       else {
         $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
-      //@TODO AdvMulti-Select is deprecated, drop support.
-      if ($props['context'] == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
+      if ($props['context'] == 'search') {
         $widget = 'Select';
-      }
-      // Set default options-url value.
-      if ((!isset($props['options-url']))) {
-        $props['options-url'] = TRUE;
+        $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
       }
 
       // Add data for popup link.
-      if ((isset($props['options-url']) && $props['options-url']) && ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
-        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+      if ((!empty($props['option_url']) || !array_key_exists('option_url', $props)) && ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
+        $props['data-option-edit-path'] = !empty($props['option_url']) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
         $props['data-api-entity'] = $props['entity'];
         $props['data-api-field'] = $props['name'];
-        if (isset($props['options-url'])) {
-          unset($props['options-url']);
-        }
-      }
-    }
-    //Use select2 library for following widgets.
-    $isSelect2 = (in_array($widget, array(
-          'Select',
-          'Multi-Select',
-          'Select State/Province',
-          'Multi-Select State/Province',
-          'Select Country',
-          'Multi-Select Country',
-    )));
-    if ($isSelect2) {
-      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
-      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
-        $props['class'] .= ' huge';
-        $props['multiple'] = 'multiple';
-      }
-      // The placeholder is only used for select-elements.
-      if (!array_key_exists('placeholder', $props)) {
-        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
       }
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
-    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
+    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type', 'option_url', 'options');
+
     // TODO: refactor switch statement, to separate methods.
     switch ($widget) {
       case 'Text':
-      case 'Link':
+      case 'Url':
+      case 'Number':
+      case 'Email':
         //TODO: Autodetect ranges
         $props['size'] = isset($props['size']) ? $props['size'] : 60;
-        return $this->add('text', $name, $label, $props, $required);
+        return $this->add(strtolower($widget), $name, $label, $props, $required);
 
       case 'hidden':
         return $this->add('hidden', $name, NULL, $props, $required);
@@ -1478,7 +1421,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         //Set default columns and rows for textarea.
         $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
         $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
-        return $this->addElement('textarea', $name, $label, $props, $required);
+        return $this->add('textarea', $name, $label, $props, $required);
 
       case 'Select Date':
         //TODO: add range support
@@ -1494,13 +1437,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
         return $this->addRadio($name, $label, $options, $props, $separator, $required);
 
+      case 'ChainSelect':
+        $props += array(
+          'required' => $required,
+          'label' => $label,
+          'multiple' => $props['context'] == 'search',
+        );
+        return $this->addChainSelect($name, $props);
+
       case 'Select':
-        unset($props['size']);
-        if (empty($props['multiple']) && !empty($props['placeholder'])) {
-          $options = array('' => $props['placeholder']) + $options;
-        }
-        if (!empty($props['data-api-field']) && (in_array($props['data-api-field'], array('state_province_id', 'county_id')))) {
-          return $this->addChainSelect($name, $props);
+        $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
+        if (!array_key_exists('placeholder', $props)) {
+          $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
         }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add('select', $name, $label, $options, $required, $props);
@@ -1511,7 +1459,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'RadioGroup':
         return $this->addRadio($name, $label, $options, $props, NULL, $required);
 
-      //case 'AdvMulti-Select':
       case 'CheckBox':
         $text = isset($props['text']) ? $props['text'] : NULL;
         unset($props['text']);
@@ -1525,16 +1472,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'File':
         // We should not build upload file in search mode.
-        if (isset($props['context']) && $props['context'] == 'search') {
+        if ($props['context'] == 'search') {
           return;
         }
         $file = $this->add('file', $name, $label, $props, $required);
         $this->addUploadElement($name);
         return $file;
 
-      //case 'RichTextEditor':
-      //TODO: Add javascript template for wysiwyg.
-      case 'Autocomplete-Select':
+      case 'RichTextEditor':
+        return $this->add('wysiwyg', $name, $label, $props, $required);
+
       case 'EntityRef':
         return $this->addEntityRef($name, $label, $props, $required);
 
@@ -1542,7 +1489,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // case 'Int':
       //case 'Float':
       //case 'Money':
-      //case 'Link':
       //case read only fields
       default:
         throw new Exception("Unsupported html-element " . $widget);
@@ -1579,40 +1525,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'data-default' => $default,
       'data-usedfor' => json_encode($usedFor),
     ));
-  }
-
-  /**
-   * @param int $id
-   * @param $title
-   * @param null $required
-   * @param null $extra
-   */
-  public function addCountry($id, $title, $required = NULL, $extra = NULL) {
-    $this->addElement('select', $id, $title,
-      array(
-        '' => ts('- select -'),
-      ) + CRM_Core_PseudoConstant::country(), $extra
-    );
-    if ($required) {
-      $this->addRule($id, ts('Please select %1', array(1 => $title)), 'required');
-    }
-  }
-
-  /**
-   * @param string $name
-   * @param $label
-   * @param $options
-   * @param $attributes
-   * @param null $required
-   * @param null $javascriptMethod
-   */
-  public function addSelectOther($name, $label, $options, $attributes, $required = NULL, $javascriptMethod = NULL) {
-
-    $this->addElement('select', $name . '_id', $label, $options, $javascriptMethod);
-
-    if ($required) {
-      $this->addRule($name . '_id', ts('Please select %1', array(1 => $label)), 'required');
-    }
   }
 
   /**
@@ -1665,16 +1577,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @return string
-   */
-  public function buttonType() {
-    $uploadNames = $this->get('uploadNames');
-    $buttonType = (is_array($uploadNames) && !empty($uploadNames)) ? 'upload' : 'next';
-    $this->assign('buttonType', $buttonType);
-    return $buttonType;
-  }
-
-  /**
    * @param $name
    *
    * @return null
@@ -1694,13 +1596,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add date.
    *
-   * @code
-   * // if you need time
-   * $attributes = array(
-   *   'addTime' => true,
-   *   'formatType' => 'relative' or 'birth' etc check advanced date settings
-   * );
-   * @endcode
+   * @deprecated
+   * Use $this->add('datepicker', ...) instead.
    *
    * @param string $name
    *   Name of the element.
@@ -1790,7 +1687,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   *  Function that will add date and time.
+   * Function that will add date and time.
+   *
+   * @deprecated
+   * Use $this->add('datepicker', ...) instead.
    *
    * @param string $name
    * @param string $label
@@ -2255,7 +2155,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'required' => FALSE,
       'placeholder' => empty($settings['required']) ? ts('- none -') : ts('- select -'),
     );
-    CRM_Utils_Array::remove($props, 'label', 'required', 'control_field');
+    CRM_Utils_Array::remove($props, 'label', 'required', 'control_field', 'context');
     $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2';
     $props['data-select-prompt'] = $props['placeholder'];
     $props['data-name'] = $elementName;

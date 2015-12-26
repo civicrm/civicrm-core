@@ -167,7 +167,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         ),
         'bracket_info' => array(
           'entity_column' => 'case_type_id',
-          'options' => CRM_Case_PseudoConstant::caseType('title', FALSE),
+          'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
         ),
       ),
     );

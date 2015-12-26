@@ -57,16 +57,14 @@
   <field>
     <name>status_id</name>
     <uniqueName>participant_status_id</uniqueName>
-    <title>Participant Status ID</title>
+    <title>Participant Status</title>
     <headerPattern>/(participant.)?(status)$/i</headerPattern>
     <import>true</import>
     <type>int unsigned</type>
     <export>true</export>
     <required>true</required>
     <default>1</default>
-    <comment>Participant status ID. FK to civicrm_participant_status_type. Default of 1 should map to status =
-      Registered.
-    </comment>
+    <comment>Participant status ID. FK to civicrm_participant_status_type. Default of 1 should map to status = Registered.</comment>
     <add>1.7</add>
     <pseudoconstant>
       <table>civicrm_participant_status_type</table>
@@ -91,7 +89,7 @@
   <field>
     <name>role_id</name>
     <uniqueName>participant_role_id</uniqueName>
-    <title>Participant Role ID</title>
+    <title>Participant Role</title>
     <pseudoconstant>
       <optionGroupName>participant_role</optionGroupName>
     </pseudoconstant>
