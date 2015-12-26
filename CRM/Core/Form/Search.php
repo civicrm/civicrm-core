@@ -200,4 +200,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     return ts('Name');
   }
 
+  /**
+   * Explicitly declare the form context for addField().
+   */
+  public function getDefaultContext() {
+    return 'search';
+  }
+
 }

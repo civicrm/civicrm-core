@@ -739,23 +739,6 @@ class CRM_Utils_Rule {
 
   /**
    * @param $value
-   * @param $options
-   *
-   * @return bool
-   */
-  public static function autocomplete($value, $options) {
-    if ($value) {
-      $selectOption = CRM_Core_BAO_CustomOption::valuesByID($options['fieldID'], $options['optionGroupID']);
-
-      if (!in_array($value, $selectOption)) {
-        return FALSE;
-      }
-    }
-    return TRUE;
-  }
-
-  /**
-   * @param $value
    * @param null $actualElementValue
    *
    * @return bool

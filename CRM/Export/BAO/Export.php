@@ -1073,9 +1073,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               elseif (isset($fieldValue) && $fieldValue != '') {
                 //check for custom data
                 if ($cfID = CRM_Core_BAO_CustomField::getKeyID($relationField)) {
-                  $row[$field . $relationField] = CRM_Core_BAO_CustomField::getDisplayValue($fieldValue, $cfID,
-                    $relationQuery[$field]->_options
-                  );
+                  $row[$field . $relationField] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
                 }
                 else {
                   //normal relationship fields
@@ -1107,7 +1105,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           ) {
             //check for custom data
             if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
-              $row[$field] = CRM_Core_BAO_CustomField::getDisplayValue($fieldValue, $cfID, $query->_options);
+              $row[$field] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
             }
             elseif (array_key_exists($field, $multipleSelectFields)) {
               //option group fixes

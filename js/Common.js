@@ -600,7 +600,7 @@ if (!CRM.vars) CRM.vars = {};
 
   function copyAttributes($source, $target, attributes) {
     _.each(attributes, function(name) {
-      if ($source.attr(name)) {
+      if ($source.attr(name) !== undefined) {
         $target.attr(name, $source.attr(name));
       }
     });
@@ -612,15 +612,25 @@ if (!CRM.vars) CRM.vars = {};
   $.fn.crmDatepicker = function(options) {
     return $(this).each(function() {
       if ($(this).is('.crm-form-date-wrapper .crm-hidden-date')) {
-        // Already initialized
+        // Already initialized - destroy
+        $(this)
+          .off('.crmDatepicker')
+          .css('display', '')
+          .removeClass('crm-hidden-date')
+          .siblings().remove();
+        $(this).unwrap();
+      }
+      if (options === 'destroy') {
         return;
       }
       var
         $dataField = $(this).wrap('<span class="crm-form-date-wrapper" />'),
-        settings = $.extend({}, $dataField.data('datepicker') || {}, options || {}),
+        settings = _.cloneDeep(options || {}),
         $dateField = $(),
         $timeField = $(),
-        $clearLink = $();
+        $clearLink = $(),
+        hasDatepicker = settings.date !== false && settings.date !== 'yy',
+        type = hasDatepicker ? 'text' : 'number';
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
         $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><i class="crm-i fa-times"></i></a>')
@@ -639,18 +649,32 @@ if (!CRM.vars) CRM.vars = {};
           });
       }
       if (settings.date !== false) {
-        $dateField = $('<input>').insertAfter($dataField);
+        // Render "number" field for year-only format, calendar popup for all other formats
+        $dateField = $('<input type="' + type + '">').insertAfter($dataField);
         copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
-        $dateField.addClass('crm-form-text crm-form-date');
-        settings.date = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
-        settings.changeMonth = _.includes('m', settings.date);
-        settings.changeYear = _.includes('y', settings.date);
-        $dateField.datepicker(settings).change(updateDataField);
+        $dateField.addClass('crm-form-' + type);
+        settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
+        settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
+        if (hasDatepicker) {
+          settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
+          settings.changeMonth = _.includes(settings.dateFormat, 'm');
+          settings.changeYear = _.includes(settings.dateFormat, 'y');
+          $dateField.addClass('crm-form-date').datepicker(settings);
+        } else {
+          $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
+          $dateField.attr('max', settings.maxDate ? CRM.utils.formatDate(settings.maxDate, 'yy') : '4000');
+        }
+        $dateField.change(updateDataField);
       }
       // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
       function isValidDate() {
+        // FIXME: parseDate doesn't work with incomplete date formats; skip validation if no month, day or year in format
+        var lowerFormat = settings.dateFormat.toLowerCase();
+        if (lowerFormat.indexOf('y') < 0 || lowerFormat.indexOf('m') < 0 || lowerFormat.indexOf('d') < 0) {
+          return true;
+        }
         try {
-          $.datepicker.parseDate(settings.date, $dateField.val());
+          $.datepicker.parseDate(settings.dateFormat, $dateField.val());
           return true;
         } catch (e) {
           return false;
@@ -660,8 +684,10 @@ if (!CRM.vars) CRM.vars = {};
         var val = $dataField.val(),
           time = null;
         if (context !== 'userInput' && context !== 'crmClear') {
-          if ($dateField.length) {
+          if (hasDatepicker) {
             $dateField.datepicker('setDate', _.includes(val, '-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
+          } else if ($dateField.length) {
+            $dateField.val(val.slice(0, 4));
           }
           if ($timeField.length) {
             if (val.length === 8) {
@@ -679,9 +705,11 @@ if (!CRM.vars) CRM.vars = {};
         if (context !== 'crmClear') {
           var val = '';
           if ($dateField.val()) {
-            if (isValidDate()) {
+            if (hasDatepicker && isValidDate()) {
               val = $.datepicker.formatDate('yy-mm-dd', $dateField.datepicker('getDate'));
               $dateField.removeClass('crm-error');
+            } else if (!hasDatepicker) {
+              val = $dateField.val() + '-01-01';
             } else {
               $dateField.addClass('crm-error');
             }
@@ -692,7 +720,7 @@ if (!CRM.vars) CRM.vars = {};
           $dataField.val(val).trigger('change', ['userInput']);
         }
       }
-      $dataField.hide().addClass('crm-hidden-date').on('change', updateInputFields);
+      $dataField.hide().addClass('crm-hidden-date').on('change.crmDatepicker', updateInputFields);
       updateInputFields();
     });
   };
@@ -925,6 +953,9 @@ if (!CRM.vars) CRM.vars = {};
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
       $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
+      $('.crm-form-text[data-crm-datepicker]', e.target).each(function() {
+        $(this).crmDatepicker($(this).data('crmDatepicker'));
+      });
       // Cache Form Input initial values
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());

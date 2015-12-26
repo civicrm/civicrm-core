@@ -40,21 +40,12 @@
                 {assign var="element_name_from" value=$element_name|cat:"_from"}
                 {assign var="element_name_to" value=$element_name|cat:"_to"}
                 <tr>
-                {if $element.data_type neq 'Date'}
                     <td class="label">{$form.$element_name_from.label}</td><td>
                     {$form.$element_name_from.html|crmAddClass:six}
                     &nbsp;&nbsp;{$form.$element_name_to.label}&nbsp;&nbsp;{$form.$element_name_to.html|crmAddClass:six}
-                {elseif $element.skip_calendar NEQ true }
-                    <td class="label"><label for='{$element_name}'>{$element.label}</label>
-                    {include file="CRM/Core/DateRange.tpl" fieldName=$element_name from='_from' to='_to'}</td><td>
-                {/if}
             {else}
                 <td class="label">{$form.$element_name.label}</td><td>
-                {if $element.data_type neq 'Date'}
-                    {$form.$element_name.html}
-                {elseif $element.skip_calendar NEQ true }
-                    {include file="CRM/common/jcalendar.tpl" elementName=$element_name}
-                {/if}
+                  {$form.$element_name.html}
                 {if !empty($form.$operator_name)}
                   <span class="crm-multivalue-search-op" for="{$element_name}">{$form.$operator_name.html}</span>
                   {assign var="add_multivalue_js" value=true}

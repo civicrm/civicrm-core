@@ -481,7 +481,7 @@ class CRM_Badge_BAO_Badge {
         $value = isset($dao->$key) ? $dao->$key : NULL;
         // Format custom fields
         if (strstr($key, 'custom_') && isset($value)) {
-          $value = CRM_Core_BAO_CustomField::getDisplayValue($value, substr($key, 7), $query->_options, $dao->contact_id);
+          $value = CRM_Core_BAO_CustomField::displayValue($value, substr($key, 7), $dao->contact_id);
         }
         $rows[$dao->participant_id][$key] = $value;
       }

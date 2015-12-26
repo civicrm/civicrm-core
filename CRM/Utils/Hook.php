@@ -767,8 +767,9 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when CiviCRM needs to edit/display a custom field with options (select, radio, checkbox,
-   * adv multiselect)
+   * This hook is called when CiviCRM needs to edit/display a custom field with options
+   *
+   * @deprecated in favor of hook_civicrm_fieldOptions
    *
    * @param int $customFieldID
    *   The custom field ID.
@@ -779,8 +780,7 @@ abstract class CRM_Utils_Hook {
    *              to be careful to not overwrite the array.
    *   Only add/edit/remove the specific field options you intend to affect.
    * @param bool $detailedFormat
-   *   If true,.
-   *                the options are in an ID => array ( 'id' => ID, 'label' => label, 'value' => value ) format
+   *   If true, the options are in an ID => array ( 'id' => ID, 'label' => label, 'value' => value ) format
    * @param array $selectAttributes
    *   Contain select attribute(s) if any.
    *
@@ -790,6 +790,23 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(3, $customFieldID, $options, $detailedFormat,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_customFieldOptions'
+    );
+  }
+
+  /**
+   * Hook for modifying field options
+   *
+   * @param string $entity
+   * @param string $field
+   * @param array $options
+   * @param array $params
+   *
+   * @return mixed
+   */
+  public static function fieldOptions($entity, $field, &$options, $params) {
+    return self::singleton()->invoke(5, $entity, $field, $options, $params,
+      self::$_nullObject, self::$_nullObject,
+      'civicrm_fieldOptions'
     );
   }
 
@@ -1061,6 +1078,8 @@ abstract class CRM_Utils_Hook {
 
   /**
    * This hooks allows to change option values.
+   *
+   * @deprecated in favor of hook_civicrm_fieldOptions
    *
    * @param array $options
    *   Associated array of option values / id

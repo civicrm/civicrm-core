@@ -305,7 +305,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               $customValue = &$val;
               if (!empty($dateFields) && array_key_exists($fieldId, $dateFields)) {
                 // formatted date capture value capture
-                $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
+                $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::displayValue($customValue, $fieldId);
 
                 //set date and time format
                 switch ($timeFormat) {
@@ -325,11 +325,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               }
               else {
                 // assign to $result
-                $customValue = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
-              }
-              // FIXME: getDisplayValue should always return a string so why is this necessary?
-              if (!$customValue && $customValue !== '0') {
-                $customValue = "";
+                $customValue = CRM_Core_BAO_CustomField::displayValue($customValue, $fieldId);
               }
 
               // Set field attributes to support crmEditable

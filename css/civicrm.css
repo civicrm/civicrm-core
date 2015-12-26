@@ -1437,7 +1437,7 @@ input.crm-form-entityref {
   text-decoration: none;
   font-size: .9em;
   color: #000;
-  padding: 1px 2px 1px 0;
+  padding: 1px 3px;
   opacity: .7;
   cursor: pointer;
 }
@@ -1454,7 +1454,8 @@ input.crm-form-entityref {
 .crm-container .crm-accordion-header .crm-hover-button {
   opacity: 1;
   position: relative;
-  top: -4px;
+  top: -2px;
+  color: inherit;
 }
 .crm-container .crm-hover-button:hover,
 .crm-container a.crm-hover-button:hover,
@@ -1539,7 +1540,6 @@ input.crm-form-entityref {
   width: 15px;
   background: url("../i/TreePlus.gif") no-repeat right 1px;
 }
-
 
 .crm-container .btn-slide-active .panel {
   z-index: 10;

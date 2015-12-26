@@ -192,6 +192,17 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     elseif (strpos($class, 'crm-form-contact-reference') !== FALSE) {
       self::preprocessContactReference($element);
     }
+    // Hack to support html5 fields (number, url, etc)
+    else {
+      foreach (CRM_Core_Form::$html5Types as $type) {
+        if (strpos($class, "crm-form-$type") !== FALSE) {
+          $element->setAttribute('type', $type);
+          // Also add the "base" class for consistent styling
+          $class .= ' crm-form-text';
+          break;
+        }
+      }
+    }
 
     if ($required) {
       $class .= ' required';

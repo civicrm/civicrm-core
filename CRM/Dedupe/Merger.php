@@ -1406,17 +1406,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
           if (!empty($mainTree[$gid]['fields'][$fid]['customValue'])) {
             foreach ($mainTree[$gid]['fields'][$fid]['customValue'] as $valueId => $values) {
-              $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomGroup::formatCustomValues($values,
-                $field, TRUE
-              );
+              $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomField::displayValue($values['data'], $fid);
             }
           }
           $value = "null";
           if (!empty($otherTree[$gid]['fields'][$fid]['customValue'])) {
             foreach ($otherTree[$gid]['fields'][$fid]['customValue'] as $valueId => $values) {
-              $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomGroup::formatCustomValues($values,
-                $field, TRUE
-              );
+              $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomField::displayValue($values['data'], $fid);
               if ($values['data'] === 0 || $values['data'] === '0') {
                 $values['data'] = $qfZeroBug;
               }
@@ -1647,7 +1643,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           case 'Select Country':
           case 'Select State/Province':
-            $submitted[$key] = CRM_Core_BAO_CustomField::getDisplayValue($value, $fid, $cFields);
+            $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fid);
             break;
 
           case 'CheckBox':
