@@ -1437,14 +1437,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
         return $this->addRadio($name, $label, $options, $props, $separator, $required);
 
+      case 'ChainSelect':
+        $props += array(
+          'required' => $required,
+          'label' => $label,
+          'multiple' => $props['context'] == 'search',
+        );
+        return $this->addChainSelect($name, $props);
+
       case 'Select':
-        $props['class'] = CRM_Utils_Array::value('class', $props, 'big');
-        $props['class'] .= ' crm-select2';
+        $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
         if (!array_key_exists('placeholder', $props)) {
           $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
-        }
-        if (!empty($props['data-api-field']) && (in_array($props['data-api-field'], array('state_province_id', 'county_id')))) {
-          return $this->addChainSelect($name, $props);
         }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add('select', $name, $label, $options, $required, $props);
@@ -2151,7 +2155,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'required' => FALSE,
       'placeholder' => empty($settings['required']) ? ts('- none -') : ts('- select -'),
     );
-    CRM_Utils_Array::remove($props, 'label', 'required', 'control_field');
+    CRM_Utils_Array::remove($props, 'label', 'required', 'control_field', 'context');
     $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2';
     $props['data-select-prompt'] = $props['placeholder'];
     $props['data-name'] = $elementName;
