@@ -257,7 +257,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>ChainSelect</type>
     </html>
     <add>1.1</add>
   </field>
@@ -273,7 +273,7 @@
   </foreignKey>
   <field>
     <name>state_province_id</name>
-    <title>State</title>
+    <title>State/Province</title>
     <type>int unsigned</type>
     <comment>Which State_Province does this address belong to.</comment>
     <pseudoconstant>
@@ -282,7 +282,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>ChainSelect</type>
     </html>
     <add>1.1</add>
   </field>
