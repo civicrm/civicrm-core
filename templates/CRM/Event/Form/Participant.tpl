@@ -374,8 +374,8 @@
         });
 
         function buildRoleCustomData() {
-          var roleId = $('select[name^=role_id]', $form).val().join();
-          CRM.buildCustomData('Participant', roleId, {/literal}{$roleCustomDataTypeID}{literal});
+          var roleId = $('select[name^=role_id]', $form).val() || [];
+          CRM.buildCustomData('Participant', roleId.join(), {/literal}{$roleCustomDataTypeID}{literal});
         }
 
         //build fee block
