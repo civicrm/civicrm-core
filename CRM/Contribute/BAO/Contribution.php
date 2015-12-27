@@ -3060,6 +3060,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       );
       if ($contributionStatus == 'Refunded') {
         $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
+        if (isset($params['refund_trxn_id'])) {
+          // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
+          $trxnParams['trxn_id'] = $params['refund_trxn_id'];
+        }
       }
       //CRM-16259, set is_payment flag for non pending status
       if (!in_array($contributionStatus, $pendingStatus)) {
@@ -3084,7 +3088,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
-        $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
+        if (!isset($params['trxnParams']['trxn_id'])) {
+          // Actually I have no idea why we are overwriting any values from the previous contribution.
+          // (filling makes sense to me). However, only protecting this value as I really really know we
+          // don't want this one overwritten.
+          // CRM-17751.
+          $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
+        }
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
 
         if (!(($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)
@@ -3125,7 +3135,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
         //Update contribution status
         $params['trxnParams']['status_id'] = $params['contribution']->contribution_status_id;
-        $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
+        if (!isset($params['refund_trxn_id'])) {
+          // CRM-17751 This has previously been deliberately set. No explanation as to why one variant
+          // gets preference over another so I am only 'protecting' a very specific tested flow
+          // and letting natural justice take care of the rest.
+          $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
+        }
         if (!empty($params['contribution_status_id']) &&
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {

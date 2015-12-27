@@ -775,7 +775,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is " . print_r($paramValue, TRUE) . "  value 2 is " . print_r($actualValues[$paramName], TRUE));
       }
       else {
-        $this->fail("Attribute '$paramName' not present in actual array.");
+        $this->assertNull($expectedValues[$paramName], "Attribute '$paramName' not present in actual array and we expected it to be " . $expectedValues[$paramName]);
       }
     }
   }

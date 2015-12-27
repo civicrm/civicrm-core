@@ -123,21 +123,21 @@ function _civicrm_api3_contribution_create_spec(&$params) {
   $params['soft_credit_to'] = array(
     'name' => 'soft_credit_to',
     'title' => 'Soft Credit contact ID (legacy)',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'description' => 'ID of Contact to be Soft credited to (deprecated - use contribution_soft api)',
     'FKClassName' => 'CRM_Contact_DAO_Contact',
   );
   $params['honor_contact_id'] = array(
     'name' => 'honor_contact_id',
     'title' => 'Honoree contact ID (legacy)',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'description' => 'ID of honoree contact (deprecated - use contribution_soft api)',
     'FKClassName' => 'CRM_Contact_DAO_Contact',
   );
   $params['honor_type_id'] = array(
     'name' => 'honor_type_id',
     'title' => 'Honoree Type (legacy)',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'description' => 'Type of honoree contact (deprecated - use contribution_soft api)',
     'pseudoconstant' => TRUE,
   );
@@ -158,8 +158,13 @@ function _civicrm_api3_contribution_create_spec(&$params) {
   );
   $params['batch_id'] = array(
     'title' => 'Batch',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'description' => 'Batch which relevant transactions should be added to',
+  );
+  $params['refund_trxn_id'] = array(
+    'title' => 'Refund Transaction ID',
+    'type' => CRM_Utils_Type::T_STRING,
+    'description' => 'Transaction ID specific to the refund taking place',
   );
 }
 
