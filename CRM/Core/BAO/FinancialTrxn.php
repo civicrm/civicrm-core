@@ -143,16 +143,18 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
    * @param $entity_id
-   *   Id of the entity usually the contactID.
+   *   Id of the entity usually the contributionID.
    * @param string $orderBy
    *   To get single trxn id for a entity table i.e last or first.
    * @param bool $newTrxn
+   * @param string $whereClause
+   *   Additional where parameters
    *
    * @return array
    *   array of category id's the contact belongs to.
    *
    */
-  public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE) {
+  public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE, $whereClause = '') {
     $ids = array('entityFinancialTrxnId' => NULL, 'financialTrxnId' => NULL);
 
     $condition = "";
@@ -164,7 +166,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
       $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
     }
 
-    $query = "SELECT ceft.id, ceft.financial_trxn_id FROM `civicrm_financial_trxn` cft
+    $query = "SELECT ceft.id, ceft.financial_trxn_id, cft.trxn_id FROM `civicrm_financial_trxn` cft
 LEFT JOIN civicrm_entity_financial_trxn ceft
 ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
 LEFT JOIN civicrm_entity_financial_trxn ceft1
@@ -172,6 +174,7 @@ ON ceft1.financial_trxn_id = cft.id AND ceft1.entity_table = 'civicrm_financial_
 LEFT JOIN civicrm_financial_item cfi ON ceft1.entity_table = 'civicrm_financial_item' and cfi.id = ceft1.entity_id
 WHERE ceft.entity_id = %1 AND (cfi.entity_table <> 'civicrm_financial_trxn' or cfi.entity_table is NULL)
 {$condition}
+{$whereClause}
 ORDER BY cft.id {$orderBy}
 LIMIT 1;";
 
@@ -180,8 +183,31 @@ LIMIT 1;";
     if ($dao->fetch()) {
       $ids['entityFinancialTrxnId'] = $dao->id;
       $ids['financialTrxnId'] = $dao->financial_trxn_id;
+      $ids['trxn_id'] = $dao->trxn_id;
     }
     return $ids;
+  }
+
+  /**
+   * Get the transaction id for the (latest) refund associated with a contribution.
+   *
+   * @param int $contributionID
+   * @return string
+   */
+  public static function getRefundTransactionTrxnID($contributionID) {
+    $ids = self::getRefundTransactionIDs($contributionID);
+    return isset($ids['trxn_id']) ? $ids['trxn_id'] : NULL;
+  }
+
+  /**
+   * Get the transaction id for the (latest) refund associated with a contribution.
+   *
+   * @param int $contributionID
+   * @return string
+   */
+  public static function getRefundTransactionIDs($contributionID) {
+    $refundStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+    return self::getFinancialTrxnId($contributionID, 'DESC', FALSE, " AND cft.status_id = $refundStatusID");
   }
 
   /**

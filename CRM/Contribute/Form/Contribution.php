@@ -329,6 +329,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     CRM_Contribute_Form_SoftCredit::setDefaultValues($defaults, $this);
 
     if ($this->_mode) {
+      // @todo - remove this function as the parent does it too.
       $config = CRM_Core_Config::singleton();
       // Set default country from config if no country set.
       if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
@@ -415,7 +416,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('is_pay_later', TRUE);
     }
     $this->assign('contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $defaults));
-
+    if (CRM_Utils_Array::value('contribution_status_id', $defaults) == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded')) {
+      $defaults['refund_trxn_id'] = CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($this->_id);
+    }
+    else {
+      $defaults['refund_trxn_id'] = isset($defaults['trxn_id']) ? $defaults['trxn_id'] : NULL;
+    }
     $dates = array(
       'receive_date',
       'receipt_date',
@@ -733,7 +739,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));
 
     $this->add('textarea', 'cancel_reason', ts('Cancellation / Refund Reason'), $attributes['cancel_reason']);
-
+    $this->add('text', 'refund_trxn_id', ts('Transaction ID for the refund payment'));
     $element = $this->add('select',
       'payment_processor_id',
       ts('Payment Processor'),

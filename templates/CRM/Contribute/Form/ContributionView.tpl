@@ -148,6 +148,12 @@
         <td>{$cancel_reason}</td>
       </tr>
     {/if}
+    {if $refund_trxn_id}
+      <tr>
+        <td class="label">{ts}Refund Transaction ID{/ts}</td>
+        <td>{$refund_trxn_id}</td>
+      </tr>
+    {/if}
   {/if}
   <tr>
     <td class="label">{ts}Payment Method{/ts}</td>
