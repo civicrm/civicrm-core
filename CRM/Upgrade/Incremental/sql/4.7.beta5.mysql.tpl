@@ -2,4 +2,4 @@
 
 -- CRM-17686
 ALTER TABLE `civicrm_job`
-ADD COLUMN `next_scheduled_run` timestamp NULL DEFAULT NULL COMMENT 'When is this cron entry scheduled to run next' AFTER `last_run`;
+ADD COLUMN `scheduled_run_date` timestamp NULL DEFAULT NULL COMMENT 'When is this cron entry scheduled to run' AFTER `last_run`;

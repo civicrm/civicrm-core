@@ -61,10 +61,10 @@
     <add>4.1</add>
   </field>
   <field>
-    <name>next_scheduled_run</name>
+    <name>scheduled_run_date</name>
     <type>timestamp</type>
     <default>NULL</default>
-    <comment>When is this cron entry scheduled to run next</comment>
+    <comment>When is this cron entry scheduled to run</comment>
     <add>4.7</add>
   </field>
   <field>
