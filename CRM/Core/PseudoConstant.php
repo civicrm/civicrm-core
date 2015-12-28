@@ -591,7 +591,6 @@ class CRM_Core_PseudoConstant {
     }
     if ($name == 'cache') {
       CRM_Core_OptionGroup::flushAll();
-      CRM_Core_BAO_CustomField::$displayInfoCache = array();
     }
   }
 
