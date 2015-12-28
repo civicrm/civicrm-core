@@ -96,6 +96,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     $this->add('select', 'run_frequency', ts('Run frequency'), CRM_Core_SelectValues::getJobFrequency());
 
+    // CRM-17686
+    $this->addDateTime('next_scheduled_run', ts(($this->_id ? 'Next' : 'First') . ' Run Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
+
     $this->add('textarea', 'parameters', ts('Command parameters'),
       "cols=50 rows=6"
     );
@@ -156,6 +159,13 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     CRM_Core_DAO::storeValues($dao, $defaults);
 
+    // CRM-17686
+    if (!empty($dao->next_scheduled_run)) {
+      $ts = strtotime($dao->next_scheduled_run);
+      $defaults['next_scheduled_run'] = date('m/d/Y', $ts);
+      $defaults['next_scheduled_run_time'] = date('h:iA', $ts);
+    }
+
     // CRM-10708
     // job entity thats shipped with core is all lower case.
     // this makes sure camel casing is followed for proper working of default population.
@@ -193,6 +203,37 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $dao->api_action = $values['api_action'];
     $dao->description = $values['description'];
     $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
+
+    // CRM-17686
+    $dt = '';
+    if (!empty($values['next_scheduled_run'])) {
+      $dt = $values['next_scheduled_run'] . ' ';;
+    }
+    if (!empty($values['next_scheduled_run_time'])) {
+      $dt .= $values['next_scheduled_run_time'];
+    }
+    $ts = strtotime(trim($dt));
+    // if a date/time is supplied and not in the past, then set the next scheduled run...
+    if ($ts > time()) {
+      $dao->next_scheduled_run = CRM_Utils_Date::currentDBDate($ts);
+      // warn about monthly/quarterly scheduling, if applicable
+      if (($dao->run_frequency == 'Monthly') || ($dao->run_frequency == 'Quarter')) {
+        $info = getdate($ts);
+        if ($info['mday'] > 28) {
+          CRM_Core_Session::setStatus(
+            ts('Relative month values are calculated based on the length of month(s) that they pass through.
+              The result will land on the same day of the month except for days 29-31 when the target month contains fewer days.
+              For example, if a job is scheduled to run on August 31st, the following invocation will occur on October 1st.
+              To avoid this issue, please schedule Monthly and Quarterly jobs to run within the first 28 days of the month.'),
+            ts('Warning'), 'info', array('expires' => 0));
+        }
+      }
+    }
+    // ...otherwise, if this isn't a new scheduled job, clear the next scheduled run
+    elseif ($this->_id) {
+      $job = new CRM_Core_ScheduledJob(array('id' => $dao->id));
+      $job->clearNextScheduledRun();
+    }
 
     $dao->save();
 

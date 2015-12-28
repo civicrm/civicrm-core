@@ -105,6 +105,15 @@ CRM.$(function($) {
       <td class="label">{$form.parameters.label}<br />{docURL page="Managing Scheduled Jobs" resource="wiki"}</td>
       <td>{$form.parameters.html}</td>
     </tr>
+    <tr class="crm-job-form-block-next_scheduled_run">
+        <td class="label">{$form.next_scheduled_run.label}</td>
+        <td>
+            {if $hideCalender neq true}{include file="CRM/common/jcalendar.tpl" elementName=next_scheduled_run}{else}{$next_scheduled_run|crmDate}{/if}<br />
+            <div dlass="description">{ts}Do not run this job before this date / time.
+              Leave blank to run {if $action eq 1}as soon as possible{else}at next scheduled interval{/if}.{/ts}
+            </div>
+        </td>
+    </tr>
     <tr class="crm-job-form-block-is_active">
       <td></td><td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
     </tr>
