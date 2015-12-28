@@ -135,6 +135,15 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_beta5($rev) {
+    $this->addTask('Disable flexible jobs extension', 'disableFlexibleJobsExtension');
+  }
+
+  /**
    * CRM-16354
    *
    * @return int
@@ -360,6 +369,19 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
     if (file_exists($cacheFile)) {
       unlink($cacheFile);
     }
+    return TRUE;
+  }
+
+  /**
+   * CRM-17669 and CRM-17686, make scheduled jobs more flexible, disable the 4.6 extension if installed
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function disableFlexibleJobsExtension(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Job', 'Flexible Jobs', 'is_active', 0, 'name');
+
     return TRUE;
   }
 
