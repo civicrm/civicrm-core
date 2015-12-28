@@ -1807,11 +1807,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param $membershipSource
    * @param $isPayLater
    * @param int $campaignId
+   * @param array $formDates
    *
    * @throws CRM_Core_Exception
    * @return array
    */
-  public static function renewMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId) {
+  public static function renewMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId, $formDates = array()) {
     $renewalMode = $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
@@ -1896,8 +1897,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         );
 
         $currentMembership['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
-        $currentMembership['start_date'] = CRM_Utils_Array::value('start_date', $dates);
-        $currentMembership['end_date'] = CRM_Utils_Array::value('end_date', $dates);
+        foreach (array('start_date', 'end_date') as $dateType) {
+          $currentMembership[$dateType] = CRM_Utils_Array::value($dateType, $formDates);
+          if (empty($currentMembership[$dateType])) {
+            $currentMembership[$dateType] = CRM_Utils_Array::value($dateType, $dates);
+          }
+        }
         $currentMembership['is_test'] = $is_test;
 
         if (!empty($membershipSource)) {
@@ -1936,7 +1941,10 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         $memParams = array();
         $memParams['join_date'] = CRM_Utils_Date::isoToMysql($membership->join_date);
         $memParams['start_date'] = CRM_Utils_Date::isoToMysql($membership->start_date);
-        $memParams['end_date'] = CRM_Utils_Array::value('end_date', $dates);
+        $memParams['end_date'] = CRM_Utils_Array::value('end_date', $formDates);
+        if (empty($memParams['end_date'])) {
+          $memParams['end_date'] = CRM_Utils_Array::value('end_date', $dates);
+        }
         $memParams['membership_type_id'] = $membershipTypeID;
 
         //set the log start date.
@@ -1974,9 +1982,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       if (!$pending) {
         $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeID, NULL, NULL, NULL, $numRenewTerms);
 
-        $memParams['join_date'] = CRM_Utils_Array::value('join_date', $dates);
-        $memParams['start_date'] = CRM_Utils_Array::value('start_date', $dates);
-        $memParams['end_date'] = CRM_Utils_Array::value('end_date', $dates);
+        foreach (array('join_date', 'start_date', 'end_date') as $dateType) {
+          $memParams[$dateType] = CRM_Utils_Array::value($dateType, $formDates);
+          if (empty($memParams[$dateType])) {
+            $memParams[$dateType] = CRM_Utils_Array::value($dateType, $dates);
+          }
+        }
 
         $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(CRM_Utils_Date::customFormat($dates['start_date'],
             $statusFormat
