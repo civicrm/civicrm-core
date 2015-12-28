@@ -89,8 +89,8 @@ class CRM_Core_ScheduledJob {
   /**
    * @return void
    */
-  public function clearNextScheduledRun() {
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET next_scheduled_run = NULL WHERE id = %1',
+  public function clearScheduledRunDate() {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET scheduled_run_date = NULL WHERE id = %1',
       array(
         '1' => array($this->id, 'Integer'),
       ));
@@ -103,9 +103,9 @@ class CRM_Core_ScheduledJob {
 
     // CRM-17686
     // check if the job has a specific scheduled date/time
-    if (!empty($this->next_scheduled_run)) {
-      if (strtotime($this->next_scheduled_run) <= time()) {
-        $this->clearNextScheduledRun();
+    if (!empty($this->scheduled_run_date)) {
+      if (strtotime($this->scheduled_run_date) <= time()) {
+        $this->clearScheduledRunDate();
         return TRUE;
       }
       else {
