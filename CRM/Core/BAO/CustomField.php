@@ -58,11 +58,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   public static $_importFields = NULL;
 
   /**
-   * @var array
-   */
-  public static $displayInfoCache = array();
-
-  /**
    * Build and retrieve the list of data types and descriptions.
    *
    * @return array
@@ -404,9 +399,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       return FALSE;
     }
     CRM_Utils_Hook::customFieldOptions($this->id, $options, FALSE);
-    $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
-    $entity = in_array($entity, array('Individual', 'Household', 'Organization')) ? 'Contact' : $entity;
-    CRM_Utils_Hook::fieldOptions($entity, "custom_{$this->id}", $options, array('context' => $context));
+    CRM_Utils_Hook::fieldOptions($this->getEntity(), "custom_{$this->id}", $options, array('context' => $context));
     return $options;
   }
 
@@ -748,11 +741,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int $fieldID
    *   The custom field ID.
    *
-   * @return CRM_Core_DAO_CustomField
+   * @return CRM_Core_BAO_CustomField
    *   The field object.
    */
   public static function getFieldObject($fieldID) {
-    $field = new CRM_Core_DAO_CustomField();
+    $field = new CRM_Core_BAO_CustomField();
 
     // check if we can get the field values from the system cache
     $cacheKey = "CRM_Core_DAO_CustomField_{$fieldID}";
@@ -827,10 +820,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     )));
 
     if ($isSelect) {
-      $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array(
-        'field' => "custom_$fieldId",
-        'context' => $search ? 'search' : 'create',
-      )), array());
+      $options = $field->getOptions($search ? 'search' : 'create');
 
       // Consolidate widget types to simplify the below switch statement
       if ($search || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
@@ -849,8 +839,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       // Add data for popup link. Normally this is handled by CRM_Core_Form->addSelect
       if ($field->option_group_id && !$search && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
         $selectAttributes += array(
-          'data-api-entity' => 'contact',
-          // FIXME: This works because the getoptions api isn't picky about custom fields, but it's WRONG
+          'data-api-entity' => $field->getEntity(),
           'data-api-field' => 'custom_' . $field->id,
           'data-option-edit-path' => 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $field->option_group_id),
         );
@@ -1026,7 +1015,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
         if ($field->data_type == 'ContactReference') {
           $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] . ' ' : '') . 'crm-form-contact-reference huge';
-          $attributes['data-api-entity'] = 'contact';
+          $attributes['data-api-entity'] = 'Contact';
           $element = $qf->add('text', $elementName, $label, $attributes, $useRequired && !$search);
 
           $urlParams = "context=customfield&id={$field->id}";
@@ -1137,22 +1126,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       throw new Exception('CRM_Core_BAO_CustomField::displayValue requires a field id');
     }
 
-    if (!isset(self::$displayInfoCache[$fieldId])) {
-      if (!is_a($field, 'CRM_Core_BAO_CustomField')) {
-        $field = new CRM_Core_BAO_CustomField();
-        $field->id = $fieldId;
-      }
-      $options = $field->getOptions();
-      self::$displayInfoCache[$fieldId] = array(
-        'id' => $fieldId,
-        'html_type' => $field->html_type,
-        'data_type' => $field->data_type,
-        'date_format' => $field->date_format,
-        'time_format' => $field->time_format,
-        'options' => $options,
-      );
+    if (!is_a($field, 'CRM_Core_BAO_CustomField')) {
+      $field = self::getFieldObject($fieldId);
     }
-    return self::formatDisplayValue($value, self::$displayInfoCache[$fieldId], $contactId);
+
+    $fieldInfo = array('options' => $field->getOptions()) + (array) $field;
+
+    return self::formatDisplayValue($value, $fieldInfo, $contactId);
   }
 
   /**
@@ -2381,6 +2361,16 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     $field = (array) $field;
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
     return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
+  }
+
+  /**
+   * Get api entity for this field
+   *
+   * @return string
+   */
+  public function getEntity() {
+    $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
+    return in_array($entity, array('Individual', 'Household', 'Organization')) ? 'Contact' : $entity;
   }
 
   /**

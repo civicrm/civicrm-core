@@ -92,7 +92,7 @@ class CRM_Core_BAO_CustomOption {
   }
 
   /**
-   * wrapper for ajax option selector.
+   * Wrapper for ajax option selector.
    *
    * @param array $params
    *   Associated array for params record id.
@@ -103,35 +103,19 @@ class CRM_Core_BAO_CustomOption {
    *   -page= offset
    */
   static public function getOptionListSelector(&$params) {
-
     $options = array();
 
-    //get the default value from custom fields
-    $customFieldBAO = new CRM_Core_BAO_CustomField();
-    $customFieldBAO->id = $params['fid'];
-    if ($customFieldBAO->find(TRUE)) {
-      $defaultValue = $customFieldBAO->default_value;
-      $fieldHtmlType = $customFieldBAO->html_type;
-    }
-    else {
-      CRM_Core_Error::fatal();
-    }
-    $defVal = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-      substr($defaultValue, 1, -1)
-    );
+    $field = CRM_Core_BAO_CustomField::getFieldObject($params['fid']);
+    $defVal = CRM_Utils_Array::explodePadded($field->default_value);
 
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
 
-    $field = CRM_Core_BAO_CustomField::getFieldObject($params['fid']);
-
-    // get the option group id
-    $optionGroupID = $field->option_group_id;
-    if (!$optionGroupID) {
+    if (!$field->option_group_id) {
       return $options;
     }
-    $queryParams = array(1 => array($optionGroupID, 'Integer'));
+    $queryParams = array(1 => array($field->option_group_id, 'Integer'));
     $total = "SELECT COUNT(*) FROM civicrm_option_value WHERE option_group_id = %1";
     $params['total'] = CRM_Core_DAO::singleValueQuery($total, $queryParams);
 
@@ -159,10 +143,7 @@ class CRM_Core_BAO_CustomOption {
         $class .= ' disabled';
         $action -= CRM_Core_Action::DISABLE;
       }
-      if ($fieldHtmlType == 'CheckBox' ||
-        $fieldHtmlType == 'AdvMulti-Select' ||
-        $fieldHtmlType == 'Multi-Select'
-      ) {
+      if (in_array($field->html_type, array('CheckBox', 'AdvMulti-Select', 'Multi-Select'))) {
         if (in_array($dao->value, $defVal)) {
           $options[$dao->id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
         }
@@ -171,7 +152,7 @@ class CRM_Core_BAO_CustomOption {
         }
       }
       else {
-        if ($defaultValue == $dao->value) {
+        if ($field->default_value == $dao->value) {
           $options[$dao->id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
         }
         else {
@@ -180,7 +161,7 @@ class CRM_Core_BAO_CustomOption {
       }
 
       $options[$dao->id]['class'] = $dao->id . ',' . $class;
-      $options[$dao->id]['is_active'] = !empty($dao->is_active) ? 'Yes' : 'No';
+      $options[$dao->id]['is_active'] = empty($dao->is_active) ? ts('No') : ts('Yes');
       $options[$dao->id]['links'] = CRM_Core_Action::formLink($links,
           $action,
           array(
