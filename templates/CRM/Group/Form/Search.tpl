@@ -95,7 +95,7 @@
     // also to handle search filtering for initial load of same page.
     var parentsOnly = 1
     var ZeroRecordText = {/literal}'{ts escape="js"}<div class="status messages">No Groups have been created for this site.{/ts}</div>'{literal};
-    CRM.$('table.crm-group-selector').data({
+    $('table.crm-group-selector').data({
       "ajax": {
         "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
         "data": function (d) {
@@ -155,84 +155,84 @@
         $('table.crm-group-selector').DataTable().draw();
       });
     });
-  })(CRM.$);
-  CRM.$('#crm-container')
-    .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
-    .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
-        // Refresh datatable when form completes
-        CRM.$('table.crm-group-selector').DataTable().draw();
+    $('#crm-container')
+      .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
+      .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
+          // Refresh datatable when form completes
+          $('table.crm-group-selector').DataTable().draw();
+      });
+    // show hide children
+    var context = $('#crm-main-content-wrapper');
+    $('table.crm-group-selector', context).on( 'click', 'span.show-children', function(){
+      var showOrgInfo = {/literal}"{$showOrgInfo}"{literal};
+      var rowID = $(this).parents('tr').prop('id');
+      var parentRow = rowID.split('_');
+      var parent_id = parentRow[1];
+      var group_id = '';
+      if ( parentRow[2]) {
+        group_id = parentRow[2];
+      }
+      var levelClass = 'level_2';
+      // check enclosing td if already at level 2
+      if ( $(this).parent().hasClass('level_2') ) {
+        levelClass = 'level_3';
+      }
+      if ( $(this).hasClass('collapsed') ) {
+        $(this).removeClass("collapsed").addClass("expanded").attr("title",{/literal}"{ts escape='js'}hide child groups{/ts}"{literal});
+        showChildren( parent_id, showOrgInfo, group_id, levelClass );
+      }
+      else {
+        $(this).removeClass("expanded").addClass("collapsed").attr("title",{/literal}"{ts escape='js'}show child groups{/ts}"{literal});
+        $('.parent_is_' + parent_id).find('.show-children').removeClass("expanded").addClass("collapsed").attr("title",{/literal}"{ts escape='js'}show child groups{/ts}"{literal});
+        $('.parent_is_' + parent_id).hide();
+        $('.parent_is_' + parent_id).each(function(i, obj) {
+          // also hide children of children
+          var gID = $(this).find('td:nth-child(2)').text();
+          $('.parent_is_' + gID).hide();
+        });
+      }
     });
-  // show hide children
-  var context = CRM.$('#crm-main-content-wrapper');
-  CRM.$('table.crm-group-selector', context).on( 'click', 'span.show-children', function(){
-    var showOrgInfo = {/literal}"{$showOrgInfo}"{literal};
-    var rowID = CRM.$(this).parents('tr').prop('id');
-    var parentRow = rowID.split('_');
-    var parent_id = parentRow[1];
-    var group_id = '';
-    if ( parentRow[2]) {
-      group_id = parentRow[2];
+    function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
+      var rowID = '#row_' + parent_id;
+      if ( group_id ) {
+        rowID = '#row_' + parent_id + '_' + group_id;
+      }
+      if ( $(rowID).next().hasClass('parent_is_' + parent_id ) ) {
+        // child rows for this parent have already been retrieved so just show them
+        $('.parent_is_' + parent_id ).show();
+      } else {
+        //FIXME Is it possible to replace all this with a datatables call? 
+        $.ajax( {
+            "dataType": 'json',
+            "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
+            "data": {'parent_id': parent_id, 'showOrgInfo': showOrgInfo},
+            "success": function(response){
+              var appendHTML = '';
+              $.each( response.data, function( i, val ) {
+                appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="crm-entity parent_is_'+parent_id+' crm-row-child">';
+                if ( val.is_parent ) {
+                  appendHTML += '<td class="crm-group-name crmf-title crm-editable ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.group_name + '</td>';
+                }
+                else {
+                  appendHTML += '<td class="crm-group-name  crmf-title crm-editable ' + levelClass + '"><span class="crm-no-children"></span>' + val.title + '</td>';
+                }
+                appendHTML += '<td class="right">' + val.count + "</td>";
+                appendHTML += "<td>" + val.created_by + "</td>";
+                appendHTML += '<td class="crm-editable crmf-description">' + (val.description || '') + "</td>";
+                appendHTML += "<td>" + val.group_type + "</td>";
+                appendHTML += '<td class="crm-editable crmf-visibility" data-type="select">' + val.visibility + "</td>";
+                if (showOrgInfo) {
+                  appendHTML += "<td>" + val.org_info + "</td>";
+                }
+                appendHTML += "<td>" + val.links + "</td>";
+                appendHTML += "</tr>";
+              });
+              $( rowID ).after( appendHTML );
+              $( rowID ).next().trigger('crmLoad');
+            }
+        });
+      }
     }
-    var levelClass = 'level_2';
-    // check enclosing td if already at level 2
-    if ( CRM.$(this).parent().hasClass('level_2') ) {
-      levelClass = 'level_3';
-    }
-    if ( CRM.$(this).hasClass('collapsed') ) {
-      CRM.$(this).removeClass("collapsed").addClass("expanded").attr("title",{/literal}"{ts escape='js'}hide child groups{/ts}"{literal});
-      showChildren( parent_id, showOrgInfo, group_id, levelClass );
-    }
-    else {
-      CRM.$(this).removeClass("expanded").addClass("collapsed").attr("title",{/literal}"{ts escape='js'}show child groups{/ts}"{literal});
-      CRM.$('.parent_is_' + parent_id).find('.show-children').removeClass("expanded").addClass("collapsed").attr("title",{/literal}"{ts escape='js'}show child groups{/ts}"{literal});
-      CRM.$('.parent_is_' + parent_id).hide();
-      CRM.$('.parent_is_' + parent_id).each(function(i, obj) {
-        // also hide children of children
-        var gID = $(this).find('td:nth-child(2)').text();
-        CRM.$('.parent_is_' + gID).hide();
-      });
-    }
-  });
-  function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
-    var rowID = '#row_' + parent_id;
-    if ( group_id ) {
-      rowID = '#row_' + parent_id + '_' + group_id;
-    }
-    if ( CRM.$(rowID).next().hasClass('parent_is_' + parent_id ) ) {
-      // child rows for this parent have already been retrieved so just show them
-      CRM.$('.parent_is_' + parent_id ).show();
-    } else {
-      //FIXME Is it possible to replace all this with a datatables call? 
-      CRM.$.ajax( {
-          "dataType": 'json',
-          "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
-          "data": {'parent_id': parent_id, 'showOrgInfo': showOrgInfo},
-          "success": function(response){
-            var appendHTML = '';
-            CRM.$.each( response.data, function( i, val ) {
-              appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="parent_is_'+parent_id+' crm-row-child">';
-              if ( val.is_parent ) {
-                appendHTML += '<td class="crm-group-name crmf-title crm-editable ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.group_name + '</td>';
-              }
-              else {
-                appendHTML += '<td class="crm-group-name  crmf-title crm-editable ' + levelClass + '"><span class="crm-no-children"></span>' + val.title + '</td>';
-              }
-              appendHTML += '<td class="right">' + val.count + "</td>";
-              appendHTML += "<td>" + val.created_by + "</td>";
-              appendHTML += '<td class="crm-editable crmf-description" data-type="textarea">' + (val.description || '') + "</td>";
-              appendHTML += "<td>" + val.group_type + "</td>";
-              appendHTML += '<td class="crm-editable crmf-visibility" data-type="select">' + val.visibility + "</td>";
-              if (showOrgInfo) {
-                appendHTML += "<td>" + val.org_info + "</td>";
-              }
-              appendHTML += "<td>" + val.links + "</td>";
-              appendHTML += "</tr>";
-            });
-            CRM.$( rowID ).after( appendHTML );
-            CRM.$( rowID ).next().trigger('crmLoad');
-          }
-      });
-    }
-  }
+  })(CRM.$);
 </script>
 {/literal}
