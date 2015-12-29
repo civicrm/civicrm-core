@@ -48,7 +48,7 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  */
 function civicrm_api3_extension_install($params) {
   $keys = _civicrm_api3_getKeys($params);
-  if (count($keys) == 0) {
+  if (!$keys) {
     return civicrm_api3_create_success();
   }
 
@@ -345,28 +345,16 @@ function civicrm_api3_extension_get($params) {
  * Determine the list of extension keys.
  *
  * @param array $params
- *   API request params with 'key' or 'keys'.
+ *   API request params with 'keys'.
  *
  * @return array
- *   Array of extension keys
- * @throws API_Exception
  */
 function _civicrm_api3_getKeys($params) {
-  if (array_key_exists('keys', $params) && is_array($params['keys'])) {
+  if (is_array($params['keys'])) {
     return $params['keys'];
   }
-  elseif (array_key_exists('keys', $params) && is_string($params['keys'])) {
-    if ($params['keys'] == '') {
-      return array();
-    }
-    else {
-      return explode(API_V3_EXTENSION_DELIMITER, $params['keys']);
-    }
+  if ($params['keys'] == '') {
+    return array();
   }
-  elseif (array_key_exists('key', $params)) {
-    return array($params['key']);
-  }
-  else {
-    throw new API_Exception('Missing required parameter: key or keys');
-  }
+  return explode(API_V3_EXTENSION_DELIMITER, $params['keys']);
 }
