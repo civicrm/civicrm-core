@@ -97,7 +97,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->add('select', 'run_frequency', ts('Run frequency'), CRM_Core_SelectValues::getJobFrequency());
 
     // CRM-17686
-    $this->addDateTime('scheduled_run_date', ts('Scheduled Run Date'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->add('datepicker', 'scheduled_run_date', ts('Scheduled Run Date'), NULL, FALSE, array('minDate' => time()));
 
     $this->add('textarea', 'parameters', ts('Command parameters'),
       "cols=50 rows=6"
@@ -162,8 +162,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     // CRM-17686
     if (!empty($dao->scheduled_run_date)) {
       $ts = strtotime($dao->scheduled_run_date);
-      $defaults['scheduled_run_date'] = date('m/d/Y', $ts);
-      $defaults['scheduled_run_date_time'] = date('h:iA', $ts);
+      $defaults['scheduled_run_date'] = date("Y-m-d H:i:s", $ts);
     }
 
     // CRM-10708
@@ -205,14 +204,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
 
     // CRM-17686
-    $dt = '';
-    if (!empty($values['scheduled_run_date'])) {
-      $dt = $values['scheduled_run_date'] . ' ';;
-    }
-    if (!empty($values['scheduled_run_date_time'])) {
-      $dt .= $values['scheduled_run_date_time'];
-    }
-    $ts = strtotime(trim($dt));
+    $ts = strtotime($values['scheduled_run_date']);
     // if a date/time is supplied and not in the past, then set the next scheduled run...
     if ($ts > time()) {
       $dao->scheduled_run_date = CRM_Utils_Date::currentDBDate($ts);
@@ -222,7 +214,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
         if ($info['mday'] > 28) {
           CRM_Core_Session::setStatus(
             ts('Relative month values are calculated based on the length of month(s) that they pass through.
-              The result will land on the same day of the month except for days 29-31 when the target month contains fewer days.
+              The result will land on the same day of the month except for days 29-31 when the target month contains fewer days than the previous month.
               For example, if a job is scheduled to run on August 31st, the following invocation will occur on October 1st, and then the 1st of every month thereafter.
               To avoid this issue, please schedule Monthly and Quarterly jobs to run within the first 28 days of the month.'),
             ts('Warning'), 'info', array('expires' => 0));
@@ -230,7 +222,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       }
     }
     // ...otherwise, if this isn't a new scheduled job, clear the next scheduled run
-    elseif ($this->_id) {
+    elseif ($dao->id) {
       $job = new CRM_Core_ScheduledJob(array('id' => $dao->id));
       $job->clearScheduledRunDate();
     }

@@ -107,10 +107,9 @@ CRM.$(function($) {
     </tr>
     <tr class="crm-job-form-block-scheduled-run-date">
         <td class="label">{$form.scheduled_run_date.label}</td>
-        <td>
-            {if $hideCalender neq true}{include file="CRM/common/jcalendar.tpl" elementName=scheduled_run_date}{else}{$scheduled_run_date|crmDate}{/if}<br />
-            <div dlass="description">{ts}Do not run this job before this date / time.
-              Leave blank to run {if $action eq 1}as soon as possible{else}at next run frequency{/if}.{/ts}
+        <td>{$form.scheduled_run_date.html}<br />
+            <div dlass="description">{ts}Do not run this job before this date / time. The run frequency selected above will apply thereafter.{/ts}<br />
+              {ts}Leave blank to run{/ts} {if $action eq 1}{ts}as soon as possible{/ts}{else}{ts}at next run frequency{/ts}{/if}.
             </div>
         </td>
     </tr>
