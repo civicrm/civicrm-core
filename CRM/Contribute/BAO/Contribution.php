@@ -3062,7 +3062,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
       }
       //CRM-16259, set is_payment flag for non pending status
-      if (!in_array(CRM_Utils_Array::value('contribution_status_id', $params), $pendingStatus)) {
+      if (!in_array($contributionStatus, $pendingStatus)) {
         $trxnParams['is_payment'] = 1;
       }
       if (!empty($params['payment_processor'])) {
