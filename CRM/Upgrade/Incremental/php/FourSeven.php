@@ -381,7 +381,12 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
    * @return bool
    */
   public function disableFlexibleJobsExtension(CRM_Queue_TaskContext $ctx) {
-    civicrm_api3('Extension', 'disable', array('key' => 'com.klangsoft.flexiblejobs'));
+    try {
+      civicrm_api3('Extension', 'disable', array('key' => 'com.klangsoft.flexiblejobs'));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // just ignore if the extension isn't installed
+    }
 
     return TRUE;
   }
