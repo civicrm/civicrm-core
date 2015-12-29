@@ -1342,26 +1342,27 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addField($name, $props = array(), $required = FALSE) {
     // Resolve context.
-    if (!isset($props['context'])) {
+    if (empty($props['context'])) {
       $props['context'] = $this->getDefaultContext();
     }
+    $context = $props['context'];
     // Resolve entity.
-    if (!isset($props['entity'])) {
+    if (empty($props['entity'])) {
       $props['entity'] = $this->getDefaultEntity();
     }
     // Resolve field.
-    if (!isset($props['name'])) {
+    if (empty($props['name'])) {
       $props['name'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
     // Resolve action.
-    if (!isset($props['action'])) {
+    if (empty($props['action'])) {
       $props['action'] = $this->getApiAction();
     }
 
     // Handle custom fields
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       $fieldId = (int) substr($name, 7);
-      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $props['context'] == 'search', CRM_Utils_Array::value('label', $props));
+      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $context == 'search', CRM_Utils_Array::value('label', $props));
     }
 
     // Core field - get metadata.
@@ -1370,7 +1371,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $label = CRM_Utils_Array::value('label', $props, isset($fieldSpec['title']) ? $fieldSpec['title'] : NULL);
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
-    if ($widget == 'TextArea' && $props['context'] == 'search') {
+    if ($widget == 'TextArea' && $context == 'search') {
       $widget = 'Text';
     }
 
@@ -1389,13 +1390,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
-      if ($props['context'] == 'search') {
+      if ($context == 'search') {
         $widget = 'Select';
         $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
       }
 
       // Add data for popup link.
-      if ((!empty($props['option_url']) || !array_key_exists('option_url', $props)) && ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
+      if ((!empty($props['option_url']) || !array_key_exists('option_url', $props)) && ($context != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
         $props['data-option-edit-path'] = !empty($props['option_url']) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
         $props['data-api-entity'] = $props['entity'];
         $props['data-api-field'] = $props['name'];
@@ -1441,14 +1442,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props += array(
           'required' => $required,
           'label' => $label,
-          'multiple' => $props['context'] == 'search',
+          'multiple' => $context == 'search',
         );
         return $this->addChainSelect($name, $props);
 
       case 'Select':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
         if (!array_key_exists('placeholder', $props)) {
-          $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
+          $props['placeholder'] = $required ? ts('- select -') : $context == 'search' ? ts('- any -') : ts('- none -');
         }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add('select', $name, $label, $options, $required, $props);
@@ -1472,7 +1473,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'File':
         // We should not build upload file in search mode.
-        if ($props['context'] == 'search') {
+        if ($context == 'search') {
           return;
         }
         $file = $this->add('file', $name, $label, $props, $required);
