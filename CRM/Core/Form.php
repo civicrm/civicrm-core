@@ -1376,6 +1376,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $isSelect = (in_array($widget, array(
           'Select',
+          'Multi-Select',
           'CheckBoxGroup',
           'RadioGroup',
           'Radio',
@@ -1389,7 +1390,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
-      if ($props['context'] == 'search') {
+      if ($props['context'] == 'search' || ((strpos($widget, 'Multi') !== FALSE) && (strpos($widget, 'Select') !== FALSE))) {
         $widget = 'Select';
         $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
       }
@@ -1441,14 +1442,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props += array(
           'required' => $required,
           'label' => $label,
-          'multiple' => $props['context'] == 'search',
+          'multiple' => CRM_Utils_Array::value('context', $props) == 'search',
         );
         return $this->addChainSelect($name, $props);
 
       case 'Select':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
         if (!array_key_exists('placeholder', $props)) {
-          $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
+          $props['placeholder'] = $required ? ts('- select -') : CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -');
         }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add('select', $name, $label, $options, $required, $props);
@@ -1472,7 +1473,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'File':
         // We should not build upload file in search mode.
-        if ($props['context'] == 'search') {
+        if (CRM_Utils_Array::value('context', $props) == 'search') {
           return;
         }
         $file = $this->add('file', $name, $label, $props, $required);
@@ -1482,6 +1483,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'RichTextEditor':
         return $this->add('wysiwyg', $name, $label, $props, $required);
 
+      case 'Autocomplete-Select':
       case 'EntityRef':
         return $this->addEntityRef($name, $label, $props, $required);
 
