@@ -109,14 +109,15 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
     foreach ($customFieldDataType as $dataType => $label) {
       switch ($dataType) {
+        case 'Country':
+        case 'StateProvince':
+          $this->foreignKeyChecksOff();
         case 'String':
         case 'Link':
         case 'Int':
         case 'Float':
         case 'Money':
         case 'Date':
-        case 'Country':
-        case 'StateProvince':
         case 'Boolean':
 
           //Based on the custom field data-type choose desired SQL operators(to test with) and basic $type
