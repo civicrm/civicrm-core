@@ -1225,7 +1225,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       return 'get';
     }
     // If you get this exception try adding more cases above.
-    throw new Exception("Cannot determine api action for " . __CLASS__);
+    throw new Exception("Cannot determine api action for " . get_class($this));
   }
 
   /**
@@ -1449,7 +1449,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Select':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
         if (!array_key_exists('placeholder', $props)) {
-          $props['placeholder'] = $required ? ts('- select -') : $context == 'search' ? ts('- any -') : ts('- none -');
+          $props['placeholder'] = $required ? ts('- select -') : ($context == 'search' ? ts('- any -') : ts('- none -'));
         }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add('select', $name, $label, $options, $required, $props);
