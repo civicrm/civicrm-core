@@ -29,7 +29,7 @@
     <comment>Foreign key to civicrm_contact.id .</comment>
     <add>2.1</add>
     <html>
-       <type>Autocomplete-Select</type>
+       <type>EntityRef</type>
      </html>
   </field>
   <foreignKey>

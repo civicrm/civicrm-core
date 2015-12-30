@@ -36,7 +36,7 @@
     <comment>FK to Contact who is sending this SMS</comment>
     <add>1.4</add>
     <html>
-      <type>Autocomplete-Select</type>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>
