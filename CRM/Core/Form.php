@@ -1225,7 +1225,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       return 'get';
     }
     // If you get this exception try adding more cases above.
-    throw new Exception("Cannot determine api action for " . get_class($this));
+    throw new Exception("Cannot determine api action for " . get_class($this) . '.' . 'CRM_Core_Action "' . CRM_Core_Action::description($action) . '" not recognized.');
   }
 
   /**
@@ -1233,7 +1233,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws Exception
    */
   public function getDefaultEntity() {
-    throw new Exception("Cannot determine default entity. The form class should implement getDefaultEntity().");
+    throw new Exception("Cannot determine default entity. " . get_class($this) . " should implement getDefaultEntity().");
   }
 
   /**
@@ -1243,7 +1243,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws Exception
    */
   public function getDefaultContext() {
-    throw new Exception("Cannot determine default context. The form class should implement getDefaultContext().");
+    throw new Exception("Cannot determine default context. " . get_class($this) . " should implement getDefaultContext().");
   }
 
   /**
