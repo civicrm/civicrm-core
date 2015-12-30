@@ -114,8 +114,16 @@ class CRM_Case_Form_Activity_OpenCase {
 
     // set default case type passed in url
     if ($form->_caseTypeId) {
-      $caseType = $form->_caseTypeId;
-      $defaults['case_type_id'] = $caseType;
+      $defaults['case_type_id'] = $form->_caseTypeId;
+    }
+    else {
+      // TODO: Not possible yet to set a default case type in the system
+      // For now just add the convenience of auto-selecting if there is only one option
+      $caseTypes = CRM_Case_BAO_Case::buildOptions('case_type_id', 'create');
+      if (count($caseTypes) == 1) {
+        reset($caseTypes);
+        $defaults['case_type_id'] = key($caseTypes);
+      }
     }
 
     $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
