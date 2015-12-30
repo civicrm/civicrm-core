@@ -690,7 +690,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage('event/search', "reset=1", '_qf_Search_refresh');
     $this->select2('participant_fee_id', 'First Night Edited');
     $this->click('_qf_Search_refresh');
-    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span//a[text()='View']", "xpath=//span[contains(text(), 'Done')]", FALSE);
+    $this->waitForAjaxContent();
+    $this->clickLink("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']//div[3]/div/div[2]//table//tbody/tr[1]/td[11]/span//a[text()='View']", "xpath=//span[contains(text(), 'Done')]", FALSE);
     $expectedLineItems[4][1] = 'Evening Sessions - First Night Edited';
     $this->_checkLineItems($expectedLineItems);
   }
