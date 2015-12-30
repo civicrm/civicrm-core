@@ -61,16 +61,14 @@
       <condition>parent_id IS NOT NULL</condition>
     </pseudoconstant>
     <html>
-      <type>Multi-Select</type>
+      <type>Select</type>
+      <multiple>1</multiple>
     </html>
     <add>1.5</add>
   </field>
   <index>
     <name>index_contact_sub_type</name>
     <fieldName>contact_sub_type</fieldName>
-    <html>
-      <type>Multi-Select</type>
-    </html>
     <add>2.1</add>
   </index>
   <field>
@@ -805,7 +803,7 @@
     <export>true</export>
     <add>2.1</add>
     <html>
-      <type>Autocomplete-Select</type>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>
