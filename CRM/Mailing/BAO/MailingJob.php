@@ -285,6 +285,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         $mailing->is_completed = TRUE;
         $mailing->save();
         $transaction->commit();
+
+        // CRM-17763
+        $details = CRM_Mailing_BAO_Mailing::report($job->mailing_id);
+        CRM_Utils_Hook::postEmailSend($details, 'civimail');
       }
     }
   }
