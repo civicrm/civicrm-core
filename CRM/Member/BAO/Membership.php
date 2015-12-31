@@ -401,11 +401,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $transaction->commit();
 
-    $reset = FALSE;
-    if (!empty($params['reset'])) {
-      $reset = TRUE;
-    }
-    self::createRelatedMemberships($params, $membership, $reset);
+    self::createRelatedMemberships($params, $membership);
 
     // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {
