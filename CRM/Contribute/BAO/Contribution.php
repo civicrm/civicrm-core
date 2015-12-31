@@ -4319,6 +4319,9 @@ LIMIT 1;";
             //we might be renewing membership,
             //so make status override false.
             $membershipParams['is_override'] = FALSE;
+            //CRM-17723 - avoid updating related membership from the api as the
+            //static $relatedContactIds array() in CRM_Member_BAO_Membership::createdRelatedMemberships()
+            //already contains these ids from previous call leading to deletion of related memberships.
             $membershipParams['reset'] = TRUE;
             civicrm_api3('Membership', 'create', $membershipParams);
 
