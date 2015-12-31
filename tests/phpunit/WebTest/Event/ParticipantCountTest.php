@@ -433,7 +433,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->select('billing_state_province_id-5', 'value=1004');
     $this->type('billing_postal_code-5', '94129');
 
-    $this->clickLink('_qf_Register_upload-bottom', '_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Register_upload-bottom', '_qf_Confirm_next-bottom', FALSE);
     $confirmStrings = array('Event Fee(s)', 'Billing Name and Address', 'Credit Card Information');
     $this->assertStringsPresent($confirmStrings);
     $this->click('_qf_Confirm_next-bottom');
