@@ -210,9 +210,10 @@ function civicrm_api3_case_get($params) {
   //search by client
   if (!empty($params['contact_id'])) {
     $ids = array();
+
     foreach ((array) $params['contact_id'] as $cid) {
       if (is_numeric($cid)) {
-        $ids = array_merge($ids, CRM_Case_BAO_Case::retrieveCaseIdsByContactId($cid, TRUE));
+        $ids = array_merge($ids, CRM_Case_BAO_Case::retrieveCaseIdsByContactId($cid, TRUE, NULL, CRM_Utils_Array::value('case_status_id', $params)));
       }
     }
     $cases = array();

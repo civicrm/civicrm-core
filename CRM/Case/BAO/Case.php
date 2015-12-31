@@ -512,7 +512,9 @@ WHERE civicrm_case.id = %1";
    *
    * @return array
    */
-  public static function retrieveCaseIdsByContactId($contactID, $includeDeleted = FALSE, $caseType = NULL) {
+  public static function retrieveCaseIdsByContactId($contactID, $includeDeleted = FALSE, $caseType = NULL, $statusId = NULL) {
+    $params = array(1 => array($contactID, 'Integer'));
+
     $query = "
 SELECT ca.id as id
 FROM civicrm_case_contact cc
@@ -529,8 +531,11 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     if (!$includeDeleted) {
       $query .= " AND ca.is_deleted = 0";
     }
+    if (isset($statusId)) {
+      $params[2] = array($statusId, 'Integer');
+      $query .= " AND ca.status_id = %2";
+    }
 
-    $params = array(1 => array($contactID, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     $caseArray = array();
