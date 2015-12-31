@@ -191,7 +191,7 @@ class CRM_Utils_Mail {
         return FALSE;
       }
       // CRM-10699
-      CRM_Utils_Hook::postEmailSend($params);
+      CRM_Utils_Hook::postEmailSend($params, 'activity');
       return TRUE;
     }
     return FALSE;
