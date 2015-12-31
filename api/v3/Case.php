@@ -138,7 +138,15 @@ function _civicrm_api3_case_get_spec(&$params) {
   $params['contact_id'] = array(
     'api.aliases' => array('client_id'),
     'title' => 'Case Client',
+    'description' => 'Contact id of one or more clients to retrieve cases for',
     'type' => CRM_Utils_Type::T_INT,
+    'FKApiName' => 'Contact',
+  );
+  $params['activity_id'] = array(
+    'title' => 'Case Activity',
+    'description' => 'Id of an activity in the case',
+    'type' => CRM_Utils_Type::T_INT,
+    'FKApiName' => 'Activity',
   );
 }
 
@@ -152,8 +160,10 @@ function _civicrm_api3_case_create_spec(&$params) {
   $params['contact_id'] = array(
     'api.aliases' => array('client_id'),
     'title' => 'Case Client',
+    'description' => 'Contact id of case client(s)',
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
+    'FKApiName' => 'Contact',
   );
   $params['status_id']['api.default'] = 1;
   $params['status_id']['api.aliases'] = array('case_status');
@@ -207,67 +217,46 @@ function _civicrm_api3_case_delete_spec(&$params) {
  */
 function civicrm_api3_case_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
-  //search by client
+  $sql = CRM_Utils_SQL_Select::fragment();
+
+  // Add clause to search by client
   if (!empty($params['contact_id'])) {
-    $ids = array();
-    foreach ((array) $params['contact_id'] as $cid) {
-      if (is_numeric($cid)) {
-        $ids = array_merge($ids, CRM_Case_BAO_Case::retrieveCaseIdsByContactId($cid, TRUE));
+    $contacts = array();
+    foreach ((array) $params['contact_id'] as $c) {
+      if (!CRM_Utils_Rule::positiveInteger($c)) {
+        throw new API_Exception('Invalid parameter: contact_id. Must provide numeric value(s).');
       }
+      $contacts[] = $c;
     }
-    $cases = array();
-    foreach ($ids as $id) {
-      if ($case = _civicrm_api3_case_read($id, $options, CRM_Utils_Array::value('check_permissions', $params))) {
-        $cases[$id] = $case;
-      }
-    }
-    return civicrm_api3_create_success($cases, $params, 'Case', 'get');
+    $sql
+      ->join('civicrm_case_contact', 'INNER JOIN civicrm_case_contact ON civicrm_case_contact.case_id = a.id')
+      ->where('civicrm_case_contact.contact_id IN (' . implode(',', $contacts) . ')');
   }
 
-  //search by activity
+  // Add clause to search by activity
   if (!empty($params['activity_id'])) {
-    if (!is_numeric($params['activity_id'])) {
+    if (!CRM_Utils_Rule::positiveInteger($params['activity_id'])) {
       throw new API_Exception('Invalid parameter: activity_id. Must provide a numeric value.');
     }
-    $caseId = CRM_Case_BAO_Case::getCaseIdByActivityId($params['activity_id']);
-    if (!$caseId) {
-      return civicrm_api3_create_success(array(), $params, 'Case', 'get');
+    $activityId = $params['activity_id'];
+    $originalId = CRM_Core_DAO::getFieldValue('CRM_Activity_BAO_Activity', $activityId, 'original_id');
+    if ($originalId) {
+      $activityId .= ',' . $originalId;
     }
-    $case = array($caseId => _civicrm_api3_case_read($caseId, $options, CRM_Utils_Array::value('check_permissions', $params)));
-    return civicrm_api3_create_success($case, $params, 'Case', 'get');
-  }
-
-  //search by contacts
-  if (($contact = CRM_Utils_Array::value('contact_id', $params)) != FALSE) {
-    if (!is_numeric($contact)) {
-      throw new API_Exception('Invalid parameter: contact_id.  Must provide a numeric value.');
-    }
-
-    $sql = "
-SELECT DISTINCT case_id
-  FROM civicrm_relationship
- WHERE (contact_id_a = $contact
-    OR contact_id_b = $contact)
-   AND case_id IS NOT NULL";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-
-    $cases = array();
-    while ($dao->fetch()) {
-      $cases[$dao->case_id] = _civicrm_api3_case_read($dao->case_id, $options, CRM_Utils_Array::value('check_permissions', $params));
-    }
-    return civicrm_api3_create_success($cases, $params, 'Case', 'get');
+    $sql
+      ->join('civicrm_case_activity', 'INNER JOIN civicrm_case_activity ON civicrm_case_activity.case_id = a.id')
+      ->where("civicrm_case_activity.activity_id IN ($activityId)");
   }
 
   // For historic reasons we always return these when an id is provided
-  $caseId = CRM_Utils_Array::value('id', $params);
-  if ($caseId) {
+  if (!empty($params['id'])) {
     $options['return'] = array('contacts' => 1, 'activities' => 1);
   }
 
-  $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
+  $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case', $sql);
   $cases = array();
   foreach ($foundcases['values'] as $foundcase) {
-    if ($case = _civicrm_api3_case_read($foundcase['id'], $options, CRM_Utils_Array::value('check_permissions', $params))) {
+    if ($case = _civicrm_api3_case_read($foundcase['id'], $options, !empty($params['check_permissions']))) {
       $cases[$foundcase['id']] = $case;
     }
   }
