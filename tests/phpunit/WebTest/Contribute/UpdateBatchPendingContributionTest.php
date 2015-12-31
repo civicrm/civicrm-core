@@ -48,10 +48,11 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->clickLink("_qf_Search_refresh");
 
     $this->click('radio_ts', 'ts_all');
-
+    $this->waitForAjaxContent();
     $this->select('task', "label=Update pending contribution status");
-    $this->click("_qf_Search_next_action");
+    $this->waitForAjaxContent();
     $this->select('contribution_status_id', 'label=Completed');
+    $this->waitForAjaxContent();
     $this->click('_qf_Status_next');
     $this->waitForElementPresent("_qf_Result_done");
     $this->click("_qf_Result_done");
