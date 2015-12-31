@@ -4319,8 +4319,15 @@ LIMIT 1;";
             //we might be renewing membership,
             //so make status override false.
             $membershipParams['is_override'] = FALSE;
+            $membershipParams['reset'] = TRUE;
             civicrm_api3('Membership', 'create', $membershipParams);
 
+            // unset/format unwanted keys
+            $removeKeys = array('id', 'contact_id', 'reset');
+            $membershipParams = array_diff_key($membershipParams, array_flip($removeKeys));
+            if (!empty($membershipParams['status_id']) && is_string($membershipParams['status_id'])) {
+              $membershipParams['status_id'] = array_search($membershipParams['status_id'], CRM_Member_PseudoConstant::membershipStatus());
+            }
             //update related Memberships.
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $membershipParams);
           }
