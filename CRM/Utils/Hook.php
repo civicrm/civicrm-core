@@ -1557,13 +1557,15 @@ abstract class CRM_Utils_Hook {
    *   The mailing parameters. Array fields include: groupName, from, toName,
    *   toEmail, subject, cc, bcc, text, html, returnPath, replyTo, headers,
    *   attachments (array)
+   * @param string $context
+   *   Context of the mailing, either 'activity' or 'civimail'
    *
    * @return mixed
    */
-  public static function postEmailSend(&$params) {
-    return self::singleton()->invoke(1, $params,
+  public static function postEmailSend(&$params, $context = '') {
+    return self::singleton()->invoke(2, $params, $context,
       self::$_nullObject, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject,
       'civicrm_postEmailSend'
     );
   }
