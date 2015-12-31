@@ -178,7 +178,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         default:
           break;
       }
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
       $this->waitForText('crm-notification-container', "Price Field '" . $label . "' has been saved.");
     }
   }
@@ -193,7 +193,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/price', 'reset=1');
 
     // Use the price set id ($sid) to pick the correct row
-    $this->clickLink("//*[@id='price_set-{$sid}']/td[4]/span[1]/a[2]", '_qf_Preview_cancel-bottom');
+    $this->clickLink("//*[@id='price_set-{$sid}']/td[4]/span[1]/a[2]", '_qf_Preview_cancel-bottom', FALSE);
 
     // Check for expected price set field strings
     if ($this->isElementPresent("xpath=//*[@class ='select2-chosen']")) {
