@@ -461,10 +461,15 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
 }
 
 /**
- * Get function for query object api.
+ * Query function for civicrm_api_basic_get.
  *
- * This is a simple get function, but it should be usable for any kind of
- * entity. I created it to work around CRM-16036.
+ * Fetches an entity based on specified params for the "where" clause,
+ * return properties for the "select" clause,
+ * as well as limit and order.
+ *
+ * Automatically joins on custom fields to return or filter by them.
+ *
+ * Supports an additional sql fragment which the calling api can provide.
  *
  * @param string $dao_name
  *   Name of DAO
