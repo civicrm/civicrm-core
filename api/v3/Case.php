@@ -252,7 +252,7 @@ function civicrm_api3_case_get($params) {
 
   // For historic reasons we return these by default only when fetching a case by id
   if (!empty($params['id']) && empty($options['return'])) {
-    $options['return'] += array('contacts' => 1, 'activities' => 1, 'contact_id' => 1);
+    $options['return'] = array('contacts' => 1, 'activities' => 1, 'contact_id' => 1);
   }
 
   foreach ($foundcases['values'] as &$case) {
