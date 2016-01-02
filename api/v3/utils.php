@@ -569,6 +569,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
   }
   // build query
   $query = CRM_Utils_SQL_Select::from($dao->tableName() . " a");
+  $dao->free();
 
   // populate $where_clauses
   foreach ($params as $key => $value) {
