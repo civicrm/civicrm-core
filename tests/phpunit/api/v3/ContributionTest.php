@@ -1037,26 +1037,137 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that financial records are added when Contribution is Refunded.
    */
   public function testCreateUpdateContributionRefund() {
-    $contribParams = array(
+    $contributionParams = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
       'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 4,
       'contribution_status_id' => 1,
-
+      'trxn_id' => 'original_payment',
     );
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
-    $newParams = array_merge($contribParams, array(
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $newParams = array_merge($contributionParams, array(
         'id' => $contribution['id'],
         'contribution_status_id' => 'Refunded',
         'cancel_date' => '2015-01-01 09:00',
+        'refund_trxn_id' => 'the refund',
       )
     );
 
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
+    $this->assertEquals('original_payment', $this->callAPISuccessGetValue('Contribution', array(
+      'id' => $contribution['id'],
+      'return' => 'trxn_id',
+    )));
+  }
+
+  /**
+   * Function tests that trxn_id is set when passed in.
+   *
+   * Here we ensure that the civicrm_financial_trxn.trxn_id & the civicrm_contribution.trxn_id are set
+   * when trxn_id is passed in.
+   */
+  public function testCreateUpdateContributionRefundTrxnIDPassedIn() {
+    $contributionParams = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2012-01-01',
+      'total_amount' => 100.00,
+      'financial_type_id' => $this->_financialTypeId,
+      'payment_instrument_id' => 4,
+      'contribution_status_id' => 1,
+      'trxn_id' => 'original_payment',
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $newParams = array_merge($contributionParams, array(
+        'id' => $contribution['id'],
+        'contribution_status_id' => 'Refunded',
+        'cancel_date' => '2015-01-01 09:00',
+        'trxn_id' => 'the refund',
+      )
+    );
+
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $this->_checkFinancialTrxn($contribution, 'refund');
+    $this->_checkFinancialItem($contribution['id'], 'refund');
+    $this->assertEquals('the refund', $this->callAPISuccessGetValue('Contribution', array(
+      'id' => $contribution['id'],
+      'return' => 'trxn_id',
+    )));
+  }
+
+  /**
+   * Function tests that trxn_id is set when passed in.
+   *
+   * Here we ensure that the civicrm_contribution.trxn_id is set
+   * when trxn_id is passed in but if refund_trxn_id is different then that
+   * is kept for the refund transaction.
+   */
+  public function testCreateUpdateContributionRefundRefundAndTrxnIDPassedIn() {
+    $contributionParams = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2012-01-01',
+      'total_amount' => 100.00,
+      'financial_type_id' => $this->_financialTypeId,
+      'payment_instrument_id' => 4,
+      'contribution_status_id' => 1,
+      'trxn_id' => 'original_payment',
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $newParams = array_merge($contributionParams, array(
+        'id' => $contribution['id'],
+        'contribution_status_id' => 'Refunded',
+        'cancel_date' => '2015-01-01 09:00',
+        'trxn_id' => 'cont id',
+        'refund_trxn_id' => 'the refund',
+      )
+    );
+
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $this->_checkFinancialTrxn($contribution, 'refund');
+    $this->_checkFinancialItem($contribution['id'], 'refund');
+    $this->assertEquals('cont id', $this->callAPISuccessGetValue('Contribution', array(
+      'id' => $contribution['id'],
+      'return' => 'trxn_id',
+    )));
+  }
+
+  /**
+   * Function tests that refund_trxn_id is set when passed in empty.
+   *
+   * Here we ensure that the civicrm_contribution.trxn_id is set
+   * when trxn_id is passed in but if refund_trxn_id isset but empty then that
+   * is kept for the refund transaction.
+   */
+  public function testCreateUpdateContributionRefundRefundNullTrxnIDPassedIn() {
+    $contributionParams = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2012-01-01',
+      'total_amount' => 100.00,
+      'financial_type_id' => $this->_financialTypeId,
+      'payment_instrument_id' => 4,
+      'contribution_status_id' => 1,
+      'trxn_id' => 'original_payment',
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $newParams = array_merge($contributionParams, array(
+        'id' => $contribution['id'],
+        'contribution_status_id' => 'Refunded',
+        'cancel_date' => '2015-01-01 09:00',
+        'trxn_id' => 'cont id',
+        'refund_trxn_id' => '',
+      )
+    );
+
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $this->_checkFinancialTrxn($contribution, 'refund', NULL, array('trxn_id' => NULL));
+    $this->_checkFinancialItem($contribution['id'], 'refund');
+    $this->assertEquals('cont id', $this->callAPISuccessGetValue('Contribution', array(
+      'id' => $contribution['id'],
+      'return' => 'trxn_id',
+    )));
   }
 
   /**
@@ -2002,7 +2113,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param string $context
    * @param int $instrumentId
    */
-  public function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {
+  public function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL, $extraParams = array()) {
     $trxnParams = array(
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
@@ -2024,6 +2135,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'total_amount' => -100,
         'status_id' => 7,
         'trxn_date' => '2015-01-01 09:00:00',
+        'trxn_id' => 'the refund',
       );
     }
     elseif ($context == 'cancelPending') {
@@ -2056,7 +2168,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       else {
         $compareParams['to_financial_account_id'] = 12;
       }
-      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, $compareParams);
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, array_merge($compareParams, $extraParams));
       $compareParams['total_amount'] = 100;
       if ($context == 'paymentInstrument') {
         $compareParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($instrumentId);
@@ -2067,7 +2179,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       }
     }
 
-    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $params, $compareParams);
+    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $params, array_merge($compareParams, $extraParams));
   }
 
   /**
