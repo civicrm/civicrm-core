@@ -1571,14 +1571,13 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when a CiviMail mailing has completed
    *
-   * @param array $report
-   *   Output from: CRM_Mailing_BAO_Mailing::report()
-   *   Includes details about the mailing, including stats to date, jobs, etc.
+   * @param int $mailingId
+   *   Mailing ID
    *
    * @return mixed
    */
-  public static function postMailing($report) {
-    return self::singleton()->invoke(1, $report,
+  public static function postMailing($mailingId) {
+    return self::singleton()->invoke(1, $mailingId,
       self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_postMailing'

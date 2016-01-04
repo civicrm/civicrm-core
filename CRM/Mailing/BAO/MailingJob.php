@@ -287,8 +287,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         $transaction->commit();
 
         // CRM-17763
-        $details = CRM_Mailing_BAO_Mailing::report($job->mailing_id);
-        CRM_Utils_Hook::postMailing($details);
+        CRM_Utils_Hook::postMailing($job->mailing_id);
       }
     }
   }
