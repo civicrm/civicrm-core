@@ -201,7 +201,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     if (self::isUpdateToRecurringContribution($params)) {
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
-        $params['contribution_recur_id'],
+        (!empty($params['contribution_recur_id']) ? $params['contribution_recur_id'] : $params['prevContribution']->contribution_recur_id),
         $contributionStatus[$params['contribution_status_id']]
       );
     }
@@ -3062,7 +3062,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
       }
       //CRM-16259, set is_payment flag for non pending status
-      if (!in_array(CRM_Utils_Array::value('contribution_status_id', $params), $pendingStatus)) {
+      if (!in_array($contributionStatus, $pendingStatus)) {
         $trxnParams['is_payment'] = 1;
       }
       if (!empty($params['payment_processor'])) {
@@ -4319,10 +4319,10 @@ LIMIT 1;";
             //we might be renewing membership,
             //so make status override false.
             $membershipParams['is_override'] = FALSE;
+            //CRM-17723 - reset static $relatedContactIds array()
+            $var = TRUE;
+            CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
             civicrm_api3('Membership', 'create', $membershipParams);
-
-            //update related Memberships.
-            CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $membershipParams);
           }
         }
       }

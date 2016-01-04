@@ -192,6 +192,17 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     elseif (strpos($class, 'crm-form-contact-reference') !== FALSE) {
       self::preprocessContactReference($element);
     }
+    // Hack to support html5 fields (number, url, etc)
+    else {
+      foreach (CRM_Core_Form::$html5Types as $type) {
+        if (strpos($class, "crm-form-$type") !== FALSE) {
+          $element->setAttribute('type', $type);
+          // Also add the "base" class for consistent styling
+          $class .= ' crm-form-text';
+          break;
+        }
+      }
+    }
 
     if ($required) {
       $class .= ' required';
@@ -245,7 +256,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * @param HTML_QuickForm_element $field
    */
   public function renderFrozenEntityRef(&$el, $field) {
-    $entity = $field->getAttribute('data-api-entity');
+    $entity = strtolower($field->getAttribute('data-api-entity'));
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
     $display = array();
 

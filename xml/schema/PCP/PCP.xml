@@ -28,7 +28,7 @@
     <comment>FK to Contact ID</comment>
     <add>2.2</add>
     <html>
-      <type>Autocomplete-Select</type>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>

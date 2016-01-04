@@ -158,7 +158,7 @@
     <import>true</import>
     <add>3.3</add>
     <html>
-      <type>Autocomplete-Select</type>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>

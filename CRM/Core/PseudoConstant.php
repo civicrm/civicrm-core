@@ -218,38 +218,15 @@ class CRM_Core_PseudoConstant {
       'localize' => FALSE,
       'onlyActive' => ($context == 'validate' || $context == 'get') ? FALSE : TRUE,
       'fresh' => FALSE,
+      'context' => $context,
     );
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getCanonicalClassName($daoName));
 
     // Custom fields are not in the schema
     if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
-      $customField = new CRM_Core_DAO_CustomField();
+      $customField = new CRM_Core_BAO_CustomField();
       $customField->id = (int) substr($fieldName, 7);
-      $customField->find(TRUE);
-      $options = FALSE;
-
-      if (!empty($customField->option_group_id)) {
-        $options = CRM_Core_OptionGroup::valuesByID($customField->option_group_id,
-          FALSE,
-          $params['grouping'],
-          $params['localize'],
-          // Note: for custom fields the 'name' column is NULL
-          CRM_Utils_Array::value('labelColumn', $params, 'label'),
-          $params['onlyActive'],
-          $params['fresh']
-        );
-      }
-      else {
-        if ($customField->data_type === 'StateProvince') {
-          $options = self::stateProvince();
-        }
-        elseif ($customField->data_type === 'Country') {
-          $options = $context == 'validate' ? self::countryIsoCode() : self::country();
-        }
-        elseif ($customField->data_type === 'Boolean') {
-          $options = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
-        }
-      }
-      CRM_Utils_Hook::customFieldOptions($customField->id, $options, FALSE);
+      $options = $customField->getOptions();
       if ($options && $flip) {
         $options = array_flip($options);
       }
@@ -261,7 +238,11 @@ class CRM_Core_PseudoConstant {
     $dao = new $daoName();
     $fieldSpec = $dao->getFieldSpec($fieldName);
     $dao->free();
-    // If neither worked then this field doesn't exist. Return false.
+
+    // Ensure we have the canonical name for this field
+    $fieldName = CRM_Utils_Array::value('name', $fieldSpec, $fieldName);
+
+    // Return false if field doesn't exist.
     if (empty($fieldSpec)) {
       return FALSE;
     }
@@ -304,7 +285,7 @@ class CRM_Core_PseudoConstant {
           $params['keyColumn'] = 'name';
         }
         // Call our generic fn for retrieving from the option_value table
-        return CRM_Core_OptionGroup::values(
+        $options = CRM_Core_OptionGroup::values(
           $pseudoconstant['optionGroupName'],
           $flip,
           $params['grouping'],
@@ -315,6 +296,8 @@ class CRM_Core_PseudoConstant {
           $params['fresh'],
           $params['keyColumn'] ? $params['keyColumn'] : 'value'
         );
+        CRM_Utils_Hook::fieldOptions($entity, $fieldName, $options, $params);
+        return $options;
       }
 
       // Fetch options from other tables
@@ -415,6 +398,7 @@ class CRM_Core_PseudoConstant {
               CRM_Utils_Array::asort($output);
             }
           }
+          CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
           self::$cache[$cacheKey] = $output;
         }
         return $flip ? array_flip($output) : $output;
@@ -423,7 +407,8 @@ class CRM_Core_PseudoConstant {
 
     // Return "Yes" and "No" for boolean fields
     elseif (CRM_Utils_Array::value('type', $fieldSpec) === CRM_Utils_Type::T_BOOLEAN) {
-      $output = $context == 'validate' ? array(0, 1) : array(1 => ts('Yes'), 0 => ts('No'));
+      $output = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
+      CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
       return $flip ? array_flip($output) : $output;
     }
     // If we're still here, it's an error. Return FALSE.

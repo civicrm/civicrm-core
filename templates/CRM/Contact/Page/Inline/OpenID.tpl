@@ -28,7 +28,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Add or edit OpenID{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="batch-edit"></span>{if empty($openid)}{ts}Add OpenID{/ts}{else}{ts}Add or edit OpenID{/ts}{/if}
+        <span class="crm-i fa-pencil"></span> {if empty($openid)}{ts}Add OpenID{/ts}{else}{ts}Add or edit OpenID{/ts}{/if}
       </div>
     {/if}
     {if empty($openid)}

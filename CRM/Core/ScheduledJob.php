@@ -87,9 +87,32 @@ class CRM_Core_ScheduledJob {
   }
 
   /**
+   * @return void
+   */
+  public function clearScheduledRunDate() {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET scheduled_run_date = NULL WHERE id = %1',
+      array(
+        '1' => array($this->id, 'Integer'),
+      ));
+  }
+
+  /**
    * @return bool
    */
   public function needsRunning() {
+
+    // CRM-17686
+    // check if the job has a specific scheduled date/time
+    if (!empty($this->scheduled_run_date)) {
+      if (strtotime($this->scheduled_run_date) <= time()) {
+        $this->clearScheduledRunDate();
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+
     // run if it was never run
     if (empty($this->last_run)) {
       return TRUE;
@@ -100,43 +123,37 @@ class CRM_Core_ScheduledJob {
       case 'Always':
         return TRUE;
 
-      case 'Hourly':
-        $format = 'YmdH';
+      // CRM-17669
+      case 'Yearly':
+        $offset = '+1 year';
+        break;
+
+      case 'Quarter':
+        $offset = '+3 months';
+        break;
+
+      case 'Monthly':
+        $offset = '+1 month';
+        break;
+
+      case 'Weekly':
+        $offset = '+1 week';
         break;
 
       case 'Daily':
-        $format = 'Ymd';
+        $offset = '+1 day';
         break;
 
-      case 'Mondays':
-        $now = CRM_Utils_Date::currentDBDate();
-        $dayAgo = strtotime('-1 day', strtotime($now));
-        $lastRun = strtotime($this->last_run);
-        $nowDayOfWeek = date('l', strtotime($now));
-        return ($lastRun < $dayAgo && $nowDayOfWeek == 'Monday');
-
-      case '1stOfMth':
-        $now = CRM_Utils_Date::currentDBDate();
-        $dayAgo = strtotime('-1 day', strtotime($now));
-        $lastRun = strtotime($this->last_run);
-        $nowDayOfMonth = date('j', strtotime($now));
-        return ($lastRun < $dayAgo && $nowDayOfMonth == '1');
-
-      case '1stOfQtr':
-        $now = CRM_Utils_Date::currentDBDate();
-        $dayAgo = strtotime('-1 day', strtotime($now));
-        $lastRun = strtotime($this->last_run);
-        $nowDayOfMonth = date('j', strtotime($now));
-        $nowMonth = date('n', strtotime($now));
-        $qtrMonths = array('1', '4', '7', '10');
-        return ($lastRun < $dayAgo && $nowDayOfMonth == '13' && in_array($nowMonth, $qtrMonths));
+      case 'Hourly':
+        $offset = '+1 hour';
+        break;
     }
 
-    $now = CRM_Utils_Date::currentDBDate();
-    $lastTime = date($format, strtotime($this->last_run));
-    $thisTime = date($format, strtotime($now));
+    $now = strtotime(CRM_Utils_Date::currentDBDate());
+    $lastTime = strtotime($this->last_run);
+    $nextTime = strtotime($offset, $lastTime);
 
-    return ($lastTime <> $thisTime);
+    return ($now >= $nextTime);
   }
 
   public function __destruct() {

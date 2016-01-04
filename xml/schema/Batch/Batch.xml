@@ -121,7 +121,7 @@
     <comment>FK to Saved Search ID</comment>
     <add>4.1</add>
     <html>
-      <type>Autocomplete-Select</type>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>

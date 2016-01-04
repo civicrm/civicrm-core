@@ -136,7 +136,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    */
   public function browse() {
 
-    $controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Search', ts('Case'), NULL);
+    $controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Search', ts('Case'), CRM_Core_Action::BROWSE);
     $controller->setEmbedded(TRUE);
     $controller->reset();
     $controller->set('limit', 20);

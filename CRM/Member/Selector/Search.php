@@ -390,18 +390,14 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         }
 
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported($row['membership_id']);
-        if (!isset($result->owner_membership_id)) {
-          $links = self::links('all',
-            $this->_isPaymentProcessor,
-            $this->_accessContribution,
-            $this->_key,
-            $this->_context,
-            $isCancelSupported
-          );
-        }
-        else {
-          $links = self::links('view');
-        }
+        $links = self::links('all',
+          $this->_isPaymentProcessor,
+          $this->_accessContribution,
+          $this->_key,
+          $this->_context,
+          $isCancelSupported
+        );
+
         // check permissions
         $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $result->membership_type_id, 'financial_type_id');
         $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
@@ -430,6 +426,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         );
       }
       else {
+        $links = self::links('view');
         $row['action'] = CRM_Core_Action::formLink($links, $mask,
           array(
             'id' => $result->membership_id,

@@ -779,9 +779,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         'options' => $subtypes,
         'class' => $buildCustomData,
         'multiple' => 'multiple',
-        'options-url' => FALSE,
-          )
-      );
+        'option_url' => NULL,
+      ));
     }
 
     // build edit blocks ( custom data, demographics, communication preference, notes, tags and groups )

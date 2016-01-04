@@ -2566,7 +2566,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * @param $tablesToTruncate
+   * Quick clean by emptying tables created for the test.
+   *
+   * @param array $tablesToTruncate
    * @param bool $dropCustomValueTables
    * @throws \Exception
    */
@@ -2575,6 +2577,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       throw new Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
     }
     if ($dropCustomValueTables) {
+      $optionGroupResult = CRM_Core_DAO::executeQuery('SELECT option_group_id FROM civicrm_custom_field');
+      while ($optionGroupResult->fetch()) {
+        if (!empty($optionGroupResult->option_group_id)) {
+          CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $optionGroupResult->option_group_id);
+        }
+      }
       $tablesToTruncate[] = 'civicrm_custom_group';
       $tablesToTruncate[] = 'civicrm_custom_field';
     }

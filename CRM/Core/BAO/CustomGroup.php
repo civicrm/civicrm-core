@@ -1366,23 +1366,6 @@ ORDER BY civicrm_custom_group.weight,
             }
             break;
 
-          case 'Select Date':
-            if (isset($value)) {
-              if (empty($field['time_format'])) {
-                list($defaults[$elementName]) = CRM_Utils_Date::setDateDefaults($value, NULL,
-                  $field['date_format']
-                );
-              }
-              else {
-                $timeElement = $elementName . '_time';
-                if (substr($elementName, -1) == ']') {
-                  $timeElement = substr($elementName, 0, -1) . '_time]';
-                }
-                list($defaults[$elementName], $defaults[$timeElement]) = CRM_Utils_Date::setDateDefaults($value, NULL, $field['date_format'], $field['time_format']);
-              }
-            }
-            break;
-
           case 'Multi-Select Country':
           case 'Multi-Select State/Province':
             if (isset($value)) {
@@ -1561,9 +1544,6 @@ ORDER BY civicrm_custom_group.weight,
   public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
 
-    // this is fix for date field
-    $form->assign('currentYear', date('Y'));
-
     foreach ($groupTree as $id => $group) {
       CRM_Core_ShowHideBlocks::links($form, $group['title'], '', '');
       foreach ($group['fields'] as $field) {
@@ -1577,7 +1557,7 @@ ORDER BY civicrm_custom_group.weight,
 
         $fieldId = $field['id'];
         $elementName = $field['element_name'];
-        CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, $inactiveNeeded, $required);
+        CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, $required);
       }
     }
   }
@@ -1909,18 +1889,10 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
             $details[$groupID][$values['id']]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $group);
             $details[$groupID][$values['id']]['fields'][$k] = array(
               'field_title' => CRM_Utils_Array::value('label', $properties),
-              'field_type' => CRM_Utils_Array::value('html_type',
-                $properties
-              ),
-              'field_data_type' => CRM_Utils_Array::value('data_type',
-                $properties
-              ),
-              'field_value' => self::formatCustomValues($values,
-                $properties
-              ),
-              'options_per_line' => CRM_Utils_Array::value('options_per_line',
-                $properties
-              ),
+              'field_type' => CRM_Utils_Array::value('html_type', $properties),
+              'field_data_type' => CRM_Utils_Array::value('data_type', $properties),
+              'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id']),
+              'options_per_line' => CRM_Utils_Array::value('options_per_line', $properties),
             );
             // also return contact reference contact id if user has view all or edit all contacts perm
             if ((CRM_Core_Permission::check('view all contacts') ||
@@ -1963,234 +1935,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       $form->assign_by_ref("{$prefix}viewCustomData", $details);
       return $details;
     }
-  }
-
-  /**
-   * Format custom value according to data, view mode
-   *
-   * @param array $values
-   *   Associated array of custom values.
-   * @param array $field
-   * @param bool $dncOptionPerLine
-   *   True if optionPerLine should not be consider.
-   *
-   * @return array|null|string
-   */
-  public static function formatCustomValues(&$values, &$field, $dncOptionPerLine = FALSE) {
-    $value = $values['data'];
-
-    //changed isset CRM-4601
-    if (CRM_Utils_System::isNull($value)) {
-      return NULL;
-    }
-
-    $htmlType = CRM_Utils_Array::value('html_type', $field);
-    $dataType = CRM_Utils_Array::value('data_type', $field);
-    $option_group_id = CRM_Utils_Array::value('option_group_id', $field);
-    $timeFormat = CRM_Utils_Array::value('time_format', $field);
-    $optionPerLine = CRM_Utils_Array::value('options_per_line', $field);
-
-    $freezeString = "";
-    $freezeStringChecked = "";
-
-    switch ($dataType) {
-      case 'Date':
-        $customFormat = NULL;
-
-        $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats();
-
-        if ($format = CRM_Utils_Array::value('date_format', $field)) {
-          if (array_key_exists($format, $actualPHPFormats)) {
-            $customTimeFormat = (array) CRM_Utils_Array::value($format, $actualPHPFormats);
-            switch ($timeFormat) {
-              case 1:
-                $customTimeFormat[] = 'g:iA';
-                break;
-
-              case 2:
-                $customTimeFormat[] = 'G:i';
-                break;
-
-              default:
-                // if time is not selected remove time from value
-                $value = substr($value, 0, 10);
-            }
-            $customFormat = implode(" ", $customTimeFormat);
-          }
-        }
-        $retValue = CRM_Utils_Date::processDate($value, NULL, FALSE, $customFormat);
-        break;
-
-      case 'Boolean':
-        if ($value == '1') {
-          $retValue = $freezeStringChecked . ts('Yes') . "\n";
-        }
-        else {
-          $retValue = $freezeStringChecked . ts('No') . "\n";
-        }
-        break;
-
-      case 'Link':
-        if ($value) {
-          $retValue = CRM_Utils_System::formatWikiURL($value);
-        }
-        break;
-
-      case 'File':
-        $retValue = $values;
-        break;
-
-      case 'ContactReference':
-        if (!empty($values['data'])) {
-          $retValue = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['data'], 'display_name');
-        }
-        break;
-
-      case 'Memo':
-        $retValue = $value;
-        break;
-
-      case 'Float':
-        if ($htmlType == 'Text') {
-          $retValue = (float) $value;
-          break;
-        }
-      case 'Money':
-        if ($htmlType == 'Text') {
-          $retValue = CRM_Utils_Money::format($value, NULL, '%a');
-          break;
-        }
-      case 'String':
-      case 'Int':
-        if (in_array($htmlType, array('Text', 'TextArea'))) {
-          $retValue = $value;
-          break;
-        }
-        // note that if its not text / textarea, the code falls thru and executes
-        // the below case also
-      case 'StateProvince':
-      case 'Country':
-        $options = array();
-        $coDAO = NULL;
-
-        //added check for Multi-Select in the below if-statement
-        $customData[] = $value;
-
-        //form custom data for multiple-valued custom data
-        switch ($htmlType) {
-          case 'Multi-Select Country':
-          case 'Select Country':
-            $customData = $value;
-            if (!is_array($value)) {
-              $customData = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-            }
-            $query = "
-                    SELECT id as value, name as label
-                    FROM civicrm_country";
-            $coDAO = CRM_Core_DAO::executeQuery($query);
-            break;
-
-          case 'Select State/Province':
-          case 'Multi-Select State/Province':
-            $customData = $value;
-            if (!is_array($value)) {
-              $customData = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-            }
-
-            $query = "
-                    SELECT id as value, name as label
-                    FROM civicrm_state_province";
-            $coDAO = CRM_Core_DAO::executeQuery($query);
-            break;
-
-          case 'Select':
-            $customData = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-            if ($option_group_id) {
-              $options = CRM_Core_BAO_OptionValue::getOptionValuesAssocArray($option_group_id);
-            }
-            break;
-
-          case 'CheckBox':
-          case 'AdvMulti-Select':
-          case 'Multi-Select':
-            $customData = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-          default:
-            if ($option_group_id) {
-              $options = CRM_Core_BAO_OptionValue::getOptionValuesAssocArray($option_group_id);
-            }
-        }
-
-        if (is_object($coDAO)) {
-          while ($coDAO->fetch()) {
-            if ($dataType == 'Country') {
-              // NB: using ts() on a variable here is OK, since the value is pre-determined, not variable
-              // and already extracted to .pot files.
-              $options[$coDAO->value] = ts($coDAO->label, array('context' => 'country'));
-            }
-            elseif ($dataType == 'StateProvince') {
-              $options[$coDAO->value] = ts($coDAO->label, array('context' => 'province'));
-            }
-            else {
-              $options[$coDAO->value] = $coDAO->label;
-            }
-          }
-        }
-
-        CRM_Utils_Hook::customFieldOptions($field['id'], $options, FALSE);
-
-        $retValue = NULL;
-        foreach ($options as $optionValue => $optionLabel) {
-          if ($dataType == 'Money') {
-            foreach ($customData as $k => $v) {
-              $customData[] = CRM_Utils_Money::format($v, NULL, '%a');
-            }
-          }
-
-          //to show only values that are checked
-          if (in_array((string) $optionValue, $customData)) {
-            $checked = in_array($optionValue, $customData) ? $freezeStringChecked : $freezeString;
-            if (!$optionPerLine || $dncOptionPerLine) {
-              if ($retValue) {
-                $retValue .= ", ";
-              }
-              $retValue .= $checked . $optionLabel;
-            }
-            else {
-              $retValue[] = $checked . $optionLabel;
-            }
-          }
-        }
-        break;
-    }
-
-    //special case for option per line formatting
-    if ($optionPerLine > 1 && is_array($retValue)) {
-      $rowCounter = 0;
-      $fieldCounter = 0;
-      $displayValues = array();
-      $displayString = '';
-      foreach ($retValue as $val) {
-        if ($displayString) {
-          $displayString .= ", ";
-        }
-
-        $displayString .= $val;
-        $rowCounter++;
-        $fieldCounter++;
-
-        if (($rowCounter == $optionPerLine) ||
-          ($fieldCounter == count($retValue))
-        ) {
-          $displayValues[] = $displayString;
-          $displayString = '';
-          $rowCounter = 0;
-        }
-      }
-      $retValue = $displayValues;
-    }
-
-    $retValue = isset($retValue) ? $retValue : NULL;
-    return $retValue;
   }
 
   /**

@@ -65,7 +65,7 @@
   <field>
     <name>tag_id</name>
     <type>int unsigned</type>
-    <title>Tag ID</title>
+    <title>Tag</title>
     <required>true</required>
     <comment>FK to civicrm_tag</comment>
     <add>1.1</add>

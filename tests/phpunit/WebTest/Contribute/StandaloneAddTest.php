@@ -142,13 +142,13 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForText("crm-notification-container", "The contribution record has been saved.");
 
     // verify if Membership is created
-    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Contribute_Form_Search crm-search-form']//div[2]table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='View']");
 
     $contriID = $this->urlArg('id', $this->getAttribute("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='Edit']@href"));
     $contactID = $this->urlArg('cid', $this->getAttribute("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='Edit']@href"));
 
     //click through to the Membership view screen
-    $this->click("xpath=//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='View']");
+    $this->click("xpath=//form[@class='CRM_Contribute_Form_Search crm-search-form']//div[2]table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span//a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     $expected = array(

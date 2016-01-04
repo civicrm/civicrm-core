@@ -84,11 +84,7 @@
         <tr>
           <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
         <td>
-      {if $element.data_type neq 'Date'}
-            {$form.$element_name.html}&nbsp;
-        {elseif $element.skip_calendar NEQ true }
-            {include file="CRM/common/jcalendar.tpl" elementName=$element_name}
-        {/if}
+          {$form.$element_name.html}&nbsp;
       {if $element.html_type eq 'Autocomplete-Select'}
           {if $element.data_type eq 'ContactReference'}
                   {include file="CRM/Custom/Form/ContactReference.tpl"}
