@@ -49,9 +49,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
 
     foreach ($e->getRows() as $row) {
+      $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {
         $params = array(
-          array('contact_id', '=', $row->context['contactId'], 0, 0),
+          array('contact_id', '=', $contactId, 0, 0),
         );
         list($contact, $_) = \CRM_Contact_BAO_Query::apiQuery($params);
         $contact = reset($contact); //CRM-4524
@@ -70,11 +71,13 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $contact = array_merge($contact, $row->context['tmpTokenParams']);
       }
 
+      $contactArray = !is_array($contactId) ? array($contactId => $contact) : $contact;
+
       // Note: This is a small contract change from the past; data should be missing
       // less randomly.
       //\CRM_Utils_Hook::tokenValues($contact, $row->context['contactId']);
-      \CRM_Utils_Hook::tokenValues($contact,
-        $row->context['contactId'],
+      \CRM_Utils_Hook::tokenValues($contactArray,
+        (array) $contactId,
         empty($row->context['mailingJob']) ? NULL : $row->context['mailingJob']->id,
         $messageTokens,
         $row->context['controller']
