@@ -207,9 +207,8 @@ function civicrm_api3_system_get($params) {
           CRM_Extension_System::singleton()->getManager()->getStatuses(),
           PREG_GREP_INVERT
         ),
-        'domains' => CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_domain'),
-        'languageLimit' => CRM_Core_Config::singleton()->languageLimit,
-        'lcMessages' => CRM_Core_Config::singleton()->lcMessages,
+        'multidomain' => CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_domain') > 1,
+        'settings' => _civicrm_api3_system_get_redacted_settings(),
         'exampleUrl' => CRM_Utils_System::url('civicrm/example', NULL, TRUE, NULL, FALSE),
       ),
       'http' => array(
@@ -291,6 +290,25 @@ function _civicrm_api3_system_get_redacted_mysql() {
     }
     else {
       $result[$dao->Variable_name] = 'REDACTED';
+    }
+  }
+
+  return $result;
+}
+
+function _civicrm_api3_system_get_redacted_settings() {
+  static $whitelist = NULL;
+  if ($whitelist === NULL) {
+    $whitelist = _civicrm_api3_system_get_whitelist(__DIR__ . '/System/setting-whitelist.txt');
+  }
+
+  $apiResult = civicrm_api3('Setting', 'get', array());
+  $result = array();
+  foreach ($apiResult['values'] as $settings) {
+    foreach ($settings as $key => $value) {
+      if (in_array($key, $whitelist)) {
+        $result[$key] = $value;
+      }
     }
   }
 
