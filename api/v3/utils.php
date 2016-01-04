@@ -740,6 +740,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
   }
 
   $result_entities = array();
+  CRM_Utils_Hook::entityGet($entity, $query, !empty($params['check_permissions']));
   $result_dao = CRM_Core_DAO::executeQuery($query->toSQL());
 
   while ($result_dao->fetch()) {
