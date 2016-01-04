@@ -314,7 +314,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         // Label is value + 1, since the code sees this is ADDITIONAL participants (in addition to "self")
         $additionalOptions = array();
         $additionalOptions[''] = 1;
-        for ($i=1; $i <= $this->_values['event']['max_additional_participants']; $i++) {
+        for ($i = 1; $i <= $this->_values['event']['max_additional_participants']; $i++) {
           $additionalOptions[$i] = $i + 1;
         }
         $this->add('select', 'additional_participants',
