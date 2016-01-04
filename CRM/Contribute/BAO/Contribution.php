@@ -292,6 +292,32 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * Get the values and resolve the most common mappings.
+   *
+   * Since contribution status is resolved in almost every function that calls getValues it makes
+   * sense to have an extra function to resolve it rather than repeat the code.
+   *
+   * Think carefully before adding more mappings to be resolved as there could be performance implications
+   * if this function starts to be called from more iterative functions.
+   *
+   * @param array $params
+   *   Input parameters to find object.
+   *
+   * @return array
+   *   Array of the found contribution.
+   * @throws CRM_Core_Exception
+   */
+  public static function getValuesWithMappings($params) {
+    $values = $ids = array();
+    $contribution = self::getValues($params, $values, $ids);
+    if (is_null($contribution)) {
+      throw new CRM_Core_Exception('No contribution found');
+    }
+    $values['contribution_status'] = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $values['contribution_status_id']);
+    return $values;
+  }
+
+  /**
    * Calculate net_amount & fee_amount if they are not set.
    *
    * Net amount should be total - fee.
@@ -3060,6 +3086,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       );
       if ($contributionStatus == 'Refunded') {
         $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
+        if (isset($params['refund_trxn_id'])) {
+          // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
+          $trxnParams['trxn_id'] = $params['refund_trxn_id'];
+        }
       }
       //CRM-16259, set is_payment flag for non pending status
       if (!in_array($contributionStatus, $pendingStatus)) {
@@ -3081,10 +3111,17 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $params['trxnParams'] = $trxnParams;
 
       if (!empty($params['prevContribution'])) {
+        $updated = FALSE;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
-        $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
+        if (!isset($params['trxnParams']['trxn_id'])) {
+          // Actually I have no idea why we are overwriting any values from the previous contribution.
+          // (filling makes sense to me). However, only protecting this value as I really really know we
+          // don't want this one overwritten.
+          // CRM-17751.
+          $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
+        }
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
 
         if (!(($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)
@@ -3120,17 +3157,24 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
             self::updateFinancialAccounts($params);
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
+            $updated = TRUE;
           }
         }
 
         //Update contribution status
         $params['trxnParams']['status_id'] = $params['contribution']->contribution_status_id;
-        $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
+        if (!isset($params['refund_trxn_id'])) {
+          // CRM-17751 This has previously been deliberately set. No explanation as to why one variant
+          // gets preference over another so I am only 'protecting' a very specific tested flow
+          // and letting natural justice take care of the rest.
+          $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
+        }
         if (!empty($params['contribution_status_id']) &&
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {
           //Update Financial Records
           self::updateFinancialAccounts($params, 'changedStatus');
+          $updated = TRUE;
         }
 
         // change Payment Instrument for a Completed contribution
@@ -3152,6 +3196,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               self::updateFinancialAccounts($params, 'changePaymentInstrument');
               $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
               self::updateFinancialAccounts($params, 'changePaymentInstrument');
+              $updated = TRUE;
             }
           }
           elseif ((!CRM_Utils_System::isNull($params['contribution']->payment_instrument_id) ||
@@ -3162,6 +3207,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             self::updateFinancialAccounts($params, 'changePaymentInstrument');
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
             self::updateFinancialAccounts($params, 'changePaymentInstrument');
+            $updated = TRUE;
           }
           elseif (!CRM_Utils_System::isNull($params['contribution']->check_number) &&
             $params['contribution']->check_number != $params['prevContribution']->check_number
@@ -3174,6 +3220,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $params['trxnParams']['check_number'] = $params['contribution']->check_number;
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
             self::updateFinancialAccounts($params, 'changePaymentInstrument');
+            $updated = TRUE;
           }
         }
 
@@ -3188,6 +3235,22 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           self::updateFinancialAccounts($params, 'changedAmount');
+          $updated = TRUE;
+        }
+
+        if (!$updated) {
+          // Looks like we might have a data correction update.
+          // This would be a case where a transaction id has been entered but it is incorrect &
+          // the person goes back in & fixes it, as opposed to a new transaction.
+          // Currently the UI doesn't support multiple refunds against a single transaction & we are only supporting
+          // the data fix scenario.
+          // CRM-17751.
+          if (isset($params['refund_trxn_id'])) {
+            $refundIDs = CRM_Core_BAO_FinancialTrxn::getRefundTransactionIDs($params['id']);
+            if ($refundIDs['trxn_id'] != $params['refund_trxn_id']) {
+              civicrm_api3('FinancialTrxn', 'create', array('id' => $refundIDs['financialTrxnId'], 'trxn_id' => $params['refund_trxn_id']));
+            }
+          }
         }
       }
 
