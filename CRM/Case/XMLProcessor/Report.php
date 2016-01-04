@@ -553,13 +553,12 @@ WHERE      a.id = %1
       if ($dao->fetch()) {
         $customGroup = array();
         foreach ($typeValues[$tableName] as $columnName => $typeValue) {
-          $value = CRM_Core_BAO_CustomField::getDisplayValue($dao->$columnName,
-            $typeValue['fieldID'],
-            $options
-          );
 
           if (CRM_Utils_Array::value('type', $typeValue) == 'Date') {
             $value = $dao->$columnName;
+          }
+          else {
+            $value = CRM_Core_BAO_CustomField::displayValue($dao->$columnName, $typeValue['fieldID']);
           }
 
           if ($value) {

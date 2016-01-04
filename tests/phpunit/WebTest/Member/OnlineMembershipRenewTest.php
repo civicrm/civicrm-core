@@ -555,8 +555,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", "$lastName, $firstName");
     $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->clickLink("_qf_Search_refresh", "css=#memberSearch table tbody tr td a.action-item:first-child");
+    $this->click("css=#memberSearch table tbody tr td a.action-item:first-child");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record
@@ -625,8 +625,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", "$organisationName");
     $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record
@@ -646,8 +646,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", "$lastName, $firstName");
     $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record

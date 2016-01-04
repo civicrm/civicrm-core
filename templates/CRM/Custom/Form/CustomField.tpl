@@ -63,12 +63,7 @@
         <tr class="custom_field-row {$element.element_name}-row">
             <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
             <td class="html-adjust">
-                {if $element.data_type neq 'Date' OR ($element.data_type eq 'Date' AND $element.is_view eq 1)}
-                    {$form.$element_name.html}&nbsp;
-                {elseif $element.skip_calendar NEQ true}
-                    {include file="CRM/common/jcalendar.tpl" elementName=$element_name}
-                {/if}
-
+                {$form.$element_name.html}&nbsp;
                 {if $element.data_type eq 'File'}
                     {if $element.element_value.data}
                       <div class="crm-attachment-wrapper crm-entity" id="file_{$element_name}">

@@ -30,7 +30,7 @@
     <comment>Contact ID of contact record given grant belongs to.</comment>
     <add>1.8</add>
     <html>
-       <type>Autocomplete-Select</type>
+       <type>EntityRef</type>
      </html>
   </field>
   <foreignKey>

@@ -805,11 +805,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
               $campaignId = CRM_Utils_Array::value('campaign_id', $this->_values);
             }
           }
-
+          foreach (array('join_date', 'start_date', 'end_date') as $dateType) {
+            $formDates[$dateType] = CRM_Utils_Array::value($dateType, $value);
+          }
+          $membershipSource = CRM_Utils_Array::value('source', $value);
           list($membership) = CRM_Member_BAO_Membership::renewMembership(
             $value['contact_id'], $value['membership_type_id'], FALSE,
             NULL, NULL, $value['custom'], NULL, NULL, FALSE,
-            NULL, NULL, $isPayLater, $campaignId
+            NULL, $membershipSource, $isPayLater, $campaignId, $formDates
           );
 
           // make contribution entry

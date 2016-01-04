@@ -259,8 +259,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("financial_type_id");
     $this->type("sort_name", $firstName);
     $this->select('financial_type_id', "label=Donation");
-    $this->clickLink('_qf_Search_refresh', "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span/a[1][text()='View']", FALSE);
-    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span/a[1][text()='View']");
+    $this->clickLink('_qf_Search_refresh', "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", FALSE);
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
     $this->waitForAjaxContent();
     $expected = array(
       'From' => "{$firstName} {$lastName}",

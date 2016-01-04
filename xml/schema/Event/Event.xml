@@ -786,7 +786,7 @@
     </pseudoconstant>
     <add>3.4</add>
     <html>
-       <type>Autocomplete-Select</type>
+       <type>EntityRef</type>
      </html>
   </field>
   <foreignKey>
@@ -824,7 +824,7 @@
     <default>NULL</default>
     <comment>Implicit FK to civicrm_event: parent event</comment>
     <html>
-       <type>Autocomplete-Select</type>
+       <type>EntityRef</type>
      </html>
     <add>4.1</add>
   </field>

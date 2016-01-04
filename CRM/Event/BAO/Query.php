@@ -359,15 +359,16 @@ class CRM_Event_BAO_Query {
 
         $qillName = $name;
         if (in_array($name, array(
-              'participant_status_id',
-              'participant_source',
-              'participant_id',
-              'participant_contact_id',
-              'participant_fee_amount',
-              'participant_fee_level',
-              'participant_is_pay_later',
-              'participant_campaign_id',
-            ))) {
+          'participant_status_id',
+          'participant_source',
+          'participant_id',
+          'participant_contact_id',
+          'participant_fee_amount',
+          'participant_fee_level',
+          'participant_is_pay_later',
+          'participant_campaign_id',
+        ))
+        ) {
           $name = str_replace('participant_', '', $name);
           if ($name == 'is_pay_later') {
             $qillName = $name;
@@ -379,7 +380,10 @@ class CRM_Event_BAO_Query {
 
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
         $tableName = empty($tableName) ? 'civicrm_participant' : $tableName;
-
+        if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $op = key($value);
+          $value = $value[$op];
+        }
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
 
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
@@ -426,11 +430,12 @@ class CRM_Event_BAO_Query {
       case 'event_title':
         $qillName = $name;
         if (in_array($name, array(
-              'event_id',
-              'event_title',
-              'event_is_public',
-            )
-          )) {
+            'event_id',
+            'event_title',
+            'event_is_public',
+          )
+        )
+        ) {
           $name = str_replace('event_', '', $name);
         }
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
@@ -507,7 +512,7 @@ class CRM_Event_BAO_Query {
    *
    * @return array|null
    */
-  public  static function defaultReturnProperties(
+  public static function defaultReturnProperties(
     $mode,
     $includeCustomFields = TRUE
   ) {
@@ -590,11 +595,23 @@ class CRM_Event_BAO_Query {
     $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', array(1 => '<em>%1</em>')));
 
     $form->addSelect('participant_status_id',
-      array('entity' => 'participant', 'label' => ts('Participant Status'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
+      array(
+        'entity' => 'participant',
+        'label' => ts('Participant Status'),
+        'multiple' => 'multiple',
+        'option_url' => NULL,
+        'placeholder' => ts('- any -'),
+      )
     );
 
     $form->addSelect('participant_role_id',
-      array('entity' => 'participant', 'label' => ts('Participant Role'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
+      array(
+        'entity' => 'participant',
+        'label' => ts('Participant Role'),
+        'multiple' => 'multiple',
+        'option_url' => NULL,
+        'placeholder' => ts('- any -'),
+      )
     );
 
     $form->addYesNo('participant_test', ts('Participant is a Test?'), TRUE);
@@ -613,11 +630,7 @@ class CRM_Event_BAO_Query {
         foreach ($group['fields'] as $field) {
           $fieldId = $field['id'];
           $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form,
-            $elementName,
-            $fieldId,
-            FALSE, FALSE, TRUE
-          );
+          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
         }
       }
     }

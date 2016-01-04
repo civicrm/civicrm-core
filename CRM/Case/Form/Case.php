@@ -111,17 +111,14 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     if (!$this->_caseId) {
       $caseAttributes = array(
-        'case_type' => CRM_Case_PseudoConstant::caseType(),
-        'case_status' => CRM_Case_PseudoConstant::caseStatus(),
-        'encounter_medium' => CRM_Case_PseudoConstant::encounterMedium(),
+        'case_type_id' => ts('Case Type'),
+        'status_id' => ts('Case Status'),
+        'medium_id' => ts('Activity Medium'),
       );
 
-      foreach ($caseAttributes as $key => $values) {
-        if (empty($values)) {
-          CRM_Core_Error::fatal(ts('You do not have any active %1',
-            array(1 => str_replace('_', ' ', $key))
-          ));
-          break;
+      foreach ($caseAttributes as $key => $label) {
+        if (!CRM_Case_BAO_Case::buildOptions($key, 'create')) {
+          CRM_Core_Error::fatal(ts('You do not have any active %1', array(1 => $label)));
         }
       }
     }

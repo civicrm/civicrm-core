@@ -236,6 +236,7 @@ function civicrm_api3_system_get($params) {
         'version' => phpversion(),
         'time' => time(),
         'tz' => date_default_timezone_get(),
+        'sapi' => php_sapi_name(),
         'extensions' => get_loaded_extensions(),
         'ini' => _civicrm_api3_system_get_redacted_ini(),
       ),
@@ -258,7 +259,20 @@ function civicrm_api3_system_get($params) {
           CRM_Extension_System::singleton()->getManager()->getStatuses(),
           PREG_GREP_INVERT
         ),
+        'multidomain' => CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_domain') > 1,
+        'settings' => _civicrm_api3_system_get_redacted_settings(),
         'exampleUrl' => CRM_Utils_System::url('civicrm/example', NULL, TRUE, NULL, FALSE),
+      ),
+      'http' => array(
+        'software' => CRM_Utils_Array::value('SERVER_SOFTWARE', $_SERVER),
+        'forwarded' => !empty($_SERVER['HTTP_X_FORWARDED_FOR']) || !empty($_SERVER['X_FORWARDED_PROTO']),
+        'port' => (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == 80 || $_SERVER['SERVER_PORT'] == 443) ? 'Standard' : 'Nonstandard',
+      ),
+      'os' => array(
+        'type' => php_uname('s'),
+        'release' => php_uname('r'),
+        'version' => php_uname('v'),
+        'machine' => php_uname('m'),
       ),
     ),
   );
@@ -328,6 +342,25 @@ function _civicrm_api3_system_get_redacted_mysql() {
     }
     else {
       $result[$dao->Variable_name] = 'REDACTED';
+    }
+  }
+
+  return $result;
+}
+
+function _civicrm_api3_system_get_redacted_settings() {
+  static $whitelist = NULL;
+  if ($whitelist === NULL) {
+    $whitelist = _civicrm_api3_system_get_whitelist(__DIR__ . '/System/setting-whitelist.txt');
+  }
+
+  $apiResult = civicrm_api3('Setting', 'get', array());
+  $result = array();
+  foreach ($apiResult['values'] as $settings) {
+    foreach ($settings as $key => $value) {
+      if (in_array($key, $whitelist)) {
+        $result[$key] = $value;
+      }
     }
   }
 

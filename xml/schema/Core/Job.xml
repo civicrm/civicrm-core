@@ -61,6 +61,14 @@
     <add>4.1</add>
   </field>
   <field>
+    <name>scheduled_run_date</name>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>When is this cron entry scheduled to run</comment>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>name</name>
     <title>Job Name</title>
     <type>varchar</type>

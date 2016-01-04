@@ -135,6 +135,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_beta6($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Disable flexible jobs extension', 'disableFlexibleJobsExtension');
+  }
+
+  /**
    * CRM-16354
    *
    * @return int
@@ -360,6 +370,24 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
     if (file_exists($cacheFile)) {
       unlink($cacheFile);
     }
+    return TRUE;
+  }
+
+  /**
+   * CRM-17669 and CRM-17686, make scheduled jobs more flexible, disable the 4.6 extension if installed
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function disableFlexibleJobsExtension(CRM_Queue_TaskContext $ctx) {
+    try {
+      civicrm_api3('Extension', 'disable', array('key' => 'com.klangsoft.flexiblejobs'));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // just ignore if the extension isn't installed
+    }
+
     return TRUE;
   }
 
