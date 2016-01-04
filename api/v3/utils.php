@@ -461,10 +461,15 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
 }
 
 /**
- * Get function for query object api.
+ * Query function for civicrm_api_basic_get.
  *
- * This is a simple get function, but it should be usable for any kind of
- * entity. I created it to work around CRM-16036.
+ * Fetches an entity based on specified params for the "where" clause,
+ * return properties for the "select" clause,
+ * as well as limit and order.
+ *
+ * Automatically joins on custom fields to return or filter by them.
+ *
+ * Supports an additional sql fragment which the calling api can provide.
  *
  * @param string $dao_name
  *   Name of DAO
@@ -494,8 +499,13 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
   $getFieldsResult = civicrm_api3($entity, 'getfields', array('action' => 'get'));
   $getFieldsResult = $getFieldsResult['values'];
   foreach ($getFieldsResult as $getFieldKey => $getFieldSpec) {
-    $uniqueAliases[$getFieldKey] = $getFieldSpec['name'];
-    $uniqueAliases[$getFieldSpec['name']] = $getFieldSpec['name'];
+    if (in_array($getFieldSpec['name'], $entity_field_names)) {
+      $uniqueAliases[$getFieldKey] = $getFieldSpec['name'];
+      $uniqueAliases[$getFieldSpec['name']] = $getFieldSpec['name'];
+      foreach (CRM_Utils_Array::value('api.aliases', $getFieldSpec, array()) as $alias) {
+        $uniqueAliases[$alias] = $getFieldSpec['name'];
+      }
+    }
   }
 
   // $select_fields maps column names to the field names of the result
@@ -516,8 +526,8 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
   $return = $return_all_fields ? array_fill_keys($entity_field_names, 1) : $options['return'];
 
   // default fields
-  foreach (array_keys($return) as $field_name) {
-    if (!empty($uniqueAliases[$field_name]) && (CRM_Core_BAO_CustomField::getKeyID($field_name) == FALSE)) {
+  foreach ($return as $field_name => $include) {
+    if ($include && !empty($uniqueAliases[$field_name])) {
       // 'a.' is an alias for the entity table.
       $select_fields["a.{$uniqueAliases[$field_name]}"] = $uniqueAliases[$field_name];
     }
@@ -559,6 +569,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
   }
   // build query
   $query = CRM_Utils_SQL_Select::from($dao->tableName() . " a");
+  $dao->free();
 
   // populate $where_clauses
   foreach ($params as $key => $value) {
@@ -1632,14 +1643,12 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
  *
  * @return array
  */
-function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
-
+function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
+  $result = _civicrm_api3_get_using_utils_sql($bao_name, $params, $uniqueFields, $sql);
   if ($returnAsSuccess) {
-    return civicrm_api3_create_success(_civicrm_api3_get_using_utils_sql($bao_name, $params, $uniqueFields, $sql), $params, $entity, 'get');
+    return civicrm_api3_create_success($result, $params, $entity, 'get');
   }
-  else {
-    return _civicrm_api3_get_using_utils_sql($bao_name, $params, $uniqueFields, $sql);
-  }
+  return $result;
 }
 
 /**
