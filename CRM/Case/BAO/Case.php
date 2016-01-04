@@ -545,19 +545,15 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
   /**
    * @param string $type
    * @param int $userID
-   * @param null $condition
-   * @param int $isDeleted
+   * @param string $condition
    *
    * @return string
    */
-  public static function getCaseActivityQuery($type = 'upcoming', $userID = NULL, $condition = NULL, $isDeleted = 0) {
+  public static function getCaseActivityQuery($type = 'upcoming', $userID = NULL, $condition = NULL) {
     if (!$userID) {
       $session = CRM_Core_Session::singleton();
       $userID = $session->get('userID');
     }
-
-    $actStatus = array_flip(CRM_Core_PseudoConstant::activityStatus('name'));
-    $scheduledStatusId = $actStatus['Scheduled'];
 
     $query = "SELECT
 civicrm_case.id as case_id,
