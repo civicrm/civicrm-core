@@ -141,7 +141,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @return CRM_Pledge_BAO_Pledge
    */
-  public static function &create(&$params) {
+  public static function create(&$params) {
     // FIXME: a cludgy hack to fix the dates to MySQL format
     $dateFields = array('start_date', 'create_date', 'acknowledge_date', 'modified_date', 'cancel_date', 'end_date');
     foreach ($dateFields as $df) {
@@ -150,6 +150,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       }
     }
 
+    $isRecalculatePledgePayment = self::isPaymentsRequireRecalculation($params);
     $transaction = new CRM_Core_Transaction();
 
     $paymentParams = array();
@@ -192,10 +193,10 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
 
     // skip payment stuff inedit mode
-    if (!isset($params['id']) || !empty($params['is_pledge_pending'])) {
+    if (!isset($params['id']) || $isRecalculatePledgePayment) {
 
       // if pledge is pending delete all payments and recreate.
-      if (!empty($params['is_pledge_pending'])) {
+      if ($isRecalculatePledgePayment) {
         CRM_Pledge_BAO_PledgePayment::deletePayments($pledge->id);
       }
 
@@ -251,6 +252,48 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     );
 
     return $pledge;
+  }
+
+  /**
+   * Is this a change to an existing pending pledge requiring payment schedule changes.
+   *
+   * If the pledge is pending the code (slightly lazily) deletes & recreates pledge payments.
+   *
+   * If the payment dates or amounts have been manually edited then this can cause data loss. We can mitigate this to
+   * some extent by making sure we have a change that could potentially affect the schedule (rather than just a
+   * custom data change or similar).
+   *
+   * This calculation needs to be performed before update takes place as previous & new pledges are compared.
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  protected static function isPaymentsRequireRecalculation($params) {
+    if (empty($params['is_pledge_pending']) || empty($params['id'])) {
+      return FALSE;
+    }
+    $scheduleChangingParameters = array(
+      'amount',
+      'frequency_unit',
+      'frequency_interval',
+      'frequency_day',
+      'installments',
+      'start_date',
+    );
+    $existingPledgeDAO = new CRM_Pledge_BAO_Pledge();
+    $existingPledgeDAO->id = $params['id'];
+    $existingPledgeDAO->find(TRUE);
+    foreach ($scheduleChangingParameters as $parameter) {
+      if ($parameter == 'start_date') {
+        if (strtotime($params[$parameter]) != strtotime($existingPledgeDAO->$parameter)) {
+          return TRUE;
+        }
+      }
+      elseif ($params[$parameter] != $existingPledgeDAO->$parameter) {
+        return TRUE;
+      }
+    }
   }
 
   /**
