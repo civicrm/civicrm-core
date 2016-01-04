@@ -55,10 +55,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
 
     $this->click("_qf_Confirm_next_checkout");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(5);
 
     // FIXME: By this time pending records has already been created. Formatting for external page (google checkout in this case)
 
@@ -88,10 +84,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
 
     $this->click("_qf_Confirm_next_checkout");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(5);
 
     // FIXME: By this time pending records has already been created. Formatting for external page (google checkout in this case)
 

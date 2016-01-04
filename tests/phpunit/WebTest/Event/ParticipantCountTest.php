@@ -219,7 +219,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
 
-    $this->type("xpath=//input[@class='four crm-form-text required']", '1');
+    $this->type("xpath=//div[@id='priceset']/div[@class='crm-section full_conference-section']//div/input[@class='four crm-form-text required']", '1');
 
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $participants[1] = array(
@@ -253,8 +253,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     // register for event
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
-
-    $this->type("xpath=//input[@class='four crm-form-text required']", '2');
+    $this->type("xpath=//div[@id='priceset']/div[@class='crm-section full_conference-section']//div/input[@class='four crm-form-text required']", '2');
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
 
     $participants[2] = array(
