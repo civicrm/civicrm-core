@@ -203,6 +203,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $params['contribution'] = $contribution;
     self::recordFinancialAccounts($params);
 
+    if (self::isUpdateToRecurringContribution($params)) {
+      CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
+        $params['contribution_recur_id'],
+        $contributionStatus[$params['contribution_status_id']]
+      );
+    }
+
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
 
@@ -214,6 +221,33 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     return $result;
+  }
+
+  /**
+   * Is this contribution updating an existing recurring contribution.
+   *
+   * We need to upd the status of the linked recurring contribution if we have a new payment against it, or the initial
+   * pending payment is being confirmed (or failing).
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  public static function isUpdateToRecurringContribution($params) {
+    if (!empty($params['contribution_recur_id']) && empty($params['id'])) {
+      return TRUE;
+    }
+    if (empty($params['prevContribution']) || empty($params['contribution_status_id'])) {
+      return FALSE;
+    }
+    if (empty($params['contribution_recur_id']) && empty($params['prevContribution']->contribution_recur_id)) {
+      return FALSE;
+    }
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    if ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
