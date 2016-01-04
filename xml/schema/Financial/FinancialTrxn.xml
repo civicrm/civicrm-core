@@ -170,9 +170,14 @@
     <title>Transaction ID</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>user-specified unique processor transaction id, bank id + trans id,... depending on payment_method</comment>
+    <comment>Transaction id supplied by external processor. This may not be unique.</comment>
     <add>1.3</add>
   </field>
+  <index>
+    <name>UI_ftrxn_trxn_id</name>
+    <fieldName>trxn_id</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>trxn_result_code</name>
     <title>Transaction result Code</title>
