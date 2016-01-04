@@ -1202,4 +1202,31 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->assertElementContainsText("xpath=//div[@id='participantSearch']/table/tbody/tr[@id='rowid$newParticipantId']/td[9]", "Cancelled (test)");
   }
 
+  /**
+   * CRM-17745: Make maximum number of participants configurable
+   */
+  public function testLimitMaximumParticipants() {
+    $this->webtestLogin('admin');
+
+    // Add event
+    $this->openCiviPage("event/add", "reset=1&action=add");
+    $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $eventDescription = "Here is a description for this conference.";
+    $registerIntro = "Fill in all the fields below and click Continue.";
+    $this->_testAddEventInfo($eventTitle, $eventDescription);
+    $multipleRegistrations = TRUE;
+    $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
+    $id = $this->urlArg('id');
+
+    // Limit additional participants
+    $this->openCiviPage("event/manage/registration", "reset=1&action=update&id=$id", '_qf_Registration_upload-bottom');
+    $this->select("max_additional_participants", "value=4");
+    $this->click("_qf_Registration_upload-bottom");
+    $this->waitForText('crm-notification-container', "'Online Registration' information has been saved.");
+
+    // Open registration page and check maximum participants
+    $this->openCiviPage("event/register", "reset=1&id=$id&action=preview", '_qf_Register_upload-bottom');
+    $this->verifyText("xpath=//select[@id='additional_participants']/option[last()]", 5);
+  }
+
 }

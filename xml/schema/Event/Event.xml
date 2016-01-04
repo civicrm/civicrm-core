@@ -615,6 +615,14 @@
     </html>
   </field>
   <field>
+    <name>max_additional_participants</name>
+    <type>int unsigned</type>
+    <title>Maximum number of additional participants per registration</title>
+    <default>0</default>
+    <comment>Maximum number of additional participants that can be registered on a single booking</comment>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>allow_same_participant_emails</name>
     <type>boolean</type>
     <title>Does Event allow multiple registrations from same email address?</title>
