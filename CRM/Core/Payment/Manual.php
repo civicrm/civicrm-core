@@ -174,10 +174,12 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
-   * Submit a payment using Advanced Integration Method.
+   * Submit a manual payment.
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
+   *
+   * @return array
    */
   public function doDirectPayment(&$params) {
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
@@ -187,6 +189,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
     else {
       $result['payment_status_id'] = array_search('Completed', $statuses);
     }
+    return $result;
   }
 
 }

@@ -127,7 +127,10 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are back office payments supported.
+   *
+   * E.g paypal standard won't permit you to enter a credit card associated with someone else's login.
+   *
    * @return bool
    */
   protected function supportsLiveMode() {

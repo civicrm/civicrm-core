@@ -2378,7 +2378,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $entityID = $ids['membership'][0];
       }
 
-      $template->assign('cancelSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity));
+      $template->assign('cancelSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity, 'cancel'));
       $template->assign('updateSubscriptionBillingUrl', $paymentObject->subscriptionURL($entityID, $entity, 'billing'));
       $template->assign('updateSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity, 'update'));
 
@@ -2471,7 +2471,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $template->assign('is_separate_payment', 0);
 
             if ($recur && $paymentObject) {
-              $url = $paymentObject->subscriptionURL($membership->id, 'membership');
+              $url = $paymentObject->subscriptionURL($membership->id, 'membership', 'cancel');
               $template->assign('cancelSubscriptionUrl', $url);
               $url = $paymentObject->subscriptionURL($membership->id, 'membership', 'billing');
               $template->assign('updateSubscriptionBillingUrl', $url);
@@ -2914,7 +2914,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($contributionId, 'contribute', 'obj');
       if (!empty($paymentObject)) {
-        $supportsCancel[$cacheKeyString] = $paymentObject->isSupported('cancelSubscription') && !$isCancelled;
+        $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring') && !$isCancelled;
       }
     }
     return $supportsCancel[$cacheKeyString];
