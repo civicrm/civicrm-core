@@ -108,17 +108,17 @@ You will need to manually delete that user (click on the link to open the %1 use
         </td>
       {/if}
 
+        {assign var=position  value=$field|strrpos:'_'}
+        {assign var=blockId   value=$field|substr:$position+1}
+        {assign var=blockName value=$field|substr:14:$position-14}
+
         <td>
-          {if $row.title|substr:0:7 == "Address"}<span id="other_{$blockName}_{$blockId}" style="white-space:pre">{else}<span id="other_{$blockName}_{$blockId}">{/if}{if !is_array($row.other)}{$row.other}{elseif $row.other.fileName}{$row.other.fileName}{else}{', '|implode:$row.other}{/if}</span>
+          {if $row.title|substr:0:7 == "Address"}<span style="white-space:pre">{else}<span>{/if}{if !is_array($row.other)}{$row.other}{elseif $row.other.fileName}{$row.other.fileName}{else}{', '|implode:$row.other}{/if}</span>
         </td>
 
         <td style='white-space: nowrap'>
            {if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
         </td>
-
-        {assign var=position  value=$field|strrpos:'_'}
-        {assign var=blockId   value=$field|substr:$position+1}
-        {assign var=blockName value=$field|substr:14:$position-14}
 
         {* For location blocks *}
         {if $row.title|substr:0:5 == "Email"   OR
@@ -160,7 +160,7 @@ You will need to manually delete that user (click on the link to open the %1 use
         {else}
 
           <td>
-            <span id="main_{$blockName}_{$blockId}">
+            <span>
               {if !is_array($row.main)}
                 {$row.main}
               {elseif $row.main.fileName}
@@ -173,7 +173,7 @@ You will need to manually delete that user (click on the link to open the %1 use
 
           <td>
             {if isset($row.main) || isset($row.other)}
-              <span id="main_{$blockName}_{$blockId}_overwrite">
+              <span>
                 {if $row.main == $row.other}
                   <span class="action_label">({ts}match{/ts})</span><br />
                 {elseif $row.main}
