@@ -1569,6 +1569,22 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when a CiviMail mailing has completed
+   *
+   * @param int $mailingId
+   *   Mailing ID
+   *
+   * @return mixed
+   */
+  public static function postMailing($mailingId) {
+    return self::singleton()->invoke(1, $mailingId,
+      self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_postMailing'
+    );
+  }
+
+  /**
    * This hook is called when Settings specifications are loaded.
    *
    * @param array $settingsFolders
