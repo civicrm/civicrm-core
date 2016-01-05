@@ -301,6 +301,7 @@ class CRM_Export_BAO_Export {
     $exportParams = array(),
     $queryOperator = 'AND'
   ) {
+
     $headerRows = $returnProperties = array();
     $primary = $paymentFields = $selectedPaymentFields = FALSE;
     $origFields = $fields;
@@ -1258,14 +1259,19 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // call export hook
       CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode);
 
-      // now write the CSV file
-      self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+      // In order to be able to write a unit test against this function we need to suppress
+      // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
+      if (empty($exportParams['suppress_csv_for_testing'])) {
+        self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+      }
 
       // delete the export temp table and component table
       $sql = "DROP TABLE IF EXISTS {$exportTempTable}";
       CRM_Core_DAO::executeQuery($sql);
-
-      CRM_Utils_System::civiExit();
+      // Do not exit in test context.
+      if (empty($exportParams['suppress_csv_for_testing'])) {
+        CRM_Utils_System::civiExit();
+      }
     }
     else {
       CRM_Core_Error::fatal(ts('No records to export'));
