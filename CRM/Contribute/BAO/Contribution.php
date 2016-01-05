@@ -2062,13 +2062,29 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if (!empty($input['amount'])) {
         $contribution->total_amount = $contributionParams['total_amount'] = $input['amount'];
       }
-      $templateContribution = civicrm_api3('Contribution', 'getsingle', array(
-        'contribution_recur_id' => $contributionParams['contribution_recur_id'],
-        'options' => array('limit' => 1),
-      ));
+      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionParams['contribution_recur_id']);
+      if (!empty($contributionParams['contribution_recur_id'])) {
+        $recurringContribution = civicrm_api3('ContributionRecur', 'getsingle', array(
+          'id' => $contributionParams['contribution_recur_id'],
+        ));
+        if (!empty($recurringContribution['campaign_id'])) {
+          // CRM-17718 the campaign id on the contribution recur record should get precedence.
+          $contributionParams['campaign_id'] = $recurringContribution['campaign_id'];
+        }
+        if (!empty($recurringContribution['financial_type_id'])) {
+          // CRM-17718 the campaign id on the contribution recur record should get precedence.
+          $contributionParams['financial_type_id'] = $recurringContribution['financial_type_id'];
+        }
+      }
       $contributionParams['skipLineItem'] = TRUE;
       $contributionParams['status_id'] = 'Pending';
-      $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
+      if (isset($contributionParams['financial_type_id'])) {
+        // Give precedence to passed in type.
+        $contribution->financial_type_id = $contributionParams['financial_type_id'];
+      }
+      else {
+        $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
+      }
       $contributionParams['contact_id'] = $templateContribution['contact_id'];
       $contributionParams['source'] = empty($templateContribution['source']) ? ts('Recurring contribution') : $templateContribution['source'];
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
@@ -4223,6 +4239,20 @@ WHERE con.id = {$contributionId}
   }
 
   /**
+   * Is there only one line item attached to the contribution.
+   *
+   * @param int $id
+   *   Contribution ID.
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function isSingleLineItem($id) {
+    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('contribution_id' => $id));
+    return ($lineItemCount == 1);
+  }
+
+  /**
    * Complete an order.
    *
    * Do not call this directly - use the contribution.completetransaction api as this function is being refactored.
@@ -4259,26 +4289,36 @@ WHERE con.id = {$contributionId}
       'campaign_id',
       'receive_date',
     );
-
-    $contributionParams = array_merge(array(
-      'contribution_status_id' => 'Completed',
-      'financial_type_id' => $contribution->financial_type_id,
-    ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
-    ));
+    if (self::isSingleLineItem($primaryContributionID)) {
+      $inputContributionWhiteList[] = 'financial_type_id';
+    }
 
     $participant = CRM_Utils_Array::value('participant', $objects);
     $memberships = CRM_Utils_Array::value('membership', $objects);
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
+    $event = CRM_Utils_Array::value('event', $objects);
+
+    $contributionParams = array_merge(array(
+      'contribution_status_id' => 'Completed',
+      'source' => self::getRecurringContributionDescription($contribution, $event),
+    ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
+    ));
+
     if (!empty($recurContrib->id)) {
       $contributionParams['contribution_recur_id'] = $recurContrib->id;
     }
+    $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
+
+    if (empty($contributionParams['receive_date']) && $changeDate) {
+      $contributionParams['receive_date'] = $changeDate;
+    }
+
     self::repeatTransaction($contribution, $input, $contributionParams);
+    $contributionParams['financial_type_id'] = $contribution->financial_type_id;
 
     if (is_numeric($memberships)) {
       $memberships = array($objects['membership']);
     }
-
-    $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
 
     $values = array();
     if (isset($input['is_email_receipt'])) {
@@ -4287,21 +4327,16 @@ WHERE con.id = {$contributionId}
 
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
+        // Figure out what we gain from this.
         CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
-        $contributionParams['source'] = ts('Online Contribution') . ': ' . $values['title'];
       }
       elseif ($recurContrib && $recurContrib->id) {
-        $contributionParams['contribution_page_id'] = NULL;
         $values['amount'] = $recurContrib->amount;
         $values['financial_type_id'] = $objects['contributionType']->id;
         $values['title'] = $source = ts('Offline Recurring Contribution');
         $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
         $values['receipt_from_name'] = $domainValues[0];
         $values['receipt_from_email'] = $domainValues[1];
-      }
-
-      if (empty($contributionParams['receive_date']) && $changeDate) {
-        $contributionParams['receive_date'] = $changeDate;
       }
 
       if ($recurContrib && $recurContrib->id && !isset($input['is_email_receipt'])) {
@@ -4392,9 +4427,7 @@ LIMIT 1;";
     }
     else {
       if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
-        $eventDetail = civicrm_api3('Event', 'getsingle', array('id' => $objects['event']->id));
-        $contributionParams['source'] = ts('Online Event Registration') . ': ' . $eventDetail['title'];
-        if ($eventDetail['is_email_confirm']) {
+        if ($event->is_email_confirm) {
           // @todo this should be set by the function that sends the mail after sending.
           $contributionParams['receipt_date'] = $changeDate;
         }
@@ -4658,6 +4691,29 @@ LIMIT 1;";
       $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
     }
     return CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+  }
+
+  /**
+   * Get the description (source field) for the recurring contribution.
+   *
+   * @param CRM_Contribute_BAO_Contribution $contribution
+   * @param CRM_Event_DAO_Event|null $event
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function getRecurringContributionDescription($contribution, $event) {
+    if (!empty($contribution->contribution_page_id)) {
+      $contributionPageTitle = civicrm_api3('ContributionPage', 'getvalue', array(
+        'id' => $contribution->contribution_page_id,
+        'return' => 'title',
+      ));
+      return ts('Online Contribution') . ': ' . $contributionPageTitle;
+    }
+    elseif ($event) {
+      return ts('Online Event Registration') . ': ' . $event->title;
+    }
+    return 'recurring contribution';
   }
 
 }

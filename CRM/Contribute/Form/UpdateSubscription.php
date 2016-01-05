@@ -78,12 +78,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
+      $this->_crid = $this->_subscriptionDetails->recur_id;
     }
     elseif ($this->_crid) {
       $this->_coid = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_crid, 'id', 'contribution_recur_id');
     }
 
-    if ((!$this->_crid && !$this->_coid) ||
+    if ((!$this->_crid) ||
       ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)
     ) {
       CRM_Core_Error::fatal('Required information missing.');
@@ -132,6 +133,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $this->_defaults = array();
     $this->_defaults['amount'] = $this->_subscriptionDetails->amount;
     $this->_defaults['installments'] = $this->_subscriptionDetails->installments;
+    $this->_defaults['campaign_id'] = $this->_subscriptionDetails->campaign_id;
+    $this->_defaults['financial_type_id'] = $this->_subscriptionDetails->financial_type_id;
     $this->_defaults['is_notify'] = 1;
 
     return $this->_defaults;
@@ -151,10 +154,18 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       TRUE, 'currency', $this->_subscriptionDetails->currency, TRUE
     );
 
-    $this->add('text', 'installments', ts('Number of Installments'), array('size' => 20), TRUE);
+    $this->add('text', 'installments', ts('Number of Installments'), array('size' => 20), FALSE);
 
     if ($this->_donorEmail) {
       $this->add('checkbox', 'is_notify', ts('Notify Contributor?'));
+    }
+
+    if (CRM_Core_Permission::check('edit contributions')) {
+      CRM_Campaign_BAO_Campaign::addCampaign($this);
+    }
+
+    if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->_crid)) {
+      $this->addEntityRef('financial_type_id', ts('Financial Type'), array('entity' => 'FinancialType'), TRUE);
     }
 
     $type = 'next';

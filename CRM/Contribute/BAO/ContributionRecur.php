@@ -378,7 +378,9 @@ SELECT rec.id                   as recur_id,
        rec.is_test,
        rec.auto_renew,
        rec.currency,
-       con.id                   as contribution_id,
+       rec.campaign_id,
+       rec.financial_type_id,
+       con.id as contribution_id,
        con.contribution_page_id,
        rec.contact_id,
        mp.membership_id";
@@ -412,8 +414,51 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       return $dao;
     }
     else {
-      return CRM_Core_DAO::$_nullObject;
+      return NULL;
     }
+  }
+
+  /**
+   * Does the recurring contribution support financial type change.
+   *
+   * This is conditional on there being only one line item or if there are no contributions as yet.
+   *
+   * (This second is a bit of an unusual condition but might occur in the context of a
+   *
+   * @param int $id
+   *
+   * @return bool
+   */
+  public static function supportsFinancialTypeChange($id) {
+    // At this stage only sites with no Financial ACLs will have the opportunity to edit the financial type.
+    // this is to limit the scope of the change and because financial ACLs are still fairly new & settling down.
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      return FALSE;
+    }
+    $contribution = self::getTemplateContribution($id);
+    return CRM_Contribute_BAO_Contribution::isSingleLineItem($contribution['id']);
+  }
+
+  /**
+   * Get the contribution to be used as the template for later contributions.
+   *
+   * Later we might merge in data stored against the contribution recur record rather than just return the contribution.
+   *
+   * @param int $id
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getTemplateContribution($id) {
+    $templateContribution = civicrm_api3('Contribution', 'get', array(
+      'contribution_recur_id' => $id,
+      'options' => array('limit' => 1, 'sort' => array('id DESC')),
+      'sequential' => 1,
+    ));
+    if ($templateContribution['count']) {
+      return $templateContribution['values'][0];
+    }
+    return array();
   }
 
   public static function setSubscriptionContext() {
@@ -589,6 +634,10 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
     if (count($lineItems) == 1) {
       foreach ($lineItems as $index => $lineItem) {
+        if (isset($contribution->financial_type_id)) {
+          // CRM-17718 allow for possibility of changed financial type ID having been set prior to calling this.
+          $lineItems[$index]['financial_type_id'] = $contribution->financial_type_id;
+        }
         if ($lineItem['line_total'] != $contribution->total_amount) {
           // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
           // if there is only one line item, and the UI should prevent this situation for those with more than one.
