@@ -3094,39 +3094,12 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       return FALSE;
     }
 
-    // This permission always has access
-    if (CRM_Core_Permission::check('access all cases and activities')) {
-      return TRUE;
+    $params = array('id' => $caseId, 'check_permissions' => TRUE);
+    if ($denyClosed && !CRM_Core_Permission::check('access all cases and activities')) {
+      $params['status_id'] = array('!=' => 'Closed');
     }
-
-    // This permission is required at minimum
-    if (!CRM_Core_Permission::check('access my cases and activities')) {
-      return FALSE;
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $userID = CRM_Utils_Type::validate($session->get('userID'), 'Positive');
-    $caseId = CRM_Utils_Type::validate($caseId, 'Positive');
-
-    $condition = " AND civicrm_case.is_deleted = 0 ";
-    $condition .= " AND case_relationship.contact_id_b = {$userID} ";
-    $condition .= " AND civicrm_case.id = {$caseId}";
-
-    if ($denyClosed) {
-      $closedId = CRM_Core_OptionGroup::getValue('case_status', 'Closed', 'name');
-      $condition .= " AND civicrm_case.status_id != $closedId";
-    }
-
-    // We don't actually care about activities in the case, but the underlying
-    // query is verbose, and this allows us to share the basic query with
-    // getCases(). $type=='any' means that activities will be left-joined.
-    $query = self::getCaseActivityQuery('any', $userID, $condition);
-    $queryParams = array();
-    $dao = CRM_Core_DAO::executeQuery($query,
-      $queryParams
-    );
-
-    return (bool) $dao->fetch();
+    $result = civicrm_api3('Case', 'getcount', $params);
+    return (bool) $result['result'];
   }
 
   /**
