@@ -62,10 +62,10 @@ class CRM_Utils_Wrapper {
   public function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {
       $mode = CRM_Utils_Array::value('mode', $arguments);
-      $imageUpload = (bool) CRM_Utils_Array::value('imageUpload', $arguments, FALSE);
-      $addSequence = (bool) CRM_Utils_Array::value('addSequence', $arguments, FALSE);
-      $attachUpload = (bool) CRM_Utils_Array::value('attachUpload', $arguments, FALSE);
-      $ignoreKey = (bool) CRM_Utils_Array::value('ignoreKey', $arguments, FALSE);
+      $imageUpload = !empty($arguments['imageUpload']);
+      $addSequence = !empty($arguments['addSequence']);
+      $attachUpload = !empty($arguments['attachUpload']);
+      $ignoreKey = !empty($arguments['ignoreKey']);
     }
     else {
       $arguments = array();
