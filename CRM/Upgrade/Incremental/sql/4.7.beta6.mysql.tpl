@@ -17,3 +17,6 @@ WHERE is_multiple_registrations = 1;
 -- CRM-17752
 ALTER TABLE `civicrm_financial_trxn`
 ADD INDEX `UI_ftrxn_trxn_id` (`trxn_id`);
+
+SELECT @domainID := min(id) FROM civicrm_domain;
+INSERT INTO civicrm_setting(name, value, domain_id, is_domain) values ('installed', 'i:1;', @domainID, 1);
