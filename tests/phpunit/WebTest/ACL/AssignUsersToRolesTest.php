@@ -153,7 +153,6 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $label = "TestAclRole" . substr(sha1(rand()), 0, 4);
     $this->waitForElementPresent("label");
     $this->type("label", $label);
-    $this->type("value", "Acl value" . $label);
     $this->click("_qf_Options_next-bottom");
     $this->waitForText('crm-notification-container', "The ACL Role '{$label}' has been saved.");
 
