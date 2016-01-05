@@ -229,9 +229,6 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     //clicking save
     $this->clickAjaxLink('_qf_Field_done-bottom');
 
-    // Visit home page for a sec to give caches time to be cleared
-    $this->openCiviPage('');
-
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
