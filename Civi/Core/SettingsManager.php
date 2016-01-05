@@ -334,6 +334,7 @@ class SettingsManager {
     switch ($entity) {
       case 'domain':
         $defaults = array(
+          'installed' => FALSE,
           'enable_components' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'),
           'customFileUploadDir' => '[civicrm.files]/custom/',
           'imageUploadDir' => '[civicrm.files]/persist/contribute/',
