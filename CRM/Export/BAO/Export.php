@@ -303,8 +303,7 @@ class CRM_Export_BAO_Export {
   ) {
 
     $headerRows = $returnProperties = array();
-    $primary = $paymentFields = $selectedPaymentFields = FALSE;
-    $origFields = $fields;
+    $paymentFields = $selectedPaymentFields = FALSE;
     $relationField = NULL;
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
@@ -452,9 +451,6 @@ class CRM_Export_BAO_Export {
         $returnProperties['provider_id'] = 1;
         $returnProperties['current_employer'] = 1;
       }
-
-      $extraReturnProperties = array();
-      $paymentFields = FALSE;
 
       $extraProperties = self::defineExtraProperties($queryMode);
       $paymentFields = $extraProperties['paymentFields'];
@@ -699,8 +695,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
 
     $queryString = "$select $from $where $having";
-
-    $groupBy = "";
 
     $groupBy = self::getGroupBy($exportMode, $queryMode, $returnProperties, $query);
 
