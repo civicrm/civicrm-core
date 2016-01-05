@@ -181,6 +181,10 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'access CiviCRM',
       'delete in CiviCase',
     ),
+    // Fine-grained permissions are managed by the api
+    'get' => array(
+      'access CiviCRM',
+    ),
     'default' => array(
       'access CiviCRM',
       'access all cases and activities',

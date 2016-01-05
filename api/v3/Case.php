@@ -165,6 +165,12 @@ function _civicrm_api3_case_create_spec(&$params) {
     'type' => CRM_Utils_Type::T_INT,
     'FKApiName' => 'Contact',
   );
+  $params['contacts'] = array(
+    'title' => 'Case Contacts',
+    'description' => 'Contacts involved in the case',
+    'type' => CRM_Utils_Type::T_INT,
+    'FKApiName' => 'Contact',
+  );
   $params['status_id']['api.default'] = 1;
   $params['status_id']['api.aliases'] = array('case_status');
   $params['creator_id']['api.default'] = 'user_contact_id';
@@ -246,6 +252,21 @@ function civicrm_api3_case_get($params) {
     $sql
       ->join('civicrm_case_activity', 'INNER JOIN civicrm_case_activity ON civicrm_case_activity.case_id = a.id')
       ->where("civicrm_case_activity.activity_id IN ($activityId)");
+  }
+
+  // Add permission clause
+  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('access all cases and activities')) {
+    $user = CRM_Core_Session::getLoggedInContactID();
+    // This permission is required at minimum
+    if (!$user || !CRM_Core_Permission::check('access my cases and activities')) {
+      return civicrm_api3_create_success(array(), $params, 'Case', 'get');
+    }
+    $params['contacts'] = $user;
+  }
+
+  // Add clause to search by contacts
+  if (!empty($params['contacts'])) {
+
   }
 
   $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case', $sql);
