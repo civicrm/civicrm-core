@@ -50,8 +50,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click('radio_ts', 'ts_all');
-    $contriIDOff = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a@href"));
-    $contriIDOn = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a@href"));
+    $contriIDOff = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]//td/span/a@href"));
+    $contriIDOn = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]//td/span/a@href"));
     if (!empty($contriIDOff)) {
       $contriIDOff = substr($contriIDOff[1], (strrpos($contriIDOff[1], '=') + 1));
     }
@@ -69,8 +69,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->click("_qf_Result_done");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $status = 'Completed';
-    $this->verifyText("xpath=id('contributionSearch')/table[1]/tbody/tr[1]/td[9]", preg_quote($status));
-    $this->verifyText("xpath=id('contributionSearch')/table[1]/tbody/tr[2]/td[9]", preg_quote($status));
+    $this->verifyText("xpath=id('contributionSearch')/table[1]/tbody/tr[1]//td[@class='crm-contribution-status']", preg_quote($status));
+    $this->verifyText("xpath=id('contributionSearch')/table[1]/tbody/tr[2]//td[@class='crm-contribution-status']", preg_quote($status));
   }
 
   /**
@@ -237,7 +237,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 100);
-    $this->click("xpath=//div[@class='crm-section payment_processor-section']/div[2]//label[text()='Pay later label {$hash}']");
+    $this->click("xpath=//label[text()='Pay later label {$hash}']");
+    $this->waitForAjaxContent();
     $streetAddress = "100 Main Street";
     $this->type("street_address-1", $streetAddress);
     $this->type("city-1", "San Francisco");
@@ -257,8 +258,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
     $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->type("sort_name", $contact['sort_name']);
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table/tbody/tr[1]/td[11]/span/a[text()='View']", FALSE);
-    $this->click("xpath=//div[@id='contributionSearch']//table/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table/tbody/tr[1]//td/span/a[text()='View']", FALSE);
+    $this->click("xpath=//div[@id='contributionSearch']//table/tbody/tr[1]//td/span/a[text()='View']");
     // View Contribution Record and test for expected values
     $expected = array(
       'From' => $contact['display_name'],
