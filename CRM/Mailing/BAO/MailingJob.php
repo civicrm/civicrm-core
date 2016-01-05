@@ -123,8 +123,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
          AND       j.end_date IS null ) )
          AND (j.job_type = 'child')
          AND   {$mailingACL}
-      ORDER BY j.mailing_id,
-           j.id
+      ORDER BY j.scheduled_date ASC,
+        j.mailing_id
       ";
 
       $job->query($query);
