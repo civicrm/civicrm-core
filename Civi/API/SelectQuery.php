@@ -367,7 +367,7 @@ class SelectQuery {
       }
       // More than 4 joins deep seems excessive - DOS attack?
       if ($depth > self::MAX_JOINS) {
-        throw new UnauthorizedException("Maximum number of joins exceeded for api.{$this->entity}.get in parameter $fkFieldName");
+        throw new UnauthorizedException("Maximum number of joins exceeded in parameter $fkFieldName");
       }
       if (!isset($fkField['FKApiName']) && !isset($fkField['FKClassName'])) {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
@@ -516,7 +516,7 @@ class SelectQuery {
    * Get acl clause for an entity
    *
    * @param string $tableAlias
-   * @param \CRM_Core_DAO $daoName
+   * @param string $daoName
    * @return null|string
    */
   private function getAclClause($tableAlias, $daoName = NULL) {
