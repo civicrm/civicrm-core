@@ -43,7 +43,7 @@
           </div>
         {else}
           <div class="crm-label">{$element.field_title}</div>
-          {if $element.field_type == 'File'}
+          {if $element.field_type == 'File' && !empty($element.field_value)}
             {if $element.field_value.displayURL}
                 <div class="crm-content crm-custom_data crm-displayURL">
                   <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
