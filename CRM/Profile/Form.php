@@ -823,7 +823,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->setDefaultsValues();
 
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
-    if ($this->_mode == self::MODE_CREATE) {
+
+    if ($this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT) {
       CRM_Core_BAO_CMSUser::buildForm($this, $this->_gid, $emailPresent, $action);
     }
     else {
@@ -1324,7 +1325,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     //create CMS user (if CMS user option is selected in profile)
     if (!empty($params['cms_create_account']) &&
-      $this->_mode == self::MODE_CREATE
+      ($this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT)
     ) {
       $params['contactID'] = $this->_id;
       if (!CRM_Core_BAO_CMSUser::create($params, $this->_mail)) {
