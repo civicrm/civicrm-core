@@ -1768,7 +1768,7 @@ SELECT contact_id
    * @param $defaults
    */
   public static function setCreateDefaults(&$params, $defaults) {
-    if (isset($params['id'])) {
+    if (!empty($params['id'])) {
       return;
     }
     foreach ($defaults as $key => $value) {
