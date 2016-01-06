@@ -129,12 +129,17 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
+    //set defaults in create mode
+    if (!$contributionID) {
+      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+    }
+
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
       $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
       if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
-          || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
+        || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
       ) {
         if (empty($params['creditnote_id']) || $params['creditnote_id'] == "null") {
           $params['creditnote_id'] = self::createCreditNoteId();
@@ -144,13 +149,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     else {
       // Since the fee amount is expecting this (later on) ensure it is always set.
       // It would only not be set for an update where it is unchanged.
-      $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', array('id' => $params['id'], 'return' => 'contribution_status_id'));
+      $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', array('id' => $contributionID, 'return' => 'contribution_status_id'));
     }
 
-    //set defaults in create mode
-    if (!$contributionID) {
-      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-    }
     self::calculateMissingAmountParams($params, $contributionID);
 
     if (!empty($params['payment_instrument_id'])) {
