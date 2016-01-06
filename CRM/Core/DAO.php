@@ -2295,7 +2295,7 @@ SELECT contact_id
    *   a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    */
-  public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
+  public static function createSQLFilter($fieldName, $filter, $type = NULL, $alias = NULL, $returnSanitisedArray = FALSE) {
     foreach ($filter as $operator => $criteria) {
       if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {
