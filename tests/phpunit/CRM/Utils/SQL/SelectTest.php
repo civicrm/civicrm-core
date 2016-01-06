@@ -259,6 +259,22 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertEquals('world', $select['hello']);
   }
 
+  public function testInsertInto_WithDupes() {
+    $select = CRM_Utils_SQL_Select::from('foo')
+      ->insertInto('bar', array('first', 'second', 'third', 'fourth'))
+      ->select('fid')
+      ->select('1')
+      ->select('fid')
+      ->select('1')
+      ->where('!field = #value', array('field' => 'zoo', 'value' => 3))
+      ->where('!field = #value', array('field' => 'aviary', 'value' => 3))
+      ->where('!field = #value', array('field' => 'zoo', 'value' => 3))
+      ->groupBy('!colName', array('colName' => 'noodle'))
+      ->groupBy('!colName', array('colName' => 'sauce'))
+      ->groupBy('!colName', array('colName' => 'noodle'));
+    $this->assertLike('INSERT INTO bar (first, second, third, fourth) SELECT fid, 1, fid, 1 FROM foo WHERE (zoo = 3) AND (aviary = 3) GROUP BY noodle, sauce', $select->toSQL());
+  }
+
   /**
    * @param $expected
    * @param $actual
