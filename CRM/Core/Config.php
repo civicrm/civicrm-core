@@ -122,6 +122,8 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         self::$_singleton->getSettings();
 
         Civi::service('settings_manager')->useDefaults();
+
+        self::$_singleton->handleFirstRun();
       }
     }
     return self::$_singleton;
@@ -468,6 +470,67 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    */
   public function free() {
     self::$_singleton = NULL;
+  }
+
+  /**
+   * Conditionally fire an event during the first page run.
+   *
+   * The install system is currently implemented several times, so it's hard to add
+   * new installation logic. We use a poor-man's method to detect the first run.
+   *
+   * Situations to test:
+   *  - New installation
+   *  - Upgrade from an old version (predating first-run tracker)
+   *  - Upgrade from an old version (with first-run tracking)
+   */
+  public function handleFirstRun() {
+    // Ordinarily, we prefetch settings en masse and find that the system is already installed.
+    // No extra SQL queries required.
+    if (Civi::settings()->get('installed')) {
+      return;
+    }
+
+    // Q: How should this behave during testing?
+    if (defined('CIVICRM_TEST')) {
+      return;
+    }
+
+    // If schema hasn't been loaded yet, then do nothing. Don't want to interfere
+    // with the existing installers. NOTE: If we change the installer pageflow,
+    // then we may want to modify this behavior.
+    if (!CRM_Core_DAO::checkTableExists('civicrm_domain')) {
+      return;
+    }
+
+    // If we're handling an upgrade, then the system has already been used, so this
+    // is not the first run.
+    if (CRM_Core_Config::isUpgradeMode()) {
+      return;
+    }
+    $dao = CRM_Core_DAO::executeQuery('SELECT version FROM civicrm_domain');
+    while ($dao->fetch()) {
+      if ($dao->version && version_compare($dao->version, CRM_Utils_System::version(), '<')) {
+        return;
+      }
+    }
+
+    // The installation flag is stored in civicrm_setting, which is domain-aware. The
+    // flag could have been stored under a different domain.
+    $dao = CRM_Core_DAO::executeQuery('
+      SELECT domain_id, value FROM civicrm_setting
+      WHERE is_domain = 1 AND name = "installed"
+    ');
+    while ($dao->fetch()) {
+      $value = unserialize($dao->value);
+      if (!empty($value)) {
+        Civi::settings()->set('installed', 1);
+        return;
+      }
+    }
+
+    // OK, this looks new.
+    Civi::service('dispatcher')->dispatch(\Civi\Core\Event\SystemInstallEvent::EVENT_NAME, new \Civi\Core\Event\SystemInstallEvent());
+    Civi::settings()->set('installed', 1);
   }
 
 }
