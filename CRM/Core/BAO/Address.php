@@ -378,8 +378,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       }
     }
 
+    // check if geocode should be skipped (can be forced with an optional parameter through the api)
+    $skip_geocode = (isset($params['skip_geocode']) && $params['skip_geocode']) ? TRUE : FALSE;
+
     // add latitude and longitude and format address if needed
-    if (!empty($config->geocodeMethod) && ($config->geocodeMethod != 'CRM_Utils_Geocode_OpenStreetMaps') && empty($params['manual_geo_code'])) {
+    if (!$skip_geocode && !empty($config->geocodeMethod) && ($config->geocodeMethod != 'CRM_Utils_Geocode_OpenStreetMaps') && empty($params['manual_geo_code'])) {
       $class = $config->geocodeMethod;
       $class::format($params);
     }
