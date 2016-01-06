@@ -149,6 +149,16 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
+  // CRM-17741 - Permissions for RelationshipType.
+  $permissions['relationship_type'] = array(
+    'get' => array(
+      'access CiviCRM',
+    ),
+    'default' => array(
+      'administer CiviCRM',
+    ),
+  );
+
   // Activity permissions
   $permissions['activity'] = array(
     'delete' => array(
