@@ -1228,16 +1228,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
         }
         elseif ($value) {
+          // In other contexts show a paperclip icon
+          if (is_numeric($value)) {
+            $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
+            $display = $icons[$value];
+          }
           // In the context of inline view, show file/image
-          if (is_string($value)) {
+          else {
             $fileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File', $value, 'id', 'uri');
             $results = CRM_Core_BAO_File::getEntityFile('*', $fileId);
             $display = $results[$fileId];
-          }
-          // In other contexts show a paperclip icon
-          else {
-            $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
-            $display = $icons[$value];
           }
         }
         break;
