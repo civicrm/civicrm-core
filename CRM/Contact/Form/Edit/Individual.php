@@ -55,6 +55,10 @@ class CRM_Contact_Form_Edit_Individual {
         'contact_edit_options', TRUE, NULL,
         FALSE, 'name', TRUE, 'AND v.filter = 2'
       );
+
+      // Use names instead of labels to build form.
+      $nameFields = array_keys($nameFields);
+
       // Fixme: dear god why? these come out in a format that is NOT the name of the fields.
       foreach ($nameFields as &$fix) {
         $fix = str_replace(' ', '_', strtolower($fix));
