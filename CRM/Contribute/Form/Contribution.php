@@ -681,6 +681,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
+    // define the status IDs that show the cancellation info, see CRM-17589
+    $cancelInfo_show_ids = array();
+    foreach ($statusName as $status_id => $status_name) {
+      if ($status_name == 'Cancelled' || $status_name == 'Refunded') {
+        $cancelInfo_show_ids[] = "'$status_id'";
+      }
+    }
+    $this->assign('cancelInfo_show_ids', implode(',', $cancelInfo_show_ids));
+
     if ($this->_id) {
       $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_id, 'contribution_status_id');
       $name = CRM_Utils_Array::value($contributionStatus, $statusName);
