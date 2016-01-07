@@ -101,6 +101,12 @@ function _civicrm_api3_address_create_spec(&$params) {
     'description' => 'Optional param to indicate you want the street_address field parsed into individual params',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   );
+  $params['skip_geocode'] = array(
+    'title' => 'Skip geocode',
+    'description' => 'Optional param to indicate you want to skip geocoding (useful when importing a lot of addresses
+      at once, the job \'Geocode and Parse Addresses\' can execute this task after the import)',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',
