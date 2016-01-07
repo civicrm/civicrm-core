@@ -9,6 +9,10 @@
  * Extant connections can be portrayed as enabled or disabled.
 -->
 
+<div class="help">
+  <p>{{ts('Connections provide a simplified way to link your CiviCRM installation to an external service.')}}</p>
+</div>
+
 <div ng-show="cxns.length > 0">
   <span crm-ui-order="{var: 'cxnOrder', defaults: ['-created_date']}"></span>
   <h3>{{ts('Existing Connections')}}</h3>
