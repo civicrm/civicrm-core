@@ -1448,7 +1448,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'Select':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
-        if (!array_key_exists('placeholder', $props) && empty($fieldSpec['default'])) {
+        if (!array_key_exists('placeholder', $props)) {
           $props['placeholder'] = $required ? ts('- select -') : ($context == 'search' ? ts('- any -') : ts('- none -'));
         }
         // TODO: Add and/or option for fields that store multiple values
