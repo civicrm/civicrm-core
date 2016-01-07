@@ -609,7 +609,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->contactMembershipCreate($this->_params);
     $result = $this->callAPISuccess('membership', 'get', array('return' => 'end_date'));
     foreach ($result['values'] as $membership) {
-      $this->assertEquals(array('end_date', 'membership_end_date', 'id'), array_keys($membership));
+      $this->assertEquals(array('end_date', 'id'), array_keys($membership));
     }
   }
   ///////////////// civicrm_membership_create methods
