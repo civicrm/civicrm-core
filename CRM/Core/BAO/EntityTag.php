@@ -283,7 +283,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   public static function getContactTags($contactID, $count = FALSE) {
     $contactTags = array();
     if (!$count) {
-      $select = "SELECT name ";
+      $select = "SELECT ct.id, ct.name ";
     }
     else {
       $select = "SELECT count(*) as cnt";
@@ -304,7 +304,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     }
 
     while ($dao->fetch()) {
-      $contactTags[] = $dao->name;
+      $contactTags[$dao->id] = $dao->name;
     }
 
     return $contactTags;

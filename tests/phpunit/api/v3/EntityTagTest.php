@@ -196,9 +196,11 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
       'contact_id_h' => $this->_householdID,
     );
 
-    $result = $this->callAPIFailure('entity_tag', 'delete', $params,
-      'tag_id is a required field'
-    );
+    $result = $this->callAPISuccess('entity_tag', 'delete', $params);
+
+    $this->assertEquals($result['not_removed'], 0);
+    $this->assertEquals($result['removed'], 2);
+    $this->assertEquals($result['total_count'], 2);
   }
 
   public function testEntityTagDeleteINDHH() {
