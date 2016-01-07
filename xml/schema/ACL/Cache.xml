@@ -8,6 +8,7 @@
   <add>1.6</add>
   <field>
     <name>id</name>
+    <title>Cache ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique table ID</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
+    <title>Cache Contact</title>
     <type>int unsigned</type>
     <comment>Foreign Key to Contact</comment>
     <add>1.6</add>
@@ -32,6 +34,7 @@
   </foreignKey>
   <field>
     <name>acl_id</name>
+    <title>Cache ACL</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign Key to ACL</comment>
@@ -51,6 +54,7 @@
   </index>
   <field>
     <name>modified_date</name>
+    <title>Cache Modified Date</title>
     <type>date</type>
     <comment>When was this cache entry last modified</comment>
     <add>1.6</add>

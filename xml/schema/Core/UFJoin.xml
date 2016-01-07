@@ -58,7 +58,6 @@
   </dynamicForeignKey>
   <index>
     <name>index_entity</name>
-    <add>1.3</add>
     <fieldName>entity_table</fieldName>
     <fieldName>entity_id</fieldName>
     <add>1.3</add>

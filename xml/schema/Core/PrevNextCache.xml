@@ -8,6 +8,7 @@
   <add>3.4</add>
   <field>
     <name>id</name>
+    <title>Prev Next Cache ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>3.4</add>
@@ -18,6 +19,7 @@
   </primaryKey>
   <field>
     <name>entity_table</name>
+    <title>Prev Next Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <comment>physical tablename for entity being joined to discount, e.g. civicrm_event</comment>
@@ -25,6 +27,7 @@
   </field>
   <field>
     <name>entity_id1</name>
+    <title>Prev Next Entity ID 1</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to entity table specified in entity_table column.</comment>
@@ -32,6 +35,7 @@
   </field>
   <field>
     <name>entity_id2</name>
+    <title>Prev Next Entity ID 2</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to entity table specified in entity_table column.</comment>
@@ -39,6 +43,7 @@
   </field>
   <field>
     <name>cacheKey</name>
+    <title>Cache Key</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Unique path name for cache element of the searched item</comment>
@@ -46,12 +51,14 @@
   </field>
   <field>
     <name>data</name>
+    <title>Prev Next Data</title>
     <type>longtext</type>
     <comment>cached snapshot of the serialized data</comment>
     <add>3.4</add>
   </field>
   <field>
     <name>is_selected</name>
+    <title>Is Selected</title>
     <type>boolean</type>
     <default>0</default>
     <add>4.2</add>

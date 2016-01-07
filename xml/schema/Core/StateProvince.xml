@@ -7,6 +7,7 @@
   <add>1.1</add>
   <field>
     <name>id</name>
+    <title>State ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>State/Province ID</comment>
@@ -37,6 +38,7 @@
   </field>
   <field>
     <name>country_id</name>
+    <title>County</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of Country that State/Province belong</comment>
