@@ -95,6 +95,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->open($this->sboxPath . "admin/people/create");
     $this->waitForElementPresent("edit-submit");
     $user = "TestUser" . substr(sha1(rand()), 0, 4);
+    $this->waitForElementPresent("edit-name");
     $this->type("edit-name", $user);
     $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
     $this->type("edit-mail", $emailId);
@@ -244,6 +245,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->open($this->sboxPath . "admin/people/create");
     $this->waitForElementPresent("edit-submit");
     $name = "TestUser" . substr(sha1(rand()), 0, 4);
+    $this->waitForElementPresent("edit-name");
     $this->type("edit-name", $name);
     $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
     $this->type("edit-mail", $emailId);
