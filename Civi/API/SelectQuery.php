@@ -69,10 +69,6 @@ class SelectQuery {
    * @var array
    */
   protected $entityFieldNames;
-  /**
-   * @var array
-   */
-  protected $uniqueAliases = array();
 
   /**
    * @param string $dao_name
@@ -90,56 +86,42 @@ class SelectQuery {
     $this->isFillUniqueFields = $isFillUniqueFields;
     $this->options = _civicrm_api3_get_options_from_params($this->params);
 
-
     $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($dao));
-    $this->apiFieldSpec = \CRM_Utils_Array::value('values', civicrm_api3($this->entity, 'getfields', array('action' => 'get')));
-    foreach ($this->apiFieldSpec as $getFieldKey => $getFieldSpec) {
-      if (in_array($getFieldSpec['name'], $this->entityFieldNames)) {
-        $this->uniqueAliases[$getFieldKey] = $getFieldSpec['name'];
-        $this->uniqueAliases[$getFieldSpec['name']] = $getFieldSpec['name'];
-        foreach (\CRM_Utils_Array::value('api.aliases', $getFieldSpec, array()) as $alias) {
-          $this->uniqueAliases[$alias] = $getFieldSpec['name'];
-        }
-      }
-    }
-
-    // Unset $this->params['options'] if they are api options (not options as a fieldname).
-    if (isset($this->params['options']) && !in_array('options', $this->uniqueAliases)) {
-      unset($this->params['options']);
-    }
+    // Call this function directly instead of using the api wrapper to force unique field names off
+    require_once 'api/v3/Generic.php';
+    $apiSpec = \civicrm_api3_generic_getfields(array('entity' => $this->entity, 'version' => 3, 'params' => array('action' => 'get')), FALSE);
+    $this->apiFieldSpec = $apiSpec['values'];
 
     $this->query = \CRM_Utils_SQL_Select::from($dao->tableName() . " a");
     $dao->free();
   }
 
   public function run() {
-
-    // $select_fields maps column names to the field names of the result
-    // values.
-    $select_fields = array();
-
-    // array with elements array('column', 'operator', 'value');
-    $where_clauses = array();
-
-    // Tables we need to join with to retrieve the custom values.
-    $custom_value_tables = array();
-
-    // ID's of custom fields that refer to a contact.
-    $contact_reference_field_ids = array();
+    // $select_fields maps column names to the field names of the result values.
+    $select_fields = $custom_fields = array();
 
     // populate $select_fields
     $return_all_fields = (empty($this->options['return']) || !is_array($this->options['return']));
     $return = $return_all_fields ? array_fill_keys($this->entityFieldNames, 1) : $this->options['return'];
 
-    // default fields
+    // core return fields
     foreach ($return as $field_name => $include) {
-      if ($include && !empty($this->uniqueAliases[$field_name])) {
-        // 'a.' is an alias for the entity table.
-        $select_fields["a.{$this->uniqueAliases[$field_name]}"] = $this->uniqueAliases[$field_name];
+      if ($include) {
+        $field = $this->getField($field_name);
+        if ($field && in_array($field['name'], $this->entityFieldNames)) {
+          // 'a.' is an alias for the entity table.
+          $select_fields["a.{$field['name']}"] = $field['name'];
+        }
+        elseif ($include && strpos($field_name, '.')) {
+          $fkField = $this->addFkField($field_name);
+          if ($fkField) {
+            $select_fields[implode('.', $fkField)] = $field_name;
+          }
+        }
       }
     }
 
-    // process custom fields IF the params contain the word "custom"
+    // Do custom fields IF the params contain the word "custom" or we are returning *
     if ($return_all_fields || strpos(json_encode($this->params), 'custom')) {
       $custom_fields = _civicrm_api3_custom_fields_for_entity($this->entity);
       foreach ($custom_fields as $cf_id => $custom_field) {
@@ -149,21 +131,16 @@ class SelectQuery {
           // This is a tested format so we support it.
           !empty($this->options['return']['custom'])
         ) {
-          $table_name = $custom_field["table_name"];
-          $column_name = $custom_field["column_name"];
-          // remember that we will need to join the correct table.
-          if (!in_array($table_name, $custom_value_tables)) {
-            $custom_value_tables[] = $table_name;
-          }
+          list($table_name, $column_name) = $this->addCustomField($custom_field);
+
           if ($custom_field["data_type"] != "ContactReference") {
             // 'ordinary' custom field. We will select the value as custom_XX.
             $select_fields["$table_name.$column_name"] = $field_name;
           }
           else {
-            // contact reference custom field. The ID will be stored in
-            // custom_XX_id. custom_XX will contain the sort name of the
-            // contact.
-            $contact_reference_field_ids[] = $cf_id;
+            // contact reference custom field. The ID will be stored in custom_XX_id.
+            // custom_XX will contain the sort name of the contact.
+            $this->query->join("c_$cf_id", "LEFT JOIN civicrm_contact c_$cf_id ON c_$cf_id.id = `$table_name`.`$column_name`");
             $select_fields["$table_name.$column_name"] = $field_name . "_id";
             // We will call the contact table for the join c_XX.
             $select_fields["c_$cf_id.sort_name"] = $field_name;
@@ -171,12 +148,10 @@ class SelectQuery {
         }
       }
     }
-    if (!in_array("a.id", $select_fields)) {
-      // Always select the ID.
-      $select_fields["a.id"] = "id";
-    }
+    // Always select the ID.
+    $select_fields["a.id"] = "id";
 
-    // populate $where_clauses
+    // populate where_clauses
     foreach ($this->params as $key => $value) {
       $table_name = NULL;
       $column_name = NULL;
@@ -215,23 +190,21 @@ class SelectQuery {
         }
       }
 
-      if (isset($this->apiFieldSpec[$key])) {
-        $key = $this->apiFieldSpec[$key]['name'];
-      }
-      if ($key == _civicrm_api_get_entity_name_from_camel($this->entity) . '_id') {
-        // The test contract enforces support of (eg) mailing_group_id if the entity is MailingGroup.
-        $key = 'id';
+      $field = $this->getField($key);
+      if ($field) {
+        $key = $field['name'];
       }
       if (in_array($key, $this->entityFieldNames)) {
         $table_name = 'a';
         $column_name = $key;
       }
       elseif (($cf_id = \CRM_Core_BAO_CustomField::getKeyID($key)) != FALSE) {
-        $table_name = $custom_fields[$cf_id]["table_name"];
-        $column_name = $custom_fields[$cf_id]["column_name"];
-
-        if (!in_array($table_name, $custom_value_tables)) {
-          $custom_value_tables[] = $table_name;
+        list($table_name, $column_name) = $this->addCustomField($custom_fields[$cf_id]);
+      }
+      elseif (strpos($key, '.')) {
+        $fkInfo = $this->addFkField($key);
+        if ($fkInfo) {
+          list($table_name, $column_name) = $fkInfo;
         }
       }
       // I don't know why I had to specifically exclude 0 as a key - wouldn't the others have caught it?
@@ -242,7 +215,7 @@ class SelectQuery {
         continue;
       }
       if (!is_array($value)) {
-        $this->query->where(array("{$table_name}.{$column_name} = @value"), array(
+        $this->query->where(array("`$table_name`.`$column_name` = @value"), array(
           "@value" => $value,
         ));
       }
@@ -261,59 +234,14 @@ class SelectQuery {
       }
     }
 
-    $i = 0;
     if (!$this->options['is_count']) {
       foreach ($select_fields as $column => $alias) {
-        ++$i;
-        $this->query = $this->query->select("!column_$i as !alias_$i", array(
-          "!column_$i" => $column,
-          "!alias_$i" => $alias,
-        ));
+        $this->query->select("$column as `$alias`");
       }
     }
     else {
       $this->query->select("count(*) as c");
     }
-
-    // join with custom value tables
-    foreach ($custom_value_tables as $table_name) {
-      ++$i;
-      $this->query = $this->query->join(
-        "!table_name_$i",
-        "LEFT OUTER JOIN !table_name_$i ON !table_name_$i.entity_id = a.id",
-        array("!table_name_$i" => $table_name)
-      );
-    }
-
-    // join with contact for contact reference fields
-    foreach ($contact_reference_field_ids as $field_id) {
-      ++$i;
-      $this->query = $this->query->join(
-        "!contact_table_name$i",
-        "LEFT OUTER JOIN civicrm_contact !contact_table_name_$i ON !contact_table_name_$i.id = !values_table_name_$i.!column_name_$i",
-        array(
-          "!contact_table_name_$i" => "c_$field_id",
-          "!values_table_name_$i" => $custom_fields[$field_id]["table_name"],
-          "!column_name_$i" => $custom_fields[$field_id]["column_name"],
-        ));
-    };
-
-    foreach ($where_clauses as $clause) {
-      ++$i;
-      if (substr($clause[1], -4) == "NULL") {
-        $this->query->where("!columnName_$i !nullThing_$i", array(
-          "!columnName_$i" => $clause[0],
-          "!nullThing_$i" => $clause[1],
-        ));
-      }
-      else {
-        $this->query->where("!columnName_$i !operator_$i @value_$i", array(
-          "!columnName_$i" => $clause[0],
-          "!operator_$i" => $clause[1],
-          "@value_$i" => $clause[2],
-        ));
-      }
-    };
 
     // order by
     if (!empty($this->options['sort'])) {
@@ -349,12 +277,14 @@ class SelectQuery {
       }
       $result_entities[$result_dao->id] = array();
       foreach ($select_fields as $column => $alias) {
+        $returnName = $alias;
+        $alias = str_replace('.', '_', $alias);
         if (property_exists($result_dao, $alias) && $result_dao->$alias != NULL) {
-          $result_entities[$result_dao->id][$alias] = $result_dao->$alias;
+          $result_entities[$result_dao->id][$returnName] = $result_dao->$alias;
         }
         // Backward compatibility on fields names.
-        if ($this->isFillUniqueFields && !empty($this->apiFieldSpec['values'][$column]['uniqueName'])) {
-          $result_entities[$result_dao->id][$this->apiFieldSpec['values'][$column]['uniqueName']] = $result_dao->$alias;
+        if ($this->isFillUniqueFields && !empty($this->apiFieldSpec[$column]['uniqueName'])) {
+          $result_entities[$result_dao->id][$this->apiFieldSpec[$column]['uniqueName']] = $result_dao->$alias;
         }
         foreach ($this->apiFieldSpec as $returnName => $spec) {
           if (empty($result_entities[$result_dao->id][$returnName]) && !empty($result_entities[$result_dao->id][$spec['name']])) {
@@ -375,4 +305,105 @@ class SelectQuery {
     $this->query->merge($sqlFragment);
     return $this;
   }
+
+  /**
+   * Joins onto an fk field
+   *
+   * Adds one or more joins to the query to make this field available for use in a clause.
+   *
+   * @param $fkFieldName
+   * @return array|null
+   *   Returns the table and field name for adding this field to a SELECT or WHERE clause
+   */
+  private function addFkField($fkFieldName) {
+    $stack = explode('.', $fkFieldName);
+    if (count($stack) < 2) {
+      return NULL;
+    }
+    $prev = 'a';
+    foreach ($stack as $depth => $fieldName) {
+      // Setup variables then skip the first level
+      if (!$depth) {
+        $fk = $fieldName;
+        // We only join on core fields
+        // @TODO: Custom contact ref fields could be supported too
+        if (!in_array($fk, $this->entityFieldNames)) {
+          return NULL;
+        }
+        $fkField = &$this->apiFieldSpec[$fk];
+        continue;
+      }
+      if (!isset($fkField['FKApiName']) && !isset($fkField['FKClassName'])) {
+        return NULL;
+      }
+      if (!isset($fkField['FKApiSpec'])) {
+        $fkField['FKApiSpec'] = \_civicrm_api_get_fields($fkField['FKApiName']);
+      }
+      $fieldInfo = \CRM_Utils_Array::value($fieldName, $fkField['FKApiSpec']);
+
+      // FIXME: What if the foreign key is not the "id" column?
+      if (!$fieldInfo || !isset($fkField['FKApiSpec']['id'])) {
+        return NULL;
+      }
+      $fkTable = \CRM_Core_DAO_AllCoreTables::getTableForClass($fkField['FKClassName']);
+      $tableAlias = "{$fk}_to_$fkTable";
+
+      $this->query->join($tableAlias, "LEFT JOIN $fkTable $tableAlias ON $prev.$fk = $tableAlias.id");
+
+      if (strpos($fieldName, 'custom_') === 0) {
+        list($tableAlias, $fieldName) = $this->addCustomField($fieldInfo, $tableAlias);
+      }
+
+      // Get ready to recurse to the next level
+      $fk = $fieldName;
+      $fkField = &$fkField['FKApiSpec'][$fieldName];
+      $prev = $tableAlias;
+    }
+    return array($tableAlias, $fieldName);
+  }
+
+  /**
+   * Joins onto a custom field
+   *
+   * Adds a join to the query to make this field available for use in a clause.
+   *
+   * @param array $customField
+   * @param string $baseTable
+   * @return array
+   *   Returns the table and field name for adding this field to a SELECT or WHERE clause
+   */
+  private function addCustomField($customField, $baseTable = 'a') {
+    $tableName = $customField["table_name"];
+    $columnName = $customField["column_name"];
+    $tableAlias = "{$baseTable}_to_$tableName";
+    $this->query->join($tableAlias, "LEFT JOIN `$tableName` `$tableAlias` ON `$tableAlias`.entity_id = `$baseTable`.id");
+    return array($tableAlias, $columnName);
+  }
+
+  /**
+   * Fetch a field from the getFields list
+   *
+   * Searches by name, uniqueName, and api.aliases
+   *
+   * @param string $fieldName
+   * @return array|null
+   */
+  private function getField($fieldName) {
+    if (!$fieldName) {
+      return NULL;
+    }
+    if (isset($this->apiFieldSpec[$fieldName])) {
+      return $this->apiFieldSpec[$fieldName];
+    }
+    foreach ($this->apiFieldSpec as $field) {
+      if (
+        $fieldName == \CRM_Utils_Array::value('uniqueName', $field) ||
+        array_search($fieldName, \CRM_Utils_Array::value('api.aliases', $field, array())) !== FALSE
+      ) {
+        return $field;
+      }
+    }
+    return NULL;
+  }
+
 }
