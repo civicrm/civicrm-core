@@ -46,7 +46,7 @@ php GenerateData.php
 cd $CIVISOURCEDIR
 "$PHP5PATH"php bin/cli.php -e System -a flush --triggers 1 --session 1
 
-$MYSQLCMD -e "DROP TABLE zipcodes; UPDATE civicrm_domain SET config_backend = NULL; DELETE FROM civicrm_extension; DELETE FROM civicrm_cache; DELETE FROM civicrm_setting;"
+$MYSQLCMD -e "DROP TABLE zipcodes; DROP TABLE IF EXISTS civicrm_install_canary; UPDATE civicrm_domain SET config_backend = NULL; DELETE FROM civicrm_extension; DELETE FROM civicrm_cache; DELETE FROM civicrm_setting;"
 TABLENAMES=$( echo "show tables like 'civicrm_%'" | $MYSQLCMD | grep ^civicrm_ | xargs )
 
 cd $CIVISOURCEDIR/sql
