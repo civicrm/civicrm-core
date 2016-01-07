@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Group Membership History ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Internal Id</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Contact Id</comment>
@@ -34,6 +36,7 @@
   </foreignKey>
   <field>
     <name>group_id</name>
+    <title>Group</title>
     <type>int unsigned</type>
     <comment>Group Id</comment>
     <add>1.1</add>
@@ -55,6 +58,7 @@
   </foreignKey>
   <field>
     <name>date</name>
+    <title>Group Membership Action Date</title>
     <type>datetime</type>
     <required>true</required>
     <comment>Date of the (un)subscription</comment>
@@ -62,6 +66,7 @@
   </field>
   <field>
     <name>method</name>
+    <title>Group Membership Action</title>
     <type>varchar</type>
     <length>8</length>
     <comment>How the (un)subscription was triggered</comment>
@@ -75,6 +80,7 @@
   </field>
   <field>
     <name>status</name>
+    <title>Group Membership Status</title>
     <type>varchar</type>
     <length>8</length>
     <comment>The state of the contact within the group</comment>
@@ -85,6 +91,7 @@
   </field>
   <field>
     <name>tracking</name>
+    <title>Group Membership Tracking</title>
     <type>varchar</type>
     <length>255</length>
     <comment>IP address or other tracking info</comment>

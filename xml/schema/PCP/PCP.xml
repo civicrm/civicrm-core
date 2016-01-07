@@ -82,6 +82,7 @@
   </field>
   <field>
     <name>donate_link_text</name>
+    <title>Donate Link Text</title>
     <type>varchar</type>
     <length>255</length>
     <default>NULL</default>
@@ -106,6 +107,7 @@
   </foreignKey>
   <field>
     <name>page_id</name>
+    <title>Contribution Page</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The Contribution or Event Page which triggered this pcp</comment>
@@ -125,6 +127,7 @@
   </field>
   <field>
     <name>pcp_block_id</name>
+    <title>PCP Block</title>
     <comment>The pcp block that this pcp page was created from</comment>
     <type>int unsigned</type>
     <required>true</required>
@@ -132,6 +135,7 @@
   </field>
   <field>
     <name>is_thermometer</name>
+    <title>Use Thermometer?</title>
     <type>int unsigned</type>
     <default>0</default>
     <html>
@@ -141,6 +145,7 @@
   </field>
   <field>
     <name>is_honor_roll</name>
+    <title>Show Honor Roll?</title>
     <type>int unsigned</type>
     <default>0</default>
     <add>2.2</add>
@@ -150,6 +155,7 @@
   </field>
   <field>
     <name>goal_amount</name>
+    <title>Goal Amount</title>
     <type>decimal</type>
     <comment>Goal amount of this Personal Campaign Page.</comment>
     <add>2.2</add>
@@ -159,6 +165,7 @@
   </field>
   <field>
     <name>currency</name>
+    <title>Currency</title>
     <type>varchar</type>
     <length>3</length>
     <default>NULL</default>
@@ -176,6 +183,7 @@
   </field>
   <field>
     <name>referer</name>
+    <title>Referer</title>
     <type>varchar</type>
     <length>255</length>
     <default>NULL</default>
@@ -184,6 +192,7 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Enabled?</title>
     <type>boolean</type>
     <comment>Is Personal Campaign Page enabled/active?</comment>
     <default>0</default>
@@ -194,6 +203,7 @@
   </field>
   <field>
     <name>is_notify</name>
+    <title>Notify Owner?</title>
     <type>boolean</type>
     <comment>Notify owner via email when someone donates to page?</comment>
     <default>0</default>

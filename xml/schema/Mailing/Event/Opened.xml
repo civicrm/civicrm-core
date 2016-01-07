@@ -31,6 +31,7 @@
   </foreignKey>
   <field>
     <name>time_stamp</name>
+    <title>Timestamp</title>
     <type>datetime</type>
     <required>true</required>
     <comment>When this open event occurred.</comment>

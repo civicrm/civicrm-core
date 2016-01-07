@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Discount ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>entity_table</name>
+    <title>Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <comment>physical tablename for entity being joined to discount, e.g. civicrm_event</comment>
@@ -26,6 +28,7 @@
   </field>
   <field>
     <name>entity_id</name>
+    <title>Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to entity table specified in entity_table column.</comment>
@@ -87,12 +90,14 @@
   </index>
   <field>
     <name>start_date</name>
+    <title>Discount Start Date</title>
     <type>date</type>
     <comment>Date when discount starts.</comment>
     <add>2.1</add>
   </field>
   <field>
     <name>end_date</name>
+    <title>Discount End Date</title>
     <type>date</type>
     <comment>Date when discount ends.</comment>
     <add>2.1</add>

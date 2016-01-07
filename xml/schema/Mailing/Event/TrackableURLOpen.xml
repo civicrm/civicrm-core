@@ -8,6 +8,7 @@
   <archive>true</archive>
   <field>
     <name>id</name>
+    <title>Trackable URL Open ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -17,6 +18,7 @@
   </primaryKey>
   <field>
     <name>event_queue_id</name>
+    <title>Event Queue</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to EventQueue</comment>
@@ -29,6 +31,7 @@
   </foreignKey>
   <field>
     <name>trackable_url_id</name>
+    <title>Trackable Url</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to TrackableURL</comment>
@@ -41,6 +44,7 @@
   </foreignKey>
   <field>
     <name>time_stamp</name>
+    <title>Timestamp</title>
     <type>datetime</type>
     <required>true</required>
     <comment>When this trackable URL open occurred.</comment>

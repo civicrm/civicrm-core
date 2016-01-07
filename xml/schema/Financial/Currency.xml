@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Currency ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Currency Id</comment>
@@ -31,6 +32,7 @@
   </field>
   <field>
     <name>symbol</name>
+    <title>Currency Symbol</title>
     <type>varchar</type>
     <length>8</length>
     <comment>Currency Symbol</comment>
@@ -41,6 +43,7 @@
   </field>
   <field>
     <name>numeric_code</name>
+    <title>Currency Numeric Code</title>
     <type>varchar</type>
     <length>3</length>
     <import>true</import>
@@ -49,6 +52,7 @@
   </field>
   <field>
     <name>full_name</name>
+    <title>Full Currency Name</title>
     <type>varchar</type>
     <length>64</length>
     <comment>Full currency name</comment>

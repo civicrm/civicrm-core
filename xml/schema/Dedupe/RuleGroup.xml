@@ -7,6 +7,7 @@
   <add>1.8</add>
   <field>
     <name>id</name>
+    <title>Rule Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique dedupe rule group id</comment>
@@ -18,6 +19,7 @@
   </primaryKey>
   <field>
     <name>contact_type</name>
+    <title>Contact Type</title>
     <type>varchar</type>
     <length>12</length>
     <comment>The type of contacts this group applies to</comment>
@@ -34,6 +36,7 @@
   </field>
   <field>
     <name>threshold</name>
+    <title>Threshold</title>
     <type>int</type>
     <required>true</required>
     <comment>The weight threshold the sum of the rule weights has to cross to consider two contacts the same</comment>
@@ -44,6 +47,7 @@
   </field>
   <field>
     <name>level</name>
+    <title>Level</title>
     <type>enum</type>
     <values>Strict, Fuzzy</values>
     <comment>Whether the rule should be used for cases where strict matching of the given contact type is required or a fuzzy one</comment>
@@ -53,6 +57,7 @@
   <field>
     <name>used</name>
     <type>varchar</type>
+    <title>Length</title>
     <length>12</length>
     <required>true</required>
     <comment>Whether the rule should be used for cases where usage is Unsupervised, Supervised OR General(programatically)</comment>
@@ -66,6 +71,7 @@
   </field>
   <field>
     <name>is_default</name>
+    <title>Default></title>
     <type>boolean</type>
     <comment>Is this a default rule (one rule for every contact type + level combination should be default)</comment>
     <add>2.1</add>
@@ -73,6 +79,7 @@
   </field>
   <field>
     <name>name</name>
+    <title>Name</title>
     <type>varchar</type>
     <length>64</length>
     <comment>Name of the rule group</comment>
@@ -80,6 +87,7 @@
   </field>
   <field>
     <name>title</name>
+    <title>Title</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Label of the rule group</comment>
@@ -90,6 +98,7 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Reserved?</title>
     <type>boolean</type>
     <comment>Is this a reserved rule - a rule group that has been optimized and cannot be changed by the admin</comment>
     <add>4.1</add>

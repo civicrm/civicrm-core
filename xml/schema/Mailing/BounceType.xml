@@ -7,6 +7,7 @@
   <comment>Table to index the various bounce types and their properties</comment>
   <field>
     <name>id</name>
+    <title>Bounce Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -16,6 +17,7 @@
   </primaryKey>
   <field>
     <name>name</name>
+    <title>Bounce Type Name</title>
     <type>varchar</type>
     <length>24</length>
     <required>true</required>
@@ -23,12 +25,14 @@
   </field>
   <field>
     <name>description</name>
+    <title>Bounce Type Description</title>
     <type>varchar</type>
     <length>255</length>
     <comment>A description of this bounce type</comment>
   </field>
   <field>
     <name>hold_threshold</name>
+    <title>Hold Threshold</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Number of bounces of this type required before the email address is put on bounce hold</comment>
