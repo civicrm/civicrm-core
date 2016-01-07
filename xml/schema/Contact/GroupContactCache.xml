@@ -8,6 +8,7 @@
   <add>2.1</add>
   <field>
     <name>id</name>
+    <title>Group Contact Cache ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>group_id</name>
+    <title>Group</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_group</comment>
@@ -41,6 +43,7 @@
   </foreignKey>
   <field>
     <name>contact_id</name>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_contact</comment>

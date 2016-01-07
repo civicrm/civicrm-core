@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Entity Financial Account ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
     <name>entity_table</name>
+    <title>Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -29,6 +31,7 @@
   </field>
   <field>
     <name>entity_id</name>
+    <title>Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>4.3</add>
@@ -41,6 +44,7 @@
   </dynamicForeignKey>
   <field>
     <name>account_relationship</name>
+    <title>Account Relationship</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>4.3</add>
@@ -55,6 +59,7 @@
   <field>
     <name>financial_account_id</name>
     <type>int unsigned</type>
+    <title>Financial Account</title>
     <required>true</required>
     <add>4.3</add>
     <comment>FK to the financial_account_id</comment>

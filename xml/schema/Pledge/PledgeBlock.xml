@@ -7,6 +7,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Pledge Block ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Pledge ID</comment>
@@ -53,6 +54,7 @@
   </field>
   <field>
     <name>is_pledge_interval</name>
+    <title>Expose Frequency Interval?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is frequency interval exposed on the contribution form.</comment>
