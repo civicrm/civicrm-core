@@ -284,3 +284,52 @@ function civicrm_api3_cxn_getcfg($params) {
     'page' => $params['page'],
   ));
 }
+
+/**
+ * Creates or modifies a Cxn row.
+ *
+ * @param array $params
+ *   Array with keys:
+ *   - id, cxn_guid OR app_guid: string.
+ *   - is_active: boolean.
+ *   - options: JSON
+ * @return page
+ * @throws Exception
+ */
+function civicrm_api3_cxn_create($params) {
+  $result = "";
+
+  try {
+    // get the ID
+    if (!empty($params['id'])) {
+      $cxnId = $params['id'];
+    }
+    else {
+      $cxnId = _civicrm_api3_cxn_parseCxnId($params);
+    }
+
+    // see if it's sth to update
+    if (isset($params['options']) || isset($params['is_active'])) {
+
+      $dao = new CRM_Cxn_DAO_Cxn();
+      $dao->id = $cxnId;
+
+      if ($dao->find()) {
+        if (isset($params['is_active'])) {
+          $dao->is_active = (int) $params['is_active'];
+        }
+        if (isset($params['options'])) {
+          $dao->options = $params['options'];
+        }
+
+        $result = $dao->save();
+      }
+
+    }
+    return civicrm_api3_create_success($result, $params, 'Cxn', 'create');
+
+  }
+  catch(Exception $ex){
+    throw $ex;
+  }
+}
