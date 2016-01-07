@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Premium Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Contribution ID</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
     <name>premiums_id</name>
+    <title>Premium</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to premiums settings record.</comment>
@@ -33,6 +35,7 @@
   </foreignKey>
   <field>
     <name>product_id</name>
+    <title>Product</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to each product object.</comment>

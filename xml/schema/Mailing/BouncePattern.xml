@@ -7,6 +7,7 @@
   <comment>Pseudo-constant table of patterns for bounce classification</comment>
   <field>
     <name>id</name>
+    <title>Bounce Pattern ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -16,6 +17,7 @@
   </primaryKey>
   <field>
     <name>bounce_type_id</name>
+    <title>Bounce Type</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Type of bounce</comment>
@@ -28,6 +30,7 @@
   </foreignKey>
   <field>
     <name>pattern</name>
+    <title>Pattern</title>
     <type>varchar</type>
     <length>255</length>
     <comment>A regexp to match a message to a bounce type</comment>
