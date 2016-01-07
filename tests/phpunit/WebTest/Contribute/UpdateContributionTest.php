@@ -323,9 +323,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $defaults = array();
     $items = CRM_Financial_BAO_FinancialItem::retrieve($itemParams, $defaults);
     $this->assertEquals($items->amount, $itemParams['amount'], 'Verify Amount for financial Item');
-    $totalAmount = $this->_getPremiumActualCost($items->id, 'Accounts Receivable', NULL, "-100.00", "'civicrm_financial_item'");
+    $totalAmount = $this->_getPremiumActualCost($items->id, NULL, 'Accounts Receivable', "-100.00", "'civicrm_financial_item'");
     $this->assertEquals($totalAmount, "-$amount", 'Verify Amount for Financial Trxn');
-    $totalAmount = $this->_getPremiumActualCost($contId, 'Accounts Receivable', NULL, "-100.00", "'civicrm_contribution'");
+    $totalAmount = $this->_getPremiumActualCost($contId, NULL, 'Accounts Receivable', "-100.00", "'civicrm_contribution'");
     $this->assertEquals($totalAmount, "-$amount", 'Verify Amount for Financial Trxn');
   }
 

@@ -237,7 +237,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 100);
-    $this->click("xpath=//div[@class='crm-section payment_processor-section']/div[2]//label[text()='Pay later label {$hash}']");
+    $this->waitForAjaxContent();
+    $this->click("xpath=//label[text()='Pay later label {$hash}']");
     $streetAddress = "100 Main Street";
     $this->type("street_address-1", $streetAddress);
     $this->type("city-1", "San Francisco");
@@ -257,8 +258,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", $contact['sort_name']);
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+    $this->clickLink("_qf_Search_refresh", "xpath=//table[@class='selector row-highlight']/tbody/tr[2]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[2]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
     // View Contribution Record and test for expected values
     $expected = array(
       'From' => $contact['display_name'],

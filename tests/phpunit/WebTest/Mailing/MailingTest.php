@@ -402,7 +402,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
     $this->waitForTextPresent("Find Mailings");
-    $this->assertElementContainsText("xpath=//table[@class='selector row-highlight']/tbody//tr//td", "Mailing $mailingName Webtest");
+    $this->assertElementContainsText("xpath=//form[@class='CRM_Mailing_Form_Search']/table[@class='selector row-highlight']/tbody//tr//td", "Mailing $mailingName Webtest");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
