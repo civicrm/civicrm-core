@@ -223,7 +223,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   public function select($exprs, $args = NULL) {
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
-      $this->selects[$expr] = $this->interpolate($expr, $args);
+      $this->selects[] = $this->interpolate($expr, $args);
     }
     return $this;
   }
@@ -254,7 +254,8 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   public function groupBy($exprs, $args = NULL) {
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
-      $this->groupBys[$expr] = $this->interpolate($expr, $args);
+      $evaluatedExpr = $this->interpolate($expr, $args);
+      $this->groupBys[$evaluatedExpr] = $evaluatedExpr;
     }
     return $this;
   }
@@ -269,7 +270,8 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   public function having($exprs, $args = NULL) {
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
-      $this->havings[$expr] = $this->interpolate($expr, $args);
+      $evaluatedExpr = $this->interpolate($expr, $args);
+      $this->havings[$evaluatedExpr] = $evaluatedExpr;
     }
     return $this;
   }
@@ -284,7 +286,8 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   public function orderBy($exprs, $args = NULL) {
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
-      $this->orderBys[$expr] = $this->interpolate($expr, $args);
+      $evaluatedExpr = $this->interpolate($expr, $args);
+      $this->orderBys[$evaluatedExpr] = $evaluatedExpr;
     }
     return $this;
   }
