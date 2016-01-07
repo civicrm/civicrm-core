@@ -189,7 +189,13 @@ class SelectQuery {
           }
         }
       }
-
+      // Ignore the "options" param if it is referring to api options and not a field in this entity
+      if (
+        $key === 'options' && is_array($value)
+        && !in_array(\CRM_Utils_Array::first(array_keys($value)), \CRM_Core_DAO::acceptedSQLOperators())
+      ) {
+        continue;
+      }
       $field = $this->getField($key);
       if ($field) {
         $key = $field['name'];
