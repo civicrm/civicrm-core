@@ -341,6 +341,10 @@ class SelectQuery {
       if (!isset($fkField['FKApiName']) && !isset($fkField['FKClassName'])) {
         return NULL;
       }
+      // Ensure we have permission to access the other api
+      if (!$this->checkPermissionToJoin($fkField['FKApiName'], array_slice($stack, 0, $depth))) {
+        return NULL;
+      }
       if (!isset($fkField['FKApiSpec'])) {
         $fkField['FKApiSpec'] = \_civicrm_api_get_fields($fkField['FKApiName']);
       }
@@ -409,6 +413,40 @@ class SelectQuery {
       }
     }
     return NULL;
+  }
+
+  /**
+   * Check permission to join onto another api entity
+   *
+   * @param string $entity
+   * @param array $fieldStack
+   *   The stack of fields leading up to this join
+   * @return bool
+   */
+  private function checkPermissionToJoin($entity, $fieldStack) {
+    if (empty($this->params['check_permissions'])) {
+      return TRUE;
+    }
+    // Build an array of params that relate to the joined entity
+    $params = array(
+      'version' => 3,
+      'return' => array(),
+      'check_permissions' => \CRM_Utils_Array::value('check_permissions', $this->params, FALSE),
+    );
+    $prefix = implode('.', $fieldStack) . '.';
+    $len = strlen($prefix);
+    foreach ($this->options['return'] as $key => $ret) {
+      if (strpos($key, $prefix) === 0) {
+        $params['return'][substr($key, $len)] = $ret;
+      }
+    }
+    foreach ($this->params as $key => $param) {
+      if (strpos($key, $prefix) === 0) {
+        $params[substr($key, $len)] = $param;
+      }
+    }
+
+    return \Civi::service('civi_api_kernel')->runAuthorize($entity, 'get', $params);
   }
 
 }
