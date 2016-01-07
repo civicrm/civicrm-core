@@ -7,6 +7,7 @@
   <add>1.1</add>
   <field>
     <name>id</name>
+    <title>County ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>County ID</comment>
@@ -37,6 +38,7 @@
   </field>
   <field>
     <name>state_province_id</name>
+    <title>State</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of State/Province that County belongs</comment>

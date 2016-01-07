@@ -8,6 +8,7 @@
   <archive>true</archive>
   <field>
     <name>id</name>
+    <title>Trackable URL ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -17,12 +18,14 @@
   </primaryKey>
   <field>
     <name>url</name>
-    <type>text</type>    
+    <title>Url</title>
+    <type>text</type>
     <required>true</required>
     <comment>The URL to be tracked.</comment>
   </field>
   <field>
     <name>mailing_id</name>
+    <title>Mailing</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to the mailing</comment>

@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Date Preference ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>2.0</add>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>name</name>
+    <title>Date Preference Name</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>

@@ -78,10 +78,6 @@
     <add>4.3</add>
     <onDelete>CASCADE</onDelete>
   </foreignKey>
-  <dynamicForeignKey>
-    <idColumn>entity_id</idColumn>
-    <typeColumn>entity_table</typeColumn>
-  </dynamicForeignKey>
   <index>
     <name>index_entity_option_id</name>
     <fieldName>entity_table</fieldName>

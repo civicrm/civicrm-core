@@ -9,6 +9,7 @@
   <log>false</log>
   <field>
     <name>id</name>
+    <title>Managed ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Surrogate Key</comment>
