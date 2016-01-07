@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Entity File ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>entity_table</name>
+    <title>Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <comment>physical tablename for entity being joined to file, e.g. civicrm_contact</comment>
@@ -26,6 +28,7 @@
   </field>
   <field>
     <name>entity_id</name>
+    <title>Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to entity table specified in entity_table column.</comment>
@@ -44,6 +47,7 @@
   </index>
   <field>
     <name>file_id</name>
+    <title>File</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_file</comment>

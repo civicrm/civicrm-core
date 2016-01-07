@@ -7,6 +7,7 @@
   <add>1.8</add>
   <field>
     <name>id</name>
+    <title>Dedupe Rule ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique dedupe rule id</comment>
@@ -18,6 +19,7 @@
   </primaryKey>
   <field>
     <name>dedupe_rule_group_id</name>
+    <title>Dedupe Rule Group</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The id of the rule group this rule belongs to</comment>
@@ -31,6 +33,7 @@
   </foreignKey>
   <field>
     <name>rule_table</name>
+    <title>Rule Table</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -39,6 +42,7 @@
   </field>
   <field>
     <name>rule_field</name>
+    <title>Rule Field</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -47,6 +51,7 @@
   </field>
   <field>
     <name>rule_length</name>
+    <title>Rule Length</title>
     <type>int unsigned</type>
     <comment>The length of the matching substring</comment>
     <add>1.8</add>
@@ -56,6 +61,7 @@
   </field>
   <field>
     <name>rule_weight</name>
+    <title>Order</title>
     <type>int</type>
     <required>true</required>
     <comment>The weight of the rule</comment>

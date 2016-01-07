@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>PCP Block ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>PCP block Id</comment>
@@ -20,12 +21,14 @@
   </primaryKey>
   <field>
     <name>entity_table</name>
+    <title>Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <add>2.2</add>
   </field>
   <field>
     <name>entity_id</name>
+    <title>Entity</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_contribution_page.id OR civicrm_event.id</comment>
@@ -45,6 +48,7 @@
   </foreignKey>
   <field>
     <name>target_entity_type</name>
+    <title>Target Entity</title>
     <type>varchar</type>
     <length>255</length>
     <required>true</required>
@@ -54,6 +58,7 @@
   </field>
   <field>
     <name>target_entity_id</name>
+    <title>Target Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The entity that this pcp targets</comment>
@@ -67,6 +72,7 @@
   </dynamicForeignKey>
   <field>
     <name>supporter_profile_id</name>
+    <title>Supporter Profile</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_uf_group.id. Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
     <default>NULL</default>
@@ -95,6 +101,7 @@
   </field>
   <field>
     <name>is_approval_needed</name>
+    <title>Approval Required?</title>
     <type>boolean</type>
     <comment>Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
     <default>NULL</default>
@@ -102,6 +109,7 @@
   </field>
   <field>
     <name>is_tellfriend_enabled</name>
+    <title>Tell a Friend Enabled?</title>
     <type>boolean</type>
     <comment>Does Personal Campaign Page allow using tell a friend?</comment>
     <default>NULL</default>
@@ -109,6 +117,7 @@
   </field>
   <field>
     <name>tellfriend_limit</name>
+    <title>Tell A Friend Limit</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Maximum recipient fields allowed in tell a friend</comment>
@@ -116,6 +125,7 @@
   </field>
   <field>
     <name>link_text</name>
+    <title>Link Text</title>
     <type>varchar</type>
     <length>255</length>
     <default>NULL</default>
@@ -125,6 +135,7 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Enabled?</title>
     <type>boolean</type>
     <comment>Is Personal Campaign Page Block enabled/active?</comment>
     <default>1</default>
@@ -132,6 +143,7 @@
   </field>
   <field>
     <name>notify_email</name>
+    <title>Notification Email</title>
     <type>varchar</type>
     <length>255</length>
     <comment>If set, notification is automatically emailed to this email-address on create/update Personal Campaign Page</comment>

@@ -48,6 +48,7 @@
   </field>
   <field>
     <name>end</name>
+    <title>End Offset</title>
     <type>int</type>
     <required>true</required>
     <comment>The end offset relative to current year, can be negative</comment>

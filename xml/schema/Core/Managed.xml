@@ -44,6 +44,7 @@
   </index>
   <field>
     <name>entity_type</name>
+    <title>Entity Type</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -52,6 +53,7 @@
   </field>
   <field>
     <name>entity_id</name>
+    <title>Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to the referenced item.</comment>
@@ -59,6 +61,7 @@
   </field>
   <field>
     <name>cleanup</name>
+    <title>Cleanup Setting</title>
     <type>varchar</type>
     <length>32</length>
     <comment>Policy on when to cleanup entity (always, never, unused)</comment>

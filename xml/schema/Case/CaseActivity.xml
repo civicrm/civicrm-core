@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Case Activity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique case-activity association id</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>case_id</name>
+    <title>Case</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Case ID of case-activity association.</comment>
@@ -33,6 +35,7 @@
   </foreignKey>
   <field>
     <name>activity_id</name>
+    <title>Activity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Activity ID of case-activity association.</comment>
