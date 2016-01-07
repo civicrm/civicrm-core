@@ -135,6 +135,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
         $found = TRUE;
       }
 
+      $context = CRM_Utils_Array::value('context', $_GET);
       if (!$found) {
         // seems like we did not find any contacts
         // maybe due to bug CRM-9096
@@ -142,6 +143,15 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
         if (!$pos['foundEntry']) {
           $navContacts['nextPrevError'] = 1;
         }
+      }
+      elseif ($context) {
+        $this->assign('context', $context);
+        CRM_Utils_System::appendBreadCrumb(array(
+          array(
+            'title' => ts('Search Results'),
+            'url' => CRM_Utils_System::url("civicrm/contact/search/$context", array('qfKey' => $qfKey)),
+          ),
+        ));
       }
     }
     $this->assign($navContacts);
