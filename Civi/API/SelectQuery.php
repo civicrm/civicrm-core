@@ -283,8 +283,8 @@ class SelectQuery {
           $result_entities[$result_dao->id][$returnName] = $result_dao->$alias;
         }
         // Backward compatibility on fields names.
-        if ($this->isFillUniqueFields && !empty($this->apiFieldSpec[$column]['uniqueName'])) {
-          $result_entities[$result_dao->id][$this->apiFieldSpec[$column]['uniqueName']] = $result_dao->$alias;
+        if ($this->isFillUniqueFields && !empty($this->apiFieldSpec[$alias]['uniqueName'])) {
+          $result_entities[$result_dao->id][$this->apiFieldSpec[$alias]['uniqueName']] = $result_dao->$alias;
         }
         foreach ($this->apiFieldSpec as $returnName => $spec) {
           if (empty($result_entities[$result_dao->id][$returnName]) && !empty($result_entities[$result_dao->id][$spec['name']])) {
