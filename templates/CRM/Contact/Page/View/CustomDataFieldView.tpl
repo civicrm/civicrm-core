@@ -43,19 +43,13 @@
           </div>
         {else}
           <div class="crm-label">{$element.field_title}</div>
-          {if $element.field_type == 'File' && !empty($element.field_value)}
-            {if $element.field_value.displayURL}
+          {if $element.field_type == 'File' && !empty($element.field_value.displayURL)}
                 <div class="crm-content crm-custom_data crm-displayURL">
                   <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
                     <img src="{$element.field_value.displayURL}" height = "{$element.field_value.imageThumbHeight}"
                          width="{$element.field_value.imageThumbWidth}">
                   </a>
-                </div>
-            {else}
-                <div class="crm-content crm-custom_data crm-fileURL">
-                  <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
-                </div>
-            {/if}
+             </div>
           {elseif $element.field_data_type EQ 'ContactReference' && $element.contact_ref_id}
             {*Contact ref id passed if user has sufficient permissions - so make a link.*}
             <div class="crm-content crm-custom-data crm-contact-reference">
