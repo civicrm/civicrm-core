@@ -3425,4 +3425,11 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     return TRUE;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function apiWhereClause($tableAlias) {
+    return CRM_Contact_BAO_Contact_Permission::cacheSubquery("`$tableAlias`.id");
+  }
+
 }

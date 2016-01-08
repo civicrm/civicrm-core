@@ -42,6 +42,10 @@ namespace Civi\API;
 class SelectQuery {
 
   /**
+   * @var \CRM_Core_DAO
+   */
+  protected $bao;
+  /**
    * @var string
    */
   protected $entity;
@@ -69,33 +73,44 @@ class SelectQuery {
    * @var array
    */
   protected $entityFieldNames;
+  /**
+   * @var string|bool
+   */
+  protected $checkPermissions;
 
   /**
-   * @param string $dao_name
-   *   Name of DAO
+   * @param string $bao_name
+   *   Name of BAO
    * @param array $params
    *   As passed into api get function.
    * @param bool $isFillUniqueFields
    *   Do we need to ensure unique fields continue to be populated for this api? (backward compatibility).
    */
-  public function __construct($dao_name, $params, $isFillUniqueFields) {
-    /* @var \CRM_Core_DAO $dao */
-    $dao = new $dao_name();
-    $this->entity = _civicrm_api_get_entity_name_from_dao($dao);
+  public function __construct($bao_name, $params, $isFillUniqueFields) {
+    $this->bao = new $bao_name();
+    $this->entity = _civicrm_api_get_entity_name_from_dao($this->bao);
     $this->params = $params;
     $this->isFillUniqueFields = $isFillUniqueFields;
+    $this->checkPermissions = \CRM_Utils_Array::value('check_permissions', $this->params, FALSE);
     $this->options = _civicrm_api3_get_options_from_params($this->params);
 
-    $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($dao));
+    $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($this->bao));
     // Call this function directly instead of using the api wrapper to force unique field names off
     require_once 'api/v3/Generic.php';
     $apiSpec = \civicrm_api3_generic_getfields(array('entity' => $this->entity, 'version' => 3, 'params' => array('action' => 'get')), FALSE);
     $this->apiFieldSpec = $apiSpec['values'];
 
-    $this->query = \CRM_Utils_SQL_Select::from($dao->tableName() . " a");
-    $dao->free();
+    $this->query = \CRM_Utils_SQL_Select::from($this->bao->tableName() . " a");
   }
 
+  /**
+   * Build & execute the query and return results array
+   *
+   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Exception
+   */
   public function run() {
     // $select_fields maps column names to the field names of the result values.
     $select_fields = $custom_fields = array();
@@ -273,7 +288,8 @@ class SelectQuery {
     }
 
     // ACLs
-    $this->addAclClause();
+    $this->query->where($this->getAclClause('a'));
+    $this->bao->free();
 
     $result_entities = array();
     $result_dao = \CRM_Core_DAO::executeQuery($this->query->toSQL());
@@ -319,9 +335,12 @@ class SelectQuery {
    *
    * Adds one or more joins to the query to make this field available for use in a clause.
    *
+   * Enforces permissions at the api level and by appending the acl clause for that entity to the join.
+   *
    * @param $fkFieldName
    * @return array|null
    *   Returns the table and field name for adding this field to a SELECT or WHERE clause
+   * @throws \API_Exception
    */
   private function addFkField($fkFieldName) {
     $stack = explode('.', $fkFieldName);
@@ -358,9 +377,16 @@ class SelectQuery {
         return NULL;
       }
       $fkTable = \CRM_Core_DAO_AllCoreTables::getTableForClass($fkField['FKClassName']);
-      $tableAlias = "{$fk}_to_$fkTable";
+      $tableAlias = implode('_to_', array_slice($stack, 0, $depth)) . "_to_$fkTable";
+      $joinClause = "LEFT JOIN $fkTable $tableAlias ON $prev.$fk = $tableAlias.id";
 
-      $this->query->join($tableAlias, "LEFT JOIN $fkTable $tableAlias ON $prev.$fk = $tableAlias.id");
+      // Add acl condition
+      $joinCondition = $this->getAclClause($tableAlias, $fkField['FKClassName']);
+      if ($joinCondition !== NULL) {
+        $joinClause .= " AND $joinCondition";
+      }
+
+      $this->query->join($tableAlias, $joinClause);
 
       if (strpos($fieldName, 'custom_') === 0) {
         list($tableAlias, $fieldName) = $this->addCustomField($fieldInfo, $tableAlias);
@@ -427,14 +453,14 @@ class SelectQuery {
    * @return bool
    */
   private function checkPermissionToJoin($entity, $fieldStack) {
-    if (empty($this->params['check_permissions'])) {
+    if (!$this->checkPermissions) {
       return TRUE;
     }
     // Build an array of params that relate to the joined entity
     $params = array(
       'version' => 3,
       'return' => array(),
-      'check_permissions' => \CRM_Utils_Array::value('check_permissions', $this->params, FALSE),
+      'check_permissions' => $this->checkPermissions,
     );
     $prefix = implode('.', $fieldStack) . '.';
     $len = strlen($prefix);
@@ -453,15 +479,24 @@ class SelectQuery {
   }
 
   /**
-   * If this entity has a `contact_id` field, add appropriate acl clause
+   * Get acl clause for an entity
+   *
+   * @param string $tableAlias
+   * @param \CRM_Core_DAO $bao
+   * @return null|string
    */
-  private function addAclClause() {
-    if (in_array('contact_id', $this->entityFieldNames)) {
-      $clause = \CRM_Contact_BAO_Contact_Permission::cacheSubquery('a.contact_id');
-      if ($clause !== '1') {
-        $this->query->where($clause);
-      }
+  private function getAclClause($tableAlias, $bao = NULL) {
+    if (!$this->checkPermissions) {
+      return NULL;
     }
+    if (!$bao) {
+      $bao = $this->bao;
+    }
+    else {
+      $baoName = str_replace('_DAO_', '_BAO_', $bao);
+      $bao = new $baoName();
+    }
+    return $bao->apiWhereClause($tableAlias);
   }
 
 }
