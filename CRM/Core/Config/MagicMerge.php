@@ -187,7 +187,7 @@ class CRM_Core_Config_MagicMerge {
 
       // "setting-url-*" properties are settings with special filtering
       // to return normalized URLs (in either absolute or relative format).
-      'customCSSURL' => array('setting-url-abs'),
+      'customCSSURL' => array('setting-url-abs-noslash'),
       'extensionsURL' => array('setting-url-abs'),
       'imageUploadURL' => array('setting-url-abs'),
       'resourceBase' => array('setting-url-rel', 'userFrameworkResourceURL'),
@@ -232,9 +232,11 @@ class CRM_Core_Config_MagicMerge {
 
       case 'setting-url-abs':
       case 'setting-url-rel':
+      case 'setting-url-rel-noslash':
+        $noslash = ($type == 'setting-url-abs-noslash') ? TRUE : FALSE;
         $type = (strstr($type, 'abs')) ? 'absolute' : 'relative';
         $value = $this->getSettings()->get($name);
-        if ($value) {
+        if ($value && !$noslash) {
           $value = CRM_Utils_File::addTrailingSlash($value);
         }
         $this->cache[$k] = Civi::paths()->getUrl($value, $type);
