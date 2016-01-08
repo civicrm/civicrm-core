@@ -229,7 +229,7 @@ AND    $operationClause LIMIT 1";
    *
    * @param string $contactIdField
    *   Full "table_name.field_name" for the field containing a contact id
-   * @return string
+   * @return string|NULL
    */
   public static function cacheSubquery($contactIdField) {
     $clauses = array();
@@ -241,7 +241,7 @@ AND    $operationClause LIMIT 1";
     if (!CRM_Core_Permission::check('access deleted contacts')) {
       $clauses[] = "$contactIdField NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)";
     }
-    return $clauses ? implode(' AND ', $clauses) : '1';
+    return $clauses ? implode(' AND ', $clauses) : NULL;
   }
 
   /**
