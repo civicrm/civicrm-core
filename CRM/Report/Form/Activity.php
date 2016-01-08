@@ -821,8 +821,10 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_having = "HAVING " . implode(' AND ', $nullFilters);
     }
     $this->orderBy();
-    if (!empty($this->_sections) && key($this->_sections) == 'civicrm_activity_activity_date_time') {
-      $this->alterSectionHeaderForDateTime();
+    foreach ($this->_sections as $alias => $section) {
+      if (!empty($section) && $section['name'] == 'activity_date_time') {
+        $this->alterSectionHeaderForDateTime('civireport_activity_temp_target', $section['tplField']);
+      }
     }
     $this->limit();
     $sql = "{$this->_select}
@@ -1060,21 +1062,6 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       }
       $this->assign('sectionTotals', $totals);
     }
-  }
-
-   /*
-   * Alter DateTime section header to group by date from the datetime field.
-   *
-   */
-  public function alterSectionHeaderForDateTime() {
-    $tempQuery = "ALTER TABLE civireport_activity_temp_target ADD COLUMN civicrm_activity_activity_date VARCHAR(128)";
-    CRM_Core_DAO::executeQuery($tempQuery);
-    $updateQuery = "UPDATE civireport_activity_temp_target SET civicrm_activity_activity_date = date(civicrm_activity_activity_date_time)";
-    CRM_Core_DAO::executeQuery($updateQuery);
-    $this->_select .= ', civicrm_activity_activity_date';
-    $this->_sections['civicrm_activity_activity_date'] = $this->_sections['civicrm_activity_activity_date_time'];
-    unset($this->_sections['civicrm_activity_activity_date_time']);
-    $this->assign('sections', $this->_sections);
   }
 
 }
