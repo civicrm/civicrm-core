@@ -265,7 +265,8 @@ class CRM_Upgrade_Incremental_php_FourSix {
    * @param string $rev
    */
   public function upgrade_4_6_12($rev) {
-    $this->addTask(ts('Add Getting Started dashlet to %1: SQL', array(1 => $rev)), '  addGettingStartedDashlet', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_6_x_runSql', $rev);
+    $this->addTask('Add Getting Started dashlet', 'addGettingStartedDashlet', $rev);
   }
 
   /**
