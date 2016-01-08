@@ -74,7 +74,7 @@
                     {else}
                       <td class="label">{$element.field_title}</td>
                       {if $element.field_type == 'File'}
-                        {if $element.field_value.displayURL}
+                        {if !empty($element.field_value.displayURL)}
                           <td class="html-adjust">
                             <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
                               <img src="{$element.field_value.displayURL}" height="100" width="100">
@@ -82,7 +82,7 @@
                           </td>
                         {else}
                           <td class="html-adjust">
-                            <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
+                            {$element.field_value}
                           </td>
                         {/if}
                       {else}
@@ -136,7 +136,7 @@
        {else}
           <div class="label">{$element.field_title}</div>
           {if $element.field_type == 'File'}
-          {if $element.field_value.displayURL}
+          {if !empty($element.field_value.displayURL)}
             <div class="content">
               <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
                <img src="{$element.field_value.displayURL}" height="100" width="100">
@@ -145,7 +145,7 @@
           {else}
             <div class="content">
              {if $element.field_value}
-              <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
+              {$element.field_value}
              {else}
               <br/>
              {/if}

@@ -1144,11 +1144,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param string|array $value
    * @param array $field
-   * @param int|null $contactID
+   * @param int|null $entityId
    *
    * @return string
    */
-  private static function formatDisplayValue($value, $field, $contactID = NULL) {
+  private static function formatDisplayValue($value, $field, $entityId = NULL) {
 
     if (self::isSerialized($field) && !is_array($value)) {
       $value = CRM_Utils_Array::explodePadded($value);
@@ -1221,24 +1221,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'File':
         // In the context of displaying a profile, show file/image
-        if ($contactID && $value) {
-          $url = self::getFileURL($contactID, $field['id'], $value);
+        if ($entityId) {
+          $url = self::getFileURL($entityId, $field['id']);
           if ($url) {
             $display = $url['file_url'];
           }
         }
         elseif ($value) {
           // In other contexts show a paperclip icon
-          if (is_numeric($value)) {
-            $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
-            $display = $icons[$value];
-          }
-          // In the context of inline view, show file/image
-          else {
-            $fileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File', $value, 'id', 'uri');
-            $results = CRM_Core_BAO_File::getEntityFile('*', $fileId);
-            $display = $results[$fileId];
-          }
+          $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
+          $display = $icons[$value];
         }
         break;
 
