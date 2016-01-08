@@ -272,6 +272,9 @@ class SelectQuery {
       $this->query->limit($this->options['limit'], $this->options['offset']);
     }
 
+    // ACLs
+    $this->addAclClause();
+
     $result_entities = array();
     $result_dao = \CRM_Core_DAO::executeQuery($this->query->toSQL());
 
@@ -447,6 +450,18 @@ class SelectQuery {
     }
 
     return \Civi::service('civi_api_kernel')->runAuthorize($entity, 'get', $params);
+  }
+
+  /**
+   * If this entity has a `contact_id` field, add appropriate acl clause
+   */
+  private function addAclClause() {
+    if (in_array('contact_id', $this->entityFieldNames)) {
+      $clause = \CRM_Contact_BAO_Contact_Permission::cacheSubquery('a.contact_id');
+      if ($clause !== '1') {
+        $this->query->where($clause);
+      }
+    }
   }
 
 }
