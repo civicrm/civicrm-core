@@ -72,6 +72,12 @@ class CRM_Core_DAO extends DB_DataObject {
   static $_checkedSqlFunctionsExist = FALSE;
 
   /**
+   * https://issues.civicrm.org/jira/browse/CRM-17748
+   * internal variable for DAO to hold per-query settings
+   */
+  protected $_options = array();
+
+  /**
    * Class constructor.
    *
    * @return \CRM_Core_DAO
@@ -315,12 +321,20 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function query($query, $i18nRewrite = TRUE) {
     // rewrite queries that should use $dbLocale-based views for multi-language installs
-    global $dbLocale;
+    global $dbLocale, $_DB_DATAOBJECT;
+
+    $conn = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
+    $orig_options = $conn->options;
+    $this->_setDBOptions($this->_options);
+
     if ($i18nRewrite and $dbLocale) {
       $query = CRM_Core_I18n_Schema::rewriteQuery($query);
     }
 
-    return parent::query($query);
+    $ret = parent::query($query);
+
+    $this->_setDBOptions($orig_options);
+    return $ret;
   }
 
   /**
@@ -2398,6 +2412,37 @@ SELECT contact_id
     // we'll append 8 characters to the end of the tableName
     $md5string = substr(md5($string), 0, 8);
     return substr($string, 0, $length - 8) . "_{$md5string}";
+  }
+
+  /**
+   * https://issues.civicrm.org/jira/browse/CRM-17748
+   * Sets the internal options to be used on a query
+   *
+   * @param array $options
+   *
+   */
+  public function setOptions($options) {
+    if (is_array($options)) {
+      $this->_options = $options;
+    }
+  }
+
+  /**
+   * https://issues.civicrm.org/jira/browse/CRM-17748
+   * wrapper to pass internal DAO options down to DB_mysql/DB_Common level
+   *
+   * @param array $options
+   *
+   */
+  protected function _setDBOptions($options) {
+    global $_DB_DATAOBJECT;
+
+    if (is_array($options) && count($options)) {
+      $conn = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
+      foreach ($options as $option_name => $option_value) {
+        $conn->setOption($option_name, $option_value);
+      }
+    }
   }
 
   /**
