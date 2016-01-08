@@ -233,7 +233,7 @@ class CRM_Core_Config_MagicMerge {
       case 'setting-url-abs':
       case 'setting-url-rel':
       case 'setting-url-rel-noslash':
-        $noslash = ($type == 'setting-url-abs-noslash') ? true : false;
+        $noslash = ($type == 'setting-url-abs-noslash') ? TRUE : FALSE;
         $type = (strstr($type, 'abs')) ? 'absolute' : 'relative';
         $value = $this->getSettings()->get($name);
         if ($value && !$noslash) {
