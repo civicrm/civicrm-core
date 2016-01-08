@@ -4482,4 +4482,20 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
   }
 
+  /*
+   * CRM-17793 - Alter DateTime section header to group by date from the datetime field.
+   * @param $tempTable
+   * @param $columnName
+   */
+  public function alterSectionHeaderForDateTime($tempTable, $columnName) {
+    $tempQuery = "ALTER TABLE {$tempTable} ADD COLUMN {$columnName}_date VARCHAR(128)";
+    CRM_Core_DAO::executeQuery($tempQuery);
+    $updateQuery = "UPDATE {$tempTable} SET {$columnName}_date = date({$columnName})";
+    CRM_Core_DAO::executeQuery($updateQuery);
+    $this->_select .= ", {$columnName}_date";
+    $this->_sections["{$columnName}_date"] = $this->_sections["{$columnName}"];
+    unset($this->_sections["{$columnName}"]);
+    $this->assign('sections', $this->_sections);
+  }
+
 }
