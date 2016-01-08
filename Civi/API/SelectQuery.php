@@ -360,6 +360,10 @@ class SelectQuery {
         $fkField = &$this->apiFieldSpec[$fk];
         continue;
       }
+      // More than 4 joins deep seems excessive - DOS attack?
+      if ($depth > 4) {
+        throw new \API_Exception("Maximum number of joins exceeded in api.{$this->entity}.get");
+      }
       if (!isset($fkField['FKApiName']) && !isset($fkField['FKClassName'])) {
         return NULL;
       }
