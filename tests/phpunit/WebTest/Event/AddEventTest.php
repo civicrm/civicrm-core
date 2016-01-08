@@ -1124,14 +1124,15 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $streetAddress = "100 Main Street";
     $this->_testAddLocation($streetAddress);
     $this->_testAddFees(FALSE, FALSE, "Test Processor", FALSE, TRUE);
-    $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations, $allowSelfService);
+    $this->_testAddOnlineRegistration($registerIntro, FALSE, $allowSelfService);
 
     // Register participant
     $id = $this->urlArg('id');
     $this->openCiviPage("event/register", "reset=1&id=$id&action=preview", '_qf_Register_upload-bottom');
-    $this->type('first_name', $contact1);
-    $this->type('last_name', "Anderson");
-    $this->type('email-Primary', "{$contact1}@example.com");
+    $this->waitForElementPresent("xpath=//div[@id='crm-event-register-different']/a");
+    $this->click("xpath=//div[@id='crm-event-register-different']/a");
+    $this->waitForAjaxcontent();
+    $this->select2("select_contact_id", "$contact1");
 
     // Fill card details
     $this->select("credit_card_type", "value=Visa");
@@ -1151,22 +1152,33 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->openCiviPage("event/search", "reset=1");
     $this->waitForElementPresent("_qf_Search_refresh");
     $this->type('sort_name', "Anderson, $contact1");
-    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[9]/td[1]/label[text()='Yes']");
     $this->click("_qf_Search_refresh");
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']");
 
     // Get the id of primary participant
     $primaryParticipantId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody/tr/td[3]/a[text()='Anderson, $contact1']/../../td[11]/span/a[1][text()='View']@href"));
+
+    // Get the contact id of primary participant
+    $primaryParticipantContactid = $this->urlArg('cid', $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody/tr/td[3]/a[text()='Anderson, $contact1']/../../td[11]/span/a[1][text()='View']@href"));
+
+    // Generate checksum for primary participant
+    $checkSum = CRM_Contact_BAO_Contact_Utils::generateChecksum($primaryParticipantContactid);
+    $this->open($this->sboxPath . "admin/people/permissions/roles");
+    $permissions = array(
+      "edit-1-access-civicrm",
+      "edit-1-access-civievent",
+      "edit-1-edit-all-events",
+    );
     $this->webtestLogout();
 
-    // Self Service Transfer of event
-    $this->openCiviPage("event/selfsvcupdate", "reset=1&pid=$primaryParticipantId");
+    // Transfer event registration.
+    $this->openCiviPage("event/selfsvcupdate", "reset=1&pid=$primaryParticipantId&cs=$checkSum");
     $this->waitForElementPresent("xpath=//table[@class='crm-selfsvcupdate-form-details']");
     $this->verifyText("xpath=//table[@class='crm-selfsvcupdate-form-details']/tbody/tr/td[1]", preg_quote("Anderson, $contact1"));
     $this->verifyText("xpath=//table[@class='crm-selfsvcupdate-form-details']/tbody/tr/td[2]", preg_quote("$eventTitle"));
     $this->select("action", "value=1");
     $this->click("_qf_SelfSvcUpdate_submit-bottom");
-    $this->waitForElementPresent("_qf_SelfSvcTransfer_cancel-bottom");
+    $this->waitForElementPresent("_qf_SelfSvcTransfer_submit-bottom");
     $newParticipantFirstName = substr(sha1(rand()), 0, 5);
     $newParticipantLastName = "Smith";
     $newParticipantEmail = "{$newParticipantFirstName}@example.com";
@@ -1175,16 +1187,23 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->type('first_name', $newParticipantFirstName);
     $this->click("_qf_SelfSvcTransfer_submit-bottom");
 
-    // Cancel registration.
+    // Cancel event registration.
     $this->webtestLogin('admin');
     $this->openCiviPage("event/search", "reset=1");
     $this->type('sort_name', "Smith, $newParticipantFirstName");
-    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[9]/td[1]/label[text()='Yes']");
     $this->click("_qf_Search_refresh");
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody/tr/td[3]/a[text()='Smith, $newParticipantFirstName']/../../td[11]/span/a[1][text()='View']");
+
+    // Get the id of new participant
     $newParticipantId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody/tr/td[3]/a[text()='Smith, $newParticipantFirstName']/../../td[11]/span/a[1][text()='View']@href"));
+
+    // Get the contact id of new participant
+    $newParticipantContactId = $this->urlArg('cid', $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody/tr/td[3]/a[text()='Smith, $newParticipantFirstName']/../../td[11]/span/a[1][text()='View']@href"));
+
+    // Generate checksum for new participant
+    $newParticipantcheckSum = CRM_Contact_BAO_Contact_Utils::generateChecksum($newParticipantContactId);
     $this->webtestLogout();
-    $this->openCiviPage("event/selfsvcupdate", "reset=1&pid=$newParticipantId");
+    $this->openCiviPage("event/selfsvcupdate", "reset=1&pid=$newParticipantId&cs=$newParticipantcheckSum");
     $this->verifyText("xpath=//table[@class='crm-selfsvcupdate-form-details']/tbody/tr/td[1]", preg_quote("Smith, $newParticipantFirstName"));
     $this->verifyText("xpath=//table[@class='crm-selfsvcupdate-form-details']/tbody/tr/td[2]", preg_quote("$eventTitle"));
     $this->select("action", "value=2");
@@ -1195,11 +1214,11 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->openCiviPage("event/search", "reset=1");
     $this->waitForElementPresent('_qf_Search_refresh');
     $this->select2("event_id", $eventTitle);
-    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[9]/td[1]/label[text()='Yes']");
+    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[9]/td[1]/label[text()='No']");
     $this->click("_qf_Search_refresh");
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody");
-    $this->assertElementContainsText("xpath=//div[@id='participantSearch']/table/tbody/tr[@id='rowid$primaryParticipantId']/td[9]", "Transferred (test)");
-    $this->assertElementContainsText("xpath=//div[@id='participantSearch']/table/tbody/tr[@id='rowid$newParticipantId']/td[9]", "Cancelled (test)");
+    $this->assertElementContainsText("xpath=//div[@id='participantSearch']/table/tbody/tr[@id='rowid$primaryParticipantId']/td[9]", "Transferred");
+    $this->assertElementContainsText("xpath=//div[@id='participantSearch']/table/tbody/tr[@id='rowid$newParticipantId']/td[9]", "Cancelled");
   }
 
   /**
