@@ -535,7 +535,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   $input['component'] = $contribution->_component;
   $input['is_test'] = $contribution->is_test;
   $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];
-
+  if (isset($params['fee_amount'])) {
+    $input['fee_amount'] = $params['fee_amount'];
+  }
   if (isset($params['is_email_receipt'])) {
     $input['is_email_receipt'] = $params['is_email_receipt'];
   }
