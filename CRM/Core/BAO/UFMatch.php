@@ -633,4 +633,12 @@ AND    domain_id    = %4
     return $ufValues[$ufID];
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function apiWhereClause($tableAlias) {
+    // Prevent default behavior of joining ACLs onto the contact_id field
+    return NULL;
+  }
+
 }
