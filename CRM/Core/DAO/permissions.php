@@ -569,7 +569,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   elseif ($action == 'setvalue' || $snippet == 'upd') {
     $action = 'update';
   }
-  elseif ($action == 'getfields' || $action == 'getspec' || $action == 'getoptions') {
+  elseif ($action == 'getfields' || $action == 'getfield' || $action == 'getspec' || $action == 'getoptions') {
     $action = 'meta';
   }
   elseif ($snippet == 'get') {
