@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -573,6 +572,24 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'month',
       'subject' => 'limit to none',
     );
+    $this->fixtures['sched_on_membership_end_date_repeat_interval'] = array(
+      'name' => 'sched_on_membership_end_date',
+      'title' => 'sched_on_membership_end_date',
+      'body_html' => '<p>Your membership expired 1 unit ago</p>',
+      'body_text' => 'Your membership expired 1 unit ago',
+      'end_frequency_interval' => 10,
+      'end_frequency_unit' => 'year',
+      'is_active' => 1,
+      'is_repeat' => TRUE,
+      'mapping_id' => 4,
+      'record_activity' => 1,
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_end_date',
+      'start_action_offset' => '0',
+      'start_action_unit' => 'hour',
+      'subject' => 'subject send reminder every unit after membership_end_date',
+    );
+
     $this->_setUp();
   }
 
@@ -1612,6 +1629,87 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       }
     }
     $this->_testObjects = array();
+  }
+
+  /**
+   * Test that the various repetition units work correctly.
+   * CRM-17028
+   */
+  public function testRepetitionFrequencyUnit() {
+    $membershipTypeParams = array(
+      'duration_interval' => '1',
+      'duration_unit' => 'year',
+      'is_active' => 1,
+      'period_type' => 'rolling',
+    );
+    $membershipType = $this->createTestObject('CRM_Member_DAO_MembershipType', $membershipTypeParams);
+    $interval_units = array('hour', 'day', 'week', 'month', 'year');
+    foreach ($interval_units as $interval_unit) {
+      $membershipEndDate = DateTime::createFromFormat('Y-m-d H:i:s', "2013-03-15 00:00:00");
+      $contactParams = array(
+        'contact_type' => 'Individual',
+        'first_name' => 'Test',
+        'last_name' => "Interval $interval_unit",
+        'is_deceased' => 0,
+      );
+      $contact = $this->createTestObject('CRM_Contact_DAO_Contact', $contactParams);
+      $this->assertTrue(is_numeric($contact->id));
+      $emailParams = array(
+        'contact_id' => $contact->id,
+        'email' => "test-member-{$interval_unit}@example.com",
+        'location_type_id' => 1,
+      );
+      $email = $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
+      $this->assertTrue(is_numeric($email->id));
+      $membershipParams = array(
+        'membership_type_id' => $membershipType->id,
+        'contact_id' => $contact->id,
+        'join_date' => '20120315',
+        'start_date' => '20120315',
+        'end_date' => '20130315',
+        'is_override' => 0,
+        'status_id' => 2,
+      );
+      $membershipParams['status-id'] = 1;
+      $membership = $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
+      $actionScheduleParams = $this->fixtures['sched_on_membership_end_date_repeat_interval'];
+      $actionScheduleParams['entity_value'] = $membershipType->id;
+      $actionScheduleParams['repetition_frequency_unit'] = $interval_unit;
+      $actionScheduleParams['repetition_frequency_interval'] = 2;
+      $actionSchedule = CRM_Core_BAO_ActionSchedule::add($actionScheduleParams);
+      $this->assertTrue(is_numeric($actionSchedule->id));
+      $beforeEndDate = $this->createModifiedDateTime($membershipEndDate, '-1 day');
+      $beforeFirstUnit = $this->createModifiedDateTime($membershipEndDate, "+1 $interval_unit");
+      $afterFirstUnit = $this->createModifiedDateTime($membershipEndDate, "+2 $interval_unit");
+      $cronRuns = array(
+        array(
+          'time' => $beforeEndDate->format('Y-m-d H:i:s'),
+          'recipients' => array(),
+        ),
+        array(
+          'time' => $membershipEndDate->format('Y-m-d H:i:s'),
+          'recipients' => array(array("test-member-{$interval_unit}@example.com")),
+        ),
+        array(
+          'time' => $beforeFirstUnit->format('Y-m-d H:i:s'),
+          'recipients' => array(),
+        ),
+        array(
+          'time' => $afterFirstUnit->format('Y-m-d H:i:s'),
+          'recipients' => array(array("test-member-{$interval_unit}@example.com")),
+        ),
+      );
+      $this->assertCronRuns($cronRuns);
+      $actionSchedule->delete();
+      $membership->delete();
+      $contact->delete();
+    }
+  }
+
+  public function createModifiedDateTime($origDateTime, $modifyRule) {
+    $newDateTime = clone($origDateTime);
+    $newDateTime->modify($modifyRule);
+    return $newDateTime;
   }
 
 }
