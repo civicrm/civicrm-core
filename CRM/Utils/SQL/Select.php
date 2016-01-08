@@ -464,6 +464,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
             $parts = array_map(array($select, 'escapeString'), $values);
             return implode(', ', $parts);
 
+          // TODO: ensure all uses of this un-escaped literal are safe
           case '!':
             return implode(', ', $values);
 
