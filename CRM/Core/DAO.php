@@ -2421,7 +2421,7 @@ SELECT contact_id
    * @param array $options
    *
    */
-  function setOptions($options) {
+  public function setOptions($options) {
     if (is_array($options)) {
       $this->_options = $options;
     }
@@ -2445,7 +2445,7 @@ SELECT contact_id
     }
   }
 
-   /**
+  /**
    * @param array $params
    */
   public function setApiFilter(&$params) {
