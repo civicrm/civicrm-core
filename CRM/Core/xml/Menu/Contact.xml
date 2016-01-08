@@ -250,6 +250,11 @@
      <title>CiviCRM Blog</title>
      <page_callback>CRM_Dashlet_Page_Blog</page_callback>
   </item>
+  <item>
+     <path>civicrm/dashlet/getting-started</path>
+     <title>CiviCRM Getting Started</title>
+     <page_callback>CRM_Dashlet_Page_GettingStarted</page_callback>
+  </item>
 <item>
      <path>civicrm/ajax/relation</path>
      <page_callback>CRM_Contact_Page_AJAX::relationship</page_callback>
