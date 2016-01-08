@@ -178,6 +178,8 @@ class CRM_Core_Config_MagicMerge {
 
       // "setting-path" properties are settings with special filtering
       // to return normalized file paths.
+      // Option: `mkdir` - auto-create dir
+      // Option: `restrict` - auto-restrict remote access
       'customFileUploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
       'customPHPPathDir' => array('setting-path'),
       'customTemplateDir' => array('setting-path'),
@@ -185,13 +187,15 @@ class CRM_Core_Config_MagicMerge {
       'imageUploadDir' => array('setting-path', NULL, array('mkdir')),
       'uploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
 
-      // "setting-url-*" properties are settings with special filtering
-      // to return normalized URLs (in either absolute or relative format).
-      'customCSSURL' => array('setting-url-abs-noslash'),
-      'extensionsURL' => array('setting-url-abs'),
-      'imageUploadURL' => array('setting-url-abs'),
-      'resourceBase' => array('setting-url-rel', 'userFrameworkResourceURL'),
-      'userFrameworkResourceURL' => array('setting-url-abs'),
+      // "setting-url" properties are settings with special filtering
+      // to return normalized URLs.
+      // Option: `noslash` - don't append trailing slash
+      // Option: `rel` - convert to relative URL (if possible)
+      'customCSSURL' => array('setting-url', NULL, array('noslash')),
+      'extensionsURL' => array('setting-url'),
+      'imageUploadURL' => array('setting-url'),
+      'resourceBase' => array('setting-url', 'userFrameworkResourceURL', array('rel')),
+      'userFrameworkResourceURL' => array('setting-url'),
 
       // "callback" properties are generated on-demand by calling a function.
       'geocodeMethod' => array('callback', 'CRM_Utils_Geocode', 'getProviderClass'),
@@ -230,16 +234,14 @@ class CRM_Core_Config_MagicMerge {
         $this->cache[$k] = $value;
         return $value;
 
-      case 'setting-url-abs':
-      case 'setting-url-rel':
-      case 'setting-url-rel-noslash':
-        $noslash = ($type == 'setting-url-abs-noslash') ? TRUE : FALSE;
-        $type = (strstr($type, 'abs')) ? 'absolute' : 'relative';
+      case 'setting-url':
+        $options = !empty($this->map[$k][2]) ? $this->map[$k][2] : array();
         $value = $this->getSettings()->get($name);
-        if ($value && !$noslash) {
-          $value = CRM_Utils_File::addTrailingSlash($value);
+        if ($value && !(in_array('noslash', $options))) {
+          $value = CRM_Utils_File::addTrailingSlash($value, '/');
         }
-        $this->cache[$k] = Civi::paths()->getUrl($value, $type);
+        $this->cache[$k] = Civi::paths()->getUrl($value,
+          in_array('rel', $options) ? 'relative' : 'absolute');
         return $this->cache[$k];
 
       case 'runtime':
@@ -284,8 +286,7 @@ class CRM_Core_Config_MagicMerge {
     switch ($type) {
       case 'setting':
       case 'setting-path':
-      case 'setting-url-abs':
-      case 'setting-url-rel':
+      case 'setting-url':
       case 'user-system':
       case 'runtime':
       case 'callback':
@@ -319,8 +320,7 @@ class CRM_Core_Config_MagicMerge {
     switch ($type) {
       case 'setting':
       case 'setting-path':
-      case 'setting-url-abs':
-      case 'setting-url-rel':
+      case 'setting-url':
         $this->getSettings()->revert($k);
         return;
 
