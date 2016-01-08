@@ -2101,4 +2101,19 @@ AND cc.sort_name LIKE '%$name%'";
     return $relationshipsDT;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function apiWhereClause($tableAlias) {
+    // Generate an acl clause for both contacts in the relationship
+    $clauses = array();
+    foreach (array('a', 'b') as $a) {
+      $clause = CRM_Contact_BAO_Contact_Permission::cacheSubquery("`$tableAlias`.contact_id_$a");
+      if ($clause !== NULL) {
+        $clauses[] = $clause;
+      }
+    }
+    return $clauses ? implode(' AND ', $clauses) : NULL;
+  }
+
 }
