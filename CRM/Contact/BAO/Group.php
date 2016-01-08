@@ -751,7 +751,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
       $group['DT_RowId'] = 'row_' . $value['id'];
       if (!$params['parentsOnly']) {
-        foreach($value['class'] as $id => $class) {
+        foreach ($value['class'] as $id => $class) {
           if ($class = 'crm-group-parent') {
             unset($value['class'][$id]);
           }
