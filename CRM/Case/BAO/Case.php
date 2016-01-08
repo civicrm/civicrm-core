@@ -1250,6 +1250,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         continue;
       }
 
+      $caseActivity['DT_RowId'] = $caseActivityId;
       //Add classes to the row, via DataTables syntax
       $caseActivity['DT_RowClass'] = "crm-entity";
 
@@ -1275,9 +1276,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       }
 
       //Add data to the row for inline editing, via DataTable syntax
-      $caseActivity['DT_RowData'] = array();
-      $caseActivity['DT_RowData']['entity'] = 'activity';
-      $caseActivity['DT_RowData']['id'] = $caseActivityId;
+      $caseActivity['DT_RowAttr'] = array();
+      $caseActivity['DT_RowAttr']['data-entity'] = 'activity';
+      $caseActivity['DT_RowAttr']['data-id'] = $caseActivityId;
 
       //Activity Date and Time
       $caseActivity['activity_date_time'] = CRM_Utils_Date::customFormat($dao->display_date);
