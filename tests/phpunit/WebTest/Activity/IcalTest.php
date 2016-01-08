@@ -26,8 +26,6 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CiviTest/CiviMailUtils.php';
-require_once 'ezc/Base/src/ezc_bootstrap.php';
-require_once 'ezc/autoload/mail_autoload.php';
 
 /**
  * Class WebTest_Activity_IcalTest

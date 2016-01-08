@@ -31,9 +31,6 @@
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 
-require_once 'ezc/Base/src/ezc_bootstrap.php';
-require_once 'ezc/autoload/mail_autoload.php';
-
 /**
  * Class CRM_Mailing_MailStore_Mbox
  */
