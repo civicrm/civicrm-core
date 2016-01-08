@@ -686,7 +686,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/zetacomponents-mail.git",
-                "reference": "60af3b3c9e7ba7b6fc6fc8643a422ace351a359a"
+                "reference": "19f5af66cdde19bc20f41671fe453b37f4121eb1"
             },
             "type": "library",
             "autoload": {
@@ -740,7 +740,7 @@
             ],
             "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2015-08-14 04:25:17"
+            "time": "2016-01-08 01:15:38"
         }
     ],
     "packages-dev": [],
