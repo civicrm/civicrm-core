@@ -57,7 +57,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $this->_setParam('paymentType', 'AIM');
     $this->_setParam('md5Hash', CRM_Utils_Array::value('signature', $paymentProcessor));
 
-    $this->_setParam('emailCustomer', 'TRUE');
     $this->_setParam('timestamp', time());
     srand(time());
     $this->_setParam('sequence', rand(1, 1000));
