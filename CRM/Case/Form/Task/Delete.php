@@ -65,7 +65,7 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addDefaultButtons(ts('Delete Cases'), 'done');
+    $this->addDefaultButtons(ts('Delete cases'), 'done');
   }
 
   /**
