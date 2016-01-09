@@ -179,8 +179,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'delete in CiviCase',
     ),
     'default' => array(
-      'access CiviCRM',
-      'access all cases and activities',
+      // This is the minimum permission needed. Finer-grained access is controlled by CRM_Case_BAO_Case::apiWhereClause
+      'access my cases and activities',
     ),
   );
 
