@@ -41,6 +41,8 @@ namespace Civi\API;
  */
 class SelectQuery {
 
+  const MAX_JOINS = 4;
+
   /**
    * @var \CRM_Core_DAO
    */
@@ -361,7 +363,7 @@ class SelectQuery {
         continue;
       }
       // More than 4 joins deep seems excessive - DOS attack?
-      if ($depth > 4) {
+      if ($depth > self::MAX_JOINS) {
         throw new \API_Exception("Maximum number of joins exceeded in api.{$this->entity}.get");
       }
       if (!isset($fkField['FKApiName']) && !isset($fkField['FKClassName'])) {

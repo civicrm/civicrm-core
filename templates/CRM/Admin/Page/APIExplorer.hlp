@@ -59,3 +59,22 @@
     </ul>
   </p>
 {/htxt}
+
+{htxt id="api-chain-title"}
+  {ts}Api Chaining{/ts}
+{/htxt}
+{htxt id="api-chain"}
+  <p>{ts}Chains allow you to execute api calls on the results of this one.{/ts}</p>
+  <p>{ts}Example: When creating a contact, you can chain the Email.create api to add email addresses for them.{/ts}</p>
+  <p>{ts}Disambiguation: api chains are different from joins in that chaining executes a separate api call for every result returned from the main call.{/ts}</p>
+{/htxt}
+
+{htxt id="api-join-title"}
+  {ts}Api Joins{/ts}
+{/htxt}
+{htxt id="api-join"}
+  <p>{ts}Join this api call to return values from or filter on a related entity.{/ts}</p>
+  <p>{ts}The new fields will be selectable from the "Params" and "Fields to return" lists.{/ts}</p>
+  <p>{ts}Example: If the api entity is Email, you can also fetch the display name of the contact this email belongs to.{/ts}</p>
+  <p>{ts}Disambiguation: Joins are different from api chaining in that joins execute as a single SELECT query, and only work for api "get" operations.{/ts}</p>
+{/htxt}
