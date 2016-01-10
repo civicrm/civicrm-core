@@ -7,6 +7,8 @@
     actions = {values: ['get']},
     fields = [],
     getFieldData = {},
+    getFieldsCache = {},
+    getActionsCache = {},
     params = {},
     smartyPhp,
     entityDoc,
@@ -15,6 +17,7 @@
     returnTpl = _.template($('#api-return-tpl').html()),
     chainTpl = _.template($('#api-chain-tpl').html()),
     docCodeTpl = _.template($('#doc-code-tpl').html()),
+    joinTpl = _.template($('#join-tpl').html()),
 
     // These types of entityRef don't require any input to open
     // FIXME: ought to be in getfields metadata
@@ -122,9 +125,37 @@
   }
 
   /**
-   * Fetch fields for entity+action
+   * Fetch metadata from the api and cache locally for performance
+   * Returns a deferred object which resolves to entity.getfields
    */
-  function getFields(changedElement) {
+  function getMetadata(entity, action) {
+    var response = $.Deferred();
+    if (getFieldsCache[entity+action]) {
+      response.resolve(getFieldsCache[entity+action]);
+    } else {
+      var apiCalls = {
+        getfields: [entity, 'getfields', {
+          api_action: action,
+          options: {get_options: 'all', get_options_context: 'match'}
+        }]
+      };
+      if (!getActionsCache[entity]) {
+        apiCalls.getactions = [entity, 'getactions'];
+      }
+      CRM.api3(apiCalls)
+        .done(function(data) {
+          getFieldsCache[entity+action] = data.getfields;
+          getActionsCache[entity] = getActionsCache[entity] || data.getactions;
+          response.resolve(data.getfields);
+        });
+    }
+    return response;
+  }
+
+  /**
+   * Respond to changing the main entity+action
+   */
+  function onChangeEntityOrAction(changedElement) {
     var required = [];
     fields = [];
     getFieldData = {};
@@ -143,7 +174,13 @@
       showFields(['api_action']);
       return;
     }
-    CRM.api3(entity, 'getfields', {'api_action': action, options: {get_options: 'all', get_options_context: 'match'}}).done(function(data) {
+    getMetadata(entity, action).done(function(data) {
+      if ($(changedElement).is('#api-entity')) {
+        actions = getActionsCache[entity];
+        populateActions();
+        if (data.deprecated) CRM.alert(data.deprecated, entity + ' Deprecated');
+      }
+      onChangeAction(action);
       _.each(data.values, function(field) {
         if (field.name) {
           getFieldData[field.name] = field;
@@ -159,9 +196,6 @@
           }
         }
       });
-      if ($(changedElement).is('#api-entity') && data.deprecated) {
-        CRM.alert(data.deprecated, entity + ' Deprecated');
-      }
       showFields(required);
       if (action === 'get' || action === 'getsingle' || action == 'getvalue' || action === 'getstat') {
         showReturn();
@@ -191,22 +225,6 @@
     }
     $('#api-params').prepend($(returnTpl({title: title, required: action == 'getvalue'})));
     $('#api-return-value').crmSelect2(params);
-  }
-
-  /**
-   * Fetch actions for entity
-   */
-  function getActions() {
-    if (entity) {
-      $('#api-action').addClass('loading');
-      CRM.api3(entity, 'getactions').done(function(data) {
-        actions = data;
-        populateActions();
-      });
-    } else {
-      actions = {values: ['get']};
-      populateActions();
-    }
   }
 
   /**
@@ -756,20 +774,13 @@
         entity = $('#api-entity').val();
         action = $('#api-action').val();
         if ($(this).is('#api-entity')) {
-          getActions();
-        } else {
-          onChangeAction(action);
+          $('#api-action').addClass('loading');
         }
-        if (entity && action) {
-          $('#api-params').html('<tr><td colspan="4" class="crm-loading-element"></td></tr>');
-          $('#api-params-table thead').show();
-          getFields(this);
-          buildParams();
-          checkBookKeepingEntity(entity, action);
-        } else {
-          $('#api-params, #api-generated pre').empty();
-          $('#api-param-buttons, #api-params-table thead').hide();
-        }
+        $('#api-params').html('<tr><td colspan="4" class="crm-loading-element"></td></tr>');
+        $('#api-params-table thead').show();
+        onChangeEntityOrAction(this);
+        buildParams();
+        checkBookKeepingEntity(entity, action);
       })
       .on('change keyup', 'input.api-input, #api-params select', buildParams)
       .on('submit', submit);
@@ -805,6 +816,6 @@
       e.preventDefault();
       addChainField();
     });
-    $('#api-entity').change();
+    populateActions();
   });
 }(CRM.$, CRM._));
