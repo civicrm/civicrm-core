@@ -1022,7 +1022,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     foreach ($fields as $field) {
       if ($includeMessageId && (!array_key_exists($field, $headers))) {
-        $headers['Message-ID'] = '<' . implode($config->verpSeparator,
+        $headers[$field] = '<' . implode($config->verpSeparator,
             array(
               $localpart . $prefix,
               $job_id,
