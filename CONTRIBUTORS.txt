@@ -1,6 +1,64 @@
 The following people and organizations sponsored and/or contributed new and improved features to the project.
 
 ************************************************
+Key Contributors and Sponsors for 4.7
+************************************************
+
+CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Eileen McNaughton,
+	       Jitendra Purohit, Josh Gowan, Kurund Jalmi,
+               Michael McAndrew, Monish Deb, Rohan Ramesh Katkar, Tim Otten,
+               Yashodha Chaku
+
+AGH Strategies - Andrew Hunt, Tyrell Cook, Nikki Murray
+Backoffice Thinking
+Cambridge University
+Caroline Badley
+Christian Wach
+Circle Interactive - Dave Jenkins
+CiviDesk - Nicolas Ganivet, Sunil Pawar, Virginie Ganivet
+Compucorp - Guanhuan Chen, Jamie Novick
+CiviCoop - Jaap Jansma
+Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove
+Dave D
+Emphanos LLC - Allen Shaw
+Freeform Solutions - Lola Slade, Stephanie Gray
+Future First - David Knoll, John Prescott
+Fuzion NZ - Chris Burgess, Eileen McNaughton, Peter Davis, Torrance Hodgeson
+Giant Rabbit - Peter Haight
+Ginkgo Street Labs - Frank Gomez, Galata Tona, Michael Daryabeygi, Roshani Kothari, Toby Lounsbury
+Joanne Chester
+JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
+Johan Vervloet
+John Kingsnorth
+Greenleaf Advancement - Guy Iaccarino
+K Sneed Consulting - Kate Sneed
+Ken West
+Korlon - Stuart Gaston
+Lesley Evensen (zorgalina)
+Lighthouse Consulting and Design - Brian Shaughnessy
+National Urban League - Lisa Taliano
+New York City Council
+New York State Senate - Ken Zalewski
+Northbridge Digital - Oliver Gibson
+Palante Technology Cooperative - Jon Goldberg, Joseph Lacey, Paul Campbell
+Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Saurabh Batra
+Seamus Lee
+Semper IT - Karin Gerritsen
+Skvare - Jeremy Proffitt, Peter Petrik
+Smiling Heart Enterprises - Neil Planchon
+Squiffle Consulting - Aidan Saunders
+Stephen Palmstrom
+Systopia - Björn Endres
+Tadpole - Kevin Cristiano
+Tech to the People - Xavier Dutoit
+Tim Mallezie
+Torenware Networks - Rob Thorne
+Veda Consulting - Parvez Saleh, Deepak Srivastava
+Wanna Pixel - Nathan Porter, Marisa Porter
+Web Access - Sudha Bisht.
+
+************************************************
 Key Contributors and Sponsors for 4.6
 ************************************************
 
