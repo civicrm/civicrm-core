@@ -24,16 +24,16 @@
  +--------------------------------------------------------------------+
 *}
 <div id="notes-search" class="form-item">
-    <table class="form-layout">
-        <tr>
-            <td>
-                {$form.note.label}<br />
-                {$form.note.html}
-            </td>
-            <td>
-                {$form.note_option.label}<br />
-                {$form.note_option.html}
-            </td>
-        </tr>
-    </table>
+  <table class="form-layout">
+    <tr>
+      <td>
+        {$form.note.label}<br />
+        {$form.note.html}
+      </td>
+      <td>
+        {$form.note_option.label}<br />
+        {$form.note_option.html}
+      </td>
+    </tr>
+  </table>
 </div>

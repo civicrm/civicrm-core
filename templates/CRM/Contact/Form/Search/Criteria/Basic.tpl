@@ -46,9 +46,9 @@
   </tr>
   <tr>
   {if $form.contact_type}
-            <td><label>{ts}Contact Type(s){/ts}</label><br />
-                {$form.contact_type.html}
-            </td>
+    <td><label>{ts}Contact Type(s){/ts}</label><br />
+      {$form.contact_type.html}
+    </td>
   {else}
     <td>&nbsp;</td>
   {/if}
