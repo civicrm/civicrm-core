@@ -4,6 +4,7 @@
   var
     entity,
     action,
+    joins = [],
     actions = {values: ['get']},
     fields = [],
     getFieldData = {},
@@ -51,14 +52,73 @@
   }
 
   /**
+   * Data provider for select2 "field" selectors
+   * @returns {{results: Array.<T>}}
+   */
+  function returnFields() {
+    return {results: fields.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')})};
+  }
+
+  /**
+   * Recursively populates data for select2 "field" selectors
+   * @param fields
+   * @param entity
+   * @param action
+   * @param prefix
+   */
+  function populateFields(fields, entity, action, prefix) {
+    _.each(getFieldsCache[entity+action].values, function(field) {
+      var name = prefix + field.name,
+        pos = fields.length;
+      fields.push({
+        id: name,
+        text: field.title || field.name,
+        multi: !!field['api.multiple'],
+        description: field.description || '',
+        required: !(!field['api.required'] || field['api.required'] === '0')
+      });
+      if (joins[name]) {
+        fields[pos].children = [];
+        populateFields(fields[pos].children, joins[name], 'get', name + '.');
+      }
+      if (!prefix && field['api.required'] && field['api.required'] !== '0') {
+        required.push(field.name);
+      }
+    });
+  }
+
+  /**
+   * Fetch metadata for a field by name - searches across joins
+   * @param name string
+   * @returns {*}
+   */
+  function getField(name) {
+    if (getFieldData[name]) {
+      return getFieldData[name];
+    }
+    var ent = entity,
+      act = action,
+      prefix = '';
+    _.each(name.split('.'), function(piece) {
+      if (joins[prefix]) {
+        ent = joins[prefix];
+        act = 'get';
+      }
+      name = piece;
+      prefix += (prefix.length ? '.' : '') + piece;
+    });
+    return getFieldsCache[ent+act].values[name] || {};
+  }
+
+  /**
    * Add a "fields" row
-   * @param name
+   * @param name string
    */
   function addField(name) {
     $('#api-params').append($(fieldTpl({name: name || '', noOps: _.includes(NO_OPERATORS, action)})));
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
-      data: fields.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')}),
+      data: returnFields,
       formatSelection: function(field) {
         return field.text +
           (field.required ? ' <span class="crm-marker">*</span>' : '');
@@ -116,7 +176,7 @@
       $row = $selector.closest('tr');
     if (entity) {
       $selector.prop('disabled', true);
-      CRM.api3(entity, 'getactions')
+      getActions(entity)
         .done(function(actions) {
           $selector.prop('disabled', false);
           CRM.utils.setOptions($('.api-chain-action', $row), _.transform(actions.values, function(ret, item) {ret.push({value: item, key: item});}));
@@ -144,12 +204,21 @@
       }
       CRM.api3(apiCalls)
         .done(function(data) {
+          data.getfields.values = _.indexBy(data.getfields.values, 'name');
           getFieldsCache[entity+action] = data.getfields;
           getActionsCache[entity] = getActionsCache[entity] || data.getactions;
-          response.resolve(data.getfields);
+          response.resolve(getFieldsCache[entity+action]);
         });
     }
     return response;
+  }
+
+  function getActions(entity) {
+    if (getActionsCache[entity]) {
+      return $.Deferred().resolve(getActionsCache[entity]);
+    } else {
+      return CRM.api3(entity, 'getactions');
+    }
   }
 
   /**
@@ -166,6 +235,7 @@
         text: ts('Action')
       });
       getFieldData.api_action = {
+        name: 'api_action',
         options: _.reduce(actions.values, function(ret, item) {
           ret[item] = item;
           return ret;
@@ -181,23 +251,11 @@
         if (data.deprecated) CRM.alert(data.deprecated, entity + ' Deprecated');
       }
       onChangeAction(action);
-      _.each(data.values, function(field) {
-        if (field.name) {
-          getFieldData[field.name] = field;
-          fields.push({
-            id: field.name,
-            text: field.title || field.name,
-            multi: !!field['api.multiple'],
-            description: field.description || '',
-            required: !(!field['api.required'] || field['api.required'] === '0')
-          });
-          if (field['api.required'] && field['api.required'] !== '0') {
-            required.push(field.name);
-          }
-        }
-      });
+      getFieldData = data.values;
+      populateFields(fields, entity, action, '');
       showFields(required);
-      if (action === 'get' || action === 'getsingle' || action == 'getvalue' || action === 'getstat') {
+      renderJoinSelector();
+      if (_.includes(['get', 'getsingle', 'getvalue', 'getstat'], action)) {
         showReturn();
       }
     });
@@ -211,9 +269,12 @@
   function showReturn() {
     var title = ts('Fields to return'),
       params = {
-        data: fields,
+        data: returnFields,
         multiple: true,
-        placeholder: ts('Leave blank for default')
+        placeholder: ts('Leave blank for default'),
+        formatResult: function(field) {
+          return field.text + '<div class="api-field-desc">' + field.description + '</div>';
+        }
       };
     if (action == 'getstat') {
       title = ts('Group by');
@@ -286,7 +347,7 @@
   }
 
   function isYesNo(fieldName) {
-    return getFieldData[fieldName] && getFieldData[fieldName].type === 16;
+    return getField(fieldName).type === 16;
   }
 
   /**
@@ -297,7 +358,7 @@
    * @returns boolean
    */
   function isSelect(fieldName, operator) {
-    var fieldSpec = getFieldData[fieldName] || {};
+    var fieldSpec = getField(fieldName);
     return (isYesNo(fieldName) || fieldSpec.options || fieldSpec.FKApiName) && !_.includes(TEXT, operator);
   }
 
@@ -340,6 +401,7 @@
       $valField = $('input.api-param-value', $row),
       multiSelect = isMultiSelect(name, operator),
       currentVal = $valField.val(),
+      fieldSpec = getField(name),
       wasSelect = $valField.data('select2');
     if (wasSelect) {
       $valField.crmEntityRef('destroy');
@@ -369,17 +431,17 @@
         });
       }
       // Select options
-      else if (getFieldData[name].options) {
+      else if (fieldSpec.options) {
         $valField.select2({
           multiple: multiSelect,
-          data: _.map(getFieldData[name].options, function (value, key) {
+          data: _.map(fieldSpec.options, function (value, key) {
             return {id: key, text: value};
           })
         });
       }
       // EntityRef
       else {
-        var entity = getFieldData[name].FKApiName;
+        var entity = fieldSpec.FKApiName;
         $valField.attr('placeholder', entity == 'Contact' ? '[' + ts('Auto-Select Current User') + ']' : ts('- select -'));
         $valField.crmEntityRef({
           entity: entity,
@@ -746,6 +808,61 @@
     }
   }
 
+  /**
+   * Renders nested checkboxes for adding joins to an api.get call
+   */
+  function renderJoinSelector() {
+    $('#api-join').hide();
+    if (!_.includes(['Contact', 'Contribution', 'Pledge'], entity) && _.includes(['get', 'getsingle'], action)) {
+      var joinable = {};
+      (function recurse(fields, joinable, prefix, depth) {
+        _.each(fields, function(field) {
+          if (field.FKApiName && field.FKClassName) {
+            var name = prefix + field.name;
+            joinable[name] = {
+              title: field.title,
+              entity: field.FKApiName,
+              checked: !!joins[name]
+            };
+            if (joins[name] && depth < CRM.vars.explorer.max_joins) {
+              joinable[name].children = {};
+              recurse(getFieldsCache[field.FKApiName+'get'].values, joinable[name].children, name + '.', depth+1);
+            }
+          }
+        });
+      })(getFieldData, joinable, '', 1);
+      if (!_.isEmpty(joinable)) {
+        // Send joinTpl as a param so it can recursively call itself to render children
+        $('#api-join').show().children('div').html(joinTpl({joins: joinable, tpl: joinTpl}));
+      }
+    }
+  }
+
+  /**
+   * When adding or removing a join from an api.get call
+   */
+  function onSelectJoin() {
+    var name = $(this).val(),
+      ent = $(this).data('entity');
+    fields = [];
+    $('input', '#api-join').prop('disabled', true);
+    if ($(this).is(':checked')) {
+      joins[name] = ent;
+      $('input.api-param-name, #api-return-value').addClass('loading');
+      getMetadata(ent, 'get').done(function() {
+        renderJoinSelector();
+        populateFields(fields, entity, action, '');
+        $('input.api-param-name, #api-return-value').removeClass('loading');
+      });
+    } else {
+      joins = _.omit(joins, function(entity, n) {
+        return n.indexOf(name) === 0;
+      });
+      renderJoinSelector();
+      populateFields(fields, entity, action, '');
+    }
+  }
+
   $(document).ready(function() {
     // Set up tabs - bind active tab to document hash because... it's cool?
     document.location.hash = document.location.hash || 'explorer';
@@ -773,6 +890,7 @@
       .on('change', '#api-entity, #api-action', function() {
         entity = $('#api-entity').val();
         action = $('#api-action').val();
+        joins = {};
         if ($(this).is('#api-entity')) {
           $('#api-action').addClass('loading');
         }
@@ -784,14 +902,17 @@
       })
       .on('change keyup', 'input.api-input, #api-params select', buildParams)
       .on('submit', submit);
+
     $('#api-params')
       .on('change', 'input.api-param-name, select.api-param-op', renderValueField)
-      .on('change', 'input.api-param-name, .api-option-name', function() {
-        if ($(this).val() === '-' && $(this).data('select2')) {
-          $(this)
-            .crmSelect2('destroy')
-            .val('')
-            .focus();
+      .on('select2-selecting', 'input.api-param-name, .api-option-name, #api-return-value', function(e) {
+        if (e.val === '-') {
+          $(this).one('change', function() {
+            $(this)
+              .crmSelect2('destroy')
+              .val('')
+              .focus();
+          });
         }
       })
       .on('click', '.api-param-remove', function(e) {
@@ -800,6 +921,7 @@
         buildParams();
       })
       .on('change', 'select.api-chain-entity', getChainedAction);
+    $('#api-join').on('change', 'input', onSelectJoin);
     $('#example-entity').on('change', getExamples);
     $('#example-action').on('change', getExample);
     $('#doc-entity').on('change', getDocEntity);
