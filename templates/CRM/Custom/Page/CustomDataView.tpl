@@ -122,21 +122,13 @@
        {else}
           <div class="label">{$element.field_title}</div>
           {if $element.field_type == 'File'}
-          {if !empty($element.field_value.displayURL)}
-            <div class="content">
-              <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
-               <img src="{$element.field_value.displayURL}" height="100" width="100">
-              </a>
-            </div>
-          {else}
             <div class="content">
              {if $element.field_value}
-              {$element.field_value}
+               {$element.field_value}
              {else}
-              <br/>
+               <br/>
              {/if}
             </div>
-          {/if}
           {else}
             {if $element.field_data_type == 'Money'}
               {if $element.field_type == 'Text'}
