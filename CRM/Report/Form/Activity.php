@@ -821,6 +821,11 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_having = "HAVING " . implode(' AND ', $nullFilters);
     }
     $this->orderBy();
+    foreach ($this->_sections as $alias => $section) {
+      if (!empty($section) && $section['name'] == 'activity_date_time') {
+        $this->alterSectionHeaderForDateTime('civireport_activity_temp_target', $section['tplField']);
+      }
+    }
     $this->limit();
     $sql = "{$this->_select}
 FROM civireport_activity_temp_target tar
