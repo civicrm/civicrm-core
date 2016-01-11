@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -71,7 +69,6 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $breadCrumbPath = CRM_Utils_System::url('civicrm/event/info',
       "id={$this->_id}&reset=1"
     );
-    $additionalBreadCrumb = "<a href=\"$breadCrumbPath\">" . ts('Events') . '</a>';
 
     //retrieve event information
     $params = array('id' => $this->_id);
