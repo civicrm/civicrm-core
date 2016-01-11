@@ -228,6 +228,7 @@ class SelectQuery {
         $fkInfo = $this->addFkField($key);
         if ($fkInfo) {
           list($table_name, $column_name) = $fkInfo;
+          $this->validateNestedInput($key, $value);
         }
       }
       // I don't know why I had to specifically exclude 0 as a key - wouldn't the others have caught it?
@@ -448,6 +449,36 @@ class SelectQuery {
       }
     }
     return NULL;
+  }
+
+  /**
+   * FIXME: This should more properly be done at the api wrapper level
+   *
+   * @param $fieldName
+   * @param $value
+   * @throws \Exception
+   */
+  private function validateNestedInput($fieldName, &$value) {
+    list($entity, $name, $spec) = $this->getNestedField($fieldName);
+    $params = array($name => $value);
+    \_civicrm_api3_validate_fields($entity, 'get', $params, $spec);
+    $value = $params[$name];
+  }
+
+  /**
+   * Helper function for validateNestedInput - should be removed when that function is
+   * @param $fieldName
+   * @return array
+   */
+  private function getNestedField($fieldName) {
+    $stack = explode('.', $fieldName);
+    $spec = $this->apiFieldSpec;
+    $fieldName = array_pop($stack);
+    foreach ($stack as $depth => $name) {
+      $entity = $spec[$name]['FKApiName'];
+      $spec = $spec[$name]['FKApiSpec'];
+    }
+    return array($entity, $fieldName, $spec);
   }
 
   /**
