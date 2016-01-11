@@ -111,6 +111,22 @@ CRM.$(function($) {
 {strip}
   <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
     <div class="crm-accordion-header">
+      {ts}Display Settings For Results{/ts}
+    </div>
+    <div class="crm-accordion-body">
+      {include file="CRM/Contact/Form/Search/Criteria/DisplaySettings.tpl"}
+    </div>
+  </div>
+  <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
+    <div class="crm-accordion-header">
+      {ts}Search Settings{/ts}
+    </div>
+    <div class="crm-accordion-body">
+      {include file="CRM/Contact/Form/Search/Criteria/SearchSettings.tpl"}
+    </div>
+  </div>
+  <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
+    <div class="crm-accordion-header">
       {ts}Basic Criteria{/ts}
     </div>
     <div class="crm-accordion-body">

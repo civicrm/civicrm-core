@@ -32,26 +32,15 @@
       <label>{ts}Complete OR Partial Email{/ts}</label><br />
       {$form.email.html}
     </td>
-    <td class="adv-search-top-submit" colspan="2">
-      <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl" location="top"}
-      </div>
-      <div class="crm-submit-buttons reset-advanced-search">
-        <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button css_right" title="{ts}Clear all search criteria{/ts}">
-          <i class="crm-i fa-undo"></i>
-          {ts}Reset Form{/ts}
-        </a>
-      </div>
-    </td>
+    {if $form.contact_type}
+      <td><label>{ts}Contact Type(s){/ts}</label><br />
+        {$form.contact_type.html}
+      </td>
+    {else}
+      <td>&nbsp;</td>
+    {/if}
   </tr>
   <tr>
-  {if $form.contact_type}
-    <td><label>{ts}Contact Type(s){/ts}</label><br />
-      {$form.contact_type.html}
-    </td>
-  {else}
-    <td>&nbsp;</td>
-  {/if}
   {if $form.group}
     <td>
       <div id='groupselect'><label>{ts}Group(s){/ts} <span class="description">(<a href="#" id='searchbygrouptype'>{ts}search by group type{/ts}</a>)</span></label>
@@ -95,8 +84,6 @@
   {else}
     <td>&nbsp;</td>
   {/if}
-  </tr>
-  <tr>
     {if $form.contact_tags}
       <td><label>{ts}Select Tag(s){/ts}</label>
         {$form.contact_tags.html}
@@ -174,18 +161,12 @@
       {$form.contact_source.html}
     </td>
     <td>
-      {if $form.uf_user}
-          {$form.uf_user.label} {$form.uf_user.html}
-          <div class="description font-italic">
-              {ts 1=$config->userFramework}Does the contact have a %1 Account?{/ts}
-          </div>
-      {else}
-          &nbsp;
-      {/if}
-    </td>
-    <td>
       {$form.job_title.label}<br />
       {$form.job_title.html}
+    </td>
+    <td colspan="3">
+      {$form.preferred_language.label}<br />
+      {$form.preferred_language.html}
     </td>
   </tr>
   <tr>
@@ -197,39 +178,15 @@
        {$form.external_identifier.label} {help id="id-external-id" file="CRM/Contact/Form/Contact"}<br />
        {$form.external_identifier.html}
     </td>
-    <td colspan="3">
-      {$form.preferred_language.label}<br />
-      {$form.preferred_language.html}
-    </td>
-  </tr>
-  <tr>
-    <td colspan="5">
-      <fieldset>
-        <legend>{ts}Search Settings{/ts}</legend>
-        <table>
-          <tr>
-            <td>
-              {$form.uf_group_id.label} {help id="id-search-views"}<br />{$form.uf_group_id.html}
-            </td>
-            <td>
-              {if $form.component_mode}
-                {$form.component_mode.label} {help id="id-display-results"}
-                <br />
-                {$form.component_mode.html}
-                {if $form.display_relationship_type}
-                  <div id="crm-display_relationship_type">{$form.display_relationship_type.html}</div>
-                {/if}
-              {else}
-                &nbsp;
-              {/if}
-            </td>
-            <td>{$form.operator.label} {help id="id-search-operator"}<br />{$form.operator.html}</td>
-            <td>
-              {if $form.deleted_contacts}{$form.deleted_contacts.html} {$form.deleted_contacts.label}{/if}
-            </td>
-          </tr>
-        </table>
-      </fieldset>
+    <td>
+      {if $form.uf_user}
+        {$form.uf_user.label} {$form.uf_user.html}
+        <div class="description font-italic">
+          {ts 1=$config->userFramework}Does the contact have a %1 Account?{/ts}
+        </div>
+      {else}
+        &nbsp;
+      {/if}
     </td>
   </tr>
 </table>
