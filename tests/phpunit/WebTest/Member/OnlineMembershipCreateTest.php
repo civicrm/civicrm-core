@@ -233,7 +233,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     }
     if ($payLater) {
       $this->waitForAjaxContent();
-      $this->click("xpath=//label[text()='Pay later label {$hash}']");
+      $this->click("xpath=//div[@class='payment_processor-section']/div[2]/label[text()='Pay later label {$hash}']");
     }
     $this->type("email-5", $firstName . "@example.com");
     $this->waitForElementPresent("first_name");
