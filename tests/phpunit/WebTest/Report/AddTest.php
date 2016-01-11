@@ -117,6 +117,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
 
     // We want navigation menu
     $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul//li/a[text()='Access']");
+    $this->waitForAjaxContent();
     $this->click("is_navigation");
 
     // Navigation menu under Reports section
@@ -188,6 +189,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
 
     // Is Navigation?
     $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul/li[6]/a");
+    $this->waitForAjaxContent();
     $this->assertEquals("on", $this->getValue("is_navigation"));
 
     // Is correct Navigation Parent?
