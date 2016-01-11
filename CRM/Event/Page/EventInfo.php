@@ -186,7 +186,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     //retrieve custom field information
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this, $this->_id, 0, $values['event']['event_type_id']);
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_id);
     $this->assign('action', CRM_Core_Action::VIEW);
     //To show the event location on maps directly on event info page
     $locations = CRM_Event_BAO_Event::getMapInfo($this->_id);

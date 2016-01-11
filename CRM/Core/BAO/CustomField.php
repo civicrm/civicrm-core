@@ -1217,16 +1217,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'File':
         // In the context of displaying a profile, show file/image
-        if ($entityId) {
-          $url = self::getFileURL($entityId, $field['id']);
-          if ($url) {
-            $display = $url['file_url'];
+        if ($value) {
+          if ($entityId) {
+            $url = self::getFileURL($entityId, $field['id']);
+            if ($url) {
+              $display = $url['file_url'];
+            }
           }
-        }
-        elseif ($value) {
-          // In other contexts show a paperclip icon
-          $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
-          $display = $icons[$value];
+          else {
+            // In other contexts show a paperclip icon
+            $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
+            $display = $icons[$value];
+          }
         }
         break;
 
