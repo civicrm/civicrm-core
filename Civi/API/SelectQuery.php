@@ -25,6 +25,7 @@
  +--------------------------------------------------------------------+
  */
 namespace Civi\API;
+use Civi\API\Exception\UnauthorizedException;
 
 /**
  * Query builder for civicrm_api_basic_get.
@@ -344,6 +345,7 @@ class SelectQuery {
    * @return array|null
    *   Returns the table and field name for adding this field to a SELECT or WHERE clause
    * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function addFkField($fkFieldName) {
     $stack = explode('.', $fkFieldName);
@@ -365,14 +367,15 @@ class SelectQuery {
       }
       // More than 4 joins deep seems excessive - DOS attack?
       if ($depth > self::MAX_JOINS) {
-        throw new \API_Exception("Maximum number of joins exceeded in api.{$this->entity}.get");
+        throw new UnauthorizedException("Maximum number of joins exceeded for api.{$this->entity}.get in parameter $fkFieldName");
       }
       if (!isset($fkField['FKApiName']) && !isset($fkField['FKClassName'])) {
+        // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
       // Ensure we have permission to access the other api
       if (!$this->checkPermissionToJoin($fkField['FKApiName'], array_slice($stack, 0, $depth))) {
-        return NULL;
+        throw new UnauthorizedException("Authorization failed to join onto {$fkField['FKApiName']} api in parameter $fkFieldName");
       }
       if (!isset($fkField['FKApiSpec'])) {
         $fkField['FKApiSpec'] = \_civicrm_api_get_fields($fkField['FKApiName']);
@@ -381,6 +384,7 @@ class SelectQuery {
 
       // FIXME: What if the foreign key is not the "id" column?
       if (!$fieldInfo || !isset($fkField['FKApiSpec']['id'])) {
+        // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
       $fkTable = \CRM_Core_DAO_AllCoreTables::getTableForClass($fkField['FKClassName']);
