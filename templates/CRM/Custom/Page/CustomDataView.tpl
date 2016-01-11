@@ -73,40 +73,26 @@
                       </td>
                     {else}
                       <td class="label">{$element.field_title}</td>
-                      {if $element.field_type == 'File'}
-                        {if !empty($element.field_value.displayURL)}
-                          <td class="html-adjust">
-                            <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
-                              <img src="{$element.field_value.displayURL}" height="100" width="100">
-                            </a>
-                          </td>
+                      {if $element.field_data_type == 'Money'}
+                        {if $element.field_type == 'Text'}
+                          <td class="html-adjust">{$element.field_value|crmMoney}</td>
                         {else}
-                          <td class="html-adjust">
-                            {$element.field_value}
-                          </td>
+                          <td class="html-adjust">{$element.field_value}</td>
                         {/if}
                       {else}
-                        {if $element.field_data_type == 'Money'}
-                          {if $element.field_type == 'Text'}
-                            <td class="html-adjust">{$element.field_value|crmMoney}</td>
-                          {else}
-                            <td class="html-adjust">{$element.field_value}</td>
-                          {/if}
-                        {else}
-                          <td class="html-adjust">
-                            {if $element.contact_ref_id}
+                        <td class="html-adjust">
+                          {if $element.contact_ref_id}
                             <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
-                              {/if}
-                              {if $element.field_data_type == 'Memo'}
-                                {$element.field_value|nl2br}
-                              {else}
-                                {$element.field_value}
-                              {/if}
-                              {if $element.contact_ref_id}
+                          {/if}
+                          {if $element.field_data_type == 'Memo'}
+                            {$element.field_value|nl2br}
+                          {else}
+                            {$element.field_value}
+                          {/if}
+                          {if $element.contact_ref_id}
                             </a>
-                            {/if}
-                          </td>
-                        {/if}
+                          {/if}
+                        </td>
                       {/if}
                     {/if}
                   </tr>
