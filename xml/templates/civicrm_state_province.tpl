@@ -2765,8 +2765,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4312, 1178, "L", "Kigali-Ville Kigali Ngari"),
 (4313, 1178, "M", "Mutara"),
 (4314, 1178, "H", "Ruhengeri"),
-(4315, 1187, "11", "Al Batah"),
-(4316, 1187, "08", "Al H,udd ash Shamallyah"),
+(4315, 1187, "11", "Al Bahah"),
+(4316, 1187, "08", "Al Hudud Ash Shamaliyah"),
 (4317, 1187, "12", "Al Jawf"),
 (4318, 1187, "03", "Al Madinah"),
 (4319, 1187, "05", "Al Qasim"),
@@ -4008,4 +4008,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1038, "NW", "Nord-Ouest"),
 
 -- Add Indian province of Telangana
-(NULL, 1101, "TG", "Telangana");
+(NULL, 1101, "TG", "Telangana"),
+
+-- CRM-17800
+(NULL, 1187, "04", "Ash Sharqiyah");
