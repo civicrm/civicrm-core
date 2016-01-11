@@ -136,6 +136,9 @@ class CiviCRM_For_WordPress_Shortcodes_Modal {
     // get screen object
     $screen = get_current_screen();
 
+    // bail if no post type (e.g. Ninja Forms)
+    if ( ! isset( $screen->post_type ) ) return;
+
     // get post types that support the editor
     $capable_post_types = $this->get_post_types_with_editor();
 
