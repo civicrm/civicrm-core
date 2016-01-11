@@ -815,22 +815,24 @@
     $('#api-join').hide();
     if (!_.includes(['Contact', 'Contribution', 'Pledge'], entity) && _.includes(['get', 'getsingle'], action)) {
       var joinable = {};
-      (function recurse(fields, joinable, prefix, depth) {
+      (function recurse(fields, joinable, prefix, depth, entities) {
         _.each(fields, function(field) {
-          if (field.FKApiName && field.FKClassName) {
+          var entity = field.FKApiName;
+          if (entity && field.FKClassName) {
             var name = prefix + field.name;
             joinable[name] = {
               title: field.title,
-              entity: field.FKApiName,
+              entity: entity,
               checked: !!joins[name]
             };
-            if (joins[name] && depth < CRM.vars.explorer.max_joins) {
+            // Expose further joins if we are not over the limit or recursing onto the same entity multiple times
+            if (joins[name] && depth < CRM.vars.explorer.max_joins && !_.countBy(entities)[entity]) {
               joinable[name].children = {};
-              recurse(getFieldsCache[field.FKApiName+'get'].values, joinable[name].children, name + '.', depth+1);
+              recurse(getFieldsCache[entity+'get'].values, joinable[name].children, name + '.', depth+1, entities.concat(entity));
             }
           }
         });
-      })(getFieldData, joinable, '', 1);
+      })(getFieldData, joinable, '', 1, [entity]);
       if (!_.isEmpty(joinable)) {
         // Send joinTpl as a param so it can recursively call itself to render children
         $('#api-join').show().children('div').html(joinTpl({joins: joinable, tpl: joinTpl}));
