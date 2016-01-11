@@ -11,7 +11,6 @@ CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Eileen McNaughton,
 
 AGH Strategies - Andrew Hunt, Tyrell Cook, Nikki Murray
 Backoffice Thinking
-Cambridge University
 Caroline Badley
 Christian Wach
 Circle Interactive - Dave Jenkins
@@ -29,7 +28,6 @@ Ginkgo Street Labs - Frank Gomez, Galata Tona, Michael Daryabeygi, Roshani Kotha
 Joanne Chester
 JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
 Johan Vervloet
-John Kingsnorth
 Greenleaf Advancement - Guy Iaccarino
 K Sneed Consulting - Kate Sneed
 Ken West
@@ -54,6 +52,7 @@ Tadpole - Kevin Cristiano
 Tech to the People - Xavier Dutoit
 Tim Mallezie
 Torenware Networks - Rob Thorne
+University of Cambridge – Alex Corr, John Kingsnorth
 Veda Consulting - Parvez Saleh, Deepak Srivastava
 Wanna Pixel - Nathan Porter, Marisa Porter
 Web Access - Sudha Bisht.
