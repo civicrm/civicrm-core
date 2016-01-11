@@ -358,7 +358,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     // Using helper webtestFillDate function.
     $this->webtestFillDateTime("start_date", "+1 week");
     $this->webtestFillDateTime("end_date", "+1 week 1 day 8 hours ");
-
+    $this->waitForElementPresent('max_participants');
     $this->type("max_participants", "50");
     $this->click("is_map");
     $this->click("is_public");
@@ -1036,6 +1036,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
 
     //Add event
     $this->openCiviPage("event/add", "reset=1&action=add");
+    $this->waitForElementPresent("_qf_EventInfo_cancel-bottom");
     $eventName = 'My Event - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
     $this->_testAddEventInfo($eventName, $eventDescription);
