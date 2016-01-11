@@ -456,25 +456,16 @@ class SelectQuery {
   }
 
   /**
-   * FIXME: This should more properly be done at the api wrapper level
+   * Perform input validation on params that use the join syntax
+   *
+   * Arguably this should be done at the api wrapper level, but doing it here provides a bit more consistency
+   * in that api permissions to perform the join are checked first.
    *
    * @param $fieldName
    * @param $value
    * @throws \Exception
    */
   private function validateNestedInput($fieldName, &$value) {
-    list($entity, $name, $spec) = $this->getNestedField($fieldName);
-    $params = array($name => $value);
-    \_civicrm_api3_validate_fields($entity, 'get', $params, $spec);
-    $value = $params[$name];
-  }
-
-  /**
-   * Helper function for validateNestedInput - should be removed when that function is
-   * @param $fieldName
-   * @return array
-   */
-  private function getNestedField($fieldName) {
     $stack = explode('.', $fieldName);
     $spec = $this->apiFieldSpec;
     $fieldName = array_pop($stack);
@@ -482,7 +473,9 @@ class SelectQuery {
       $entity = $spec[$name]['FKApiName'];
       $spec = $spec[$name]['FKApiSpec'];
     }
-    return array($entity, $fieldName, $spec);
+    $params = array($fieldName => $value);
+    \_civicrm_api3_validate_fields($entity, 'get', $params, $spec);
+    $value = $params[$fieldName];
   }
 
   /**

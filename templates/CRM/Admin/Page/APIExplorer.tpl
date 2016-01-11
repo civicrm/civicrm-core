@@ -101,6 +101,12 @@
     margin: 0;
     padding: 0 0 0.25em 2.5em;
   }
+  #api-join li > i {
+    opacity: .5;
+  }
+  #api-join li.join-enabled > i {
+    opacity: 1;
+  }
   #api-generated-wraper,
   #api-result {
     overflow: auto;
@@ -383,7 +389,7 @@
   {literal}
   <ul class="fa-ul">
     <% _.forEach(joins, function(join, name) { %>
-      <li>
+      <li <% if(join.checked) { %>class="join-enabled"<% } %>>
         <i class="fa-li crm-i fa-reply fa-rotate-180"></i>
         <label for="select-join-<%= name %>" class="api-checkbox-label">
           <input type="checkbox" id="select-join-<%= name %>" value="<%= name %>" data-entity="<%= join.entity %>" <% if(join.checked) { %>checked<% } %>/>
