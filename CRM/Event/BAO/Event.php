@@ -1902,7 +1902,8 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @return bool
    */
   public static function validRegistrationDate(&$values) {
-    // make sure that we are between  registration start date and registration end date
+    // make sure that we are between registration start date and end dates
+    // and that if the event has ended, registration is still specifically open
     $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $values));
     $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_end_date', $values));
     $eventEnd = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $values));
@@ -1911,7 +1912,10 @@ WHERE  ce.loc_block_id = $locBlockId";
     if ($startDate && $startDate >= $now) {
       $validDate = FALSE;
     }
-    if ($endDate && $endDate < $now && $eventEnd && $eventEnd < $now) {
+    elseif ($endDate && $endDate < $now) {
+      $validDate = FALSE;
+    }
+    elseif ($eventEnd && $eventEnd < $now && !$endDate) {
       $validDate = FALSE;
     }
 
