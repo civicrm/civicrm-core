@@ -2295,7 +2295,7 @@ SELECT contact_id
    *   a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    */
-  public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
+  public static function createSQLFilter($fieldName, $filter, $type = NULL, $alias = NULL, $returnSanitisedArray = FALSE) {
     foreach ($filter as $operator => $criteria) {
       if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {
@@ -2446,9 +2446,25 @@ SELECT contact_id
   }
 
   /**
+   * @deprecated
    * @param array $params
    */
   public function setApiFilter(&$params) {
+  }
+
+  /**
+   * Generates a clause suitable for adding to WHERE or ON when doing an api.get for this entity
+   *
+   * @param string $tableAlias
+   * @return null|string
+   */
+  public function apiWhereClause($tableAlias) {
+    $fields = $this->fields();
+    $cidField = CRM_Utils_Array::value('contact_id', $fields);
+    if (CRM_Utils_Array::value('FKClassName', $cidField) == 'CRM_Contact_DAO_Contact') {
+      return CRM_Contact_BAO_Contact_Permission::cacheSubquery("`$tableAlias`.contact_id");
+    }
+    return NULL;
   }
 
 }

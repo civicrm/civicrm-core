@@ -267,7 +267,7 @@ function _civicrm_api3_generic_getlist_spec(&$params, $apiRequest) {
       'type' => CRM_Utils_Type::T_TEXT,
     ),
     'label_field' => array(
-      'title' => 'Search Field',
+      'title' => 'Label Field',
       'description' => "Field to display as title of results (usually automatic)",
       'type' => CRM_Utils_Type::T_TEXT,
     ),

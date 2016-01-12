@@ -108,10 +108,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   // Contact-related data permissions.
   // CRM-14094 - Users can edit and delete contact-related objects using inline edit with 'edit all contacts' permission
   $permissions['address'] = array(
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
+    // get is managed by BAO::apiWhereClause
+    'get' => array(),
     'default' => array(
       'access CiviCRM',
       'edit all contacts',
@@ -121,9 +119,10 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['phone'] = $permissions['address'];
   $permissions['website'] = $permissions['address'];
   $permissions['im'] = $permissions['address'];
-  $permissions['loc_block'] = $permissions['address'];
-  $permissions['entity_tag'] = $permissions['address'];
-  $permissions['note'] = $permissions['address'];
+  // @todo - implement CRM_Core_BAO_EntityTag::apiWhereClause and remove this heavy-handed restriction
+  $permissions['entity_tag'] = array('get' => array('access CiviCRM', 'view all contacts')) + $permissions['address'];
+  // @todo - ditto
+  $permissions['note'] = $permissions['entity_tag'];
 
   // Allow non-admins to get and create tags to support tagset widget
   // Delete is still reserved for admins
@@ -135,10 +134,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
 
   //relationship permissions
   $permissions['relationship'] = array(
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
+    // get is managed by BAO::apiWhereClause
+    'get' => array(),
     'delete' => array(
       'access CiviCRM',
       'edit all contacts',
@@ -182,8 +179,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'delete in CiviCase',
     ),
     'default' => array(
-      'access CiviCRM',
-      'access all cases and activities',
+      // This is the minimum permission needed. Finer-grained access is controlled by CRM_Case_BAO_Case::apiWhereClause
+      'access my cases and activities',
     ),
   );
 
@@ -250,6 +247,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit all events',
     ),
   );
+  // Loc block is only used for events
+  $permissions['loc_block'] = $permissions['event'];
 
   // File permissions
   $permissions['file'] = array(
@@ -569,7 +568,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   elseif ($action == 'setvalue' || $snippet == 'upd') {
     $action = 'update';
   }
-  elseif ($action == 'getfields' || $action == 'getspec' || $action == 'getoptions') {
+  elseif ($action == 'getfields' || $action == 'getfield' || $action == 'getspec' || $action == 'getoptions') {
     $action = 'meta';
   }
   elseif ($snippet == 'get') {
