@@ -65,8 +65,9 @@
    * @param entity
    * @param action
    * @param prefix
+   * @param required
    */
-  function populateFields(fields, entity, action, prefix) {
+  function populateFields(fields, entity, action, prefix, required) {
     _.each(getFieldsCache[entity+action].values, function(field) {
       var name = prefix + field.name,
         pos = fields.length;
@@ -81,7 +82,7 @@
         fields[pos].children = [];
         populateFields(fields[pos].children, joins[name], 'get', name + '.');
       }
-      if (!prefix && field['api.required'] && field['api.required'] !== '0') {
+      if (!prefix && required && field['api.required'] && field['api.required'] !== '0') {
         required.push(field.name);
       }
     });
@@ -213,6 +214,11 @@
     return response;
   }
 
+  /**
+   * TODO: This works given the current code structure but would cause race conditions if called many times per second
+   * @param entity string
+   * @returns $.Deferred
+   */
   function getActions(entity) {
     if (getActionsCache[entity]) {
       return $.Deferred().resolve(getActionsCache[entity]);
@@ -227,6 +233,7 @@
   function onChangeEntityOrAction(changedElement) {
     var required = [];
     fields = [];
+    joins = [];
     getFieldData = {};
     // Special case for getfields
     if (action === 'getfields') {
@@ -242,6 +249,7 @@
         }, {})
       };
       showFields(['api_action']);
+      renderJoinSelector();
       return;
     }
     getMetadata(entity, action).done(function(data) {
@@ -252,7 +260,7 @@
       }
       onChangeAction(action);
       getFieldData = data.values;
-      populateFields(fields, entity, action, '');
+      populateFields(fields, entity, action, '', required);
       showFields(required);
       renderJoinSelector();
       if (_.includes(['get', 'getsingle', 'getvalue', 'getstat'], action)) {
