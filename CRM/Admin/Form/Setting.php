@@ -131,6 +131,9 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
             'label' => ts($props['title']),
           ));
         }
+        elseif ($add == 'addMonthDay') {
+          $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
+        }
         else {
           $this->$add($setting, ts($props['title']));
         }
