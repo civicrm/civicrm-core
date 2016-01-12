@@ -85,6 +85,28 @@
     display: inline;
     font-weight: bold;
   }
+  #mainTabContainer label.api-checkbox-label {
+    font-weight: normal;
+  }
+  #mainTabContainer h4 {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: .2em .2em 0.5em;
+  }
+  #api-join {
+    margin-top: 1em;
+    font-size: .8em;
+  }
+  #api-join ul {
+    margin: 0;
+    padding: 0 0 0.25em 2.5em;
+  }
+  #api-join li > i {
+    opacity: .5;
+  }
+  #api-join li.join-enabled > i {
+    opacity: 1;
+  }
   #api-generated-wraper,
   #api-result {
     overflow: auto;
@@ -174,14 +196,19 @@
       <input class="crm-form-text" id="api-action" name="action" value="get">
       &nbsp;&nbsp;
 
-      <label for="debug-checkbox" title="{ts}Display debug output with results.{/ts}">
+      <label for="debug-checkbox" class="api-checkbox-label" title="{ts}Display debug output with results.{/ts}">
         <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="debug-checkbox" name="debug" value="1" >debug
       </label>
       &nbsp;|&nbsp;
 
-      <label for="sequential-checkbox" title="{ts}Sequential is more compact format, well-suited for json and smarty.{/ts}">
+      <label for="sequential-checkbox" class="api-checkbox-label" title="{ts}Sequential is more compact format, well-suited for json and smarty.{/ts}">
         <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="sequential-checkbox" name="sequential" checked="checked" value="1">sequential
       </label>
+
+      <div id="api-join" class="crm-form-block crm-collapsible collapsed" style="display:none;">
+        <h4 class="collapsible-title">{ts}Join on:{/ts} {help id='api-join'}</h4>
+        <div></div>
+      </div>
 
       <table id="api-params-table">
         <thead style="display: none;">
@@ -197,6 +224,7 @@
         <a href="#" class="crm-hover-button" id="api-params-add"><i class="crm-i fa-plus"></i> {ts}Add Parameter{/ts}</a>
         <a href="#" class="crm-hover-button" id="api-option-add"><i class="crm-i fa-cog"></i> {ts}Add Option{/ts}</a>
         <a href="#" class="crm-hover-button" id="api-chain-add"><i class="crm-i fa-link"></i> {ts}Chain API Call{/ts}</a>
+        {help id="api-chain"}
       </div>
       <div id="api-generated-wraper">
         <table id="api-generated" border=1>
@@ -355,5 +383,22 @@
       <pre class="lang-php linenums"><%- code %></pre>
     </div>
   </div>
+</script>
+
+<script type="text/template" id="join-tpl">
+  {literal}
+  <ul class="fa-ul">
+    <% _.forEach(joins, function(join, name) { %>
+      <li <% if(join.checked) { %>class="join-enabled"<% } %>>
+        <i class="fa-li crm-i fa-reply fa-rotate-180"></i>
+        <label for="select-join-<%= name %>" class="api-checkbox-label">
+          <input type="checkbox" id="select-join-<%= name %>" value="<%= name %>" data-entity="<%= join.entity %>" <% if(join.checked) { %>checked<% } %>/>
+          <%- join.title %>
+        </label>
+      </li>
+      <% if(join.children) print(tpl({joins: join.children, tpl: tpl})); %>
+    <% }); %>
+  </ul>
+  {/literal}
 </script>
 {/strip}

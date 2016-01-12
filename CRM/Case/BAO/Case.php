@@ -3454,4 +3454,31 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function apiWhereClause($tableAlias) {
+    $clauses = array();
+    // Only case admins can view deleted cases
+    if (!CRM_Core_Permission::check('administer CiviCase')) {
+      $clauses[] = "`$tableAlias`.is_deleted = 0";
+    }
+    // Ensure the user has permission to view the case client
+    $contactClause = CRM_Contact_BAO_Contact_Permission::cacheSubquery('contact_id');
+    if ($contactClause !== NULL) {
+      $clauses[] = "`$tableAlias`.id IN (SELECT case_id FROM civicrm_case_contact WHERE $contactClause)";
+    }
+    // The api gatekeeper ensures the user has at least "access all cases and activities"
+    // so if they do not have permission to see all cases we'll assume they can only access their own
+    if (!CRM_Core_Permission::check('access all cases and activities')) {
+      $user = (int) CRM_Core_Session::getLoggedInContactID();
+      $clauses[] = "`$tableAlias`.id IN (
+        SELECT r.case_id FROM civicrm_relationship r, civicrm_case_contact cc WHERE r.is_active = 1 AND cc.case_id = r.case_id AND (
+          (contact_id_a = cc.contact_id AND contact_id_b = $user) OR (contact_id_b = cc.contact_id AND contact_id_a = $user)
+        )
+      )";
+    }
+    return $clauses ? implode(' AND ', $clauses) : NULL;
+  }
+
 }
