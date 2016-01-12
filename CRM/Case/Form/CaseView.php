@@ -184,9 +184,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       NULL,
       $entitySubType
     );
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this,
-      $groupTree
-    );
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_caseID);
   }
 
   /**

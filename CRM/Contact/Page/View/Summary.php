@@ -63,9 +63,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       $entitySubType
     );
 
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this,
-      $groupTree
-    );
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_contactId);
 
     // also create the form element for the activity links box
     $controller = new CRM_Core_Controller_Simple(

@@ -104,7 +104,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', $this, $id, 0, CRM_Utils_Array::value('financial_type_id', $values));
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $id);
 
     $premiumId = NULL;
     if ($id) {

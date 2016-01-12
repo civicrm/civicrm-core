@@ -152,7 +152,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
         $finalTree[$treeId] = $trees;
       }
     }
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree, FALSE, NULL, NULL, NULL, $participantID);
     $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values[$participantID]['event_id'], 'title');
     //CRM-7150, show event name on participant view even if the event is disabled
     if (empty($values[$participantID]['event'])) {
