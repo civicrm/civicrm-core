@@ -205,8 +205,8 @@
         <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="sequential-checkbox" name="sequential" checked="checked" value="1">sequential
       </label>
 
-      <div id="api-join" class="crm-form-block" style="display:none;">
-        <h4>{ts}Join On{/ts} {help id='api-join'}</h4>
+      <div id="api-join" class="crm-form-block crm-collapsible collapsed" style="display:none;">
+        <h4 class="collapsible-title">{ts}Join on:{/ts} {help id='api-join'}</h4>
         <div></div>
       </div>
 
