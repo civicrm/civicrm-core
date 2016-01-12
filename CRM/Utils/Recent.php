@@ -141,7 +141,7 @@ class CRM_Utils_Recent {
         'delete_url' => CRM_Utils_Array::value('deleteUrl', $others),
       )
     );
-    error_log("FOOOO: " . self::$_maxItems);
+    
     if (count(self::$_recent) > self::$_maxItems) {
       array_pop(self::$_recent);
     }
