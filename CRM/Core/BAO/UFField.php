@@ -283,7 +283,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @return int
    */
   public static function autoWeight($params) {
-    if (isset($params['option.autoweight']) || !$params['option.autoweight']) {
+    if (isset($params['option.autoweight'])) {
+      return CRM_Utils_Array::value('weight', $params);
+    }
+    if (isset($params['option.autoweight']) && !$params['option.autoweight']) {
       return CRM_Utils_Array::value('weight', $params);
     }
     if (!empty($params['id']) && empty($params['weight'])) {
