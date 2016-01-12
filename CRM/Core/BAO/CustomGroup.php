@@ -1864,10 +1864,11 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param int $gID
    * @param null $prefix
    * @param int $customValueId
+   * @param int $entityId
    *
    * @return array|int
    */
-  public static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL) {
+  public static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL, $entityId = NULL) {
     $details = array();
     foreach ($groupTree as $key => $group) {
       if ($key === 'info') {
@@ -1891,7 +1892,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               'field_title' => CRM_Utils_Array::value('label', $properties),
               'field_type' => CRM_Utils_Array::value('html_type', $properties),
               'field_data_type' => CRM_Utils_Array::value('data_type', $properties),
-              'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id']),
+              'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId),
               'options_per_line' => CRM_Utils_Array::value('options_per_line', $properties),
             );
             // also return contact reference contact id if user has view all or edit all contacts perm

@@ -54,7 +54,7 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
     $groupTree = &CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $contactId,
       $cgId, $entitySubType
     );
-    $details = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
+    $details = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contactId);
     //get the fields of single custom group record
     if ($customRecId == 1) {
       $fields = reset($details[$cgId]);
