@@ -112,7 +112,9 @@ class civicrm_api3 {
       return;
     }
     if (isset($config) && isset($config['conf_path'])) {
-      define('CIVICRM_SETTINGS_PATH', $config['conf_path'] . '/civicrm.settings.php');
+      if (!defined('CIVICRM_SETTINGS_PATH')) {
+        define('CIVICRM_SETTINGS_PATH', $config['conf_path'] . '/civicrm.settings.php');
+      }
       require_once CIVICRM_SETTINGS_PATH;
       require_once 'CRM/Core/ClassLoader.php';
       require_once 'api/api.php';
