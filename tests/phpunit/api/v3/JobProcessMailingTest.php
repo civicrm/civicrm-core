@@ -73,6 +73,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'scheduled_date' => 'now',
     );
     $this->defaultSettings = array(
+      'mailings' => 1, // int, #mailings to send
       'recipients' => 20, // int, #contacts to receive mailing
       'workers' => 1, // int, #concurrent cron jobs
       'iterations' => 1, // int, #times to spawn all the workers
@@ -212,6 +213,24 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       10, // Total sent.
     );
 
+    // For two mailings, launch 1 worker, 5 times in a row. Deliver everything.
+    $es[6] = array(
+      array(// Settings.
+        'mailings' => 2,
+        'recipients' => 10,
+        'workers' => 1,
+        'iterations' => 5,
+        'mailerBatchLimit' => 6,
+      ),
+      array(// Tallies.
+        // x6 => x4+x2 => x6 => x2 => x0
+        6 => 3, // 3 jobs which produce 6 messages
+        2 => 1, // 1 job which produces 2 messages
+        0 => 1, // 1 job which produces 0 messages
+      ),
+      20, // Total sent.
+    );
+
     return $es;
   }
 
@@ -244,7 +263,9 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'mailThrottleTime',
     )));
 
-    $this->callAPISuccess('mailing', 'create', $this->_params);
+    for ($i = 0; $i < $settings['mailings']; $i++) {
+      $this->callAPISuccess('mailing', 'create', $this->_params);
+    }
 
     $this->_mut->assertRecipients(array());
 
@@ -268,7 +289,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
         'actualTallies' => $actualTallies,
         'apiResults' => $allApiResults,
       ), TRUE));
-    $this->_mut->assertRecipients($this->getRecipients(1, $expectedTotal));
+    $this->_mut->assertRecipients($this->getRecipients(1, $expectedTotal / $settings['mailings'], 'nul.example.com', $settings['mailings']));
     $this->assertEquals(0, $apiCalls->getRunningCount());
   }
 
@@ -295,13 +316,17 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    *
    * @param int $start
    * @param int $count
+   * @param string $domain
+   * @param int $mailings
    *
    * @return array
    */
-  public function getRecipients($start, $count, $domain = 'nul.example.com') {
+  public function getRecipients($start, $count, $domain = 'nul.example.com', $mailings = 1) {
     $recipients = array();
-    for ($i = $start; $i < ($start + $count); $i++) {
-      $recipients[][0] = 'mail' . $i . '@' . $domain;
+    for ($m = 0; $m < $mailings; $m++) {
+      for ($i = $start; $i < ($start + $count); $i++) {
+        $recipients[][0] = 'mail' . $i . '@' . $domain;
+      }
     }
     return $recipients;
   }
