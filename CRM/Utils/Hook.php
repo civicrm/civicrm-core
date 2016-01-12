@@ -490,6 +490,20 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook allows modification of a SELECT query on an entity, e.g. during an api.get operation.
+   *
+   * @param string $entity
+   * @param CRM_Utils_SQL_Select $query
+   * @param bool $checkPermissions
+   */
+  public static function entityGet($entity, $query, $checkPermissions) {
+    self::singleton()->invoke(3, $entity, $query, $checkPermissions,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_entityGet'
+    );
+  }
+
+  /**
    * This hook is called when building the menu table.
    *
    * @param array $files

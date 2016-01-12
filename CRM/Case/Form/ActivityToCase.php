@@ -87,7 +87,11 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->add('text', 'file_on_case_unclosed_case_id', ts('Select Case'), array('class' => 'huge'), TRUE);
+    $entityRefParams = array(
+      'entity' => 'Case',
+      'api' => array('extra' => array('contact_id')),
+    );
+    $this->addEntityRef('file_on_case_unclosed_case_id', ts('Select Case'), $entityRefParams, TRUE);
     $this->addEntityRef('file_on_case_target_contact_id', ts('With Contact(s)'), array('multiple' => TRUE));
     $this->add('text', 'file_on_case_activity_subject', ts('Subject'), array('size' => 50));
   }
