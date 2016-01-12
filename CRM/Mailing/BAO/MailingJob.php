@@ -89,6 +89,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $config = CRM_Core_Config::singleton();
     $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
+    $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
 
     if (!empty($testParams)) {
       $query = "
@@ -215,6 +216,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       if ($testParams) {
         return $isComplete;
       }
+
+      // CRM-17629: Stop processing jobs if mailer batch limit reached
+      if ($mailerBatchLimit > 0 && self::$mailsProcessed >= $mailerBatchLimit) {
+        break;
+      }
+
     }
   }
 
