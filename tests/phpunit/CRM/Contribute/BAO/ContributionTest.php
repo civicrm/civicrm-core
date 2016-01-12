@@ -636,13 +636,20 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Add() method (add and edit modes of participant)
+   * addPayments() method (add and edit modes of participant)
    */
   public function testAddPayments() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
     foreach ($lineItems as $value) {
       CRM_Contribute_BAO_Contribution::addPayments($value, array($contribution));
     }
+    $this->checkItemValues($contribution);
+  }
+
+  /**
+   * checks db values for financial item
+   */
+  public function checkItemValues($contribution) {                                                               
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
     $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType(4, $relationTypeId);
     $query = "SELECT eft1.entity_id, ft.total_amount, eft1.amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') 
@@ -661,6 +668,23 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     Contact::delete($this->_contactId);
     Event::delete($this->_eventId);
+  }
+
+  /**
+   * assignProportionalLineItems() method (add and edit modes of participant)
+   */
+  public function testAssignProportionalLineItems() {
+    list($lineItems, $contribution) = $this->addParticipantWithContribution();
+    $contributions['total_amount'] = $contribution->total_amount;
+    $params = array(
+      'contribution_id' => $contribution->id,
+      'total_amount' => 150.00,
+    );
+    $trxn = new CRM_Financial_DAO_FinancialTrxn();
+    $trxn->orderBy('id DESC');
+    $trxn->find(TRUE);
+    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contributions);
+    $this->checkItemValues($contribution);
   }
 
   /**
