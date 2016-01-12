@@ -711,7 +711,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     );
     CRM_Event_BAO_Event::create($eventParams);
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetId);
-    
+
     $priceFields = $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $priceField->id));
     $participantParams = array(
       'financial_type_id' => 4,

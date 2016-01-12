@@ -4731,7 +4731,7 @@ LIMIT 1;";
    *
    */
   public static function addPayments($lineItems, $contributions) {
-      // get financial trxn which is a payment
+    // get financial trxn which is a payment
     $ftSql = "SELECT ft.id 
       FROM civicrm_financial_trxn ft 
       INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
