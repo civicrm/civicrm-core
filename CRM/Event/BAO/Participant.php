@@ -2226,9 +2226,9 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
   }
 
   /**
-   *CRM-17797 -- Format fields and setDefaults for primary and additional participants profile
-   *@param int $contactId
-   *@param $form array
+   * CRM-17797 -- Format fields and setDefaults for primary and additional participants profile
+   * @param int $contactId
+   * @param CRM_Core_Form $form
    */
   public static function formatFieldsAndSetProfileDefaults($contactId, &$form) {
     if (!$contactId) {
