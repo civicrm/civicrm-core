@@ -44,22 +44,8 @@
                 {/foreach}
               </td>
               {else}
-              <td class="label">{$element.field_title}</td>
-              {if $element.field_type == 'File'}
-                {if $element.field_value.displayURL}
-                  <td class="html-adjust">
-                    <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
-                      <img src="{$element.field_value.displayURL}" height = "100" width="100">
-                    </a>
-                  </td>
-                  {else}
-                  <td class="html-adjust">
-                    <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
-                  </td>
-                {/if}
-                {else}
+                <td class="label">{$element.field_title}</td>
                 <td class="html-adjust">{$element.field_value}</td>
-              {/if}
             {/if}
           </tr>
         </table>
