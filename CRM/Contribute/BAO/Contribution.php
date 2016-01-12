@@ -4799,18 +4799,17 @@ LIMIT 1;";
       while ($dao->fetch()) {
         $ftIds[$dao->price_field_value_id] = $dao->id;
       }
+      $eftParams = array(
+        'entity_table' => 'civicrm_financial_item',
+        'financial_trxn_id' => $trxn->id,
+      );
       foreach ($lineItems as $key => $value) {
         $paid = $value['line_total'] * ($params['total_amount'] / $contribution['total_amount']);
         // Record Entity Financial Trxn
-        $eftParams = array(
-          'entity_table' => 'civicrm_financial_item',
-          'financial_trxn_id' => $trxn->id,
-          'amount' => $paid,
-          'entity_id' => $ftIds[$value['price_field_value_id']],
-        );
-        $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
-        $entityTrxn->copyValues($eftParams);
-        $entityTrxn->save();
+        $eftParams['amount'] = $paid;
+        $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
+
+        civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
       }
     }
   }
