@@ -1427,7 +1427,7 @@ if (!CRM.vars) CRM.vars = {};
       })
 
       // Allow normal clicking of links within accordions
-      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
+      .on('click.crmAccordions', 'div.crm-accordion-header a, .collapsible-title a', function (e) {
         e.stopPropagation();
       })
       // Handle accordions
