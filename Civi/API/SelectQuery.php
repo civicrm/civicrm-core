@@ -516,19 +516,19 @@ class SelectQuery {
    * Get acl clause for an entity
    *
    * @param string $tableAlias
-   * @param \CRM_Core_DAO $bao
+   * @param \CRM_Core_DAO $daoName
    * @return null|string
    */
-  private function getAclClause($tableAlias, $bao = NULL) {
+  private function getAclClause($tableAlias, $daoName = NULL) {
     if (!$this->checkPermissions) {
       return NULL;
     }
-    if (!$bao) {
+    if (!$daoName) {
       $bao = $this->bao;
     }
     else {
-      $baoName = str_replace('_DAO_', '_BAO_', $bao);
-      $bao = new $baoName();
+      $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+      $bao = class_exists($baoName) ? new $baoName() : new $daoName();
     }
     return $bao->apiWhereClause($tableAlias);
   }
