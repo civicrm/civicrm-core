@@ -132,32 +132,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $contactID = $this->getContactID();
     CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
 
-    if ($contactID) {
-      $fields = array();
-
-      if (!empty($this->_fields)) {
-        $removeCustomFieldTypes = array('Participant');
-        foreach ($this->_fields as $name => $dontCare) {
-          if (substr($name, 0, 7) == 'custom_') {
-            $id = substr($name, 7);
-            if (!$this->_allowConfirmation &&
-              !CRM_Core_BAO_CustomGroup::checkCustomField($id, $removeCustomFieldTypes)
-            ) {
-              continue;
-            }
-            // ignore component fields
-          }
-          elseif ((substr($name, 0, 12) == 'participant_')) {
-            continue;
-          }
-          $fields[$name] = 1;
-        }
-      }
-    }
-
-    if (!empty($fields)) {
-      CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults);
-    }
+    CRM_Event_BAO_Participant::formatFieldsAndSetProfileDefaults($contactID, $this);
 
     // Set default payment processor as default payment_processor radio button value
     if (!empty($this->_paymentProcessors)) {
