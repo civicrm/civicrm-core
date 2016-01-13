@@ -77,6 +77,10 @@ class SelectQuery {
    */
   protected $entityFieldNames;
   /**
+   * @var array
+   */
+  protected $aclFields = array();
+  /**
    * @var string|bool
    */
   protected $checkPermissions;
@@ -104,6 +108,9 @@ class SelectQuery {
     $this->apiFieldSpec = $apiSpec['values'];
 
     $this->query = \CRM_Utils_SQL_Select::from($this->bao->tableName() . " a");
+
+    // Add ACLs
+    $this->query->where($this->getAclClause('a'));
   }
 
   /**
@@ -278,8 +285,6 @@ class SelectQuery {
       $this->query->limit($this->options['limit'], $this->options['offset']);
     }
 
-    // ACLs
-    $this->query->where($this->getAclClause('a'));
     $this->bao->free();
 
     $result_entities = array();
@@ -360,8 +365,9 @@ class SelectQuery {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
+      $subStack = array_slice($stack, 0, $depth);
       // Ensure we have permission to access the other api
-      if (!$this->checkPermissionToJoin($fkField['FKApiName'], array_slice($stack, 0, $depth))) {
+      if (!$this->checkPermissionToJoin($fkField['FKApiName'], $subStack)) {
         throw new UnauthorizedException("Authorization failed to join onto {$fkField['FKApiName']} api in parameter $fkFieldName");
       }
       if (!isset($fkField['FKApiSpec'])) {
@@ -375,11 +381,11 @@ class SelectQuery {
         return NULL;
       }
       $fkTable = \CRM_Core_DAO_AllCoreTables::getTableForClass($fkField['FKClassName']);
-      $tableAlias = implode('_to_', array_slice($stack, 0, $depth)) . "_to_$fkTable";
+      $tableAlias = implode('_to_', $subStack) . "_to_$fkTable";
       $joinClause = "LEFT JOIN $fkTable $tableAlias ON $prev.$fk = $tableAlias.id";
 
       // Add acl condition
-      $joinCondition = $this->getAclClause($tableAlias, $fkField['FKClassName']);
+      $joinCondition = $this->getAclClause($tableAlias, $fkField['FKClassName'], $subStack);
       if ($joinCondition !== NULL) {
         $joinClause .= " AND $joinCondition";
       }
@@ -504,9 +510,10 @@ class SelectQuery {
    *
    * @param string $tableAlias
    * @param string $daoName
+   * @param array $stack
    * @return null|string
    */
-  private function getAclClause($tableAlias, $daoName = NULL) {
+  private function getAclClause($tableAlias, $daoName = NULL, $stack = array()) {
     if (!$this->checkPermissions) {
       return NULL;
     }
@@ -517,7 +524,23 @@ class SelectQuery {
       $baoName = str_replace('_DAO_', '_BAO_', $daoName);
       $bao = class_exists($baoName) ? new $baoName() : new $daoName();
     }
-    return $bao->apiWhereClause($tableAlias);
+    // Prevent (most) redundant acl sub clauses if they have already been applied to the main entity.
+    // FIXME: Currently this only works 1 level deep, but tracking through multiple joins would increase complexity
+    // and just doing it for the first join takes care of most acl clause deduping.
+    if (count($stack) === 1 && in_array($stack[0], $this->aclFields)) {
+      return NULL;
+    }
+    $clauses = array();
+    foreach ((array) $bao->apiWhereClause() as $field => $vals) {
+      if (!$stack) {
+        // Track field clauses added to the main entity
+        $this->aclFields[] = $field;
+      }
+      if ($vals) {
+        $clauses[] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+      }
+    }
+    return $clauses ? implode(' AND ', $clauses) : NULL;
   }
 
   /**

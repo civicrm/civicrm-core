@@ -636,9 +636,9 @@ AND    domain_id    = %4
   /**
    * @inheritDoc
    */
-  public function apiWhereClause($tableAlias) {
+  public function apiWhereClause() {
     // Prevent default behavior of joining ACLs onto the contact_id field
-    return NULL;
+    return array();
   }
 
 }

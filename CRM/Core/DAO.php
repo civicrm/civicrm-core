@@ -2453,18 +2453,28 @@ SELECT contact_id
   }
 
   /**
-   * Generates a clause suitable for adding to WHERE or ON when doing an api.get for this entity
+   * Generates clauses suitable for adding to WHERE or ON when doing an api.get for this entity
    *
-   * @param string $tableAlias
-   * @return null|string
+   * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
+   * @code
+   *   array(
+   *     'location_type_id' => array('IS NOT NULL', 'IN (1,2,3)')
+   *   )
+   * @endcode
+   *
+   * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
+   *
+   * @return array
    */
-  public function apiWhereClause($tableAlias) {
+  public function apiWhereClause() {
     $fields = $this->fields();
     $cidField = CRM_Utils_Array::value('contact_id', $fields);
     if (CRM_Utils_Array::value('FKClassName', $cidField) == 'CRM_Contact_DAO_Contact') {
-      return CRM_Contact_BAO_Contact_Permission::cacheSubquery("`$tableAlias`.contact_id");
+      return array(
+        'contact_id' => CRM_Contact_BAO_Contact_Permission::cacheSubquery(),
+      );
     }
-    return NULL;
+    return array();
   }
 
 }

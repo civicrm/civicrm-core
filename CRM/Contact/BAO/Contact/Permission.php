@@ -225,23 +225,23 @@ AND    $operationClause LIMIT 1";
   }
 
   /**
-   * Generate acl subquery that can be placed in the WHERE clause of a query or the ON clause of a JOIN
+   * Generate acl subqueries that can be placed in the WHERE clause of a query or the ON clause of a JOIN
    *
-   * @param string $contactIdField
-   *   Full "table_name.field_name" for the field containing a contact id
-   * @return string|NULL
+   * Returns an array of clauses that can each be placed after the name of the contact_id field in the query.
+   *
+   * @return array
    */
-  public static function cacheSubquery($contactIdField) {
+  public static function cacheSubquery() {
     $clauses = array();
     if (!CRM_Core_Permission::check(array(array('view all contacts', 'edit all contacts')))) {
       $contactID = (int) CRM_Core_Session::getLoggedInContactID();
       self::cache($contactID);
-      $clauses[] = "$contactIdField IN (SELECT contact_id FROM civicrm_acl_contact_cache WHERE user_id = $contactID)";
+      $clauses[] = "IN (SELECT contact_id FROM civicrm_acl_contact_cache WHERE user_id = $contactID)";
     }
     if (!CRM_Core_Permission::check('access deleted contacts')) {
-      $clauses[] = "$contactIdField NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)";
+      $clauses[] = "NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)";
     }
-    return $clauses ? implode(' AND ', $clauses) : NULL;
+    return $clauses;
   }
 
   /**

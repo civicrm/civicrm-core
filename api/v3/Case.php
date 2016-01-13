@@ -98,7 +98,7 @@ function civicrm_api3_case_create($params) {
 
   foreach ((array) $params['contact_id'] as $cid) {
     $contactParams = array('case_id' => $caseBAO->id, 'contact_id' => $cid);
-    CRM_Case_BAO_Case::addCaseToContact($contactParams);
+    CRM_Case_BAO_CaseContact::create($contactParams);
   }
 
   // Initialize XML processor with $params
