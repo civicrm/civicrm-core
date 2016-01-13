@@ -167,7 +167,7 @@ class CRM_Case_Page_AJAX {
       'contact_id' => $contactId,
     );
 
-    CRM_Case_BAO_Case::addCaseToContact($params);
+    CRM_Case_BAO_CaseContact::create($params);
 
     // add case relationships
     CRM_Case_BAO_Case::addCaseRelationships($caseId, $contactId);

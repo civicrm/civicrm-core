@@ -149,66 +149,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
     return $case;
   }
 
-  /**
-   * Create case contact record.
-   *
-   * @param array $params
-   *   case_id, contact_id
-   *
-   * @return object
-   */
-  public static function addCaseToContact($params) {
-    $caseContact = new CRM_Case_DAO_CaseContact();
-    $caseContact->case_id = $params['case_id'];
-    $caseContact->contact_id = $params['contact_id'];
-    $caseContact->find(TRUE);
-    $caseContact->save();
-
-    // add to recently viewed
-    $caseType = CRM_Case_BAO_Case::getCaseType($caseContact->case_id);
-    $url = CRM_Utils_System::url('civicrm/contact/view/case',
-      "action=view&reset=1&id={$caseContact->case_id}&cid={$caseContact->contact_id}&context=home"
-    );
-
-    $title = CRM_Contact_BAO_Contact::displayName($caseContact->contact_id) . ' - ' . $caseType;
-
-    $recentOther = array();
-    if (CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
-      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/case',
-        "action=delete&reset=1&id={$caseContact->case_id}&cid={$caseContact->contact_id}&context=home"
-      );
-    }
-
-    // add the recently created case
-    CRM_Utils_Recent::add($title,
-      $url,
-      $caseContact->case_id,
-      'Case',
-      $params['contact_id'],
-      NULL,
-      $recentOther
-    );
-
-    return $caseContact;
-  }
-
-  /**
-   * Delete case contact record.
-   *
-   * @param int $caseID
-   */
-  public static function deleteCaseContact($caseID) {
-    $caseContact = new CRM_Case_DAO_CaseContact();
-    $caseContact->case_id = $caseID;
-    $caseContact->delete();
-
-    // delete the recently created Case
-    $caseRecent = array(
-      'id' => $caseID,
-      'type' => 'Case',
-    );
-    CRM_Utils_Recent::del($caseRecent);
-  }
 
   /**
    * Convert associative array names to values and vice-versa.
@@ -3426,28 +3366,30 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * @inheritDoc
    */
-  public function apiWhereClause($tableAlias) {
-    $clauses = array();
-    // Only case admins can view deleted cases
-    if (!CRM_Core_Permission::check('administer CiviCase')) {
-      $clauses[] = "`$tableAlias`.is_deleted = 0";
-    }
+  public function apiWhereClause() {
+    $clauses = array(
+      'id' => array(),
+      // Only case admins can view deleted cases
+      'is_deleted' => CRM_Core_Permission::check('administer CiviCase') ? NULL : "= 0",
+    );
     // Ensure the user has permission to view the case client
-    $contactClause = CRM_Contact_BAO_Contact_Permission::cacheSubquery('contact_id');
-    if ($contactClause !== NULL) {
-      $clauses[] = "`$tableAlias`.id IN (SELECT case_id FROM civicrm_case_contact WHERE $contactClause)";
+    $contactClause = CRM_Contact_BAO_Contact_Permission::cacheSubquery();
+    if ($contactClause) {
+      $contactClause = implode(' AND contact_id ', $contactClause);
+      $clauses['id'][] = "IN (SELECT case_id FROM civicrm_case_contact WHERE contact_id $contactClause)";
     }
     // The api gatekeeper ensures the user has at least "access all cases and activities"
     // so if they do not have permission to see all cases we'll assume they can only access their own
     if (!CRM_Core_Permission::check('access all cases and activities')) {
       $user = (int) CRM_Core_Session::getLoggedInContactID();
-      $clauses[] = "`$tableAlias`.id IN (
+      $clauses['id'][] = "IN (
         SELECT r.case_id FROM civicrm_relationship r, civicrm_case_contact cc WHERE r.is_active = 1 AND cc.case_id = r.case_id AND (
-          (contact_id_a = cc.contact_id AND contact_id_b = $user) OR (contact_id_b = cc.contact_id AND contact_id_a = $user)
+          (r.contact_id_a = cc.contact_id AND r.contact_id_b = $user) OR (r.contact_id_b = cc.contact_id AND r.contact_id_a = $user)
         )
       )";
     }
-    return $clauses ? implode(' AND ', $clauses) : NULL;
+
+    return $clauses;
   }
 
 }
