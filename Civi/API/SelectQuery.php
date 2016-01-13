@@ -268,25 +268,12 @@ class SelectQuery {
       $this->query->select("count(*) as c");
     }
 
-    // order by
+    // Order by
     if (!empty($this->options['sort'])) {
-      $sort_fields = array();
-      foreach (explode(',', $this->options['sort']) as $sort_option) {
-        $words = preg_split("/[\s]+/", $sort_option);
-        if (count($words) > 0 && in_array($words[0], array_values($select_fields))) {
-          $tmp = $words[0];
-          if (!empty($words[1]) && strtoupper($words[1]) == 'DESC') {
-            $tmp .= " DESC";
-          }
-          $sort_fields[] = $tmp;
-        }
-      }
-      if (count($sort_fields) > 0) {
-        $this->query->orderBy(implode(",", $sort_fields));
-      }
+      $this->orderBy($this->options['sort']);
     }
 
-    // limit
+    // Limit
     if (!empty($this->options['limit']) || !empty($this->options['offset'])) {
       $this->query->limit($this->options['limit'], $this->options['offset']);
     }
@@ -531,6 +518,43 @@ class SelectQuery {
       $bao = class_exists($baoName) ? new $baoName() : new $daoName();
     }
     return $bao->apiWhereClause($tableAlias);
+  }
+
+  /**
+   * Orders the query by one or more fields
+   *
+   * e.g.
+   * @code
+   *   $this->orderBy(array('last_name DESC', 'birth_date'));
+   * @endcode
+   *
+   * @param string|array $sortParams
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function orderBy($sortParams) {
+    $orderBy = array();
+    foreach (is_array($sortParams) ? $sortParams : explode(',', $sortParams) as $item) {
+      $words = preg_split("/[\s]+/", trim($item));
+      if ($words) {
+        // Direction defaults to ASC unless DESC is specified
+        $direction = strtoupper(\CRM_Utils_Array::value(1, $words, '')) == 'DESC' ? ' DESC' : '';
+        $field = $this->getField($words[0]);
+        if ($field) {
+          $orderBy[] = 'a.' . $field['name'] . $direction;
+        }
+        elseif (strpos($words[0], '.')) {
+          $join = $this->addFkField($words[0]);
+          if ($join) {
+            $orderBy[] = "`{$join[0]}`.`{$join[1]}`$direction";
+          }
+        }
+        else {
+          throw new \API_Exception("Unknown field specified for sort. Cannot order by '$item'");
+        }
+      }
+    }
+    $this->query->orderBy($orderBy);
   }
 
 }
