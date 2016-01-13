@@ -2445,7 +2445,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $values['is_email_receipt'] = 1;
       }
 
-      $values['contributionId'] = $ids['contribution'];
+      if (!empty($ids['contribution'])) {
+        $values['contributionId'] = $ids['contribution'];
+      }
 
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
         $this->_relatedObjects['participant']->id, $this->is_test, $returnMessageText
@@ -2731,9 +2733,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (!empty($values['lineItem']) && !empty($this->_relatedObjects['membership'])) {
       $values['useForMember'] = TRUE;
     }
-
-    $template->assign('contributionId', $this->id);
-    $values['contributionId'] = $this->id;
 
     //assign honor information to receipt message
     $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
