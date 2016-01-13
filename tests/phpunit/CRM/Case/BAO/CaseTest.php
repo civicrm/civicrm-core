@@ -41,7 +41,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'case_id' => 1,
       'contact_id' => 17,
     );
-    CRM_Case_BAO_Case::addCaseToContact($params);
+    CRM_Case_BAO_CaseContact::create($params);
 
     $recent = CRM_Utils_Recent::get();
     $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
