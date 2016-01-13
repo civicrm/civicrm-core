@@ -627,10 +627,6 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $skipPermissions,
     $mode
   );
-  if ($getCount) {
-    // only return the count of contacts
-    return $entities;
-  }
 
   return $entities;
 }
