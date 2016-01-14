@@ -54,15 +54,15 @@ class CRM_Utils_Recent {
    * @var int
    */
   static private $_maxItems = 20;
-  
+
   /**
    * Initialize this class and set the static variables.
    */
   public static function initialize() {
     $maxItemsSetting = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'recentItemsMaxCount');
-    if (isset($maxItemsSetting) && $maxItemsSetting > 0 && $maxItemsSetting < 100)
-        self::$_maxItems = $maxItemsSetting;
-    
+    if (isset($maxItemsSetting) && $maxItemsSetting > 0 && $maxItemsSetting < 100) {
+      self::$_maxItems = $maxItemsSetting;
+    }
     if (!self::$_recent) {
       $session = CRM_Core_Session::singleton();
       self::$_recent = $session->get(self::STORE_NAME);
@@ -107,10 +107,11 @@ class CRM_Utils_Recent {
     $others = array()
   ) {
     self::initialize();
-    
-    if (!self::isProviderEnabled($type))
-        return;
-    
+
+    if (!self::isProviderEnabled($type)) {
+      return;
+    }
+
     $session = CRM_Core_Session::singleton();
 
     // make sure item is not already present in list
@@ -141,7 +142,7 @@ class CRM_Utils_Recent {
         'delete_url' => CRM_Utils_Array::value('deleteUrl', $others),
       )
     );
-    
+
     if (count(self::$_recent) > self::$_maxItems) {
       array_pop(self::$_recent);
     }
@@ -206,67 +207,48 @@ class CRM_Utils_Recent {
   /**
    * Check if a provider is allowed to add stuff.
    * If correspondig setting is empty, all are allowed
-   * 
+   *
    * @param string $providerName
    */
   public static function isProviderEnabled($providerName) {
-      
-      // Join contact types to providerName 'Contact'
-      $contactTypes = CRM_Contact_BAO_ContactType::contactTypes(TRUE);
-      if (in_array($providerName, $contactTypes))
-         $providerName = 'Contact';
-      
-      $allowed = true;
-      
-      // Use core setting recentItemsProviders if configured
-      $providersPermitted = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'recentItemsProviders');
-      if ($providersPermitted)
-          $allowed = in_array($providerName, $providersPermitted);
-      
-      // Else allow
-      return $allowed;
+
+    // Join contact types to providerName 'Contact'
+    $contactTypes = CRM_Contact_BAO_ContactType::contactTypes(TRUE);
+    if (in_array($providerName, $contactTypes)) {
+      $providerName = 'Contact';
+    }
+    $allowed = TRUE;
+
+    // Use core setting recentItemsProviders if configured
+    $providersPermitted = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'recentItemsProviders');
+    if ($providersPermitted) {
+      $allowed = in_array($providerName, $providersPermitted);
+    }
+    // Else allow
+    return $allowed;
   }
 
   /**
    * Gets the list of available providers to civi's recent items stack
    */
   public static function getProviders() {
-      $providers = array(
-          'Contact' => ts('Contacts'),
-          'Relationship' => ts('Relationships'),
-          'Activity' => ts('Activities'),
-          'Note' => ts('Notes'),
-          'Group' => ts('Groups'),
-          'Case' => ts('Cases'),
-          'Contribution' => ts('Contributions'),
-          'Participant' => ts('Participants'),
-          'Grant' => ts('Grants'),
-          'Membership' => ts('Memberships'),
-          'Pledge' => ts('Pledges'),
-          'Event' => ts('Events'),
-          'Campaign' => ts('Campaigns'),
-      );
-      
-      /** We may strip off disabled components **/
-//            $enabledComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
-//      if (!$enabledComponents) 
-//          return $providers;
-//      
-//      foreach ($enabledComponents as $component) {
-//          switch ($component) {
-//              case 'CiviEvent': => ts('CiviEvent'),
-//              'Participants' => ts('Participants'),
-//              'CiviContribute' => ts('CiviContribute'),
-//              'CiviMember' => ts('CiviMember'),
-//              'CiviMail' => ts('CiviMail'),
-//              'CiviReport' => ts('CiviReport'),
-//              'CiviPledge' => ts('CiviPledge'),
-//              'CiviCase' => ts('CiviCase'),
-//              'CiviCampaign' => ts('CiviCampaign'),
-//              'CiviGrant' => ts('CiviGrant')
-//          }
-//      }
+    $providers = array(
+      'Contact' => ts('Contacts'),
+      'Relationship' => ts('Relationships'),
+      'Activity' => ts('Activities'),
+      'Note' => ts('Notes'),
+      'Group' => ts('Groups'),
+      'Case' => ts('Cases'),
+      'Contribution' => ts('Contributions'),
+      'Participant' => ts('Participants'),
+      'Grant' => ts('Grants'),
+      'Membership' => ts('Memberships'),
+      'Pledge' => ts('Pledges'),
+      'Event' => ts('Events'),
+      'Campaign' => ts('Campaigns'),
+    );
 
-      return $providers;
+    return $providers;
   }
+
 }
