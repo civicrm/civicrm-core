@@ -70,14 +70,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
   }
 
-  public function testGetUnclosedCases() {
-    $params = array(
-      'case_type' => 'ousing Suppor',
-    );
-    $cases = CRM_Case_BAO_Case::getUnclosedCases($params);
-    $this->assertEquals('Housing Support', $cases[1]['case_type']);
-  }
-
   public function testGetContactCases() {
     $cases = CRM_Case_BAO_Case::getContactCases(3);
     $this->assertEquals('Housing Support', $cases[1]['case_type']);
