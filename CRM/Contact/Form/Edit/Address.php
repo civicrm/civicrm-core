@@ -75,6 +75,7 @@ class CRM_Contact_Form_Edit_Address {
     $form->addSelect("address[$blockId][location_type_id]", array(
         'entity' => 'address',
         'class' => 'eight',
+        'option_url' => NULL,
       ) + $js, $inlineEdit);
 
     if (!$inlineEdit) {
