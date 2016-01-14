@@ -43,6 +43,13 @@ function civicrm_api3_case_contact_create($params) {
 }
 
 /**
+ * @param array $fields
+ */
+function _civicrm_api3_case_contact_create_spec(&$fields) {
+  $fields['contact_id']['api.required'] = $fields['case_id']['api.required'] = 1;
+}
+
+/**
  * Get a CaseContact.
  *
  * @param array $params
