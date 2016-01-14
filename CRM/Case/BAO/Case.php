@@ -79,33 +79,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Given the list of params in the params array, fetch the object
-   * and store the values in the values array.
-   *
-   * @param array $params
-   *   Input parameters to find object.
-   * @param array $values
-   *   Output values of the object.
-   * @param array $ids
-   *   The array that holds all the db ids.
-   *
-   * @return CRM_Case_BAO_Case|null
-   *   The found object or null
-   */
-  public static function &getValues(&$params, &$values, &$ids) {
-    $case = new CRM_Case_BAO_Case();
-
-    $case->copyValues($params);
-
-    if ($case->find(TRUE)) {
-      $ids['case'] = $case->id;
-      CRM_Core_DAO::storeValues($case, $values);
-      return $case;
-    }
-    return NULL;
-  }
-
-  /**
    * Takes an associative array and creates a case object.
    *
    * @param array $params
@@ -146,62 +119,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
     //we are not creating log for case
     //since case log can be tracked using log for activity.
-    return $case;
-  }
-
-
-  /**
-   * Convert associative array names to values and vice-versa.
-   *
-   * This function is used by both the web form layer and the api. Note that
-   * the api needs the name => value conversion, also the view layer typically
-   * requires value => name conversion
-   *
-   * @param array $defaults
-   * @param string $property
-   * @param array $lookup
-   * @param bool $reverse
-   *
-   * @return bool
-   */
-  public static function lookupValue(&$defaults, $property, &$lookup, $reverse) {
-    $id = $property . '_id';
-
-    $src = $reverse ? $property : $id;
-    $dst = $reverse ? $id : $property;
-
-    if (!array_key_exists($src, $defaults)) {
-      return FALSE;
-    }
-
-    $look = $reverse ? array_flip($lookup) : $lookup;
-
-    if (is_array($look)) {
-      if (!array_key_exists($defaults[$src], $look)) {
-        return FALSE;
-      }
-    }
-    $defaults[$dst] = $look[$defaults[$src]];
-    return TRUE;
-  }
-
-  /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $defaults
-   *   (reference ) an assoc array to hold the name / value pairs.
-   *                        in a hierarchical manner
-   * @param array $ids
-   *   (reference) the array that holds all the db ids.
-   *
-   * @return CRM_Case_BAO_Case
-   */
-  public static function retrieve(&$params, &$defaults, &$ids) {
-    $case = CRM_Case_BAO_Case::getValues($params, $defaults, $ids);
     return $case;
   }
 
@@ -337,18 +254,6 @@ WHERE civicrm_case.id = %1";
         }
       }
     }
-  }
-
-  /**
-   * Delete the activities related to case.
-   *
-   * @param int $activityId
-   *   Id of the activity.
-   */
-  public static function deleteCaseActivity($activityId) {
-    $case = new CRM_Case_DAO_CaseActivity();
-    $case->activity_id = $activityId;
-    $case->delete();
   }
 
   /**
@@ -1991,95 +1896,6 @@ SELECT civicrm_contact.id as casemanager_id,
     }
 
     return $caseManagerContact;
-  }
-
-  /**
-   * Get all cases with no end dates.
-   *
-   * @param array $params
-   * @param array $excludeCaseIds
-   * @param bool $excludeDeleted
-   *
-   * @param bool $includeClosed
-   *
-   * @return array
-   *   Case and related data keyed on case id
-   */
-  public static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE, $includeClosed = FALSE) {
-    //params from ajax call.
-    $where = array($includeClosed ? '(1)' : '(ca.end_date is null)');
-    if ($caseType = CRM_Utils_Array::value('case_type', $params)) {
-      $where[] = "( civicrm_case_type.title LIKE '%$caseType%' )";
-    }
-    if ($sortName = CRM_Utils_Array::value('sort_name', $params)) {
-      $config = CRM_Core_Config::singleton();
-      $search = ($config->includeWildCardInName) ? "%$sortName%" : "$sortName%";
-      $where[] = "( sort_name LIKE '$search' )";
-    }
-    if ($cid = CRM_Utils_Array::value('contact_id', $params)) {
-      $where[] = " c.id = $cid ";
-    }
-    if (is_array($excludeCaseIds) &&
-      !CRM_Utils_System::isNull($excludeCaseIds)
-    ) {
-      $where[] = ' ( ca.id NOT IN ( ' . implode(',', $excludeCaseIds) . ' ) ) ';
-    }
-    if ($excludeDeleted) {
-      $where[] = ' ( ca.is_deleted = 0 OR ca.is_deleted IS NULL ) ';
-    }
-
-    //filter for permissioned cases.
-    $filterCases = array();
-    $doFilterCases = FALSE;
-    if (!CRM_Core_Permission::check('access all cases and activities')) {
-      $doFilterCases = TRUE;
-      $session = CRM_Core_Session::singleton();
-      $filterCases = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'));
-    }
-    $whereClause = implode(' AND ', $where);
-
-    $limitClause = '';
-    if ($limit = CRM_Utils_Array::value('limit', $params)) {
-      $limitClause = "LIMIT 0, $limit";
-    }
-
-    $query = "
-    SELECT  c.id as contact_id,
-            c.sort_name,
-            ca.id,
-            ca.subject as case_subject,
-            civicrm_case_type.title as case_type,
-            ca.start_date as start_date,
-            ca.end_date as end_date,
-            ca.status_id
-      FROM  civicrm_case ca INNER JOIN civicrm_case_contact cc ON ca.id=cc.case_id
- INNER JOIN  civicrm_contact c ON cc.contact_id=c.id
- INNER JOIN  civicrm_case_type ON ca.case_type_id = civicrm_case_type.id
-     WHERE  {$whereClause}
-  ORDER BY  c.sort_name, ca.end_date
-            {$limitClause}
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $statuses = CRM_Case_BAO_Case::buildOptions('status_id', 'create');
-
-    $unclosedCases = array();
-    while ($dao->fetch()) {
-      if ($doFilterCases && !array_key_exists($dao->id, $filterCases)) {
-        continue;
-      }
-      $unclosedCases[$dao->id] = array(
-        'sort_name' => $dao->sort_name,
-        'case_type' => $dao->case_type,
-        'contact_id' => $dao->contact_id,
-        'start_date' => $dao->start_date,
-        'end_date' => $dao->end_date,
-        'case_subject' => $dao->case_subject,
-        'case_status' => $statuses[$dao->status_id],
-      );
-    }
-    $dao->free();
-
-    return $unclosedCases;
   }
 
   /**
