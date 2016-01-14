@@ -1905,79 +1905,14 @@ SELECT civicrm_contact.id as casemanager_id,
    * @return null|string
    */
   public static function caseCount($contactId = NULL, $excludeDeleted = TRUE) {
-    $whereConditions = array();
+    $params = array('check_permissions' => TRUE);
     if ($excludeDeleted) {
-      $whereConditions[] = "( civicrm_case.is_deleted = 0 OR civicrm_case.is_deleted IS NULL )";
+      $params['is_deleted'] = 0;
     }
     if ($contactId) {
-      $whereConditions[] = "civicrm_case_contact.contact_id = {$contactId}";
+      $params['contact_id'] = $contactId;
     }
-    if (!CRM_Core_Permission::check('access all cases and activities')) {
-      static $accessibleCaseIds;
-      if (!is_array($accessibleCaseIds)) {
-        $session = CRM_Core_Session::singleton();
-        $accessibleCaseIds = array_keys(self::getCases(FALSE, $session->get('userID'), 'any'));
-      }
-      //no need of further processing.
-      if (empty($accessibleCaseIds)) {
-        return 0;
-      }
-      $whereConditions[] = "( civicrm_case.id in (" . implode(',', $accessibleCaseIds) . ") )";
-    }
-
-    $whereClause = '';
-    if (!empty($whereConditions)) {
-      $whereClause = "WHERE " . implode(' AND ', $whereConditions);
-    }
-
-    $query = "
-   SELECT  count( civicrm_case.id )
-     FROM  civicrm_case
-LEFT JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case_id )
-           {$whereClause}";
-
-    return CRM_Core_DAO::singleValueQuery($query);
-  }
-
-  /**
-   * Retrieve cases related to particular contact.
-   *
-   * @param int $contactId
-   *   Contact id.
-   * @param bool $excludeDeleted
-   *   Do not include deleted cases.
-   *
-   * @return array
-   */
-  public static function getContactCases($contactId, $excludeDeleted = TRUE) {
-    $cases = array();
-    if (!$contactId) {
-      return $cases;
-    }
-
-    $whereClause = "civicrm_case_contact.contact_id = %1";
-    if ($excludeDeleted) {
-      $whereClause .= " AND ( civicrm_case.is_deleted = 0 OR civicrm_case.is_deleted IS NULL )";
-    }
-
-    $query = "
-    SELECT  civicrm_case.id, civicrm_case_type.title as case_type, civicrm_case.start_date
-      FROM  civicrm_case
-INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case_id )
- LEFT JOIN  civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
-     WHERE  {$whereClause}";
-
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($contactId, 'Integer')));
-    while ($dao->fetch()) {
-      $cases[$dao->id] = array(
-        'case_id' => $dao->id,
-        'case_type' => $dao->case_type,
-        'case_start_date' => $dao->start_date,
-      );
-    }
-    $dao->free();
-
-    return $cases;
+    return civicrm_api3('Case', 'getcount', $params);
   }
 
   /**
@@ -2609,6 +2544,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       static $caseCount;
       if (!isset($caseCount)) {
         $caseCount = civicrm_api3('Case', 'getcount', array(
+          'check_permissions' => TRUE,
           'status_id' => array('!=' => 'Closed'),
           'is_deleted' => 0,
           'end_date' => array('IS NULL' => 1),
@@ -2858,8 +2794,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     if ($denyClosed && !CRM_Core_Permission::check('access all cases and activities')) {
       $params['status_id'] = array('!=' => 'Closed');
     }
-    $result = civicrm_api3('Case', 'getcount', $params);
-    return (bool) $result['result'];
+    return (bool) civicrm_api3('Case', 'getcount', $params);
   }
 
   /**

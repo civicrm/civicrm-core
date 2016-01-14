@@ -66,41 +66,24 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       return;
     }
 
-    //check for civicase access.
-    if (!CRM_Case_BAO_Case::accessCiviCase()) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
-    }
     $this->_hasAccessToAllCases = CRM_Core_Permission::check('access all cases and activities');
     $this->assign('hasAccessToAllCases', $this->_hasAccessToAllCases);
 
-    $this->_contactID = $this->get('cid');
-    $this->_caseID = $this->get('id');
+    $this->assign('contactID', $this->_contactID = (int) $this->get('cid'));
+    $this->assign('caseID', $this->_caseID = (int) $this->get('id'));
+
+    // Access check.
+    if (!CRM_Case_BAO_Case::accessCase($this->_caseID, FALSE)) {
+      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+    }
 
     $fulltext = CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject);
     if ($fulltext == 'fulltext') {
       $this->assign('fulltext', $fulltext);
     }
 
-    $this->assign('caseID', $this->_caseID);
-    $this->assign('contactID', $this->_contactID);
     $this->assign('contactType', CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type'));
-
-    //validate case id.
-    $this->_userCases = array();
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-    if (!$this->_hasAccessToAllCases) {
-      $this->_userCases = CRM_Case_BAO_Case::getCases(FALSE, $userID, 'any');
-      if (!array_key_exists($this->_caseID, $this->_userCases)) {
-        CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
-      }
-    }
-    $this->assign('userID', $userID);
-
-    if (CRM_Case_BAO_Case::caseCount($this->_contactID) >= 2) {
-      $this->_mergeCases = TRUE;
-    }
-    $this->assign('mergeCases', $this->_mergeCases);
+    $this->assign('userID', CRM_Core_Session::getLoggedInContactID());
 
     //retrieve details about case
     $params = array('id' => $this->_caseID);
@@ -244,6 +227,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $linkActTypeId = array_search('Link Cases', $allActTypes);
     if ($linkActTypeId) {
       $count = civicrm_api3('Case', 'getcount', array(
+        'check_permissions' => TRUE,
         'id' => array('!=' => $this->_caseID),
         'is_deleted' => 0,
       ));
@@ -293,43 +277,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
     $this->addElement('submit', $this->getButtonName('next'), ' ', array('class' => 'hiddenElement'));
 
-    if ($this->_mergeCases) {
-      $allCases = CRM_Case_BAO_Case::getContactCases($this->_contactID);
-      $otherCases = array();
-      foreach ($allCases as $caseId => $details) {
-        //filter current and own cases.
-        if (($caseId == $this->_caseID) ||
-          (!$this->_hasAccessToAllCases &&
-            !array_key_exists($caseId, $this->_userCases)
-          )
-        ) {
-          continue;
-        }
-
-        $otherCases[$caseId] = 'Case ID: ' . $caseId . ' Type: ' . $details['case_type'] . ' Start: ' . $details['case_start_date'];
-      }
-      if (empty($otherCases)) {
-        $this->_mergeCases = FALSE;
-        $this->assign('mergeCases', $this->_mergeCases);
-      }
-      else {
-        $this->add('select', 'merge_case_id',
-          ts('Select Case for Merge'),
-          array(
-            '' => ts('- select case -'),
-          ) + $otherCases,
-          FALSE,
-          array('class' => 'crm-select2 huge')
-        );
-        $this->addElement('submit',
-          $this->getButtonName('next', 'merge_case'),
-          ts('Merge'),
-          array(
-            'class' => 'hiddenElement',
-          )
-        );
-      }
-    }
+    $this->buildMergeCaseForm();
 
     //call activity form
     self::activityForm($this, $aTypes);
@@ -535,6 +483,43 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), '', FALSE, array('id' => 'activity_deleted_' . $form->_caseID));
+    }
+  }
+
+  /**
+   * Form elements for merging cases
+   */
+  public function buildMergeCaseForm() {
+    $otherCases = array();
+    $result = civicrm_api3('Case', 'get', array(
+      'check_permissions' => TRUE,
+      'contact_id' => $this->_contactID,
+      'is_deleted' => 0,
+      'id' => array('!=' => $this->_caseID),
+      'return' => array('id', 'start_date', 'case_type_id.title'),
+    ));
+    foreach ($result['values'] as $id => $case) {
+      $otherCases[$id] = "#$id: {$case['case_type_id.title']} " . ts('(opened %1)', array(1 => $case['start_date']));
+    }
+
+    $this->assign('mergeCases', $this->_mergeCases = (bool) $otherCases);
+
+    if ($otherCases) {
+      $this->add('select', 'merge_case_id',
+        ts('Select Case for Merge'),
+        array(
+          '' => ts('- select case -'),
+        ) + $otherCases,
+        FALSE,
+        array('class' => 'crm-select2 huge')
+      );
+      $this->addElement('submit',
+        $this->getButtonName('next', 'merge_case'),
+        ts('Merge'),
+        array(
+          'class' => 'hiddenElement',
+        )
+      );
     }
   }
 

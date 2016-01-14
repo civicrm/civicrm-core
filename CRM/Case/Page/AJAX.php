@@ -105,8 +105,11 @@ class CRM_Case_Page_AJAX {
   public function caseDetails() {
     $caseId = CRM_Utils_Type::escape($_GET['caseId'], 'Positive');
 
-    $case = civicrm_api3('Case', 'getsingle',
-      array('id' => $caseId, 'return' => array('subject', 'case_type_id', 'status_id', 'start_date', 'end_date')));
+    $case = civicrm_api3('Case', 'getsingle', array(
+      'id' => $caseId,
+      'check_permissions' => TRUE,
+      'return' => array('subject', 'case_type_id', 'status_id', 'start_date', 'end_date'))
+    );
 
     $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
     $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
