@@ -54,6 +54,7 @@ class CRM_Utils_Recent {
    * @var int
    */
   static private $_maxItems = 20;
+
   /**
    * Initialize this class and set the static variables.
    */
@@ -249,4 +250,5 @@ class CRM_Utils_Recent {
 
     return $providers;
   }
+
 }
