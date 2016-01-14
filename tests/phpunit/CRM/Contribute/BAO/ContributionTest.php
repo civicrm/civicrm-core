@@ -649,7 +649,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * checks db values for financial item
    */
-  public function checkItemValues($contribution) {                                                               
+  public function checkItemValues($contribution) {
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
     $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType(4, $relationTypeId);
     $query = "SELECT eft1.entity_id, ft.total_amount, eft1.amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') 
@@ -697,7 +697,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     require_once 'CiviTest/Event.php';
     $this->_contactId = Contact::createIndividual();
     $this->_eventId = Event::create($this->_contactId);
-    $paramsSet['title'] = 'Price Set'. substr(sha1(rand()), 0, 4);
+    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 4);
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 4;
