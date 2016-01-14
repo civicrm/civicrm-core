@@ -250,13 +250,19 @@ function civicrm_api3_case_get($params) {
 
   $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case', $sql);
 
-  // For historic reasons we return these by default only when fetching a case by id
-  if (!empty($params['id']) && empty($options['return'])) {
-    $options['return'] = array('contacts' => 1, 'activities' => 1, 'contact_id' => 1);
-  }
+  if (empty($options['is_count'])) {
+    // For historic reasons we return these by default only when fetching a case by id
+    if (!empty($params['id']) && empty($options['return'])) {
+      $options['return'] = array(
+        'contacts' => 1,
+        'activities' => 1,
+        'contact_id' => 1,
+      );
+    }
 
-  foreach ($foundcases['values'] as &$case) {
-    _civicrm_api3_case_read($case, $options);
+    foreach ($foundcases['values'] as &$case) {
+      _civicrm_api3_case_read($case, $options);
+    }
   }
 
   return $foundcases;

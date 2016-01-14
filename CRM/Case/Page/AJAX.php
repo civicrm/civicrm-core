@@ -38,33 +38,6 @@
 class CRM_Case_Page_AJAX {
 
   /**
-   * Retrieve unclosed cases.
-   */
-  public static function unclosedCases() {
-    $params = array(
-      'limit' => Civi::settings()->get('search_autocomplete_count'),
-      'sort_name' => CRM_Utils_Type::escape(CRM_Utils_Array::value('term', $_GET, ''), 'String'),
-    );
-
-    $excludeCaseIds = array();
-    if (!empty($_GET['excludeCaseIds'])) {
-      $excludeCaseIds = explode(',', CRM_Utils_Type::escape($_GET['excludeCaseIds'], 'String'));
-    }
-    $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds, TRUE, TRUE);
-    $results = array();
-    foreach ($unclosedCases as $caseId => $details) {
-      $results[] = array(
-        'id' => $caseId,
-        'label' => $details['sort_name'] . ' - ' . $details['case_type'] . ($details['end_date'] ? ' (' . ts('closed') . ')' : ''),
-        'label_class' => $details['end_date'] ? 'strikethrough' : '',
-        'description' => array("#$caseId: " . $details['case_subject'] . ' (' . $details['case_status'] . ')'),
-        'extra' => $details,
-      );
-    }
-    CRM_Utils_JSON::output($results);
-  }
-
-  /**
    * @throws \CRM_Core_Exception
    */
   public function processCaseTags() {
