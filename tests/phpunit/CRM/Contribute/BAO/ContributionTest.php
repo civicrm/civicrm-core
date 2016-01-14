@@ -660,10 +660,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $queryParams[2] = array($toFinancialAccount, 'Integer');
 
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
-    $amounts = array(1 => 50.00, 2 => 100.00);
+    $amounts = array(100.00, 50.00);
     while ($dao->fetch()) {
       $this->assertEquals(150.00, $dao->total_amount, 'Mismatch of total amount paid.');
-      $this->assertEquals($dao->amount, $amounts[$dao->entity_id], 'Mismatch of amount proportionally assigned to financial item');
+      $this->assertEquals($dao->amount, array_pop($amounts), 'Mismatch of amount proportionally assigned to financial item');
     }
 
     Contact::delete($this->_contactId);
@@ -697,8 +697,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     require_once 'CiviTest/Event.php';
     $this->_contactId = Contact::createIndividual();
     $this->_eventId = Event::create($this->_contactId);
-    $paramsSet['title'] = 'Price Set';
-    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
+    $paramsSet['title'] = 'Price Set'. substr(sha1(rand()), 0, 4);
+    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 4;
     $paramsSet['extends'] = 1;
