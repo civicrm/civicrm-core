@@ -832,7 +832,7 @@ return array(
     'html_type' => 'text',
     'html_attributes' => array(
       'size' => 2,
-      'maxlength' => 3
+      'maxlength' => 3,
     ),
     'default' => 20,
     'add' => '4.7',
@@ -861,7 +861,7 @@ return array(
     'description' => 'What providers may save views in CiviCRM\'s "Recently viewed" list. If empty, all are in.',
     'help_text' => NULL,
     'pseudoconstant' => array(
-      'callback' => 'CRM_Utils_Recent::getProviders'
+      'callback' => 'CRM_Utils_Recent::getProviders',
     ),
   ),
 );
