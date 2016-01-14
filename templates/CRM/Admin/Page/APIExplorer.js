@@ -94,6 +94,9 @@
    * @returns {*}
    */
   function getField(name) {
+    if (!name) {
+      return {};
+    }
     if (getFieldData[name]) {
       return getFieldData[name];
     }
