@@ -445,6 +445,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ActivityType',
       'MailingEventConfirm',
       'Case',
+      'CaseContact',
       'Contact',
       'ContactType',
       'MailingEventResubscribe',
