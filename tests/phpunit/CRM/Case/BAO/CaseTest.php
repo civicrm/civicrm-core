@@ -70,11 +70,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
   }
 
-  public function testGetContactCases() {
-    $cases = CRM_Case_BAO_Case::getContactCases(3);
-    $this->assertEquals('Housing Support', $cases[1]['case_type']);
-  }
-
   /* FIXME: requires activities
    * function testGetRelatedCases() {
    * }
