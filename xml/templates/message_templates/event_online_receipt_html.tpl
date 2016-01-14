@@ -31,7 +31,12 @@
      <p>{$event.confirm_email_text|htmlize}</p>
 
     {else}
-  <p>{ts}Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to {/ts}<strong>{if $participant_status}{$participant_status}{else}{if $isOnWaitlist}{ts}waitlisted{/ts}{else}{ts}registered{/ts}{/if}{/if}</strong>.</p>
+  <p>{if $participant_status}
+  {ts}Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to {$participant_status}.{/ts}
+  {else}{if $isOnWaitlist}
+  {ts}Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to waitlisted.{/ts}
+  {else}
+  {ts}Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to registered.{/ts}{/if}{/if}</p>
 
     {/if}
 
