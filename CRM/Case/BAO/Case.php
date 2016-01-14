@@ -2790,15 +2790,19 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     );
 
     if (in_array($operation, $caseActOperations)) {
-      static $unclosedCases;
-      if (!is_array($unclosedCases)) {
-        $unclosedCases = self::getUnclosedCases();
+      static $caseCount;
+      if (!isset($caseCount)) {
+        $caseCount = civicrm_api3('Case', 'getcount', array(
+          'status_id' => array('!=' => 'Closed'),
+          'is_deleted' => 0,
+          'end_date' => array('IS NULL' => 1),
+        ));
       }
       if ($operation == 'File On Case') {
-        $allow = (empty($unclosedCases)) ? FALSE : TRUE;
+        $allow = !empty($caseCount);
       }
       else {
-        $allow = (count($unclosedCases) > 1) ? TRUE : FALSE;
+        $allow = ($caseCount > 1);
       }
     }
 

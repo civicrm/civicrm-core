@@ -240,10 +240,16 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       unset($aTypes[$openActTypeId]);
     }
 
-    //check for link cases.
-    $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases(NULL, array($this->_caseID));
-    if (empty($unclosedCases) && ($linkActTypeId = array_search('Link Cases', $allActTypes))) {
-      unset($aTypes[$linkActTypeId]);
+    // Only show "link cases" activity if other cases exist.
+    $linkActTypeId = array_search('Link Cases', $allActTypes);
+    if ($linkActTypeId) {
+      $count = civicrm_api3('Case', 'getcount', array(
+        'id' => array('!=' => $this->_caseID),
+        'is_deleted' => 0,
+      ));
+      if (!$count) {
+        unset($aTypes[$linkActTypeId]);
+      }
     }
 
     if (!$xmlProcessor->getNaturalActivityTypeSort()) {

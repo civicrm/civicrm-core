@@ -91,10 +91,10 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
     $caseSubclauses = array();
     $caseBao = new CRM_Case_BAO_Case();
     foreach ($caseBao->apiWhereClause() as $field => $fieldClauses) {
-      if ($field == 'id') {
+      if ($field == 'id' && $fieldClauses) {
         $clauses['case_id'] = array_merge($clauses['case_id'], (array) $fieldClauses);
       }
-      else {
+      elseif ($fieldClauses) {
         $caseSubclauses[] = "$field " . implode(" AND $field ", (array) $fieldClauses);
       }
     }
