@@ -84,9 +84,9 @@ You will need to manually delete that user (click on the link to open the %1 use
 
   <tr>
     <td>Last modified</td>
-    <td>{$other_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} (Most recent) {/if}</td>
+    <td>{$other_result.values.0.modified_date|crmDate} {if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} (Most recent) {/if}</td>
     <td></td>
-    <td>{$main_result.values.0.modified_date|date_format:"%d/%m/%y %H:%M:%S"} {if $main_result.values.0.modified_date gt $other_result.values.0.modified_date} (Most recent) {/if}</td>
+    <td>{$main_result.values.0.modified_date|crmDate} {if $main_result.values.0.modified_date gt $other_result.values.0.modified_date} (Most recent) {/if}</td>
     <td></td>
   </tr>
 
