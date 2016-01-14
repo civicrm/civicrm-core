@@ -569,7 +569,7 @@ AND li.entity_id = {$entityId}
   /**
    * Update line item array.
    *
-   * @param array $lineItemId
+   * @param array $lineItems
    *   An assoc array of lineItem.
    *
    * @param Int $contributionId
@@ -582,7 +582,7 @@ AND li.entity_id = {$entityId}
     }
     // get previous line item for contribution
     $oldLineItems = self::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
-    foreach ($lineItems as &$items) {    
+    foreach ($lineItems as &$items) {
       foreach ($items as &$lineItem) {
         $itemId = CRM_Utils_Array::value('id', $lineItem);
         if ($itemId) {
@@ -595,7 +595,7 @@ AND li.entity_id = {$entityId}
       }
       foreach ($oldLineItems as $oldkey => &$oldvalue) {
         $oldvalue['id'] = $oldkey;
-        $oldvalue['diff_amount'] = - $oldvalue['line_total'];
+        $oldvalue['diff_amount'] = -$oldvalue['line_total'];
         $oldvalue['qty'] = 0;
       }
       $items = array_merge($items, $oldLineItems);
