@@ -2467,14 +2467,14 @@ SELECT contact_id
    * @return array
    */
   public function apiWhereClause() {
+    $clauses = array();
     $fields = $this->fields();
     $cidField = CRM_Utils_Array::value('contact_id', $fields);
     if (CRM_Utils_Array::value('FKClassName', $cidField) == 'CRM_Contact_DAO_Contact') {
-      return array(
-        'contact_id' => CRM_Contact_BAO_Contact_Permission::cacheSubquery(),
-      );
+      $clauses['contact_id'] = CRM_Contact_BAO_Contact_Permission::cacheSubquery();
     }
-    return array();
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
   /**
