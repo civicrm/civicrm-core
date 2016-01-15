@@ -36,9 +36,10 @@
  * This class contains the functions that are called using AJAX (jQuery)
  */
 class CRM_Custom_Page_AJAX {
+
   /**
-   * Get list of options.
-   *
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    */
   public static function getOptionList() {
     $params = $_REQUEST;
