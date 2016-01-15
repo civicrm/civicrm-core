@@ -6,3 +6,7 @@ UPDATE civicrm_membership_block cmb JOIN civicrm_price_set_entity cpse ON cmb.en
 -- CRM-17429 - Old contributions may be using this payment processor type, so we'll disable rather than delete it for existing installs:
 UPDATE civicrm_payment_processor_type SET is_active = 0 WHERE name = 'Google_Checkout';
 UPDATE civicrm_payment_processor pp, civicrm_payment_processor_type ppt SET pp.is_active = 0 WHERE pp.payment_processor_type_id = ppt.id AND ppt.name = 'Google_Checkout';
+
+-- CRM-17815
+{include file='../CRM/Upgrade/4.7.beta8.msg_template/civicrm_msg_template.tpl'}
+
