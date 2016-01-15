@@ -373,7 +373,7 @@ function _civicrm_api3_get_DAO($name) {
 }
 
 /**
- * Return the DAO of the function or Entity.
+ * Return the BAO name of the function or Entity.
  *
  * @param string $name
  *   Is either a function of the api (civicrm_{entity}_create or the entity name.
