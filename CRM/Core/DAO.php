@@ -2477,4 +2477,23 @@ SELECT contact_id
     return array();
   }
 
+  /**
+   * @param string $tableAlias
+   * @return array
+   */
+  public static function getAclClause($tableAlias = NULL) {
+    $bao = new static();
+    if ($tableAlias === NULL) {
+      $tableAlias = $bao->tableName();
+    }
+    $clauses = array();
+    foreach ((array) $bao->apiWhereClause() as $field => $vals) {
+      $clauses[$field] = NULL;
+      if ($vals) {
+        $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+      }
+    }
+    return $clauses;
+  }
+
 }

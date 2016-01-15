@@ -232,6 +232,11 @@ class CRM_Case_BAO_Query {
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }
+    // Add acl clause
+    $aclClauses = array_filter(CRM_Case_BAO_Case::getAclClause());
+    foreach ($aclClauses as $clause) {
+      $query->_where[0][] = $clause;
+    }
   }
 
   /**
@@ -702,7 +707,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_case', NULL, TRUE, FALSE);
 
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
+    if (CRM_Core_Permission::check('administer CiviCase')) {
       $form->addElement('checkbox', 'case_deleted', ts('Deleted Cases'));
     }
 
