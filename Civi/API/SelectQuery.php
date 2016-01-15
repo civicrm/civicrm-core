@@ -42,12 +42,10 @@ use Civi\API\Exception\UnauthorizedException;
  */
 class SelectQuery {
 
-  const MAX_JOINS = 4;
+  const
+    MAX_JOINS = 4,
+    MAIN_TABLE_ALIAS = 'a';
 
-  /**
-   * @var \CRM_Core_DAO
-   */
-  protected $bao;
   /**
    * @var string
    */
@@ -86,31 +84,32 @@ class SelectQuery {
   protected $checkPermissions;
 
   /**
-   * @param string $bao_name
+   * @param string $baoName
    *   Name of BAO
    * @param array $params
    *   As passed into api get function.
    * @param bool $isFillUniqueFields
    *   Do we need to ensure unique fields continue to be populated for this api? (backward compatibility).
    */
-  public function __construct($bao_name, $params, $isFillUniqueFields) {
-    $this->bao = new $bao_name();
-    $this->entity = _civicrm_api_get_entity_name_from_dao($this->bao);
+  public function __construct($baoName, $params, $isFillUniqueFields) {
+    $bao = new $baoName();
+    $this->entity = _civicrm_api_get_entity_name_from_dao($bao);
     $this->params = $params;
     $this->isFillUniqueFields = $isFillUniqueFields;
     $this->checkPermissions = \CRM_Utils_Array::value('check_permissions', $this->params, FALSE);
     $this->options = _civicrm_api3_get_options_from_params($this->params);
 
-    $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($this->bao));
+    $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($bao));
     // Call this function directly instead of using the api wrapper to force unique field names off
     require_once 'api/v3/Generic.php';
     $apiSpec = \civicrm_api3_generic_getfields(array('entity' => $this->entity, 'version' => 3, 'params' => array('action' => 'get')), FALSE);
     $this->apiFieldSpec = $apiSpec['values'];
 
-    $this->query = \CRM_Utils_SQL_Select::from($this->bao->tableName() . " a");
+    $this->query = \CRM_Utils_SQL_Select::from($bao->tableName() . ' ' . self::MAIN_TABLE_ALIAS);
+    $bao->free();
 
-    // Add ACLs
-    $this->query->where($this->getAclClause('a'));
+    // Add ACLs first to avoid redundant subclauses
+    $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
   }
 
   /**
@@ -134,8 +133,7 @@ class SelectQuery {
       if ($include) {
         $field = $this->getField($field_name);
         if ($field && in_array($field['name'], $this->entityFieldNames)) {
-          // 'a.' is an alias for the entity table.
-          $select_fields["a.{$field['name']}"] = $field['name'];
+          $select_fields[self::MAIN_TABLE_ALIAS . ".{$field['name']}"] = $field['name'];
         }
         elseif ($include && strpos($field_name, '.')) {
           $fkField = $this->addFkField($field_name);
@@ -174,7 +172,7 @@ class SelectQuery {
       }
     }
     // Always select the ID.
-    $select_fields["a.id"] = "id";
+    $select_fields[self::MAIN_TABLE_ALIAS . ".id"] = "id";
 
     // populate where_clauses
     foreach ($this->params as $key => $value) {
@@ -203,14 +201,13 @@ class SelectQuery {
           }
 
           if ($filterKey == 'is_current' || $filterKey == 'isCurrent') {
-            // Is current is almost worth creating as a 'sql filter' in the DAO function since several entities have the
-            // concept.
+            // Is current is almost worth creating as a 'sql filter' in the DAO function since several entities have the concept.
             $todayStart = date('Ymd000000', strtotime('now'));
             $todayEnd = date('Ymd235959', strtotime('now'));
-            $this->query->where(array("(a.start_date <= '$todayStart' OR a.start_date IS NULL) AND (a.end_date >= '$todayEnd' OR
-          a.end_date IS NULL)
-          AND a.is_active = 1
-        "));
+            $a = self::MAIN_TABLE_ALIAS;
+            $this->query->where("($a.start_date <= '$todayStart' OR $a.start_date IS NULL)
+              AND ($a.end_date >= '$todayEnd' OR $a.end_date IS NULL)
+              AND a.is_active = 1");
           }
         }
       }
@@ -226,7 +223,7 @@ class SelectQuery {
         $key = $field['name'];
       }
       if (in_array($key, $this->entityFieldNames)) {
-        $table_name = 'a';
+        $table_name = self::MAIN_TABLE_ALIAS;
         $column_name = $key;
       }
       elseif (($cf_id = \CRM_Core_BAO_CustomField::getKeyID($key)) != FALSE) {
@@ -285,8 +282,6 @@ class SelectQuery {
       $this->query->limit($this->options['limit'], $this->options['offset']);
     }
 
-    $this->bao->free();
-
     $result_entities = array();
     $result_dao = \CRM_Core_DAO::executeQuery($this->query->toSQL());
 
@@ -344,7 +339,7 @@ class SelectQuery {
     if (count($stack) < 2) {
       return NULL;
     }
-    $prev = 'a';
+    $prev = self::MAIN_TABLE_ALIAS;
     foreach ($stack as $depth => $fieldName) {
       // Setup variables then skip the first level
       if (!$depth) {
@@ -385,7 +380,7 @@ class SelectQuery {
       $joinClause = "LEFT JOIN $fkTable $tableAlias ON $prev.$fk = $tableAlias.id";
 
       // Add acl condition
-      $joinCondition = $this->getAclClause($tableAlias, $fkField['FKClassName'], $subStack);
+      $joinCondition = $this->getAclClause($tableAlias, \_civicrm_api3_get_BAO($fkField['FKApiName']), $subStack);
       if ($joinCondition !== NULL) {
         $joinClause .= " AND $joinCondition";
       }
@@ -414,7 +409,7 @@ class SelectQuery {
    * @return array
    *   Returns the table and field name for adding this field to a SELECT or WHERE clause
    */
-  private function addCustomField($customField, $baseTable = 'a') {
+  private function addCustomField($customField, $baseTable = self::MAIN_TABLE_ALIAS) {
     $tableName = $customField["table_name"];
     $columnName = $customField["column_name"];
     $tableAlias = "{$baseTable}_to_$tableName";
@@ -509,20 +504,13 @@ class SelectQuery {
    * Get acl clause for an entity
    *
    * @param string $tableAlias
-   * @param string $daoName
+   * @param string $baoName
    * @param array $stack
    * @return null|string
    */
-  private function getAclClause($tableAlias, $daoName = NULL, $stack = array()) {
+  private function getAclClause($tableAlias, $baoName, $stack = array()) {
     if (!$this->checkPermissions) {
       return NULL;
-    }
-    if (!$daoName) {
-      $bao = $this->bao;
-    }
-    else {
-      $baoName = str_replace('_DAO_', '_BAO_', $daoName);
-      $bao = class_exists($baoName) ? new $baoName() : new $daoName();
     }
     // Prevent (most) redundant acl sub clauses if they have already been applied to the main entity.
     // FIXME: Currently this only works 1 level deep, but tracking through multiple joins would increase complexity
@@ -530,16 +518,13 @@ class SelectQuery {
     if (count($stack) === 1 && in_array($stack[0], $this->aclFields)) {
       return NULL;
     }
-    $clauses = array();
-    foreach ((array) $bao->apiWhereClause() as $field => $vals) {
-      if (!$stack) {
-        // Track field clauses added to the main entity
-        $this->aclFields[] = $field;
-      }
-      if ($vals) {
-        $clauses[] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
-      }
+    $clauses = $baoName::getAclClause($tableAlias);
+    if (!$stack) {
+      // Track field clauses added to the main entity
+      $this->aclFields = array_keys($clauses);
     }
+
+    $clauses = array_filter($clauses);
     return $clauses ? implode(' AND ', $clauses) : NULL;
   }
 
@@ -564,7 +549,7 @@ class SelectQuery {
         $direction = strtoupper(\CRM_Utils_Array::value(1, $words, '')) == 'DESC' ? ' DESC' : '';
         $field = $this->getField($words[0]);
         if ($field) {
-          $orderBy[] = 'a.' . $field['name'] . $direction;
+          $orderBy[] = self::MAIN_TABLE_ALIAS . '.' . $field['name'] . $direction;
         }
         elseif (strpos($words[0], '.')) {
           $join = $this->addFkField($words[0]);
