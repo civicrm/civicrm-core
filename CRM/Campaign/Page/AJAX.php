@@ -565,8 +565,8 @@ class CRM_Campaign_Page_AJAX {
   }
 
   /**
-   * Retrieve campaigns as for campaign dashboard.
-   *
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    */
   public function campaignList() {
     //get the search criteria params.
@@ -668,8 +668,8 @@ class CRM_Campaign_Page_AJAX {
   }
 
   /**
-   * Retrieve survey for survey dashboard.
-   *
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    */
   public function surveyList() {
     //get the search criteria params.
@@ -773,8 +773,8 @@ class CRM_Campaign_Page_AJAX {
   }
 
   /**
-   * Retrieve petitions for petition dashboard.
-   *
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    */
   public function petitionList() {
     //get the search criteria params.
