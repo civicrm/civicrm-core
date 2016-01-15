@@ -3428,7 +3428,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   /**
    * @inheritDoc
    */
-  public function apiWhereClause() {
+  public function addSelectWhereClause() {
     $clauses = array(
       'id' => CRM_Contact_BAO_Contact_Permission::cacheSubquery(),
     );

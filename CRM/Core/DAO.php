@@ -2453,7 +2453,7 @@ SELECT contact_id
   }
 
   /**
-   * Generates clauses suitable for adding to WHERE or ON when doing an api.get for this entity
+   * Generates acl clauses suitable for adding to WHERE or ON when doing an api.get for this entity
    *
    * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
    * @code
@@ -2466,7 +2466,7 @@ SELECT contact_id
    *
    * @return array
    */
-  public function apiWhereClause() {
+  public function addSelectWhereClause() {
     $clauses = array();
     $fields = $this->fields();
     $cidField = CRM_Utils_Array::value('contact_id', $fields);
@@ -2481,13 +2481,13 @@ SELECT contact_id
    * @param string $tableAlias
    * @return array
    */
-  public static function getAclClause($tableAlias = NULL) {
+  public static function getSelectWhereClause($tableAlias = NULL) {
     $bao = new static();
     if ($tableAlias === NULL) {
       $tableAlias = $bao->tableName();
     }
     $clauses = array();
-    foreach ((array) $bao->apiWhereClause() as $field => $vals) {
+    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
       $clauses[$field] = NULL;
       if ($vals) {
         $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
