@@ -2467,17 +2467,22 @@ SELECT contact_id
    * @return array
    */
   public function addSelectWhereClause() {
+    // This is the default fallback, and works for contact-related entities like Email, Relationship, etc.
     $clauses = array();
-    $fields = $this->fields();
-    $cidField = CRM_Utils_Array::value('contact_id', $fields);
-    if (CRM_Utils_Array::value('FKClassName', $cidField) == 'CRM_Contact_DAO_Contact') {
-      $clauses['contact_id'] = CRM_Contact_BAO_Contact_Permission::cacheSubquery();
+    foreach ($this->fields() as $fieldName => $field) {
+      if (strpos($fieldName, 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+        $clauses[$fieldName] = self::mergeSubquery('Contact');
+      }
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
   }
 
   /**
+   * This returns the final permissioned query string for this entity
+   *
+   * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
+   *
    * @param string $tableAlias
    * @return array
    */
@@ -2492,6 +2497,31 @@ SELECT contact_id
       if ($vals) {
         $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
       }
+    }
+    return $clauses;
+  }
+
+  /**
+   * Helper function for adding the permissioned subquery from one entity onto another
+   *
+   * @param string $entity
+   * @param string $joinColumn
+   * @return array
+   */
+  public static function mergeSubquery($entity, $joinColumn = 'id') {
+    $baoName = _civicrm_api3_get_BAO($entity);
+    $bao = new $baoName();
+    $clauses = $subclauses = array();
+    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+      if ($vals && $field == $joinColumn) {
+        $clauses = array_merge($clauses, (array) $vals);
+      }
+      elseif ($vals) {
+        $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);
+      }
+    }
+    if ($subclauses) {
+      $clauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subclauses) . ")";
     }
     return $clauses;
   }
