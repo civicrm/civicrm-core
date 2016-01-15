@@ -81,28 +81,13 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
    * @inheritDoc
    */
   public function addSelectWhereClause() {
-    // In order to make things easier for downstream developers, we reuse and adapt case acls here.
-    // This doesn't yield the most straightforward query, but hopefully the sql engine will sort it out.
-    $clauses = array(
+    return array(
+      // Reuse case acls
+      'case_id' => CRM_Core_DAO::mergeSubquery('Case'),
       // Case acls already check for contact access so we can just mark contact_id as handled
-      'contact_id' => NULL,
-      'case_id' => array(),
+      'contact_id' => array(),
     );
-    $caseSubclauses = array();
-    $caseBao = new CRM_Case_BAO_Case();
-    foreach ($caseBao->addSelectWhereClause() as $field => $fieldClauses) {
-      if ($field == 'id' && $fieldClauses) {
-        $clauses['case_id'] = array_merge($clauses['case_id'], (array) $fieldClauses);
-      }
-      elseif ($fieldClauses) {
-        $caseSubclauses[] = "$field " . implode(" AND $field ", (array) $fieldClauses);
-      }
-    }
-    if ($caseSubclauses) {
-      $clauses['case_id'][] = 'IN (SELECT id FROM civicrm_case WHERE ' . implode(' AND ', $caseSubclauses) . ')';
-    }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
-    return $clauses;
+    // Don't call hook selectWhereClause, the case query already did
   }
 
 }

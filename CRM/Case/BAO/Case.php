@@ -3122,18 +3122,20 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @inheritDoc
    */
   public function addSelectWhereClause() {
+    // We always return an array with these keys, even if they are empty,
+    // because this tells the query builder that we have considered these fields for acls
     $clauses = array(
       'id' => array(),
       // Only case admins can view deleted cases
-      'is_deleted' => CRM_Core_Permission::check('administer CiviCase') ? NULL : "= 0",
+      'is_deleted' => CRM_Core_Permission::check('administer CiviCase') ? array() : array("= 0"),
     );
     // Ensure the user has permission to view the case client
-    $contactClause = CRM_Contact_BAO_Contact_Permission::cacheSubquery();
+    $contactClause = CRM_Core_DAO::mergeSubquery('Contact');
     if ($contactClause) {
       $contactClause = implode(' AND contact_id ', $contactClause);
       $clauses['id'][] = "IN (SELECT case_id FROM civicrm_case_contact WHERE contact_id $contactClause)";
     }
-    // The api gatekeeper ensures the user has at least "access all cases and activities"
+    // The api gatekeeper ensures the user has at least "access my cases and activities"
     // so if they do not have permission to see all cases we'll assume they can only access their own
     if (!CRM_Core_Permission::check('access all cases and activities')) {
       $user = (int) CRM_Core_Session::getLoggedInContactID();
