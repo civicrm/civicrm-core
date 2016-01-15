@@ -490,6 +490,19 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * @param string|CRM_Core_DAO $entity
+   * @param array $clauses
+   * @return mixed
+   */
+  public static function selectWhereClause($entity, &$clauses) {
+    $entityName = is_object($entity) ? _civicrm_api_get_entity_name_from_dao($entity) : $entity;
+    return self::singleton()->invoke(2, $entityName, $clauses,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_selectWhereClause'
+    );
+  }
+
+  /**
    * This hook is called when building the menu table.
    *
    * @param array $files

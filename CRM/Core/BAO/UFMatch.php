@@ -638,7 +638,9 @@ AND    domain_id    = %4
    */
   public function apiWhereClause() {
     // Prevent default behavior of joining ACLs onto the contact_id field
-    return array();
+    $clauses = array();
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
 }
