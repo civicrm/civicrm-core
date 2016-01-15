@@ -233,7 +233,7 @@ class CRM_Case_BAO_Query {
       }
     }
     // Add acl clause
-    $aclClauses = array_filter(CRM_Case_BAO_Case::getAclClause());
+    $aclClauses = array_filter(CRM_Case_BAO_Case::getSelectWhereClause());
     foreach ($aclClauses as $clause) {
       $query->_where[0][] = $clause;
     }

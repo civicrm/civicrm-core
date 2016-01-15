@@ -108,7 +108,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   // Contact-related data permissions.
   // CRM-14094 - Users can edit and delete contact-related objects using inline edit with 'edit all contacts' permission
   $permissions['address'] = array(
-    // get is managed by BAO::apiWhereClause
+    // get is managed by BAO::addSelectWhereClause
     'get' => array(),
     'default' => array(
       'access CiviCRM',
@@ -119,7 +119,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['phone'] = $permissions['address'];
   $permissions['website'] = $permissions['address'];
   $permissions['im'] = $permissions['address'];
-  // @todo - implement CRM_Core_BAO_EntityTag::apiWhereClause and remove this heavy-handed restriction
+  // @todo - implement CRM_Core_BAO_EntityTag::addSelectWhereClause and remove this heavy-handed restriction
   $permissions['entity_tag'] = array('get' => array('access CiviCRM', 'view all contacts')) + $permissions['address'];
   // @todo - ditto
   $permissions['note'] = $permissions['entity_tag'];
@@ -134,7 +134,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
 
   //relationship permissions
   $permissions['relationship'] = array(
-    // get is managed by BAO::apiWhereClause
+    // get is managed by BAO::addSelectWhereClause
     'get' => array(),
     'delete' => array(
       'access CiviCRM',
@@ -179,7 +179,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'delete in CiviCase',
     ),
     'default' => array(
-      // This is the minimum permission needed. Finer-grained access is controlled by CRM_Case_BAO_Case::apiWhereClause
+      // This is the minimum permission needed. Finer-grained access is controlled by CRM_Case_BAO_Case::addSelectWhereClause
       'access my cases and activities',
     ),
   );
