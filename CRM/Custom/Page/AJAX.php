@@ -138,7 +138,7 @@ class CRM_Custom_Page_AJAX {
       $sortOrder = constant('SORT_' . strtoupper($sortOrder));
       $sortCol = array();
       $dataType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $sort, 'data_type');
-      foreach ($multiRecordFields as $key=> $row) {
+      foreach ($multiRecordFields as $key => $row) {
         $sortCol[$key] = $row[$sort];
         if ($dataType == 'Date') {
           $sortCol[$key] = CRM_Utils_Date::unixTime($row[$sort]);
