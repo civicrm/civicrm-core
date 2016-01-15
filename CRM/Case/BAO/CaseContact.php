@@ -101,6 +101,7 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
     if ($caseSubclauses) {
       $clauses['case_id'][] = 'IN (SELECT id FROM civicrm_case WHERE ' . implode(' AND ', $caseSubclauses) . ')';
     }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
   }
 
