@@ -35,7 +35,7 @@
     <div id="custom-{$customGroupId}-table-wrapper" {if $pageViewType eq 'customDataView'}class="crm-entity" data-entity="contact" data-id="{$contactId}"{/if}>
       <div>
         {strip}
-          <table id="records" class="display">
+          <table id="records" class={if $pageViewType eq 'customDataView'}"crm-multifield-selector"{else}'display'{/if}>
             <thead>
             <tr>
               {foreach from=$headers key=recId item=head}
@@ -47,17 +47,52 @@
               {/foreach}
             </tr>
             </thead>
-            {foreach from=$records key=recId item=rows}
-              <tr class="{cycle values="odd-row,even-row"}">
-                {foreach from=$headers key=hrecId item=head}
-                  <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
-                {/foreach}
-                <td>{$rows.action}</td>
-                {foreach from=$dateFieldsVals key=fid item=rec}
-                    <td class='crm-field-{$fid}_date hiddenElement'>{$rec.$recId}</td>
-                {/foreach}
-              </tr>
-            {/foreach}
+            {if $pageViewType eq 'customDataView'}
+              {literal}
+              <script type="text/javascript">
+              CRM.$(function($) {
+                var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/multirecordfieldlist" h=0 q="snippet=4&cid=$contactId&cgid=$customGroupId"}'{literal};
+
+                $('table.crm-multifield-selector').dataTable({
+                  "bProcessing": true,
+                  "aaSorting": [],
+                  "asStripClasses" : [ "odd-row", "even-row" ],
+                  "sPaginationType": "full_numbers",
+                  "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+                  "bServerSide": true,
+                  "sAjaxSource": sourceUrl,
+                });
+
+                $(".crm-multifield-selector").on('click','.delete-custom-row', function (e) {
+                  var $el = $(this);
+                  CRM.confirm({
+                    message: '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}'
+                  }).on('crmConfirm:yes', function() {
+                    var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
+                    var request = $.post(postUrl, $el.data('delete_params'));
+                    CRM.status({/literal}"{ts escape='js'}Record Deleted{/ts}"{literal}, request);
+                    request.done(function() {
+                      CRM.refreshParent($el);
+                    });
+                  })
+                  e.preventDefault();
+                });
+              });
+              </script>
+              {/literal}
+            {else}
+              {foreach from=$records key=recId item=rows}
+                <tr class="{cycle values="odd-row,even-row"}">
+                  {foreach from=$headers key=hrecId item=head}
+                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
+                  {/foreach}
+                  <td>{$rows.action}</td>
+                  {foreach from=$dateFieldsVals key=fid item=rec}
+                      <td class='crm-field-{$fid}_date hiddenElement'>{$rec.$recId}</td>
+                  {/foreach}
+                </tr>
+              {/foreach}
+            {/if}
           </table>
         {/strip}
       </div>
