@@ -105,4 +105,54 @@ class CRM_Custom_Page_AJAX {
     CRM_Utils_JSON::output(TRUE);
   }
 
+  /**
+   * Get list of Multi Record Fields.
+   *
+   */
+  public static function getMultiRecordFieldList() {
+    $params = $_REQUEST;
+
+    $sEcho = CRM_Utils_Type::escape($_GET['sEcho'], 'Integer');
+    $offset = isset($params['iDisplayStart']) ? CRM_Utils_Type::escape($params['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($params['iDisplayLength']) ? CRM_Utils_Type::escape($params['iDisplayLength'], 'Integer') : 25;
+
+    $params['page'] = ($offset / $rowCount) + 1;
+    $params['rp'] = $rowCount;
+    $contactType = CRM_Contact_BAO_Contact::getContactType($params['cid']);
+
+    $obj = new CRM_Profile_Page_MultipleRecordFieldsListing();
+    $obj->_pageViewType = 'customDataView';
+    $obj->_contactId = $params['cid'];
+    $obj->_customGroupId = $params['cgid'];
+    $obj->_contactType = $contactType;
+    $obj->_offset = ($params['page'] - 1) * $params['rp'];
+    $obj->_rowCount = $params['rp'];
+
+    list($headers, $multiRecordFields) = $obj->browse();
+
+    // sort the fields by the columns
+    $sortMapper = array_values($headers);
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
+    if ($sort && $sortOrder) {
+      $sortOrder = constant('SORT_' . strtoupper($sortOrder));
+      $sortCol = array();
+      $dataType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $sort, 'data_type');
+      foreach ($multiRecordFields as $key=> $row) {
+        $sortCol[$key] = $row[$sort];
+        if ($dataType == 'Date') {
+          $sortCol[$key] = CRM_Utils_Date::unixTime($row[$sort]);
+        }
+      }
+      array_multisort($sortCol, $sortOrder, $multiRecordFields);
+    }
+
+    $iFilteredTotal = $iTotal = $obj->_total;
+    $selectorElements = array_merge($headers, array('action', 'class'));
+
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
+    echo CRM_Utils_JSON::encodeDataTableSelector($multiRecordFields, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
+    CRM_Utils_System::civiExit();
+  }
+
 }

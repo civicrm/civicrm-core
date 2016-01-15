@@ -45,13 +45,13 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
   protected $_profileId = NULL;
 
-  protected $_contactId = NULL;
+  public $_contactId = NULL;
 
-  protected $_customGroupTitle = NULL;
+  public $_customGroupTitle = NULL;
 
-  protected $_pageViewType = NULL;
+  public $_pageViewType = NULL;
 
-  protected $_contactType = NULL;
+  public $_contactType = NULL;
 
   /**
    * Get BAO Name.
@@ -299,6 +299,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           unset($links[CRM_Core_Action::COPY]);
         }
         $newCgCount = (!$reached) ? count($result) + 1 : NULL;
+        if (isset($this->_offset) && isset($this->_rowCount)) {
+          $this->_total = count($result);
+          $result = array_slice($result, $this->_offset, $this->_rowCount, TRUE);
+          $cgcount = $this->_offset + 1;
+        }
         foreach ($result as $recId => &$value) {
           foreach ($value as $fieldId => &$val) {
             if (is_numeric($fieldId)) {
@@ -418,16 +423,20 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     $headers = array();
     if (!empty($fieldIDs)) {
       foreach ($fieldIDs as $fieldID) {
-        $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : $fieldLabels[$fieldID]['label'];
+        $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : !isset($this->_offset) ? $fieldLabels[$fieldID]['label'] : $fieldID;
       }
     }
     $this->assign('dateFields', $dateFields);
     $this->assign('dateFieldsVals', $dateFieldsVals);
     $this->assign('cgcount', $cgcount);
+    $this->assign('contactId', $this->_contactId);
+    $this->assign('contactType', $this->_contactType);
     $this->assign('customGroupTitle', $this->_customGroupTitle);
     $this->assign('headers', $headers);
     $this->assign('records', $result);
-    $this->assign('attributes', $attributes);
+    $this->assign('attributes', json_encode($attributes));
+
+    return array($headers, $result);
   }
 
   /**
