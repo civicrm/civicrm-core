@@ -518,7 +518,7 @@ class SelectQuery {
     if (count($stack) === 1 && in_array($stack[0], $this->aclFields)) {
       return NULL;
     }
-    $clauses = $baoName::getAclClause($tableAlias);
+    $clauses = $baoName::getSelectWhereClause($tableAlias);
     if (!$stack) {
       // Track field clauses added to the main entity
       $this->aclFields = array_keys($clauses);

@@ -80,7 +80,7 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
   /**
    * @inheritDoc
    */
-  public function apiWhereClause() {
+  public function addSelectWhereClause() {
     // In order to make things easier for downstream developers, we reuse and adapt case acls here.
     // This doesn't yield the most straightforward query, but hopefully the sql engine will sort it out.
     $clauses = array(
@@ -90,7 +90,7 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
     );
     $caseSubclauses = array();
     $caseBao = new CRM_Case_BAO_Case();
-    foreach ($caseBao->apiWhereClause() as $field => $fieldClauses) {
+    foreach ($caseBao->addSelectWhereClause() as $field => $fieldClauses) {
       if ($field == 'id' && $fieldClauses) {
         $clauses['case_id'] = array_merge($clauses['case_id'], (array) $fieldClauses);
       }

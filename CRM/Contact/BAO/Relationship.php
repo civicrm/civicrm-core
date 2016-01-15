@@ -2104,7 +2104,7 @@ AND cc.sort_name LIKE '%$name%'";
   /**
    * @inheritDoc
    */
-  public function apiWhereClause() {
+  public function addSelectWhereClause() {
     // Generate an acl clause for both contacts in the relationship
     $clauses = array(
       'contact_id_a' => CRM_Contact_BAO_Contact_Permission::cacheSubquery(),

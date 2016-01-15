@@ -3121,7 +3121,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * @inheritDoc
    */
-  public function apiWhereClause() {
+  public function addSelectWhereClause() {
     $clauses = array(
       'id' => array(),
       // Only case admins can view deleted cases
