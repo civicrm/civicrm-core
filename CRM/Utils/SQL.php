@@ -26,68 +26,36 @@
  */
 
 /**
+ * Just another collection of static utils functions.
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
-
-/**
- * This class contains the functions for Case Contact management.
- */
-class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
+class CRM_Utils_SQL {
 
   /**
-   * Create case contact record.
+   * Helper function for adding the permissioned subquery from one entity onto another
    *
-   * @param array $params
-   *   case_id, contact_id
-   *
-   * @return CRM_Case_BAO_CaseContact
+   * @param string $entity
+   * @param string $joinColumn
+   * @return array
    */
-  public static function create($params) {
-    $caseContact = new self();
-    $caseContact->copyValues($params);
-    $caseContact->save();
-
-    // add to recently viewed
-    $caseType = CRM_Case_BAO_Case::getCaseType($caseContact->case_id);
-    $url = CRM_Utils_System::url('civicrm/contact/view/case',
-      "action=view&reset=1&id={$caseContact->case_id}&cid={$caseContact->contact_id}&context=home"
-    );
-
-    $title = CRM_Contact_BAO_Contact::displayName($caseContact->contact_id) . ' - ' . $caseType;
-
-    $recentOther = array();
-    if (CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
-      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/case',
-        "action=delete&reset=1&id={$caseContact->case_id}&cid={$caseContact->contact_id}&context=home"
-      );
+  public static function mergeSubquery($entity, $joinColumn = 'id') {
+    $baoName = _civicrm_api3_get_BAO($entity);
+    $bao = new $baoName();
+    $clauses = $subclauses = array();
+    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+      if ($vals && $field == $joinColumn) {
+        $clauses = array_merge($clauses, (array) $vals);
+      }
+      elseif ($vals) {
+        $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);
+      }
     }
-
-    // add the recently created case
-    CRM_Utils_Recent::add($title,
-      $url,
-      $caseContact->case_id,
-      'Case',
-      $caseContact->contact_id,
-      NULL,
-      $recentOther
-    );
-
-    return $caseContact;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function addSelectWhereClause() {
-    return array(
-      // Reuse case acls
-      'case_id' => CRM_Utils_SQL::mergeSubquery('Case'),
-      // Case acls already check for contact access so we can just mark contact_id as handled
-      'contact_id' => array(),
-    );
-    // Don't call hook selectWhereClause, the case query already did
+    if ($subclauses) {
+      $clauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subclauses) . ")";
+    }
+    return $clauses;
   }
 
 }
