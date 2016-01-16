@@ -2471,7 +2471,7 @@ SELECT contact_id
     $clauses = array();
     foreach ($this->fields() as $fieldName => $field) {
       if (strpos($fieldName, 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
-        $clauses[$fieldName] = self::mergeSubquery('Contact');
+        $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
       }
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses);
@@ -2497,31 +2497,6 @@ SELECT contact_id
       if ($vals) {
         $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
       }
-    }
-    return $clauses;
-  }
-
-  /**
-   * Helper function for adding the permissioned subquery from one entity onto another
-   *
-   * @param string $entity
-   * @param string $joinColumn
-   * @return array
-   */
-  public static function mergeSubquery($entity, $joinColumn = 'id') {
-    $baoName = _civicrm_api3_get_BAO($entity);
-    $bao = new $baoName();
-    $clauses = $subclauses = array();
-    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
-      if ($vals && $field == $joinColumn) {
-        $clauses = array_merge($clauses, (array) $vals);
-      }
-      elseif ($vals) {
-        $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);
-      }
-    }
-    if ($subclauses) {
-      $clauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subclauses) . ")";
     }
     return $clauses;
   }
