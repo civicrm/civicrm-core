@@ -3130,7 +3130,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       'is_deleted' => CRM_Core_Permission::check('administer CiviCase') ? array() : array("= 0"),
     );
     // Ensure the user has permission to view the case client
-    $contactClause = CRM_Core_DAO::mergeSubquery('Contact');
+    $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
     if ($contactClause) {
       $contactClause = implode(' AND contact_id ', $contactClause);
       $clauses['id'][] = "IN (SELECT case_id FROM civicrm_case_contact WHERE contact_id $contactClause)";
