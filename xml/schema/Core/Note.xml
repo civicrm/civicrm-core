@@ -26,6 +26,9 @@
     <length>64</length>
     <required>true</required>
     <comment>Name of table where item being referenced is stored.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_Note::entityTables</callback>
+    </pseudoconstant>
     <add>1.1</add>
   </field>
   <field>
