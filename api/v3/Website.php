@@ -42,7 +42,7 @@
  */
 function civicrm_api3_website_create($params) {
   //DO NOT USE THIS FUNCTION AS THE BASIS FOR A NEW API http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
-
+  _civicrm_api3_check_edit_permissions('CRM_Core_BAO_Website', $params);
   $websiteBAO = CRM_Core_BAO_Website::add($params);
   $values = array();
   _civicrm_api3_object_to_array($websiteBAO, $values[$websiteBAO->id]);
@@ -74,10 +74,10 @@ function _civicrm_api3_website_create_spec(&$params) {
  */
 function civicrm_api3_website_delete($params) {
   //DO NOT USE THIS FUNCTION AS THE BASIS FOR A NEW API http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
-  $websiteID = CRM_Utils_Array::value('id', $params);
-
+  civicrm_api3_verify_mandatory($params, NULL, array('id'));
+  _civicrm_api3_check_edit_permissions('CRM_Core_BAO_Website', array('id' => $params['id']));
   $websiteDAO = new CRM_Core_DAO_Website();
-  $websiteDAO->id = $websiteID;
+  $websiteDAO->id = $params['id'];
   if ($websiteDAO->find()) {
     while ($websiteDAO->fetch()) {
       $websiteDAO->delete();
@@ -85,7 +85,7 @@ function civicrm_api3_website_delete($params) {
     }
   }
   else {
-    throw new API_Exception('Could not delete Website with id ' . $websiteID);
+    throw new API_Exception('Could not delete Website with id ' . $params['id']);
   }
 }
 

@@ -1353,9 +1353,11 @@ function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $e
  *   Entity - pass in if entity is non-standard & required $ids array.
  *
  * @throws API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  * @return array
  */
 function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
+  _civicrm_api3_check_edit_permissions($bao_name, $params);
   _civicrm_api3_format_params_for_create($params, $entity);
   $args = array(&$params);
   if ($entity) {
@@ -1445,10 +1447,11 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
  * @return array
  *   API result array
  * @throws API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function _civicrm_api3_basic_delete($bao_name, &$params) {
-
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
+  _civicrm_api3_check_edit_permissions($bao_name, array('id' => $params['id']));
   $args = array(&$params['id']);
   if (method_exists($bao_name, 'del')) {
     $bao = call_user_func_array(array($bao_name, 'del'), $args);
@@ -2431,4 +2434,28 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fiel
   }
 
   return civicrm_api3_create_success($matches, $params);
+}
+
+/**
+ * @param string $bao_name
+ * @param array $params
+ * @throws \Civi\API\Exception\UnauthorizedException
+ */
+function _civicrm_api3_check_edit_permissions($bao_name, $params) {
+  // For lack of something more clever, here's a whitelist of entities whos permissions
+  // are inherited from a contact record.
+  // Note, when adding here, also remember to modify _civicrm_api3_permissions()
+  $contactEntities = array(
+    'CRM_Core_BAO_Email',
+    'CRM_Core_BAO_Phone',
+    'CRM_Core_BAO_Address',
+    'CRM_Core_BAO_IM',
+    'CRM_Core_BAO_Website',
+  );
+  if (!empty($params['check_permissions']) && in_array($bao_name, $contactEntities)) {
+    $cid = !empty($params['contact_id']) ? $params['contact_id'] : CRM_Core_DAO::getFieldValue($bao_name, $params['id'], 'contact_id');
+    if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
+      throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+    }
+  }
 }
