@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('crmCxn').controller('CrmCxnManageCtrl', function CrmCxnManageCtrl($scope, apiCalls, crmApi, crmUiAlert, crmBlocker, crmStatus, $timeout, dialogService) {
+  angular.module('crmCxn').controller('CrmCxnManageCtrl', function CrmCxnManageCtrl($scope, apiCalls, crmApi, crmUiAlert, crmBlocker, crmStatus, $timeout, dialogService, crmCxnCheckAddr) {
     var ts = $scope.ts = CRM.ts(null);
     if (apiCalls.appMetas.is_error) {
       $scope.appMetas = [];
@@ -12,6 +12,17 @@
     $scope.cxns = apiCalls.cxns.values;
     $scope.alerts = _.where(apiCalls.sysCheck.values, {name: 'checkCxnOverrides'});
 
+    crmCxnCheckAddr(apiCalls.cfg.values.siteCallbackUrl).then(function(response) {
+      if (response.valid) return;
+      crmUiAlert({
+        type: 'warning',
+        title: ts('Internet Access Required'),
+        templateUrl: '~/crmCxn/Connectivity.html',
+        scope: $scope.$new(),
+        options: {expires: false}
+      });
+    });
+
     $scope.filter = {};
     var block = $scope.block = crmBlocker();
 
@@ -19,18 +30,30 @@
       crmUiAlert({text: alert.message, title: alert.title, type: 'error'});
     });
 
-    $scope.findCxnByAppId = function(appId) {
-      var result = _.where($scope.cxns, {
-        app_guid: appId
-      });
+    // Convert array [x] to x|null|error
+    function asOne(result, msg) {
       switch (result.length) {
         case 0:
           return null;
         case 1:
           return result[0];
         default:
-          throw "Error: Too many connections for appId: " + appId;
+          throw msg;
       }
+    }
+
+    $scope.findCxnByAppId = function(appId) {
+      var result = _.where($scope.cxns, {
+        app_guid: appId
+      });
+      return asOne(result, "Error: Too many connections for appId: " + appId);
+    };
+
+    $scope.findAppByAppId = function(appId) {
+      var result = _.where($scope.appMetas, {
+        appId: appId
+      });
+      return asOne(result, "Error: Too many apps for appId: " + appId);
     };
 
     $scope.hasAvailApps = function() {
@@ -54,6 +77,11 @@
     $scope.register = function(appMeta) {
       var reg = crmApi('Cxn', 'register', {app_guid: appMeta.appId}).then($scope.refreshCxns);
       return block(crmStatus({start: ts('Connecting...'), success: ts('Connected')}, reg));
+    };
+
+    $scope.reregister = function(appMeta) {
+      var reg = crmApi('Cxn', 'register', {app_guid: appMeta.appId}).then($scope.refreshCxns);
+      return block(crmStatus({start: ts('Reconnecting...'), success: ts('Reconnected')}, reg));
     };
 
     $scope.unregister = function(appMeta) {

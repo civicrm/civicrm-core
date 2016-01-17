@@ -25,12 +25,16 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ */
+
+/**
+ * Class CRM_Core_Payment_PayPalImpl for paypal pro, paypal standard & paypal express.
  */
 class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   const CHARSET = 'iso-8859-1';
@@ -51,7 +55,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param $paymentProcessor
+   * @param CRM_Core_Payment $paymentProcessor
    *
    * @return \CRM_Core_Payment_PayPalImpl
    */
@@ -416,7 +420,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   public function doQuery($params) {
     if (empty($params['trxn_id'])) {
-      throw new \Civi\Payment\Exception\PaymentProcessorException('transaction id not set');
+      return array();
     }
     $args = array(
       'TRANSACTIONID' => $params['trxn_id'],

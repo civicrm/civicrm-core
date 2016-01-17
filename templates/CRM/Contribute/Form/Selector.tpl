@@ -32,7 +32,6 @@
     {if !$single and $context eq 'Search' }
         <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
     {/if}
-    {assign var="softCreditColumns" value=0}
     {foreach from=$columnHeaders item=header}
         <th scope="col">
         {if $header.sort}
@@ -42,9 +41,6 @@
           {$header.name}
     {/if}
         </th>
-  {if $header.name eq "Soft Credit For"}
-    {assign var='softCreditColumns' value=1}
-  {/if}
     {/foreach}
   </tr>
   </thead>

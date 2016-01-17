@@ -533,6 +533,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           array('desc' => ts('Actions')),
         )
       );
+    CRM_Core_Smarty::singleton()->assign('softCreditColumns', $this->_includeSoftCredits);
     return self::$_columnHeaders;
   }
 

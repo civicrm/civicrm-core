@@ -1880,12 +1880,13 @@ abstract class CRM_Utils_Hook {
    * This hook fires whenever a record in a case changes.
    *
    * @param \Civi\CCase\Analyzer $analyzer
+   *   A bundle of data about the case (such as the case and activity records).
    */
   public static function caseChange(\Civi\CCase\Analyzer $analyzer) {
     $event = new \Civi\CCase\Event\CaseChangeEvent($analyzer);
     \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_caseChange", $event);
 
-    return self::singleton()->invoke(1, $angularModules,
+    self::singleton()->invoke(1, $analyzer,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_caseChange'
     );
