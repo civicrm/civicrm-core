@@ -98,7 +98,7 @@ function civicrm_api3_case_create($params) {
 
   foreach ((array) $params['contact_id'] as $cid) {
     $contactParams = array('case_id' => $caseBAO->id, 'contact_id' => $cid);
-    CRM_Case_BAO_Case::addCaseToContact($contactParams);
+    CRM_Case_BAO_CaseContact::create($contactParams);
   }
 
   // Initialize XML processor with $params
@@ -250,13 +250,19 @@ function civicrm_api3_case_get($params) {
 
   $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case', $sql);
 
-  // For historic reasons we return these by default only when fetching a case by id
-  if (!empty($params['id']) && empty($options['return'])) {
-    $options['return'] = array('contacts' => 1, 'activities' => 1, 'contact_id' => 1);
-  }
+  if (empty($options['is_count'])) {
+    // For historic reasons we return these by default only when fetching a case by id
+    if (!empty($params['id']) && empty($options['return'])) {
+      $options['return'] = array(
+        'contacts' => 1,
+        'activities' => 1,
+        'contact_id' => 1,
+      );
+    }
 
-  foreach ($foundcases['values'] as &$case) {
-    _civicrm_api3_case_read($case, $options);
+    foreach ($foundcases['values'] as &$case) {
+      _civicrm_api3_case_read($case, $options);
+    }
   }
 
   return $foundcases;
@@ -433,4 +439,42 @@ function _civicrm_api3_case_format_params(&$params) {
   elseif (empty($params['case_type'])) {
     $params['case_type'] = $caseTypes[$params['case_type_id']];
   }
+}
+
+/**
+ * It actually works a lot better to use the CaseContact api instead of the Case api
+ * for entityRef fields so we can perform the necessary joins,
+ * so we pass off getlist requests to the CaseContact api.
+ *
+ * @param array $params
+ * @return mixed
+ */
+function civicrm_api3_case_getList($params) {
+  require_once 'api/v3/Generic/Getlist.php';
+  require_once 'api/v3/CaseContact.php';
+  $params['id_field'] = 'case_id';
+  $params['label_field'] = $params['search_field'] = 'contact_id.sort_name';
+  $params['description_field'] = array(
+    'case_id',
+    'case_id.case_type_id.title',
+    'case_id.subject',
+    'case_id.status_id',
+    'case_id.start_date',
+  );
+  $apiRequest = array(
+    'entity' => 'CaseContact',
+    'action' => 'getlist',
+    'params' => $params,
+  );
+  return civicrm_api3_generic_getList($apiRequest);
+}
+
+/**
+ * Needed due to the above override
+ * @param $params
+ * @param $apiRequest
+ */
+function _civicrm_api3_case_getlist_spec(&$params, $apiRequest) {
+  require_once 'api/v3/Generic/Getlist.php';
+  _civicrm_api3_generic_getlist_spec($params, $apiRequest);
 }

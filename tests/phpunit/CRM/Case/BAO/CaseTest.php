@@ -41,7 +41,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'case_id' => 1,
       'contact_id' => 17,
     );
-    CRM_Case_BAO_Case::addCaseToContact($params);
+    CRM_Case_BAO_CaseContact::create($params);
 
     $recent = CRM_Utils_Recent::get();
     $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
@@ -68,19 +68,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   public function testGetCasesSummary() {
     $cases = CRM_Case_BAO_Case::getCasesSummary(TRUE, 3);
     $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
-  }
-
-  public function testGetUnclosedCases() {
-    $params = array(
-      'case_type' => 'ousing Suppor',
-    );
-    $cases = CRM_Case_BAO_Case::getUnclosedCases($params);
-    $this->assertEquals('Housing Support', $cases[1]['case_type']);
-  }
-
-  public function testGetContactCases() {
-    $cases = CRM_Case_BAO_Case::getContactCases(3);
-    $this->assertEquals('Housing Support', $cases[1]['case_type']);
   }
 
   /* FIXME: requires activities

@@ -42,12 +42,10 @@ use Civi\API\Exception\UnauthorizedException;
  */
 class SelectQuery {
 
-  const MAX_JOINS = 4;
+  const
+    MAX_JOINS = 4,
+    MAIN_TABLE_ALIAS = 'a';
 
-  /**
-   * @var \CRM_Core_DAO
-   */
-  protected $bao;
   /**
    * @var string
    */
@@ -77,33 +75,41 @@ class SelectQuery {
    */
   protected $entityFieldNames;
   /**
+   * @var array
+   */
+  protected $aclFields = array();
+  /**
    * @var string|bool
    */
   protected $checkPermissions;
 
   /**
-   * @param string $bao_name
+   * @param string $baoName
    *   Name of BAO
    * @param array $params
    *   As passed into api get function.
    * @param bool $isFillUniqueFields
    *   Do we need to ensure unique fields continue to be populated for this api? (backward compatibility).
    */
-  public function __construct($bao_name, $params, $isFillUniqueFields) {
-    $this->bao = new $bao_name();
-    $this->entity = _civicrm_api_get_entity_name_from_dao($this->bao);
+  public function __construct($baoName, $params, $isFillUniqueFields) {
+    $bao = new $baoName();
+    $this->entity = _civicrm_api_get_entity_name_from_dao($bao);
     $this->params = $params;
     $this->isFillUniqueFields = $isFillUniqueFields;
     $this->checkPermissions = \CRM_Utils_Array::value('check_permissions', $this->params, FALSE);
     $this->options = _civicrm_api3_get_options_from_params($this->params);
 
-    $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($this->bao));
+    $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($bao));
     // Call this function directly instead of using the api wrapper to force unique field names off
     require_once 'api/v3/Generic.php';
     $apiSpec = \civicrm_api3_generic_getfields(array('entity' => $this->entity, 'version' => 3, 'params' => array('action' => 'get')), FALSE);
     $this->apiFieldSpec = $apiSpec['values'];
 
-    $this->query = \CRM_Utils_SQL_Select::from($this->bao->tableName() . " a");
+    $this->query = \CRM_Utils_SQL_Select::from($bao->tableName() . ' ' . self::MAIN_TABLE_ALIAS);
+    $bao->free();
+
+    // Add ACLs first to avoid redundant subclauses
+    $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
   }
 
   /**
@@ -127,8 +133,7 @@ class SelectQuery {
       if ($include) {
         $field = $this->getField($field_name);
         if ($field && in_array($field['name'], $this->entityFieldNames)) {
-          // 'a.' is an alias for the entity table.
-          $select_fields["a.{$field['name']}"] = $field['name'];
+          $select_fields[self::MAIN_TABLE_ALIAS . ".{$field['name']}"] = $field['name'];
         }
         elseif ($include && strpos($field_name, '.')) {
           $fkField = $this->addFkField($field_name);
@@ -167,7 +172,7 @@ class SelectQuery {
       }
     }
     // Always select the ID.
-    $select_fields["a.id"] = "id";
+    $select_fields[self::MAIN_TABLE_ALIAS . ".id"] = "id";
 
     // populate where_clauses
     foreach ($this->params as $key => $value) {
@@ -196,14 +201,13 @@ class SelectQuery {
           }
 
           if ($filterKey == 'is_current' || $filterKey == 'isCurrent') {
-            // Is current is almost worth creating as a 'sql filter' in the DAO function since several entities have the
-            // concept.
+            // Is current is almost worth creating as a 'sql filter' in the DAO function since several entities have the concept.
             $todayStart = date('Ymd000000', strtotime('now'));
             $todayEnd = date('Ymd235959', strtotime('now'));
-            $this->query->where(array("(a.start_date <= '$todayStart' OR a.start_date IS NULL) AND (a.end_date >= '$todayEnd' OR
-          a.end_date IS NULL)
-          AND a.is_active = 1
-        "));
+            $a = self::MAIN_TABLE_ALIAS;
+            $this->query->where("($a.start_date <= '$todayStart' OR $a.start_date IS NULL)
+              AND ($a.end_date >= '$todayEnd' OR $a.end_date IS NULL)
+              AND a.is_active = 1");
           }
         }
       }
@@ -219,7 +223,7 @@ class SelectQuery {
         $key = $field['name'];
       }
       if (in_array($key, $this->entityFieldNames)) {
-        $table_name = 'a';
+        $table_name = self::MAIN_TABLE_ALIAS;
         $column_name = $key;
       }
       elseif (($cf_id = \CRM_Core_BAO_CustomField::getKeyID($key)) != FALSE) {
@@ -268,32 +272,15 @@ class SelectQuery {
       $this->query->select("count(*) as c");
     }
 
-    // order by
+    // Order by
     if (!empty($this->options['sort'])) {
-      $sort_fields = array();
-      foreach (explode(',', $this->options['sort']) as $sort_option) {
-        $words = preg_split("/[\s]+/", $sort_option);
-        if (count($words) > 0 && in_array($words[0], array_values($select_fields))) {
-          $tmp = $words[0];
-          if (!empty($words[1]) && strtoupper($words[1]) == 'DESC') {
-            $tmp .= " DESC";
-          }
-          $sort_fields[] = $tmp;
-        }
-      }
-      if (count($sort_fields) > 0) {
-        $this->query->orderBy(implode(",", $sort_fields));
-      }
+      $this->orderBy($this->options['sort']);
     }
 
-    // limit
+    // Limit
     if (!empty($this->options['limit']) || !empty($this->options['offset'])) {
       $this->query->limit($this->options['limit'], $this->options['offset']);
     }
-
-    // ACLs
-    $this->query->where($this->getAclClause('a'));
-    $this->bao->free();
 
     $result_entities = array();
     $result_dao = \CRM_Core_DAO::executeQuery($this->query->toSQL());
@@ -352,7 +339,7 @@ class SelectQuery {
     if (count($stack) < 2) {
       return NULL;
     }
-    $prev = 'a';
+    $prev = self::MAIN_TABLE_ALIAS;
     foreach ($stack as $depth => $fieldName) {
       // Setup variables then skip the first level
       if (!$depth) {
@@ -367,14 +354,15 @@ class SelectQuery {
       }
       // More than 4 joins deep seems excessive - DOS attack?
       if ($depth > self::MAX_JOINS) {
-        throw new UnauthorizedException("Maximum number of joins exceeded for api.{$this->entity}.get in parameter $fkFieldName");
+        throw new UnauthorizedException("Maximum number of joins exceeded in parameter $fkFieldName");
       }
       if (!isset($fkField['FKApiName']) && !isset($fkField['FKClassName'])) {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
+      $subStack = array_slice($stack, 0, $depth);
       // Ensure we have permission to access the other api
-      if (!$this->checkPermissionToJoin($fkField['FKApiName'], array_slice($stack, 0, $depth))) {
+      if (!$this->checkPermissionToJoin($fkField['FKApiName'], $subStack)) {
         throw new UnauthorizedException("Authorization failed to join onto {$fkField['FKApiName']} api in parameter $fkFieldName");
       }
       if (!isset($fkField['FKApiSpec'])) {
@@ -388,11 +376,11 @@ class SelectQuery {
         return NULL;
       }
       $fkTable = \CRM_Core_DAO_AllCoreTables::getTableForClass($fkField['FKClassName']);
-      $tableAlias = implode('_to_', array_slice($stack, 0, $depth)) . "_to_$fkTable";
+      $tableAlias = implode('_to_', $subStack) . "_to_$fkTable";
       $joinClause = "LEFT JOIN $fkTable $tableAlias ON $prev.$fk = $tableAlias.id";
 
       // Add acl condition
-      $joinCondition = $this->getAclClause($tableAlias, $fkField['FKClassName']);
+      $joinCondition = $this->getAclClause($tableAlias, \_civicrm_api3_get_BAO($fkField['FKApiName']), $subStack);
       if ($joinCondition !== NULL) {
         $joinClause .= " AND $joinCondition";
       }
@@ -421,7 +409,7 @@ class SelectQuery {
    * @return array
    *   Returns the table and field name for adding this field to a SELECT or WHERE clause
    */
-  private function addCustomField($customField, $baseTable = 'a') {
+  private function addCustomField($customField, $baseTable = self::MAIN_TABLE_ALIAS) {
     $tableName = $customField["table_name"];
     $columnName = $customField["column_name"];
     $tableAlias = "{$baseTable}_to_$tableName";
@@ -516,21 +504,65 @@ class SelectQuery {
    * Get acl clause for an entity
    *
    * @param string $tableAlias
-   * @param \CRM_Core_DAO $daoName
+   * @param string $baoName
+   * @param array $stack
    * @return null|string
    */
-  private function getAclClause($tableAlias, $daoName = NULL) {
+  private function getAclClause($tableAlias, $baoName, $stack = array()) {
     if (!$this->checkPermissions) {
       return NULL;
     }
-    if (!$daoName) {
-      $bao = $this->bao;
+    // Prevent (most) redundant acl sub clauses if they have already been applied to the main entity.
+    // FIXME: Currently this only works 1 level deep, but tracking through multiple joins would increase complexity
+    // and just doing it for the first join takes care of most acl clause deduping.
+    if (count($stack) === 1 && in_array($stack[0], $this->aclFields)) {
+      return NULL;
     }
-    else {
-      $baoName = str_replace('_DAO_', '_BAO_', $daoName);
-      $bao = class_exists($baoName) ? new $baoName() : new $daoName();
+    $clauses = $baoName::getSelectWhereClause($tableAlias);
+    if (!$stack) {
+      // Track field clauses added to the main entity
+      $this->aclFields = array_keys($clauses);
     }
-    return $bao->apiWhereClause($tableAlias);
+
+    $clauses = array_filter($clauses);
+    return $clauses ? implode(' AND ', $clauses) : NULL;
+  }
+
+  /**
+   * Orders the query by one or more fields
+   *
+   * e.g.
+   * @code
+   *   $this->orderBy(array('last_name DESC', 'birth_date'));
+   * @endcode
+   *
+   * @param string|array $sortParams
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function orderBy($sortParams) {
+    $orderBy = array();
+    foreach (is_array($sortParams) ? $sortParams : explode(',', $sortParams) as $item) {
+      $words = preg_split("/[\s]+/", trim($item));
+      if ($words) {
+        // Direction defaults to ASC unless DESC is specified
+        $direction = strtoupper(\CRM_Utils_Array::value(1, $words, '')) == 'DESC' ? ' DESC' : '';
+        $field = $this->getField($words[0]);
+        if ($field) {
+          $orderBy[] = self::MAIN_TABLE_ALIAS . '.' . $field['name'] . $direction;
+        }
+        elseif (strpos($words[0], '.')) {
+          $join = $this->addFkField($words[0]);
+          if ($join) {
+            $orderBy[] = "`{$join[0]}`.`{$join[1]}`$direction";
+          }
+        }
+        else {
+          throw new \API_Exception("Unknown field specified for sort. Cannot order by '$item'");
+        }
+      }
+    }
+    $this->query->orderBy($orderBy);
   }
 
 }
