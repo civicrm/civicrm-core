@@ -49,6 +49,7 @@
     <length>64</length>
     <required>true</required>
     <comment>Name of table where item being referenced is stored.</comment>
+    <pseudoconstant>CRM_Mailing_BAO_Mailing::mailingGroupEntityTables</pseudoconstant>
   </field>
   <field>
     <name>entity_id</name>
