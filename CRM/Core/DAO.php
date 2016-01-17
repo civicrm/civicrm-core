@@ -2453,18 +2453,52 @@ SELECT contact_id
   }
 
   /**
-   * Generates a clause suitable for adding to WHERE or ON when doing an api.get for this entity
+   * Generates acl clauses suitable for adding to WHERE or ON when doing an api.get for this entity
+   *
+   * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
+   * @code
+   *   array(
+   *     'location_type_id' => array('IS NOT NULL', 'IN (1,2,3)')
+   *   )
+   * @endcode
+   *
+   * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
+   *
+   * @return array
+   */
+  public function addSelectWhereClause() {
+    // This is the default fallback, and works for contact-related entities like Email, Relationship, etc.
+    $clauses = array();
+    foreach ($this->fields() as $fieldName => $field) {
+      if (strpos($fieldName, 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+        $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
+      }
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
+  /**
+   * This returns the final permissioned query string for this entity
+   *
+   * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
    *
    * @param string $tableAlias
-   * @return null|string
+   * @return array
    */
-  public function apiWhereClause($tableAlias) {
-    $fields = $this->fields();
-    $cidField = CRM_Utils_Array::value('contact_id', $fields);
-    if (CRM_Utils_Array::value('FKClassName', $cidField) == 'CRM_Contact_DAO_Contact') {
-      return CRM_Contact_BAO_Contact_Permission::cacheSubquery("`$tableAlias`.contact_id");
+  public static function getSelectWhereClause($tableAlias = NULL) {
+    $bao = new static();
+    if ($tableAlias === NULL) {
+      $tableAlias = $bao->tableName();
     }
-    return NULL;
+    $clauses = array();
+    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+      $clauses[$field] = NULL;
+      if ($vals) {
+        $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+      }
+    }
+    return $clauses;
   }
 
 }

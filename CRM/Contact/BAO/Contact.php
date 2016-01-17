@@ -3428,8 +3428,15 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   /**
    * @inheritDoc
    */
-  public function apiWhereClause($tableAlias) {
-    return CRM_Contact_BAO_Contact_Permission::cacheSubquery("`$tableAlias`.id");
+  public function addSelectWhereClause() {
+    // We always return an array with these keys, even if they are empty,
+    // because this tells the query builder that we have considered these fields for acls
+    $clauses = array(
+      'id' => (array) CRM_Contact_BAO_Contact_Permission::cacheSubquery(),
+      'is_deleted' => CRM_Core_Permission::check('access deleted contacts') ? array() : array('!= 1'),
+    );
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
 }
