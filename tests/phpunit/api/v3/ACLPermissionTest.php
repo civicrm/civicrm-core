@@ -116,16 +116,17 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Ensure contact permissions extend to related entities like email
    */
   public function testRelatedEntityPermissions() {
+    $this->createLoggedInUser();
     $disallowedContact = $this->individualCreate(array(), 0);
     $this->allowedContactId = $this->individualCreate(array(), 1);
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlyOne'));
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $testEntities = array(
-      'Email' => array('email' => 'null@nothing'),
-      'Phone' => array('phone' => '123456'),
-      'IM' => array('name' => 'hello'),
+      'Email' => array('email' => 'null@nothing', 'location_type_id' => 1),
+      'Phone' => array('phone' => '123456', 'location_type_id' => 1),
+      'IM' => array('name' => 'hello', 'location_type_id' => 1),
       'Website' => array('url' => 'http://test'),
-      'Address' => array('street_address' => '123 Sesame St.'),
+      'Address' => array('street_address' => '123 Sesame St.', 'location_type_id' => 1),
     );
     foreach ($testEntities as $entity => $params) {
       $params += array(
