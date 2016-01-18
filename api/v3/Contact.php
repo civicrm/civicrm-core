@@ -49,8 +49,12 @@
  *   API Result Array
  */
 function civicrm_api3_contact_create($params) {
-
   $contactID = CRM_Utils_Array::value('contact_id', $params, CRM_Utils_Array::value('id', $params));
+
+  if ($contactID && !empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
+    throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+  }
+
   $dupeCheck = CRM_Utils_Array::value('dupe_check', $params, FALSE);
   $values = _civicrm_api3_contact_check_params($params, $dupeCheck);
   if ($values) {
@@ -368,12 +372,16 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
  * @param array $params
  *   input parameters per getfields
  *
+ * @throws \Civi\API\Exception\UnauthorizedException
  * @return array
  *   API Result Array
  */
 function civicrm_api3_contact_delete($params) {
-
   $contactID = CRM_Utils_Array::value('id', $params);
+
+  if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::DELETE)) {
+    throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+  }
 
   $session = CRM_Core_Session::singleton();
   if ($contactID == $session->get('userID')) {

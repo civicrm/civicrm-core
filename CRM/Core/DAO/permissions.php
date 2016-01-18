@@ -86,10 +86,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
     // managed by query object
     'get' => array(),
-    'update' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
+    // managed by _civicrm_api3_check_edit_permissions
+    'update' => array(),
     'getquick' => array(
       array('access CiviCRM', 'access AJAX API'),
     ),
@@ -106,21 +104,21 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   );
 
   // Contact-related data permissions.
-  // CRM-14094 - Users can edit and delete contact-related objects using inline edit with 'edit all contacts' permission
   $permissions['address'] = array(
     // get is managed by BAO::addSelectWhereClause
-    'get' => array(),
-    'default' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
+    // create/delete are managed by _civicrm_api3_check_edit_permissions
+    'default' => array(),
   );
   $permissions['email'] = $permissions['address'];
   $permissions['phone'] = $permissions['address'];
   $permissions['website'] = $permissions['address'];
   $permissions['im'] = $permissions['address'];
+
   // @todo - implement CRM_Core_BAO_EntityTag::addSelectWhereClause and remove this heavy-handed restriction
-  $permissions['entity_tag'] = array('get' => array('access CiviCRM', 'view all contacts')) + $permissions['address'];
+  $permissions['entity_tag'] = array(
+    'get' => array('access CiviCRM', 'view all contacts'),
+    'default' => array('access CiviCRM', 'edit all contacts'),
+  );
   // @todo - ditto
   $permissions['note'] = $permissions['entity_tag'];
 
