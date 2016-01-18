@@ -1187,8 +1187,7 @@ class CiviCRM_For_WordPress {
     $this->remove_wp_magic_quotes();
 
     // Code inside invoke() requires the current user to be set up
-    global $current_user;
-    get_currentuserinfo();
+    $current_user = wp_get_current_user();
 
     /**
      * Bypass synchronize if running upgrade to avoid any serious non-recoverable
