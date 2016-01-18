@@ -85,6 +85,9 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => FALSE,
           ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+          ),
           'currency' => array(
             'required' => TRUE,
             'no_display' => TRUE,
@@ -141,6 +144,11 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
             'title' => ts('Pledge Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('contribution_status'),
+          ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
         'group_bys' => array(
@@ -388,6 +396,13 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
+        $entryFound = TRUE;
+      }
+
+      if (array_key_exists('civicrm_pledge_financial_type_id', $row)) {
+        if ($value = $row['civicrm_pledge_financial_type_id']) {
+          $rows[$rowNum]['civicrm_pledge_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($value, FALSE);
+        }
         $entryFound = TRUE;
       }
 
