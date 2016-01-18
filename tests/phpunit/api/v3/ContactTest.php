@@ -2219,7 +2219,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $result = $this->callAPIFailure('contact', 'update', $params);
-    $this->assertEquals('API permission check failed for Contact/update call; insufficient permission: require access CiviCRM and edit all contacts', $result['error_message'], 'lacking permissions should not be enough to update a contact');
+    $this->assertEquals('Permission denied to modify contact record', $result['error_message']);
 
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
