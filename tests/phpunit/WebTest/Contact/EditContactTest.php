@@ -113,7 +113,9 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
 
   }
 
-  // CRM-17273
+  /**
+   * CRM-17273
+   */
   public function testdisallowEditLocationType() {
     $this->webtestLogin();
 
