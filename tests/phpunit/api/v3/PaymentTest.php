@@ -140,7 +140,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params); //Create partially paid contribution
-    
+
     //Create partial payment
     $params = array(
       'contribution_id' => $contribution['id'],
@@ -183,12 +183,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 200.00);
-    
+
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
   }
-  
+
   public function testCreatePaymentLineItems() {
 
     // Create priceset & price fields
@@ -204,7 +204,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params); //Create partially paid contribution
-    
+
     //Create partial payment
     $params = array(
       'contribution_id' => $contribution['id'],
@@ -247,7 +247,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 200.00);
-    
+
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
@@ -262,9 +262,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Create price set.
    *
-   *
-   * @param $entity
-   * @param array $params
    */
   public function createPriceSet() {
     $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', array(
