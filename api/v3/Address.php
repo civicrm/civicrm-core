@@ -34,6 +34,8 @@
 /**
  * Add an Address for a contact.
  *
+ * FIXME: Should be using basic_create util
+ *
  * @param array $params
  *   Array per getfields metadata.
  *
@@ -41,6 +43,7 @@
  *   API result array
  */
 function civicrm_api3_address_create(&$params) {
+  _civicrm_api3_check_edit_permissions('CRM_Core_BAO_Address', $params);
   /**
    * If street_parsing, street_address has to be parsed into
    * separate parts
