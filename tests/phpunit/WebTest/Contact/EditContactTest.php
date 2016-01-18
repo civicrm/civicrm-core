@@ -113,4 +113,58 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
 
   }
 
+  /**
+   * CRM-17273
+   */
+  public function testdisallowEditLocationType() {
+    $this->webtestLogin();
+
+    // create contact
+    $firstName = 'WebTest' . substr(sha1(rand()), 0, 7);
+    $lastName = 'ContactEdit' . substr(sha1(rand()), 0, 7);
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+    $this->waitForElementPresent('_qf_Contact_cancel-bottom');
+
+    $this->type("first_name", $firstName);
+    $this->type("last_name", $lastName);
+
+    //fill email
+    $this->type("email_1_email", substr(sha1(rand()), 0, 7) . "email1@gmail.com");
+    $this->click("xpath=//div[@id='contactDetails']/table[1]/tbody/tr[1]/td[1]/a[text()='add']");
+    $this->waitForElementPresent('email_2_email');
+    $this->type("email_2_email", substr(sha1(rand()), 0, 7) . "email2@gmail.com");
+
+    //fill in phone  1
+    $this->type("phone_1_phone", "111113333");
+    $this->type("phone_1_phone_ext", "101");
+
+    //fill in IM
+    $this->type("im_1_name", "testYahoo");
+
+    //address section
+    $this->click("addressBlock");
+    $this->waitForElementPresent("address_1_street_address");
+    //fill in address 1
+    $this->type("address_1_street_address", "902C El Camino Way SW");
+    $this->type("address_1_city", "Dumfries");
+    $this->type("address_1_postal_code", "1234");
+
+    // Submit form
+    $this->click("_qf_Contact_upload_view-top");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // Get Contact id
+    $cid = $this->urlArg('cid');
+    $this->openCiviPage("contact/add", "reset=1&action=update&cid=$cid");
+
+    $this->waitForElementPresent('_qf_Contact_cancel-bottom');
+    $this->waitForElementNotPresent("xpath=//div[@id='contactDetails']/table[1]/tbody/tr[@id='Email_Block_1']/td[1]/a/i");
+    $this->waitForElementNotPresent("xpath=//div[@id='contactDetails']/table[1]/tbody/tr[@id='Email_Block_2']/td[1]/a/i");
+    $this->waitForElementNotPresent("xpath=//div[@id='contactDetails']/table[1]/tbody/tr[@id='Phone_Block_1']/td[2]/a/i");
+    $this->waitForElementNotPresent("xpath=//div[@id='contactDetails']/table[1]/tbody/tr[@id='IM_Block_1']/td[2]/a/i");
+
+    $this->click("addressBlockId");
+    $this->waitForElementNotPresent("xpath=//div[@id='addressBlock']/div/table/tbody/tr[1]/td[1]/span[1]/a/i");
+  }
+
 }
