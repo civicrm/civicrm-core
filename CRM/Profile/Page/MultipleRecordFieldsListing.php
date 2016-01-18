@@ -171,7 +171,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   public function browse() {
     $dateFields = NULL;
     $cgcount = 0;
-    $attributes = array();
+    $attributes = $headerAttr = array();
     $dateFieldsVals = NULL;
     if ($this->_pageViewType == 'profileDataView' && $this->_profileId) {
       $fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, NULL,
@@ -260,8 +260,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $options[$fieldIDs[$key]]['attributes']['time_format'] = CRM_Utils_Array::value('time_format', $returnValues);
       }
 
+      $DTparams = !empty($this->_DTparams) ? $this->_DTparams : NULL;
       // commonly used for both views i.e profile listing view (profileDataView) and custom data listing view (customDataView)
-      $result = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_contactId, NULL, $fieldIDs, TRUE);
+      $result = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_contactId, NULL, $fieldIDs, TRUE, $DTparams);
+      $resultCount = $result['count'];
+      unset($result['count']);
 
       if ($this->_pageViewType == 'profileDataView') {
         if (!empty($fieldIDs)) {
@@ -298,11 +301,10 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         if ($reached) {
           unset($links[CRM_Core_Action::COPY]);
         }
-        $newCgCount = (!$reached) ? count($result) + 1 : NULL;
-        if (isset($this->_offset) && isset($this->_rowCount)) {
-          $this->_total = count($result);
-          $result = array_slice($result, $this->_offset, $this->_rowCount, TRUE);
-          $cgcount = $this->_offset + 1;
+        $newCgCount = (!$reached) ? $resultCount + 1 : NULL;
+        if (!empty($DTparams)) {
+          $this->_total = $resultCount;
+          $cgcount = $DTparams['offset'] + 1;
         }
         foreach ($result as $recId => &$value) {
           foreach ($value as $fieldId => &$val) {
@@ -367,6 +369,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               }
               if ($editable) {
                 $fieldAttributes['class'] .= ' crm-editable';
+                $headerAttr[$fieldId]['class'] = 'crm-editable';
               }
               $attributes[$fieldId][$recId] = $fieldAttributes;
 
@@ -380,6 +383,8 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $op = 'profile.multiValue.row';
               }
               else {
+                $headerAttr[$fieldId]['dataType'] = CRM_Utils_Array::value('data-type', $fieldAttributes);
+                $headerAttr[$fieldId]['dataEmptyOption'] = CRM_Utils_Array::value('data-empty-option', $fieldAttributes);
                 // different set of url params
                 $actionParams['gid'] = $actionParams['groupID'] = $this->_customGroupId;
                 $actionParams['cid'] = $actionParams['entityID'] = $this->_contactId;
@@ -403,7 +408,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $actionParams['cs'] = $pageCheckSum;
               }
 
-              $value['action'] = CRM_Core_Action::formLink(
+              $value['links'] = CRM_Core_Action::formLink(
                 $links,
                 $linkAction,
                 $actionParams,
@@ -423,7 +428,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     $headers = array();
     if (!empty($fieldIDs)) {
       foreach ($fieldIDs as $fieldID) {
-        $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : !isset($this->_offset) ? $fieldLabels[$fieldID]['label'] : $fieldID;
+        $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : $fieldLabels[$fieldID]['label'];
       }
     }
     $this->assign('dateFields', $dateFields);
@@ -433,10 +438,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     $this->assign('contactType', $this->_contactType);
     $this->assign('customGroupTitle', $this->_customGroupTitle);
     $this->assign('headers', $headers);
+    $this->assign('headerAttr', $headerAttr);
     $this->assign('records', $result);
-    $this->assign('attributes', json_encode($attributes));
+    $this->assign('attributes', $attributes);
 
-    return array($headers, $result);
+    return array($result, $attributes);
   }
 
   /**
