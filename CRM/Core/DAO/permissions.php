@@ -86,10 +86,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
     // managed by query object
     'get' => array(),
-    'update' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
+    // managed by _civicrm_api3_check_edit_permissions
+    'update' => array(),
     'getquick' => array(
       array('access CiviCRM', 'access AJAX API'),
     ),
