@@ -42,6 +42,11 @@
  */
 function civicrm_api3_payment_get($params) {
   $financialTrxn = array();
+  $limit = '';
+  if (isset($params['options']) && CRM_Utils_Array::value('limit', $params['options'])) {
+    $limit = CRM_Utils_Array::value('limit', $params['options']);
+  }
+  $params['options']['limit'] = 0;
   $eft = civicrm_api3('EntityFinancialTrxn', 'get', $params);
   if (!empty($eft['values'])) {
     foreach ($eft['values'] as $efts) {
@@ -52,6 +57,9 @@ function civicrm_api3_payment_get($params) {
       'id' => array('IN' => $eftIds),
       'is_payment' => 1,
     );
+    if ($limit) {
+      $ftParams['options']['limit'] = $limit;
+    }
     $financialTrxn = civicrm_api3('FinancialTrxn', 'get', $ftParams);
     foreach ($financialTrxn['values'] as &$values) {
       $values['contribution_id'] = $map[$values['id']];
