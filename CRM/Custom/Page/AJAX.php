@@ -110,11 +110,16 @@ class CRM_Custom_Page_AJAX {
    *
    */
   public static function getMultiRecordFieldList() {
-    $params = $_REQUEST;
+    $params = $_GET;
 
-    $sEcho = CRM_Utils_Type::escape($_GET['sEcho'], 'Integer');
-    $offset = isset($params['iDisplayStart']) ? CRM_Utils_Type::escape($params['iDisplayStart'], 'Integer') : 0;
-    $rowCount = isset($params['iDisplayLength']) ? CRM_Utils_Type::escape($params['iDisplayLength'], 'Integer') : 25;
+    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
+    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 10;
+    $sortMapper = array();
+    foreach ($_GET['columns'] as $key => $value) {
+      $sortMapper[$key] = $value['data'];
+    };
+    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
 
     $params['page'] = ($offset / $rowCount) + 1;
     $params['rp'] = $rowCount;
@@ -125,34 +130,36 @@ class CRM_Custom_Page_AJAX {
     $obj->_contactId = $params['cid'];
     $obj->_customGroupId = $params['cgid'];
     $obj->_contactType = $contactType;
-    $obj->_offset = ($params['page'] - 1) * $params['rp'];
-    $obj->_rowCount = $params['rp'];
-
-    list($headers, $multiRecordFields) = $obj->browse();
-
-    // sort the fields by the columns
-    $sortMapper = array_values($headers);
-    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
+    $obj->_DTparams['offset'] = ($params['page'] - 1) * $params['rp'];
+    $obj->_DTparams['rowCount'] = $params['rp'];
     if ($sort && $sortOrder) {
-      $sortOrder = constant('SORT_' . strtoupper($sortOrder));
-      $sortCol = array();
-      $dataType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $sort, 'data_type');
-      foreach ($multiRecordFields as $key => $row) {
-        $sortCol[$key] = $row[$sort];
-        if ($dataType == 'Date') {
-          $sortCol[$key] = CRM_Utils_Date::unixTime($row[$sort]);
-        }
-      }
-      array_multisort($sortCol, $sortOrder, $multiRecordFields);
+      $sort = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $sort, 'column_name', 'label');
+      $obj->_DTparams['sort'] = $sort . ' ' . $sortOrder;
     }
 
-    $iFilteredTotal = $iTotal = $obj->_total;
-    $selectorElements = array_merge($headers, array('action', 'class'));
+    list($fields, $attributes) = $obj->browse();
 
-    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-    echo CRM_Utils_JSON::encodeDataTableSelector($multiRecordFields, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
-    CRM_Utils_System::civiExit();
+    // format params and add links
+    $fieldList = array();
+    foreach ($fields as $id => $value) {
+      $field = array();
+      foreach ($value as $fieldId => $fieldName) {
+        if (is_numeric($fieldId)) {
+          $fieldName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldId, 'label');
+          CRM_Utils_Array::crmReplaceKey($value, $fieldId, $fieldName);
+        }
+      }
+      $field = $value;
+      array_push($fieldList, $field);
+    }
+    $fieldList = array_map('array_merge', $fieldList);
+
+    $multiRecordFields = array();
+    $multiRecordFields['data'] = $fieldList;
+    $multiRecordFields['recordsTotal'] = $obj->_total;
+    $multiRecordFields['recordsFiltered'] = $obj->_total;
+
+    CRM_Utils_JSON::output($multiRecordFields);
   }
 
 }
