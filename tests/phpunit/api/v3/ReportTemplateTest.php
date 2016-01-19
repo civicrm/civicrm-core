@@ -184,18 +184,13 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public static function getReportTemplates() {
     $reportsToSkip = array(
       'activity' => 'does not respect function signature on from clause',
-      'walklist' => 'Notice: Undefined index: type in CRM_Report_Form_Walklist_Walklist line 155.(suspect the select function should be removed in favour of the parent (state province field) also, type should be added to state province & others? & potentially getAddressColumns fn should be used per other reports',
       'contribute/repeat' => 'Reports with important functionality in postProcess are not callable via the api. For variable setting recommend beginPostProcessCommon, for temp table creation recommend From fn',
       'contribute/topDonor' => 'construction of query in postProcess makes inaccessible ',
-      'contribute/sybunt' => 'e notice - (ui gives fatal error at civicrm/report/contribute/sybunt&reset=1&force=1 e-notice is on yid_valueContribute/Sybunt.php(214) because at the force url "yid_relative" not "yid_value" is defined',
-      'contribute/lybunt' => 'same as sybunt - fatals on force url & test identifies why',
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
-      'contact/relationship' => '(see contribute/repeat), property declaration issue, Undefined property: CRM_Report_Form_Contact_Relationship::$relationType in /Contact/Relationship.php(486):',
       'logging/contact/summary' => '(likely to be test related) probably logging off Undefined index: Form/Contact/LoggingSummary.php(231): PHP',
       'logging/contact/detail' => '(likely to be test related) probably logging off  DB Error: no such table',
       'logging/contribute/summary' => '(likely to be test related) probably logging off DB Error: no such table',
       'logging/contribute/detail' => '(likely to be test related) probably logging off DB Error: no such table',
-      'survey/detail' => '(likely to be test related)  Undefined index: CiviCampaign civicrm CRM/Core/Component.php(196)',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
       'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
     );
