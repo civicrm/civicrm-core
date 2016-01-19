@@ -149,6 +149,9 @@ class Bootstrap {
       if ($error == FALSE) {
         throw new \Exception("Could not load the CiviCRM settings file: {$settings}");
       }
+
+      list ($cmsType, $cmsBasePath) = $this->findCmsRoot($this->getSearchDir());
+      $_SERVER['SCRIPT_FILENAME'] = $cmsBasePath . '/index.php';
     }
 
     // Backward compatibility - New civicrm.settings.php files include
