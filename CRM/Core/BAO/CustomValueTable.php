@@ -430,12 +430,10 @@ class CRM_Core_BAO_CustomValueTable {
     }
     $cond = implode(' AND ', $cond);
 
-    $limit = '';
+    $limit = $orderBy = '';
     if (!empty($DTparams['rowCount']) && $DTparams['rowCount'] > 0) {
       $limit = " LIMIT " . CRM_Utils_Type::escape($DTparams['offset'], 'Integer') . ", " . CRM_Utils_Type::escape($DTparams['rowCount'], 'Integer');
     }
-
-    $orderBy = '';
     if (!empty($DTparams['sort'])) {
       $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($DTparams['sort'], 'String');
     }
@@ -474,7 +472,9 @@ AND    $cond
     foreach ($select as $tableName => $clauses) {
       $query = "SELECT SQL_CALC_FOUND_ROWS id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
       $dao = CRM_Core_DAO::executeQuery($query);
-      $result['count'] = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
+      if (!empty($DTparams)) {
+        $result['count'] = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
+      }
       while ($dao->fetch()) {
         foreach ($fields[$tableName] as $fieldID) {
           $fieldName = "custom_{$fieldID}";
