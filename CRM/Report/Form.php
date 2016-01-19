@@ -2140,7 +2140,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     foreach ($this->_columnHeaders as $fld => $val) {
       if (!in_array($fld, $this->_statFields)) {
         if (!$this->_grandFlag) {
-          $this->rollupRow[$fld] = "Grand Total";
+          $this->rollupRow[$fld] = ts('Grand Total');
           $this->_grandFlag = TRUE;
         }
         else {
