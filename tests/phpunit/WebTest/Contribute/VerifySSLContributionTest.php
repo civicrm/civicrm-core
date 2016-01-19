@@ -60,7 +60,6 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
       $contributionPageTitle = "Verify SSL ($hash)";
       $this->names['PayPal'] = "PayPal Pro ($hash)";
       $this->names['AuthNet'] = "AuthNet ($hash)";
-      //$this->names['Google_Checkout'] = "Google Checkout ($hash)";
       //$this->names['PayPal_Standard'] = "PayPal Standard ($hash)";
 
       $processors = array();
