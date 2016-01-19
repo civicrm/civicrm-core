@@ -489,7 +489,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
 (
   SELECT ca4.case_id, act4.id AS id, act4.activity_date_time AS desired_date, act4.activity_type_id, act4.status_id, aov.name AS act_type_name, aov.label AS act_type
   FROM civicrm_activity act4
-  LEFT JOIN civicrm_case_activity ca4
+  INNER JOIN civicrm_case_activity ca4
     ON ca4.activity_id = act4.id
     AND act4.is_current_revision = 1
   LEFT JOIN civicrm_option_group aog
