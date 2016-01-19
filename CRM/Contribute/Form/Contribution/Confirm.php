@@ -478,56 +478,35 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['is_quick_config'] = 1;
     }
     $this->assign('priceSetID', $this->_priceSetId);
-    $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
-    if ($this->_paymentProcessor &&
-      $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('Google_Checkout', $paymentProcessorType)
-      && !$this->_params['is_pay_later'] && !($this->_amount == 0)
-    ) {
-      $this->_checkoutButtonName = $this->getButtonName('next', 'checkout');
-      $this->add('image',
-        $this->_checkoutButtonName,
-        $this->_paymentProcessor['url_button'],
-        array('class' => 'crm-form-submit')
-      );
 
-      $this->addButtons(array(
-          array(
-            'type' => 'back',
-            'name' => ts('Go Back'),
-          ),
-        )
-      );
+    // The concept of contributeMode is deprecated.
+    // the is_monetary concept probably should be too as it can be calculated from
+    // the existence of 'amount' & seems fragile.
+    if ($this->_contributeMode == 'notify' || !$this->_values['is_monetary'] ||
+      $this->_amount <= 0.0 || $this->_params['is_pay_later'] ||
+      ($this->_separateMembershipPayment && $this->_amount <= 0.0)
+    ) {
+      $contribButton = ts('Continue');
+      $this->assign('button', ts('Continue'));
     }
     else {
-      // The concept of contributeMode is deprecated.
-      // the is_monetary concept probably should be too as it can be calculated from
-      // the existence of 'amount' & seems fragile.
-      if ($this->_contributeMode == 'notify' || !$this->_values['is_monetary'] ||
-        $this->_amount <= 0.0 || $this->_params['is_pay_later'] ||
-        ($this->_separateMembershipPayment && $this->_amount <= 0.0)
-      ) {
-        $contribButton = ts('Continue');
-        $this->assign('button', ts('Continue'));
-      }
-      else {
-        $contribButton = ts('Make Contribution');
-        $this->assign('button', ts('Make Contribution'));
-      }
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => $contribButton,
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-            'js' => array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"),
-          ),
-          array(
-            'type' => 'back',
-            'name' => ts('Go Back'),
-          ),
-        )
-      );
+      $contribButton = ts('Make Contribution');
+      $this->assign('button', ts('Make Contribution'));
     }
+    $this->addButtons(array(
+        array(
+          'type' => 'next',
+          'name' => $contribButton,
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+          'js' => array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"),
+        ),
+        array(
+          'type' => 'back',
+          'name' => ts('Go Back'),
+        ),
+      )
+    );
 
     $defaults = array();
     $fields = array_fill_keys(array_keys($this->_fields), 1);

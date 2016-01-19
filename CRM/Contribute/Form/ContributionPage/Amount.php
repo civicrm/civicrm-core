@@ -401,10 +401,6 @@ SELECT id
           'payment_processor_type_id'
         );
         $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessorTypeId, 'name');
-        if ($paymentProcessorType == 'Google_Checkout') {
-          $errors['is_recur_interval'] = ts('Google Checkout does not support recurring intervals');
-          break;
-        }
       }
     }
 
