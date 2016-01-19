@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
@@ -48,6 +46,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   /**
    */
   public function __construct() {
+    $this->_rollup = 'WITH ROLLUP';
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $yearsInPast = 10;
     $yearsInFuture = 1;
@@ -215,6 +214,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $optionYear,
             'default' => date('Y'),
+            'type' => CRM_Utils_Type::T_INT,
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
@@ -247,10 +247,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
-  }
-
-  public function preProcess() {
-    parent::preProcess();
   }
 
   public function select() {
@@ -382,7 +378,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   public function groupBy() {
     $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id, " .
       self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
-        '.receive_date') . " WITH ROLLUP";
+        '.receive_date') . " " . $this->_rollup;
     $this->assign('chartSupported', TRUE);
   }
 
