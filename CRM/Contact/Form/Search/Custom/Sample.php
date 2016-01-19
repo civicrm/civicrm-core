@@ -211,9 +211,7 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
    * @return array
    */
   public function setDefaultValues() {
-    return array(
-      'household_name' => '',
-    );
+    return array_merge(array('household_name' => ''), $this->_formValues);
   }
 
   /**

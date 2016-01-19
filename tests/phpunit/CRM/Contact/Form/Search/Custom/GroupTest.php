@@ -97,11 +97,12 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
+        dirname(__FILE__) . '/datasets/group-dataset.xml'
       )
     );
 
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
+
     $sql = $obj->all();
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -133,7 +134,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
+        dirname(__FILE__) . '/datasets/group-dataset.xml'
       )
     );
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
@@ -169,7 +170,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
+        dirname(__FILE__) . '/datasets/group-dataset.xml'
       )
     );
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);

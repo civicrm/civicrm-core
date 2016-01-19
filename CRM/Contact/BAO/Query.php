@@ -1474,6 +1474,14 @@ class CRM_Contact_BAO_Query {
     }
 
     foreach ($formValues as $id => $values) {
+
+      if (self::isAlreadyProcessedForQueryFormat($values)) {
+        $params[] = $values;
+        continue;
+      }
+
+      self::legacyConvertFormValues($id, $values);
+
       if ($id == 'privacy') {
         if (is_array($formValues['privacy'])) {
           $op = !empty($formValues['privacy']['do_not_toggle']) ? '=' : '!=';
@@ -1539,6 +1547,31 @@ class CRM_Contact_BAO_Query {
       }
     }
     return $params;
+  }
+
+  /**
+   * Function to support legacy format for groups and tags.
+   *
+   * @param string $id
+   * @param array|int $values
+   *
+   */
+  public static function legacyConvertFormValues($id, &$values) {
+    $legacyElements = array(
+      'group',
+      'tag',
+      'contact_tags',
+      'contact_type',
+      'membership_type_id',
+      'membership_status_id',
+      'activity_type_id',
+      'location_type',
+    );
+    if (in_array($id, $legacyElements) && is_array($values)) {
+      // prior to 4.6, formValues for some attributes (e.g. group, tag) are stored in array(id1 => 1, id2 => 1),
+      // as per the recent Search fixes $values need to be in standard array(id1, id2) format
+      CRM_Utils_Array::formatArrayKeys($values);
+    }
   }
 
   /**
@@ -4471,6 +4504,29 @@ civicrm_relationship.is_permission_a_b = 0
       return TRUE;
     }
     return FALSE;
+
+  /**
+   * Has this field already been reformatting to Query object syntax.
+   *
+   * The form layer passed formValues to this function in preProcess & postProcess. Reason unknown. This seems
+   * to come with associated double queries & is possibly damaging performance.
+   *
+   * However, here we add a tested function to ensure convertFormValues identifies pre-processed fields & returns
+   * them as they are.
+   *
+   * @param mixed $values
+   *   Value in formValues for the field.
+   *
+   * @return bool;
+   */
+  public static function isAlreadyProcessedForQueryFormat($values) {
+    if (!is_array($values)) {
+      return FALSE;
+    }
+    if (($operator = CRM_Utils_Array::value(1, $values)) == FALSE) {
+      return FALSE;
+    }
+    return in_array($operator, CRM_Core_DAO::acceptedSQLOperators());
   }
 
   /**
