@@ -144,10 +144,13 @@ class CRM_Custom_Page_AJAX {
     $fieldList = array();
     foreach ($fields as $id => $value) {
       $field = array();
-      foreach ($value as $fieldId => $fieldName) {
+      foreach ($value as $fieldId => &$fieldName) {
+        if (!empty($attributes[$fieldId][$id]['class'])) {
+          $fieldName = array('data' => $fieldName, 'cssClass' => $attributes[$fieldId][$id]['class']);
+        }
         if (is_numeric($fieldId)) {
-          $fieldName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldId, 'label');
-          CRM_Utils_Array::crmReplaceKey($value, $fieldId, $fieldName);
+          $fName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldId, 'label');
+          CRM_Utils_Array::crmReplaceKey($value, $fieldId, $fName);
         }
       }
       $field = $value;
