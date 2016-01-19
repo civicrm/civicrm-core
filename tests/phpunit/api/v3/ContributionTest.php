@@ -92,7 +92,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_processorParams = array(
       'domain_id' => 1,
       'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
+      'payment_processor_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_PaymentProcessor', 'payment_processor_type_id', 'Dummy'),
       'financial_account_id' => 12,
       'is_active' => 1,
       'user_name' => '',
