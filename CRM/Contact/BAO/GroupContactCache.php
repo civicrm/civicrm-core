@@ -324,6 +324,7 @@ WHERE  id IN ( $groupIDs )
         $query = "
 TRUNCATE civicrm_group_contact_cache
 ";
+        CRM_Core_DAO::executeQuery($query, $params);
         $update = "
 UPDATE civicrm_group g
 SET    cache_date = null,
@@ -331,17 +332,26 @@ SET    cache_date = null,
 ";
       }
       else {
-        $query = "
-DELETE     gc
-FROM       civicrm_group_contact_cache gc
-INNER JOIN civicrm_group g ON g.id = gc.group_id
-WHERE      TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout
+        $groupsQuery = "SELECT id
+          FROM civicrm_group
+          WHERE TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout ";
+        $dao = CRM_Core_DAO::executeQuery($groupsQuery);
+        $groupsIDs = array();
+        while ($dao->fetch()) {
+          $groupsIDs[] = $dao->id;
+          $query = "
+DELETE g
+FROM  civicrm_group_contact_cache g
+WHERE g.group_id = $dao->id;
 ";
+          CRM_Core_DAO::executeQuery($query, $params);
+        }
+        $groups = implode(', ', $groupsIDs);
         $update = "
 UPDATE civicrm_group g
 SET    cache_date = null,
        refresh_date = null
-WHERE  TIMESTAMPDIFF(MINUTE, cache_date, $now) >= $smartGroupCacheTimeout
+WHERE  g.group_id IN ($groups)
 ";
         $refresh = "
 UPDATE civicrm_group g
@@ -364,6 +374,7 @@ SET    cache_date = null,
        refresh_date = null
 WHERE  id IN ( $groupIDs )
 ";
+      CRM_Core_DAO::executeQuery($query, $params);
     }
     else {
       $query = "
@@ -378,9 +389,8 @@ SET    cache_date = null,
 WHERE  id = %1
 ";
       $params = array(1 => array($groupID, 'Integer'));
+      CRM_Core_DAO::executeQuery($query, $params);
     }
-
-    CRM_Core_DAO::executeQuery($query, $params);
 
     if ($refresh) {
       CRM_Core_DAO::executeQuery($refresh, $params);
