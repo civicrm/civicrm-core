@@ -432,7 +432,7 @@ class CRM_Core_BAO_CustomValueTable {
 
     $limit = '';
     if (!empty($DTparams['rowCount']) && $DTparams['rowCount'] > 0) {
-      $limit = " LIMIT {$DTparams['offset']}, {$DTparams['rowCount']} ";
+      $limit = " LIMIT " . CRM_Utils_Type::escape($DTparams['offset'], 'Integer') . ", " . CRM_Utils_Type::escape($DTparams['rowCount'], 'Integer');
     }
 
     $orderBy = '';

@@ -40,24 +40,45 @@
             <tr>
             {if $pageViewType eq 'customDataView'}
               {foreach from=$headers key=recId item=head}
-                <th data-data={ts}'{$head}'{/ts} cell-class="{$headerAttr.$recId.class}"
+                <th data-data={ts}'{$head}'{/ts}
                 {if !empty($headerAttr.$recId.dataType)}cell-data-type="{$headerAttr.$recId.dataType}"{/if}
                 {if !empty($headerAttr.$recId.dataEmptyOption)}cell-data-empty-option="{$headerAttr.$recId.dataEmptyOption}"{/if}>{ts}{$head}{/ts}
                 </th>
               {/foreach}
-              <th data-data="links" data-orderable="false">&nbsp;</th>
+              <th data-data="action" data-orderable="false">&nbsp;</th>
             </tr>
             </thead>
               {literal}
               <script type="text/javascript">
                 (function($) {
+                  var ZeroRecordText = {/literal}'{ts 1=$customGroupTitle}No records of type \'%1\' found.{/ts}'{literal};
                   $('table.crm-multifield-selector').data({
                     "ajax": {
                       "url": {/literal}'{crmURL p="civicrm/ajax/multirecordfieldlist" h=0 q="snippet=4&cid=$contactId&cgid=$customGroupId"}'{literal},
                     },
                     "aaSorting": [],
                     "pageLength": 10,
+                    "language": {
+                      "zeroRecords": ZeroRecordText,
+                    },
+                    //Add class attributes to cells
+                    "fnRowCallback": function(nRow, aData) {
+                      $('thead th').each( function( index ) {
+                        var fName = $(this).attr('data-data');
+                        var cell = $('td:eq(' + index + ')', nRow);
+                        if (typeof aData[fName]=='object'){
+                          if (typeof aData[fName].data != 'undefined') {
+                            $(cell).html(aData[fName].data);
+                          }
+                          if (typeof aData[fName].cssClass != 'undefined') {
+                            $(cell).attr('class', aData[fName].cssClass);
+                          }
+                        }
+                      });
+                      return nRow;
+                    },
                   })
+
                   $(".crm-multifield-selector").on('click','.delete-custom-row', function (e) {
                   var $el = $(this);
                   CRM.confirm({
