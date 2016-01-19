@@ -3305,8 +3305,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         'status' => ts('Records') . ' %%StatusMessage%%',
         'buttonBottom' => 'PagerBottomButton',
         'buttonTop' => 'PagerTopButton',
-        'pageID' => $this->get(CRM_Utils_Pager::PAGE_ID),
       );
+      if (!empty($this->controller)) {
+        // This happens when being called from the api Really we want the api to be able to
+        // pass paging parameters, but at this stage just preventing test crashes.
+        $params['pageID'] = $this->get(CRM_Utils_Pager::PAGE_ID);
+      }
 
       $pager = new CRM_Utils_Pager($params);
       $this->assign_by_ref('pager', $pager);
