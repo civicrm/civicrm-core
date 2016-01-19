@@ -33,11 +33,7 @@
     <div class="help">
         <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
             {if $contributeMode EQ 'notify' and ! $is_pay_later}
-                {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout'}
-                    {ts}Click the <strong>Google Checkout</strong> button to checkout to Google, where you will select your payment method and complete the contribution.{/ts}
-                {else}
-                    {ts 1=$paymentProcessor.name 2=$button}Click the <strong>%2</strong> button to go to %1, where you will select your payment method and complete the contribution.{/ts}
-                {/if}
+                {ts 1=$paymentProcessor.name 2=$button}Click the <strong>%2</strong> button to go to %1, where you will select your payment method and complete the contribution.{/ts}
             {elseif ! $is_monetary or $amount LE 0.0 or $is_pay_later}
                 {ts 1=$button}To complete this transaction, click the <strong>%1</strong> button below.{/ts}
             {else}
@@ -277,19 +273,6 @@
         {/if}
         </p>
     </div>
-    {/if}
-
-    {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout' and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) and ! $is_pay_later}
-        <fieldset class="crm-group google_checkout-group"><legend>{ts}Checkout with Google{/ts}</legend>
-        <table class="form-layout-compressed">
-            <tr>
-                <td class="description">{ts}Click the Google Checkout button to continue.{/ts}</td>
-            </tr>
-            <tr>
-                <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</span></td>
-            </tr>
-        </table>
-        </fieldset>
     {/if}
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">

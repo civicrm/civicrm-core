@@ -72,40 +72,6 @@ class CiviContributeProcessor {
     ),
   );
 
-  static $_googleParamsMapper = array(
-    //category    => array(google_param    => civicrm_field);
-    'contact' => array(
-      'first-name' => 'first_name',
-      'last-name' => 'last_name',
-      'contact-name' => 'display_name',
-      'email' => 'email',
-    ),
-    'location' => array(
-      'address1' => 'street_address',
-      'address2' => 'supplemental_address_1',
-      'city' => 'city',
-      'postal-code' => 'postal_code',
-      'country-code' => 'country',
-    ),
-    'transaction' => array(
-      'total-charge-amount' => 'total_amount',
-      'google-order-number' => 'trxn_id',
-      'currency' => 'currency',
-      'item-name' => 'source',
-      'item-description' => 'note',
-      'timestamp' => 'receive_date',
-      'latest-charge-fee' => 'fee_amount',
-      'net-amount' => 'net_amount',
-      'times' => 'installments',
-      'period' => 'frequency_unit',
-      'frequency_interval' => 'frequency_interval',
-      'start_date' => 'start_date',
-      'modified_date' => 'modified_date',
-      'trxn_type' => 'trxn_type',
-      'amount' => 'amount',
-    ),
-  );
-
   static $_csvParamsMapper = array(
     // Note: if csv header is not present in the mapper, header itself
     // is considered as a civicrm field.
@@ -239,82 +205,6 @@ class CiviContributeProcessor {
     } while ($result['l_errorcode0'] == '11002');
   }
 
-  /**
-   * @param $paymentProcessor
-   * @param $paymentMode
-   * @param $start
-   * @param $end
-   */
-  public static function google($paymentProcessor, $paymentMode, $start, $end) {
-    require_once "CRM/Contribute/BAO/Contribution/Utils.php";
-    require_once 'CRM/Core/Payment/Google.php';
-    $nextPageToken = TRUE;
-    $searchParams = array(
-      'start' => $start,
-      'end' => $end,
-      'notification-types' => array('charge-amount'),
-    );
-
-    $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor, $searchParams);
-
-    while ($nextPageToken) {
-      if ($response[0] == 'error') {
-        CRM_Core_Error::debug_log_message("GOOGLE ERROR: " .
-          $response[1]['error']['error-message']['VALUE'], TRUE
-        );
-      }
-      $nextPageToken = isset($response[1][$response[0]]['next-page-token']['VALUE']) ? $response[1][$response[0]]['next-page-token']['VALUE'] : FALSE;
-
-      if (is_array($response[1][$response[0]]['notifications']['charge-amount-notification'])) {
-
-        if (array_key_exists('google-order-number',
-          $response[1][$response[0]]['notifications']['charge-amount-notification']
-        )) {
-          // sometimes 'charge-amount-notification' itself is an absolute
-          // array and not array of arrays. This is the case when there is only one
-          // charge-amount-notification. Hack for this special case -
-          $chrgAmt = $response[1][$response[0]]['notifications']['charge-amount-notification'];
-          unset($response[1][$response[0]]['notifications']['charge-amount-notification']);
-          $response[1][$response[0]]['notifications']['charge-amount-notification'][] = $chrgAmt;
-        }
-
-        foreach ($response[1][$response[0]]['notifications']['charge-amount-notification'] as $amtData) {
-          $searchParams = array(
-            'order-numbers' => array($amtData['google-order-number']['VALUE']),
-            'notification-types' => array('risk-information', 'new-order', 'charge-amount'),
-          );
-          $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor,
-            $searchParams
-          );
-          // append amount information as well
-          $response[] = $amtData;
-
-          $params = self::formatAPIParams($response,
-            self::$_googleParamsMapper,
-            'google'
-          );
-          if ($paymentMode == 'test') {
-            $params['transaction']['is_test'] = 1;
-          }
-          else {
-            $params['transaction']['is_test'] = 0;
-          }
-          if (self::processAPIContribution($params)) {
-            CRM_Core_Error::debug_log_message("Processed - {$params['email']}, {$amtData['total-charge-amount']['VALUE']}, {$amtData['google-order-number']['VALUE']} ..<p>", TRUE);
-          }
-          else {
-            CRM_Core_Error::debug_log_message("Skipped - {$params['email']}, {$amtData['total-charge-amount']['VALUE']}, {$amtData['google-order-number']['VALUE']} ..<p>", TRUE);
-          }
-        }
-
-        if ($nextPageToken) {
-          $searchParams = array('next-page-token' => $nextPageToken);
-          $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor, $searchParams);
-        }
-      }
-    }
-  }
-
   public static function csv() {
     $csvFile = '/home/deepak/Desktop/crm-4247.csv';
     $delimiter = ";";
@@ -365,7 +255,6 @@ class CiviContributeProcessor {
 
     switch ($type) {
       case 'paypal':
-      case 'google':
         $start = CRM_Utils_Request::retrieve('start', 'String',
           CRM_Core_DAO::$_nullObject, FALSE, 31, 'REQUEST'
         );
@@ -410,7 +299,6 @@ class CiviContributeProcessor {
 
     if (!in_array($type, array(
       'paypal',
-      'google',
       'csv',
     ))
     ) {
@@ -508,98 +396,6 @@ class CiviContributeProcessor {
       return $params;
     }
 
-    if ($type == 'google') {
-      // return if response smell invalid
-      if (!array_key_exists('risk-information-notification', $apiParams[1][$apiParams[0]]['notifications'])) {
-        return FALSE;
-      }
-      $riskInfo = &$apiParams[1][$apiParams[0]]['notifications']['risk-information-notification'];
-
-      if (array_key_exists('new-order-notification', $apiParams[1][$apiParams[0]]['notifications'])) {
-        $newOrder = &$apiParams[1][$apiParams[0]]['notifications']['new-order-notification'];
-      }
-
-      if ($riskInfo['google-order-number']['VALUE'] == $apiParams[2]['google-order-number']['VALUE']) {
-        foreach ($riskInfo['risk-information']['billing-address'] as $field => $info) {
-          if (!empty($mapper['location'][$field])) {
-            $params['address'][1][$mapper['location'][$field]] = $info['VALUE'];
-          }
-          elseif (!empty($mapper['contact'][$field])) {
-            if ($newOrder && !empty($newOrder['buyer-billing-address']['structured-name'])) {
-              foreach ($newOrder['buyer-billing-address']['structured-name'] as $namePart => $nameValue) {
-                $params[$mapper['contact'][$namePart]] = $nameValue['VALUE'];
-              }
-            }
-            else {
-              $params[$mapper['contact'][$field]] = $info['VALUE'];
-            }
-          }
-          elseif (!empty($mapper['transaction'][$field])) {
-            $transaction[$mapper['transaction'][$field]] = $info['VALUE'];
-          }
-        }
-
-        // Response is an huge array. Lets pickup only those which we ineterested in
-        // using a local mapper, rather than traversing the entire array.
-        $localMapper = array(
-          'google-order-number' => $riskInfo['google-order-number']['VALUE'],
-          'total-charge-amount' => $apiParams[2]['total-charge-amount']['VALUE'],
-          'currency' => $apiParams[2]['total-charge-amount']['currency'],
-          'item-name' => $newOrder['shopping-cart']['items']['item']['item-name']['VALUE'],
-          'timestamp' => $apiParams[2]['timestamp']['VALUE'],
-        );
-        if (array_key_exists('latest-charge-fee', $apiParams[2])) {
-          $localMapper['latest-charge-fee'] = $apiParams[2]['latest-charge-fee']['total']['VALUE'];
-          $localMapper['net-amount'] = $localMapper['total-charge-amount'] - $localMapper['latest-charge-fee'];
-        }
-
-        // This is a subscription (recurring) donation.
-        if (array_key_exists('subscription', $newOrder['shopping-cart']['items']['item'])) {
-          $subscription = $newOrder['shopping-cart']['items']['item']['subscription'];
-          $localMapper['amount'] = $newOrder['order-total']['VALUE'];
-          $localMapper['times'] = $subscription['payments']['subscription-payment']['times'];
-          // Convert Google's period to one compatible with the CiviCRM db field.
-          $freqUnits = array(
-            'DAILY' => 'day',
-            'WEEKLY' => 'week',
-            'MONHTLY' => 'month',
-            'YEARLY' => 'year',
-          );
-          $localMapper['period'] = $freqUnits[$subscription['period']];
-          // Unlike PayPal, Google has no concept of freq. interval, it is always 1.
-          $localMapper['frequency_interval'] = '1';
-          // Google Checkout dates are in ISO-8601 format. We need a format that
-          // MySQL likes
-          $unix_timestamp = strtotime($localMapper['timestamp']);
-          $mysql_date = date('YmdHis', $unix_timestamp);
-          $localMapper['modified_date'] = $mysql_date;
-          $localMapper['start_date'] = $mysql_date;
-          // This is PayPal's nomenclature, but just use it for Google as well since
-          // we act on the value of trxn_type in processAPIContribution().
-          $localMapper['trxn_type'] = 'subscrpayment';
-        }
-
-        foreach ($localMapper as $localKey => $localVal) {
-          if (!empty($mapper['transaction'][$localKey])) {
-            $transaction[$mapper['transaction'][$localKey]] = $localVal;
-          }
-        }
-
-        if (empty($params) && empty($transaction)) {
-          continue;
-        }
-
-        if (!empty($transaction) && $category) {
-          $params['transaction'] = $transaction;
-        }
-        else {
-          $params += $transaction;
-        }
-
-        CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
-      }
-      return $params;
-    }
   }
 
   /**

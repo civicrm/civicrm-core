@@ -858,13 +858,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         'test_password' => '7ARxW575w736eF5p',
       );
     }
-    elseif ($processorType == 'Google_Checkout') {
-      // FIXME: we 'll need to make a new separate account for testing
-      $processorSettings = array(
-        'user_name' => '559999327053114',
-        'password' => 'R2zv2g60-A7GXKJYl0nR0g',
-      );
-    }
     elseif ($processorType == 'PayPal') {
       $processorSettings = array(
         'test_user_name' => '559999327053114',
