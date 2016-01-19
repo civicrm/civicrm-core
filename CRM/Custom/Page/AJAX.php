@@ -139,7 +139,7 @@ class CRM_Custom_Page_AJAX {
 
     list($fields, $attributes) = $obj->browse();
 
-    // format params and add links
+    // format params and add class attributes
     $fieldList = array();
     foreach ($fields as $id => $value) {
       $field = array();
@@ -155,12 +155,13 @@ class CRM_Custom_Page_AJAX {
       $field = $value;
       array_push($fieldList, $field);
     }
+    $totalRecords = !empty($obj->_total) ? $obj->_total : 0;
     $fieldList = array_map('array_merge', $fieldList);
 
     $multiRecordFields = array();
     $multiRecordFields['data'] = $fieldList;
-    $multiRecordFields['recordsTotal'] = $obj->_total;
-    $multiRecordFields['recordsFiltered'] = $obj->_total;
+    $multiRecordFields['recordsTotal'] = $totalRecords;
+    $multiRecordFields['recordsFiltered'] = $totalRecords;
 
     CRM_Utils_JSON::output($multiRecordFields);
   }

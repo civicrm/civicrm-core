@@ -30,7 +30,7 @@
   {else}
      {assign var='dialogId' value='profile-dialog'}
   {/if}
-  {if $records and $headers}
+  {if ($records and $headers) or ($pageViewType eq 'customDataView')}
     {include file="CRM/common/jsortable.tpl"}
     <div id="custom-{$customGroupId}-table-wrapper" {if $pageViewType eq 'customDataView'}class="crm-entity" data-entity="contact" data-id="{$contactId}"{/if}>
       <div>
@@ -56,17 +56,15 @@
                     "ajax": {
                       "url": {/literal}'{crmURL p="civicrm/ajax/multirecordfieldlist" h=0 q="snippet=4&cid=$contactId&cgid=$customGroupId"}'{literal},
                     },
-                    "aaSorting": [],
-                    "pageLength": 10,
                     "language": {
-                      "zeroRecords": ZeroRecordText,
+                      "emptyTable": ZeroRecordText,
                     },
                     //Add class attributes to cells
                     "fnRowCallback": function(nRow, aData) {
                       $('thead th').each( function( index ) {
                         var fName = $(this).attr('data-data');
                         var cell = $('td:eq(' + index + ')', nRow);
-                        if (typeof aData[fName]=='object'){
+                        if (typeof aData[fName]=='object') {
                           if (typeof aData[fName].data != 'undefined') {
                             $(cell).html(aData[fName].data);
                           }
