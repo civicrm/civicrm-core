@@ -369,7 +369,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               }
               if ($editable) {
                 $fieldAttributes['class'] .= ' crm-editable';
-                $headerAttr[$fieldId]['class'] = 'crm-editable';
               }
               $attributes[$fieldId][$recId] = $fieldAttributes;
 
@@ -408,7 +407,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $actionParams['cs'] = $pageCheckSum;
               }
 
-              $value['links'] = CRM_Core_Action::formLink(
+              $value['action'] = CRM_Core_Action::formLink(
                 $links,
                 $linkAction,
                 $actionParams,
