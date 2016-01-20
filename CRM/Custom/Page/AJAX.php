@@ -146,7 +146,7 @@ class CRM_Custom_Page_AJAX {
       $field = array();
       foreach ($value as $fieldId => &$fieldName) {
         if (!empty($attributes[$fieldId][$id]['class'])) {
-          $fieldName = array('data' => $fieldName, 'cssClass' => $attributes[$fieldId][$id]['class']);
+          $fieldName = array('data' => $fieldName, 'cellClass' => $attributes[$fieldId][$id]['class']);
         }
         if (is_numeric($fieldId)) {
           $fName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldId, 'label');
@@ -157,7 +157,6 @@ class CRM_Custom_Page_AJAX {
       array_push($fieldList, $field);
     }
     $totalRecords = !empty($obj->_total) ? $obj->_total : 0;
-    $fieldList = array_map('array_merge', $fieldList);
 
     $multiRecordFields = array();
     $multiRecordFields['data'] = $fieldList;

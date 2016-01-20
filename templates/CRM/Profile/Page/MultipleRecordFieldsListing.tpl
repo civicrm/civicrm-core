@@ -60,37 +60,21 @@
                       "emptyTable": ZeroRecordText,
                     },
                     //Add class attributes to cells
-                    "fnRowCallback": function(nRow, aData) {
-                      $('thead th').each( function( index ) {
+                    "rowCallback": function(row, data) {
+                      $('thead th').each( function(index) {
                         var fName = $(this).attr('data-data');
-                        var cell = $('td:eq(' + index + ')', nRow);
-                        if (typeof aData[fName]=='object') {
-                          if (typeof aData[fName].data != 'undefined') {
-                            $(cell).html(aData[fName].data);
+                        var cell = $('td:eq(' + index + ')', row);
+                        if (typeof data[fName] == 'object') {
+                          if (typeof data[fName].data != 'undefined') {
+                            $(cell).html(data[fName].data);
                           }
-                          if (typeof aData[fName].cssClass != 'undefined') {
-                            $(cell).attr('class', aData[fName].cssClass);
+                          if (typeof data[fName].cellClass != 'undefined') {
+                            $(cell).attr('class', data[fName].cellClass);
                           }
                         }
                       });
-                      return nRow;
                     },
                   })
-
-                  $(".crm-multifield-selector").on('click','.delete-custom-row', function (e) {
-                  var $el = $(this);
-                  CRM.confirm({
-                    message: '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}'
-                  }).on('crmConfirm:yes', function() {
-                      var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
-                      var request = $.post(postUrl, $el.data('delete_params'));
-                      CRM.status({/literal}"{ts escape='js'}Record Deleted{/ts}"{literal}, request);
-                      request.done(function() {
-                        CRM.refreshParent($el);
-                      });
-                    })
-                    e.preventDefault();
-                  });
                 })(CRM.$);
               </script>
               {/literal}
