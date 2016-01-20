@@ -118,11 +118,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals(1, $payment['count']);
-    $this->assertEquals($payment['values'][$payment['id']]['total_amount'], 100.00);
-    $this->assertEquals($payment['values'][$payment['id']]['trxn_id'], 23456);
-    $this->assertEquals($payment['values'][$payment['id']]['trxn_date'], '2010-01-20 00:00:00');
-    $this->assertEquals($payment['values'][$payment['id']]['is_payment'], 1);
-    $this->assertEquals($payment['values'][$payment['id']]['contribution_id'], $contribution['id']);
+    $expectedResult = array(
+      'total_amount' => 100,
+      'trxn_id' => 23456,
+      'trxn_date' => '2010-01-20 00:00:00',
+      'contribution_id' => $contribution['id'],
+      'is_payment' => 1,
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
