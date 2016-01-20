@@ -219,7 +219,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($expectedResult as $key => $value) {
       $this->assertEquals($payment['values'][$payment['id']][$key], $value);
     }
-    
   }
 
   /**
