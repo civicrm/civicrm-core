@@ -98,7 +98,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test Get.
+   * Test Get Payment api.
    */
   public function testGetPayment() {
     $p = array(
@@ -128,8 +128,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * Test create payment api with no line item in params
+   */
   public function testCreatePaymentNoLineItems() {
-
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -189,8 +191,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * Test create payment api with line item in params
+   */
   public function testCreatePaymentLineItems() {
-
     // Create priceset & price fields
     $this->createPriceSet();
 
@@ -253,6 +257,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * function to delete data
+   */
   public function cleanUpAfterPriceSets() {
     $this->quickCleanUpFinancialEntities();
     $this->contactDelete($this->_ids['contact']);
