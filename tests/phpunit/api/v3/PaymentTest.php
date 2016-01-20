@@ -26,7 +26,6 @@
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
 
 
 /**
@@ -41,21 +40,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Assume empty database with just civicrm_data.
    */
   protected $_individualId;
-  protected $_contribution;
   protected $_financialTypeId = 1;
   protected $_apiversion;
-  protected $_entity = 'Contribution';
   public $debug = 0;
-  protected $_params;
-  protected $_ids = array();
-  protected $_pageParams = array();
-
-  /**
-   * Parameters to create payment processor.
-   *
-   * @var array
-   */
-  protected $_processorParams = array();
 
   /**
    * Setup function.
@@ -65,28 +52,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $this->_apiversion = 3;
     $this->_individualId = $this->individualCreate();
-    $this->_params = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '20120511',
-      'total_amount' => 100.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'non_deductible_amount' => 10.00,
-      'fee_amount' => 5.00,
-      'net_amount' => 95.00,
-      'source' => 'SSF',
-      'contribution_status_id' => 1,
-    );
-    $this->_processorParams = array(
-      'domain_id' => 1,
-      'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
-      'financial_account_id' => 12,
-      'is_active' => 1,
-      'user_name' => '',
-      'url_site' => 'http://dummy.com',
-      'url_recur' => 'http://dummy.com',
-      'billing_mode' => 1,
-    );
   }
 
   /**
@@ -309,14 +274,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
-  }
-
-  /**
-   * function to delete data
-   */
-  public function cleanUpAfterPriceSets() {
-    $this->quickCleanUpFinancialEntities();
-    $this->contactDelete($this->_ids['contact']);
   }
 
   /**
