@@ -32,7 +32,7 @@
  */
 
 /**
- * This class generates form components generic to recurring contributions
+ * This class generates form components generic to recurring contributions.
  *
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
@@ -64,12 +64,17 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    */
   public $_contactID;
 
+  /**
+   * Pre-processing for the form.
+   *
+   * @throws \Exception
+   */
   public function preProcess() {
 
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->_crid) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'info');
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
+      $this->_paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($this->_crid);
+      $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
     }
 
