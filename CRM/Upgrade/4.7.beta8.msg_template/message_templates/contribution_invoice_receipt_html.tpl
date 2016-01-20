@@ -170,6 +170,7 @@
           </td>
         </tr>
       </table>
+      {if $contribution_status_id == $pendingStatusId && $is_pay_later == 1}
       <table style = "margin-top:5px;padding-right:45px;">
         <tr>
           <td><img src = "{$resourceBase}/i/contribute/cut_line.png" height = "15" width = "630"></td>
@@ -215,10 +216,8 @@
     {/if}
     <tr>
       <td colspan = "2"></td>
-      {if $contribution_status_id == $pendingStatusId && $is_pay_later == 1}
         <td><font size = "1" align = "right" style="font-weight:bold;">{ts}Due Date:  {/ts}</font></td>
         <td><font size = "1" align = "right">{$dueDate}</font></td>
-      {/if}
     </tr>
     <tr>
                   <td colspan = "5" style = "color:#F5F5F5;"><hr></hr></td>
@@ -228,6 +227,7 @@
     </tr>
   </table>
 
+{/if}
 
       {if $contribution_status_id == $refundedStatusId || $contribution_status_id == $cancelledStatusId}
     <table style = "margin-top:2px;padding-left:7px;page-break-before: always;">
