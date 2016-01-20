@@ -4768,7 +4768,7 @@ LIMIT 1;";
       foreach ($lineItems as $key => $value) {
         $paid = $value['line_total'] * ($contribution->net_amount / $contribution->total_amount);
         // Record Entity Financial Trxn
-        $params['amount'] = $paid;
+        $params['amount'] = round($paid, 2);
         $params['entity_id'] = $ftIds[$value['price_field_value_id']];
 
         civicrm_api3('EntityFinancialTrxn', 'create', $params);
@@ -4806,7 +4806,7 @@ LIMIT 1;";
       foreach ($lineItems as $key => $value) {
         $paid = $value['line_total'] * ($params['total_amount'] / $contribution['total_amount']);
         // Record Entity Financial Trxn
-        $eftParams['amount'] = $paid;
+        $eftParams['amount'] = round($paid, 2);
         $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
 
         civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
