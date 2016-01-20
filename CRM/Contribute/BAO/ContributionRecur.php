@@ -113,7 +113,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    * @param array $duplicates
-   *   (reference ) store ids of duplicate contribs.
+   *   (reference ) store ids of duplicate contributions.
    *
    * @return bool
    *   true if duplicate, false otherwise
@@ -157,19 +157,21 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   }
 
   /**
+   * Get the payment processor (array) for a recurring processor.
+   *
    * @param int $id
-   * @param $mode
+   * @param string $mode
+   *   - Test or NULL - all other variants are ignored.
    *
    * @return array|null
    */
-  public static function getPaymentProcessor($id, $mode) {
-    //FIX ME:
+  public static function getPaymentProcessor($id, $mode = NULL) {
     $sql = "
 SELECT r.payment_processor_id
   FROM civicrm_contribution_recur r
  WHERE r.id = %1";
     $params = array(1 => array($id, 'Integer'));
-    $paymentProcessorID = &CRM_Core_DAO::singleValueQuery($sql,
+    $paymentProcessorID = CRM_Core_DAO::singleValueQuery($sql,
       $params
     );
     if (!$paymentProcessorID) {
@@ -180,7 +182,7 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * Get the number of installment done/completed for each recurring contribution
+   * Get the number of installment done/completed for each recurring contribution.
    *
    * @param array $ids
    *   (reference ) an array of recurring contribution ids.
