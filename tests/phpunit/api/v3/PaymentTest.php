@@ -345,4 +345,30 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * Test delete payment api
+   */
+  public function testDeletePayment() {
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+
+    $params = array(
+      'contribution_id' => $contribution['id'],
+    );
+
+    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $payment['count']);
+
+    $cancelParams = array(
+      'id' => $payment['id'],
+    );
+    $this->callAPIAndDocument('payment', 'delete', $cancelParams, __FUNCTION__, __FILE__);
+
+    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(0, $payment['count']);
+
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+  }
+
 }
