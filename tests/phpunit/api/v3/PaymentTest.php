@@ -226,32 +226,27 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api with line item in params
    */
   public function testCreatePaymentLineItems() {
-    // Create priceset & price fields
-    $this->createPriceSet();
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $lineItems = $this->callAPISuccess('LineItem', 'get', array('contribution_id' => $contribution['id']));
 
-    $params = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '20120511',
-      'total_amount' => 200.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'payment_instrument_id' => 1,
-      'contribution_status_id' => 8,
-    );
-
-    $contribution = $this->callAPISuccess('contribution', 'create', $params); //Create partially paid contribution
-
-    //Create partial payment
+    //Create partial payment by passing line item array is params
     $params = array(
       'contribution_id' => $contribution['id'],
-      'total_amount' => 150,
+      'total_amount' => 50,
     );
+    $amounts = array(40, 10);
+    foreach ($lineItems['values'] as $id => $ignore) {
+      $params['line_item'][] = array($id => array_pop($amounts));
+    }
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
-
-    $this->assertEquals($payment['values'][$payment['id']]['from_financial_account_id'], 7);
-    $this->assertEquals($payment['values'][$payment['id']]['to_financial_account_id'], 6);
-    $this->assertEquals($payment['values'][$payment['id']]['total_amount'], 150);
-    $this->assertEquals($payment['values'][$payment['id']]['status_id'], 1);
-    $this->assertEquals($payment['values'][$payment['id']]['is_payment'], 1);
+    $expectedResult = array(
+      'from_financial_account_id' => 7,
+      'to_financial_account_id' => 6,
+      'total_amount' => 50,
+      'status_id' => 1,
+      'is_payment' => 1,
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
 
     // Check entity financial trxn created properly
     $params = array(
@@ -262,27 +257,56 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
 
-    $this->assertEquals($eft['values'][$eft['id']]['amount'], 150);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 50);
+
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $amounts = array(40, 10);
+    foreach ($eft['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($amounts));
+    }
 
     // Now create payment to complete total amount of contribution
     $params = array(
       'contribution_id' => $contribution['id'],
-      'total_amount' => 50,
+      'total_amount' => 100,
     );
+    $amounts = array(80, 20);
+    foreach ($lineItems['values'] as $id => $ignore) {
+      $params['line_item'][] = array($id => array_pop($amounts));
+    }
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
-
-    $this->assertEquals($payment['values'][$payment['id']]['from_financial_account_id'], 7);
-    $this->assertEquals($payment['values'][$payment['id']]['to_financial_account_id'], 6);
-    $this->assertEquals($payment['values'][$payment['id']]['total_amount'], 50);
-    $this->assertEquals($payment['values'][$payment['id']]['status_id'], 1);
-    $this->assertEquals($payment['values'][$payment['id']]['is_payment'], 1);
-
+    $expectedResult = array(
+      'from_financial_account_id' => 7,
+      'to_financial_account_id' => 6,
+      'total_amount' => 100,
+      'status_id' => 1,
+      'is_payment' => 1,
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $amounts = array(80, 20);
+    foreach ($eft['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($amounts));
+    }
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
 
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 200.00);
-
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 300.00);
+    $paymentParticipant = array(
+      'contribution_id' => $contribution['id'],
+    );
+    $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $paymentParticipant);
+    $participant = $this->callAPISuccess('participant', 'get', array('id' => $participantPayment['participant_id']));
+    $this->assertEquals($participant['values'][$participant['id']]['participant_status'], 'Registered');
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
