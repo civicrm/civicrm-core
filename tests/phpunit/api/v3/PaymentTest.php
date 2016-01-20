@@ -132,29 +132,22 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api with no line item in params
    */
   public function testCreatePaymentNoLineItems() {
-    $params = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '20120511',
-      'total_amount' => 200.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'payment_instrument_id' => 1,
-      'contribution_status_id' => 8,
-    );
-
-    $contribution = $this->callAPISuccess('contribution', 'create', $params); //Create partially paid contribution
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
 
     //Create partial payment
     $params = array(
       'contribution_id' => $contribution['id'],
-      'total_amount' => 150,
+      'total_amount' => 50,
     );
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
-
-    $this->assertEquals($payment['values'][$payment['id']]['from_financial_account_id'], 7);
-    $this->assertEquals($payment['values'][$payment['id']]['to_financial_account_id'], 6);
-    $this->assertEquals($payment['values'][$payment['id']]['total_amount'], 150);
-    $this->assertEquals($payment['values'][$payment['id']]['status_id'], 1);
-    $this->assertEquals($payment['values'][$payment['id']]['is_payment'], 1);
+    $expectedResult = array(
+      'from_financial_account_id' => 7,
+      'to_financial_account_id' => 6,
+      'total_amount' => 50,
+      'status_id' => 1,
+      'is_payment' => 1,
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
 
     // Check entity financial trxn created properly
     $params = array(
@@ -165,30 +158,42 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
 
-    $this->assertEquals($eft['values'][$eft['id']]['amount'], 150);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 50);
 
     // Now create payment to complete total amount of contribution
     $params = array(
       'contribution_id' => $contribution['id'],
-      'total_amount' => 50,
+      'total_amount' => 100,
     );
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
-
-    $this->assertEquals($payment['values'][$payment['id']]['from_financial_account_id'], 7);
-    $this->assertEquals($payment['values'][$payment['id']]['to_financial_account_id'], 6);
-    $this->assertEquals($payment['values'][$payment['id']]['total_amount'], 50);
-    $this->assertEquals($payment['values'][$payment['id']]['status_id'], 1);
-    $this->assertEquals($payment['values'][$payment['id']]['is_payment'], 1);
+    $expectedResult = array(
+      'from_financial_account_id' => 7,
+      'to_financial_account_id' => 6,
+      'total_amount' => 100,
+      'status_id' => 1,
+      'is_payment' => 1,
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
 
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
 
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 200.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 300.00);
 
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
+  }
+
+  /**
+   * Function to assert db values
+   */
+  public function checkPaymentResult($payment, $expectedResult) {
+    foreach ($expectedResult as $key => $value) {
+      $this->assertEquals($payment['values'][$payment['id']][$key], $value);
+    }
+    
   }
 
   /**
