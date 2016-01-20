@@ -328,13 +328,7 @@ SELECT f.id, f.label, f.data_type,
           case 'Country':
 
             if ($field['is_search_range'] && is_array($value)) {
-              $this->searchRange($field['id'],
-                $field['label'],
-                $field['data_type'],
-                $fieldName,
-                $value,
-                $grouping
-              );
+              //didn't found any field under any of these three data-types as searchable by range
             }
             else {
               // fix $value here to escape sql injection attacks
@@ -388,13 +382,8 @@ SELECT f.id, f.label, f.data_type,
             break;
 
           case 'Int':
-            if ($field['is_search_range'] && is_array($value)) {
-              $this->searchRange($field['id'], $field['label'], $field['data_type'], $fieldName, $value, $grouping);
-            }
-            else {
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-              $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));;
-            }
+            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
+            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));;
             break;
 
           case 'Boolean':
@@ -430,77 +419,14 @@ SELECT f.id, f.label, f.data_type,
             }
 
           case 'Float':
-            if ($field['is_search_range']) {
-              $this->searchRange($field['id'], $field['label'], $field['data_type'], $fieldName, $value, $grouping);
-            }
-            else {
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Float');
-              $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
-            }
+            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Float');
+            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
             break;
 
           case 'Date':
-            if (in_array($op, CRM_Core_DAO::acceptedSQLOperators())) {
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-              list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value,
-                $op, array(), CRM_Utils_Type::T_DATE);
-              $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
-              break;
-            }
-
-            $fromValue = CRM_Utils_Array::value('from', $value);
-            $toValue = CRM_Utils_Array::value('to', $value);
-            $value = CRM_Utils_Array::value($op, $value, $value);
-
-            if (!$fromValue && !$toValue) {
-              if (!is_array($value) && !CRM_Utils_Date::processDate($value) && !in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-                continue;
-              }
-
-              // hack to handle yy format during search
-              if (is_numeric($value) && strlen($value) == 4) {
-                $value = "01-01-{$value}";
-              }
-
-              if (is_array($value)) {
-                $date = $qillValue = array();
-                foreach ($value as $key => $val) {
-                  $date[$key] = CRM_Utils_Date::processDate($val);
-                  $qillValue[$key] = CRM_Utils_Date::customFormat($date[$key]);
-                }
-              }
-              else {
-                $date = CRM_Utils_Date::processDate($value);
-                $qillValue = CRM_Utils_Date::customFormat($date);
-              }
-
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $date, 'String');
-              $this->_qill[$grouping][] = $field['label'] . " {$qillOp} " . implode(', ', (array) $qillValue);
-            }
-            else {
-              if (is_numeric($fromValue) && strlen($fromValue) == 4) {
-                $fromValue = "01-01-{$fromValue}";
-              }
-
-              if (is_numeric($toValue) && strlen($toValue) == 4) {
-                $toValue = "01-01-{$toValue}";
-              }
-
-              // TO DO: add / remove time based on date parts
-              $fromDate = CRM_Utils_Date::processDate($fromValue);
-              $toDate = CRM_Utils_Date::processDate($toValue);
-              if (!$fromDate && !$toDate) {
-                continue;
-              }
-              if ($fromDate) {
-                $this->_where[$grouping][] = "$fieldName >= $fromDate";
-                $this->_qill[$grouping][] = $field['label'] . ' >= ' . CRM_Utils_Date::customFormat($fromDate);
-              }
-              if ($toDate) {
-                $this->_where[$grouping][] = "$fieldName <= $toDate";
-                $this->_qill[$grouping][] = $field['label'] . ' <= ' . CRM_Utils_Date::customFormat($toDate);
-              }
-            }
+            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+            list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, array(), CRM_Utils_Type::T_DATE);
+            $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
             break;
 
           case 'File':
@@ -553,45 +479,6 @@ SELECT f.id, f.label, f.data_type,
       implode(' ', $this->_tables),
       $whereStr,
     );
-  }
-
-  /**
-   * @param int $id
-   * @param $label
-   * @param $type
-   * @param string $fieldName
-   * @param $value
-   * @param $grouping
-   */
-  public function searchRange(&$id, &$label, $type, $fieldName, &$value, &$grouping) {
-    $qill = array();
-
-    if (isset($value['from'])) {
-      $val = CRM_Utils_Type::escape($value['from'], $type);
-
-      if ($type == 'String') {
-        $this->_where[$grouping][] = "$fieldName >= '$val'";
-      }
-      else {
-        $this->_where[$grouping][] = "$fieldName >= $val";
-      }
-      $qill[] = ts('greater than or equal to \'%1\'', array(1 => $value['from']));
-    }
-
-    if (isset($value['to'])) {
-      $val = CRM_Utils_Type::escape($value['to'], $type);
-      if ($type == 'String') {
-        $this->_where[$grouping][] = "$fieldName <= '$val'";
-      }
-      else {
-        $this->_where[$grouping][] = "$fieldName <= $val";
-      }
-      $qill[] = ts('less than or equal to \'%1\'', array(1 => $value['to']));
-    }
-
-    if (!empty($qill)) {
-      $this->_qill[$grouping][] = $label . ' - ' . implode(' ' . ts('and') . ' ', $qill);
-    }
   }
 
 }
