@@ -49,7 +49,15 @@
             CRM.$(function($) {
               var $table = $("#{/literal}custom-{$customGroupId}-table-wrapper{literal}");
               $('a.delete-custom-row', $table).on('click', function(e) {
-                var $el = $(this);
+                deleteRow($(this));
+                e.preventDefault();
+              });
+              $(".crm-multifield-selector").on('click', '.delete-custom-row', function (e) {
+                deleteRow($(this));
+                e.preventDefault();
+              });
+
+              function deleteRow($el) {
                 CRM.confirm({
                   message: '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}'
                 }).on('crmConfirm:yes', function() {
@@ -60,8 +68,7 @@
                     CRM.refreshParent($el);
                   });
                 })
-                e.preventDefault();
-              });
+              }
             });
           </script>
         {/literal}
