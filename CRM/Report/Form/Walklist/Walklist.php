@@ -97,6 +97,7 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
           'state_province_id' => array(
             'title' => ts('State/Province'),
             'default' => TRUE,
+            'type' => CRM_Utils_Type::T_INT,
           ),
           'country_id' => array(
             'title' => ts('Country'),
