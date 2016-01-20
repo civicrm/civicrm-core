@@ -375,4 +375,78 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * Test update payment api
+   */
+  public function testUpdatePayment() {
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+
+    //Create partial payment by passing line item array is params
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 50,
+    );
+
+    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $expectedResult = array(
+      'from_financial_account_id' => 7,
+      'to_financial_account_id' => 6,
+      'total_amount' => 50,
+      'status_id' => 1,
+      'is_payment' => 1,
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
+
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $amounts = array(33.33, 16.67);
+    foreach ($eft['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($amounts));
+    }
+
+    // update the amount for payment
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 100,
+      'id' => $payment['id'],
+    );
+    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $amounts = array(66.67, 33.33);
+    foreach ($eft['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($amounts));
+    }
+
+    $params = array(
+      'contribution_id' => $contribution['id'],
+    );
+    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $amounts = array(100.00, -50.00, 50.00, 150.00);
+    foreach ($payment['values'] as $value) {
+      $amount = array_pop($amounts);
+      $this->assertEquals($value['total_amount'], $amount, 'Mismatch total amount');
+
+      // Check entity financial trxn created properly
+      $params = array(
+        'entity_id' => $contribution['id'],
+        'entity_table' => 'civicrm_contribution',
+        'financial_trxn_id' => $value['id'],
+      );
+      $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+      $this->assertEquals($eft['values'][$eft['id']]['amount'], $amount);
+    }
+
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+  }
+
 }
