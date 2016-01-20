@@ -4046,7 +4046,7 @@ WHERE con.id = {$contributionId}
       empty($params['skipLineItem']) && !$isLineItem
     ) {
       $taxRateParams = $taxRates[$params['financial_type_id']];
-      $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($params['total_amount'], $taxRateParams);
+      $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount(CRM_Utils_Array::value('total_amount', $params), $taxRateParams);
       $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
 
       // Get Line Item on update of contribution
@@ -4061,7 +4061,7 @@ WHERE con.id = {$contributionId}
           $params['line_item'][$setID][$priceFieldID]['tax_amount'] = $params['tax_amount'];
         }
       }
-      $params['total_amount'] = $params['total_amount'] + $params['tax_amount'];
+      $params['total_amount'] = CRM_Utils_Array::value('total_amount', $params) + $params['tax_amount'];
     }
     elseif (isset($params['api.line_item.create'])) {
       // Update total amount of contribution using lineItem
