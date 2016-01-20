@@ -121,7 +121,7 @@ function civicrm_api3_payment_cancel(&$params) {
  */
 function civicrm_api3_payment_create(&$params) {
   // Check if it is an update
-  if ($params['id']) {
+  if (CRM_Utils_Array::value ('id', $params)) {
     $amount = $params['total_amount'];
     civicrm_api3('Payment', 'cancel', $params);
     $params['total_amount'] = $amount;
