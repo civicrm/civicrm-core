@@ -163,6 +163,16 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $this->assertEquals($eft['values'][$eft['id']]['amount'], 50);
 
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $amounts = array(33.33, 16.67);
+    foreach ($eft['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($amounts));
+    }
+
     // Now create payment to complete total amount of contribution
     $params = array(
       'contribution_id' => $contribution['id'],
@@ -177,13 +187,26 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'is_payment' => 1,
     );
     $this->checkPaymentResult($payment, $expectedResult);
-
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $amounts = array(66.67, 33.33);
+    foreach ($eft['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($amounts));
+    }
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
 
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 300.00);
-
+    $paymentParticipant = array(
+      'contribution_id' => $contribution['id'],
+    );
+    $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $paymentParticipant);
+    $participant = $this->callAPISuccess('participant', 'get', array('id' => $participantPayment['participant_id']));
+    $this->assertEquals($participant['values'][$participant['id']]['participant_status'], 'Registered');
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
