@@ -317,7 +317,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test cancel payment api
-   */ 
+   */
   public function testCancelPayment() {
     list($lineItems, $contribution) = $this->createParticipantWithContribution();
 
@@ -336,7 +336,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(2, $payment['count']);
     $amounts = array(-150.00, 150.00);
-    foreach($payment['values'] as $value) {
+    foreach ($payment['values'] as $value) {
       $this->assertEquals($value['total_amount'], array_pop($amounts), 'Mismatch total amount');
     }
 
