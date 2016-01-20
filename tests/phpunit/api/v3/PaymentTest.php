@@ -315,4 +315,34 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->_priceIds['price_field'] = $priceField['id'];
   }
 
+  /**
+   * Test cancel payment api
+   */ 
+  public function testCancelPayment() {
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+
+    $params = array(
+      'contribution_id' => $contribution['id'],
+    );
+
+    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $payment['count']);
+
+    $cancelParams = array(
+      'id' => $payment['id'],
+    );
+    $this->callAPIAndDocument('payment', 'cancel', $cancelParams, __FUNCTION__, __FILE__);
+
+    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(2, $payment['count']);
+    $amounts = array(-150.00, 150.00);
+    foreach($payment['values'] as $value) {
+      $this->assertEquals($value['total_amount'], array_pop($amounts), 'Mismatch total amount');
+    }
+
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+  }
+
 }
