@@ -319,56 +319,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->contactDelete($this->_ids['contact']);
   }
 
-
-  /**
-   * Create price set.
-   *
-   */
-  public function createPriceSet() {
-    $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', array(
-      'title' => "Test Contribution Page",
-      'financial_type_id' => 1,
-      'currency' => 'NZD',
-      'is_pay_later' => 1,
-      'is_monetary' => TRUE,
-      'is_email_receipt' => FALSE,
-    ));
-    $priceSet = $this->callAPISuccess('price_set', 'create', array(
-      'is_quick_config' => 0,
-      'extends' => 'CiviContribute',
-      'financial_type_id' => 1,
-      'title' => 'My Test Price Set',
-    ));
-    $priceSetID = $priceSet['id'];
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
-
-    $priceField = $this->callAPISuccess('price_field', 'create', array(
-      'price_set_id' => $priceSetID,
-      'label' => 'Goat Breed',
-      'html_type' => 'Radio',
-    ));
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
-        'price_set_id' => $priceSetID,
-        'price_field_id' => $priceField['id'],
-        'label' => 'Long Haired Goat',
-        'amount' => 50,
-        'financial_type_id' => 'Donation',
-      )
-    );
-    $this->_priceIds['price_field_value'] = array($priceFieldValue['id']);
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
-        'price_set_id' => $priceSetID,
-        'price_field_id' => $priceField['id'],
-        'label' => 'Shoe-eating Goat',
-        'amount' => 150,
-        'financial_type_id' => 'Donation',
-      )
-    );
-    $this->_priceIds['price_field_value'][] = $priceFieldValue['id'];
-    $this->_priceIds['price_set'] = $priceSetID;
-    $this->_priceIds['price_field'] = $priceField['id'];
-  }
-
   /**
    * Test cancel payment api
    */
