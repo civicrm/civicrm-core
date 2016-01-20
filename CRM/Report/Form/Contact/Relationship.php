@@ -45,6 +45,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   /**
+   * This will be a_b or b_a.
+   *
+   * @var string
+   */
+  protected $relationType;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -557,7 +564,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function postProcess() {
     $this->beginPostProcess();
 
-    $this->relationType = NULL;
     $originalRelationshipTypeIdValue = $this->_params['relationship_type_id_value'];
     if (!empty($this->_params['relationship_type_id_value'])) {
       $relationshipTypes = array();
