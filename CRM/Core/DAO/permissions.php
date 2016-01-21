@@ -196,9 +196,10 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   // Campaign permissions
   $permissions['campaign'] = array(
     'get' => array('access CiviCRM'),
-    'create' => array(array('administer CiviCampaign', 'manage campaign')),
-    'update' => array(array('administer CiviCampaign', 'manage campaign')),
-    'delete' => array(array('administer CiviCampaign', 'manage campaign')),
+    'default' => array(
+      // nested array = OR
+      array('administer CiviCampaign', 'manage campaign')
+    ),
   );
   $permissions['survey'] = $permissions['campaign'];
 
@@ -570,7 +571,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   if ($action == 'replace' || $snippet == 'del') {
     // 'Replace' is a combination of get+create+update+delete; however, the permissions
     // on each of those will be tested separately at runtime. This is just a sniff-test
-    // based on the heuristic that 'delete' tends to be the most closesly guarded
+    // based on the heuristic that 'delete' tends to be the most closely guarded
     // of the necessary permissions.
     $action = 'delete';
   }
