@@ -119,16 +119,10 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
+   * Set the default values of various form elements.
    *
    * @return array
-   *   reference to the array of default values
-   */
-  /**
-   * @return array
+   *   Default values
    */
   public function setDefaultValues() {
     $this->_defaults = array();
@@ -211,7 +205,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param CRM_Core_Form $self
    *
    *
    * @return bool|array
