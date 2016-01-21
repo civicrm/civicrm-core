@@ -583,6 +583,11 @@ class CRM_Contribute_BAO_Query {
         $query->_tables['civicrm_product'] = $query->_whereTables['civicrm_product'] = 1;
         return;
 
+      case 'contribution_is_payment':
+        $query->_where[$grouping][] = " civicrm_financial_trxn.is_payment $op $value";
+        $query->_tables['contribution_financial_trxn'] = $query->_whereTables['contribution_financial_trxn'] = 1;
+        return;
+
       default:
         //all other elements are handle in this case
         $fldName = substr($name, 13);

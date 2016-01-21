@@ -3447,4 +3447,95 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     ));
   }
 
+  /**
+   * Add participant with contribution
+   *
+   * @return array
+   */
+  protected function createParticipantWithContribution() {
+    // creating price set, price field
+    require_once 'CiviTest/Event.php';
+    require_once 'CiviTest/Contact.php';
+    $this->_contactId = Contact::createIndividual();
+    $this->_eventId = Event::create($this->_contactId);
+    $paramsSet['title'] = 'Price Set';
+    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
+    $paramsSet['is_active'] = TRUE;
+    $paramsSet['financial_type_id'] = 4;
+    $paramsSet['extends'] = 1;
+    $priceSet = $this->callAPISuccess('price_set', 'create', $paramsSet);
+    $priceSetId = $priceSet['id'];
+    //Checking for priceset added in the table.
+    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
+      'id', $paramsSet['title'], 'Check DB for created priceset'
+    );
+    $paramsField = array(
+      'label' => 'Price Field',
+      'name' => CRM_Utils_String::titleToVar('Price Field'),
+      'html_type' => 'CheckBox',
+      'option_label' => array('1' => 'Price Field 1', '2' => 'Price Field 2'),
+      'option_value' => array('1' => 100, '2' => 200),
+      'option_name' => array('1' => 'Price Field 1', '2' => 'Price Field 2'),
+      'option_weight' => array('1' => 1, '2' => 2),
+      'option_amount' => array('1' => 100, '2' => 200),
+      'is_display_amounts' => 1,
+      'weight' => 1,
+      'options_per_line' => 1,
+      'is_active' => array('1' => 1, '2' => 1),
+      'price_set_id' => $priceSet['id'],
+      'is_enter_qty' => 1,
+      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+    );
+    $priceField = CRM_Price_BAO_PriceField::create($paramsField);
+    $eventParams = array(
+      'id' => $this->_eventId,
+      'financial_type_id' => 4,
+      'is_monetary' => 1,
+    );
+    $this->callAPISuccess('event', 'create', $eventParams);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetId);
+    $priceFields = $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $priceField->id));
+    $participantParams = array(
+      'financial_type_id' => 4,
+      'event_id' => $this->_eventId,
+      'role_id' => 1,
+      'status_id' => 14,
+      'fee_currency' => 'USD',
+      'contact_id' => $this->_contactId,
+    );
+    $participant = $this->callAPISuccess('Participant', 'create', $participantParams);
+    $contributionParams = array(
+      'total_amount' => 150,
+      'currency' => 'USD',
+      'contact_id' => $this->_contactId,
+      'financial_type_id' => 4,
+      'contribution_status_id' => 1,
+      'partial_payment_total' => 300.00,
+      'partial_amount_pay' => 150,
+      'contribution_mode' => 'participant',
+      'participant_id' => $participant['id'],
+    );
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[1][$key] = array(
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+      );
+    }
+    $contributionParams['line_item'] = $lineItems;
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $paymentParticipant = array(
+      'participant_id' => $participant['id'],
+      'contribution_id' => $contribution['id'],
+    );
+    $ids = array();
+    $this->callAPISuccess('ParticipantPayment', 'create', $paymentParticipant);
+    return array($lineItems, $contribution);
+  }
+
 }
