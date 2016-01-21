@@ -39,6 +39,9 @@
     <required>true</required>
     <comment>Amount to be contributed or charged each recurrence.</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>currency</name>
@@ -81,6 +84,9 @@
     <required>true</required>
     <comment>Number of time units for recurrence of payment.</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>installments</name>
@@ -88,6 +94,9 @@
     <type>int unsigned</type>
     <comment>Total number of payments to be made. Set this to 0 if this is an open-ended commitment i.e. no set end date.</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>start_date</name>
@@ -96,6 +105,9 @@
     <required>true</required>
     <comment>The date the first scheduled recurring contribution occurs.</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>create_date</name>
@@ -104,6 +116,9 @@
     <required>true</required>
     <comment>When this recurring contribution record was created.</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>modified_date</name>
@@ -111,6 +126,9 @@
     <type>datetime</type>
     <comment>Last updated date for this record. mostly the last time a payment was received</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>cancel_date</name>
@@ -118,6 +136,9 @@
     <type>datetime</type>
     <comment>Date this recurring contribution was cancelled by contributor- if we can get access to it</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>end_date</name>
@@ -125,6 +146,9 @@
     <type>datetime</type>
     <comment>Date this recurring contribution finished successfully</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>processor_id</name>
@@ -221,6 +245,9 @@
     <type>datetime</type>
     <comment>Next scheduled date</comment>
     <add>4.4</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>failure_count</name>
@@ -236,6 +263,9 @@
     <title>Retry Failed Attempt Date</title>
     <comment>Date to retry failed attempt</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>auto_renew</name>
