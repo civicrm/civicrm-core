@@ -169,4 +169,33 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     return NULL;
   }
 
+  /**
+   * Get an array of the fields that can be edited on the recurring contribution.
+   *
+   * Some payment processors support editing the amount and other scheduling details of recurring payments, especially
+   * those which use tokens. Others are fixed. This function allows the processor to return an array of the fields that
+   * can be updated from the contribution recur edit screen.
+   *
+   * The fields are likely to be a subset of these
+   *  - 'amount',
+   *  - 'installments',
+   *  - 'frequency_interval',
+   *  - 'frequency_unit',
+   *  - 'cycle_day',
+   *  - 'next_sched_contribution_date',
+   *  - 'end_date',
+   *  - 'failure_retry_day',
+   *
+   * The form does not restrict which fields from the contribution_recur table can be added (although if the html_type
+   * metadata is not defined in the xml for the field it will cause an error.
+   *
+   * Open question - would it make sense to return membership_id in this - which is sometimes editable and is on that
+   * form (UpdateSubscription).
+   *
+   * @return array
+   */
+  public function getEditableRecurringScheduleFields() {
+    return array('amount', 'next_sched_contribution_date');
+  }
+
 }
