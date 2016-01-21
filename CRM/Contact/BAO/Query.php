@@ -1489,6 +1489,18 @@ class CRM_Contact_BAO_Query {
           $params[] = array('on_hold', '=', $formValues['email_on_hold']['on_hold'], 0, 0);
         }
       }
+      elseif (substr($id, 0, 7) == 'custom_'
+        &&  (
+          substr($id, -9, 9) == '_relative'
+          || substr($id, -5, 5) == '_from'
+          || substr($id, -3, 3) == '_to'
+        )
+      ) {
+        self::convertCustomRelativeFields($formValues, $params, $values, $id);
+      }
+      elseif (!empty($values) && !is_array($values) && self::isCustomDateField($id)) {
+        $params[] = array($id, '=', CRM_Utils_Date::processDate($values), 0, $wildcard);
+      }
       elseif (preg_match('/_date_relative$/', $id) ||
         $id == 'event_relative' ||
         $id == 'case_from_relative' ||
@@ -4386,6 +4398,82 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
+   * Convert submitted values for relative custom fields to query object format.
+   *
+   * The query will support the sqlOperator format so convert to that format.
+   *
+   * @param array $formValues
+   *   Submitted values.
+   * @param array $params
+   *   Converted parameters for the query object.
+   * @param string $values
+   *   Submitted value.
+   * @param string $fieldName
+   *   Submitted field name. (Matches form field not DB field.)
+   */
+  protected static function convertCustomRelativeFields(&$formValues, &$params, $values, $fieldName) {
+    if (empty($values)) {
+      // e.g we might have relative set & from & to empty. The form flow is a bit funky &
+      // this function gets called again after they fields have been converted which can get ugly.
+      return;
+    }
+    $customFieldName = self::getCustomFieldName($fieldName);
+
+    if (substr($fieldName, -9, 9) == '_relative') {
+      list($from, $to) = CRM_Utils_Date::getFromTo($values, NULL, NULL);
+    }
+    else {
+      if ($fieldName == $customFieldName . '_to' && CRM_Utils_Array::value($customFieldName . '_from', $formValues)) {
+        // Both to & from are set. We only need to acton one, choosing from.
+        return;
+      }
+
+      $from = CRM_Utils_Array::value($customFieldName . '_from', $formValues, NULL);
+      $to = CRM_Utils_Array::value($customFieldName . '_to', $formValues, NULL);
+
+      if (self::isCustomDateField($customFieldName)) {
+        list($from, $to) = CRM_Utils_Date::getFromTo(NULL, $from, $to);
+      }
+    }
+
+    if ($from) {
+      if ($to) {
+        $relativeFunction = array('BETWEEN' => array($from, $to));
+      }
+      else {
+        $relativeFunction = array('>=' => $from);
+      }
+    }
+    else {
+      $relativeFunction = array('<=' => $to);
+    }
+    $params[] = array(
+      $customFieldName,
+      '=',
+      $relativeFunction,
+      0,
+      0,
+    );
+  }
+
+  /**
+   * Are we dealing with custom field of type date.
+   *
+   * @param $fieldName
+   *
+   * @return bool
+   */
+  public static function isCustomDateField($fieldName) {
+    if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($fieldName)) == FALSE) {
+      return FALSE;
+    }
+    if ('Date' == civicrm_api3('CustomField', 'getvalue', array('id' => $customFieldID, 'return' => 'data_type'))) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * Create and query the db for an contact search.
    *
    * @param int $offset
@@ -5170,7 +5258,9 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
           // We could get away with keeping this in 4.6 if we make it such that it throws an enotice in 4.7 so
           // people have to de-slopify it.
           if (!empty($value[0])) {
-            $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReport;
+            if ($op != 'BETWEEN') {
+              $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReport;
+            }
             if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => $value), $dataType)) != FALSE) {
               return $queryString;
             }
@@ -5683,11 +5773,26 @@ AND   displayRelType.is_active = 1
         $fieldValue = implode(', ', $qillString);
       }
       else {
-        $fieldValue = implode(', ', $fieldValue);
+        if ($type == CRM_Utils_Type::T_DATE) {
+          foreach ($fieldValue as $index => $value) {
+            $fieldValue[$index] = CRM_Utils_Date::customFormat($value);
+          }
+        }
+        $separator = ', ';
+        // @todo - this is a bit specific (one operator).
+        // However it is covered by a unit test so can be altered later with
+        // some confidence.
+        if ($op == 'BETWEEN') {
+          $separator = ' AND ';
+        }
+        $fieldValue = implode($separator, $fieldValue);
       }
     }
     elseif (!empty($pseudoOptions) && array_key_exists($fieldValue, $pseudoOptions)) {
       $fieldValue = $pseudoOptions[$fieldValue];
+    }
+    elseif ($type === CRM_Utils_Type::T_DATE) {
+      $fieldValue = CRM_Utils_Date::customFormat($fieldValue);
     }
 
     return array(CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue);
