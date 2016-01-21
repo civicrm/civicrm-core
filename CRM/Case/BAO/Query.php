@@ -233,9 +233,13 @@ class CRM_Case_BAO_Query {
       }
     }
     // Add acl clause
-    $aclClauses = array_filter(CRM_Case_BAO_Case::getSelectWhereClause());
-    foreach ($aclClauses as $clause) {
-      $query->_where[0][] = $clause;
+    // This is new and so far only for cases - it would be good to find a more abstract
+    // way to auto-apply this for all search components rather than copy-pasting this code to others
+    if (isset($query->_tables['civicrm_case'])) {
+      $aclClauses = array_filter(CRM_Case_BAO_Case::getSelectWhereClause());
+      foreach ($aclClauses as $clause) {
+        $query->_where[0][] = $clause;
+      }
     }
   }
 
