@@ -440,7 +440,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // Case C: Default error handler
 
     // log to file
-    CRM_Core_Error::debug_var('Fatal Error Details', $vars);
+    CRM_Core_Error::debug_var('Fatal Error Details', $vars, FALSE);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
     // print to screen
