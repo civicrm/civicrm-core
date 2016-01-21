@@ -130,10 +130,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $alreadyHardCodedFields = array('amount', 'installments');
     foreach ($this->editableScheduleFields as $editableScheduleField) {
       if (!in_array($editableScheduleField, $alreadyHardCodedFields)) {
-        $this->addField($editableScheduleField, array(
-          'entity' => 'ContributionRecur',
-          'context' => $this->getDefaultContext(),
-        ));
+        $this->addField($editableScheduleField, array('entity' => 'ContributionRecur'));
       }
     }
 
