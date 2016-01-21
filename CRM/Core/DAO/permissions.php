@@ -183,6 +183,11 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   );
   $permissions['case_contact'] = $permissions['case'];
 
+  $permissions['case_type'] = array(
+    'default' => array('administer CiviCase'),
+    'get' => array('access my cases and activities'),
+  );
+
   // Campaign permissions
   $permissions['campaign'] = array(
     'get' => array('access CiviCRM'),
