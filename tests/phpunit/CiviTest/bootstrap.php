@@ -16,7 +16,7 @@ if (file_exists('/etc/timezone')) {
 # Crank up the memory
 ini_set('memory_limit', '2G');
 define('CIVICRM_TEST', 1);
-eval(cv('php:boot', 1));
+eval(cv('php:boot --level=settings', 'phpcode'));
 
 // This is exists to support CiviUnitTestCase::populateDB(). That doesn't make it a good idea.
 require_once "DB.php";
@@ -34,23 +34,39 @@ $GLOBALS['mysql_db'] = $dsninfo['database'];
  *
  * @param string $cmd
  *   The rest of the command to send.
- * @param bool $raw
- *   If TRUE, return the raw output. If FALSE, parse JSON output.
+ * @param string $decode
+ *   Ex: 'json' or 'phpcode'.
  * @return string
  *   Response output (if the command executed normally).
  * @throws \RuntimeException
  *   If the command terminates abnormally.
  */
-function cv($cmd, $raw = FALSE) {
+function cv($cmd, $decode = 'json') {
   $cmd = 'cv ' . $cmd;
   $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => STDERR);
   $env = $_ENV + array('CV_OUTPUT' => 'json');
   $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__, $env);
   fclose($pipes[0]);
-  $bootCode = stream_get_contents($pipes[1]);
+  $result = stream_get_contents($pipes[1]);
   fclose($pipes[1]);
   if (proc_close($process) !== 0) {
-    throw new RuntimeException("Command failed ($cmd)");
+    throw new RuntimeException("Command failed ($cmd):\n$result");
   }
-  return $raw ? $bootCode : json_decode($bootCode, 1);
+  switch ($decode) {
+    case 'raw':
+      return $result;
+
+    case 'phpcode':
+      // If the last output is /*PHPCODE*/, then we managed to complete execution.
+      if (substr(trim($result), 0, 12) !== "/*BEGINPHP*/" || substr(trim($result), -10) !== "/*ENDPHP*/") {
+        throw new \RuntimeException("Command failed ($cmd):\n$result");
+      }
+      return $result;
+
+    case 'json':
+      return json_decode($result, 1);
+
+    default:
+      throw new RuntimeException("Bad decoder format ($decode)");
+  }
 }
