@@ -517,6 +517,9 @@ COLS;
     // so there's no need for a default timestamp and therefore we remove such default timestamps
     // also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
     $query = self::fixTimeStampAndNotNullSQL($query);
+
+    // Ensure there's a comma present before adding the new columns
+    $query = preg_replace("/(?<!,)(?<=\S)(\s*\n\))/", ",$1", $query);
     $query = preg_replace("/^\) /m", "$cols\n) ", $query);
 
     CRM_Core_DAO::executeQuery($query);
