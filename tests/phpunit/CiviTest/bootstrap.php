@@ -15,8 +15,8 @@ if (file_exists('/etc/timezone')) {
 
 # Crank up the memory
 ini_set('memory_limit', '2G');
-
-eval(cv('php:boot --test', 1));
+define('CIVICRM_TEST', 1);
+eval(cv('php:boot', 1));
 
 // This is exists to support CiviUnitTestCase::populateDB(). That doesn't make it a good idea.
 require_once "DB.php";
