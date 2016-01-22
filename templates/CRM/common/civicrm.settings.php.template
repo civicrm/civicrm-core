@@ -64,7 +64,7 @@ if (!defined('CIVICRM_UF')) {
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-if (!defined('CIVICRM_UF_DSN')) {
+if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
   define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true');
 }
 
@@ -89,7 +89,12 @@ if (!defined('CIVICRM_UF_DSN')) {
  *
  */
 if (!defined('CIVICRM_DSN')) {
-  define( 'CIVICRM_DSN'          , 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true');
+  if (CIVICRM_UF !== 'UnitTests') {
+    define('CIVICRM_DSN', 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true');
+  }
+  else {
+    define('CIVICRM_DSN', 'mysql://%%testUser%%:%%testPass%%@%%testHost%%/%%testName%%?new_link=true');
+  }
 }
 
 /**
