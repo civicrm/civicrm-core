@@ -1,15 +1,8 @@
 <?php
 // ADAPTED FROM tools/scripts/phpunit
 
-$GLOBALS['base_dir'] = dirname(dirname(dirname(__DIR__)));
-$tests_dir = $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'phpunit';
-$civi_pkgs_dir = $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR . 'packages';
 ini_set('safe_mode', 0);
-ini_set('include_path',
-  "{$GLOBALS['base_dir']}" . PATH_SEPARATOR .
-  "$tests_dir" . PATH_SEPARATOR .
-  "$civi_pkgs_dir" . PATH_SEPARATOR
-  . ini_get('include_path'));
+ini_set('include_path', dirname(__DIR__) . PATH_SEPARATOR . ini_get('include_path'));
 
 #  Relying on system timezone setting produces a warning,
 #  doing the following prevents the warning message
@@ -23,15 +16,46 @@ if (file_exists('/etc/timezone')) {
 # Crank up the memory
 ini_set('memory_limit', '2G');
 
-require_once $GLOBALS['base_dir'] . '/vendor/autoload.php';
-
-/*
-require $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR .
-'packages' . DIRECTORY_SEPARATOR .
-'PHPUnit' . DIRECTORY_SEPARATOR .
-'Autoload.php';
- */
-
+// TODO Consider moving into main civicrm.settings.php so that `cv('api')` works better.
 if (!defined('CIVICRM_UF') && getenv('CIVICRM_UF')) {
   define('CIVICRM_UF', getenv('CIVICRM_UF'));
+}
+
+eval(cv('php:boot --test', 1));
+
+// This is exists to support CiviUnitTestCase::populateDB(). That doesn't make it a good idea.
+require_once "DB.php";
+$dsninfo = DB::parseDSN(CIVICRM_DSN);
+$GLOBALS['mysql_host'] = $dsninfo['hostspec'];
+$GLOBALS['mysql_port'] = @$dsninfo['port'];
+$GLOBALS['mysql_user'] = $dsninfo['username'];
+$GLOBALS['mysql_pass'] = $dsninfo['password'];
+$GLOBALS['mysql_db'] = $dsninfo['database'];
+
+// ------------------------------------------------------------------------------
+
+/**
+ * Call the "cv" command.
+ *
+ * @param string $cmd
+ *   The rest of the command to send.
+ * @param bool $raw
+ *   If TRUE, return the raw output. If FALSE, parse JSON output.
+ * @return string
+ *   Response output (if the command executed normally).
+ * @throws \RuntimeException
+ *   If the command terminates abnormally.
+ */
+function cv($cmd, $raw = FALSE) {
+  $cmd = 'cv ' . $cmd;
+  $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => STDERR);
+  $env = $_ENV + array('CV_OUTPUT' => 'json');
+  $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__, $env);
+  fclose($pipes[0]);
+  $bootCode = stream_get_contents($pipes[1]);
+  fclose($pipes[1]);
+  if (proc_close($process) !== 0) {
+    throw new RuntimeException("Command failed ($cmd)");
+  }
+  return $raw ? $bootCode : json_decode($bootCode, 1);
 }
