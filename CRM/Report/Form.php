@@ -4038,15 +4038,17 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (array_key_exists('civicrm_address_country_id', $row)) {
       if ($value = $row['civicrm_address_country_id']) {
         $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
-          "reset=1&force=1&{$criteriaQueryParams}&" .
-          "country_id_op=in&country_id_value={$value}",
-          $this->_absoluteUrl, $this->_id
-        );
-        $rows[$rowNum]['civicrm_address_country_id_link'] = $url;
-        $rows[$rowNum]['civicrm_address_country_id_hover'] = ts("%1 for this country.",
-          array(1 => $linkText)
-        );
+        if ($baseUrl) {
+          $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
+            "reset=1&force=1&{$criteriaQueryParams}&" .
+            "country_id_op=in&country_id_value={$value}",
+            $this->_absoluteUrl, $this->_id
+          );
+          $rows[$rowNum]['civicrm_address_country_id_link'] = $url;
+          $rows[$rowNum]['civicrm_address_country_id_hover'] = ts("%1 for this country.",
+            array(1 => $linkText)
+          );
+        }
       }
 
       $entryFound = TRUE;
@@ -4054,15 +4056,17 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (array_key_exists('civicrm_address_county_id', $row)) {
       if ($value = $row['civicrm_address_county_id']) {
         $rows[$rowNum]['civicrm_address_county_id'] = CRM_Core_PseudoConstant::county($value, FALSE);
-        $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
-          "reset=1&force=1&{$criteriaQueryParams}&" .
-          "county_id_op=in&county_id_value={$value}",
-          $this->_absoluteUrl, $this->_id
-        );
-        $rows[$rowNum]['civicrm_address_county_id_link'] = $url;
-        $rows[$rowNum]['civicrm_address_county_id_hover'] = ts("%1 for this county.",
-          array(1 => $linkText)
-        );
+        if ($baseUrl) {
+          $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
+            "reset=1&force=1&{$criteriaQueryParams}&" .
+            "county_id_op=in&county_id_value={$value}",
+            $this->_absoluteUrl, $this->_id
+          );
+          $rows[$rowNum]['civicrm_address_county_id_link'] = $url;
+          $rows[$rowNum]['civicrm_address_county_id_hover'] = ts("%1 for this county.",
+            array(1 => $linkText)
+          );
+        }
       }
       $entryFound = TRUE;
     }
@@ -4070,15 +4074,16 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (array_key_exists('civicrm_address_state_province_id', $row)) {
       if ($value = $row['civicrm_address_state_province_id']) {
         $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-
-        $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
-          "reset=1&force=1&{$criteriaQueryParams}&state_province_id_op=in&state_province_id_value={$value}",
-          $this->_absoluteUrl, $this->_id
-        );
-        $rows[$rowNum]['civicrm_address_state_province_id_link'] = $url;
-        $rows[$rowNum]['civicrm_address_state_province_id_hover'] = ts("%1 for this state.",
-          array(1 => $linkText)
-        );
+        if ($baseUrl) {
+          $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
+            "reset=1&force=1&{$criteriaQueryParams}&state_province_id_op=in&state_province_id_value={$value}",
+            $this->_absoluteUrl, $this->_id
+          );
+          $rows[$rowNum]['civicrm_address_state_province_id_link'] = $url;
+          $rows[$rowNum]['civicrm_address_state_province_id_hover'] = ts("%1 for this state.",
+            array(1 => $linkText)
+          );
+        }
       }
       $entryFound = TRUE;
     }
@@ -4106,7 +4111,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       if (array_key_exists('civicrm_contact_' . $fieldName, $row)) {
         if (($value = $row['civicrm_contact_' . $fieldName]) != FALSE) {
           $rows[$rowNum]['civicrm_contact_' . $fieldName] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $value);
-          if (($title = CRM_Utils_Array::value($fieldName, $addLinks)) != FALSE) {
+          if ($baseUrl && ($title = CRM_Utils_Array::value($fieldName, $addLinks)) != FALSE) {
             $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, $fieldName, 'civicrm_contact', $title);
           }
         }
