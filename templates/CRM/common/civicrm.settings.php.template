@@ -394,6 +394,11 @@ if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
 // define('CIVICRM_MYSQL_STRICT', TRUE );
 // }
 
+if (CIVICRM_UF === 'UnitTests') {
+  if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');
+  if (!defined('CIVICRM_MYSQL_STRICT')) define('CIVICRM_MYSQL_STRICT', true);
+}
+
 /**
  *
  * Do not change anything below this line. Keep as is
