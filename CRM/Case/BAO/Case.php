@@ -3145,7 +3145,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         )
       )";
     }
-
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
   }
 
