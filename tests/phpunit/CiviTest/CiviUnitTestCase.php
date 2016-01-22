@@ -249,6 +249,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   TRUE if the populate logic runs; FALSE if it is skipped
    */
   protected static function _populateDB($perClass = FALSE, &$object = NULL) {
+    if (CIVICRM_UF !== 'UnitTests') {
+      throw new \RuntimeException("_populateDB requirs CIVICRM_UF=UnitTests");
+    }
 
     if ($perClass || $object == NULL) {
       $dbreset = TRUE;
