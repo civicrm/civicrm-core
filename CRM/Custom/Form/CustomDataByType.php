@@ -53,7 +53,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     if (!is_array($this->_subType) && strstr($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR)) {
       $this->_subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
-    CRM_Custom_Form_CustomData::setGroupTree($this, $this->_subType, NULL, $this->_groupID);
+    CRM_Custom_Form_CustomData::setGroupTree($this, $this->_subType, $this->_groupID);
 
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;
