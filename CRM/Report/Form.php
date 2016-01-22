@@ -2159,6 +2159,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         }
       }
     }
+    if ($this->_grandFlag) {
+      $this->moveSummaryColumnsToTheRightHandSide();
+    }
 
     $this->assign('grandStat', $this->rollupRow);
     return TRUE;
@@ -2850,6 +2853,17 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   public function modifyColumnHeaders() {
     // use this method to modify $this->_columnHeaders
+  }
+
+  /**
+   * Move totals columns to the right edge of the table.
+   *
+   * It seems like a more logical layout to have any totals columns on the far right regardless of
+   * the location of the rest of their table.
+   */
+  public function moveSummaryColumnsToTheRightHandSide() {
+    $statHeaders = (array_intersect_key($this->_columnHeaders, array_flip($this->_statFields)));
+    $this->_columnHeaders = array_merge(array_diff_key($this->_columnHeaders, $statHeaders), $this->_columnHeaders, $statHeaders);
   }
 
   /**
