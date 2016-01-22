@@ -4157,6 +4157,17 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         $entryFound = TRUE;
       }
     }
+    $yesNoFields = array(
+      'do_not_email', 'is_deceased', 'do_not_phone', 'do_not_sms', 'do_not_mail', 'is_opt_out',
+    );
+    foreach ($yesNoFields as $fieldName) {
+      if (array_key_exists('civicrm_contact_' . $fieldName, $row)) {
+        // Since these are essentially 'negative fields' it feels like it
+        // makes sense to only highlight the exceptions hence no 'No'.
+        $rows[$rowNum]['civicrm_contact_' . $fieldName] = !empty($rows[$rowNum]['civicrm_contact_' . $fieldName]) ? ts('Yes') : '';
+        $entryFound = TRUE;
+      }
+    }
     return $entryFound;
   }
 
@@ -4333,6 +4344,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'external_identifier' => array(
         'title' => ts('Contact identifier from external system'),
       ),
+      'do_not_email' => array(),
+      'do_not_phone' => array(),
+      'do_not_mail' => array(),
+      'do_not_sms' => array(),
+      'is_opt_out' => array(),
+      'is_deceased' => array(),
     );
   }
 
