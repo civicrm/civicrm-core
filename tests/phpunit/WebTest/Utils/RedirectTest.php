@@ -23,22 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/CiviSeleniumSettings.php';
 
-/**
- *  Include configuration
- */
-define('CIVICRM_SETTINGS_PATH', __DIR__ . '/civicrm.settings.dist.php');
-define('CIVICRM_SETTINGS_LOCAL_PATH', __DIR__ . '/civicrm.settings.local.php');
 define('CIVICRM_WEBTEST', 1);
-
-if (file_exists(CIVICRM_SETTINGS_LOCAL_PATH)) {
-  require_once CIVICRM_SETTINGS_LOCAL_PATH;
-}
-require_once CIVICRM_SETTINGS_PATH;
-
 
 /**
  * Check that we handle redirects appropriately.
