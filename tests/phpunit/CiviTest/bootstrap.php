@@ -31,3 +31,7 @@ require $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR .
 'PHPUnit' . DIRECTORY_SEPARATOR .
 'Autoload.php';
  */
+
+if (!defined('CIVICRM_UF') && getenv('CIVICRM_UF')) {
+  define('CIVICRM_UF', getenv('CIVICRM_UF'));
+}

@@ -36,6 +36,10 @@ foreach ($argv as $k => $v) {
   elseif (preg_match('/^Civi\\\\/', $v)) {
     $argv[$k] = 'tests/phpunit/' . strtr($v, '\\', '/') . '.php';
   }
+
+  if (!preg_match('/^(WebTest)/', $v)) {
+    putenv('CIVICRM_UF=UnitTests');
+  }
 }
 
 // Transition: Make sure we use phpunit code from PATH, not
@@ -50,6 +54,7 @@ if (is_dir('packages/PHPUnit/')) {
 
 $cmd =
   findPhp() // In case this system has multiple copies of PHP, use the active/preferred one.
+  // . ' -ddisplay_errors=1'
   . ' '
   . escapeshellarg($phpunit)
   . ' '
