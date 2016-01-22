@@ -54,7 +54,12 @@
  * (Administer::System Settings::Resource URLs).
  */
 if (!defined('CIVICRM_UF')) {
-  define( 'CIVICRM_UF', '%%cms%%');
+  if (getenv('CIVICRM_UF')) {
+    define('CIVICRM_UF', getenv('CIVICRM_UF'));
+  }
+  else {
+    define('CIVICRM_UF', '%%cms%%');
+  }
 }
 
 /**

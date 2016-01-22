@@ -16,11 +16,6 @@ if (file_exists('/etc/timezone')) {
 # Crank up the memory
 ini_set('memory_limit', '2G');
 
-// TODO Consider moving into main civicrm.settings.php so that `cv('api')` works better.
-if (!defined('CIVICRM_UF') && getenv('CIVICRM_UF')) {
-  define('CIVICRM_UF', getenv('CIVICRM_UF'));
-}
-
 eval(cv('php:boot --test', 1));
 
 // This is exists to support CiviUnitTestCase::populateDB(). That doesn't make it a good idea.

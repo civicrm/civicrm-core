@@ -51,6 +51,9 @@ class ExternalBatch {
     $this->root = $civicrm_root;
     $this->settingsPath = defined('CIVICRM_SETTINGS_PATH') ? CIVICRM_SETTINGS_PATH : NULL;
     $this->defaultParams = $defaultParams;
+    $this->addEnv(array(
+      'CIVICRM_UF' => CIVICRM_UF,
+    ));
   }
 
   /**
