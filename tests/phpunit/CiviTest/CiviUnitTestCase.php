@@ -920,7 +920,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
 
     $calls = new \Civi\API\ExternalBatch($defaultParams);
-    $calls->setSettingsPath("$civicrm_root/tests/phpunit/CiviTest/civicrm.settings.cli.php");
 
     if (!$calls->isSupported()) {
       $this->markTestSkipped('The test relies on Civi\API\ExternalBatch. This is unsupported in the local environment.');
