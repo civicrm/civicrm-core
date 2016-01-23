@@ -148,6 +148,19 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       $defaults['participant_campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values['event']);
     }
 
+    //CRM-17865 set custom field defaults
+    if (!empty($this->_fields)) {
+      foreach ($this->_fields as $name => $field) {
+        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
+          if (!isset($defaults[$name])) {
+            CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $defaults,
+              NULL, CRM_Profile_Form::MODE_REGISTER
+            );
+          }
+        }
+      }
+    }
+
     return $defaults;
   }
 
