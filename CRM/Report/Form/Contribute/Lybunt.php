@@ -38,12 +38,52 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
+  /**
+   * This is the report that links will lead to.
+   *
+   * It is a bit problematic to use contribute/detail for anything other than a single contact
+   * as the filtering from this report does not carry over to that report.
+   *
+   * @var array
+   */
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   protected $lifeTime_from = NULL;
   protected $lifeTime_where = NULL;
+  protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Household',
+    'Organization',
+  );
 
   /**
+   * Table containing list of contact IDs.
+   *
+   * @var string
+   */
+  protected $contactTempTable = '';
+
+  /**
+   * Table containing list of contact IDs.
+   *
+   * @var string
+   */
+  protected $groupTempTable = '';
+
+  /**
+   * Status clause to be added in to both contact based & contribution based queries.
+   *
+   * The rationale seems to be that we construct a list of contacts and then show the relevant contributions for them.
+   *
+   * Presumably the clause originally was only status but now type is included too.
+   *
+   * @var string
+   */
+  protected $_statusClause = '';
+
+  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_rollup = 'WITH ROLLUP';
@@ -70,48 +110,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
         'grouping' => 'contact-field',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Donor Name'),
-            'default' => TRUE,
-            'required' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-          ),
-          'middle_name' => array(
-            'title' => ts('Middle Name'),
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-          ),
-          'age' => array(
-            'title' => ts('Age'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
-        'grouping' => 'contact-fields',
+        'fields' => $this->getBasicContactFields(),
         'order_bys' => array(
           'sort_name' => array(
             'title' => ts('Last Name, First Name'),
-            'default' => '1',
-            'default_weight' => '0',
+            'default' => '0',
             'default_order' => 'ASC',
           ),
           'first_name' => array(
@@ -157,6 +160,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           'contact_sub_type' => array(
             'title' => ts('Contact Subtype'),
           ),
+          'is_deceased' => array(),
+          'do_not_phone' => array(),
+          'do_not_email' => array(),
+          'do_not_sms' => array(),
+          'do_not_mail' => array(),
+          'is_opt_out' => array(),
         ),
       ),
       'civicrm_line_item' => array(
@@ -183,7 +192,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         ),
       ),
     );
-    $this->_columns += $this->addAddressFields();
+    $this->_columns += $this->addAddressFields(FALSE);
     $this->_columns += array(
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -194,17 +203,22 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
-          'total_amount' => array(
-            'title' => ts('Total Amount'),
-            'no_display' => TRUE,
-            'required' => TRUE,
-            'no_repeat' => TRUE,
-          ),
           'receive_date' => array(
             'title' => ts('Year'),
             'no_display' => TRUE,
             'required' => TRUE,
             'no_repeat' => TRUE,
+          ),
+          'last_year_total_amount' => array(
+            'title' => ts('Last Year Total'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_MONEY,
+          ),
+          'civicrm_life_time_total' => array(
+            'title' => ts('Lifetime Total'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_MONEY,
+            'statistics' => array('sum' => ts('Lifetime total')),
           ),
         ),
         'filters' => array(
@@ -228,6 +242,14 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'default' => array('1'),
           ),
         ),
+        'order_bys' => array(
+          'last_year_total_amount' => array(
+            'title' => ts('Total amount last year'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'DESC',
+          ),
+        ),
       ),
     );
 
@@ -249,136 +271,288 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     parent::__construct();
   }
 
-  public function select() {
-
-    $this->_columnHeaders = $select = array();
-    $current_year = $this->_params['yid_value'];
-    $previous_year = $current_year - 1;
-
-    foreach ($this->_columns as $tableName => $table) {
-
-      if (array_key_exists('fields', $table)) {
-        foreach ($table['fields'] as $fieldName => $field) {
-
-          if (!empty($field['required']) ||
-            !empty($this->_params['fields'][$fieldName])
-          ) {
-            if ($fieldName == 'total_amount') {
-              $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
-
-              $this->_columnHeaders["{$previous_year}"]['type'] = $field['type'];
-              $this->_columnHeaders["{$previous_year}"]['title'] = $previous_year;
-
-              $this->_columnHeaders["civicrm_life_time_total"]['type'] = $field['type'];
-              $this->_columnHeaders["civicrm_life_time_total"]['title'] = 'LifeTime';;
-            }
-            elseif ($fieldName == 'receive_date') {
-              $select[] = self::fiscalYearOffset($field['dbAlias']) .
-                " as {$tableName}_{$fieldName} ";
-            }
-            else {
-              $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName} ";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-            }
-
-            if (!empty($field['no_display'])) {
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = TRUE;
-            }
-          }
-        }
-      }
+  /**
+   * Build select clause for a single field.
+   *
+   * @param string $tableName
+   * @param string $tableKey
+   * @param string $fieldName
+   * @param string $field
+   *
+   * @return string
+   */
+  public function selectClause(&$tableName, $tableKey, &$fieldName, &$field) {
+    if ($fieldName == 'last_year_total_amount') {
+      $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field;
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $this->getLastYearColumnTitle();
+      $this->_statFields[$this->getLastYearColumnTitle()] = "{$tableName}_{$fieldName}";
+      return "SUM(IF(" . $this->whereClauseLastYear('contribution_civireport.receive_date') .  ", contribution_civireport.total_amount, 0)) as {$tableName}_{$fieldName}";
     }
-
-    $this->_select = "SELECT  " . implode(', ', $select) . " ";
+    if ($fieldName == 'civicrm_life_time_total') {
+      $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field;
+      $this->_statFields[$field['title']] = "{$tableName}_{$fieldName}";
+      return "SUM({$this->_aliases[$tableName]}.total_amount) as {$tableName}_{$fieldName}";
+    }
+    if ($fieldName == 'receive_date') {
+      return self::fiscalYearOffset($field['dbAlias']) .
+        " as {$tableName}_{$fieldName} ";
+    }
+    return FALSE;
   }
 
+  /**
+   * Get the title for the last year column.
+   */
+  public function getLastYearColumnTitle() {
+    if ($this->getYearFilterType() == 'calendar') {
+      return ts('Total for ') . ($this->getCurrentYear() - 1);
+    }
+    return ts('Total for Fiscal Year ') . ($this->getCurrentYear() - 1) . '-' . ($this->getCurrentYear());
+  }
+
+  /**
+   * Construct from clause.
+   *
+   * On the first run we are creating a table of contacts to include in the report.
+   *
+   * Once contactTempTable is populated we should avoid using any further filters that affect
+   * the contacts that should be visible.
+   */
   public function from() {
-
-    $this->_from = "
-        FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
-              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
-              {$this->_aclFrom}";
-
-    if ($this->isTableSelected('civicrm_email')) {
-      $this->_from .= "
-              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
-                     AND {$this->_aliases['civicrm_email']}.is_primary = 1";
+    if (!empty($this->contactTempTable)) {
+      $this->_from = "
+        FROM  civicrm_contribution {$this->_aliases['civicrm_contribution']}
+        INNER JOIN $this->contactTempTable restricted_contacts
+          ON restricted_contacts.cid = {$this->_aliases['civicrm_contribution']}.contact_id
+          AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+        INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+          ON restricted_contacts.cid = {$this->_aliases['civicrm_contact']}.id";
+      if ($this->isTableSelected('civicrm_email')) {
+        $this->_from .= "
+          LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
+            ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
+            AND {$this->_aliases['civicrm_email']}.is_primary = 1";
+      }
+      if ($this->isTableSelected('civicrm_phone')) {
+        $this->_from .= "
+          LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
+            ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
+            AND {$this->_aliases['civicrm_phone']}.is_primary = 1";
+      }
+      $this->addAddressFromClause();
     }
-    if ($this->isTableSelected('civicrm_phone')) {
-      $this->_from .= "
-              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                         {$this->_aliases['civicrm_phone']}.is_primary = 1";
+    else {
+      if ($this->groupTempTable) {
+        $this->_from .= "FROM $this->groupTempTable {$this->_aliases['civicrm_contact']}";
+      }
+      else {
+        $this->_from .= "FROM civicrm_contact {$this->_aliases['civicrm_contact']}";
+      }
+
+      $this->_from .= " INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} ";
+      if (!$this->groupTempTable) {
+        // The received_date index is better than the contribution_status_id index (fairly substantially).
+        // But if we have already pre-filtered down to a group of contacts then we want that to be the
+        // primary filter and the index hint will block that.
+        $this->_from .= "USE index (received_date)";
+      }
+      $this->_from .= " ON {$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_contact']}.id
+         AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+         AND " . $this->whereClauseLastYear("{$this->_aliases['civicrm_contribution']}.receive_date") . "
+       {$this->_aclFrom}
+       LEFT JOIN civicrm_contribution cont_exclude ON cont_exclude.contact_id = {$this->_aliases['civicrm_contact']}.id
+         AND " . $this->whereClauseThisYear('cont_exclude.receive_date');
+      $this->selectivelyAddLocationTablesJoinsToFilterQuery();
     }
-    $this->addAddressFromClause();
+
   }
 
-  public function where() {
-    $this->_statusClause = "";
-    $clauses = array($this->_aliases['civicrm_contribution'] . '.is_test = 0');
-    $current_year = $this->_params['yid_value'];
-    $previous_year = $current_year - 1;
-
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if ($fieldName == 'yid') {
-            $clause = "contribution_civireport.contact_id NOT IN
-(SELECT distinct contri.contact_id FROM civicrm_contribution contri
- WHERE contri.is_test = 0 AND " .
-              self::fiscalYearOffset('contri.receive_date') . " = $current_year) AND contribution_civireport.contact_id IN (SELECT distinct contri.contact_id FROM civicrm_contribution contri
- WHERE " . self::fiscalYearOffset('contri.receive_date') .
-              " = $previous_year AND contri.is_test = 0) AND " . self::fiscalYearOffset('contribution_civireport.receive_date') . " = $previous_year";
-          }
-          elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
-          ) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            if ($relative || $from || $to) {
-              $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
-            }
-          }
-          else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-              if (($fieldName == 'contribution_status_id' ||
-                  $fieldName == 'financial_type_id') && !empty($clause)
-              ) {
-                $this->_statusClause .= " AND " . $clause;
-              }
-            }
-          }
-
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
+  /**
+   * Generate where clause.
+   *
+   * We are overriding this primarily for 'before-after' handling of the receive_date placeholder field.
+   *
+   * We call this twice. The first time we are generating a temp table and we want to do an IS NULL on the
+   * join that draws in contributions from this year. The second time we are filtering elsewhere (contacts via
+   * the temp table & contributions via selective addition of contributions in the select function).
+   *
+   * If lifetime total is NOT selected we can add a further filter here to possibly improve performance
+   * but the benefit if unproven as yet.
+   * $clause = $this->whereClauseLastYear("{$this->_aliases['civicrm_contribution']}.receive_date");
+   *
+   * @param array $field Field specifications
+   * @param string $op Query operator (not an exact match to sql)
+   * @param mixed $value
+   * @param float $min
+   * @param float $max
+   *
+   * @return null|string
+   */
+  public function whereClause(&$field, $op, $value, $min, $max) {
+    if ($field['name'] == 'receive_date') {
+      $clause = 1;
+      if (empty($this->contactTempTable)) {
+        $this->_whereClauses[] = "cont_exclude.id IS NULL";
       }
     }
+    else {
+      $clause = parent::whereClause($field, $op, $value, $min, $max);
+    }
+    if ($field['name'] == 'contribution_status_id' || $field['name'] == 'financial_type_id') {
+      $this->_statusClause .= " AND " . $clause;
+    }
+    return $clause;
+  }
 
-    $this->_where = 'WHERE ' . implode(' AND ', $clauses);
+  /**
+   * Build where clause for groups.
+   *
+   * This has been overridden in order to:
+   *  1) only build the group clause when filtering
+   *  2) render the id field as id rather than contact_id in
+   *   order to allow us to join on hte created temp table as if it
+   *   were the contact table.
+   *
+   * Further refactoring could break down the parent function so it can be selectively
+   * leveraged.
+   *
+   * @param string $field
+   * @param mixed $value
+   * @param string $op
+   *
+   * @return string
+   */
+  public function whereGroupClause($field, $value, $op) {
+    if (empty($this->contactTempTable)) {
+      $group = new CRM_Contact_DAO_Group();
+      $group->is_active = 1;
+      $group->find();
+      $smartGroups = array();
+      while ($group->fetch()) {
+        if (in_array($group->id, $this->_params['gid_value']) &&
+          $group->saved_search_id
+        ) {
+          $smartGroups[] = $group->id;
+        }
+      }
 
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
+      CRM_Contact_BAO_GroupContactCache::check($smartGroups);
+
+      $smartGroupQuery = '';
+      if (!empty($smartGroups)) {
+        $smartGroups = implode(',', $smartGroups);
+        $smartGroupQuery = " UNION DISTINCT
+                  SELECT DISTINCT smartgroup_contact.contact_id as id
+                  FROM civicrm_group_contact_cache smartgroup_contact
+                  WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
+      }
+
+      $sqlOp = $this->getSQLOperator($op);
+      if (!is_array($value)) {
+        $value = array($value);
+      }
+      $clause = "{$field['dbAlias']} IN (" . implode(', ', $value) . ")";
+
+      $query = "SELECT DISTINCT {$this->_aliases['civicrm_group']}.contact_id as id
+                 FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
+                 WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added'
+                 {$smartGroupQuery}  ";
+      $this->buildGroupTempTable($query);
+    }
+    return "1";
+  }
+  /**
+   * Generate where clause for last calendar year or fiscal year.
+   *
+   * @todo must be possible to re-use relative dates stuff.
+   *
+   * @param string $fieldName
+   *
+   * @return string
+   */
+  public function whereClauseLastYear($fieldName) {
+    return "$fieldName BETWEEN '" . $this->getFirstDateOfPriorRange() . "' AND '" . $this->getLastDateOfPriorRange() . "'";
+  }
+
+  /**
+   * Generate where clause for last calendar year or fiscal year.
+   *
+   * @todo must be possible to re-use relative dates stuff.
+   *
+   * @param string $fieldName
+   *
+   * @param int $current_year
+   * @return null|string
+   */
+  public function whereClauseThisYear($fieldName, $current_year = NULL) {
+    return "$fieldName BETWEEN '" . $this->getFirstDateOfCurrentRange() . "' AND '" . $this->getLastDateOfCurrentRange() . "'";
+  }
+
+
+  /**
+   * Get the year value for the current year.
+   *
+   * @return string
+   */
+  public function getCurrentYear() {
+    return $this->_params['yid_value'];
+  }
+
+  /**
+   * Get the date time of the first date in the 'this year' range.
+   *
+   * @return string
+   */
+  public function getFirstDateOfCurrentRange() {
+    $current_year = $this->getCurrentYear();
+    if ($this->getYearFilterType() == 'calendar') {
+      return "{$current_year }-01-01";
+    }
+    else {
+      $fiscalYear = CRM_Core_Config::singleton()->fiscalYearStart;
+      return "{$current_year}-{$fiscalYear['M']}-{$fiscalYear['d']}";
     }
   }
+
+  /**
+   * Get the year value for the current year.
+   *
+   * @return string
+   */
+  public function getYearFilterType() {
+    return CRM_Utils_Array::value('yid_op', $this->_params, 'calendar');
+  }
+
+  /**
+   * Get the date time of the last date in the 'this year' range.
+   *
+   * @return string
+   */
+  public function getLastDateOfCurrentRange() {
+    return date('YmdHis', strtotime('+ 1 year - 1 second', strtotime($this->getFirstDateOfCurrentRange())));
+  }
+
+  /**
+   * Get the date time of the first date in the 'last year' range.
+   *
+   * @return string
+   */
+  public function getFirstDateOfPriorRange() {
+    return date('YmdHis', strtotime('- 1 year', strtotime($this->getFirstDateOfCurrentRange())));
+  }
+
+  /**
+   * Get the date time of the last date in the 'last year' range.
+   *
+   * @return string
+   */
+  public function getLastDateOfPriorRange() {
+    return date('YmdHis', strtotime('+ 1 year - 1 second', strtotime($this->getFirstDateOfPriorRange())));
+  }
+
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id, " .
-      self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
-        '.receive_date') . " " . $this->_rollup;
+    $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
     $this->assign('chartSupported', TRUE);
   }
 
@@ -388,94 +562,176 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * @return array
    */
   public function statistics(&$rows) {
-    $statistics = parent::statistics($rows);
-    if (!empty($rows)) {
-      $select = "SELECT SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
-      $where = "WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
-        AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause}";
 
-      $sql = "{$select} {$this->_from} {$where}";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      if ($dao->fetch()) {
-        $statistics['counts']['amount'] = array(
-          'value' => $dao->amount,
-          'title' => 'Total LifeTime',
+    $statistics = parent::statistics($rows);
+    // The parent class does something odd where it adds an extra row to the count for the grand total.
+    // Perhaps that works on some other report? But here it just seems odd.
+    $this->countStat($statistics, count($rows));
+    if (!empty($rows)) {
+      if (!empty($this->rollupRow) && !empty($this->rollupRow['civicrm_contribution_last_year_total_amount'])) {
+        $statistics['counts']['civicrm_contribution_last_year_total_amount'] = array(
+          'value' => $this->rollupRow['civicrm_contribution_last_year_total_amount'],
+          'title' => $this->getLastYearColumnTitle(),
           'type' => CRM_Utils_Type::T_MONEY,
         );
+
+      }
+      if (!empty($this->rollupRow) && !empty($this->rollupRow['civicrm_contribution_civicrm_life_time_total'])) {
+        $statistics['counts']['civicrm_contribution_civicrm_life_time_total'] = array(
+          'value' => $this->rollupRow['civicrm_contribution_civicrm_life_time_total'],
+          'title' => ts('Total LifeTime'),
+          'type' => CRM_Utils_Type::T_MONEY,
+        );
+      }
+      else {
+        $select = "SELECT SUM({$this->_aliases['civicrm_contribution']}.total_amount) as amount,
+          SUM(IF( " . $this->whereClauseLastYear('contribution_civireport.receive_date') .  ", contribution_civireport.total_amount, 0)) as last_year
+         ";
+        $sql = "{$select} {$this->_from} {$this->_where}";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        if ($dao->fetch()) {
+          $statistics['counts']['amount'] = array(
+            'value' => $dao->amount,
+            'title' => ts('Total LifeTime'),
+            'type' => CRM_Utils_Type::T_MONEY,
+          );
+          $statistics['counts']['last_year'] = array(
+            'value' => $dao->last_year,
+            'title' => $this->getLastYearColumnTitle(),
+            'type' => CRM_Utils_Type::T_MONEY,
+          );
+        }
       }
     }
 
     return $statistics;
   }
 
-  public function postProcess() {
-
-    // get ready with post process params
-    $this->beginPostProcess();
-
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-    $this->select();
-    $this->from();
-    $this->where();
-    $this->groupBy();
-
+  /**
+   * This function is called by both the api (tests) and the UI.
+   */
+  public function beginPostProcessCommon() {
+    // Call this first so we can construct the WHERE temp table before we get into the FROM stuff.
+    $this->storeWhereHavingClauseArray();
+    $this->buildQuery();
+    // @todo this acl has no test coverage and is very hard to test manually so could be fragile.
     $this->getPermissionedFTQuery($this);
+    $this->resetFormSql();
 
-    $rows = $this->_contactIds = array();
+    $this->contactTempTable = 'civicrm_report_temp_lybunt_c_' . date('Ymd_') . uniqid();
     $this->limit();
-    $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}  GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
+    $getContacts = "
+      CREATE TEMPORARY TABLE $this->contactTempTable
+      SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}
+      GROUP BY {$this->_aliases['civicrm_contact']}.id";
     $this->addToDeveloperTab($getContacts);
-    $dao = CRM_Core_DAO::executeQuery($getContacts);
-
-    while ($dao->fetch()) {
-      $this->_contactIds[] = $dao->cid;
-    }
-    $dao->free();
+    CRM_Core_DAO::executeQuery($getContacts);
     if (empty($this->_params['charts'])) {
       $this->setPager();
     }
 
-    if (!empty($this->_contactIds) || !empty($this->_params['charts'])) {
-      $sql = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
-        AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
-      $this->addToDeveloperTab($sql);
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      $current_year = $this->_params['yid_value'];
-      $previous_year = $current_year - 1;
+    // Reset where clauses to be regenerated in postProcess.
+    $this->_whereClauses = array();
+  }
 
-      while ($dao->fetch()) {
+  /**
+   * This function is called by both the api (tests) and the UI.
+   *
+   * @todo consider moving this to the parent class & reusing the filter then render logic.
+   *
+   * (this approach is taken to it's extreme in the extended reports extension with it's 'preconstrain'
+   * concept).
+   *
+   * @param string $clause
+   */
+  public function buildGroupTempTable($clause) {
+    if (empty($this->groupTempTable)) {
+      $this->groupTempTable = 'civicrm_report_temp_lybunt_g_' . date('Ymd_') . uniqid();
+      CRM_Core_DAO::executeQuery("
+        CREATE TEMPORARY TABLE $this->groupTempTable
+        $clause
+      ");
+      CRM_Core_DAO::executeQuery("ALTER TABLE $this->groupTempTable ADD INDEX i_id(id)");
+    }
+  }
 
-        if (!$dao->civicrm_contribution_contact_id) {
-          continue;
-        }
+  /**
+   * Build the report query.
+   *
+   * The issue we are hitting is that if we want to do group by & then ORDER BY we have to
+   * wrap the query in an outer query with the order by - otherwise the group by takes precedent.
+   * This is an issue when we want to group by contact but order by the maximum aggregate donation.
+   *
+   * @param bool $applyLimit
+   *
+   * @return string
+   */
+  public function buildQuery($applyLimit = TRUE) {
+    $this->select();
+    $this->from();
+    $this->customDataFrom(empty($this->contactTempTable));
+    $this->where();
+    $this->groupBy();
+    $this->orderBy();
+    $this->getPermissionedFTQuery($this);
+    $limitFilter = '';
 
-        $row = array();
-        foreach ($this->_columnHeaders as $key => $value) {
-          if (property_exists($dao, $key)) {
-            $rows[$dao->civicrm_contribution_contact_id][$key] = $dao->$key;
-          }
-        }
-
-        if ($dao->civicrm_contribution_receive_date) {
-          if ($dao->civicrm_contribution_receive_date == $previous_year) {
-            $rows[$dao->civicrm_contribution_contact_id][$dao->civicrm_contribution_receive_date] = $dao->civicrm_contribution_total_amount;
-          }
-        }
-        else {
-          $rows[$dao->civicrm_contribution_contact_id]['civicrm_life_time_total'] = $dao->civicrm_contribution_total_amount;
-        }
-      }
-      $dao->free();
+    // order_by columns not selected for display need to be included in SELECT
+    // This differs from parent in that we are getting those not in order by rather than not in
+    // sections, as we need to adapt to our contact group by.
+    $unselectedSectionColumns = array_diff_key($this->_orderByFields, $this->getSelectColumns());
+    foreach ($unselectedSectionColumns as $alias => $section) {
+      $this->_select .= ", {$section['dbAlias']} as {$alias}";
     }
 
-    $this->formatDisplay($rows, FALSE);
+    if ($applyLimit && empty($this->_params['charts'])) {
+      $this->limit();
+    }
 
-    // assign variables to templates
-    $this->doTemplateAssignment($rows);
+    $sql = "{$this->_select} {$this->_from} {$this->_where} $limitFilter {$this->_groupBy} {$this->_having} {$this->_rollup}";
 
-    // do print / pdf / instance stuff if needed
-    $this->endPostProcess($rows);
+    if (!empty($this->_orderByArray)) {
+      $this->_orderBy = str_replace('contact_civireport.', 'civicrm_contact_', "ORDER BY ISNULL(civicrm_contribution_contact_id), " . implode(', ', $this->_orderByArray));
+      $this->_orderBy = str_replace('contribution_civireport.', 'civicrm_contribution_', $this->_orderBy);
+      foreach ($this->_orderByFields as $field) {
+        $this->_orderBy = str_replace($field['dbAlias'], $field['tplField'], $this->_orderBy);
+      }
+      $sql = str_replace('SQL_CALC_FOUND_ROWS', '', $sql);
+      $sql = "SELECT SQL_CALC_FOUND_ROWS  * FROM ( $sql ) as inner_query {$this->_orderBy} $this->_limit";
+    }
+
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
+    $this->addToDeveloperTab($sql);
+
+    return $sql;
+  }
+
+  /**
+   * Reset the form sql to prevent misleading developer tab info.
+   */
+  protected function resetFormSql() {
+    $this->sql = '';
+    $this->sqlArray = array();
+  }
+
+  /**
+   * Are we ordering by the latest year total.
+   *
+   * If we are we need to drop the rollup to do the ordering.
+   *
+   * Without bigger changes we can't get the lifetime total and order by
+   * the latest year total in the same query.
+   *
+   * @return bool
+   */
+  public function isOrderByLastYearTotal() {
+    $this->storeOrderByArray();
+    foreach ($this->_orderByArray as $orderBy) {
+      if (stristr($orderBy, 'contribution_civireport.total_amount')) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -547,8 +803,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         }
       }
 
-      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s)') ? TRUE : $entryFound;
-
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, 'List all contribution(s)') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, 'List all contribution(s)') ? TRUE : $entryFound;
       //handle gender
       if (array_key_exists('civicrm_contact_gender_id', $row)) {
         if ($value = $row['civicrm_contact_gender_id']) {
