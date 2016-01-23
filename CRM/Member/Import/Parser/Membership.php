@@ -162,7 +162,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       return CRM_Import_Parser::ERROR;
     }
 
-    $params = &$this->getActiveFieldParams();
+    $params = $this->getActiveFieldParams();
     $errorMessage = NULL;
 
     //To check whether start date or join date is provided
@@ -269,7 +269,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         return $response;
       }
 
-      $params = &$this->getActiveFieldParams();
+      $params = $this->getActiveFieldParams();
 
       //assign join date equal to start date if join date is not provided
       if (empty($params['join_date']) && !empty($params['membership_start_date'])) {
