@@ -93,7 +93,7 @@ function civicrm_api3_order_create(&$params) {
       $payments = civicrm_api3($entity . '_payment', 'create', $paymentParams);
     }
   }
-  return civicrm_api3_create_success($contribution['values'], $params, 'Order', 'create');
+  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $contribution), $params, 'Order', 'create');
 }
 
 /**
@@ -106,7 +106,7 @@ function civicrm_api3_order_create(&$params) {
  */
 function civicrm_api3_order_delete($params) {
   $result = civicrm_api3('Contribution', 'delete', $params);
-  return civicrm_api3_create_success($result['values'], $params, 'Order', 'delete');
+  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $result), $params, 'Order', 'delete');
 }
 
 /**
@@ -121,10 +121,10 @@ function civicrm_api3_order_cancel($params) {
   $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
   $params['contribution_status_id'] = array_search('Cancelled', $contributionStatuses);
   $result = civicrm_api3('Contribution', 'create', $params);
-  if (!$result['is_error']) {
+  if (!CRM_Utils_Array::value('is_error', $result)) {
     CRM_Contribute_BAO_Contribution::transitionComponents($params);
   }
-  return civicrm_api3_create_success($result['values'], $params, 'Order', 'cancel');
+  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $result), $params, 'Order', 'cancel');
 }
 
 /**
