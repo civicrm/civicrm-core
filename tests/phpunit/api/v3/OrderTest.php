@@ -122,7 +122,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test cancel payment api
+   * Test cancel order api
    */
   public function testCancelOrder() {
     $p = array(
@@ -154,6 +154,29 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
+  }
+
+  /**
+   * Test delete order api
+   */
+  public function testDeleteOrder() {
+    $p = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 100.00,
+      'financial_type_id' => $this->_financialTypeId,
+      'trxn_id' => 23456,
+      'contribution_status_id' => 1,
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $p);
+
+    $params = array(
+      'contribution_id' => $contribution['id'],
+    );
+
+    $this->callAPIAndDocument('order', 'delete', $params, __FUNCTION__, __FILE__);
+    $order = $this->callAPIAndDocument('order', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(0, $order['count']);
   }
 
 }
