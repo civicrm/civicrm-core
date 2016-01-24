@@ -69,6 +69,10 @@ class SelectQuery {
   /**
    * @var array
    */
+  private $joins = array();
+  /**
+   * @var array
+   */
   protected $apiFieldSpec;
   /**
    * @var array
@@ -136,7 +140,7 @@ class SelectQuery {
           $select_fields[self::MAIN_TABLE_ALIAS . ".{$field['name']}"] = $field['name'];
         }
         elseif ($include && strpos($field_name, '.')) {
-          $fkField = $this->addFkField($field_name);
+          $fkField = $this->addFkField($field_name, 'LEFT');
           if ($fkField) {
             $select_fields[implode('.', $fkField)] = $field_name;
           }
@@ -154,7 +158,7 @@ class SelectQuery {
           // This is a tested format so we support it.
           !empty($this->options['return']['custom'])
         ) {
-          list($table_name, $column_name) = $this->addCustomField($custom_field);
+          list($table_name, $column_name) = $this->addCustomField($custom_field, 'LEFT');
 
           if ($custom_field["data_type"] != "ContactReference") {
             // 'ordinary' custom field. We will select the value as custom_XX.
@@ -227,10 +231,10 @@ class SelectQuery {
         $column_name = $key;
       }
       elseif (($cf_id = \CRM_Core_BAO_CustomField::getKeyID($key)) != FALSE) {
-        list($table_name, $column_name) = $this->addCustomField($custom_fields[$cf_id]);
+        list($table_name, $column_name) = $this->addCustomField($custom_fields[$cf_id], 'INNER');
       }
       elseif (strpos($key, '.')) {
-        $fkInfo = $this->addFkField($key);
+        $fkInfo = $this->addFkField($key, 'INNER');
         if ($fkInfo) {
           list($table_name, $column_name) = $fkInfo;
           $this->validateNestedInput($key, $value);
@@ -329,12 +333,14 @@ class SelectQuery {
    * Enforces permissions at the api level and by appending the acl clause for that entity to the join.
    *
    * @param $fkFieldName
+   * @param $side
+   *
    * @return array|null
    *   Returns the table and field name for adding this field to a SELECT or WHERE clause
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function addFkField($fkFieldName) {
+  private function addFkField($fkFieldName, $side) {
     $stack = explode('.', $fkFieldName);
     if (count($stack) < 2) {
       return NULL;
@@ -356,7 +362,7 @@ class SelectQuery {
       if ($depth > self::MAX_JOINS) {
         throw new UnauthorizedException("Maximum number of joins exceeded in parameter $fkFieldName");
       }
-      if (!isset($fkField['FKApiName']) && !isset($fkField['FKClassName'])) {
+      if (!isset($fkField['FKApiName']) || !isset($fkField['FKClassName'])) {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
@@ -377,18 +383,17 @@ class SelectQuery {
       }
       $fkTable = \CRM_Core_DAO_AllCoreTables::getTableForClass($fkField['FKClassName']);
       $tableAlias = implode('_to_', $subStack) . "_to_$fkTable";
-      $joinClause = "LEFT JOIN $fkTable $tableAlias ON $prev.$fk = $tableAlias.id";
 
       // Add acl condition
-      $joinCondition = $this->getAclClause($tableAlias, \_civicrm_api3_get_BAO($fkField['FKApiName']), $subStack);
-      if ($joinCondition !== NULL) {
-        $joinClause .= " AND $joinCondition";
-      }
+      $joinCondition = array_merge(
+        array("$prev.$fk = $tableAlias.id"),
+        $this->getAclClause($tableAlias, \_civicrm_api3_get_BAO($fkField['FKApiName']), $subStack)
+      );
 
-      $this->query->join($tableAlias, $joinClause);
+      $this->join($side, $fkTable, $tableAlias, $joinCondition);
 
       if (strpos($fieldName, 'custom_') === 0) {
-        list($tableAlias, $fieldName) = $this->addCustomField($fieldInfo, $tableAlias);
+        list($tableAlias, $fieldName) = $this->addCustomField($fieldInfo, $side, $tableAlias);
       }
 
       // Get ready to recurse to the next level
@@ -405,15 +410,16 @@ class SelectQuery {
    * Adds a join to the query to make this field available for use in a clause.
    *
    * @param array $customField
+   * @param string $side
    * @param string $baseTable
    * @return array
    *   Returns the table and field name for adding this field to a SELECT or WHERE clause
    */
-  private function addCustomField($customField, $baseTable = self::MAIN_TABLE_ALIAS) {
+  private function addCustomField($customField, $side, $baseTable = self::MAIN_TABLE_ALIAS) {
     $tableName = $customField["table_name"];
     $columnName = $customField["column_name"];
     $tableAlias = "{$baseTable}_to_$tableName";
-    $this->query->join($tableAlias, "LEFT JOIN `$tableName` `$tableAlias` ON `$tableAlias`.entity_id = `$baseTable`.id");
+    $this->join($side, $tableName, $tableAlias, array("`$tableAlias`.entity_id = `$baseTable`.id"));
     return array($tableAlias, $columnName);
   }
 
@@ -506,26 +512,24 @@ class SelectQuery {
    * @param string $tableAlias
    * @param string $baoName
    * @param array $stack
-   * @return null|string
+   * @return array
    */
   private function getAclClause($tableAlias, $baoName, $stack = array()) {
     if (!$this->checkPermissions) {
-      return NULL;
+      return array();
     }
     // Prevent (most) redundant acl sub clauses if they have already been applied to the main entity.
     // FIXME: Currently this only works 1 level deep, but tracking through multiple joins would increase complexity
     // and just doing it for the first join takes care of most acl clause deduping.
     if (count($stack) === 1 && in_array($stack[0], $this->aclFields)) {
-      return NULL;
+      return array();
     }
     $clauses = $baoName::getSelectWhereClause($tableAlias);
     if (!$stack) {
       // Track field clauses added to the main entity
       $this->aclFields = array_keys($clauses);
     }
-
-    $clauses = array_filter($clauses);
-    return $clauses ? implode(' AND ', $clauses) : NULL;
+    return array_filter($clauses);
   }
 
   /**
@@ -552,7 +556,7 @@ class SelectQuery {
           $orderBy[] = self::MAIN_TABLE_ALIAS . '.' . $field['name'] . $direction;
         }
         elseif (strpos($words[0], '.')) {
-          $join = $this->addFkField($words[0]);
+          $join = $this->addFkField($words[0], 'LEFT');
           if ($join) {
             $orderBy[] = "`{$join[0]}`.`{$join[1]}`$direction";
           }
@@ -563,6 +567,20 @@ class SelectQuery {
       }
     }
     $this->query->orderBy($orderBy);
+  }
+
+  /**
+   * @param string $side
+   * @param string $tableName
+   * @param string $tableAlias
+   * @param array $conditions
+   */
+  public function join($side, $tableName, $tableAlias, $conditions) {
+    // INNER JOINs take precedence over LEFT JOINs
+    if ($side != 'LEFT' || !isset($this->joins[$tableAlias])) {
+      $this->joins[$tableAlias] = $side;
+      $this->query->join($tableAlias, "$side JOIN `$tableName` `$tableAlias` ON " . implode(' AND ', $conditions));
+    }
   }
 
 }
