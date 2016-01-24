@@ -139,6 +139,11 @@ function civicrm_api3_order_cancel($params) {
 function civicrm_api3_order_get($params) {
   $contributions = array();
   $params['api.line_item.get'] = array('qty' => array('<>' => 0));
+  $isSequential = FALSE;
+  if (CRM_Utils_Array::value('sequential', $params)) {
+    $params['sequential'] = 0;
+    $isSequential = TRUE;
+  }
   $result = civicrm_api3('Contribution', 'get', $params);
   if (!empty($result['values'])) {
     foreach ($result['values'] as $key => $contribution) {
@@ -147,6 +152,7 @@ function civicrm_api3_order_get($params) {
       unset($contributions[$key]['api.line_item.get']);
     }
   }
+  $params['sequential'] = $isSequential;
   return civicrm_api3_create_success($contributions, $params, 'Order', 'get');
 }
 
