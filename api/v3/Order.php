@@ -151,22 +151,6 @@ function civicrm_api3_order_get($params) {
 }
 
 /**
- * Adjust Metadata for Get action.
- *
- * The metadata is used for setting defaults, documentation & validation.
- *
- * @param array $params
- *   Array of parameters determined by getfields.
- */
-function _civicrm_api3_order_get_spec(&$params) {
-  $params['contribution_id'] = array(
-    'api.required' => 1 ,
-    'title' => 'Contribution ID',
-    'type' => CRM_Utils_Type::T_INT,
-  );
-}
-
-/**
  * Adjust Metadata for Delete action.
  *
  * The metadata is used for setting defaults, documentation & validation.
