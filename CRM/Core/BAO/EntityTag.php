@@ -44,7 +44,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @return array
    *   reference $tag array of category id's the contact belongs to.
    */
-  public static function &getTag($entityID, $entityTable = 'civicrm_contact') {
+  public static function getTag($entityID, $entityTable = 'civicrm_contact') {
     $tags = array();
 
     $entityTag = new CRM_Core_BAO_EntityTag();
