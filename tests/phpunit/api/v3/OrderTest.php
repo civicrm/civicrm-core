@@ -183,6 +183,90 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create order api for participant
+   */
+  public function testAddOrderForPariticipant() {
+    require_once 'CiviTest/Event.php';
+    $this->_eventId = Event::create($this->_individualId);
+    $p = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 300,
+      'financial_type_id' => $this->_financialTypeId,
+      'contribution_status_id' => 1,
+    );
+    $priceFields = $this->createPriceSet();
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[$key] = array(
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+        'entity_table' => 'civicrm_participant',
+      );
+    }
+    $p['line_items'][] = array(
+      'line_item' => $lineItems,
+      'params' => array(
+        'contact_id' => $this->_individualId,
+        'event_id' => $this->_eventId,
+        'status_id' => 1,
+        'role_id' => 1,
+        'register_date' => '2007-07-21 00:00:00',
+        'source' => 'Online Event Registration: API Testing',
+      ),
+    );
+    $order = $this->callAPISuccess('order', 'create', $p);
+    $params = array(
+      'contribution_id' => $order['id'],
+    );
+
+    $order = $this->callAPISuccess('order', 'get', $params);
+    $expectedResult = array(
+      'total_amount' => 300,
+      'contribution_id' => $order['id'],
+      'contribution_status' => 'Completed',
+      'net_amount' => 300,
+    );
+    $this->checkPaymentResult($order, $expectedResult);
+    $this->callAPISuccessGetCount('ParticipantPayment', $params, 1);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $order['id'],
+    ));
+    $p['line_items'][] = array(
+      'line_item' => $lineItems,
+      'params' => array(
+        'contact_id' => $this->individualCreate(),
+        'event_id' => $this->_eventId,
+        'status_id' => 1,
+        'role_id' => 1,
+        'register_date' => '2007-07-21 00:00:00',
+        'source' => 'Online Event Registration: API Testing',
+      ),
+    );
+    $p['total_amount'] = 600;
+    $order = $this->callAPISuccess('order', 'create', $p);
+    $expectedResult = array(
+      'total_amount' => 600,
+      'contribution_status' => 'Completed',
+      'net_amount' => 600,
+    );
+    $paymentParticipant = array(
+      'contribution_id' => $order['id'],
+    );
+    $order = $this->callAPISuccess('order', 'get', $paymentParticipant);
+    $this->checkPaymentResult($order, $expectedResult);
+    $this->callAPISuccessGetCount('ParticipantPayment', $paymentParticipant, 2);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $order['id'],
+    ));
+  }
+
+  /**
    * Test create order api with line items
    */
   public function testAddOrderWithLineItems() {
