@@ -3509,7 +3509,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
   
   /**
-   * Create price set 
+   * Create price set
    *
    * @param string $component
    * @param int $componentId
@@ -3550,7 +3550,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentId, $priceSetId);
     }
     return $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $priceField->id));
-    
   }
 
 }
