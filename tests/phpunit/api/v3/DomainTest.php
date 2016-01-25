@@ -211,7 +211,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     // Check for domain_version in create result.
     $this->assertEquals($this->params['domain_version'], $result_value['domain_version']);
   }
-  
+
   /**
    * Test civicrm_domain_create with empty params.
    *
