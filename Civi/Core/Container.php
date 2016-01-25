@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Core;
 
+use Civi\API\Provider\ActionObjectProvider;
 use Civi\Core\Event\SystemInstallEvent;
 use Civi\Core\Lock\LockManager;
 use Doctrine\Common\Annotations\AnnotationReader;
