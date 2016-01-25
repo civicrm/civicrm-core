@@ -172,7 +172,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $this->assertEquals($result['count'], 1);
     $this->assertNotNull($result['id']);
     $this->assertEquals($result['values'][$result['id']]['name'], $this->params['name']);
-    $this->assertEquals($result['values'][$result['id']]['version'], $this->params['domain_version']);
+    $this->assertEquals($result['values'][$result['id']]['domain_version'], $this->params['domain_version']);
   }
 
   /**
@@ -198,6 +198,20 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $this->assertEquals($domain_before['version'], $domain_after['version']);
   }
 
+  /**
+   * Test whether Domain.create returns a correct value for domain_version.
+   *
+   * See CRM-17430.
+   */
+  public function testCreateDomainResult() {
+    // First create a domain.
+    $domain_result = $this->callAPISuccess('Domain', 'create', $this->params);
+    $result_value = CRM_Utils_Array::first($domain_result['values']);
+
+    // Check for domain_version in create result.
+    $this->assertEquals($this->params['domain_version'], $result_value['domain_version']);
+  }
+  
   /**
    * Test civicrm_domain_create with empty params.
    *
