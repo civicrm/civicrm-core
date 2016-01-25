@@ -124,7 +124,8 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
-      list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_contactIds, $key);
+      list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_contactIds, $key,
+        'civicrm_contact', FALSE);
 
       $status = array(
         ts('%count contact un-tagged', array(
