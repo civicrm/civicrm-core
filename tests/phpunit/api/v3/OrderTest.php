@@ -72,7 +72,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     );
 
-    $order = $this->callAPIAndDocument('Order', 'get', $params, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('Order', 'get', $params);
 
     $this->assertEquals(1, $order['count']);
     $expectedResult = array(
@@ -122,9 +122,9 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     );
 
-    $this->callAPIAndDocument('order', 'cancel', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('order', 'cancel', $params);
 
-    $order = $this->callAPIAndDocument('Order', 'get', $params, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('Order', 'get', $params);
     $expectedResult = array(
       'total_amount' => 100,
       'contribution_id' => $contribution['id'],
@@ -147,8 +147,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'contribution_id' => $order['id'],
     );
 
-    $this->callAPIAndDocument('order', 'delete', $params, __FUNCTION__, __FILE__);
-    $order = $this->callAPIAndDocument('order', 'get', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('order', 'delete', $params);
+    $order = $this->callAPISuccess('order', 'get', $params);
     $this->assertEquals(0, $order['count']);
   }
 
@@ -161,7 +161,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'contribution_id' => $order['id'],
     );
 
-    $order = $this->callAPIAndDocument('order', 'get', $params, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('order', 'get', $params);
     $expectedResult = array(
       'total_amount' => 100,
       'contribution_id' => $order['id'],
@@ -185,13 +185,13 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   /**
    * Test create order api with line items
    */
-  public function testAddOrderLineItems() {
+  public function testAddOrderWithLineItems() {
     $order = $this->addOrder(TRUE);
     $params = array(
       'contribution_id' => $order['id'],
     );
 
-    $order = $this->callAPIAndDocument('order', 'get', $params, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('order', 'get', $params);
     $expectedResult = array(
       'total_amount' => 300,
       'contribution_id' => $order['id'],
