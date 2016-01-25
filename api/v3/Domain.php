@@ -163,6 +163,7 @@ function _civicrm_api3_domain_create_spec(&$params) {
   $params['domain_version'] = array(
     'title' => "CiviCRM Version",
     'description' => "The civicrm version this instance is running",
+    'type' => CRM_Utils_Type::T_STRING,
   );
   $params['domain_version']['api.required'] = 1;
   unset($params['version']);
