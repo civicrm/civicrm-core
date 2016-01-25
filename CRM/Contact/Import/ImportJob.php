@@ -427,7 +427,7 @@ class CRM_Contact_Import_ImportJob {
     if (is_array($this->_tag)) {
       $tagAdditions = array();
       foreach ($this->_tag as $tagId => $val) {
-        $addTagCount = CRM_Core_BAO_EntityTag::addEntitiesToTag($contactIds, $tagId);
+        $addTagCount = CRM_Core_BAO_EntityTag::addEntitiesToTag($contactIds, $tagId, 'civicrm_contact', FALSE);
         $totalTagCount = $addTagCount[1];
         if (isset($addedTag) && $tagId == $addedTag->id) {
           $tagName = $newTagName;
