@@ -239,8 +239,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   /**
    * add order
    *
-   * @param boolean $isPriceSet
-   * @param float $componentId$amount
+   * @param bool $isPriceSet
+   * @param float $componentId
    * @param array $extraParams
    *
    * @return array
