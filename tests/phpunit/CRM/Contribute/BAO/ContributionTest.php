@@ -692,7 +692,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    *
    * @return array
    */
-  protected function addParticipantWithContribution() {
+  public function addParticipantWithContribution() {
     // creating price set, price field
     require_once 'CiviTest/Event.php';
     $this->_contactId = Contact::createIndividual();
