@@ -56,26 +56,32 @@ function civicrm_api3_order_create(&$params) {
     foreach ($params['line_items'] as $lineItems) {
       $entityParams = CRM_Utils_Array::value('params', $lineItems, array());
       if (!empty($entityParams) && !empty($lineItems['line_item'])) {
-        $entity = str_replace('civicrm_', '', $lineItems['line_item']['entity_table']);
+        $item = reset($lineItems['line_item']);
+        $entity = str_replace('civicrm_', '', $item['entity_table']);
       }
       if ($entityParams) {
         if (in_array($entity, array('participant', 'membership'))) {
           $entityParams['skipLineItem'] = TRUE;
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
           $params['contribution_mode'] = $entity;
-          $entityIds[] = $lineItems['line_item']['entity_id'] = $params[$entity . '_id'] = $entityResult['id'];
+          $entityIds[] = $params[$entity . '_id'] = $entityResult['id'];
+          foreach ($lineItems['line_item'] as &$items) {
+            $items['entity_id'] = $entityResult['id'];
+          }
         }
         else {
           // pledge payment
         }
       }
       if (empty($priceSetID)) {
+        $item = reset($lineItems['line_item']);
         $priceSetID = civicrm_api3('PriceField', 'getvalue', array(
           'return' => 'price_set_id',
-          'id' => $lineItems['line_item']['price_field_id'],
+          'id' => $item['price_field_id'],
         ));
+        $params['line_item'][$priceSetID] = array();
       }
-      $params['line_item'][$priceSetID][$lineItems['line_item']['price_field_id']] = $lineItems['line_item'];
+      $params['line_item'][$priceSetID] = array_merge($params['line_item'][$priceSetID], $lineItems['line_item']);
     }
   }
   $contribution = civicrm_api3('Contribution', 'create', $params);
