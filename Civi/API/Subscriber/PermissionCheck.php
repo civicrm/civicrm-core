@@ -90,6 +90,12 @@ class PermissionCheck implements EventSubscriberInterface {
       $event->authorize();
       $event->stopPropagation();
     }
+    elseif ($apiRequest['version'] == 4) {
+      if (!$apiRequest->getCheckPermissions()) {
+        $event->authorize();
+        $event->stopPropagation();
+      }
+    }
   }
 
   /**

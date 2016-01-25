@@ -382,7 +382,7 @@ function _civicrm_api3_get_DAO($name) {
  *   return the DAO name to manipulate this function
  *   eg. "civicrm_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
  *
- * @return mixed
+ * @return string|null
  */
 function _civicrm_api3_get_BAO($name) {
   // FIXME: DAO should be renamed CRM_Badge_DAO_BadgeLayout
@@ -1336,9 +1336,25 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
  * @return array
  */
 function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
-  $query = new \Civi\API\SelectQuery($bao_name, $params, $uniqueFields);
+  $entity = CRM_Core_DAO_AllCoreTables::getBriefName(str_replace('_BAO_', '_DAO_', $bao_name));
+  $options = _civicrm_api3_get_options_from_params($params);
+
+  $query = new \Civi\API\Api3SelectQuery($entity);
+  $query->where = $params;
+  if ($options['is_count']) {
+    $query->select = array('count');
+  }
+  else {
+    $query->select = array_keys(array_filter($options['return']));
+    $query->orderBy = $options['sort'];
+    $query->isFillUniqueFields = $uniqueFields;
+  }
+  $query->limit = $options['limit'];
+  $query->offset = $options['offset'];
+  $query->checkPermissions = CRM_Utils_Array::value('check_permissions', $params, FALSE);
   $query->merge($sql);
   $result = $query->run();
+
   if ($returnAsSuccess) {
     return civicrm_api3_create_success($result, $params, $entity, 'get');
   }
