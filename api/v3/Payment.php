@@ -138,12 +138,22 @@ function civicrm_api3_payment_create(&$params) {
     throw new API_Exception('Please select a contribution which has a partial or pending payment');
   }
   else {
-    $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
-    $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
-    $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
-    $cmp = bccomp($total, $paid, 5);
-    if ($cmp == 0 || $cmp == -1) {// If paid amount is greater or equal to total amount
-      civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+    // Check if pending contribution
+    if ($contribution['contribution_status'] == 'Pending') {
+      $cmp = bccomp($contribution['total_amount'], $params['total_amount'], 5);
+      if ($cmp == 0 || $cmp == -1) { // Total payment amount is the whole amount paid against pending contribution
+        civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+        // Get the trxn
+        $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+        $ftParams = array('id' => $trxnId['financialTrxnId']);
+        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, CRM_Core_DAO::$_nullArray);
+      }
+      else {
+        $trxn = CRM_Core_BAO_FinancialTrxn::getPartialPaymentTrxn($contribution, $params);
+      }
+    }
+    else {
+      $trxn = CRM_Core_BAO_FinancialTrxn::getPartialPaymentTrxn($contribution, $params);
     }
   }
   if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {

@@ -539,5 +539,22 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
 
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
+  
+  /**
+   * @param array $contribution
+   * @param array $params
+   *
+   * @return CRM_Core_BAO_FinancialTrxn
+   */
+  public static function getPartialPaymentTrxn($contribution, $params) {
+    $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+    $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
+    $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
+    $cmp = bccomp($total, $paid, 5);
+    if ($cmp == 0 || $cmp == -1) {// If paid amount is greater or equal to total amount
+      civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+    }
+    return $trxn;
+  }
 
 }
