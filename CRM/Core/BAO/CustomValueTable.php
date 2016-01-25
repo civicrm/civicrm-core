@@ -400,13 +400,14 @@ class CRM_Core_BAO_CustomValueTable {
    *                                   is set the entityType is ignored
    *
    * @param bool $formatMultiRecordField
+   * @param array $DTparams - CRM-17810 dataTable params for the multiValued custom fields.
    *
    * @return array
    *   Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
    *                                   Empty array if no custom values found.
    */
-  public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE) {
+  public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE, $DTparams = NULL) {
     if (!$entityID) {
       // adding this here since an empty contact id could have serious repurcussions
       // like looping forever
@@ -428,6 +429,14 @@ class CRM_Core_BAO_CustomValueTable {
       $cond[] = "cg.extends IN ( 'Contact', 'Individual', 'Household', 'Organization' )";
     }
     $cond = implode(' AND ', $cond);
+
+    $limit = $orderBy = '';
+    if (!empty($DTparams['rowCount']) && $DTparams['rowCount'] > 0) {
+      $limit = " LIMIT " . CRM_Utils_Type::escape($DTparams['offset'], 'Integer') . ", " . CRM_Utils_Type::escape($DTparams['rowCount'], 'Integer');
+    }
+    if (!empty($DTparams['sort'])) {
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($DTparams['sort'], 'String');
+    }
 
     // First find all the fields that extend this type of entity.
     $query = "
@@ -461,8 +470,11 @@ AND    $cond
 
     $result = array();
     foreach ($select as $tableName => $clauses) {
-      $query = "SELECT id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID";
+      $query = "SELECT SQL_CALC_FOUND_ROWS id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
       $dao = CRM_Core_DAO::executeQuery($query);
+      if (!empty($DTparams)) {
+        $result['count'] = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
+      }
       while ($dao->fetch()) {
         foreach ($fields[$tableName] as $fieldID) {
           $fieldName = "custom_{$fieldID}";

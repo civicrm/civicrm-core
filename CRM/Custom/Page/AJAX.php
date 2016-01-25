@@ -106,4 +106,64 @@ class CRM_Custom_Page_AJAX {
     CRM_Utils_JSON::output(TRUE);
   }
 
+  /**
+   * Get list of Multi Record Fields.
+   *
+   */
+  public static function getMultiRecordFieldList() {
+    $params = $_GET;
+
+    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
+    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 10;
+    $sortMapper = array();
+    foreach ($_GET['columns'] as $key => $value) {
+      $sortMapper[$key] = $value['data'];
+    };
+    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
+
+    $params['page'] = ($offset / $rowCount) + 1;
+    $params['rp'] = $rowCount;
+    $contactType = CRM_Contact_BAO_Contact::getContactType($params['cid']);
+
+    $obj = new CRM_Profile_Page_MultipleRecordFieldsListing();
+    $obj->_pageViewType = 'customDataView';
+    $obj->_contactId = $params['cid'];
+    $obj->_customGroupId = $params['cgid'];
+    $obj->_contactType = $contactType;
+    $obj->_DTparams['offset'] = ($params['page'] - 1) * $params['rp'];
+    $obj->_DTparams['rowCount'] = $params['rp'];
+    if ($sort && $sortOrder) {
+      $sort = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $sort, 'column_name', 'label');
+      $obj->_DTparams['sort'] = $sort . ' ' . $sortOrder;
+    }
+
+    list($fields, $attributes) = $obj->browse();
+
+    // format params and add class attributes
+    $fieldList = array();
+    foreach ($fields as $id => $value) {
+      $field = array();
+      foreach ($value as $fieldId => &$fieldName) {
+        if (!empty($attributes[$fieldId][$id]['class'])) {
+          $fieldName = array('data' => $fieldName, 'cellClass' => $attributes[$fieldId][$id]['class']);
+        }
+        if (is_numeric($fieldId)) {
+          $fName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldId, 'label');
+          CRM_Utils_Array::crmReplaceKey($value, $fieldId, $fName);
+        }
+      }
+      $field = $value;
+      array_push($fieldList, $field);
+    }
+    $totalRecords = !empty($obj->_total) ? $obj->_total : 0;
+
+    $multiRecordFields = array();
+    $multiRecordFields['data'] = $fieldList;
+    $multiRecordFields['recordsTotal'] = $totalRecords;
+    $multiRecordFields['recordsFiltered'] = $totalRecords;
+
+    CRM_Utils_JSON::output($multiRecordFields);
+  }
+
 }
