@@ -123,27 +123,29 @@
   </div>
   {/if}
 
-  {if $pledgeBlock}
-    {if $is_pledge_payment}
-    <div class="crm-public-form-item crm-section {$form.pledge_amount.name}-section">
-      <div class="label">{$form.pledge_amount.label}&nbsp;<span class="marker">*</span></div>
-      <div class="content">{$form.pledge_amount.html}</div>
-      <div class="clear"></div>
-    </div>
-      {else}
-    <div class="crm-public-form-item crm-section {$form.is_pledge.name}-section">
-      <div class="label">&nbsp;</div>
-      <div class="content">
-        {$form.is_pledge.html}&nbsp;
-        {if $is_pledge_interval}
-          {$form.pledge_frequency_interval.html}&nbsp;
-        {/if}
-        {$form.pledge_frequency_unit.html}<span id="pledge_installments_num">&nbsp;{ts}for{/ts}&nbsp;{$form.pledge_installments.html}&nbsp;{ts}installments.{/ts}</span>
+  {crmRegion name='contribution-main-pledge-block'}
+    {if $pledgeBlock}
+      {if $is_pledge_payment}
+      <div class="crm-public-form-item crm-section {$form.pledge_amount.name}-section">
+        <div class="label">{$form.pledge_amount.label}&nbsp;<span class="marker">*</span></div>
+        <div class="content">{$form.pledge_amount.html}</div>
+        <div class="clear"></div>
       </div>
-      <div class="clear"></div>
-    </div>
+        {else}
+      <div class="crm-public-form-item crm-section {$form.is_pledge.name}-section">
+        <div class="label">&nbsp;</div>
+        <div class="content">
+          {$form.is_pledge.html}&nbsp;
+          {if $is_pledge_interval}
+            {$form.pledge_frequency_interval.html}&nbsp;
+          {/if}
+          {$form.pledge_frequency_unit.html}<span id="pledge_installments_num">&nbsp;{ts}for{/ts}&nbsp;{$form.pledge_installments.html}&nbsp;{ts}installments.{/ts}</span>
+        </div>
+        <div class="clear"></div>
+      </div>
+      {/if}
     {/if}
-  {/if}
+  {/crmRegion}
 
   {if $form.is_recur}
   <div class="crm-public-form-item crm-section {$form.is_recur.name}-section">
