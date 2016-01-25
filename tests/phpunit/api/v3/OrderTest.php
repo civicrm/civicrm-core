@@ -97,7 +97,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'unit_price' => 100,
       'line_total' => 100,
       'financial_type_id' => 1,
-    ); 
+    );
     $this->checkPaymentResult($order, $expectedResult, $lineItems);
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
