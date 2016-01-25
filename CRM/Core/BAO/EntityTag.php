@@ -134,11 +134,13 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   The id of the tag.
    * @param string $entityTable
    *   Name of entity table default:civicrm_contact.
+   * @param bool $applyPermissions
+   *   Should permissions be applied in this function.
    *
    * @return array
-   *   (total, added, notAdded) count of enities added to tag
+   *   (total, added, notAdded) count of entities added to tag
    */
-  public static function addEntitiesToTag(&$entityIds, $tagId, $entityTable = 'civicrm_contact') {
+  public static function addEntitiesToTag(&$entityIds, $tagId, $entityTable, $applyPermissions) {
     $numEntitiesAdded = 0;
     $numEntitiesNotAdded = 0;
     $entityIdsAdded = array();
@@ -146,7 +148,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     foreach ($entityIds as $entityId) {
       // CRM-17350 - check if we have permission to edit the contact
       // that this tag belongs to.
-      if (!CRM_Contact_BAO_Contact_Permission::allow($entityId, CRM_Core_Permission::EDIT)) {
+      if ($applyPermissions && !self::checkPermissionOnEntityTag($entityId, $entityTable)) {
         $numEntitiesNotAdded++;
         continue;
       }
@@ -177,7 +179,30 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Given an array of entity ids and entity table, remove entity(s) tags
+   * Basic check for ACL permission on editing/creating/removing a tag.
+   *
+   * In the absence of something better contacts get a proper check and other entities
+   * default to 'edit all contacts'. This is currently only accessed from the api which previously
+   * applied edit all contacts to all - so while still too restrictive it represents a loosening.
+   *
+   * Current possible entities are attachments, activities, cases & contacts.
+   *
+   * @param int $entityID
+   * @param string $entityTable
+   *
+   * @return bool
+   */
+  public static function checkPermissionOnEntityTag($entityID, $entityTable) {
+    if ($entityTable == 'civicrm_contact') {
+      return CRM_Contact_BAO_Contact_Permission::allow($entityID, CRM_Core_Permission::EDIT);
+    }
+    else {
+      return CRM_Core_Permission::check('edit all contacts');
+    }
+  }
+
+  /**
+   * Given an array of entity ids and entity table, remove entity(s)tags.
    *
    * @param array $entityIds
    *   (reference ) the array of entity ids to be removed.
@@ -185,11 +210,13 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   The id of the tag.
    * @param string $entityTable
    *   Name of entity table default:civicrm_contact.
+   * @param bool $applyPermissions
+   *   Should permissions be applied in this function.
    *
    * @return array
    *   (total, removed, notRemoved) count of entities removed from tags
    */
-  public static function removeEntitiesFromTag(&$entityIds, $tagId, $entityTable = 'civicrm_contact') {
+  public static function removeEntitiesFromTag(&$entityIds, $tagId, $entityTable, $applyPermissions) {
     $numEntitiesRemoved = 0;
     $numEntitiesNotRemoved = 0;
     $entityIdsRemoved = array();
@@ -197,8 +224,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     foreach ($entityIds as $entityId) {
       // CRM-17350 - check if we have permission to edit the contact
       // that this tag belongs to.
-      if (!CRM_Contact_BAO_Contact_Permission::allow($entityId, CRM_Core_Permission::EDIT)) {
-        $numEntitiesNotAdded++;
+      if ($applyPermissions && !self::checkPermissionOnEntityTag($entityId, $entityTable)) {
+        $numEntitiesNotRemoved++;
         continue;
       }
       $tag = new CRM_Core_DAO_EntityTag();
