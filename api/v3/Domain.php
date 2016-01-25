@@ -141,10 +141,13 @@ function civicrm_api3_domain_create($params) {
   }
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 
-  // Rename version to domain_version, see CRM-17430.
   $result_value = CRM_Utils_Array::first($result['values']);
-  $result_value['domain_version'] = $result_value['version'];
-  unset($result_value['version']);
+  if (isset($result_value['version'])) {
+    // Rename version to domain_version, see CRM-17430.
+    $result_value['domain_version'] = $result_value['version'];
+    unset($result_value['version']);
+    $result['values'][$result['id']] = $result_value;
+  }
   return $result;
 }
 
