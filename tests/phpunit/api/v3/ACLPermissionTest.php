@@ -359,7 +359,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
   }
 
-
   /**
    * @dataProvider entities
    * Function tests that an empty where hook returns no results
@@ -401,24 +400,28 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * No results returned.
+   *
    * @implements CRM_Utils_Hook::aclWhereClause
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param $contactID
-   * @param $where
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
    */
   public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
 
   /**
    * All results returned.
+   *
    * @implements CRM_Utils_Hook::aclWhereClause
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param $contactID
-   * @param $where
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
    */
   public function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " (1) ";
