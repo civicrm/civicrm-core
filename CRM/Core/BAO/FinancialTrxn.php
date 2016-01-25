@@ -539,7 +539,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
 
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
-  
+
   /**
    * @param array $contribution
    * @param array $params

@@ -141,7 +141,8 @@ function civicrm_api3_payment_create(&$params) {
     // Check if pending contribution
     if ($contribution['contribution_status'] == 'Pending') {
       $cmp = bccomp($contribution['total_amount'], $params['total_amount'], 5);
-      if ($cmp == 0 || $cmp == -1) { // Total payment amount is the whole amount paid against pending contribution
+      // Total payment amount is the whole amount paid against pending contribution
+      if ($cmp == 0 || $cmp == -1) {
         civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
