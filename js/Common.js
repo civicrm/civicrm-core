@@ -733,6 +733,7 @@ if (!CRM.vars) CRM.vars = {};
       var defaults = {
         "processing": true,
         "serverSide": true,
+        "aaSorting": [],
         "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
         "pageLength": 25,
         "drawCallback": function(settings) {
