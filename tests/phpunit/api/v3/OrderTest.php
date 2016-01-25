@@ -179,4 +179,44 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->assertEquals(0, $order['count']);
   }
 
+  /**
+   * Test create order api
+   */
+  public function testAddOrder() {
+    $p = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 100.00,
+      'financial_type_id' => $this->_financialTypeId,
+      'trxn_id' => 23456,
+      'contribution_status_id' => 1,
+    );
+    $order = $this->callAPISuccess('Order', 'create', $p);
+
+    $params = array(
+      'contribution_id' => $order['id'],
+    );
+
+    $order = $this->callAPIAndDocument('order', 'get', $params, __FUNCTION__, __FILE__);
+    $expectedResult = array(
+      'total_amount' => 100,
+      'trxn_id' => 23456,
+      'contribution_id' => $order['id'],
+      'contribution_status' => 'Completed',
+      'net_amount' => 100,
+    );
+    $lineItems[] = array(
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $order['id'],
+      'contribution_id' => $order['id'],
+      'unit_price' => 100,
+      'line_total' => 100,
+      'financial_type_id' => 1,
+    );
+    $this->checkPaymentResult($order, $expectedResult, $lineItems);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $order['id'],
+    ));
+  }
+
 }
