@@ -174,7 +174,7 @@ function _civicrm_api3_order_delete_spec(&$params) {
 }
 
 /**
- * Adjust Metadata for Delete action.
+ * Adjust Metadata for Cancel action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
