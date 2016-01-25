@@ -219,4 +219,82 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * Test create order api with line items
+   */
+  public function testAddOrderLineItems() {
+    $priceFields = $this->createPriceSet();
+    $p = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 300.00,
+      'financial_type_id' => $this->_financialTypeId,
+      'trxn_id' => 23456,
+      'contribution_status_id' => 1,
+    );  
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[1][$key] = array(
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+      );
+    }
+    $p['line_item'] = $lineItems;
+    $order = $this->callAPISuccess('Order', 'create', $p);
+
+    $params = array(
+      'contribution_id' => $order['id'],
+    );
+
+    $order = $this->callAPIAndDocument('order', 'get', $params, __FUNCTION__, __FILE__);
+    $expectedResult = array(
+      'total_amount' => 300,
+      'trxn_id' => 23456,
+      'contribution_id' => $order['id'],
+      'contribution_status' => 'Completed',
+      'net_amount' => 300,
+    );
+    $items[] = array(
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $order['id'],
+      'contribution_id' => $order['id'],
+      'unit_price' => 100,
+      'line_total' => 100,
+    );
+    $items[] = array(
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $order['id'],
+      'contribution_id' => $order['id'],
+      'unit_price' => 200,
+      'line_total' => 200,
+    );
+    $this->checkPaymentResult($order, $expectedResult, $items);
+
+    $params = array(
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $order['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 300);
+
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $eft['values'][$eft['id']]['financial_trxn_id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $amounts = array(200, 100);
+    foreach ($eft['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($amounts));
+    }
+
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $order['id'],
+    ));
+  }
+
 }
