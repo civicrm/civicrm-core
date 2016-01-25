@@ -183,6 +183,98 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create order api for membership
+   */
+  public function testAddOrderForMembership() {
+    require_once 'CiviTest/Membership.php';
+    $membership = new Membership();
+    $membershipType = $membership->createMembershipType();
+    $membershipType1 = $membership->createMembershipType();
+    $membershipType = $membershipTypes = array($membershipType->id, $membershipType1->id);
+    $p = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 200,
+      'financial_type_id' => $this->_financialTypeId,
+      'contribution_status_id' => 1,
+    );
+    $priceFields = $this->createPriceSet();
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[$key] = array(
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+        'entity_table' => 'civicrm_membership',
+        'membership_type_id' => array_pop($membershipType),
+      );
+    }
+    $p['line_items'][] = array(
+      'line_item' => array(array_pop($lineItems)),
+      'params' => array(
+        'contact_id' => $this->_individualId,
+        'membership_type_id' => array_pop($membershipTypes),
+        'join_date' => '2006-01-21',
+        'start_date' => '2006-01-21',
+        'end_date' => '2006-12-21',
+        'source' => 'Payment',
+        'is_override' => 1,
+        'status_id' => 1,
+      ),
+    );
+    $order = $this->callAPISuccess('order', 'create', $p);
+    $params = array(
+      'contribution_id' => $order['id'],
+    );
+
+    $order = $this->callAPISuccess('order', 'get', $params);
+    $expectedResult = array(
+      'total_amount' => 200,
+      'contribution_id' => $order['id'],
+      'contribution_status' => 'Completed',
+      'net_amount' => 200,
+    );
+    $this->checkPaymentResult($order, $expectedResult);
+    $this->callAPISuccessGetCount('MembershipPayment', $params, 1);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $order['id'],
+    ));
+    $p['line_items'][] = array(
+      'line_item' => array(array_pop($lineItems)),
+      'params' => array(
+        'contact_id' => $this->_individualId,
+        'membership_type_id' => array_pop($membershipTypes),
+        'join_date' => '2006-01-21',
+        'start_date' => '2006-01-21',
+        'end_date' => '2006-12-21',
+        'source' => 'Payment',
+        'is_override' => 1,
+        'status_id' => 1,
+      ),
+    );
+    $p['total_amount'] = 300;
+    $order = $this->callAPISuccess('order', 'create', $p);
+    $expectedResult = array(
+      'total_amount' => 300,
+      'contribution_status' => 'Completed',
+      'net_amount' => 300,
+    );
+    $paymentMembership = array(
+      'contribution_id' => $order['id'],
+    );
+    $order = $this->callAPISuccess('order', 'get', $paymentMembership);
+    $this->checkPaymentResult($order, $expectedResult);
+    $this->callAPISuccessGetCount('MembershipPayment', $paymentMembership, 2);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $order['id'],
+    ));
+  }
+
+  /**
    * Test create order api for participant
    */
   public function testAddOrderForPariticipant() {
