@@ -115,8 +115,6 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    * Test getPartialPaymentTrxn function.
    */
   public function testGetPartialPaymentTrxn() {
-    $contactId = $this->individualCreate();
-
     $contributionTest = new CRM_Contribute_BAO_ContributionTest();
     list($lineItems, $contribution) = $contributionTest->addParticipantWithContribution();
     $contribution = (array)$contribution;
