@@ -3507,7 +3507,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->callAPISuccess('ParticipantPayment', 'create', $paymentParticipant);
     return array($lineItems, $contribution);
   }
-  
+
   /**
    * Create price set
    *
