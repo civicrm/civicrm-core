@@ -66,15 +66,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test Get Payment api.
    */
   public function testGetOrder() {
-    $p = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '2010-01-20',
-      'total_amount' => 100.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'trxn_id' => 23456,
-      'contribution_status_id' => 1,
-    );
-    $contribution = $this->callAPISuccess('contribution', 'create', $p);
+    $contribution = $this->addOrder(FALSE, 100);
 
     $params = array(
       'contribution_id' => $contribution['id'],
@@ -85,7 +77,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->assertEquals(1, $order['count']);
     $expectedResult = array(
       'total_amount' => 100,
-      'trxn_id' => 23456,
       'contribution_id' => $contribution['id'],
       'contribution_status' => 'Completed',
       'net_amount' => 100,
@@ -125,15 +116,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test cancel order api
    */
   public function testCancelOrder() {
-    $p = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '2010-01-20',
-      'total_amount' => 100.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'trxn_id' => 23456,
-      'contribution_status_id' => 1,
-    );
-    $contribution = $this->callAPISuccess('contribution', 'create', $p);
+    $contribution = $this->addOrder(FALSE, 100);
 
     $params = array(
       'contribution_id' => $contribution['id'],
@@ -144,7 +127,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $order = $this->callAPIAndDocument('Order', 'get', $params, __FUNCTION__, __FILE__);
     $expectedResult = array(
       'total_amount' => 100,
-      'trxn_id' => 23456,
       'contribution_id' => $contribution['id'],
       'contribution_status' => 'Cancelled',
       'net_amount' => 100,
@@ -160,18 +142,9 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test delete order api
    */
   public function testDeleteOrder() {
-    $p = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '2010-01-20',
-      'total_amount' => 100.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'trxn_id' => 23456,
-      'contribution_status_id' => 1,
-    );
-    $contribution = $this->callAPISuccess('contribution', 'create', $p);
-
+    $order = $this->addOrder(FALSE, 100);
     $params = array(
-      'contribution_id' => $contribution['id'],
+      'contribution_id' => $order['id'],
     );
 
     $this->callAPIAndDocument('order', 'delete', $params, __FUNCTION__, __FILE__);
@@ -183,16 +156,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test create order api
    */
   public function testAddOrder() {
-    $p = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '2010-01-20',
-      'total_amount' => 100.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'trxn_id' => 23456,
-      'contribution_status_id' => 1,
-    );
-    $order = $this->callAPISuccess('Order', 'create', $p);
-
+    $order = $this->addOrder(FALSE, 100);
     $params = array(
       'contribution_id' => $order['id'],
     );
@@ -200,7 +164,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $order = $this->callAPIAndDocument('order', 'get', $params, __FUNCTION__, __FILE__);
     $expectedResult = array(
       'total_amount' => 100,
-      'trxn_id' => 23456,
       'contribution_id' => $order['id'],
       'contribution_status' => 'Completed',
       'net_amount' => 100,
@@ -223,30 +186,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test create order api with line items
    */
   public function testAddOrderLineItems() {
-    $priceFields = $this->createPriceSet();
-    $p = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '2010-01-20',
-      'total_amount' => 300.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'trxn_id' => 23456,
-      'contribution_status_id' => 1,
-    );  
-    foreach ($priceFields['values'] as $key => $priceField) {
-      $lineItems[1][$key] = array(
-        'price_field_id' => $priceField['price_field_id'],
-        'price_field_value_id' => $priceField['id'],
-        'label' => $priceField['label'],
-        'field_title' => $priceField['label'],
-        'qty' => 1,
-        'unit_price' => $priceField['amount'],
-        'line_total' => $priceField['amount'],
-        'financial_type_id' => $priceField['financial_type_id'],
-      );
-    }
-    $p['line_item'] = $lineItems;
-    $order = $this->callAPISuccess('Order', 'create', $p);
-
+    $order = $this->addOrder(TRUE);
     $params = array(
       'contribution_id' => $order['id'],
     );
@@ -254,7 +194,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $order = $this->callAPIAndDocument('order', 'get', $params, __FUNCTION__, __FILE__);
     $expectedResult = array(
       'total_amount' => 300,
-      'trxn_id' => 23456,
       'contribution_id' => $order['id'],
       'contribution_status' => 'Completed',
       'net_amount' => 300,
@@ -295,6 +234,44 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $order['id'],
     ));
+  }
+
+  /**
+   * add order
+   *
+   * @param boolean $isPriceSet
+   * @param float $componentId$amount
+   * @param array $extraParams
+   *
+   * @return array
+   */
+  public function addOrder($isPriceSet, $amount = 300, $extraParams = array()) {
+    $p = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => $amount,
+      'financial_type_id' => $this->_financialTypeId,
+      'contribution_status_id' => 1,
+    );
+
+    if ($isPriceSet) {
+      $priceFields = $this->createPriceSet();
+      foreach ($priceFields['values'] as $key => $priceField) {
+        $lineItems[1][$key] = array(
+          'price_field_id' => $priceField['price_field_id'],
+          'price_field_value_id' => $priceField['id'],
+          'label' => $priceField['label'],
+          'field_title' => $priceField['label'],
+          'qty' => 1,
+          'unit_price' => $priceField['amount'],
+          'line_total' => $priceField['amount'],
+          'financial_type_id' => $priceField['financial_type_id'],
+        );
+      }
+      $p['line_item'] = $lineItems;
+    }
+    $p = array_merge($extraParams, $p);
+    return $this->callAPISuccess('Order', 'create', $p);
   }
 
 }

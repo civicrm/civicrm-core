@@ -3508,8 +3508,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     return array($lineItems, $contribution);
   }
   
-/**
+  /**
    * Create price set 
+   *
+   * @param string $component
+   * @param int $componentId
    *
    * @return array
    */
