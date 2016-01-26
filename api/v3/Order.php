@@ -53,6 +53,7 @@ function civicrm_api3_order_create(&$params) {
   $entityIds = array();
   if (CRM_Utils_Array::value('line_items', $params) && is_array($params['line_items'])) {
     $priceSetID = NULL;
+    CRM_Contribute_BAO_Contribution::checkLineItems($params);
     foreach ($params['line_items'] as $lineItems) {
       $entityParams = CRM_Utils_Array::value('params', $lineItems, array());
       if (!empty($entityParams) && !empty($lineItems['line_item'])) {
@@ -201,5 +202,33 @@ function _civicrm_api3_order_cancel_spec(&$params) {
     'api.required' => 1 ,
     'title' => 'Contribution ID',
     'type' => CRM_Utils_Type::T_INT,
+  );
+}
+
+/**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_order_create_spec(&$params) {
+  $params['contact_id'] = array(
+    'name' => 'contact_id',
+    'title' => 'Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
+  );
+  $params['total_amount'] = array(
+    'name' => 'total_amount',
+    'title' => 'Total Amount',
+    'api.required' => TRUE,
+  );
+  $params['financial_type_id'] = array(
+    'name' => 'financial_type_id',
+    'title' => 'Financial Type',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
   );
 }
