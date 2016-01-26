@@ -111,7 +111,16 @@ function civicrm_api3_order_create(&$params) {
  * @return array
  */
 function civicrm_api3_order_delete($params) {
-  $result = civicrm_api3('Contribution', 'delete', $params);
+  $contribution = civicrm_api3('Contribution', 'get', array(
+    'return' => array('is_test'),
+    'id' => CRM_Utils_Array::value('contribution_id', $params, $params['id']),
+  ));
+  if ($contribution['id'] && $contribution['values'][$contribution['id']]['is_test'] == TRUE) {
+    $result = civicrm_api3('Contribution', 'delete', $params);
+  }
+  else {
+    throw new API_Exception('Could not delete Order.');
+  }
   return civicrm_api3_create_success(CRM_Utils_Array::value('values', $result), $params, 'Order', 'delete');
 }
 

@@ -146,7 +146,10 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $params = array(
       'contribution_id' => $order['id'],
     );
-
+    $this->callAPISuccess('contribution', 'create', array(
+      'contribution_id' => $order['id'],
+      'is_test' => TRUE,
+    ));
     $this->callAPISuccess('order', 'delete', $params);
     $order = $this->callAPISuccess('order', 'get', $params);
     $this->assertEquals(0, $order['count']);
