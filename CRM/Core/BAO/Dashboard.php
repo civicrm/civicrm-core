@@ -162,7 +162,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         'domain_id' => CRM_Core_Config::domainID(),
         'option.limit' => 0,
       ));
-    $contactID = CRM_Core_Session::singleton()->get('userID');
+    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     $allDashlets = CRM_Utils_Array::index(array('name'), $getDashlets['values']);
     $defaultDashlets = array();
     $defaults = array('blog' => 1, 'getting-started' => '0');
@@ -281,27 +281,27 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Get details of each dashlets.
+   * Get details of a dashlet.
    *
    * @param int $dashletID
    *   Widget ID.
    *
    * @return array
-   *   associted array title and content
+   *   associative array including title and content.
    */
   public static function getDashletInfo($dashletID) {
     $dashletInfo = array();
 
     $params = array(1 => array($dashletID, 'Integer'));
     $query = "SELECT name, label, url, fullscreen_url, is_fullscreen FROM civicrm_dashboard WHERE id = %1";
-    $dashboadDAO = CRM_Core_DAO::executeQuery($query, $params);
-    $dashboadDAO->fetch();
+    $dashboardDAO = CRM_Core_DAO::executeQuery($query, $params);
+    $dashboardDAO->fetch();
 
     // build the content
     $dao = new CRM_Contact_DAO_DashboardContact();
 
     $session = CRM_Core_Session::singleton();
-    $dao->contact_id = $session->get('userID');
+    $dao->contact_id = $session->getLoggedInContactID();
     $dao->dashboard_id = $dashletID;
     $dao->find(TRUE);
 
@@ -314,34 +314,24 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       $dao->content = NULL;
     }
 
-    // if content is empty and url is set, retrieve it from url
-    if (!$dao->content && $dashboadDAO->url) {
-      $url = $dashboadDAO->url;
+    // Use the api to pull the entry.
+    $getDashlet = civicrm_api3("Dashboard", "get", array(
+      'dashboard_id' => $dashletID));
 
-      // CRM-7087
-      // -lets use relative url for internal use.
-      // -make sure relative url should not be htmlize.
-      if (substr($dashboadDAO->url, 0, 4) != 'http') {
-        $urlParam = explode('?', $dashboadDAO->url);
-        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], TRUE, NULL, FALSE);
-      }
-
-      //get content from url
-      $dao->content = CRM_Utils_System::getServerResponse($url);
-      $dao->created_date = date("YmdHis");
-      $dao->save();
-    }
-
+    // Perform a request to get a dashlet's contents.
+    $invoke=new Crm_Core_Invoke;
+    $invoke->setPrint(CRM_Core_Smarty::PRINT_SNIPPET);
+    $invoke->setReset(TRUE);
     $dashletInfo = array(
-      'title' => $dashboadDAO->label,
-      'name' => $dashboadDAO->name,
-      'content' => $dao->content,
+      'title' => $dashboardDAO->label,
+      'name' => $dashboardDAO->name,
+      'content' => $invoke->invoke(array("civicrm", "dashlet", $dashboardDAO->name), TRUE),
     );
 
-    if ($dashboadDAO->is_fullscreen) {
-      $fullscreenUrl = $dashboadDAO->fullscreen_url;
+    // FIXME: how is fullscreenUrl supposed to get populated?
+    if ($dashboardDAO->is_fullscreen) {
       if (substr($fullscreenUrl, 0, 4) != 'http') {
-        $urlParam = explode('?', $dashboadDAO->fullscreen_url);
+        $urlParam = explode('?', $dashboardDAO->fullscreen_url);
         $fullscreenUrl = CRM_Utils_System::url($urlParam[0], $urlParam[1], TRUE, NULL, FALSE);
       }
       $dashletInfo['fullscreenUrl'] = $fullscreenUrl;
@@ -361,7 +351,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   public static function saveDashletChanges($columns, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
     if (!$contactID) {
-      $contactID = $session->get('userID');
+      $contactID = $session->getLoggedInContactID();
     }
 
     if (empty($contactID)) {
@@ -510,7 +500,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     else {
       //Get the id of Logged in User
       $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = $session->getLoggedInContactID();
       if (!empty($contactID)) {
         $contactIDs[] = $session->get('userID');
       }
