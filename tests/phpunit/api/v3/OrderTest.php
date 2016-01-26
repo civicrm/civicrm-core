@@ -63,7 +63,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test Get Payment api.
+   * Test Get order api.
    */
   public function testGetOrder() {
     $contribution = $this->addOrder(FALSE, 100);
@@ -92,6 +92,25 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
     );
     $this->checkPaymentResult($order, $expectedResult, $lineItems);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+  }
+
+  /**
+   * Test Get Order api for participant contribution.
+   */
+  public function testGetOrderParticipant() {
+    $contribution = $this->addOrder(FALSE, 100);
+    list($items, $contribution) = $this->createParticipantWithContribution();
+
+    $params = array(
+      'contribution_id' => $contribution['id'],
+    );
+
+    $order = $this->callAPISuccess('Order', 'get', $params);
+
+    $this->assertEquals(2, count($order['values'][$contribution['id']]['line_items']));
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
