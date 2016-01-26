@@ -32,7 +32,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
    */
   public function generateCreateSql($fileName = 'civicrm.mysql') {
     echo "Generating sql file\n";
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
+    $template = new CRM_Core_CodeGen_Util_Template('sql', $this->config->dbDsn);
 
     $template->assign('database', $this->config->database);
     $template->assign('tables', $this->tables);
@@ -49,19 +49,19 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
   public function generateDropSql($fileName = 'civicrm_drop.mysql') {
     echo "Generating sql drop tables file\n";
     $dropOrder = array_reverse(array_keys($this->tables));
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
+    $template = new CRM_Core_CodeGen_Util_Template('sql', $this->config->dbDsn);
     $template->assign('dropOrder', $dropOrder);
     $template->run('drop.tpl', $this->config->sqlCodePath . $fileName);
   }
 
   public function generateNavigation() {
     echo "Generating navigation file\n";
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
+    $template = new CRM_Core_CodeGen_Util_Template('sql', $this->config->dbDsn);
     $template->run('civicrm_navigation.tpl', $this->config->sqlCodePath . "civicrm_navigation.mysql");
   }
 
   public function generateLocaleDataSql() {
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
+    $template = new CRM_Core_CodeGen_Util_Template('sql', $this->config->dbDsn);
 
     global $tsLocale;
     $oldTsLocale = $tsLocale;
@@ -91,7 +91,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
   }
 
   public function generateSample() {
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
+    $template = new CRM_Core_CodeGen_Util_Template('sql', $this->config->dbDsn);
     $sections = array(
       'civicrm_sample.tpl',
       'civicrm_acl.tpl',

@@ -35,6 +35,7 @@ $genCode = new CRM_Core_CodeGen_Main(
   @$argv[3], // cms
   empty($argv[2]) ? NULL : $argv[2], // db version
   empty($argv[1]) ? 'schema/Schema.xml' : $argv[1], // schema file
-  getenv('CIVICRM_GENCODE_DIGEST') ? getenv('CIVICRM_GENCODE_DIGEST') : NULL  // path to digest file
+  getenv('CIVICRM_GENCODE_DIGEST') ? getenv('CIVICRM_GENCODE_DIGEST') : NULL,  // path to digest file
+  empty($argv[4]) ? "mysql://username:password@localhost/database" : $argv[4] // db connect string
 );
 $genCode->main();
