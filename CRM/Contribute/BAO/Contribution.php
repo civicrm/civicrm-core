@@ -4824,7 +4824,6 @@ LIMIT 1;";
    * @param array $params
    *  array of order params.
    *
-   * @return string
    */
   public static function checkLineItems(&$params) {
     $totalAmount = CRM_Utils_Array::value('total_amount', $params);
@@ -4841,9 +4840,8 @@ LIMIT 1;";
       $params['total_amount'] = $lineItemAmount;
     }
     elseif ($totalAmount != $lineItemAmount) {
-      return "Line item total doesn't match with total amount.";
+      throw new API_Exception("Line item total doesn't match with total amount.");
     }
-    return NULL;
   }
 
 }

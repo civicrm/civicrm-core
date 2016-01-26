@@ -819,12 +819,16 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         ),
       ),
     );
-    $error = CRM_Contribute_BAO_Contribution::checkLineItems($params);
-    $this->assertEquals("Line item total doesn't match with total amount.", $error);
+    try {
+      $error = CRM_Contribute_BAO_Contribution::checkLineItems($params);
+      $this->fail("Missed expected exception");
+    }
+    catch (Exception $e) {
+      $this->assertEquals("Line item total doesn't match with total amount.", $e->getMessage());
+    }
     $this->assertEquals(3, $params['line_items'][0]['line_item'][0]['financial_type_id']);
     $params['total_amount'] = 300;
-    $error = CRM_Contribute_BAO_Contribution::checkLineItems($params);
-    $this->assertEquals(NULL, $error);
+    CRM_Contribute_BAO_Contribution::checkLineItems($params);
   }
 
 }
