@@ -243,7 +243,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param array $freezeOptions
    *
    * @return null
-   * @internal param bool $search true if used for search else false
    */
   public static function addQuickFormElement(
     &$qf,
