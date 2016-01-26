@@ -784,7 +784,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * checkLineItems() check if total amount matches the sum of line total 
+   * checkLineItems() check if total amount matches the sum of line total
    */
   public function testcheckLineItems() {
     $params = array(
@@ -815,9 +815,9 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
               'financial_type_id' => 1,
             ),
           ),
-          'params'=> array(),
+          'params' => array(),
         ),
-      )
+      ),
     );
     $error = CRM_Contribute_BAO_Contribution::checkLineItems($params);
     $this->assertEquals("Line item total doesn't match with total amount.", $error);
