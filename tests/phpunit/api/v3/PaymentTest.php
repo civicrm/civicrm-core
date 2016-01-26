@@ -107,7 +107,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
     );
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = array(
       'from_financial_account_id' => 7,
       'to_financial_account_id' => 6,
@@ -143,7 +143,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 100,
     );
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = array(
       'from_financial_account_id' => 7,
       'to_financial_account_id' => 6,
@@ -202,7 +202,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($lineItems['values'] as $id => $ignore) {
       $params['line_item'][] = array($id => array_pop($amounts));
     }
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = array(
       'from_financial_account_id' => 7,
       'to_financial_account_id' => 6,
@@ -242,7 +242,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($lineItems['values'] as $id => $ignore) {
       $params['line_item'][] = array($id => array_pop($amounts));
     }
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = array(
       'from_financial_account_id' => 7,
       'to_financial_account_id' => 6,
@@ -286,7 +286,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     );
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(1, $payment['count']);
 
     $cancelParams = array(
@@ -294,7 +294,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     );
     $this->callAPIAndDocument('payment', 'cancel', $cancelParams, __FUNCTION__, __FILE__);
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(2, $payment['count']);
     $amounts = array(-150.00, 150.00);
     foreach ($payment['values'] as $value) {
@@ -316,7 +316,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     );
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(1, $payment['count']);
 
     $cancelParams = array(
@@ -324,7 +324,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     );
     $this->callAPIAndDocument('payment', 'delete', $cancelParams, __FUNCTION__, __FILE__);
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(0, $payment['count']);
 
     $this->callAPISuccess('Contribution', 'Delete', array(
@@ -344,7 +344,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 50,
     );
 
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = array(
       'from_financial_account_id' => 7,
       'to_financial_account_id' => 6,
@@ -385,7 +385,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $params = array(
       'contribution_id' => $contribution['id'],
     );
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $amounts = array(100.00, -50.00, 50.00, 150.00);
     foreach ($payment['values'] as $value) {
       $amount = array_pop($amounts);
@@ -425,7 +425,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 100,
     );
-    $payment = $this->callAPIAndDocument('Payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = array(
       'from_financial_account_id' => 7,
       'to_financial_account_id' => 6,
