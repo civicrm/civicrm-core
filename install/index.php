@@ -1390,17 +1390,40 @@ class Installer extends InstallRequirements {
         $GLOBALS['user'] = $original_user;
         drupal_save_session(TRUE);
 
-        //change the default language to one chosen
+        //change the default settings based on the language chosen
         if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
           // This ensures that defaults get set, otherwise the user will login
           // and most configurations will be empty, not set to en_US defaults.
           civicrm_api3('Setting', 'revert');
 
-          civicrm_api3('Setting', 'create', array(
-              'domain_id' => 'current_domain',
-              'lcMessages' => $config['seedLanguage'],
-            )
-          );
+          // get settings if the corresponding file exist
+          $settingsParams = array();
+          $fileName = $crmPath . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $config['seedLanguage'] . DIRECTORY_SEPARATOR . 'settings.json';
+          if (file_exists($fileName)) {
+            $json = file_get_contents($fileName);
+            $settings = json_decode($json, TRUE);
+
+            if (!empty($settings)) {
+
+              // get all valid settings
+              $results = civicrm_api3('Setting', 'getfields', array());
+              $validSettings = array_keys($results['values']);
+
+              // add valid settings to params to send to api
+              foreach ($settings as $setting => $value) {
+                if (in_array($setting, $validSettings)) {
+                  $settingsParams[$setting] = $value;
+                }
+
+                // TODO: add support for currencies_enabled which is an OptionGroup
+              }
+            }
+          }
+          $settingsParams['domain_id'] = 'current_domain';
+          $settingsParams['lcMessages'] = $config['seedLanguage'];
+
+          civicrm_api3('Setting', 'create', $settingsParams);
+
         }
 
         $output .= '</ul>';
