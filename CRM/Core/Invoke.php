@@ -38,6 +38,21 @@
 class CRM_Core_Invoke {
 
   /**
+   * Are we in print mode? if so we need to modify the display
+   * functionality to do a minimal display :)
+   *
+   * @var boolean
+   */
+   protected $_print = FALSE;
+
+  /**
+   * Do we need to reset the controller session for this request?
+   *
+   * @var boolean
+   */
+   protected $_reset = FALSE;
+
+  /**
    * This is the main front-controller that integrates with the CMS. Any
    * page-request that is sent to the CMS and intended for CiviCRM should
    * be processed by invoke().
@@ -49,7 +64,7 @@ class CRM_Core_Invoke {
    *   HTML. For non-HTML content, invoke() may call print() and exit().
    *
    */
-  public static function invoke($args) {
+  public function invoke($args) {
     try {
       return self::_invoke($args);
     }
@@ -68,13 +83,25 @@ class CRM_Core_Invoke {
    * @return string
    *   HTML. For non-HTML content, invoke() may call print() and exit().
    */
-  public static function _invoke($args) {
+  private function _invoke($args) {
     if ($args[0] !== 'civicrm') {
       return NULL;
     }
+
+    // FIXME: centralize $_REQUEST parsing here.
+
     // CRM-15901: Turn off PHP errors display for all ajax calls
     if (CRM_Utils_Array::value(1, $args) == 'ajax' || CRM_Utils_Array::value('snippet', $_REQUEST)) {
       ini_set('display_errors', 0);
+    }
+
+    // handle snippet and reset interpretation here, instead of in Page.php
+    if (CRM_Utils_Array::value('snippet', $_REQUEST)) {
+      self::setPrint($_REQUEST['snippet']);
+    }
+
+    if (CRM_Utils_Array::value('reset', $_REQUEST)) {
+      self::setReset($_REQUEST['reset']);
     }
 
     if (!defined('CIVICRM_SYMFONY_PATH')) {
@@ -92,8 +119,8 @@ class CRM_Core_Invoke {
       $kernel = new AppKernel('dev', TRUE);
       $kernel->loadClassCache();
       $response = $kernel->handle(Symfony\Component\HttpFoundation\Request::createFromGlobals());
-      if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
-        // let the CMS handle the trappings
+      if (preg_match(':^text/html:', $response->headers->get('Content-Type')) || $this->_print != FALSE) {
+        // let the caller handle the result.
         return $response->getContent();
       }
       else {
@@ -198,7 +225,7 @@ class CRM_Core_Invoke {
    *   See CRM_Core_Menu.
    * @return string, HTML
    */
-  static public function runItem($item) {
+  private function runItem($item) {
     $config = CRM_Core_Config::singleton();
     if ($config->userFramework == 'Joomla' && $item) {
       $config->userFrameworkURLVar = 'task';
@@ -273,7 +300,7 @@ class CRM_Core_Invoke {
       $result = NULL;
       // WISHLIST: Refactor this. Instead of pattern-matching on page_callback, lookup
       // page_callback via Civi\Core\Resolver and check the implemented interfaces. This
-      // would require rethinking the default constructor.
+      // will probably require rethinking the default constructor.
       if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
         $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']));
       }
@@ -309,6 +336,8 @@ class CRM_Core_Invoke {
         else {
           CRM_Core_Error::fatal();
         }
+	$object->setPrint($this->_print);
+	$object->setReset($this->_reset);
         $result = $object->run($newArgs, $pageArgs);
       }
 
@@ -401,4 +430,21 @@ class CRM_Core_Invoke {
     CRM_Core_IDS::createConfigFile(TRUE);
   }
 
+  /**
+   * Setter for print. Shamelessly stolen from Page.php
+   *
+   * @param bool $print
+   */
+   public function setPrint($print) {
+     $this->_print = $print;
+   }
+
+  /**
+   * Setter for reset.
+   *
+   * @param bool $reset
+   */
+   public function setReset($reset) {
+     $this->_reset = $reset;
+  }
 }
