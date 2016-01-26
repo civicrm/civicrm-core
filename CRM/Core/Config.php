@@ -413,6 +413,15 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       return TRUE;
     }
 
+    if ($path && preg_match('/^civicrm\/ajax\/l10n-js/', $path)
+      && !empty($_SERVER['HTTP_REFERER'])
+    ) {
+      $ref = parse_url($_SERVER['HTTP_REFERER']);
+      if (preg_match('/civicrm\/upgrade/', $ref['path']) || preg_match('/civicrm\/upgrade/', urldecode($ref['query']))) {
+        return TRUE;
+      }
+    }
+
     return FALSE;
   }
 
