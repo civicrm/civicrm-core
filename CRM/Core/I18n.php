@@ -64,6 +64,15 @@ class CRM_Core_I18n {
   private $locale;
 
   /**
+   * A dbDsn, for when we are connecting to the database server, for localization.
+   *
+   * @var string
+   *   the dbDsn string used to connect to the database.
+   */
+
+  var $dbDsn = "";
+
+  /**
    * A locale-based constructor that shouldn't be called from outside of this class (use singleton() instead).
    *
    * @param string $locale
@@ -225,8 +234,9 @@ class CRM_Core_I18n {
    * where n is 1 for the first parameter. The following parameters are reserved:
    *   - escape - sets escape mode:
    *       - 'html' for HTML escaping, this is the default.
+   *	   - 'sql' for SQL escaping. Requires connecting to the database engine to perform escaping.
    *       - 'js' for javascript escaping.
-   *       - 'no'/'off'/0 - turns off escaping
+   *       - 'no'/'off'/0 - turns off escaping.
    *   - plural - The plural version of the text (2nd parameter of ngettext())
    *   - count - The item count for plural mode (3rd parameter of ngettext())
    *   - context - gettext context of that string (for homonym handling)
@@ -315,7 +325,11 @@ class CRM_Core_I18n {
 
     // escape SQL if we were asked for it
     if (isset($escape) and ($escape == 'sql')) {
-      $text = CRM_Core_DAO::escapeString($text);
+      if ($DAO === NULL) {
+        $DAO = new CRM_Core_DAO;
+        $DAO->setDsn($this->dbDsn);
+      }
+     $text = $DAO->escapeString($text);
     }
 
     // escape for JavaScript (if requested)
