@@ -4824,7 +4824,7 @@ LIMIT 1;";
   }
 
   /**
-   * Function use to check check line items
+   * Function to check line items
    *
    * @param array $params
    *  array of order params.
