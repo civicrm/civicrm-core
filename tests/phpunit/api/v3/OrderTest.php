@@ -81,7 +81,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'contribution_id' => $contribution['id'],
         'contribution_status' => 'Completed',
         'net_amount' => 100,
-       ),
+      )
     );
     $lineItems[] = array(
       'entity_table' => 'civicrm_contribution',
