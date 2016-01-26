@@ -385,7 +385,14 @@ class SettingsBag {
       $dao->created_id = $session->get('userID');
     }
 
-    $dao->save();
+    if ($dao->id) {
+      $dao->save();
+    }
+    else {
+      // Cannot use $dao->save(); in upgrade mode (eg WP + Civi 4.4=>4.7), the DAO will refuse
+      // to save the field `group_name`, which is required in older schema.
+      \CRM_Core_DAO::executeQuery(\CRM_Utils_SQL_Insert::dao($dao)->toSQL());
+    }
     $dao->free();
   }
 
