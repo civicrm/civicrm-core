@@ -783,4 +783,48 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     return array($lineItems, $contributions);
   }
 
+  /**
+   * checkLineItems() check if total amount matches the sum of line total 
+   */
+  public function testcheckLineItems() {
+    $params = array(
+      'contact_id' => 202,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 3,
+      'line_items' => array(
+        array(
+          'line_item' => array(
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 16,
+              'label' => 'test 1',
+              'qty' => 1,
+              'unit_price' => 100,
+              'line_total' => 100,
+            ),
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 17,
+              'label' => 'Test 2',
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'financial_type_id' => 1,
+            ),
+          ),
+          'params'=> array(),
+        ),
+      )
+    );
+    $error = CRM_Contribute_BAO_Contribution::checkLineItems($params);
+    $this->assertEquals("Line item total doesn't match with total amount.", $error);
+    $this->assertEquals(3, $params['line_items'][0]['line_item'][0]['financial_type_id']);
+    $params['total_amount'] = 300;
+    $error = CRM_Contribute_BAO_Contribution::checkLineItems($params);
+    $this->assertEquals(NULL, $error);
+  }
+
 }

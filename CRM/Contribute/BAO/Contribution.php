@@ -4823,4 +4823,32 @@ LIMIT 1;";
     }
   }
 
+  /**
+   * Function use to check check line items
+   *
+   * @param array $params
+   *  array of order params.
+   *
+   * @return string
+   */
+  public static function checkLineItems(&$params) {
+    $totalAmount = CRM_Utils_Array::value('total_amount', $params);
+    $lineItemAmount = 0;
+    foreach ($params['line_items'] as &$lineItems) {
+      foreach ($lineItems['line_item'] as &$item) {
+        if (empty($item['financial_type_id'])) {
+          $item['financial_type_id'] = $params['financial_type_id'];
+        }
+        $lineItemAmount += $item['line_total'];
+      }
+    }
+    if (!isset($totalAmount)) {
+      $params['total_amount'] = $lineItemAmount;
+    }
+    elseif ($totalAmount != $lineItemAmount) {
+      return "Line item total doesn't match with total amount.";
+    }
+    return NULL;
+  }
+
 }
