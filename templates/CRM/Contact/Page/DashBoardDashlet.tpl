@@ -64,11 +64,12 @@
   CRM.$(function($) {
     $('#crm-dashboard-configure').click(function() {
       $.ajax({
-         url: CRM.url('civicrm/dashlet', 'reset=1&snippet=1'),
-         success: function( content ) {
+         dataType:'json',
+         url: CRM.url('civicrm/dashlet', 'reset=1&snippet=json'),
+         success: function( dashboard_configure ) {
            $("#civicrm-dashboard, #crm-dashboard-configure, .show-refresh, #empty-message").hide();
            $('.show-done').show();
-           $("#configure-dashlet").show().html(content).trigger('crmLoad');
+           $("#configure-dashlet").show().html(dashboard_configure.content).trigger('crmLoad');
          }
       });
       return false;
