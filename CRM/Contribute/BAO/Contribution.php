@@ -2453,6 +2453,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($values['event']['is_email_confirm']) {
         $values['is_email_receipt'] = 1;
       }
+
+      if (!empty($ids['contribution'])) {
+        $values['contributionId'] = $ids['contribution'];
+      }
+
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
         $this->_relatedObjects['participant']->id, $this->is_test, $returnMessageText
       );
