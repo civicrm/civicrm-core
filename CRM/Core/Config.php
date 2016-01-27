@@ -417,7 +417,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       && !empty($_SERVER['HTTP_REFERER'])
     ) {
       $ref = parse_url($_SERVER['HTTP_REFERER']);
-      if (preg_match('/civicrm\/upgrade/', $ref['path']) || preg_match('/civicrm\/upgrade/', urldecode($ref['query']))) {
+      if (
+        (!empty($ref['path']) && preg_match('/civicrm\/upgrade/', $ref['path'])) ||
+        (!empty($ref['query']) && preg_match('/civicrm\/upgrade/', urldecode($ref['query'])))
+      ) {
         return TRUE;
       }
     }
