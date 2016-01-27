@@ -457,4 +457,28 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test cancel order api
+   */
+  public function testCancelOrder() {
+    $contribution = $this->addOrder(FALSE, 100);
+    $params = array(
+      'contribution_id' => $contribution['id'],
+    );
+    $this->callAPISuccess('order', 'cancel', $params);
+    $order = $this->callAPISuccess('Order', 'get', $params);
+    $expectedResult = array(
+      $contribution['id'] => array(
+        'total_amount' => 100,
+        'contribution_id' => $contribution['id'],
+        'contribution_status' => 'Cancelled',
+        'net_amount' => 100,
+      ),
+    );
+    $this->checkPaymentResult($order, $expectedResult);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+  }
+
 }
