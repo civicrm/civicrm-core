@@ -3,23 +3,40 @@ namespace Civi\ActionSchedule;
 
 /**
  * The AbstractMappingTest is a base class which can help define new
- * tests for ActionMappings. Concrete classes should implement a few
- * elements:
+ * tests for scheduled-reminders.
  *
- *   - Optionally, override clock() to specify when the cron jobs run.
- *     (By default, clock specifies daily from 20-Jan-15 to 1-Mar-15.)
+ * Generally, the problem of testing scheduled-reminders is one of permutations --
+ * there are many different types of records, fields on the records, and scheduling options.
+ * To test these, we setup a schedule of cron-runs (eg Jan 20 to Mar 1) and create some example
+ * records.
+ *
+ * To setup the examples, we need to string together several helper functions, like:
+ *
+ *  - startOnTime(), startWeekBefore(), or startWeekAfter()
+ *  - repeatTwoWeeksAfter()
+ *  - limitToRecipientAlice(), limitToRecipientBob(), alsoRecipientBob()
+ *  - addAliceDues(), addBobDonation()
+ *  - addAliceMeeting(), addBobPhoneCall()
+ *
+ * (Some of these helpers are defined in AbstractMappingTest. Some are defined in subclasses.)
+ *
+ * Concrete subclasses should implement a few elements:
+ *
+ *   - Optionally, modify $cronSchedule to specify when the cron jobs run.
+ *     (By default, it specifies daily from 20-Jan-15 to 1-Mar-15.)
  *   - Implement at least one setup-helper which creates example records.
  *     The example records should use the specified date (`$this->targetDate`)
- *     and should relate to `$this->matchedContact`. Additionally, the
- *     setup-helper should created spurious contacts which are almost
- *     (but not quite) matched to the schedule rules.
- *   - Implement at least one schedule-helper which configures `$this->scheduled`
+ *     and should relate to `$this->contact['alice']` (or 'bob 'or 'carol').
+ *   - Implement at least one schedule-helper which configures `$this->schedule`
  *     to use the preferred action mapping. It may define various
- *     filters, such value-filters, status-filters, or recipient-filters.
+ *     filters, such as value-filters, status-filters, or recipient-filters.
  *   - Implement `createTestCases()` which defines various
- *     permutations of tests to run.
+ *     permutations of tests to run. Each test provides a list of emails
+ *     which should be fired (datetime/recipient/subject).
  *
- * For an example, see CRM_Contribute_ActionMapping_ByTypeTest.
+ * For examples:
+ * @see CRM_Contribute_ActionMapping_ByTypeTest
+ * @see CRM_Activity_ActionMappingTest
  */
 abstract class AbstractMappingTest extends \CiviUnitTestCase {
 
@@ -130,6 +147,36 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
     $this->schedule->subject = 'Hello, {contact.first_name}. (via subject)';
     $this->schedule->body_html = '<p>Hello, {contact.first_name}. (via body_html)</p>';
     $this->schedule->body_text = 'Hello, {contact.first_name}. (via body_text)';
+  }
+
+  /**
+   * Limit possible recipients to Alice.
+   */
+  public function limitToRecipientAlice() {
+    $this->schedule->limit_to = 1;
+    $this->schedule->recipient = NULL;
+    $this->schedule->recipient_listing = NULL;
+    $this->schedule->recipient_manual = $this->contacts['alice']['id'];
+  }
+
+  /**
+   * Limit possible recipients to Bob.
+   */
+  public function limitToRecipientBob() {
+    $this->schedule->limit_to = 1;
+    $this->schedule->recipient = NULL;
+    $this->schedule->recipient_listing = NULL;
+    $this->schedule->recipient_manual = $this->contacts['bob']['id'];
+  }
+
+  /**
+   * Also include recipient Bob.
+   */
+  public function alsoRecipientBob() {
+    $this->schedule->limit_to = 0;
+    $this->schedule->recipient = NULL;
+    $this->schedule->recipient_listing = NULL;
+    $this->schedule->recipient_manual = $this->contacts['bob']['id'];
   }
 
   // ---------------------------------------- Core test definitions ----------------------------------------
