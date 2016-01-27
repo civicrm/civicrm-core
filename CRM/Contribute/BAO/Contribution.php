@@ -3353,8 +3353,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     ) {
       return;
     }
-    if (($params['prevContribution']->contribution_status_id == array_search('Partially paid', $contributionStatus))
-      && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
+    if (((($params['prevContribution']->contribution_status_id == array_search('Partially paid', $contributionStatus))
+      && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))
+      || (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus))
+      && $params['contribution']->contribution_status_id == array_search('Partially paid', $contributionStatus)))
       && $context == 'changedStatus'
     ) {
       return;
@@ -3553,7 +3555,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $checkStatus = array(
       'Cancelled' => array('Completed', 'Refunded'),
       'Completed' => array('Cancelled', 'Refunded'),
-      'Pending' => array('Cancelled', 'Completed', 'Failed'),
+      'Pending' => array('Cancelled', 'Completed', 'Failed', 'Partially paid'),
       'In Progress' => array('Cancelled', 'Completed', 'Failed'),
       'Refunded' => array('Cancelled', 'Completed'),
       'Partially paid' => array('Completed'),
