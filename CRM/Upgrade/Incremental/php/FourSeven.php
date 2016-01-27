@@ -142,6 +142,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_beta6($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Disable flexible jobs extension', 'disableFlexibleJobsExtension');
+    $this->addTask('Add Index to financial_trxn trxn_id field', 'addIndexFinancialTrxnTrxnID');
   }
 
   /**
@@ -388,6 +389,19 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
       // just ignore if the extension isn't installed
     }
 
+    return TRUE;
+  }
+
+  /**
+   * CRM-17752 add index to civicrm_financial_trxn.trxn_id (deliberately non-unique).
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexFinancialTrxnTrxnID(CRM_Queue_TaskContext $ctx) {
+    $tables = array('civicrm_financial_trxn' => array('trxn_id'));
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
     return TRUE;
   }
 
