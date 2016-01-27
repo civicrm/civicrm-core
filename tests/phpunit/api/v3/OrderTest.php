@@ -433,4 +433,27 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * Test delete order api
+   */
+  public function testDeleteOrder() {
+    $order = $this->addOrder(FALSE, 100);
+    $params = array(
+      'contribution_id' => $order['id'],
+    );
+    try {
+      $this->callAPISuccess('order', 'delete', $params);
+      $this->fail("Missed expected exception");
+    }
+    catch (Exception $expected) {
+      $this->callAPISuccess('contribution', 'create', array(
+        'contribution_id' => $order['id'],
+        'is_test' => TRUE,
+      ));
+      $this->callAPISuccess('order', 'delete', $params);
+      $order = $this->callAPISuccess('order', 'get', $params);
+      $this->assertEquals(0, $order['count']);
+    }
+  }
+
 }
