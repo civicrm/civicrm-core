@@ -131,7 +131,7 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
    */
   public function testThatForEntitiesEditAllContactsCanAddTags($entity) {
 
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit all contacts');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit all contacts', 'access CiviCRM');
     $this->callAPISuccess('EntityTag', 'create', array(
       'entity_id' => 1,
       'tag_id' => $entity,
