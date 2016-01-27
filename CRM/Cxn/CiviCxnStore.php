@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Cxn_CiviCxnStore
+ */
 class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
 
   protected $cxns = array();

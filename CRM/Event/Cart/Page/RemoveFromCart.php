@@ -4,6 +4,11 @@
  * Class CRM_Event_Cart_Page_RemoveFromCart
  */
 class CRM_Event_Cart_Page_RemoveFromCart extends CRM_Core_Page {
+  /**
+   * This function takes care of all the things common to all pages.
+   *
+   * This typically involves assigning the appropriate smarty variables :)
+   */
   public function run() {
     $transaction = new CRM_Core_Transaction();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);

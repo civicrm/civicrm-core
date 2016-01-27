@@ -27,6 +27,10 @@
 
 namespace Civi\ActionSchedule;
 
+/**
+ * Interface MappingInterface
+ * @package Civi\ActionSchedule
+ */
 interface MappingInterface {
 
   /**
