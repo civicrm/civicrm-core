@@ -134,12 +134,12 @@ function civicrm_api3_payment_create(&$params) {
   }
   // Get contribution
   $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $params['contribution_id']));
-  if (!in_array($contribution['contribution_status'], array('Partially paid', 'Pending'))) {
+  if ($contribution['contribution_status_id'] != CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name') || $contribution['contribution_status_id'] != CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
     throw new API_Exception('Please select a contribution which has a partial or pending payment');
   }
   else {
     // Check if pending contribution
-    if ($contribution['contribution_status'] == 'Pending') {
+    if ($contribution['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
       $cmp = bccomp($contribution['total_amount'], $params['total_amount'], 5);
       // Total payment amount is the whole amount paid against pending contribution
       if ($cmp == 0 || $cmp == -1) {
