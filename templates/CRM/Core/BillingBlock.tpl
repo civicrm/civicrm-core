@@ -202,27 +202,13 @@
                 .replace(/-/g, '');
         $('#credit_card_number').val(cc);
       });
-    });
 
-    $('input[name="payment_processor_id"]').change( function() {
       function toggleConfirmButton() {
         var suppressSubmitButton = {/literal}"{$suppressSubmitButton}"{literal};
-        var elementObj = $('input[name="payment_processor"]');
-        if ( elementObj.attr('type') == 'hidden' ) {
-          var processorTypeId = elementObj.val( );
-        }
-        else {
-          var processorTypeId = elementObj.filter(':checked').val();
-        }
-
-        if (suppressSubmitButton) {
-          $("#crm-submit-buttons").hide();
-        }
-        else {
-          $("#crm-submit-buttons").show();
-        }
+        $("#crm-submit-buttons").toggle(!suppressSubmitButton);
       }
       toggleConfirmButton();
+      $('input[name="payment_processor_id"]').change(toggleConfirmButton);
     });
 
   </script>
