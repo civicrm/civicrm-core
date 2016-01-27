@@ -54,7 +54,9 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   }
 
   /**
-   * @param $contactType
+   * Is this contact type active.
+   *
+   * @param string $contactType
    *
    * @return bool
    */
@@ -266,8 +268,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
   }
 
   /**
-   *
-   * retrieve info array about all types i.e basic + subtypes.
+   * Retrieve info array about all types i.e basic + subtypes.
    *
    * @param bool $all
    * @param bool $reset
@@ -326,7 +327,7 @@ WHERE  type.name IS NOT NULL
   }
 
   /**
-   * Retrieve basic type pairs with name as 'built-in name' and 'label' as value
+   * Retrieve basic type pairs with name as 'built-in name' and 'label' as value.
    *
    * @param bool $all
    * @param null $typeName

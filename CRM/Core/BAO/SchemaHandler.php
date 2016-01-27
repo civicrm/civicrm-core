@@ -29,35 +29,29 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *  This file contains functions for creating and altering CiviCRM-tables.
- */
-
-/**
- * structure, similar to what is used in GenCode.php
+ *  This file contains functions for creating and altering CiviCRM-tables structure.
  *
  * $table = array(
- * 'name'       => TABLE_NAME,
- *                'attributes' => ATTRIBUTES,
- *                'fields'     => array(
- *                                      array(
- * 'name'          => FIELD_NAME,
- *                                             'type'          => FIELD_SQL_TYPE,
- * // can be field, index, constraint
- *                                             'class'         => FIELD_CLASS_TYPE,
- *                                             'primary'       => BOOLEAN,
- *                                             'required'      => BOOLEAN,
- *                                             'searchable'    => TRUE,
- *                                             'fk_table_name' => FOREIGN_KEY_TABLE_NAME,
- *                                             'fk_field_name' => FOREIGN_KEY_FIELD_NAME,
- *                                             'comment'       => COMMENT,
- *                                             'default'       => DEFAULT, )
- *                                      ...
- *                                      ) );
+ *  'name'  => TABLE_NAME,
+ *  'attributes' => ATTRIBUTES,
+ *  'fields' => array(
+ *    array(
+ *      'name' => FIELD_NAME,
+ *      // can be field, index, constraint
+ *      'type' => FIELD_SQL_TYPE,
+ *      'class'         => FIELD_CLASS_TYPE,
+ *      'primary'       => BOOLEAN,
+ *      'required'      => BOOLEAN,
+ *      'searchable'    => TRUE,
+ *      'fk_table_name' => FOREIGN_KEY_TABLE_NAME,
+ *      'fk_field_name' => FOREIGN_KEY_FIELD_NAME,
+ *      'comment'       => COMMENT,
+ *      'default'       => DEFAULT, )
+ *      ...
+ *  ));
  */
 class CRM_Core_BAO_SchemaHandler {
 
