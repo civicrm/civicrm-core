@@ -348,6 +348,12 @@ function _civicrm_api3_system_get_redacted_mysql() {
   return $result;
 }
 
+/**
+ * Get redacted settings.
+ *
+ * @return array
+ * @throws CiviCRM_API3_Exception
+ */
 function _civicrm_api3_system_get_redacted_settings() {
   static $whitelist = NULL;
   if ($whitelist === NULL) {
