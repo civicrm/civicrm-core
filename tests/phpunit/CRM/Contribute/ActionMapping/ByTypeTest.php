@@ -117,6 +117,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     return $cs;
   }
 
+  /**
+   * Create a contribution record for Alice with type "Member Dues".
+   */
   public function addAliceDues() {
     $this->callAPISuccess('Contribution', 'create', array(
       'contact_id' => $this->contacts['alice']['id'],
@@ -138,6 +141,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     ));
   }
 
+  /**
+   * Create a contribution record for Bob with type "Donation".
+   */
   public function addBobDonation() {
     $this->callAPISuccess('Contribution', 'create', array(
       'contact_id' => $this->contacts['bob']['id'],
@@ -152,6 +158,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     ));
   }
 
+  /**
+   * Schedule message delivery for contributions of type "Member Dues".
+   */
   public function scheduleForDues() {
     $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
@@ -159,6 +168,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(array(1));
   }
 
+  /**
+   * Schedule message delivery for contributions of type "Donation".
+   */
   public function scheduleForDonation() {
     $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
@@ -166,6 +178,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
+  /**
+   * Schedule message delivery for any contribution, regardless of type.
+   */
   public function scheduleForAny() {
     $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
@@ -173,6 +188,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
+  /**
+   * Schedule message delivery to the 'soft credit' assignee.
+   */
   public function scheduleForSoftCreditor() {
     $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
