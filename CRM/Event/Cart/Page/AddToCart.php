@@ -4,6 +4,11 @@
  * Class CRM_Event_Cart_Page_AddToCart
  */
 class CRM_Event_Cart_Page_AddToCart extends CRM_Core_Page {
+  /**
+   * This function takes care of all the things common to all pages.
+   *
+   * This typically involves assigning the appropriate smarty variables :)
+   */
   public function run() {
     $transaction = new CRM_Core_Transaction();
 
