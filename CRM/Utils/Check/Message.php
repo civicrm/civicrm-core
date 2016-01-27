@@ -233,8 +233,8 @@ class CRM_Utils_Check_Message {
    */
   private function checkStatusPreference() {
     $this->hiddenUntil = FALSE;
-    // Debug, info & notice can't be hidden
-    if ($this->level < 3) {
+    // Debug & info can't be hidden
+    if ($this->level < 2) {
       return FALSE;
     }
     $statusPreferenceParams = array(
