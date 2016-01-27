@@ -218,6 +218,7 @@ class RecipientBuilder {
       ->merge($query, array('params'))
       ->merge($this->selectIntoActionLog(self::PHASE_ADDITION_FIRST, $query))
       ->merge($this->joinReminder('LEFT JOIN', 'addl', $query))
+      ->where('reminder.id IS NULL')
       ->where("c.is_deleted = 0 AND c.is_deceased = 0")
       ->merge($this->prepareAddlFilter('c.id'))
       ->where("c.id NOT IN (
