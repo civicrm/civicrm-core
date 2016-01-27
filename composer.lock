@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "02df41ffbec4b86911f04fabcdafb9d2",
-    "content-hash": "27d87bada17dcb2a1e63968ea500c79e",
+    "hash": "77c841b4a3ad8ae6b4e740251e10526f",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -87,28 +86,6 @@
             "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
             "homepage": "https://github.com/dompdf/dompdf",
             "time": "2015-12-07 04:07:13"
-        },
-        {
-            "name": "iats-payments/civicrm",
-            "version": "1.4.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/iATSPayments/com.iatspayments.civicrm.git",
-                "reference": "17b0edcdb056fa6257c4cd6612ff354c3f18dcce"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/iATSPayments/com.iatspayments.civicrm/zipball/17b0edcdb056fa6257c4cd6612ff354c3f18dcce",
-                "reference": "17b0edcdb056fa6257c4cd6612ff354c3f18dcce",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "AGPL"
-            ],
-            "description": "CiviCRM extension for iATS Payments",
-            "time": "2015-10-30 17:48:34"
         },
         {
             "name": "phenx/php-font-lib",
