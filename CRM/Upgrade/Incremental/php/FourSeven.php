@@ -146,6 +146,15 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_1($rev) {
+    $this->addTask('Add Index to civicrm_contribution creditnote_id field', 'addIndexContributionCreditNoteID');
+  }
+
+  /**
    * CRM-16354
    *
    * @return int
@@ -401,6 +410,19 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
    */
   public function addIndexFinancialTrxnTrxnID(CRM_Queue_TaskContext $ctx) {
     $tables = array('civicrm_financial_trxn' => array('trxn_id'));
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+    return TRUE;
+  }
+
+  /**
+   * CRM-17882 Add index to civicrm_contribution.credit_note_id.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexContributionCreditNoteID(CRM_Queue_TaskContext $ctx) {
+    $tables = array('civicrm_contribution' => array('creditnote_id'));
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
     return TRUE;
   }
