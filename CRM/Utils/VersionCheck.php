@@ -32,7 +32,7 @@
  */
 class CRM_Utils_VersionCheck {
   const
-    CACHEFILE_NAME = '[civicrm.files]/persist/version-info-cache.json',
+    CACHEFILE_NAME = 'version-info-cache.json',
     // after this length of time we fall back on poor-man's cron (7+ days)
     CACHEFILE_EXPIRE = 605000;
 
@@ -92,7 +92,7 @@ class CRM_Utils_VersionCheck {
   public function __construct() {
     $this->localVersion = CRM_Utils_System::version();
     $this->localMajorVersion = $this->getMajorVersion($this->localVersion);
-    $this->cacheFile = Civi::paths()->getPath(self::CACHEFILE_NAME);
+    $this->cacheFile = CRM_Core_Config::singleton()->uploadDir . self::CACHEFILE_NAME;
   }
 
   /**
