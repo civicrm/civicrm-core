@@ -76,6 +76,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $itemStatus = NULL;
+    if (empty($contribution->contact_id)) {
+      $contribution->find(TRUE);
+    }
     if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)
       || $contribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)
     ) {
@@ -125,7 +128,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
       $trxnId['id'] = $trxn['financialTrxnId'];
     }
-
     return self::create($params, NULL, $trxnId);
   }
 

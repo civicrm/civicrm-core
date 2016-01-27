@@ -3140,9 +3140,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
 
       $params['trxnParams'] = $trxnParams;
-
       if (!empty($params['prevContribution'])) {
         $updated = FALSE;
+        //check if line item is changed
+        if (array_key_exists('line_item', $params)) {
+          CRM_Price_BAO_LineItem::updateLineItemParams($params['line_item'], $params['contribution']->id);
+        }
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
@@ -3454,6 +3457,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $trxnIds['id'] = $params['entity_id'];
       foreach ($params['line_item'] as $fieldId => $fields) {
         foreach ($fields as $fieldValueId => $fieldValues) {
+          if (!CRM_Utils_Array::value('id', $fieldValues)) {
+            $params['line_item'][$fieldId][$fieldValueId]['trxnId'] = $trxnIds;
+            continue;
+          }
           $prevParams['entity_id'] = $fieldValues['id'];
           $prevfinancialItem = CRM_Financial_BAO_FinancialItem::retrieve($prevParams, CRM_Core_DAO::$_nullArray);
 
@@ -3483,10 +3490,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $amount = $params['total_amount'];
             }
           }
+          elseif (CRM_Utils_Array::value('diff_amount', $fieldValues)) {
+            // change in amount for line item
+            $amount = $fieldValues['diff_amount'];
+          }
           else {
             $amount = $diff * $fieldValues['line_total'];
           }
-
           $itemParams = array(
             'transaction_date' => $receiveDate,
             'contact_id' => $params['prevContribution']->contact_id,
@@ -3500,7 +3510,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           );
           CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
 
-          if ($fieldValues['tax_amount']) {
+          if (!empty($fieldValues['tax_amount'])) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
             $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
@@ -4818,4 +4828,29 @@ LIMIT 1;";
     }
   }
 
+  /**
+   * Function use to check check line items
+   *
+   * @param array $params
+   *  array of order params.
+   *
+   */
+  public static function checkLineItems(&$params) {
+    $totalAmount = CRM_Utils_Array::value('total_amount', $params);
+    $lineItemAmount = 0;
+    foreach ($params['line_items'] as $lineItems) {
+      foreach ($lineItems['line_item'] as &$item) {
+        if (empty($item['financial_type_id'])) {
+          $item['financial_type_id'] = $params['financial_type_id'];
+        }
+        $lineItemAmount += $item['line_total'];
+      }
+    }
+    if (!isset($totalAmount)) {
+      $params['total_amount'] = $lineItemAmount;
+    }
+    elseif ($totalAmount != $lineItemAmount) {
+      throw new API_Exception("Line item total doesn't match with total amount.");
+    }
+  }
 }

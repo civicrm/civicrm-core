@@ -381,14 +381,15 @@ AND li.entity_id = {$entityId}
     ) {
       return;
     }
-
     foreach ($lineItem as $priceSetId => $values) {
       if (!$priceSetId) {
         continue;
       }
 
       foreach ($values as $line) {
-        $line['entity_table'] = $entityTable;
+        if (empty($line['entity_table'])) {
+          $line['entity_table'] = $entityTable;
+        }
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
         }
@@ -408,8 +409,13 @@ AND li.entity_id = {$entityId}
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $lineItems = CRM_Price_BAO_LineItem::create($line);
-        if (!$update && $contributionDetails) {
-          CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
+        if ((!$update && $contributionDetails) || (!CRM_Utils_Array::value('id', $line))) {
+          CRM_Financial_BAO_FinancialItem::add(
+            $lineItems,
+            $contributionDetails,
+            FALSE,
+            CRM_Utils_Array::value('trxnId', $line)
+          );
           if (isset($line['tax_amount'])) {
             CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails, TRUE);
           }
@@ -558,6 +564,42 @@ AND li.entity_id = {$entityId}
       $tax = round(($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100, 2);
     }
     return $tax;
+  }
+
+  /**
+   * Update line item array.
+   *
+   * @param array $lineItems
+   *   An assoc array of lineItem.
+   *
+   * @param Int $contributionId
+   *   Contribution Id.
+   *
+   */
+  public static function updateLineItemParams(&$lineItems, $contributionId) {
+    if (empty($lineItems) || !$contributionId) {
+      return FALSE;
+    }
+    // get previous line item for contribution
+    $oldLineItems = self::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
+    foreach ($lineItems as &$items) {
+      foreach ($items as &$lineItem) {
+        $itemId = CRM_Utils_Array::value('id', $lineItem);
+        if ($itemId) {
+          if (!array_key_exists($itemId, $oldLineItems)) {
+            // throw exception error;
+          }
+          $lineItem['diff_amount'] = $lineItem['line_total'] - $oldLineItems[$itemId]['line_total'];
+          unset($oldLineItems[$itemId]);
+        }
+      }
+      foreach ($oldLineItems as $oldkey => &$oldvalue) {
+        $oldvalue['id'] = $oldkey;
+        $oldvalue['diff_amount'] = -$oldvalue['line_total'];
+        $oldvalue['qty'] = 0;
+      }
+      $items = array_merge($items, $oldLineItems);
+    }
   }
 
 }
