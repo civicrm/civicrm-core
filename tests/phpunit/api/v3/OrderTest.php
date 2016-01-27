@@ -367,7 +367,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $p['total_amount'] = 600;
     $order = $this->callAPISuccess('order', 'create', $p);
     $expectedResult = array(
-      $order['id']=> array(
+      $order['id'] => array(
         'total_amount' => 600,
         'contribution_status' => 'Completed',
         'net_amount' => 600,
