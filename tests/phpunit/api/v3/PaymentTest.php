@@ -462,7 +462,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     );
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = array(
-      $payment['id'] => array(         
+      $payment['id'] => array(
         'from_financial_account_id' => 7,
         'to_financial_account_id' => 6,
         'total_amount' => 100,
@@ -485,6 +485,90 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     );
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
     $this->assertEquals($eft['values'][$eft['id']]['amount'], 100);
+    // Check contribution for completed status
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+  }
+
+  /**
+   * Test create payment api for paylater contribution with partial payment
+   */
+  public function testCreatePaymentPayLaterPartialPayment() {
+    $this->createLoggedInUser();
+    $contributionParams = array(
+      'total_amount' => 100,
+      'currency' => 'USD',
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 2,
+      'is_pay_later' => 1,
+    );
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    //Create partial payment
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 60,
+    );
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+    $expectedResult = array(
+      $payment['id'] => array(
+        'total_amount' => 60,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
+    // Check entity financial trxn created properly
+    $params = array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 60);
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 60);
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Partially paid');
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    //Create full payment
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 40,
+    );
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+    $expectedResult = array(
+      $payment['id'] => array(
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 40,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
+    // Check entity financial trxn created properly
+    $params = array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 40);
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 40);
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');

@@ -136,7 +136,7 @@ function civicrm_api3_payment_create(&$params) {
   $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $params['contribution_id']));
   $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
   if ($contributionStatus[$contribution['contribution_status_id']] != 'Partially paid'
-    && !($contributionStatus[$contribution['contribution_status_id']] = 'Pending' && $contribution['is_pay_later'] == TRUE)
+    && !($contributionStatus[$contribution['contribution_status_id']] == 'Pending' && $contribution['is_pay_later'] == TRUE)
   ) {
     throw new API_Exception('Please select a contribution which has a partial or pending payment');
   }
@@ -155,10 +155,10 @@ function civicrm_api3_payment_create(&$params) {
         $fullyPaidPayLater = TRUE;
       }
       else {
-        civicrm_api3('Contribution', 'create', 
+        civicrm_api3('Contribution', 'create',
           array(
-           'id' => $contribution['id'],
-           'contribution_status_id' => array_search('Partially paid', $contributionStatus),
+            'id' => $contribution['id'],
+            'contribution_status_id' => array_search('Partially paid', $contributionStatus),
           )
         );
       }
