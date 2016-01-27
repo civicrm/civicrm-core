@@ -31,6 +31,7 @@ class Membership extends PHPUnit_Framework_Testcase {
       'is_active' => 1,
       'contact_check' => 1,
       'relationship_direction' => 'a_b',
+      'member_of_contact_id' => $orgId,
     );
 
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
