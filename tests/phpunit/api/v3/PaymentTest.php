@@ -49,6 +49,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $this->_apiversion = 3;
     $this->_individualId = $this->individualCreate();
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
   }
 
   /**
@@ -57,6 +59,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(array('civicrm_uf_match'));
+    $config = CRM_Core_Config::singleton();
+    unset($config->userPermissionClass->permissions);
   }
 
   /**
@@ -75,11 +79,17 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $params = array(
       'contribution_id' => $contribution['id'],
+      'check_permissions' => TRUE,
     );
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('administer CiviCRM');
+    $payment = $this->callAPIFailure('payment', 'get', $params);
+    $this->assertEquals('You do not have permission to access this api', $payment['error_message']);
+
+    array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviContribute');
 
     $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
-
     $this->assertEquals(1, $payment['count']);
+
     $expectedResult = array(
       'total_amount' => 100,
       'trxn_id' => 23456,
@@ -277,18 +287,25 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test cancel payment api
    */
   public function testCancelPayment() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('administer CiviCRM', 'access CiviContribute');
     list($lineItems, $contribution) = $this->createParticipantWithContribution();
 
     $params = array(
       'contribution_id' => $contribution['id'],
     );
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(1, $payment['count']);
 
     $cancelParams = array(
       'id' => $payment['id'],
+      'check_permissions' => TRUE,
     );
+    $payment = $this->callAPIFailure('payment', 'cancel', $cancelParams);
+    $this->assertEquals('You do not have permission to access this api', $payment['error_message']);
+
+    array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'edit contributions');
+
     $this->callAPIAndDocument('payment', 'cancel', $cancelParams, __FUNCTION__, __FILE__);
 
     $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
@@ -307,6 +324,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test delete payment api
    */
   public function testDeletePayment() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('administer CiviCRM', 'access CiviContribute');
     list($lineItems, $contribution) = $this->createParticipantWithContribution();
 
     $params = array(
@@ -316,10 +334,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $payment['count']);
 
-    $cancelParams = array(
+    $deleteParams = array(
       'id' => $payment['id'],
+      'check_permissions' => TRUE,
     );
-    $this->callAPIAndDocument('payment', 'delete', $cancelParams, __FUNCTION__, __FILE__);
+    $payment = $this->callAPIFailure('payment', 'delete', $deleteParams);
+    $this->assertEquals('You do not have permission to access this api', $payment['error_message']);
+
+    array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'delete in CiviContribute');
+    $this->callAPIAndDocument('payment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
 
     $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(0, $payment['count']);
@@ -333,6 +356,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test update payment api
    */
   public function testUpdatePayment() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('administer CiviCRM', 'access CiviContribute', 'edit contributions');
     list($lineItems, $contribution) = $this->createParticipantWithContribution();
 
     //Create partial payment by passing line item array is params
@@ -360,13 +384,19 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($eft['values'] as $value) {
       $this->assertEquals($value['amount'], array_pop($amounts));
     }
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('administer CiviCRM', 'access CiviContribute');
 
     // update the amount for payment
     $params = array(
       'contribution_id' => $contribution['id'],
       'total_amount' => 100,
       'id' => $payment['id'],
+      'check_permissions' => TRUE,
     );
+    $payment = $this->callAPIFailure('payment', 'create', $params);
+    $this->assertEquals('You do not have permission to access this api', $payment['error_message']);
+
+    array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'edit contributions');
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
 
     $params = array(

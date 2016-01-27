@@ -88,7 +88,7 @@ function civicrm_api3_payment_get($params) {
  *   Api result array
  */
 function civicrm_api3_payment_delete(&$params) {
-  if (!CRM_Core_Permission::check('access CiviContribute') && !CRM_Core_Permission::check('delete in CiviContribute')) {
+  if (!(CRM_Core_Permission::check('access CiviContribute') && CRM_Core_Permission::check('delete in CiviContribute'))) {
     throw new API_Exception('You do not have permission to access this api');
   }
   return civicrm_api3('FinancialTrxn', 'delete', $params);
@@ -105,7 +105,7 @@ function civicrm_api3_payment_delete(&$params) {
  *   Api result array
  */
 function civicrm_api3_payment_cancel(&$params) {
-  if (!CRM_Core_Permission::check('access CiviContribute') && !CRM_Core_Permission::check('edit contributions')) {
+  if (!(CRM_Core_Permission::check('access CiviContribute') && CRM_Core_Permission::check('edit contributions'))) {
     throw new API_Exception('You do not have permission to access this api');
   }
   $eftParams = array(
@@ -135,7 +135,7 @@ function civicrm_api3_payment_cancel(&$params) {
  *   Api result array
  */
 function civicrm_api3_payment_create(&$params) {
-  if (!CRM_Core_Permission::check('access CiviContribute') && !CRM_Core_Permission::check('edit contributions')) {
+  if (!(CRM_Core_Permission::check('access CiviContribute') && CRM_Core_Permission::check('edit contributions'))) {
     throw new API_Exception('You do not have permission to access this api');
   }
   // Check if it is an update
