@@ -43,11 +43,3 @@
       </div>
     </fieldset>
   </div>
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      var $form = $('#billing-payment-block').closest('form');
-      $('.crm-submit-buttons', $form).hide();
-    });
-  </script>
-{/literal}
