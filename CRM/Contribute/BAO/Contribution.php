@@ -4777,10 +4777,10 @@ LIMIT 1;";
    */
   public static function addPayments($lineItems, $contributions) {
     // get financial trxn which is a payment
-    $ftSql = "SELECT ft.id
+    $ftSql = "SELECT ft.id, ft.total_amount
       FROM civicrm_financial_trxn ft
       INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
-      WHERE eft.entity_id = %1 AND ft.is_payment = 1";
+      WHERE eft.entity_id = %1 AND ft.is_payment = 1 ORDER BY ft.id DESC LIMIT 1";
     $sql = "SELECT fi.id, li.price_field_value_id
       FROM civicrm_financial_item fi
       INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
@@ -4790,7 +4790,11 @@ LIMIT 1;";
       if ($contribution->contribution_status_id != CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name')) {
         continue;
       }
-      $ftId = CRM_Core_DAO::singleValueQuery($ftSql, array(1 => array($contribution->id, 'Integer')));
+      $ftDao = CRM_Core_DAO::executeQuery($ftSql, array(1 => array($contribution->id, 'Integer')));
+      while ($ftDao->fetch()) {
+        $trxnAmount = $ftDao->total_amount;
+        $ftId = $ftDao->id;
+      }
       // get financial item
       $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contribution->id, 'Integer')));
       while ($dao->fetch()) {
@@ -4802,7 +4806,7 @@ LIMIT 1;";
         'financial_trxn_id' => $ftId,
       );
       foreach ($lineItems as $key => $value) {
-        $paid = $value['line_total'] * ($contribution->net_amount / $contribution->total_amount);
+        $paid = $value['line_total'] * ($trxnAmount / $contribution->total_amount);
         // Record Entity Financial Trxn
         $params['amount'] = round($paid, 2);
         $params['entity_id'] = $ftIds[$value['price_field_value_id']];
