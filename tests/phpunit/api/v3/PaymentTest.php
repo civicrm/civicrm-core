@@ -410,6 +410,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api for paylater contribution
    */
   public function testCreatePaymentPayLater() {
+    $this->createLoggedInUser();
     $contributionParams = array(
       'total_amount' => 100,
       'currency' => 'USD',
