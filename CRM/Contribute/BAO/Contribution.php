@@ -3799,18 +3799,21 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
       $getLine['entity_id'] = $contributionDAO->id;
       $getLine['entity_table'] = 'civicrm_contribution';
-      $lineItemId = CRM_Price_BAO_LineItem::retrieve($getLine, CRM_Core_DAO::$_nullArray);
-      if (!empty($lineItemId->id)) {
-        $addFinancialEntry = array(
-          'transaction_date' => $financialTrxn->trxn_date,
-          'contact_id' => $contributionDAO->contact_id,
-          'amount' => $financialTrxn->total_amount,
-          'status_id' => array_search('Paid', $financialItemStatus),
-          'entity_id' => $lineItemId->id,
-          'entity_table' => 'civicrm_line_item',
-        );
-        $trxnIds['id'] = $financialTrxn->id;
-        CRM_Financial_BAO_FinancialItem::create($addFinancialEntry, NULL, $trxnIds);
+      $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionDAO->id);
+      if (!empty($lineItems)) {
+        foreach ($lineItems as $lineItemId => $lineItemValue) {
+          $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
+          $addFinancialEntry = array(
+            'transaction_date' => $financialTrxn->trxn_date,
+            'contact_id' => $contributionDAO->contact_id,
+            'amount' => round($paid, 2),
+            'status_id' => array_search('Paid', $financialItemStatus),
+            'entity_id' => $lineItemId,
+            'entity_table' => 'civicrm_line_item',
+          );
+          $trxnIds['id'] = $financialTrxn->id;
+          CRM_Financial_BAO_FinancialItem::create($addFinancialEntry, NULL, $trxnIds);
+        }
       }
       if ($participantId) {
         // update participant status
