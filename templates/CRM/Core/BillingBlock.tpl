@@ -202,17 +202,19 @@
                 .replace(/-/g, '');
         $('#credit_card_number').val(cc);
       });
-
-      function toggleConfirmButton() {
-        var suppressSubmitButton = {/literal}"{$suppressSubmitButton}"{literal};
-        $("#crm-submit-buttons").toggle(!suppressSubmitButton);
-      }
-      toggleConfirmButton();
-      $('input[name="payment_processor_id"]').change(toggleConfirmButton);
     });
 
   </script>
   {/literal}
+{/if}
+{if $suppressSubmitButton}
+{literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      $('.crm-submit-buttons', $('#billing-payment-block').closest('form')).hide();
+    });
+  </script>
+{/literal}
 {/if}
 {/crmRegion}
 {crmRegion name="billing-block-post"}
