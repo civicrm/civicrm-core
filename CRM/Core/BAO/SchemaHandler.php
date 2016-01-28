@@ -395,13 +395,28 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
   }
 
   /**
+   * Create indexes.
+   *
    * @param $tables
+   *   Tables to create index for in the format:
+   *     array('civicrm_entity_table' => 'entity_id')
+   *     OR
+   *     array('civicrm_entity_table' => array('entity_id', 'entity_table'))
+   *   The latter will create a combined index on the 2 keys (in order).
+   *
+   *  Side note - when creating combined indexes the one with the most variation
+   *  goes first  - so entity_table always goes after entity_id.
+   *
+   *  It probably makes sense to consider more sophisticated options at some point
+   *  but at the moment this is only being as enhanced as fast as the test is.
+   *
+   * @todo add support for length & multilingual on combined keys.
+   *
    * @param string $createIndexPrefix
    * @param array $substrLenghts
    */
   public static function createIndexes(&$tables, $createIndexPrefix = 'index', $substrLenghts = array()) {
     $queries = array();
-    require_once 'CRM/Core/DAO/Domain.php';
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
@@ -423,16 +438,26 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
 
       // now check for all fields if the index exists
       foreach ($fields as $field) {
-        // handle indices over substrings, CRM-6245
-        // $lengthName is appended to index name, $lengthSize is the field size modifier
-        $lengthName = isset($substrLenghts[$table][$field]) ? "_{$substrLenghts[$table][$field]}" : '';
-        $lengthSize = isset($substrLenghts[$table][$field]) ? "({$substrLenghts[$table][$field]})" : '';
+        $fieldName = implode('_', (array) $field);
+
+        if (is_array($field)) {
+          // No support for these for combined indexes as yet - add a test when you
+          // want to add that.
+          $lengthName = '';
+          $lengthSize = '';
+        }
+        else {
+          // handle indices over substrings, CRM-6245
+          // $lengthName is appended to index name, $lengthSize is the field size modifier
+          $lengthName = isset($substrLenghts[$table][$fieldName]) ? "_{$substrLenghts[$table][$fieldName]})" : '';
+          $lengthSize = isset($substrLenghts[$table][$fieldName]) ? "({$substrLenghts[$table][$fieldName]})" : '';
+        }
 
         $names = array(
-          "index_{$field}{$lengthName}",
-          "FK_{$table}_{$field}{$lengthName}",
-          "UI_{$field}{$lengthName}",
-          "{$createIndexPrefix}_{$field}{$lengthName}",
+          "index_{$fieldName}{$lengthName}",
+          "FK_{$table}_{$fieldName}{$lengthName}",
+          "UI_{$fieldName}{$lengthName}",
+          "{$createIndexPrefix}_{$fieldName}{$lengthName}",
         );
 
         // skip to the next $field if one of the above $names exists; handle multilingual for CRM-4126
@@ -445,13 +470,16 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
 
         // the index doesn't exist, so create it
         // if we're multilingual and the field is internationalised, do it for every locale
-        if (!CRM_Utils_System::isNull($locales) and isset($columns[$table][$field])) {
+        // @todo remove is_array check & add multilingual support for combined indexes and add a test.
+        // Note combined indexes currently using this function are on fields like
+        // entity_id + entity_table which are not multilingual.
+        if (!is_array($field) && !CRM_Utils_System::isNull($locales) and isset($columns[$table][$fieldName])) {
           foreach ($locales as $locale) {
-            $queries[] = "CREATE INDEX {$createIndexPrefix}_{$field}{$lengthName}_{$locale} ON {$table} ({$field}_{$locale}{$lengthSize})";
+            $queries[] = "CREATE INDEX {$createIndexPrefix}_{$fieldName}{$lengthName}_{$locale} ON {$table} ({$fieldName}_{$locale}{$lengthSize})";
           }
         }
         else {
-          $queries[] = "CREATE INDEX {$createIndexPrefix}_{$field}{$lengthName} ON {$table} ({$field}{$lengthSize})";
+          $queries[] = "CREATE INDEX {$createIndexPrefix}_{$fieldName}{$lengthName} ON {$table} (" . implode(',', (array) $field) . "{$lengthSize})";
         }
       }
     }
