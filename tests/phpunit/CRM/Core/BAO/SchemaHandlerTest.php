@@ -29,6 +29,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_Core_BAO_SchemaHandlerTest.
+ *
+ * These tests create and drop indexes on the civicrm_uf_join table. The indexes
+ * being added and dropped we assume will never exist.
  */
 class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
 
@@ -52,6 +55,40 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
       }
     }
     $this->assertEquals(1, $count);
+  }
+
+  /**
+   * Test creating an index.
+   *
+   * We want to be sure it creates an index and exits gracefully if the index
+   * already exists.
+   */
+  public function testCombinedIndex() {
+    $tables = array('civicrm_uf_join' => array('weight'));
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+
+    $tables = array('civicrm_uf_join' => array(array('weight', 'module')));
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+    $dao = CRM_Core_DAO::executeQuery("SHOW INDEX FROM civicrm_uf_join");
+    $weightCount = 0;
+    $combinedCount = 0;
+    $indexes = array();
+
+    while ($dao->fetch()) {
+      if ($dao->Column_name == 'weight') {
+        $weightCount++;
+        $indexes[$dao->Key_name] = $dao->Key_name;
+      }
+      if ($dao->Column_name == 'module') {
+        $combinedCount++;
+        $this->assertArrayHasKey($dao->Key_name, $indexes);
+      }
+
+    }
+    foreach (array_keys($indexes) as $index) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_uf_join DROP INDEX " . $index);
+    }
+    $this->assertEquals(2, $weightCount);
   }
 
 }
