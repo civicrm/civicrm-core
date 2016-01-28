@@ -353,7 +353,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       2 => 'Donation',
       6 => 'Completed',
     );
-    foreach($verifyFinancialData as $col => $data) {
+    foreach ($verifyFinancialData as $col => $data) {
       $this->verifyText("xpath=//tr[@class='crm-child-row']/td/div/table/tbody/tr[2]/td[{$col}]", $data);
     }
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[10]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
@@ -475,7 +475,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
         3 => 'Credit Card',
         6 => 'Completed',
       );
-      foreach($verifyFinancialData as $col => $data) {
+      foreach ($verifyFinancialData as $col => $data) {
         $this->verifyText("xpath=//tr[@class='crm-child-row']/td/div/table/tbody/tr[2]/td[{$col}]", $data);
       }
       $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[10]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
