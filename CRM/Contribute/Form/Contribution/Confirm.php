@@ -378,6 +378,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // assign contribution page id to the template so we can add css class for it
     $this->assign('contributionPageID', $this->_id);
+    $this->assign('is_for_organization', CRM_Utils_Array::value('is_for_organization', $this->_params));
 
     $this->set('params', $this->_params);
   }
@@ -2081,7 +2082,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // If onbehalf-of-organization contribution / signup, add organization
     // and it's location.
-    if (isset($this->_values['onbehalf_profile_id']) && isset($behalfOrganization['organization_name'])) {
+    if (isset($this->_values['onbehalf_profile_id']) && isset($behalfOrganization['organization_name']) && !empty($this->_params['is_for_organization'])) {
       $ufFields = array();
       foreach ($this->_fields['onbehalf'] as $name => $value) {
         $ufFields[$name] = 1;
