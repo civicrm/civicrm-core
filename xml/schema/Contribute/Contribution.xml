@@ -464,6 +464,11 @@
       <type>Text</type>
     </html>
   </field>
+  <index>
+    <name>creditnote_id</name>
+    <fieldName>creditnote_id</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>tax_amount</name>
     <title>Tax Amount</title>
