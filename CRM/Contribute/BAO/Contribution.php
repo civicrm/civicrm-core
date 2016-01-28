@@ -4792,10 +4792,10 @@ LIMIT 1;";
         continue;
       }
       $ftDao = CRM_Core_DAO::executeQuery($ftSql, array(1 => array($contribution->id, 'Integer')));
-      while ($ftDao->fetch()) {
-        $trxnAmount = $ftDao->total_amount;
-        $ftId = $ftDao->id;
-      }
+      $ftDao->fetch();
+      $trxnAmount = $ftDao->total_amount;
+      $ftId = $ftDao->id;
+
       // get financial item
       $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contribution->id, 'Integer')));
       while ($dao->fetch()) {
