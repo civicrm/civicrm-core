@@ -45,10 +45,8 @@
                     {$form.$element_name_from.html|crmAddClass:six}
                     &nbsp;&nbsp;{$form.$element_name_to.label}&nbsp;&nbsp;{$form.$element_name_to.html|crmAddClass:six}
                 {elseif $element.skip_calendar NEQ true }
-                    <td class="label">{$form.$element_name_from.label}</td><td>
-                    {include file="CRM/common/jcalendar.tpl" elementName=$element_name_from}
-                    &nbsp;&nbsp;{$form.$element_name_to.label}&nbsp;&nbsp;
-                    {include file="CRM/common/jcalendar.tpl" elementName=$element_name_to}
+                    <td class="label"><label for='{$element_name}'>{$element.label}</label>
+                    {include file="CRM/Core/DateRange.tpl" fieldName=$element_name from='_from' to='_to'}</td><td>
                 {/if}
             {else}
                 <td class="label">{$form.$element_name.label}</td><td>
