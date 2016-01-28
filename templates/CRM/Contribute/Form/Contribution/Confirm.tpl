@@ -130,7 +130,7 @@
     {/if}
 
 
-    {if $onbehalfProfile|@count}
+    {if $onbehalfProfile|@count && $is_for_organization}
       <div class="crm-group onBehalf_display-group label-left crm-profile-view">
          {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
       </div>
