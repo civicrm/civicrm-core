@@ -3411,21 +3411,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
       }
     }
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
-    $params['entity_id'] = $trxn->id;
 
     if ($context == 'changedStatus') {
       if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
           || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus))
         && ($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))
       ) {
-        $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
-        $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
-
-        $entityParams = array(
-          'entity_table' => 'civicrm_financial_item',
-          'financial_trxn_id' => $trxn->id,
-        );
         if (empty($params['line_item'])) {
           //CRM-15296
           //@todo - check with Joe regarding this situation - payment processors create pending transactions with no line items
@@ -3433,6 +3424,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           // & this can be removed
           return;
         }
+        $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+        $params['entity_id'] = $trxn->id;
+        $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
+        $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
+
+        $entityParams = array(
+          'entity_table' => 'civicrm_financial_item',
+          'financial_trxn_id' => $trxn->id,
+        );
         foreach ($params['line_item'] as $fieldId => $fields) {
           foreach ($fields as $fieldValueId => $fieldValues) {
             $fparams = array(
@@ -3454,6 +3454,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         return;
       }
     }
+
+    $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+    $params['entity_id'] = $trxn->id;
     if ($context != 'changePaymentInstrument') {
       $itemParams['entity_table'] = 'civicrm_line_item';
       $trxnIds['id'] = $params['entity_id'];
@@ -4487,10 +4490,6 @@ LIMIT 1;";
     if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
       $input['payment_processor'] = $paymentProcessorId;
     }
-    $input['contribution_status_id'] = $contributionStatuses['Completed'];
-    $input['total_amount'] = $input['amount'];
-    $input['contribution'] = $contribution;
-    $input['financial_type_id'] = $contribution->financial_type_id;
 
     if (!empty($contribution->_relatedObjects['participant'])) {
       $input['contribution_mode'] = 'participant';
@@ -4500,7 +4499,14 @@ LIMIT 1;";
     elseif (!empty($contribution->_relatedObjects['membership'])) {
       $input['skipLineItem'] = TRUE;
       $input['contribution_mode'] = 'membership';
+      $contribution->contribution_status_id = $contributionStatuses['Completed'];
+      $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $input);
+      $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     }
+    $input['contribution_status_id'] = $contributionStatuses['Completed'];
+    $input['total_amount'] = $input['amount'];
+    $input['contribution'] = $contribution;
+    $input['financial_type_id'] = $contribution->financial_type_id;
     //@todo writing a unit test I was unable to create a scenario where this line did not fatal on second
     // and subsequent payments. In this case the line items are created at
     // CRM_Contribute_BAO_ContributionRecur::addRecurLineItems
@@ -4750,8 +4756,8 @@ LIMIT 1;";
    */
   public static function addPayments($lineItems, $contributions) {
     // get financial trxn which is a payment
-    $ftSql = "SELECT ft.id 
-      FROM civicrm_financial_trxn ft 
+    $ftSql = "SELECT ft.id
+      FROM civicrm_financial_trxn ft
       INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
       WHERE eft.entity_id = %1 AND ft.is_payment = 1";
     $sql = "SELECT fi.id, li.price_field_value_id
