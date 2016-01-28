@@ -1167,6 +1167,64 @@ FROM   civicrm_domain
   }
 
   /**
+   * execute an unbuffered query.  This is a wrapper around new functionality
+   * exposed with CRM-17748.
+   *
+   * @param string $query query to be executed
+   * 
+   * @return Object CRM_Core_DAO object that points to an unbuffered result set
+   * @static
+   * @access public
+   */
+  static function executeUnbufferedQuery(
+    $query,
+    $params        = array(),
+    $abort         = TRUE,
+    $daoName       = NULL,
+    $freeDAO       = FALSE,
+    $i18nRewrite   = TRUE,
+    $trapException = FALSE
+  ) {
+    $queryStr = self::composeQuery($query, $params, $abort);
+    //CRM_Core_Error::debug( 'q', $queryStr );
+    if (!$daoName) {
+      $dao = new CRM_Core_DAO();
+    }
+    else {
+      $dao = new $daoName( );
+    }
+
+    if ($trapException) {
+      CRM_Core_Error::ignoreException();
+    }
+
+    // set the DAO object to use an unbuffered query
+    $dao->setOptions( array('result_buffering'=>0) );
+
+    $result = $dao->query($queryStr, $i18nRewrite);
+
+    if ($trapException) {
+      CRM_Core_Error::setCallback();
+    }
+
+    if (is_a($result, 'DB_Error')) {
+      return $result;
+    }
+
+    // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism. 
+    $dao->N = TRUE;
+
+    if ($freeDAO ||
+      preg_match('/^(insert|update|delete|create|drop|replace)/i', $queryStr)
+    ) {
+      // we typically do this for insert/update/delete stataments OR if explicitly asked to
+      // free the dao
+      $dao->free();
+    }
+    return $dao;
+  }
+
+  /**
    * Execute a query.
    *
    * @param string $query
