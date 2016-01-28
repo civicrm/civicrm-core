@@ -1171,18 +1171,18 @@ FROM   civicrm_domain
    * exposed with CRM-17748.
    *
    * @param string $query query to be executed
-   * 
+   *
    * @return Object CRM_Core_DAO object that points to an unbuffered result set
    * @static
    * @access public
    */
-  static function executeUnbufferedQuery(
+  static public function executeUnbufferedQuery(
     $query,
-    $params        = array(),
-    $abort         = TRUE,
-    $daoName       = NULL,
-    $freeDAO       = FALSE,
-    $i18nRewrite   = TRUE,
+    $params = array(),
+    $abort = TRUE,
+    $daoName = NULL,
+    $freeDAO = FALSE,
+    $i18nRewrite = TRUE,
     $trapException = FALSE
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
@@ -1191,7 +1191,7 @@ FROM   civicrm_domain
       $dao = new CRM_Core_DAO();
     }
     else {
-      $dao = new $daoName( );
+      $dao = new $daoName();
     }
 
     if ($trapException) {
@@ -1199,7 +1199,7 @@ FROM   civicrm_domain
     }
 
     // set the DAO object to use an unbuffered query
-    $dao->setOptions( array('result_buffering'=>0) );
+    $dao->setOptions(array('result_buffering' => 0));
 
     $result = $dao->query($queryStr, $i18nRewrite);
 
@@ -1211,7 +1211,7 @@ FROM   civicrm_domain
       return $result;
     }
 
-    // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism. 
+    // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
     $dao->N = TRUE;
 
     if ($freeDAO ||
