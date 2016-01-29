@@ -59,7 +59,15 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     parent::__construct($name, $data, $dataName, $browser);
     $this->loggedInAs = NULL;
 
-    require_once 'CiviSeleniumSettings.php';
+    if (!empty($GLOBALS['_CV'])) {
+      require_once 'CiviSeleniumSettings.auto.php';
+    }
+    elseif (CRM_Utils_File::isIncludable('CiviSeleniumSettings.php')) {
+      require_once 'CiviSeleniumSettings.php';
+    }
+    else {
+      throw new RuntimeException("Cannot initialize Selenium test. Please setup CiviSeleniumSettings.php or configure \"cv\".");
+    }
     $this->settings = new CiviSeleniumSettings();
     if (property_exists($this->settings, 'serverStartupTimeOut') && $this->settings->serverStartupTimeOut) {
       global $CiviSeleniumTestCase_polled;
