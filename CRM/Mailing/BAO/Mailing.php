@@ -3139,8 +3139,8 @@ AND        m.id = %1
    */
   public static function mailingGroupEntityTables() {
     $tables = array(
-      'civicrm_group',
-      'civicrm_mailing',
+      CRM_Contact_BAO_Group::getTableName(),
+      CRM_Mailing_BAO_Mailing::getTableName(),
     );
     // Identical keys & values
     return array_combine($tables, $tables);
