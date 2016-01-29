@@ -26,12 +26,6 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
-/**
  *  Test for the Attachment API
  *
  * @package CiviCRM_APIv3

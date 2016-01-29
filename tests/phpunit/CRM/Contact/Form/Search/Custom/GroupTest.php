@@ -30,7 +30,7 @@
 /**
  *  Include parent class definition
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 
 /**
  *  Include class under test

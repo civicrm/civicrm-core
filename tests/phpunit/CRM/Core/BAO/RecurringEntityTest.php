@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CRM/Core/BAO/RecurringEntity.php';
-
 /**
  * Class CRM_Core_BAO_RecurringEntityTest
  */

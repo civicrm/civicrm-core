@@ -25,14 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/Custom.php';
-require_once 'CiviTest/ContributionPage.php';
-require_once 'CiviTest/Membership.php';
-require_once 'CRM/Core/Controller.php';
-
 /**
  * Class CRM_Member_BAO_MembershipTest
  */

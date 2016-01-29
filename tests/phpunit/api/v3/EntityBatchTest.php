@@ -25,9 +25,6 @@
  --------------------------------------------------------------------
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  *  Test APIv3 civicrm_entity_batch_* functions
  *
