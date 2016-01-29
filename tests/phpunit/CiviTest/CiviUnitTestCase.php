@@ -159,19 +159,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // we need full error reporting
     error_reporting(E_ALL & ~E_NOTICE);
 
-    if (!empty($GLOBALS['mysql_db'])) {
-      self::$_dbName = $GLOBALS['mysql_db'];
-    }
-    else {
-      self::$_dbName = 'civicrm_tests_dev';
-    }
+    self::$_dbName = self::getDBName();
 
     //  create test database
-    self::$utils = new Utils($GLOBALS['mysql_host'],
-      $GLOBALS['mysql_port'],
-      $GLOBALS['mysql_user'],
-      $GLOBALS['mysql_pass']
-    );
+    self::$utils = new Utils(CIVICRM_DSN);
 
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
@@ -210,7 +201,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return string
    */
   public static function getDBName() {
-    $dbName = !empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
+    static $dbName = NULL;
+    if ($dbName === NULL ) {
+      require_once "DB.php";
+      $dsninfo = DB::parseDSN(CIVICRM_DSN);
+      $dbName = $dsninfo['database'];
+    }
     return $dbName;
   }
 
@@ -527,11 +523,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *  FIXME: Maybe a better way to do it
    */
   public function foreignKeyChecksOff() {
-    self::$utils = new Utils($GLOBALS['mysql_host'],
-      $GLOBALS['mysql_port'],
-      $GLOBALS['mysql_user'],
-      $GLOBALS['mysql_pass']
-    );
+    self::$utils = new Utils(CIVICRM_DSN);
     $dbName = self::getDBName();
     $query = "USE {$dbName};" . "SET foreign_key_checks = 1";
     if (self::$utils->do_query($query) === FALSE) {
