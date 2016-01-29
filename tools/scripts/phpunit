@@ -30,7 +30,7 @@ array_shift($argv);
 
 // Convert class names to file names
 foreach ($argv as $k => $v) {
-  if (preg_match('/^(CRM_|api_v3|WebTest_)/', $v)) {
+  if (preg_match('/^(CRM_|api_v3_|EnvTest|WebTest_)/', $v)) {
     $argv[$k] = 'tests/phpunit/' . strtr($v, '_', '/') . '.php';
   }
   elseif (preg_match('/^Civi\\\\/', $v)) {
