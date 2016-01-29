@@ -111,7 +111,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       switch ($dataType) {
         case 'Country':
         case 'StateProvince':
-          $this->foreignKeyChecksOff();
         case 'String':
         case 'Link':
         case 'Int':

@@ -520,25 +520,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   *  FIXME: Maybe a better way to do it
-   */
-  public function foreignKeyChecksOff() {
-    self::$utils = new Utils(CIVICRM_DSN);
-    $dbName = self::getDBName();
-    $query = "USE {$dbName};" . "SET foreign_key_checks = 1";
-    if (self::$utils->do_query($query) === FALSE) {
-      // fail happens
-      echo 'Cannot set foreign_key_checks = 0';
-      exit(1);
-    }
-    return TRUE;
-  }
-
-  public function foreignKeyChecksOn() {
-    // FIXME: might not be needed if previous fixme implemented
-  }
-
-  /**
    * Generic function to compare expected values after an api call to retrieved.
    * DB values.
    *
