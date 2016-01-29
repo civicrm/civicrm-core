@@ -23,15 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviSeleniumSettings.php';
 
 define('CIVICRM_WEBTEST', 1);
 
 /**
  * Check that we handle redirects appropriately.
  */
-class WebTest_Utils_RedirectTest extends CiviUnitTestCase {
+class WebTest_Utils_RedirectTest extends PHPUnit_Framework_TestCase {
   protected $url;
   protected $ch;
 
@@ -41,6 +39,16 @@ class WebTest_Utils_RedirectTest extends CiviUnitTestCase {
   public function __construct($name = NULL) {
     parent::__construct($name);
 
+    // TODO: Just use $GLOBALS['_CV'] and don't bother with CiviSeleniumSettings.
+    if (!empty($GLOBALS['_CV'])) {
+      require_once 'CiviTest/CiviSeleniumSettings.auto.php';
+    }
+    elseif (CRM_Utils_File::isIncludable('CiviTest/CiviSeleniumSettings.php')) {
+      require_once 'CiviTest/CiviSeleniumSettings.php';
+    }
+    else {
+      throw new RuntimeException("Cannot initialize Selenium test. Please setup CiviSeleniumSettings.php or configure \"cv\".");
+    }
     $this->settings = new CiviSeleniumSettings();
     if (property_exists($this->settings, 'serverStartupTimeOut') && $this->settings->serverStartupTimeOut) {
       global $CiviSeleniumTestCase_polled;
