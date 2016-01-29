@@ -31,7 +31,6 @@ use Civi\Payment\System;
 /**
  *  Include class definitions
  */
-require_once 'tests/phpunit/Utils.php';
 require_once 'api/api.php';
 require_once 'CRM/Financial/BAO/FinancialType.php';
 define('API_LATEST_VERSION', 3);
@@ -162,7 +161,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     self::$_dbName = self::getDBName();
 
     //  create test database
-    self::$utils = new Utils(CIVICRM_DSN);
+    self::$utils = new CiviTestPdoUtils(CIVICRM_DSN);
 
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
@@ -202,7 +201,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   public static function getDBName() {
     static $dbName = NULL;
-    if ($dbName === NULL ) {
+    if ($dbName === NULL) {
       require_once "DB.php";
       $dsninfo = DB::parseDSN(CIVICRM_DSN);
       $dbName = $dsninfo['database'];
@@ -2755,7 +2754,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *   'template_path' Set to TRUE to use the default, FALSE or "" to disable support, or a string path to use another path
    */
   public function customDirectories($customDirs) {
-    require_once 'CRM/Core/Config.php';
     $config = CRM_Core_Config::singleton();
 
     if (empty($customDirs['php_path']) || $customDirs['php_path'] === FALSE) {
@@ -3419,8 +3417,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   protected function createParticipantWithContribution() {
     // creating price set, price field
-    require_once 'CiviTest/Event.php';
-    require_once 'CiviTest/Contact.php';
     $this->_contactId = Contact::createIndividual();
     $this->_eventId = Event::create($this->_contactId);
     $eventParams = array(
