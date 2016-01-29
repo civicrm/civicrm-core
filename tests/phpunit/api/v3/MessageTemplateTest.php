@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for Template API - civicrm_msg_template*
  *

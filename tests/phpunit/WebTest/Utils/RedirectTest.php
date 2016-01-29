@@ -40,15 +40,6 @@ class WebTest_Utils_RedirectTest extends PHPUnit_Framework_TestCase {
     parent::__construct($name);
 
     // TODO: Just use $GLOBALS['_CV'] and don't bother with CiviSeleniumSettings.
-    if (!empty($GLOBALS['_CV'])) {
-      require_once 'CiviTest/CiviSeleniumSettings.auto.php';
-    }
-    elseif (CRM_Utils_File::isIncludable('CiviTest/CiviSeleniumSettings.php')) {
-      require_once 'CiviTest/CiviSeleniumSettings.php';
-    }
-    else {
-      throw new RuntimeException("Cannot initialize Selenium test. Please setup CiviSeleniumSettings.php or configure \"cv\".");
-    }
     $this->settings = new CiviSeleniumSettings();
     if (property_exists($this->settings, 'serverStartupTimeOut') && $this->settings->serverStartupTimeOut) {
       global $CiviSeleniumTestCase_polled;

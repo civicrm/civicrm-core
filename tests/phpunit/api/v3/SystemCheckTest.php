@@ -25,10 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  * System.check API has many special test cases, so they have their own class.
  *

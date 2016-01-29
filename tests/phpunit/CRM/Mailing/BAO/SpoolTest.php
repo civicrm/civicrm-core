@@ -1,6 +1,4 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
 
 /*
  * @see also WebTest_Mailing_SpoolTest
@@ -24,7 +22,6 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
     $this->_mut->stop();
     parent::tearDown();
   }
-
 
   /**
    * Basic send.

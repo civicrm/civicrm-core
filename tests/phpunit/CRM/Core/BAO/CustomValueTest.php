@@ -31,9 +31,6 @@
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Custom.php';
-
 /**
  * Class CRM_Core_BAO_CustomValueTest
  */

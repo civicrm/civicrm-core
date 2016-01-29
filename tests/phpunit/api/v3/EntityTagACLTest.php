@@ -32,8 +32,6 @@
  * @subpackage API_Core
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class api_v3_EntityTagTest.
  *

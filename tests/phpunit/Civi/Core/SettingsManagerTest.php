@@ -1,8 +1,6 @@
 <?php
 namespace Civi\Core;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 class SettingsManagerTest extends \CiviUnitTestCase {
 
   protected $domainDefaults;

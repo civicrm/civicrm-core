@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class for testing new DAO meet required standards.
  *

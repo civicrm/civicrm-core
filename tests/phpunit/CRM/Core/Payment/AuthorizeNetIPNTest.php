@@ -1,8 +1,5 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
-
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
  */

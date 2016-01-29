@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for GroupNesting API - civicrm_group_nesting_*
  *

@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
-
 /**
  *  Test APIv3 civicrm_contribute_recur* functions
  *

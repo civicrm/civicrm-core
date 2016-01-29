@@ -35,7 +35,7 @@
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 //@todo - why doesn't class loader find these (I tried renaming)
 require_once 'CiviTest/CiviMailUtils.php';
 
