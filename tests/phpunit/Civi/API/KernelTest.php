@@ -3,8 +3,6 @@ namespace Civi\API;
 
 use \Symfony\Component\EventDispatcher\EventDispatcher;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  */
 class KernelTest extends \CiviUnitTestCase {

@@ -1,8 +1,6 @@
 <?php
 namespace Civi\ActionSchedule;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * The AbstractMappingTest is a base class which can help define new
  * tests for ActionMappings. Concrete classes should implement a few

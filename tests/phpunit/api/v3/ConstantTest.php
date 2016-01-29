@@ -30,11 +30,6 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-/**
  *  Test APIv3 civicrm_activity_* functions
  *
  * @package CiviCRM_APIv3

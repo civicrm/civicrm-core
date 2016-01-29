@@ -25,9 +25,6 @@
   +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for CRM_Contact_BAO_Group BAO
  *
