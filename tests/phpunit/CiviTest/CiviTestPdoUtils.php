@@ -42,6 +42,8 @@ class CiviTestPdoUtils {
    */
   public $pdo;
 
+  public $dbName;
+
   /**
    *  Construct an object for this database.
    */
@@ -52,6 +54,7 @@ class CiviTestPdoUtils {
     $port = @$dsninfo['port'];
     $user = $dsninfo['username'];
     $pass = $dsninfo['password'];
+    $this->dbName = $dsninfo['database'];
 
     try {
       $this->pdo = new PDO("mysql:host={$host}" . ($port ? ";port=$port" : ""),
