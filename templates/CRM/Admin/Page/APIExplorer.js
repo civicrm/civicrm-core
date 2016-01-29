@@ -82,7 +82,7 @@
         description: field.description || '',
         required: !(!field['api.required'] || field['api.required'] === '0')
       });
-      if (joins[name]) {
+      if (typeof joins[name] === 'string') {
         fields[pos].children = [];
         populateFields(fields[pos].children, joins[name], 'get', name + '.');
       }
