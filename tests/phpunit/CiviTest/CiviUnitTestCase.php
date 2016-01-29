@@ -90,7 +90,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected $tempDirs;
 
   /**
-   * @var Utils instance
+   * @var CiviTestPdoUtils
    */
   public static $utils;
 
@@ -260,7 +260,29 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     self::$populateOnce = NULL;
 
-    return CiviTestDB::realPopulateDB(self::getDBName(), self::$utils);
+    $builder = new CiviTestDB(self::$utils);
+
+    static $isSchemaUpdated = FALSE;
+    if (!$isSchemaUpdated) {
+      $builder->updateSchema();
+      $isSchemaUpdated = TRUE;
+    }
+
+    $builder->populate();
+
+    // Rebuild triggers
+    civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
+
+    CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
+      'CiviEvent',
+      'CiviContribute',
+      'CiviMember',
+      'CiviMail',
+      'CiviReport',
+      'CiviPledge',
+    ));
+
+    return TRUE;
   }
 
   public static function setUpBeforeClass() {
