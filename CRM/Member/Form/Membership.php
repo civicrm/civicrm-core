@@ -243,7 +243,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     if (!$this->_memType) {
       $params = CRM_Utils_Request::exportValues();
-      if (isset($params['membership_type_id'][1])) {
+      if (!empty($params['membership_type_id'][1])) {
         $this->_memType = $params['membership_type_id'][1];
       }
     }
