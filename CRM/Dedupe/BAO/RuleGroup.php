@@ -77,6 +77,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         'addressee.label' => 'civicrm_contact.addressee_id',
         'email_greeting.label' => 'civicrm_contact.email_greeting_id',
         'postal_greeting.label' => 'civicrm_contact.postal_greeting_id',
+        'civicrm_phone.phone' => 'civicrm_phone.phone_numeric',
       );
       // the table names we support in dedupe rules - a filter for importableFields()
       $supportedTables = array(
