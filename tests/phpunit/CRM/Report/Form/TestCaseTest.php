@@ -131,7 +131,6 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->foreignKeyChecksOff();
     $this->quickCleanup($this->_tablesToTruncate);
   }
 
