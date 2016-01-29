@@ -44,12 +44,15 @@ class Utils {
 
   /**
    *  Construct an object for this database.
-   * @param $host
-   * @param $port
-   * @param $user
-   * @param $pass
    */
-  public function __construct($host, $port, $user, $pass) {
+  public function __construct($dsn) {
+    require_once "DB.php";
+    $dsninfo = DB::parseDSN($dsn);
+    $host = $dsninfo['hostspec'];
+    $port = @$dsninfo['port'];
+    $user = $dsninfo['username'];
+    $pass = $dsninfo['password'];
+
     try {
       $this->pdo = new PDO("mysql:host={$host}" . ($port ? ";port=$port" : ""),
         $user, $pass,

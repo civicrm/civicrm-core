@@ -18,15 +18,6 @@ ini_set('memory_limit', '2G');
 define('CIVICRM_TEST', 1);
 eval(cv('php:boot --level=settings', 'phpcode'));
 
-// This is exists to support CiviUnitTestCase::populateDB(). That doesn't make it a good idea.
-require_once "DB.php";
-$dsninfo = DB::parseDSN(CIVICRM_DSN);
-$GLOBALS['mysql_host'] = $dsninfo['hostspec'];
-$GLOBALS['mysql_port'] = @$dsninfo['port'];
-$GLOBALS['mysql_user'] = $dsninfo['username'];
-$GLOBALS['mysql_pass'] = $dsninfo['password'];
-$GLOBALS['mysql_db'] = $dsninfo['database'];
-
 // ------------------------------------------------------------------------------
 
 /**
