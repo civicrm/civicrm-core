@@ -446,7 +446,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       $this->fail("Missed expected exception");
     }
     catch (Exception $expected) {
-      $this->callAPISuccess('contribution', 'create', array(
+      $this->callAPISuccess('Contribution', 'create', array(
         'contribution_id' => $order['id'],
         'is_test' => TRUE,
       ));
