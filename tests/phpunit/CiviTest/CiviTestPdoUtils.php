@@ -34,7 +34,7 @@
  *  Utility functions
  * @package   CiviCRM
  */
-class Utils {
+class CiviTestPdoUtils {
 
   /**
    *  PDO for the database.
