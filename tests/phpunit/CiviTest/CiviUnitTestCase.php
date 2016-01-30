@@ -90,11 +90,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected $tempDirs;
 
   /**
-   * @var CiviTestPdoUtils
-   */
-  public static $utils;
-
-  /**
    * @var boolean populateOnce allows to skip db resets in setUp
    *
    *  WARNING! USE WITH CAUTION - IT'LL RENDER DATA DEPENDENCIES
@@ -159,9 +154,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     error_reporting(E_ALL & ~E_NOTICE);
 
     self::$_dbName = self::getDBName();
-
-    //  create test database
-    self::$utils = new CiviTestPdoUtils(CIVICRM_DSN);
 
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
@@ -228,7 +220,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
       self::$dbInit = TRUE;
     }
-    return $this->createDefaultDBConnection(self::$utils->pdo, $dbName);
+
+    return $this->createDefaultDBConnection(CiviTester::pdo(), $dbName);
   }
 
   /**
@@ -260,27 +253,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     self::$populateOnce = NULL;
 
-    $builder = new CiviTestDB(self::$utils);
-
-    static $isSchemaUpdated = FALSE;
-    if (!$isSchemaUpdated) {
-      $builder->updateSchema();
-      $isSchemaUpdated = TRUE;
-    }
-
-    $builder->populate();
-
-    // Rebuild triggers
-    civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
-
-    CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
-      'CiviEvent',
-      'CiviContribute',
-      'CiviMember',
-      'CiviMail',
-      'CiviReport',
-      'CiviPledge',
-    ));
+    CiviTester::data()->populate();
 
     return TRUE;
   }
