@@ -923,7 +923,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ((!empty($membershipParams['selectMembership']) &&
         $membershipParams['selectMembership'] != 'no_thanks'
       ) ||
-      ( $this->_useForMember && !empty($priceFieldIds) )
+      ($this->_useForMember && !empty($priceFieldIds))
     ) {
       $processMembership = TRUE;
 
