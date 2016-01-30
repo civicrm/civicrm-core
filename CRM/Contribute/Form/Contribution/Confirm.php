@@ -919,10 +919,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // store the fact that this is a membership and membership type is selected
     $processMembership = FALSE;
+    $priceFieldIds = $this->get('memberPriceFieldIDS');
     if ((!empty($membershipParams['selectMembership']) &&
         $membershipParams['selectMembership'] != 'no_thanks'
       ) ||
-      $this->_useForMember
+      ( $this->_useForMember && !empty($priceFieldIds) )
     ) {
       $processMembership = TRUE;
 

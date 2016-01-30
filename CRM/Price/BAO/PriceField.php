@@ -445,6 +445,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           else {
             $none = ts('- none -');
+            if (!empty($qf->_membershipBlock) && empty($qf->_quickConfig)) {
+              foreach($fieldOptions as $fieldOption) {
+                if (CRM_Utils_Array::value('membership_type_id', $fieldOption) ) {
+                  $none = ts('No thank you');
+                }
+              }
+            }
           }
 
           $choice[] = $qf->createElement('radio', NULL, '', $none, '0',
