@@ -188,6 +188,11 @@ $GLOBALS['civicrm_default_error_scope'] = NULL;
 // The translation files are in the parent directory (l10n)
 $i18n = CRM_Core_I18n::singleton();
 
+// Support for Arabic, Hebrew, Farsi, etc.
+// Used in the template.html
+$short_lang_code = CRM_Core_I18n_PseudoConstant::shortForLong($tsLocale);
+$text_direction = (CRM_Core_I18n::isLanguageRTL($tsLocale) ? 'rtl' : 'ltr');
+
 global $cmsPath;
 if ($installType == 'drupal') {
   //CRM-6840 -don't force to install in sites/all/modules/
