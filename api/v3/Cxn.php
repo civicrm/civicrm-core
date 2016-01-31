@@ -222,13 +222,14 @@ function _civicrm_api3_cxn_getlink_spec(&$spec) {
   $daoFields = CRM_Cxn_DAO_Cxn::fields();
   $spec['app_guid'] = $daoFields['app_guid'];
   $spec['cxn_guid'] = $daoFields['cxn_guid'];
-  $spec['page'] = array(
-    'name' => 'page',
+  $spec['page_name'] = array(
+    'name' => 'page_name',
     'type' => CRM_Utils_Type::T_STRING,
     'title' => ts('Page Type'),
     'description' => 'The type of page (eg "settings")',
     'maxlength' => 63,
     'size' => CRM_Utils_Type::HUGE,
+    'api.aliases' => array('page'),
   );
 }
 
@@ -245,14 +246,14 @@ function civicrm_api3_cxn_getlink($params) {
   $cxnId = _civicrm_api3_cxn_parseCxnId($params);
   $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
 
-  if (empty($params['page']) || !is_string($params['page'])) {
+  if (empty($params['page_name']) || !is_string($params['page_name'])) {
     throw new API_Exception("Invalid page");
   }
 
   /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
   $client = \Civi::service('cxn_reg_client');
   return $client->call($appMeta, 'Cxn', 'getlink', array(
-    'page' => $params['page'],
+    'page' => $params['page_name'],
   ));
 }
 
@@ -270,19 +271,6 @@ function civicrm_api3_cxn_getcfg($params) {
     'siteCallbackUrl' => CRM_Cxn_BAO_Cxn::getSiteCallbackUrl(),
   );
   return civicrm_api3_create_success($result);
-
-  $cxnId = _civicrm_api3_cxn_parseCxnId($params);
-  $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
-
-  if (empty($params['page']) || !is_string($params['page'])) {
-    throw new API_Exception("Invalid page");
-  }
-
-  /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
-  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
-  return $client->call($appMeta, 'Cxn', 'getlink', array(
-    'page' => $params['page'],
-  ));
 }
 
 /**
