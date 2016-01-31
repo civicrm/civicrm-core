@@ -174,9 +174,9 @@ global $tsLocale;
 $tsLocale = 'en_US';
 $seedLanguage = 'en_US';
 
-if (isset($_POST['seedLanguage']) and isset($langs[$_POST['seedLanguage']])) {
-  $seedLanguage = $_POST['seedLanguage'];
-  $tsLocale = $_POST['seedLanguage'];
+if (isset($_GET['seedLanguage']) and isset($langs[$_GET['seedLanguage']])) {
+  $seedLanguage = $_GET['seedLanguage'];
+  $tsLocale = $_GET['seedLanguage'];
 }
 
 $config = CRM_Core_Config::singleton(FALSE);
