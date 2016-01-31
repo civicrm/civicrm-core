@@ -211,7 +211,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
          * splits has two possibilities depending on FROM account
          */
         if (empty($dao->from_account_id)) {
-          // In this case, split records need to use the individual financial_item account for each item in the trxn
+          // In this case, split records need to use the individual financial_item account and financial_type for each item in the trxn
           $item_sql = "SELECT
             fa.id AS account_id,
             fa.name AS account_name,
@@ -228,7 +228,9 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
             contact.id AS contact_id,
             contact.display_name AS contact_name,
             contact.first_name AS contact_first_name,
-            contact.last_name AS contact_last_name
+            contact.last_name AS contact_last_name,
+            ftype.name as financial_type,
+            ftype.financial_type_code
             FROM civicrm_entity_financial_trxn eft
             LEFT JOIN civicrm_financial_item fi ON eft.entity_id = fi.id
             LEFT JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
@@ -236,6 +238,9 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
             LEFT JOIN civicrm_option_value cov ON (cov.value = ft.payment_instrument_id AND cov.option_group_id = cog.id)
             LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
             LEFT JOIN civicrm_contact contact ON contact.id = fi.contact_id
+            LEFT JOIN civicrm_entity_financial_trxn eft2 ON (eft2.financial_trxn_id = eft.financial_trxn_id AND eft2.entity_table = 'civicrm_contribution')
+            LEFT JOIN civicrm_contribution contribution ON contribution.id = eft2.entity_id
+            LEFT JOIN civicrm_financial_type ftype ON ftype.id = contribution.financial_type_id
             WHERE eft.entity_table = 'civicrm_financial_item'
             AND eft.financial_trxn_id = %1";
 
@@ -272,6 +277,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
               'description' => $this->format($itemDAO->description),
               'check_number' => $this->format($itemDAO->check_number),
               'currency' => $this->format($itemDAO->currency),
+              'financial_type_code' => $this->format($itemDAO->financial_type_code),
             );
           } // end items loop
           $itemDAO->free();

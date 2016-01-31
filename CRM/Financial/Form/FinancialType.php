@@ -67,7 +67,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
     $this->add('text', 'name', ts('Name'), CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialType', 'name'), TRUE);
 
     $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialType', 'description'));
-
+    $this->add('text', 'financial_type_code', ts('Financial Type Code'), CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialType', 'financial_type_code'));
     $this->add('checkbox', 'is_deductible', ts('Tax-Deductible?'), CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialType', 'is_deductible'));
     $this->add('checkbox', 'is_active', ts('Enabled?'), CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialType', 'is_active'));
     $this->add('checkbox', 'is_reserved', ts('Reserved?'), CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialType', 'is_reserved'));

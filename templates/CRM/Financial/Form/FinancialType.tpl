@@ -41,6 +41,10 @@
         <td class="label">{$form.description.label}</td>
     <td class="html-adjust">{$form.description.html}</td>
        </tr>
+       <tr class="crm-contribution-form-block-financial_type_code">
+        <td class="label">{$form.financial_type_code.label}</td>
+    <td class="html-adjust">{$form.financial_type_code.html}</td>
+       </tr>
 
        <tr class="crm-contribution-form-block-is_deductible">
         <td class="label">{$form.is_deductible.label}</td>
