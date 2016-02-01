@@ -450,7 +450,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     chdir($root);
 
     // Create a mock $request object
-    $autoloader = require_once $root . '/core/vendor/autoload.php';
+    $autoloader = require_once $root . '/vendor/autoload.php';
     // @Todo: do we need to handle case where $_SERVER has no HTTP_HOST key, ie. when run via cli?
     $request = new \Symfony\Component\HttpFoundation\Request(array(), array(), array(), array(), array(), $_SERVER);
 
@@ -544,6 +544,22 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     foreach (Drupal\Core\Cache\Cache::getBins() as $service_id => $cache_backend) {
       $cache_backend->deleteAll();
     }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getModules() {
+    $modules = array();
+
+    $module_data = system_rebuild_module_data();
+    foreach ($module_data as $module_name => $extension) {
+      if (!isset($extension->info['hidden']) && $extension->origin != 'core') {
+        $extension->schema_version = drupal_get_installed_schema_version($module_name);
+        $modules[] = new CRM_Core_Module('drupal.' . $module_name, ($extension->status == 1 ? TRUE : FALSE));
+      }
+    }
+    return $modules;
   }
 
 }
