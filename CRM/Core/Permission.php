@@ -553,30 +553,18 @@ class CRM_Core_Permission {
 
   /**
    * @param bool $all
+   *   Include disabled components
    * @param bool $descriptions
-   *   whether to return descriptions
+   *   Whether to return descriptions
    *
    * @return array
    */
-  public static function &basicPermissions($all = FALSE, $descriptions = FALSE) {
-    if ($descriptions) {
-      static $permissionsDesc = NULL;
-
-      if (!$permissionsDesc) {
-        $permissionsDesc = self::assembleBasicPermissions($all, $descriptions);
-      }
-
-      return $permissionsDesc;
+  public static function basicPermissions($all = FALSE, $descriptions = FALSE) {
+    $cacheKey = implode('-', array($all, $descriptions));
+    if (empty(Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey])) {
+      Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey] = self::assembleBasicPermissions($all, $descriptions);
     }
-    else {
-      static $permissions = NULL;
-
-      if (!$permissions) {
-        $permissions = self::assembleBasicPermissions($all, $descriptions);
-      }
-
-      return $permissions;
-    }
+    return Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey];
   }
 
   /**
