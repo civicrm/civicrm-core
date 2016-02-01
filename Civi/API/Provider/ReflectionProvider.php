@@ -104,7 +104,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   }
 
   /**
-   * {inheritdoc}
+   * @inheritDoc
    * @param array $apiRequest
    * @return array
    * @throws \API_Exception
@@ -128,7 +128,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   }
 
   /**
-   * {inheritdoc}
+   * @inheritDoc
    * @param int $version
    * @return array
    */
@@ -137,7 +137,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   }
 
   /**
-   * {inheritdoc}
+   * @inheritDoc
    * @param int $version
    * @param string $entity
    * @return array
