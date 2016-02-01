@@ -135,14 +135,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       'Member' => $firstName . ' ' . $lastName,
       'Membership Type' => $memTypeTitle1,
       'Source' => 'Online Contribution:' . ' ' . $contributionTitle,
+      'Status' => 'Pending',
     );
-    if ($payLater) {
-      $verifyData['Status'] = 'Pending';
-    }
-    else {
-
-      $verifyData['Status'] = 'New';
-    }
     $this->webtestVerifyTabularData($verifyData);
 
     // Click View action link on associated contribution record
@@ -153,31 +147,24 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $verifyData = array(
       'From' => $firstName . ' ' . $lastName,
       'Total Amount' => '$ 100.00',
+      'Contribution Status' => 'Pending : Pay Later',
     );
-    if ($payLater) {
-      $verifyData['Contribution Status'] = 'Pending : Pay Later';
-    }
-    else {
-      $verifyData['Contribution Status'] = 'Completed';
-    }
     $this->webtestVerifyTabularData($verifyData);
 
     //CRM-15735 - verify membership dates gets changed w.r.t receive_date of contribution.
-    if ($payLater) {
-      $receiveDate = date('F jS, Y', strtotime("-1 month"));
-      $endDate = date('F jS, Y', strtotime("+1 year -1 month -1 day"));
-      $this->clickAjaxLink("xpath=//button//span[contains(text(),'Edit')]", 'receive_date');
-      $this->select('contribution_status_id', 'Completed');
-      $this->webtestFillDate('receive_date', '-1 month');
-      $this->clickAjaxLink("xpath=//button//span[contains(text(),'Save')]", "xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
-      $updatedData = array(
-        'Status' => 'New',
-        'Member Since' => $receiveDate,
-        'Start date' => $receiveDate,
-        'End date' => $endDate,
-      );
-      $this->webtestVerifyTabularData($updatedData);
-    }
+    $receiveDate = date('F jS, Y', strtotime("-1 month"));
+    $endDate = date('F jS, Y', strtotime("+1 year -1 month -1 day"));
+    $this->clickAjaxLink("xpath=//button//span[contains(text(),'Edit')]", 'receive_date');
+    $this->select('contribution_status_id', 'Completed');
+    $this->webtestFillDate('receive_date', '-1 month');
+    $this->clickAjaxLink("xpath=//button//span[contains(text(),'Save')]", "xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
+    $updatedData = array(
+      'Status' => 'New',
+      'Member Since' => $receiveDate,
+      'Start date' => $receiveDate,
+      'End date' => $endDate,
+    );
+    $this->webtestVerifyTabularData($updatedData);
 
     // CRM-8141 signup for membership 2 with same anonymous user info (should create 2 separate membership records because membership orgs are different)
     //logout
@@ -229,11 +216,14 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       $this->click("xpath=//div[@class='crm-section contribution_amount-section']/div[2]//span/label[text()='No thank you']");
     }
     elseif ($amountSection) {
+      $this->clickAt("xpath=//div[@class='content other_amount-content']/input");
+      $this->keyDown("xpath=//div[@class='content other_amount-content']/input", " ");
       $this->type("xpath=//div[@class='content other_amount-content']/input", $otherAmount);
+      $this->typeKeys("xpath=//div[@class='content other_amount-content']/input", $otherAmount);
     }
     if ($payLater) {
       $this->waitForAjaxContent();
-      $this->click("xpath=//div[@class='payment_processor-section']/div[2]/label[text()='Pay later label {$hash}']");
+      $this->click("xpath=//label[text()='Pay later label {$hash}']");
     }
     $this->type("email-5", $firstName . "@example.com");
     $this->waitForElementPresent("first_name");
@@ -254,6 +244,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     }
     else {
       if (!$payLater && $amountSection) {
+        $this->click("xpath=//label[text()='Test Processor']");
+        $this->waitForAjaxContent();
         //Credit Card Info
         $this->select("credit_card_type", "value=Visa");
         $this->type("credit_card_number", "4111111111111111");
@@ -351,6 +343,19 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->type("sort_name", "$lastName $firstName");
     $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+
+    // assert financial data - CRM-17863
+    $this->waitForElementPresent("xpath=//tr/td[@class='crm-contribution-amount']/a[@title='view payments']");
+    $this->click("xpath=//tr/td[@class='crm-contribution-amount']/a[@title='view payments']");
+    $this->waitForAjaxContent();
+    $verifyFinancialData = array(
+      1 => '50.00',
+      2 => 'Donation',
+      6 => 'Completed',
+    );
+    foreach ($verifyFinancialData as $col => $data) {
+      $this->verifyText("xpath=//tr[@class='crm-child-row']/td/div/table/tbody/tr[2]/td[{$col}]", $data);
+    }
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[10]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     //View Contribution Record and verify data
@@ -459,6 +464,20 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       $this->type("sort_name", "$lastName $firstName");
       $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
       $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+
+      // assert financial data - CRM-17863
+      $this->waitForElementPresent("xpath=//tr/td[@class='crm-contribution-amount']/a[@title='view payments']");
+      $this->click("xpath=//tr/td[@class='crm-contribution-amount']/a[@title='view payments']");
+      $this->waitForAjaxContent();
+      $verifyFinancialData = array(
+        1 => '0.00',
+        2 => 'Member Dues',
+        3 => 'Credit Card',
+        6 => 'Completed',
+      );
+      foreach ($verifyFinancialData as $col => $data) {
+        $this->verifyText("xpath=//tr[@class='crm-child-row']/td/div/table/tbody/tr[2]/td[{$col}]", $data);
+      }
       $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[10]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
       //View Contribution Record and verify data
