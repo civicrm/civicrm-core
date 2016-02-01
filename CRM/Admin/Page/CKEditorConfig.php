@@ -67,7 +67,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     }
 
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'bower_components/ckeditor/ckeditor.js', 0, 'html-header')
+      ->addScriptFile('civicrm', 'bower_components/ckeditor/ckeditor.js', 0, 'page-header')
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/fulltoolbareditor.js', 1)
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/abstracttoolbarmodifier.js', 2)
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/toolbarmodifier.js', 3)
