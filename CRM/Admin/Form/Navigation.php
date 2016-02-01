@@ -85,7 +85,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     $separator = array(0 => 'None', 1 => 'After Menu Element', 2 => 'Before Menu Element');
     $this->add('select', 'has_separator', ts('Separator?'), $separator);
 
-    $active = $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $active = $this->add('advcheckbox', 'is_active', ts('Enabled?'));
 
     if (CRM_Utils_Array::value('name', $this->_defaults) == 'Home') {
       $active->freeze();
