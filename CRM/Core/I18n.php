@@ -542,6 +542,21 @@ class CRM_Core_I18n {
     return (bool) $domain->locales;
   }
 
+  /**
+   * Is the language written "right-to-left"?
+   *
+   * @param $language
+   *   Language (for example 'en_US', or 'fr_CA').
+   *
+   * @return Bool
+   *   True if it is an RTL language.
+   */
+  public static function isLanguageRTL($language) {
+    $rtl = CRM_Core_I18n_PseudoConstant::getRTLlanguages();
+    $short = CRM_Core_I18n_PseudoConstant::shortForLong($language);
+
+    return (in_array($short, $rtl));
+  }
 
   /**
    * Change the processing language without changing the current user language
