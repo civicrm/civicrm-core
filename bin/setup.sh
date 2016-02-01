@@ -228,9 +228,6 @@ fi
 
 if [ -n "$DO_FLUSH" ]; then
   pushd "$CALLEDPATH/.."
-    # run the cli script to build the menu and the triggers
-    "$PHP5PATH"php bin/cli.php -e System -a flush --triggers 1 --session 1
-
     # reset config_backend and userFrameworkResourceURL which gets set
     # when config object is initialized
     $MYSQLCMD -e "UPDATE civicrm_domain SET config_backend = NULL; UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL';"
