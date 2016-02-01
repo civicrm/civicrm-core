@@ -578,9 +578,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $errors[$emailName] = "Your email is invaid";
       }
       elseif (email_exists($params['mail'])) {
-        $resetUrl = $config->userFrameworkBaseURL . 'wp-login.php?action=lostpassword';
         $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
-          array(1 => $params['mail'], 2 => $resetUrl)
+          array(1 => $params['mail'], 2 => wp_lostpassword_url())
         );
       }
     }
@@ -650,8 +649,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getLoginURL($destination = '') {
     $config = CRM_Core_Config::singleton();
-    $loginURL = $config->userFrameworkBaseURL;
-    $loginURL .= 'wp-login.php';
+    $loginURL = wp_login_url();
     return $loginURL;
   }
 
