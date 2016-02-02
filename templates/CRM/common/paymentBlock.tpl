@@ -100,7 +100,7 @@
         {capture assign='profilePathVar'}{/capture}
       {/if}
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="`$urlPathVar``$profilePathVar``$contributionPageID`processor_id="}" + type;
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="currency=`$currency`&`$urlPathVar``$profilePathVar``$contributionPageID`processor_id="}" + type;
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {
