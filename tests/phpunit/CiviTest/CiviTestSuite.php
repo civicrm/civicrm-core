@@ -27,11 +27,6 @@
  */
 
 /**
- * Include parent class definition
- */
-require_once 'PHPUnit/Framework/TestSuite.php';
-
-/**
  * Parent class for test suites
  *
  * @package   CiviCRM
