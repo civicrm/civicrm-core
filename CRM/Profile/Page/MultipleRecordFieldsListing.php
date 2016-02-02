@@ -389,7 +389,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $actionParams['cid'] = $actionParams['entityID'] = $this->_contactId;
                 $actionParams['recId'] = $recId;
                 $actionParams['type'] = $this->_contactType;
-                $actionParams['cgcount'] = $cgcount;
+                $actionParams['cgcount'] = empty($DTparams['sort']) ? $cgcount : $recId;
                 $actionParams['newCgCount'] = $newCgCount;
 
                 // DELETE action links
