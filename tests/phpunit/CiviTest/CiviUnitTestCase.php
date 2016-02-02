@@ -411,7 +411,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
-    $this->clearOutputBuffer();
   }
 
   /**
@@ -3218,12 +3217,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if (!$this->tx) {
       $this->tx = new CRM_Core_Transaction($nest);
       $this->tx->rollback();
-    }
-  }
-
-  public function clearOutputBuffer() {
-    while (ob_get_level() > 0) {
-      ob_end_clean();
     }
   }
 
