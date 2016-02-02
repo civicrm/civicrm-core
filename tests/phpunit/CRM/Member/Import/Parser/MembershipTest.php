@@ -24,10 +24,6 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/Membership.php';
-
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *

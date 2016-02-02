@@ -25,10 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
-
-
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -662,7 +658,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $lineItem = $this->callAPISuccessGetSingle('LineItem', array());
     $this->assertEquals(45, $lineItem['line_total']);
   }
-
 
   /**
    * Get parameters for credit card submit calls.

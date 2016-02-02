@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Utils_TypeTest
  */

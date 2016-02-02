@@ -14,7 +14,10 @@ if (PHP_SAPI !== 'cli') {
   die("phpunit can only be run from command line.");
 }
 
-$phpunit = findCommand('phpunit');
+$phpunit = findCommand('phpunit4');
+if (!$phpunit) {
+  $phpunit = findCommand('phpunit');
+}
 if (!$phpunit) {
   echo "Plesae ensure that:\n";
   echo " * PHPUnit is installed.\n";
@@ -30,11 +33,15 @@ array_shift($argv);
 
 // Convert class names to file names
 foreach ($argv as $k => $v) {
-  if (preg_match('/^(CRM_|api_v3|WebTest_)/', $v)) {
+  if (preg_match('/^(CRM_|api_v3_|EnvTest|WebTest_)/', $v)) {
     $argv[$k] = 'tests/phpunit/' . strtr($v, '_', '/') . '.php';
   }
   elseif (preg_match('/^Civi\\\\/', $v)) {
     $argv[$k] = 'tests/phpunit/' . strtr($v, '\\', '/') . '.php';
+  }
+
+  if (!preg_match('/^(WebTest)/', $v)) {
+    putenv('CIVICRM_UF=UnitTests');
   }
 }
 
@@ -50,6 +57,7 @@ if (is_dir('packages/PHPUnit/')) {
 
 $cmd =
   findPhp() // In case this system has multiple copies of PHP, use the active/preferred one.
+  // . ' -ddisplay_errors=1'
   . ' '
   . escapeshellarg($phpunit)
   . ' '

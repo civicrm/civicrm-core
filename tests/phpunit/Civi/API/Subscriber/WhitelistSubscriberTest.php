@@ -5,8 +5,6 @@ use Civi\API\Kernel;
 use Civi\API\WhitelistRule;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * The WhitelistSubscriber enforces security policies
  * based on API whitelists. This test combines a number

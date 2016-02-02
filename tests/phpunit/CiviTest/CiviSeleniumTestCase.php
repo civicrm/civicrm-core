@@ -25,17 +25,7 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *  Include configuration
- */
-define('CIVICRM_SETTINGS_PATH', __DIR__ . '/civicrm.settings.dist.php');
-define('CIVICRM_SETTINGS_LOCAL_PATH', __DIR__ . '/civicrm.settings.local.php');
 define('CIVICRM_WEBTEST', 1);
-
-if (file_exists(CIVICRM_SETTINGS_LOCAL_PATH)) {
-  require_once CIVICRM_SETTINGS_LOCAL_PATH;
-}
-require_once CIVICRM_SETTINGS_PATH;
 
 /**
  *  Base class for CiviCRM Selenium tests
@@ -69,7 +59,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     parent::__construct($name, $data, $dataName, $browser);
     $this->loggedInAs = NULL;
 
-    require_once 'CiviSeleniumSettings.php';
     $this->settings = new CiviSeleniumSettings();
     if (property_exists($this->settings, 'serverStartupTimeOut') && $this->settings->serverStartupTimeOut) {
       global $CiviSeleniumTestCase_polled;

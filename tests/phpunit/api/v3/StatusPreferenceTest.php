@@ -25,10 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  *  Class api_v3_StatusPreferenceTest
  *

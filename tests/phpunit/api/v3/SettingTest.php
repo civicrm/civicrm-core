@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  *  Test APIv3 civicrm_setting_* functions
  *
@@ -235,7 +232,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testCreateInvalidURLSettings() {
     $params = array(
       'domain_id' => $this->_domainID2,
-      'userFrameworkResourceURL' => 'dfhkd*hfd',
+      'userFrameworkResourceURL' => 'dfhkd hfd',
     );
     $result = $this->callAPIFailure('setting', 'create', $params);
     $params = array(

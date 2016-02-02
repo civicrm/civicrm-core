@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Tests for linking to resource files
  */

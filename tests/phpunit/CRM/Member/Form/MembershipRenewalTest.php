@@ -34,13 +34,6 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-require_once 'HTML/QuickForm/Page.php';
-
-/**
  *  Test CRM_Member_Form_Membership functions.
  *
  * @package   CiviCRM

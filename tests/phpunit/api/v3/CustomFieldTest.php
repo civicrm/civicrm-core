@@ -26,12 +26,6 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
-
-
-/**
  *  Test APIv3 civicrm_create_custom_group
  *
  * @package   CiviCRM
@@ -210,7 +204,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /*function testCustomFieldCreateExample( )
   {
 
-
   $customGroup = $this->customGroupCreate('Individual','date_test_group',3);
   require_once 'api/v3/examples/CustomField/Create.php';
   $result = custom_field_create_example();
@@ -280,7 +273,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $this->assertEquals($optionGroupID, 3);
   }
-
 
   /**
    * Test custom field get works & return param works
