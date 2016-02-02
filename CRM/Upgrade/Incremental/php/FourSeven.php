@@ -155,6 +155,15 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_2($rev) {
+    $this->addTask('Fix Index on civicrm_financial_item combined entity_id + entity_table', 'addCombinedIndexFinancialItemEntityIDEntityType');
+  }
+
+  /**
    * CRM-16354
    *
    * @return int
@@ -424,6 +433,24 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
   public function addIndexContributionCreditNoteID(CRM_Queue_TaskContext $ctx) {
     $tables = array('civicrm_contribution' => array('creditnote_id'));
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+    return TRUE;
+  }
+
+  /**
+   * CRM-17775 Add correct index for table civicrm_financial_item.
+   *
+   * Note that the entity ID should always precede the entity_table as
+   * it is more unique. This is better for performance and does not cause fallback
+   * to no index if table it omitted.
+   *
+   * @return bool
+   */
+  public function addCombinedIndexFinancialItemEntityIDEntityType() {
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_financial_item', 'UI_id');
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_financial_item', 'IX_Entity');
+    CRM_Core_BAO_SchemaHandler::createIndexes(array(
+      'civicrm_financial_item' => array(array('entity_id', 'entity_table')),
+    ));
     return TRUE;
   }
 
