@@ -35,7 +35,7 @@
     <div id="custom-{$customGroupId}-table-wrapper" {if $pageViewType eq 'customDataView'}class="crm-entity" data-entity="contact" data-id="{$contactId}"{/if}>
       <div>
         {strip}
-          <table id="records" class={if $pageViewType eq 'customDataView'}"crm-multifield-selector crm-ajax-table"{else}'display'{/if}>
+          <table id="records-{$customGroupId}" class={if $pageViewType eq 'customDataView'}"crm-multifield-selector crm-ajax-table"{else}'display'{/if}>
             <thead>
             <tr>
             {if $pageViewType eq 'customDataView'}
@@ -52,6 +52,7 @@
               <script type="text/javascript">
                 (function($) {
                   var ZeroRecordText = {/literal}'{ts 1=$customGroupTitle}No records of type \'%1\' found.{/ts}'{literal};
+                  var $table = $('#records-' + {/literal}'{$customGroupId}'{literal});
                   $('table.crm-multifield-selector').data({
                     "ajax": {
                       "url": {/literal}'{crmURL p="civicrm/ajax/multirecordfieldlist" h=0 q="snippet=4&cid=$contactId&cgid=$customGroupId"}'{literal},
@@ -61,7 +62,7 @@
                     },
                     //Add class attributes to cells
                     "rowCallback": function(row, data) {
-                      $('thead th').each( function(index) {
+                      $('thead th', $table).each(function(index) {
                         var fName = $(this).attr('data-data');
                         var cell = $('td:eq(' + index + ')', row);
                         if (typeof data[fName] == 'object') {
