@@ -207,7 +207,7 @@ elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
   $upload_dir = wp_upload_dir();
   $files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
-  $wp_civi_settings = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settingsphp';
+  $wp_civi_settings = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
   $wp_civi_settings_deprectated = CIVICRM_PLUGIN_DIR . 'civicrm.settings.php';
   if (file_exists($wp_civi_settings_deprectated)) {
     $alreadyInstalled = $wp_civi_settings_deprectated;
