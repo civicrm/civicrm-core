@@ -762,19 +762,22 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         $template = array();
         if ($this->header->body_text) {
           $template[] = $this->header->body_text;
-        } else {
+        }
+        else {
           $template[] = CRM_Utils_String::htmlToText($this->header->body_html);
         }
 
         if ($this->body_text) {
           $template[] = $this->body_text;
-        } else {
+        }
+        else {
           $template[] = CRM_Utils_String::htmlToText($this->body_html);
         }
 
         if ($this->footer->body_text) {
           $template[] = $this->footer->body_text;
-        } else {
+        }
+        else {
           $template[] = CRM_Utils_String::htmlToText($this->footer->body_html);
         }
 
