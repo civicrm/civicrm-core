@@ -14,7 +14,10 @@ if (PHP_SAPI !== 'cli') {
   die("phpunit can only be run from command line.");
 }
 
-$phpunit = findCommand('phpunit');
+$phpunit = findCommand('phpunit4');
+if (!$phpunit) {
+  $phpunit = findCommand('phpunit');
+}
 if (!$phpunit) {
   echo "Plesae ensure that:\n";
   echo " * PHPUnit is installed.\n";
