@@ -92,8 +92,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship created.');
-    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
-    $this->click("xpath=//div[@class='crm-contact-relationship-current']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
@@ -173,8 +173,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //save the relationship
     $this->click('_qf_Relationship_upload-bottom');
 
-    $this->waitForElementPresent("xpath=//div[@id='contact-summary-relationship-tab']/div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
-    $this->click("xpath=//div[@id='contact-summary-relationship-tab']/div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
@@ -265,8 +265,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //save the relationship
     $this->click('_qf_Relationship_upload-bottom');
 
-    $this->waitForElementPresent("xpath=//div[@id='contact-summary-relationship-tab']/div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
-    $this->click("xpath=//div[@id='contact-summary-relationship-tab']/div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
@@ -332,8 +332,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship created.');
-    $this->waitForElementPresent("xpath=//div[@id='contact-summary-relationship-tab']/div[2]/div[1]/table/tbody/tr/td[9]/span[1]//a[text()='View']");
-    $this->click("xpath=//div[@id='contact-summary-relationship-tab']/div[2]/div[1]/table/tbody/tr/td[9]/span[1]//a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span[1]//a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span[1]//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
@@ -406,8 +406,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship created.');
 
-    $this->waitForElementPresent("xpath=//div[@id='contact-summary-relationship-tab']/div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
-    $this->click("xpath=//div[@id='contact-summary-relationship-tab']/div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]//span//a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
