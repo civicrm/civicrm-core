@@ -259,8 +259,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("financial_type_id");
     $this->type("sort_name", $firstName);
     $this->select('financial_type_id', "label=Donation");
-    $this->clickLink('_qf_Search_refresh', "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", FALSE);
-    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
+    $this->clickLink('_qf_Search_refresh', "xpath=//table[@class='selector row-highlight']/tbody/tr/td[10]/span//a[text()='View']", FALSE);
+    $this->click("xpath=//div[@id='contributionSearch']/table[@class='selector row-highlight']/tbody/tr/td[10]/span//a[text()='View']");
     $this->waitForAjaxContent();
     $expected = array(
       'From' => "{$firstName} {$lastName}",
@@ -274,7 +274,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", 'member_source');
     $this->type('sort_name', "$lastName $firstName");
     $this->clickLink('_qf_Search_refresh', "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span//a[text()='View']", FALSE);
-    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span//a[text()='View']", '_qf_MembershipView_cancel-bottom', FALSE);
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span//a[text()='View']");
+    $this->waitForAjaxContent();
 
     //View Membership Record
     $expected = array(
