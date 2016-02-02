@@ -1400,10 +1400,6 @@ class Installer extends InstallRequirements {
 
         //change the default language to one chosen
         if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
-          // This ensures that defaults get set, otherwise the user will login
-          // and most configurations will be empty, not set to en_US defaults.
-          civicrm_api3('Setting', 'revert');
-
           civicrm_api3('Setting', 'create', array(
               'domain_id' => 'current_domain',
               'lcMessages' => $config['seedLanguage'],
