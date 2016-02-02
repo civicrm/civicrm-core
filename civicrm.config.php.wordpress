@@ -265,6 +265,13 @@ class Bootstrap {
 
     $settings = NULL;
     switch ($cmsType) {
+      case 'backdrop':
+        $settings = $this->findFirstFile(
+           array_merge($this->findDrupalDirs($cmsRoot), array($cmsRoot)),
+          'civicrm.settings.php'
+        );
+        break;
+
       case 'drupal':
         $settings = $this->findFirstFile($this->findDrupalDirs($cmsRoot), 'civicrm.settings.php');
         break;
@@ -283,8 +290,8 @@ class Bootstrap {
 
       case 'wp':
         $wpDirs = array(
-          $cmsRoot . '/wp-content/uploads/civicrm',
-          $cmsRoot . '/wp-content/plugins/civicrm',
+          $cmsRoot . '/*/uploads/civicrm',
+          $cmsRoot . '/*/plugins/civicrm',
         );
         $settings = $this->findFirstFile($wpDirs, 'civicrm.settings.php');
         break;
@@ -297,7 +304,7 @@ class Bootstrap {
    *
    * @param string $cmsRoot
    *   The root of the Drupal installation.
-   * @return string
+   * @return array
    */
   protected function findDrupalDirs($cmsRoot) {
     $dirs = array();
@@ -321,7 +328,7 @@ class Bootstrap {
     // CMS root.
     $cmsPatterns = array(
       'wp' => array(
-        'wp-content/plugins/civicrm/civicrm/civicrm-version.php',
+        'wp-includes/version.php',
         // Future? 'vendor/civicrm/wordpress/civicrm.php' => 'wp',
       ),
       'joomla' => array(
@@ -329,9 +336,11 @@ class Bootstrap {
         // Future? 'vendor/civicrm/joomla/civicrm.php' => 'joomla',
       ),
       'drupal' => array(
-        'sites/*/civicrm.settings.php',
-        // Future? 'sites/libraries/civicrm/civicrm-version.php' => 'drupal',
-        // Future? 'vendor/civicrm/drupal/civicrm.module' => 'drupal',
+        'modules/system/system.module', // D7
+        'core/core.services.yml', // D8
+      ),
+      'backdrop' => array(
+        'core/modules/layout/layout.module',
       ),
     );
 
