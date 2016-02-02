@@ -29,19 +29,8 @@
 use Civi\Payment\System;
 
 /**
- *  Include configuration
- */
-define('CIVICRM_SETTINGS_PATH', __DIR__ . '/civicrm.settings.dist.php');
-define('CIVICRM_SETTINGS_LOCAL_PATH', __DIR__ . '/civicrm.settings.local.php');
-
-if (file_exists(CIVICRM_SETTINGS_LOCAL_PATH)) {
-  require_once CIVICRM_SETTINGS_LOCAL_PATH;
-}
-require_once CIVICRM_SETTINGS_PATH;
-/**
  *  Include class definitions
  */
-require_once 'tests/phpunit/Utils.php';
 require_once 'api/api.php';
 require_once 'CRM/Financial/BAO/FinancialType.php';
 define('API_LATEST_VERSION', 3);
@@ -99,11 +88,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @var array of temporary directory names
    */
   protected $tempDirs;
-
-  /**
-   * @var Utils instance
-   */
-  public static $utils;
 
   /**
    * @var boolean populateOnce allows to skip db resets in setUp
@@ -169,19 +153,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // we need full error reporting
     error_reporting(E_ALL & ~E_NOTICE);
 
-    if (!empty($GLOBALS['mysql_db'])) {
-      self::$_dbName = $GLOBALS['mysql_db'];
-    }
-    else {
-      self::$_dbName = 'civicrm_tests_dev';
-    }
-
-    //  create test database
-    self::$utils = new Utils($GLOBALS['mysql_host'],
-      $GLOBALS['mysql_port'],
-      $GLOBALS['mysql_user'],
-      $GLOBALS['mysql_pass']
-    );
+    self::$_dbName = self::getDBName();
 
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
@@ -220,7 +192,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return string
    */
   public static function getDBName() {
-    $dbName = !empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
+    static $dbName = NULL;
+    if ($dbName === NULL) {
+      require_once "DB.php";
+      $dsninfo = DB::parseDSN(CIVICRM_DSN);
+      $dbName = $dsninfo['database'];
+    }
     return $dbName;
   }
 
@@ -243,7 +220,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
       self::$dbInit = TRUE;
     }
-    return $this->createDefaultDBConnection(self::$utils->pdo, $dbName);
+
+    return $this->createDefaultDBConnection(CiviTester::pdo(), $dbName);
   }
 
   /**
@@ -259,6 +237,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   TRUE if the populate logic runs; FALSE if it is skipped
    */
   protected static function _populateDB($perClass = FALSE, &$object = NULL) {
+    if (CIVICRM_UF !== 'UnitTests') {
+      throw new \RuntimeException("_populateDB requires CIVICRM_UF=UnitTests");
+    }
 
     if ($perClass || $object == NULL) {
       $dbreset = TRUE;
@@ -272,95 +253,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     self::$populateOnce = NULL;
 
-    $dbName = self::getDBName();
-    $pdo = self::$utils->pdo;
-    // only consider real tables and not views
-    $tables = $pdo->query("SELECT table_name FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_SCHEMA = '{$dbName}' AND TABLE_TYPE = 'BASE TABLE'");
-
-    $truncates = array();
-    $drops = array();
-    foreach ($tables as $table) {
-      // skip log tables
-      if (substr($table['table_name'], 0, 4) == 'log_') {
-        continue;
-      }
-
-      // don't change list of installed extensions
-      if ($table['table_name'] == 'civicrm_extension') {
-        continue;
-      }
-
-      if (substr($table['table_name'], 0, 14) == 'civicrm_value_') {
-        $drops[] = 'DROP TABLE ' . $table['table_name'] . ';';
-      }
-      else {
-        $truncates[] = 'TRUNCATE ' . $table['table_name'] . ';';
-      }
-    }
-
-    $queries = array(
-      "USE {$dbName};",
-      "SET foreign_key_checks = 0",
-      // SQL mode needs to be strict, that's our standard
-      "SET SQL_MODE='STRICT_ALL_TABLES';",
-      "SET global innodb_flush_log_at_trx_commit = 2;",
-    );
-    $queries = array_merge($queries, $truncates);
-    $queries = array_merge($queries, $drops);
-    foreach ($queries as $query) {
-      if (self::$utils->do_query($query) === FALSE) {
-        //  failed to create test database
-        echo "failed to create test db.";
-        exit;
-      }
-    }
-
-    //  initialize test database
-    $sql_file2 = dirname(dirname(dirname(dirname(__FILE__)))) . "/sql/civicrm_data.mysql";
-    $sql_file3 = dirname(dirname(dirname(dirname(__FILE__)))) . "/sql/test_data.mysql";
-    $sql_file4 = dirname(dirname(dirname(dirname(__FILE__)))) . "/sql/test_data_second_domain.mysql";
-
-    $query2 = file_get_contents($sql_file2);
-    $query3 = file_get_contents($sql_file3);
-    $query4 = file_get_contents($sql_file4);
-    if (self::$utils->do_query($query2) === FALSE) {
-      echo "Cannot load civicrm_data.mysql. Aborting.";
-      exit;
-    }
-    if (self::$utils->do_query($query3) === FALSE) {
-      echo "Cannot load test_data.mysql. Aborting.";
-      exit;
-    }
-    if (self::$utils->do_query($query4) === FALSE) {
-      echo "Cannot load test_data.mysql. Aborting.";
-      exit;
-    }
-
-    // done with all the loading, get transactions back
-    if (self::$utils->do_query("set global innodb_flush_log_at_trx_commit = 1;") === FALSE) {
-      echo "Cannot set global? Huh?";
-      exit;
-    }
-
-    if (self::$utils->do_query("SET foreign_key_checks = 1") === FALSE) {
-      echo "Cannot get foreign keys back? Huh?";
-      exit;
-    }
-
-    unset($query, $query2, $query3);
-
-    // Rebuild triggers
-    civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
-
-    CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
-      'CiviEvent',
-      'CiviContribute',
-      'CiviMember',
-      'CiviMail',
-      'CiviReport',
-      'CiviPledge',
-    ));
+    CiviTester::data()->populate();
 
     return TRUE;
   }
@@ -481,15 +374,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $contactID;
   }
 
-  public function cleanDB() {
-    self::$populateOnce = NULL;
-    $this->DBResetRequired = TRUE;
-
-    $this->_dbconn = $this->getConnection();
-    static::_populateDB();
-    $this->tempDirs = array();
-  }
-
   /**
    * Create default domain contacts for the two domains added during test class.
    * database population.
@@ -527,30 +411,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
-    $this->clearOutputBuffer();
-  }
-
-  /**
-   *  FIXME: Maybe a better way to do it
-   */
-  public function foreignKeyChecksOff() {
-    self::$utils = new Utils($GLOBALS['mysql_host'],
-      $GLOBALS['mysql_port'],
-      $GLOBALS['mysql_user'],
-      $GLOBALS['mysql_pass']
-    );
-    $dbName = self::getDBName();
-    $query = "USE {$dbName};" . "SET foreign_key_checks = 1";
-    if (self::$utils->do_query($query) === FALSE) {
-      // fail happens
-      echo 'Cannot set foreign_key_checks = 0';
-      exit(1);
-    }
-    return TRUE;
-  }
-
-  public function foreignKeyChecksOn() {
-    // FIXME: might not be needed if previous fixme implemented
   }
 
   /**
@@ -927,7 +787,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
 
     $calls = new \Civi\API\ExternalBatch($defaultParams);
-    $calls->setSettingsPath("$civicrm_root/tests/phpunit/CiviTest/civicrm.settings.cli.php");
 
     if (!$calls->isSupported()) {
       $this->markTestSkipped('The test relies on Civi\API\ExternalBatch. This is unsupported in the local environment.');
@@ -2790,7 +2649,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *   'template_path' Set to TRUE to use the default, FALSE or "" to disable support, or a string path to use another path
    */
   public function customDirectories($customDirs) {
-    require_once 'CRM/Core/Config.php';
     $config = CRM_Core_Config::singleton();
 
     if (empty($customDirs['php_path']) || $customDirs['php_path'] === FALSE) {
@@ -3362,12 +3220,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
   }
 
-  public function clearOutputBuffer() {
-    while (ob_get_level() > 0) {
-      ob_end_clean();
-    }
-  }
-
   /**
    * Assert the attachment exists.
    *
@@ -3454,8 +3306,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   protected function createParticipantWithContribution() {
     // creating price set, price field
-    require_once 'CiviTest/Event.php';
-    require_once 'CiviTest/Contact.php';
     $this->_contactId = Contact::createIndividual();
     $this->_eventId = Event::create($this->_contactId);
     $eventParams = array(

@@ -28,7 +28,6 @@
 /**
  *  Include parent class definition
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  *  Test contact custom search functions

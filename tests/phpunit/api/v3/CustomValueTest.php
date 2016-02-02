@@ -25,8 +25,6 @@
  * +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class api_v3_CustomValueTest
  */
@@ -111,7 +109,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       switch ($dataType) {
         case 'Country':
         case 'StateProvince':
-          $this->foreignKeyChecksOff();
         case 'String':
         case 'Link':
         case 'Int':

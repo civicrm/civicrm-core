@@ -54,7 +54,12 @@
  * (Administer::System Settings::Resource URLs).
  */
 if (!defined('CIVICRM_UF')) {
-  define( 'CIVICRM_UF', '%%cms%%');
+  if (getenv('CIVICRM_UF')) {
+    define('CIVICRM_UF', getenv('CIVICRM_UF'));
+  }
+  else {
+    define('CIVICRM_UF', '%%cms%%');
+  }
 }
 
 /**
@@ -64,7 +69,7 @@ if (!defined('CIVICRM_UF')) {
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-if (!defined('CIVICRM_UF_DSN')) {
+if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
   define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true');
 }
 
@@ -89,7 +94,12 @@ if (!defined('CIVICRM_UF_DSN')) {
  *
  */
 if (!defined('CIVICRM_DSN')) {
-  define( 'CIVICRM_DSN'          , 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true');
+  if (CIVICRM_UF === 'UnitTests' && isset($GLOBALS['_CV']['TEST_DB_DSN'])) {
+    define('CIVICRM_DSN', $GLOBALS['_CV']['TEST_DB_DSN']);
+  }
+  else {
+    define('CIVICRM_DSN', 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true');
+  }
 }
 
 /**
@@ -383,6 +393,11 @@ if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
 // if (!defined('CIVICRM_MYSQL_STRICT')) {
 // define('CIVICRM_MYSQL_STRICT', TRUE );
 // }
+
+if (CIVICRM_UF === 'UnitTests') {
+  if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');
+  if (!defined('CIVICRM_MYSQL_STRICT')) define('CIVICRM_MYSQL_STRICT', true);
+}
 
 /**
  *

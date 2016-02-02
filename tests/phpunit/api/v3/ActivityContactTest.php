@@ -26,9 +26,6 @@
  */
 
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  *  Test APIv3 civicrm_activity_contact* functions
  *
