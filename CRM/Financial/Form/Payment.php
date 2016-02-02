@@ -36,6 +36,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    * @var int
    */
   protected $_paymentProcessorID;
+  protected $currency;
 
   /**
    * @var array
@@ -48,6 +49,8 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     parent::preProcess();
     $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
       TRUE);
+    $this->currency = CRM_Utils_Request::retrieve('currency', 'String', CRM_Core_DAO::$_nullObject,
+      TRUE);
 
     $this->assignBillingType();
 
@@ -58,9 +61,17 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     self::addCreditCardJs();
 
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+    $this->assign('currency', $this->currency);
 
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;
+  }
+
+  /**
+   * @return string
+   */
+  public function getCurrency() {
+    return $this->currency;
   }
 
   /**
