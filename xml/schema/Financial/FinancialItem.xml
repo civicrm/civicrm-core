@@ -167,10 +167,4 @@
     <fieldName>entity_id</fieldName>
     <add>4.3</add>
   </index>
-  <index>
-    <name>IX_entity</name>
-    <fieldName>entity_table</fieldName>
-    <fieldName>entity_id</fieldName>
-    <add>4.3</add>
-  </index>
 </table>
