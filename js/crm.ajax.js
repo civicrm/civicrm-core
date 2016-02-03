@@ -256,6 +256,10 @@
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
       if (this.options.block) this.element.block();
       $.getJSON(url, function(data) {
+        if (data.status === 'redirect') {
+          that.options.url = data.userContext;
+          return that.refresh();
+        }
         if (that.options.block) that.element.unblock();
         if (!$.isPlainObject(data)) {
           that._onFailure(data);
@@ -470,7 +474,7 @@
       }, settings.ajaxForm));
       if (settings.openInline) {
         settings.autoClose = $el.crmSnippet('isOriginalUrl');
-        $(this).on('click', settings.openInline, function(e) {
+        $(this).off('.openInline').on('click.openInline', settings.openInline, function(e) {
           if ($(this).is(exclude + ', .crm-popup')) {
             return;
           }
