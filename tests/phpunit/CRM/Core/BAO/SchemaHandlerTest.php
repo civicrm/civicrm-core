@@ -89,4 +89,36 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     $this->assertEquals(2, $weightCount);
   }
 
+  /**
+   * Test the drop index if exists function for a non-existent index.
+   */
+  public function testCHeckIndexNotExists() {
+    $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'magic_button'));
+  }
+
+  /**
+   * Test the drop index if exists function for a non-existent index.
+   */
+  public function testCHeckIndexExists() {
+    $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'index_hash'));
+  }
+
+  /**
+   * Test the drop index if exists function for a non-existent index.
+   */
+  public function testDropIndexNoneExists() {
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'magic_button');
+  }
+
+  /**
+   * Test the drop index if exists function.
+   */
+  public function testDropIndexExists() {
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'index_hash');
+    $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'index_hash'));
+
+    // Recreate it to clean up after the test.
+    CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('hash')));
+  }
+
 }
