@@ -379,6 +379,7 @@ class Container {
       \CRM_Core_DAO::init($runtime->dsn);
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
+      \CRM_Extension_System::singleton(TRUE)->getClassLoader()->register();
 
       $c = new self();
       \Civi::$statics[__CLASS__]['container'] = $c->loadContainer();
