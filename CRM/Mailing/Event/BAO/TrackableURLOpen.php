@@ -81,8 +81,8 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     );
 
     if (!$search->fetch()) {
-      /* Can't find either the URL or the queue. If we can find the URL then
-         return the URL without tracking.  Otherwise return the base URL. */
+      // Can't find either the URL or the queue. If we can find the URL then
+      // return the URL without tracking.  Otherwise return the base URL.
 
       $search->query("SELECT $turl.url as url from $turl
                     WHERE $turl.id = " . CRM_Utils_Type::escape($url_id, 'Integer')
