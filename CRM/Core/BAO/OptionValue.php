@@ -169,7 +169,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return CRM_Core_DAO_OptionValue
    */
-  public static function add(&$params, $ids) {
+  public static function add(&$params, $ids = array()) {
     // CRM-10921: do not reset attributes to default if this is an update
     //@todo consider if defaults are being set in the right place. 'dumb' defaults like
     // these would be usefully set @ the api layer so they are visible to api users
