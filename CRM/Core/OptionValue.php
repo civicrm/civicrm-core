@@ -181,6 +181,7 @@ class CRM_Core_OptionValue {
    *
    */
   public static function addOptionValue(&$params, &$groupParams, &$action, &$optionValueID) {
+    $ids = array();
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     // checking if the group name with the given id or name (in $groupParams) exists
     if (!empty($groupParams)) {
