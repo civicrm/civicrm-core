@@ -758,17 +758,27 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     if (!$this->templates) {
       $this->getHeaderFooter();
       $this->templates = array();
-
-      if ($this->body_text) {
+      if ($this->body_text || $this->header->body_text || $this->footer->body_text) {
         $template = array();
-        if ($this->header) {
+        if ($this->header->body_text) {
           $template[] = $this->header->body_text;
         }
+        else {
+          $template[] = CRM_Utils_String::htmlToText($this->header->body_html);
+        }
 
-        $template[] = $this->body_text;
+        if ($this->body_text) {
+          $template[] = $this->body_text;
+        }
+        else {
+          $template[] = CRM_Utils_String::htmlToText($this->body_html);
+        }
 
-        if ($this->footer) {
+        if ($this->footer->body_text) {
           $template[] = $this->footer->body_text;
+        }
+        else {
+          $template[] = CRM_Utils_String::htmlToText($this->footer->body_html);
         }
 
         $this->templates['text'] = implode("\n", $template);
@@ -792,7 +802,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         // this is where we create a text template from the html template if the text template did not exist
         // this way we ensure that every recipient will receive an email even if the pref is set to text and the
         // user uploads an html email only
-        if (!$this->body_text) {
+        if (empty($this->templates['text'])) {
           $this->templates['text'] = CRM_Utils_String::htmlToText($this->templates['html']);
         }
       }
