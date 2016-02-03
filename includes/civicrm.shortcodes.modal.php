@@ -107,7 +107,8 @@ class CiviCRM_For_WordPress_Shortcodes_Modal {
 
       $config = CRM_Core_Config::singleton();
       $imageBtnURL = $config->resourceBase . 'i/logo16px.png';
-      echo '<a href="/wp-admin/admin.php?page=CiviCRM&q=civicrm/shortcode&reset=1" class="button crm-popup medium-popup crm-shortcode-button" data-popup-type="page" style="padding-left: 4px;" title="' . __( 'Add CiviCRM Public Pages', 'civicrm' ) . '"><img src="' . $imageBtnURL . '" height="15" width="15" alt="' . __( 'Add CiviCRM Public Pages', 'civicrm' ) . '" />'. __( 'CiviCRM', 'civicrm' ) .'</a>';
+      $url = CIVICRM_UF_ADMINURL . 'admin.php?page=CiviCRM&q=civicrm/shortcode&reset=1';
+      echo '<a href= "' . $url . '" class="button crm-popup medium-popup crm-shortcode-button" data-popup-type="page" style="padding-left: 4px;" title="' . __( 'Add CiviCRM Public Pages', 'civicrm' ) . '"><img src="' . $imageBtnURL . '" height="15" width="15" alt="' . __( 'Add CiviCRM Public Pages', 'civicrm' ) . '" />'. __( 'CiviCRM', 'civicrm' ) .'</a>';
 
     }
 
