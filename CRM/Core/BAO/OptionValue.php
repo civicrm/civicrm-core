@@ -169,7 +169,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return CRM_Core_DAO_OptionValue
    */
-  public static function add(&$params, $ids) {
+  public static function add(&$params, &$ids) {
     // CRM-10921: do not reset attributes to default if this is an update
     //@todo consider if defaults are being set in the right place. 'dumb' defaults like
     // these would be usefully set @ the api layer so they are visible to api users
@@ -517,24 +517,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $options[$value['value']] = $value['label'];
     }
     return $options;
-  }
-
-  /**
-   * Ensure an option value exists.
-   *
-   * This function is intended to be called from the upgrade script to ensure
-   * that an option value exists, without hitting an error if it already exists.
-   *
-   * This is sympathetic to sites who might pre-add it.
-   */
-  public static function ensureOptionValueExists($params) {
-    $existingValues = civicrm_api3('OptionValue', 'get', array(
-      'option_group_name' => $params['option_group_id'],
-      'name' => $params['name'],
-    ));
-    if (!$existingValues['count']) {
-      civicrm_api3('OptionValue', 'create', $params);
-    }
   }
 
 }
