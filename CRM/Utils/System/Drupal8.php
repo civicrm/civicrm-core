@@ -562,4 +562,59 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return $modules;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getUniqueIdentifierFromUserObject($user) {
+    return $user->get('mail')->value;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUserIDFromUserObject($user) {
+    return $user->get('uid')->value;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+
+    $users = array();
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties();
+
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+    foreach ($users as $user) {
+      $mail = $user->get('mail')->value;
+      if (empty($mail)) {
+        continue;
+      }
+      $uid = $user->get('uid')->value;
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $uid, $mail, $uf, 1, 'Individual', TRUE)) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
+  }
+
 }
