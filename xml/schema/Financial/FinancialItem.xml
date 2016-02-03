@@ -150,6 +150,7 @@
     <fieldName>id</fieldName>
     <unique>true</unique>
     <add>4.3</add>
+    <drop>4.7</drop>
   </index>
   <index>
     <name>IX_created_date</name>
@@ -166,11 +167,12 @@
     <fieldName>entity_table</fieldName>
     <fieldName>entity_id</fieldName>
     <add>4.3</add>
+    <drop>4.7</drop>
   </index>
   <index>
-    <name>IX_entity</name>
-    <fieldName>entity_table</fieldName>
+    <name>index_entity_id_entity_table</name>
     <fieldName>entity_id</fieldName>
-    <add>4.3</add>
+    <fieldName>entity_table</fieldName>
+    <add>4.7</add>
   </index>
 </table>
