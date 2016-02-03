@@ -373,7 +373,7 @@ ALTER TABLE {$tableName}
    */
   public static function dropColumn($tableName, $columnName) {
     $sql = "ALTER TABLE $tableName DROP COLUMN $columnName";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
@@ -415,7 +415,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    * @param string $createIndexPrefix
    * @param array $substrLenghts
    */
-  public static function createIndexes(&$tables, $createIndexPrefix = 'index', $substrLenghts = array()) {
+  public static function createIndexes($tables, $createIndexPrefix = 'index', $substrLenghts = array()) {
     $queries = array();
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -492,6 +492,18 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
   }
 
   /**
+   * Drop an index if one by that name exists.
+   *
+   * @param string $tableName
+   * @param string $indexName
+   */
+  public static function dropIndexIfExists($tableName, $indexName) {
+    if (self::checkIfIndexExists($tableName, $indexName)) {
+      CRM_Core_DAO::executeQuery("DROP INDEX $indexName ON $tableName");
+    }
+  }
+
+  /**
    * @param int $customFieldID
    * @param string $tableName
    * @param string $columnName
@@ -546,6 +558,25 @@ MODIFY      {$columnName} varchar( $length )
         )
       ));
     }
+  }
+
+  /**
+   * Check if the table has an index matching the name.
+   *
+   * @param string $tableName
+   * @param array $indexName
+   *
+   * @return \CRM_Core_DAO|object
+   */
+  public static function checkIfIndexExists($tableName, $indexName) {
+    $result = CRM_Core_DAO::executeQuery(
+      "SHOW INDEX FROM $tableName WHERE key_name = %1 AND seq_in_index = 1",
+      array(1 => array($indexName, 'String'))
+    );
+    if ($result->fetch()) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
