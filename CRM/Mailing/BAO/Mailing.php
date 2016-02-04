@@ -758,7 +758,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     if (!$this->templates) {
       $this->getHeaderFooter();
       $this->templates = array();
-      if ($this->body_text || property_exists($this->header, 'body_text') || property_exists($this->footer, 'body_text')) {
+      if ($this->body_text || !empty($this->header)) {
         $template = array();
         if ($this->header->body_text) {
           $template[] = $this->header->body_text;
