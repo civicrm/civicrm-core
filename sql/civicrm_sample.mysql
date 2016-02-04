@@ -139,8 +139,8 @@ INSERT INTO `civicrm_dashboard`
     VALUES
     ( @domain_id, 'report/6', ''       , 'civicrm/report/instance/6?reset=1&section=1&snippet=5&charts=barChart',  'access CiviContribute', 'AND', 0, 0,'1', 4, '1', 'civicrm/report/instance/6?reset=1&section=1&snippet=5&charts=barChart&context=dashletFullscreen'),
     ( @domain_id, 'report/13', ''            , 'civicrm/report/instance/13?reset=1&section=2&snippet=5',                 'access CiviContribute', 'AND', 0, 0,'1', 5, '1', 'civicrm/report/instance/13?reset=1&section=2&snippet=5&context=dashletFullscreen'),
-    ( @domain_id, 'report/25', '', 'civicrm/report/instance/25?reset=1&section=1&snippet=5&charts=pieChart', 'access CiviEvent'     , 'AND', 0, 0,'1', 6, '1', 'civicrm/report/instance/25?reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/20', ''  , 'civicrm/report/instance/20?reset=1&section=2&snippet=5',                 'access CiviMember'    , 'AND', 0, 0,'1', 7, '1', 'civicrm/report/instance/20?reset=1&section=2&snippet=5&context=dashletFullscreen');
+    ( @domain_id, 'report/26', '', 'civicrm/report/instance/26?reset=1&section=1&snippet=5&charts=pieChart', 'access CiviEvent'     , 'AND', 0, 0,'1', 6, '1', 'civicrm/report/instance/26?reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/21', ''  , 'civicrm/report/instance/21?reset=1&section=2&snippet=5',                 'access CiviMember'    , 'AND', 0, 0,'1', 7, '1', 'civicrm/report/instance/21?reset=1&section=2&snippet=5&context=dashletFullscreen');
 
 -- INSERT sample data for membership
 

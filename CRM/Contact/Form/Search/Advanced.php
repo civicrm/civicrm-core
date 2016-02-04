@@ -465,7 +465,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * @param int $id
    * @param array $formValues
    */
-  public function tempFixFormValues($id, &$formValues) {
+  public function tempFixFormValues($id, $formValues) {
     foreach ($formValues as $index => $formValue) {
       if (is_array($formValue) && isset($formValue[1])) {
         if ($formValue[1] == 'IN') {

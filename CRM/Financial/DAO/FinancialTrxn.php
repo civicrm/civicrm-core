@@ -201,11 +201,13 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Transaction ID') ,
           'required' => true,
         ) ,
         'from_financial_account_id' => array(
           'name' => 'from_financial_account_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Transaction From Account') ,
           'description' => 'FK to financial_account table.',
           'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
           'html' => array(
@@ -220,6 +222,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'to_financial_account_id' => array(
           'name' => 'to_financial_account_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Transaction To Account') ,
           'description' => 'FK to financial_financial_account table.',
           'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
           'html' => array(
@@ -234,14 +237,14 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'trxn_date' => array(
           'name' => 'trxn_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Trxn Date') ,
+          'title' => ts('Financial Transaction Date') ,
           'description' => 'date transaction occurred',
           'default' => 'NULL',
         ) ,
         'total_amount' => array(
           'name' => 'total_amount',
           'type' => CRM_Utils_Type::T_MONEY,
-          'title' => ts('Total Amount') ,
+          'title' => ts('Financial Total Amount') ,
           'description' => 'amount of transaction',
           'required' => true,
           'precision' => array(
@@ -252,7 +255,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'fee_amount' => array(
           'name' => 'fee_amount',
           'type' => CRM_Utils_Type::T_MONEY,
-          'title' => ts('Fee Amount') ,
+          'title' => ts('Financial Fee Amount') ,
           'description' => 'actual processor fee if known - may be 0.',
           'precision' => array(
             20,
@@ -262,7 +265,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'net_amount' => array(
           'name' => 'net_amount',
           'type' => CRM_Utils_Type::T_MONEY,
-          'title' => ts('Net Amount') ,
+          'title' => ts('Financial Net Amount') ,
           'description' => 'actual funds transfer amount. total less fees. if processor does not report actual fee during transaction, this is set to total_amount.',
           'precision' => array(
             20,
@@ -272,7 +275,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'currency' => array(
           'name' => 'currency',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Currency') ,
+          'title' => ts('Financial Currency') ,
           'description' => '3 character string, value from config setting or input via user.',
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
@@ -295,6 +298,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'trxn_id' => array(
           'name' => 'trxn_id',
           'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Transaction ID') ,
           'description' => 'user-specified unique processor transaction id, bank id + trans id,... depending on payment_method',
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
@@ -302,7 +306,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'trxn_result_code' => array(
           'name' => 'trxn_result_code',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Trxn Result Code') ,
+          'title' => ts('Transaction result Code') ,
           'description' => 'processor result code',
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
@@ -321,13 +325,14 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'payment_processor_id' => array(
           'name' => 'payment_processor_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Processor') ,
           'description' => 'Payment Processor for this financial transaction',
           'FKClassName' => 'CRM_Financial_DAO_PaymentProcessor',
         ) ,
         'financial_trxn_payment_instrument_id' => array(
           'name' => 'payment_instrument_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Payment Instrument') ,
+          'title' => ts('Payment Method') ,
           'description' => 'FK to payment_instrument option group values',
           'html' => array(
             'type' => 'Select',

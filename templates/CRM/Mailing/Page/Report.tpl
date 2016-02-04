@@ -145,15 +145,13 @@
 <th><a href="{$report.event_totals.links.clicks}">{ts}Clicks{/ts}</a></th>
 <th><a href="{$report.event_totals.links.clicks_unique}">{ts}Unique Clicks{/ts}</a></th>
 <th>{ts}Success Rate{/ts}</th>
-<th>{ts}URL{/ts}</th>
-<th>{ts}Report{/ts}</th></tr>
+<th>{ts}URL{/ts}</th></tr>
 {foreach from=$report.click_through item=row}
 <tr class="{cycle values="odd-row,even-row"}">
 <td>{if $row.clicks > 0}<a href="{$row.link}">{$row.clicks}</a>{else}{$row.clicks}{/if}</td>
 <td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
 <td>{$row.rate|string_format:"%0.2f"}%</td>
 <td><a href="{$row.url}">{$row.url}</a></td>
-<td><a href="{$row.report}">Report</a></td>
 </tr>
 {/foreach}
 </table>

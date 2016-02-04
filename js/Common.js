@@ -421,7 +421,7 @@ CRM.strings = CRM.strings || {};
         selectParams = {};
       $el.data('api-entity', entity);
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
-      $el.data('api-params', $.extend({}, $el.data('api-params') || {}, options.api));
+      $el.data('api-params', $.extend(true, {}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
       $el.addClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref');
       var settings = {

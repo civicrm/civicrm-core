@@ -219,6 +219,7 @@ class CRM_Member_BAO_Query {
           $value = array('IN' => explode(',', $value));
         }
 
+
       case 'membership_status':
       case 'membership_status_id':
       case 'membership_type':
@@ -228,15 +229,15 @@ class CRM_Member_BAO_Query {
         }
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
-          $qillName = 'Membership Status(s)';
+          $qillName = ts('Membership Status');
         }
         elseif ($name == 'member_id') {
           $name = 'id';
-          $qillName = 'Membership ID';
+          $qillName = ts('Membership ID');
         }
         else {
           $name = 'membership_type_id';
-          $qillName = 'Membership Type(s)';
+          $qillName = ts('Membership Type');
         }
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.$name",
           $op,
@@ -244,11 +245,7 @@ class CRM_Member_BAO_Query {
           "Integer"
         );
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Member_DAO_Membership', $name, $value, $op);
-        $query->_qill[$grouping][] = ts('%1 %2 %3', array(
-          1 => $qillName,
-          2 => $op,
-          3 => $value,
-        ));
+        $query->_qill[$grouping][] = $qillName . ' ' . $op . ' ' . $value;
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
@@ -430,7 +427,7 @@ class CRM_Member_BAO_Query {
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
-    $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL,NULL,'label',FALSE,FALSE);
+    $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label', FALSE, FALSE);
     $form->add('select', 'membership_status_id', ts('Membership Status(s)'), $membershipStatus, FALSE, array(
       'id' => 'membership_status_id',
       'multiple' => 'multiple',

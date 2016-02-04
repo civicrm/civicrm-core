@@ -289,7 +289,7 @@ class CRM_Utils_Mail_EmailProcessor {
                 $text = $mail->body->text;
               }
               elseif ($mail->body instanceof ezcMailMultipart) {
-               if ($mail->body instanceof ezcMailMultipartReport) {
+                if ($mail->body instanceof ezcMailMultipartReport) {
                   $part = $mail->body->getMachinePart();
                   if ($part instanceof ezcMailDeliveryStatus) {
                     foreach ($part->recipients as $rec) {

@@ -100,6 +100,8 @@ INSERT INTO `civicrm_dashboard`
     ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`)
     VALUES
     ( @domainID, 'blog', '', 'civicrm/dashlet/blog?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/blog?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
+    ( @domainID, 'getting-started', '', 'civicrm/dashlet/getting-started?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/getting-started?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
+
     ( @domainID, 'activity', '', 'civicrm/dashlet/activity?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 1, 'civicrm/dashlet/activity?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
     ( @domainID, 'myCases', '', 'civicrm/dashlet/myCases?reset=1&snippet=5', 'access my cases and activities', NULL , 0, 0, 1, 2, 'civicrm/dashlet/myCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
     ( @domainID, 'allCases', '', 'civicrm/dashlet/allCases?reset=1&snippet=5', 'access all cases and activities', NULL , 0, 0, 1, 3, 'civicrm/dashlet/allCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
@@ -452,21 +454,22 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, 'civicrm/admin/setting/component?reset=1', '', 'Enable Components',                                 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/extensions?reset=1',        '', 'Manage Extensions', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 2 ),
-    ( @domainID, 'civicrm/admin/setting/smtp?reset=1',                  '', 'Outbound Email',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/admin/paymentProcessor?reset=1',              '', 'Payment Processors',                           'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 4 ),
-    ( @domainID, 'civicrm/admin/setting/mapping?reset=1',               '', 'Mapping and Geocoding',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 5 ),
-    ( @domainID, 'civicrm/admin/setting/misc?reset=1',                  '', 'Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 6 ),
-    ( @domainID, 'civicrm/admin/setting/path?reset=1',                  '',        'Directories',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 7 ),
-    ( @domainID, 'civicrm/admin/setting/url?reset=1',                   '',      'Resource URLs',                                'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 8 ),
-    ( @domainID, 'civicrm/admin/setting/updateConfigBackend?reset=1',   '', 'Cleanup Caches and Update Paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 9 ),
-    ( @domainID, 'civicrm/admin/setting/uf?reset=1',                    '',    'CMS Integration',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 10 ),
-    ( @domainID, 'civicrm/admin/options/safe_file_extension?reset=1', '', 'Safe File Extensions','administer CiviCRM', '',@systemSettingslastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/options?reset=1',                       '', 'Option Groups',                                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 12 ),
-    ( @domainID, 'civicrm/admin/mapping?reset=1',                       '', 'Import/Export Mappings',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 13 ),
-    ( @domainID, 'civicrm/admin/setting/debug?reset=1',                 '','Debugging and Error Handling',        'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 14 ),
-    ( @domainID, 'civicrm/admin/setting/preferences/multisite?reset=1', '', 'Multi Site Settings',                         'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 15 ),
-    ( @domainID, 'civicrm/admin/job?reset=1',                           '', 'Scheduled Jobs',                                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 16 ),
-    ( @domainID, 'civicrm/admin/sms/provider?reset=1', '', 'SMS Providers',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 17 );
+    ( @domainID, 'civicrm/a/#/cxn',                                     '', 'Connections',                                         'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 3 ),
+    ( @domainID, 'civicrm/admin/setting/smtp?reset=1',                  '', 'Outbound Email',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 4 ),
+    ( @domainID, 'civicrm/admin/paymentProcessor?reset=1',              '', 'Payment Processors',                           'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 5 ),
+    ( @domainID, 'civicrm/admin/setting/mapping?reset=1',               '', 'Mapping and Geocoding',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 6 ),
+    ( @domainID, 'civicrm/admin/setting/misc?reset=1',                  '', 'Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 7 ),
+    ( @domainID, 'civicrm/admin/setting/path?reset=1',                  '',        'Directories',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 8 ),
+    ( @domainID, 'civicrm/admin/setting/url?reset=1',                   '',      'Resource URLs',                                'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 9 ),
+    ( @domainID, 'civicrm/admin/setting/updateConfigBackend?reset=1',   '', 'Cleanup Caches and Update Paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 10 ),
+    ( @domainID, 'civicrm/admin/setting/uf?reset=1',                    '',    'CMS Integration',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 11 ),
+    ( @domainID, 'civicrm/admin/options/safe_file_extension?reset=1', '', 'Safe File Extensions','administer CiviCRM', '',@systemSettingslastID, '1', NULL, 12 ),
+    ( @domainID, 'civicrm/admin/options?reset=1',                       '', 'Option Groups',                                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 13 ),
+    ( @domainID, 'civicrm/admin/mapping?reset=1',                       '', 'Import/Export Mappings',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 14 ),
+    ( @domainID, 'civicrm/admin/setting/debug?reset=1',                 '','Debugging and Error Handling',        'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 15 ),
+    ( @domainID, 'civicrm/admin/setting/preferences/multisite?reset=1', '', 'Multi Site Settings',                         'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 16 ),
+    ( @domainID, 'civicrm/admin/job?reset=1',                           '', 'Scheduled Jobs',                                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 17 ),
+    ( @domainID, 'civicrm/admin/sms/provider?reset=1', '', 'SMS Providers',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 18 );
 
 
 -- begin component admin menus

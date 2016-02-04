@@ -409,6 +409,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       FALSE, TRUE, TRUE, NULL, $queryOperator
     );
 
+    //CRM-17595, CRM-17596
+    //unset civicrm_activity to avoid inclusion of it in from clause if we are exporting case with custom fields.
+    if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT && preg_grep('/^custom_/', array_keys($query->_select))) {
+      unset($query->_tables['civicrm_activity']);
+    }
+
     //sort by state
     //CRM-15301
     $query->_sort = $order;
@@ -569,8 +575,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $where .= " AND contact_a.is_deleted != 1";
     }
 
-    $queryString = "$select $from $where $having";
-
     $groupBy = "";
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
       CRM_Utils_Array::value('notes', $returnProperties) ||
@@ -596,7 +600,15 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       case CRM_Export_Form_Select::MEMBER_EXPORT:
         $groupBy = " GROUP BY civicrm_membership.id";
         break;
+
+      case CRM_Export_Form_Select::CASE_EXPORT:
+        //CRM-17595, CRM-17596 - replace civicrm_activity.id with case_activity.id if custom fields are included in export
+        if (preg_grep('/^custom_/', array_keys($query->_select))) {
+          $from = str_replace('`civicrm_activity`.id', '`case_activity`.id', $from);
+        }
+        break;
     }
+    $queryString = "$select $from $where $having";
 
     if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
       $groupBy = " GROUP BY civicrm_activity.id ";
@@ -1348,7 +1360,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             $sqlColumns[$fieldName] = "$fieldName varchar({$query->_fields[$field]['maxlength']})";
           }
           else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+            $sqlColumns[$fieldName] = "$fieldName varchar(64)";
           }
           break;
 
@@ -1423,12 +1435,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 break;
 
               default:
-                $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+                $sqlColumns[$fieldName] = "$fieldName varchar(64)";
                 break;
             }
           }
           else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+            $sqlColumns[$fieldName] = "$fieldName varchar(64)";
           }
         }
       }

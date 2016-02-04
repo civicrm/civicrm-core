@@ -1125,16 +1125,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    */
   public static function getDisplayValue($value, $id, &$options, $contactID = NULL, $fieldID = NULL) {
     $option = &$options[$id];
-    $attributes = &$option['attributes'];
-    $html_type = $attributes['html_type'];
-    $data_type = $attributes['data_type'];
-    $format = CRM_Utils_Array::value('format', $attributes);
+    $field = self::getFieldObject($id);
 
     return self::getDisplayValueCommon($value,
       $option,
-      $html_type,
-      $data_type,
-      $format,
+      $field->html_type,
+      $field->data_type,
+      NULL,
       $contactID,
       $fieldID
     );
@@ -1177,16 +1174,19 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     switch ($html_type) {
       case 'Radio':
         if ($data_type == 'Boolean') {
-          $option = array('No', 'Yes');
+          $options = array('No', 'Yes');
+        }
+        else {
+          $options = $option;
         }
         if (is_array($value)) {
           $display = NULL;
           foreach ($value as $data) {
-            $display .= $display ? ', ' . $option[$data] : $option[$data];
+            $display .= $display ? ', ' . $options[$data] : $options[$data];
           }
         }
         else {
-          $display = CRM_Utils_Array::value($value, $option);
+          $display = CRM_Utils_Array::value($value, $options);
         }
         break;
 

@@ -159,7 +159,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addElement('text', 'sort_name', ts('Member Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+    $this->addSortNameField();
 
     CRM_Member_BAO_Query::buildSearchForm($this);
 
@@ -174,6 +174,28 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       $this->addTaskMenu(CRM_Member_Task::permissionedTaskTitles($permission));
     }
 
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is on.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithEmail() {
+    return ts('Member Name or Email');
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is off.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithOutEmail() {
+    return ts('Member Name');
   }
 
   /**
@@ -285,7 +307,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     );
     if ($status) {
       $status = explode(',', $status);
-      $this->_formValues['status_id'] = $this->_defaults['status_id'] = (array) $status;
+      $this->_formValues['membership_status_id'] = $this->_defaults['membership_status_id'] = (array) $status;
     }
 
     $membershipType = CRM_Utils_Request::retrieve('type', 'String',

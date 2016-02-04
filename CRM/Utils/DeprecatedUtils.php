@@ -76,12 +76,7 @@ function _civicrm_api3_deprecated_participant_formatted_param($params, &$values,
             if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
               (strtolower(trim($customValue)) == strtolower(trim($v1)))
             ) {
-              if ($type == 'CheckBox') {
-                $values[$key][$customValue] = 1;
-              }
-              else {
-                $values[$key][] = $customValue;
-              }
+              $values[$key][] = $customValue;
             }
           }
         }
@@ -252,12 +247,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
             if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
               (strtolower($customValue) == strtolower(trim($v1)))
             ) {
-              if ($type == 'CheckBox') {
-                $values[$key][$customValue] = 1;
-              }
-              else {
-                $values[$key][] = $customValue;
-              }
+              $values[$key][] = $customValue;
             }
           }
         }
@@ -305,17 +295,38 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         //import contribution record according to select contact type
         require_once 'CRM/Contact/DAO/Contact.php';
         $contactType = new CRM_Contact_DAO_Contact();
+        $contactId = CRM_Utils_Array::value('contribution_contact_id', $params);
+        $externalId = CRM_Utils_Array::value('external_identifier', $params);
+        $email = CRM_Utils_Array::value('email', $params);
         //when insert mode check contact id or external identifier
-        if (!empty($params['contribution_contact_id']) || !empty($params['external_identifier'])) {
-          if (!empty($params['contribution_contact_id'])) {
-            $contactType->id = CRM_Utils_Array::value('contribution_contact_id', $params);
-          }
-          elseif (!empty($params['external_identifier'])) {
-            $contactType->external_identifier = $params['external_identifier'];
-          }
+        if ($contactId || $externalId) {
+          $contactType->id = $contactId;
+          $contactType->external_identifier = $externalId;
           if ($contactType->find(TRUE)) {
             if ($params['contact_type'] != $contactType->contact_type) {
               return civicrm_api3_create_error("Contact Type is wrong: $contactType->contact_type");
+            }
+          }
+        }
+        elseif ($email) {
+          if (!CRM_Utils_Rule::email($email)) {
+            return civicrm_api3_create_error("Invalid email address $email provided. Row was skipped");
+          }
+
+          // get the contact id from duplicate contact rule, if more than one contact is returned
+          // we should return error, since current interface allows only one-one mapping
+          $emailParams = array('email' => $email, 'contact_type' => $params['contact_type']);
+          $checkDedupe = _civicrm_api3_deprecated_duplicate_formatted_contact($emailParams);
+          if (!$checkDedupe['is_error']) {
+            return civicrm_api3_create_error("Invalid email address(doesn't exist) $email. Row was skipped");
+          }
+          else {
+            $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
+            if (count($matchingContactIds) > 1) {
+              return civicrm_api3_create_error("Invalid email address(duplicate) $email. Row was skipped");
+            }
+            elseif (count($matchingContactIds) == 1) {
+              $params['contribution_contact_id'] = $matchingContactIds[0];
             }
           }
         }
@@ -344,9 +355,6 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         else {
           if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
             return civicrm_api3_create_error("Empty Contribution and Invoice and Transaction ID. Row was skipped.");
-          }
-          else {
-            return civicrm_api3_create_error("Empty Contact and External ID. Row was skipped.");
           }
         }
         break;
@@ -712,12 +720,7 @@ function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $
             if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
               (strtolower(trim($customValue)) == strtolower(trim($v1)))
             ) {
-              if ($type == 'CheckBox') {
-                $values[$key][$customValue] = 1;
-              }
-              else {
-                $values[$key][] = $customValue;
-              }
+              $values[$key][] = $customValue;
             }
           }
         }

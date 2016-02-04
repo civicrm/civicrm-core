@@ -76,8 +76,8 @@ require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
 // Load civicrm database config
-if (isset($_REQUEST['mysql'])) {
-  $databaseConfig = $_REQUEST['mysql'];
+if (isset($_POST['mysql'])) {
+  $databaseConfig = $_POST['mysql'];
 }
 else {
   $databaseConfig = array(
@@ -90,8 +90,8 @@ else {
 
 if ($installType == 'drupal') {
   // Load drupal database config
-  if (isset($_REQUEST['drupal'])) {
-    $drupalConfig = $_REQUEST['drupal'];
+  if (isset($_POST['drupal'])) {
+    $drupalConfig = $_POST['drupal'];
   }
   else {
     $drupalConfig = array(
@@ -104,7 +104,7 @@ if ($installType == 'drupal') {
 }
 
 $loadGenerated = 0;
-if (isset($_REQUEST['loadGenerated'])) {
+if (isset($_POST['loadGenerated'])) {
   $loadGenerated = 1;
 }
 
@@ -134,6 +134,9 @@ global $tsLocale;
 $tsLocale = 'en_US';
 $seedLanguage = 'en_US';
 
+// CRM-16801 This validates that seedLanguage is valid by looking in $langs.
+// NB: the variable is initial a $_REQUEST for the initial page reload,
+// then becomes a $_POST when the installation form is submitted.
 if (isset($_REQUEST['seedLanguage']) and isset($langs[$_REQUEST['seedLanguage']])) {
   $seedLanguage = $_REQUEST['seedLanguage'];
   $tsLocale = $_REQUEST['seedLanguage'];
@@ -261,14 +264,14 @@ if ($databaseConfig) {
 }
 
 // Actual processor
-if (isset($_REQUEST['go']) && !$req->hasErrors() && !$dbReq->hasErrors()) {
+if (isset($_POST['go']) && !$req->hasErrors() && !$dbReq->hasErrors()) {
   // Confirm before reinstalling
-  if (!isset($_REQUEST['force_reinstall']) && $alreadyInstalled) {
+  if (!isset($_POST['force_reinstall']) && $alreadyInstalled) {
     include $installDirPath . 'template.html';
   }
   else {
     $inst = new Installer();
-    $inst->install($_REQUEST);
+    $inst->install($_POST);
   }
 
   // Show the config form

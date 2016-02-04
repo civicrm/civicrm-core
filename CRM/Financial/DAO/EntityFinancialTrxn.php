@@ -145,6 +145,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Entity Financial Transaction ID') ,
           'description' => 'ID',
           'required' => true,
         ) ,
@@ -165,11 +166,13 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO
         'entity_id' => array(
           'name' => 'entity_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Entity ID') ,
           'required' => true,
         ) ,
         'financial_trxn_id' => array(
           'name' => 'financial_trxn_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Transaction Id') ,
           'FKClassName' => 'CRM_Financial_DAO_FinancialTrxn',
         ) ,
         'amount' => array(

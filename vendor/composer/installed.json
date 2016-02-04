@@ -40,6 +40,81 @@
         ]
     },
     {
+        "name": "phenx/php-font-lib",
+        "version": "0.2.2",
+        "version_normalized": "0.2.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/PhenX/php-font-lib.git",
+            "reference": "c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82",
+            "reference": "c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82",
+            "shasum": ""
+        },
+        "time": "2014-02-01 15:22:28",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "classes/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Ménager",
+                "email": "fabien.menager@gmail.com"
+            }
+        ],
+        "description": "A library to read, parse, export and make subsets of different types of font files.",
+        "homepage": "https://github.com/PhenX/php-font-lib"
+    },
+    {
+        "name": "totten/ca-config",
+        "version": "v13.02.0",
+        "version_normalized": "13.02.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/totten/ca_config.git",
+            "reference": "7a51033f4e18c1ac846a16c6de16050e735b01cf"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/totten/ca_config/zipball/7a51033f4e18c1ac846a16c6de16050e735b01cf",
+            "reference": "7a51033f4e18c1ac846a16c6de16050e735b01cf",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2"
+        },
+        "time": "2013-02-13 03:40:18",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "CA_Config": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-2-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Tim Otten",
+                "email": "to-git@think.hm"
+            }
+        ],
+        "description": "Default configuration for certificate authorities",
+        "homepage": "https://github.com/totten/ca_config"
+    },
+    {
         "name": "phpseclib/phpseclib",
         "version": "0.3.10",
         "version_normalized": "0.3.10.0",
@@ -138,127 +213,6 @@
             "x.509",
             "x509"
         ]
-    },
-    {
-        "name": "civicrm/civicrm-cxn-rpc",
-        "version": "v0.15.07.27",
-        "version_normalized": "0.15.07.27",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-            "reference": "b6738943aec5b94be5bdc157453142c87851b684"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/b6738943aec5b94be5bdc157453142c87851b684",
-            "reference": "b6738943aec5b94be5bdc157453142c87851b684",
-            "shasum": ""
-        },
-        "require": {
-            "phpseclib/phpseclib": "0.3.*",
-            "psr/log": "1.0.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "3.7.*"
-        },
-        "time": "2015-07-28 02:17:20",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Civi\\Cxn\\Rpc\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Tim Otten",
-                "email": "totten@civicrm.org"
-            }
-        ],
-        "description": "RPC library for CiviConnect"
-    },
-    {
-        "name": "phenx/php-font-lib",
-        "version": "0.2.2",
-        "version_normalized": "0.2.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/PhenX/php-font-lib.git",
-            "reference": "c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82",
-            "reference": "c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82",
-            "shasum": ""
-        },
-        "time": "2014-02-01 15:22:28",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "classes/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Ménager",
-                "email": "fabien.menager@gmail.com"
-            }
-        ],
-        "description": "A library to read, parse, export and make subsets of different types of font files.",
-        "homepage": "https://github.com/PhenX/php-font-lib"
-    },
-    {
-        "name": "dompdf/dompdf",
-        "version": "v0.6.1",
-        "version_normalized": "0.6.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/dompdf/dompdf.git",
-            "reference": "cf7d8a0a27270418850cc7d7ea532159e5eeb3eb"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/dompdf/dompdf/zipball/cf7d8a0a27270418850cc7d7ea532159e5eeb3eb",
-            "reference": "cf7d8a0a27270418850cc7d7ea532159e5eeb3eb",
-            "shasum": ""
-        },
-        "require": {
-            "phenx/php-font-lib": "0.2.*"
-        },
-        "time": "2014-03-11 01:59:52",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "include/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Ménager",
-                "email": "fabien.menager@gmail.com"
-            },
-            {
-                "name": "Brian Sweeney",
-                "email": "eclecticgeek@gmail.com"
-            }
-        ],
-        "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
-        "homepage": "https://github.com/dompdf/dompdf"
     },
     {
         "name": "symfony/dependency-injection",
@@ -476,42 +430,88 @@
         "homepage": "https://symfony.com"
     },
     {
-        "name": "totten/ca-config",
-        "version": "v13.02.0",
-        "version_normalized": "13.02.0.0",
+        "name": "civicrm/civicrm-cxn-rpc",
+        "version": "v0.15.12.04",
+        "version_normalized": "0.15.12.04",
         "source": {
             "type": "git",
-            "url": "https://github.com/totten/ca_config.git",
-            "reference": "7a51033f4e18c1ac846a16c6de16050e735b01cf"
+            "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
+            "reference": "6e3a0f956860908a240758ab8c80a020549a6f03"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/totten/ca_config/zipball/7a51033f4e18c1ac846a16c6de16050e735b01cf",
-            "reference": "7a51033f4e18c1ac846a16c6de16050e735b01cf",
+            "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/6e3a0f956860908a240758ab8c80a020549a6f03",
+            "reference": "6e3a0f956860908a240758ab8c80a020549a6f03",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.2"
+            "phpseclib/phpseclib": "0.3.*",
+            "psr/log": "1.0.0"
         },
-        "time": "2013-02-13 03:40:18",
+        "require-dev": {
+            "phpunit/phpunit": "3.7.*"
+        },
+        "time": "2015-12-05 04:41:02",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
-            "psr-0": {
-                "CA_Config": "src/"
+            "psr-4": {
+                "Civi\\Cxn\\Rpc\\": "src/"
             }
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-            "BSD-2-Clause"
+            "MIT"
         ],
         "authors": [
             {
                 "name": "Tim Otten",
-                "email": "to-git@think.hm"
+                "email": "totten@civicrm.org"
             }
         ],
-        "description": "Default configuration for certificate authorities",
-        "homepage": "https://github.com/totten/ca_config"
+        "description": "RPC library for CiviConnect"
+    },
+    {
+        "name": "dompdf/dompdf",
+        "version": "v0.6.2",
+        "version_normalized": "0.6.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/dompdf/dompdf.git",
+            "reference": "cc06008f75262510ee135b8cbb14e333a309f651"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/dompdf/dompdf/zipball/cc06008f75262510ee135b8cbb14e333a309f651",
+            "reference": "cc06008f75262510ee135b8cbb14e333a309f651",
+            "shasum": ""
+        },
+        "require": {
+            "phenx/php-font-lib": "0.2.*"
+        },
+        "time": "2015-12-07 04:07:13",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "include/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Ménager",
+                "email": "fabien.menager@gmail.com"
+            },
+            {
+                "name": "Brian Sweeney",
+                "email": "eclecticgeek@gmail.com"
+            }
+        ],
+        "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
+        "homepage": "https://github.com/dompdf/dompdf"
     }
 ]

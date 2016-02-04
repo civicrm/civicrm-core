@@ -942,7 +942,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       'version' => 3,
     ));
 
-    if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Relationship already exists') {
+    if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Duplicate Relationship') {
       throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
     }
 
@@ -1474,11 +1474,10 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     $query = 'SELECT * FROM `civicrm_membership_status`';
     if ($active) {
-      $query .= 'WHERE `is_current_member` = 1 OR `id` = %1 ';
+      $query .= ' WHERE `is_current_member` = 1 OR `id` = %1 ';
     }
 
-    $params[1] = array($pendingStatusId, 'String');
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($pendingStatusId, 'Integer')));
 
     while ($dao->fetch()) {
       $membershipStatusRecordIds[$dao->id] = $dao->id;
