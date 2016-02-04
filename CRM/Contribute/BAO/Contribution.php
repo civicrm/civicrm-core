@@ -3346,14 +3346,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $itemAmount = $trxnID = NULL;
     //get all the statuses
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
-        || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus))
+    $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
+    if (($previousContributionStatus == 'Pending'
+        || $previousContributionStatus == 'In Progress')
       && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
       && $context == 'changePaymentInstrument'
     ) {
       return;
     }
-    if (($params['prevContribution']->contribution_status_id == array_search('Partially paid', $contributionStatus))
+    if (($previousContributionStatus == 'Partially paid')
       && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
       && $context == 'changedStatus'
     ) {
@@ -3366,7 +3367,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       //get all the statuses
       $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $cancelledTaxAmount = 0;
-      if ($params['prevContribution']->contribution_status_id == array_search('Completed', $contributionStatus)
+      if ($previousContributionStatus == 'Completed'
         && ($params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
           || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))
       ) {
@@ -3377,8 +3378,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
         }
       }
-      elseif (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
-          && $params['prevContribution']->is_pay_later) || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)
+      elseif (($previousContributionStatus == 'Pending'
+          && $params['prevContribution']->is_pay_later) || $previousContributionStatus == 'In Progress'
       ) {
         $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
@@ -3413,8 +3414,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if ($context == 'changedStatus') {
-      if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
-          || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus))
+      if (($previousContributionStatus == 'Pending'
+          || $previousContributionStatus == 'In Progress')
         && ($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))
       ) {
         if (empty($params['line_item'])) {
