@@ -192,7 +192,10 @@
     <type>int unsigned</type>
     <import>true</import>
     <export>true</export>
-    <comment>pseudo FK to civicrm_option_value of financial_item status option_group</comment>
+    <pseudoconstant>
+      <optionGroupName>contribution_status</optionGroupName>
+    </pseudoconstant>
+    <comment>pseudo FK to civicrm_option_value of contribution_status_id option_group</comment>
     <headerPattern>/status/i</headerPattern>
     <add>4.3</add>
   </field>
