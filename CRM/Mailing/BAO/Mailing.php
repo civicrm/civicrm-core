@@ -763,7 +763,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         if (!empty($this->header->body_text)) {
           $template[] = $this->header->body_text;
         }
-        else {
+        elseif (!empty($this->header->body_html)) {
           $template[] = CRM_Utils_String::htmlToText($this->header->body_html);
         }
 
@@ -777,7 +777,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         if (!empty($this->footer->body_text)) {
           $template[] = $this->footer->body_text;
         }
-        else {
+        elseif (!empty($this->footer->body_html)) {
           $template[] = CRM_Utils_String::htmlToText($this->footer->body_html);
         }
 
