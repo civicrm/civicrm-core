@@ -51,12 +51,7 @@
      {else}
        {assign var='entity' value=$component}
      {/if}
-    {if $suppressPaymentFormButtons}
-      {ts 1=$entity}No payments found for this %1 record{/ts}
-    {else}
-      {* Am unsure where this appears so unsure if above text could apply *}
-      {ts 1=$entity}No Additional payments found for this %1 record{/ts}
-    {/if}
+     {ts 1=$entity}No payments found for this %1 record{/ts}
   {/if}
   {if !$suppressPaymentFormButtons}
     <div class="crm-submit-buttons">
