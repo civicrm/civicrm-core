@@ -1068,6 +1068,45 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Refund a contribution for a financial type with a contra account.
+   *
+   * CRM-17951 the contra account is a financial account with a relationship to a
+   * financial type. It is not always configured but should be reflected
+   * in the financial_trxn & financial_item table if it is.
+   */
+  public function testCreateUpdateRefundContributionConfiguredContraAccount() {
+    $financialAccount = $this->callAPISuccess('FinancialAccount', 'create', array(
+      'name' => 'Refund Account',
+      'is_active' => TRUE,
+    ));
+
+    $entityFinancialAccount = $this->callAPISuccess('EntityFinancialAccount', 'create', array(
+      'entity_id' => $this->_financialTypeId,
+      'entity_table' => 'civicrm_financial_type',
+      'account_relationship' => 'Credit/Contra Revenue Account is',
+      'financial_account_id' => 'Refund Account',
+    ));
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
+    $this->callAPISuccess('Contribution', 'create', array(
+      'id' => $contribution['id'],
+      'contribution_status_id' => 'Refunded',
+    ));
+
+    $lineItems = $this->callAPISuccessGetSingle(
+      'LineItem', array(
+      'contribution_id' => $contribution['id'],
+      'api.FinancialItem.getsingle' => array('amount' => array('<' => 0)),
+    ));
+    $this->assertEquals($financialAccount['id'], $lineItems['api.FinancialItem.getsingle']['financial_account_id']);
+
+    $this->callAPISuccess('Contribution', 'delete', array('id' => $contribution['id']));
+    $this->callAPISuccess('EntityFinancialAccount', 'delete', array('id' => $entityFinancialAccount['id']));
+    $this->callAPISuccess('FinancialAccount', 'delete', array('id' => $financialAccount['id']));
+
+  }
+
+  /**
    * Function tests that trxn_id is set when passed in.
    *
    * Here we ensure that the civicrm_financial_trxn.trxn_id & the civicrm_contribution.trxn_id are set

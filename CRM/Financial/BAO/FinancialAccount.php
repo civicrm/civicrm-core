@@ -200,4 +200,50 @@ WHERE cft.id = %1
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
+  /**
+   * Get the Financial Account for a Financial Type Relationship Combo.
+   *
+   * Note that some relationships are optionally configured - so far
+   * Chargeback and Credit / Contra. Since these are the only 2 currently Income
+   * is an appropriate fallback. In future it might make sense to extend the logic.
+   *
+   * Note that we avoid the CRM_Core_PseudoConstant function as it stores one
+   * account per financial type and is unreliable.
+   *
+   * @param int $financialTypeID
+   *
+   * @param string $relationshipType
+   *
+   * @return int
+   */
+  public static function getFinancialAccountForFinancialTypeByRelationship($financialTypeID, $relationshipType) {
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '{$relationshipType}' "));
+
+    if (!isset(Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId])) {
+      $accounts = civicrm_api3('EntityFinancialAccount', 'get', array(
+        'entity_id' => $financialTypeID,
+        'entity_table' => 'civicrm_financial_type',
+      ));
+
+      foreach ($accounts['values'] as $account) {
+        Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$account['account_relationship']] = $account['financial_account_id'];
+      }
+
+      $accountRelationships = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL);
+
+      $incomeAccountRelationshipID = array_search('Income Account is', $accountRelationships);
+      $incomeAccountFinancialAccountID = Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$incomeAccountRelationshipID];
+
+      foreach (array('Chargeback Account is', 'Credit/Contra Revenue Account is') as $optionalAccountRelationship) {
+
+        $accountRelationshipID = array_search($optionalAccountRelationship, $accountRelationships);
+        if (empty(Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$accountRelationshipID])) {
+          Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$accountRelationshipID] =  $incomeAccountFinancialAccountID;
+        }
+      }
+
+    }
+    return Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId];
+  }
+
 }
