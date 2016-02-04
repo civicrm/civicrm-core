@@ -50,11 +50,11 @@
   {/if}
 {else}
   <div class="crm-section crm-petition-contact-profile">
-    {include file="CRM/Campaign/Form/Petition/Block.tpl" fields=$petitionContactProfile}
+    {include file="CRM/UF/Form/Block.tpl" fields=$petitionContactProfile hideFieldset=true}
   </div>
 
   <div class="crm-section crm-petition-activity-profile">
-    {include file="CRM/Campaign/Form/Petition/Block.tpl" fields=$petitionActivityProfile}
+    {include file="CRM/UF/Form/Block.tpl" fields=$petitionActivityProfile hideFieldset=true}
   </div>
 
   {if $isCaptcha}
