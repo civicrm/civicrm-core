@@ -137,7 +137,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
       $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
+      // @todo - should we include Chargeback? If so use self::isContributionStatusNegative($params['contribution_status_id'])
       if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
         || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
       ) {
@@ -3122,7 +3122,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
-      if ($contributionStatus == 'Refunded') {
+      if ($contributionStatus == 'Refunded' || $contributionStatus == 'Chargeback') {
         $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
         if (isset($params['refund_trxn_id'])) {
           // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
@@ -3370,8 +3370,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $cancelledTaxAmount = 0;
       if ($previousContributionStatus == 'Completed'
-        && ($params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
-          || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))
+        && (self::isContributionStatusNegative($params['contribution']->contribution_status_id))
       ) {
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
         $cancelledTaxAmount = CRM_Utils_Array::value('tax_amount', $params, '0.00');
@@ -3480,9 +3479,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $currency = $params['contribution']->currency;
           }
           $diff = 1;
-          if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)
-            || $params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
-            ) {
+          if ($context == 'changeFinancialType' || self::isContributionStatusNegative($params['contribution']->contribution_status_id)) {
             $diff = -1;
           }
           if (!empty($params['is_quick_config'])) {
@@ -3532,6 +3529,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
+   * Is this contribution status a reversal.
+   *
+   * If so we would expect to record a negative value in the financial_trxn table.
+   *
+   * @param int $status_id
+   *
+   * @return bool
+   */
+  public static function isContributionStatusNegative($status_id) {
+    $reversalStatuses = array('Cancelled', 'Chargeback', 'Refunded');
+    return in_array(CRM_Contribute_PseudoConstant::contributionStatus($status_id, 'name'), $reversalStatuses);
+  }
+
+  /**
    * Check status validation on update of a contribution.
    *
    * @param array $values
@@ -3555,7 +3566,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $checkStatus = array(
       'Cancelled' => array('Completed', 'Refunded'),
-      'Completed' => array('Cancelled', 'Refunded'),
+      'Completed' => array('Cancelled', 'Refunded', 'Chargeback'),
       'Pending' => array('Cancelled', 'Completed', 'Failed'),
       'In Progress' => array('Cancelled', 'Completed', 'Failed'),
       'Refunded' => array('Cancelled', 'Completed'),
