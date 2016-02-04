@@ -238,7 +238,7 @@ WHERE cft.id = %1
 
         $accountRelationshipID = array_search($optionalAccountRelationship, $accountRelationships);
         if (empty(Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$accountRelationshipID])) {
-          Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$accountRelationshipID] =  $incomeAccountFinancialAccountID;
+          Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$accountRelationshipID] = $incomeAccountFinancialAccountID;
         }
       }
 
