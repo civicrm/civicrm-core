@@ -161,6 +161,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_2($rev) {
     $this->addTask('Fix Index on civicrm_financial_item combined entity_id + entity_table', 'addCombinedIndexFinancialItemEntityIDEntityType');
+    $this->addTask('enable financial account relationships for chargeback & refund', 'addRefundAndChargeBackAccountsIfNotExist');
   }
 
   /**
@@ -450,6 +451,38 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_financial_item', 'IX_Entity');
     CRM_Core_BAO_SchemaHandler::createIndexes(array(
       'civicrm_financial_item' => array(array('entity_id', 'entity_table')),
+    ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-17951 Add accounts option values for refund and chargeback.
+   *
+   * Add Chargeback contribution status and Chargeback and Contra account relationships,
+   * checking first if one exists.
+   */
+  public function addRefundAndChargeBackAccountsIfNotExist() {
+    // First we enable and edit the record for Credit contra - this exists but is disabled for most sites.
+    // Using the ensure function (below) will not enabled a disabled option (by design).
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value v
+     INNER JOIN civicrm_option_group g on v.option_group_id=g.id and g.name='account_relationship'
+     SET v.is_active=1, v.label='Credit/Contra Revenue Account is', v.name='Credit/Contra Revenue Account is', v.description='Credit/Contra Revenue Account is'
+     WHERE v.name = 'Credit/Contra Account is';");
+
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
+      'option_group_id' => 'account_relationship',
+      'name' => 'Chargeback Account Is',
+      'label' => ts('Chargeback Account Is'),
+      'is_active' => TRUE,
+      'component_id' => 'CiviContribute',
+    ));
+
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
+      'option_group_id' => 'contribution_status',
+      'name' => 'Chargeback',
+      'label' => ts('Chargeback'),
+      'is_active' => TRUE,
+      'component_id' => 'CiviContribute',
     ));
     return TRUE;
   }
