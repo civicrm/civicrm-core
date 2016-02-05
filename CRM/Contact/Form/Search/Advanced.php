@@ -424,25 +424,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     }
 
     if ($this->_ssID && empty($_POST)) {
-      $specialFields = array('contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id');
-
-      foreach ($defaults as $element => $value) {
-        if (!empty($value) && is_array($value)) {
-          if (in_array($element, $specialFields)) {
-            $element = str_replace('member_membership_type_id', 'membership_type_id', $element);
-            $element = str_replace('member_status_id', 'membership_status_id', $element);
-            $defaults[$element] = array_keys($value);
-          }
-          // As per the OK (Operator as Key) value format, value array may contain key
-          // as an operator so to ensure the default is always set actual value
-          elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-            $defaults[$element] = CRM_Utils_Array::value(key($value), $value);
-            if (is_string($defaults[$element])) {
-              $defaults[$element] = str_replace("%", '', $defaults[$element]);
-            }
-          }
-        }
-      }
+      $defaults = array_merge($defaults, CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID));
     }
     return $defaults;
   }
