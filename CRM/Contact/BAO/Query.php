@@ -4504,6 +4504,7 @@ civicrm_relationship.is_permission_a_b = 0
       return TRUE;
     }
     return FALSE;
+  }
 
   /**
    * Has this field already been reformatting to Query object syntax.
