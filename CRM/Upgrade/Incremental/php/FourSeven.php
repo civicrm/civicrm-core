@@ -471,8 +471,8 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
 
     CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
       'option_group_id' => 'account_relationship',
-      'name' => 'Chargeback Account Is',
-      'label' => ts('Chargeback Account Is'),
+      'name' => 'Chargeback Account is',
+      'label' => ts('Chargeback Account is'),
       'is_active' => TRUE,
       'component_id' => 'CiviContribute',
     ));
