@@ -34,12 +34,11 @@ Dmitry Smirnov
 Elin Waring
 Emphanos LLC - Allen Shaw
 Esantanche
-Freeform Solutions - Lola Slade, Stephanie Gray
+Freeform Solutions - Lola Slade, Stephanie Gray, Herb van den Dool
 Future First - David Knoll, John Prescott
-Fuzion NZ - Chris Burgess, Eileen McNaughton, Peter Davis, Torrance Hodgeson
+Fuzion NZ - Chris Burgess, Eileen McNaughton, Peter Davis, Torrance Hodgson
 Giant Rabbit - Peter Haight
 Ginkgo Street Labs - Frank Gomez, Galata Tona, Michael Daryabeygi, Roshani Kothari, Toby Lounsbury
-Herb
 Jake Martin White
 Joanne Chester
 Joe McLaughlin
