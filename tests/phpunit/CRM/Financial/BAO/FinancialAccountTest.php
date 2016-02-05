@@ -31,12 +31,9 @@
 class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
   public function setUp() {
+    $this->useTransaction(TRUE);
     parent::setUp();
     $this->organizationCreate();
-  }
-
-  public function teardown() {
-    $this->financialAccountDelete('Donations');
   }
 
   /**
@@ -72,7 +69,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $ids = $defaults = array();
-    $contributionType = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    CRM_Financial_BAO_FinancialAccount::add($params);
 
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
 
@@ -137,6 +134,46 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountid, 'accounting_code', '4800');
     $accountingCode = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialType->id);
     $this->assertEquals($accountingCode, 4800, 'Verify accounting code.');
+  }
+
+  /**
+   * Test getting financial account for a given financial Type with a particular relationship.
+   */
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltIn() {
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Income Account Is'));
+  }
+
+  /**
+   * Test getting financial account for a given financial Type with a particular relationship.
+   */
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInRefunded() {
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account Is'));
+  }
+
+  /**
+   * Test getting financial account for a given financial Type with a particular relationship.
+   */
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInChargeBack() {
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Chargeback Account Is'));
+  }
+
+  /**
+   * Test getting financial account for a given financial Type with a particular relationship.
+   */
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipCustomAddedRefunded() {
+    $financialAccount = $this->callAPISuccess('FinancialAccount', 'create', array(
+      'name' => 'Refund Account',
+      'is_active' => TRUE,
+    ));
+
+    $this->callAPISuccess('EntityFinancialAccount', 'create', array(
+      'entity_id' => 2,
+      'entity_table' => 'civicrm_financial_type',
+      'account_relationship' => 'Credit/Contra Revenue Account is',
+      'financial_account_id' => 'Refund Account',
+    ));
+    $this->assertEquals($financialAccount['id'],
+      CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account is'));
   }
 
 }
