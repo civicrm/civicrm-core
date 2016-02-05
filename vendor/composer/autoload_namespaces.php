@@ -18,5 +18,6 @@ return array(
     'File' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Crypt' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Civi\\' => array($baseDir . '/', $baseDir . '/tests/phpunit'),
+    'Civi' => array($baseDir . '/'),
     'CA_Config' => array($vendorDir . '/totten/ca-config/src'),
 );

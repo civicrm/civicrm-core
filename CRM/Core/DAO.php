@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'PEAR.php';
@@ -99,8 +97,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param string $dsn
    *   The database connection string.
-   *
-   * @return void
    */
   public static function init($dsn) {
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
@@ -220,7 +216,7 @@ class CRM_Core_DAO extends DB_DataObject {
           break;
 
         case CRM_Utils_Type::T_TIME:
-          CRM_Core_Error::fatal('T_TIME shouldnt be used.');
+          CRM_Core_Error::fatal("T_TIME shouldn't be used.");
           //$object->$dbName='000000';
           //break;
         case CRM_Utils_Type::T_CCNUM:
@@ -267,11 +263,11 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Reset the DAO object. DAO is kinda crappy in that there is an unwritten
-   * rule of one query per DAO. We attempt to get around this crappy restricrion
-   * by resetting some of DAO's internal fields. Use this with caution
+   * Reset the DAO object.
    *
-   * @return void
+   * DAO is kinda crappy in that there is an unwritten rule of one query per DAO.
+   *
+   * We attempt to get around this crappy restriction by resetting some of DAO's internal fields. Use this with caution
    */
   public function reset() {
 
@@ -330,8 +326,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param object $factory
    *   The factory application object.
-   *
-   * @return void
    */
   public static function setFactory(&$factory) {
     self::$_factory = &$factory;
@@ -341,8 +335,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * Factory method to instantiate a new object from a table name.
    *
    * @param string $table
-   *
-   * @return void
    */
   public function factory($table = '') {
     if (!isset(self::$_factory)) {
@@ -355,8 +347,6 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Initialization for all DAO objects. Since we access DB_DO programatically
    * we need to set the links manually.
-   *
-   * @return void
    */
   public function initialize() {
     $this->_connect();
@@ -437,6 +427,8 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Save DAO object.
+   *
    * @return $this
    */
   public function save() {
@@ -571,8 +563,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *   The object that we are extracting data from.
    * @param array $values
    *   (reference ) associative array of name/value pairs.
-   *
-   * @return void
    */
   public static function storeValues(&$object, &$values) {
     $fields = &$object->fields();
@@ -1138,8 +1128,6 @@ FROM   civicrm_domain
    *   Name of the dao object.
    * @param int $contactId
    *   Id of the contact to delete.
-   *
-   * @return void
    */
   public static function deleteEntityContact($daoName, $contactId) {
     $object = new $daoName();
@@ -2390,7 +2378,7 @@ SELECT contact_id
     }
 
     // the string is longer than the length and we need a uniq string
-    // for the same tablename we need the same uniq string everytime
+    // for the same tablename we need the same uniq string every time
     // hence we use md5 on the string, which is not random
     // we'll append 8 characters to the end of the tableName
     $md5string = substr(md5($string), 0, 8);

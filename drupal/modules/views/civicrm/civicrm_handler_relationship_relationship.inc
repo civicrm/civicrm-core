@@ -22,7 +22,7 @@ class civicrm_handler_relationship_relationship extends views_handler_relationsh
 
     // relationshipType() returns information about relations as array with fields
     // 'name_a_b', 'name_b_a', 'contact_type_a' and 'contact_type_b'.
-    $options = array(0 => 'Any');
+    $options = array();
     foreach (CRM_Core_PseudoConstant::relationshipType('label') as $id => $info) {
       $options[$id] = "{$info['label_a_b']} | {$info['label_b_a']}";
     }
@@ -50,9 +50,10 @@ class civicrm_handler_relationship_relationship extends views_handler_relationsh
 
     $form['relationship_type'] = array(
       '#type' => 'select',
+      '#multiple' => TRUE,
       '#title' => 'Choose a specific relationship type',
       '#options' => self::$relationship_types,
-      '#description' => t('Use this drop down to limit this relatioship to a specific type of CiviCRM relationship'),
+      '#description' => t('Choose to limit this relationship to one or more specific types of CiviCRM relationship. Hold the Shift key to select or
       '#default_value' => $this->options['relationship_type'],
     );
     $form['relationship_state'] = array(
@@ -76,7 +77,6 @@ class civicrm_handler_relationship_relationship extends views_handler_relationsh
         'value' => $this->options['relationship_type'],
         'numeric' => TRUE,
         'field' => 'relationship_type_id',
-        'operator' => '=',
       );
     }
     // Specify the state of relationships to join

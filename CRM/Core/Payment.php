@@ -550,6 +550,24 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Query payment processor for details about a transaction.
+   *
+   * @param array $params
+   *   Array of parameters containing one of:
+   *   - trxn_id Id of an individual transaction.
+   *   - processor_id Id of a recurring contribution series as stored in the civicrm_contribution_recur table.
+   *
+   * @return array
+   *   Extra parameters retrieved.
+   *   Any parameters retrievable through this should be documented in the function comments at
+   *   CRM_Core_Payment::doQuery. Currently:
+   *   - fee_amount Amount of fee paid
+   */
+  public function doQuery($params) {
+    return array();
+  }
+
+  /**
    * This function checks to see if we have the right config values.
    *
    * @return string

@@ -49,13 +49,26 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    $caseEnabled = in_array("CiviCase", $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
       $this->engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
     }
-    $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE);
+    $components = CRM_Core_Component::getEnabledComponents();
+    foreach ($components as $componentName => $componentInfo) {
+      if (CRM_Core_Permission::check("access $componentName")) {
+        $accessAllowed[] = $componentInfo->componentID;
+      }
+    }
+
+    $include = '';
+    if (!empty($accessAllowed)) {
+      $include = 'OR v.component_id IN (' . implode(', ', $accessAllowed) . ')';
+    }
+    $condition = " AND ( v.component_id IS NULL {$include} )";
+    $this->activityTypes = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition);
     asort($this->activityTypes);
 
     $this->_columns = array(
@@ -246,6 +259,16 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         'fields' => array(),
       ),
     ) + $this->addressFields(TRUE);
+
+    if ($caseEnabled && CRM_Core_Permission::check('access all cases and activities')) {
+      $this->_columns['civicrm_activity']['filters']['include_case_activities'] = array(
+        'name' => 'include_case_activities',
+        'title' => ts('Include Case Activities'),
+        'type' => CRM_Utils_Type::T_INT,
+        'operatorType' => CRM_Report_Form::OP_SELECT,
+        'options' => array('0' => ts('No'), '1' => ts('Yes')),
+      );
+    }
 
     if ($campaignEnabled) {
       // Add display column and filter for Survey Results, Campaign and Engagement Index if CiviCampaign is enabled
@@ -509,10 +532,16 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                 CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
               );
+              if ($field['name'] == 'include_case_activities') {
+                $clause = NULL;
+              }
               if ($fieldName == 'activity_type_id' &&
                 empty($this->_params['activity_type_id_value'])
               ) {
-                $actTypes = array_flip(CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE));
+                if (empty($this->_params['include_case_activities_value'])) {
+                  $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE);
+                }
+                $actTypes = array_flip($this->activityTypes);
                 $clause = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (" .
                   implode(',', $actTypes) . ") )";
               }
@@ -635,6 +664,29 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     }
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
+  public static function formRule($fields, $files, $self) {
+    $errors = array();
+    $config = CRM_Core_Config::singleton();
+    if (in_array("CiviCase", $config->enableComponents)) {
+      $caseActivityTypes = array_map('current', CRM_Case_PseudoConstant::caseActivityType());
+      if (!empty($fields['activity_type_id_value']) && is_array($fields['activity_type_id_value']) && empty($fields['include_case_activities_value'])) {
+        foreach ($fields['activity_type_id_value'] as $activityTypeId) {
+          if (in_array($activityTypeId, $caseActivityTypes)) {
+            $errors['fields'] = ts("Please enable 'Include Case Activities' to filter with Case Activity types.");
+          }
+        }
+      }
+    }
+    return $errors;
+  }
+
   public function postProcess() {
     $this->beginPostProcess();
 
@@ -668,6 +720,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     // fixme: add when required
     $tempQuery = "
   ALTER TABLE  civireport_activity_temp_target
+  MODIFY COLUMN civicrm_contact_contact_target_id VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_assignee VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_source VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_assignee_id VARCHAR(128),

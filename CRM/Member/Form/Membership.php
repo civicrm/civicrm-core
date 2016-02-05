@@ -773,7 +773,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $params, $errors);
 
       $priceFieldIDS = array();
-      foreach ($self->_priceSet['fields'] as $priceIds => $dontCare) {
+      foreach ($self->_priceSet['fields'] as $priceIds => $field) {
 
         if (!empty($params['price_' . $priceIds])) {
           if (is_array($params['price_' . $priceIds])) {
@@ -783,7 +783,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
               }
             }
           }
-          else {
+          elseif (!$field['is_enter_qty']) {
             $priceFieldIDS[] = $params['price_' . $priceIds];
           }
         }
@@ -1679,7 +1679,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $endDate = CRM_Utils_Date::customFormat($endDate);
         $statusMsg .= ' ' . ts('The membership End Date is %1.', array(1 => $endDate));
       }
-      if (!empty($formValues['send_receipt']) && $receiptSend) {
+      if ($receiptSend) {
         $statusMsg .= ' ' . ts('A confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
       }
     }
@@ -1707,7 +1707,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
       }
       $statusMsg = implode('<br/>', $statusMsg);
-      if (!empty($formValues['send_receipt']) && $receiptSend && !empty($mailSend)) {
+      if ($receiptSend && !empty($mailSend)) {
         $statusMsg .= ' ' . ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
       }
     }

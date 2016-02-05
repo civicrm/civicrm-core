@@ -1,0 +1,14 @@
+<div ng-controller="CrmCxnConfirmAboutCtrl">
+  <div crm-ui-accordion="{title: ts('About'), collapsed: false}">
+    <div ng-bind-html="appMeta.desc"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Permissions: Summary'), collapsed: true}">
+    <div ng-bind-html="appMeta.perm.desc"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Permissions: Details'), collapsed: true}">
+    <div crm-cxn-perm-table="{perm: appMeta.perm}"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Advanced'), collapsed: true}">
+    <div crm-cxn-adv-table="{appMeta: appMeta}"></div>
+  </div>
+</div>

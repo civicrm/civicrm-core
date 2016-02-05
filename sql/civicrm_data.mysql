@@ -8121,14 +8121,14 @@ INSERT INTO civicrm_msg_template
          {ts 1=$cancelSubscriptionUrl}This is a recurring contribution. You can cancel future contributions by <a href="%1">visiting this web page</a>.{/ts}
         </td>
         {if $updateSubscriptionBillingUrl}
-         <tr>
          </tr>
+         <tr>
          <td colspan="2" {$labelStyle}>
           {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
          </td>
         {/if}
-       <tr>
        </tr>
+       <tr>
         <td colspan="2" {$labelStyle}>
          {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
         </td>
@@ -8804,14 +8804,14 @@ INSERT INTO civicrm_msg_template
          {ts 1=$cancelSubscriptionUrl}This is a recurring contribution. You can cancel future contributions by <a href="%1">visiting this web page</a>.{/ts}
         </td>
         {if $updateSubscriptionBillingUrl}
-         <tr>
          </tr>
+         <tr>
          <td colspan="2" {$labelStyle}>
           {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
          </td>
         {/if}
-       <tr>
        </tr>
+       <tr>
         <td colspan="2" {$labelStyle}>
          {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
         </td>
@@ -20537,7 +20537,7 @@ or want to inquire about reinstating your registration for this event.{/ts}</p>
 
 ***********************************************************
 ', '<center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left">
+ <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt_test" style="font-family: Arial, Verdana, sans-serif; text-align: left">
   <tr>
    <td>
     <p>{ts}Test-drive Email / Receipt{/ts}</p>
@@ -20556,7 +20556,7 @@ or want to inquire about reinstating your registration for this event.{/ts}</p>
 
 ***********************************************************
 ', '<center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left">
+ <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt_test" style="font-family: Arial, Verdana, sans-serif; text-align: left">
   <tr>
    <td>
     <p>{ts}Test-drive Email / Receipt{/ts}</p>
@@ -22940,6 +22940,8 @@ INSERT INTO `civicrm_dashboard`
     ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`)
     VALUES
     ( @domainID, 'blog', '', 'civicrm/dashlet/blog?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/blog?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
+    ( @domainID, 'getting-started', '', 'civicrm/dashlet/getting-started?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/getting-started?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
+
     ( @domainID, 'activity', '', 'civicrm/dashlet/activity?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 1, 'civicrm/dashlet/activity?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
     ( @domainID, 'myCases', '', 'civicrm/dashlet/myCases?reset=1&snippet=5', 'access my cases and activities', NULL , 0, 0, 1, 2, 'civicrm/dashlet/myCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
     ( @domainID, 'allCases', '', 'civicrm/dashlet/allCases?reset=1&snippet=5', 'access all cases and activities', NULL , 0, 0, 1, 3, 'civicrm/dashlet/allCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
@@ -23292,21 +23294,22 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, 'civicrm/admin/setting/component?reset=1', '', 'Enable Components',                                 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/extensions?reset=1',        '', 'Manage Extensions', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 2 ),
-    ( @domainID, 'civicrm/admin/setting/smtp?reset=1',                  '', 'Outbound Email',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/admin/paymentProcessor?reset=1',              '', 'Payment Processors',                           'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 4 ),
-    ( @domainID, 'civicrm/admin/setting/mapping?reset=1',               '', 'Mapping and Geocoding',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 5 ),
-    ( @domainID, 'civicrm/admin/setting/misc?reset=1',                  '', 'Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 6 ),
-    ( @domainID, 'civicrm/admin/setting/path?reset=1',                  '',        'Directories',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 7 ),
-    ( @domainID, 'civicrm/admin/setting/url?reset=1',                   '',      'Resource URLs',                                'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 8 ),
-    ( @domainID, 'civicrm/admin/setting/updateConfigBackend?reset=1',   '', 'Cleanup Caches and Update Paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 9 ),
-    ( @domainID, 'civicrm/admin/setting/uf?reset=1',                    '',    'CMS Integration',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 10 ),
-    ( @domainID, 'civicrm/admin/options/safe_file_extension?reset=1', '', 'Safe File Extensions','administer CiviCRM', '',@systemSettingslastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/options?reset=1',                       '', 'Option Groups',                                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 12 ),
-    ( @domainID, 'civicrm/admin/mapping?reset=1',                       '', 'Import/Export Mappings',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 13 ),
-    ( @domainID, 'civicrm/admin/setting/debug?reset=1',                 '','Debugging and Error Handling',        'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 14 ),
-    ( @domainID, 'civicrm/admin/setting/preferences/multisite?reset=1', '', 'Multi Site Settings',                         'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 15 ),
-    ( @domainID, 'civicrm/admin/job?reset=1',                           '', 'Scheduled Jobs',                                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 16 ),
-    ( @domainID, 'civicrm/admin/sms/provider?reset=1', '', 'SMS Providers',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 17 );
+    ( @domainID, 'civicrm/a/#/cxn',                                     '', 'Connections',                                         'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 3 ),
+    ( @domainID, 'civicrm/admin/setting/smtp?reset=1',                  '', 'Outbound Email',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 4 ),
+    ( @domainID, 'civicrm/admin/paymentProcessor?reset=1',              '', 'Payment Processors',                           'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 5 ),
+    ( @domainID, 'civicrm/admin/setting/mapping?reset=1',               '', 'Mapping and Geocoding',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 6 ),
+    ( @domainID, 'civicrm/admin/setting/misc?reset=1',                  '', 'Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 7 ),
+    ( @domainID, 'civicrm/admin/setting/path?reset=1',                  '',        'Directories',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 8 ),
+    ( @domainID, 'civicrm/admin/setting/url?reset=1',                   '',      'Resource URLs',                                'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 9 ),
+    ( @domainID, 'civicrm/admin/setting/updateConfigBackend?reset=1',   '', 'Cleanup Caches and Update Paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 10 ),
+    ( @domainID, 'civicrm/admin/setting/uf?reset=1',                    '',    'CMS Integration',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 11 ),
+    ( @domainID, 'civicrm/admin/options/safe_file_extension?reset=1', '', 'Safe File Extensions','administer CiviCRM', '',@systemSettingslastID, '1', NULL, 12 ),
+    ( @domainID, 'civicrm/admin/options?reset=1',                       '', 'Option Groups',                                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 13 ),
+    ( @domainID, 'civicrm/admin/mapping?reset=1',                       '', 'Import/Export Mappings',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 14 ),
+    ( @domainID, 'civicrm/admin/setting/debug?reset=1',                 '','Debugging and Error Handling',        'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 15 ),
+    ( @domainID, 'civicrm/admin/setting/preferences/multisite?reset=1', '', 'Multi Site Settings',                         'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 16 ),
+    ( @domainID, 'civicrm/admin/job?reset=1',                           '', 'Scheduled Jobs',                                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 17 ),
+    ( @domainID, 'civicrm/admin/sms/provider?reset=1', '', 'SMS Providers',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 18 );
 
 
 -- begin component admin menus
@@ -23706,4 +23709,4 @@ INSERT INTO `civicrm_report_instance`
 VALUES
     (  @domainID, '', 'survey/detail', '', 'access CiviReport', 'a:39:{s:6:"fields";a:2:{s:9:"sort_name";s:1:"1";s:6:"result";s:1:"1";}s:22:"assignee_contact_id_op";s:2:"eq";s:25:"assignee_contact_id_value";s:0:"";s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:17:"street_number_min";s:0:"";s:17:"street_number_max";s:0:"";s:16:"street_number_op";s:3:"lte";s:19:"street_number_value";s:0:"";s:14:"street_name_op";s:3:"has";s:17:"street_name_value";s:0:"";s:15:"postal_code_min";s:0:"";s:15:"postal_code_max";s:0:"";s:14:"postal_code_op";s:3:"lte";s:17:"postal_code_value";s:0:"";s:7:"city_op";s:3:"has";s:10:"city_value";s:0:"";s:20:"state_province_id_op";s:2:"in";s:23:"state_province_id_value";a:0:{}s:13:"country_id_op";s:2:"in";s:16:"country_id_value";a:0:{}s:12:"survey_id_op";s:2:"in";s:15:"survey_id_value";a:0:{}s:12:"status_id_op";s:2:"eq";s:15:"status_id_value";s:1:"1";s:11:"custom_1_op";s:2:"in";s:14:"custom_1_value";a:0:{}s:11:"custom_2_op";s:2:"in";s:14:"custom_2_value";a:0:{}s:17:"custom_3_relative";s:1:"0";s:13:"custom_3_from";s:0:"";s:11:"custom_3_to";s:0:"";s:11:"description";s:75:"Detailed report for canvassing, phone-banking, walk lists or other surveys.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:17:"access CiviReport";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}');
 
-UPDATE civicrm_domain SET version = '4.6.10';
+UPDATE civicrm_domain SET version = '4.6.12';

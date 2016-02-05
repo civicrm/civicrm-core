@@ -74,8 +74,9 @@ table.form-layout td, table.form-layout th {
    border-top       : 2px groove #DCDCDC;
 }
 
-#crm-container table.report-layout tr.crm-report-sectionHeader.page-break {
+#crm-container div.page-break {
   page-break-before: always;
+  height: 0;
 }
 
 #crm-container .report-label {

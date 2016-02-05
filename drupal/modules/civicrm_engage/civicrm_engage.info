@@ -1,6 +1,6 @@
 name = CiviEngage
 description = Walklist and Phone-banking support for CiviCRM.
-version = 4.6.10
+version = 4.6.120
 core = 7.x
 package = CiviCRM
 project = civicrm
