@@ -134,9 +134,12 @@ global $tsLocale;
 $tsLocale = 'en_US';
 $seedLanguage = 'en_US';
 
-if (isset($_POST['seedLanguage']) and isset($langs[$_POST['seedLanguage']])) {
-  $seedLanguage = $_POST['seedLanguage'];
-  $tsLocale = $_POST['seedLanguage'];
+// CRM-16801 This validates that seedLanguage is valid by looking in $langs.
+// NB: the variable is initial a $_REQUEST for the initial page reload,
+// then becomes a $_POST when the installation form is submitted.
+if (isset($_REQUEST['seedLanguage']) and isset($langs[$_REQUEST['seedLanguage']])) {
+  $seedLanguage = $_REQUEST['seedLanguage'];
+  $tsLocale = $_REQUEST['seedLanguage'];
 }
 
 $config = CRM_Core_Config::singleton(FALSE);

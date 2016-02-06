@@ -547,10 +547,6 @@ abstract class CRM_Utils_System_Base {
    */
   public function getTimeZoneOffset() {
     $timezone = $this->getTimeZoneString();
-    if (preg_match('/[0-9][0-9]:[0-9][0-9]/', $timezone))
-    {
-        return $timezone; // the time zone is already a numeric offset, so we don't need to do any more.
-    }
     if ($timezone) {
       if ($timezone == 'UTC') {
         // CRM-17072 Let's short-circuit all the zero handling & return it here!
@@ -559,14 +555,14 @@ abstract class CRM_Utils_System_Base {
       $tzObj = new DateTimeZone($timezone);
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
-      // Europe/London in winter has an offset of zero.
-      if ($tz===false) {
+
+      if (empty($tz)) {
         return FALSE;
       }
 
       $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
 
-      if ($tz >= 0) {  // $tz is a number, not a string, so it is better to test it.  00:00 needs a plus sigh.
+      if ($timeZoneOffset > 0) {
         $timeZoneOffset = '+' . $timeZoneOffset;
       }
       return $timeZoneOffset;

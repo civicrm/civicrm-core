@@ -258,4 +258,39 @@ class CRM_Upgrade_Incremental_php_FourSix {
     return TRUE;
   }
 
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_6_12($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_6_x_runSql', $rev);
+    $this->addTask('Add Getting Started dashlet', 'addGettingStartedDashlet', $rev);
+  }
+
+  /**
+   * Add Getting Started dashlet to dashboard
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addGettingStartedDashlet(CRM_Queue_TaskContext $ctx) {
+    $sql = "SELECT count(*) FROM civicrm_dashboard WHERE name='gettingStarted'";
+    $res = CRM_Core_DAO::singleValueQuery($sql);
+    $domainId = CRM_Core_Config::domainID();
+    if ($res <= 0) {
+      $sql = "INSERT INTO `civicrm_dashboard`
+    ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`) VALUES ( {$domainId}, 'getting-started', 'Getting Started', 'civicrm/dashlet/getting-started?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/getting-started?reset=1&snippet=5&context=dashletFullscreen', 1, 1)";
+      CRM_Core_DAO::executeQuery($sql);
+      // Add default position for Getting Started Dashlet ( left column)
+      $sql = "INSERT INTO `civicrm_dashboard_contact` (dashboard_id, contact_id, column_no, is_active)
+SELECT (SELECT MAX(id) FROM `civicrm_dashboard`), contact_id, 0, IF (SUM(is_active) > 0, 1, 0)
+FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
+      CRM_Core_DAO::executeQuery($sql);
+    }
+    return TRUE;
+  }
+
 }

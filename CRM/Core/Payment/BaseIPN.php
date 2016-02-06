@@ -646,6 +646,9 @@ LIMIT 1;";
       if (!empty($input['campaign_id'])) {
         $contribution->campaign_id = $input['campaign_id'];
       }
+      elseif (!empty($recurContrib->campaign_id)) {
+        $contribution->campaign_id = $recurContrib->campaign_id;
+      }
     }
 
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(

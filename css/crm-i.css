@@ -1,0 +1,40 @@
+/* Direct copy of .fa from font-awesome.css
+This is separate to avoid conflict with a site theme's implementation of FA.  It
+is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
+.ui-icon[class*=" fa-"],
+.crm-container a.helpicon,
+.crm-container .replace-plain:before,
+.crm-i {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+}
+
+i.crm-i {
+  font-style: normal;
+}
+
+/* Have FA handle jQuery UI icons */
+
+.ui-icon[class*=" fa-"] {
+  /* Remove the jQuery UI Icon */
+  background: none repeat scroll 0 0 transparent !important;
+  /* Remove the jQuery UI Text Indent */
+  text-indent: 0;
+  /* Bump it up - jQuery UI is -8px */
+  margin-top: -0.5em;
+}
+
+/* Allow use of icon-large to be properly aligned */
+.ui-icon.icon-large {
+  margin-top: -0.75em;
+}
+
+.ui-button-icon-only .ui-icon[class*=" fa-"] {
+  /* Bump it - jQuery UI is -8px */
+  margin-left: -7px;
+}

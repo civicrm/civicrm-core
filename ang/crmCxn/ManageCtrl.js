@@ -90,14 +90,15 @@
     };
 
     $scope.toggleCxn = function toggleCxn(cxn) {
-      var reg = crmApi('Cxn', 'create', {id: cxn.id, is_active: !cxn.is_active, debug: 1}).then(function(){
-        cxn.is_active = !cxn.is_active;
+      var is_active = (cxn.is_active=="1" ? 0 : 1); // we switch the flag
+      var reg = crmApi('Cxn', 'create', {id: cxn.id, app_guid: cxn.app_meta.appId, is_active: is_active, debug: 1}).then(function(){
+        cxn.is_active = is_active;
       });
       return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, reg));
     };
 
     $scope.openLink = function openLink(appMeta, page, options) {
-      var promise = crmApi('Cxn', 'getlink', {app_guid: appMeta.appId, page: page}).then(function(result) {
+      var promise = crmApi('Cxn', 'getlink', {app_guid: appMeta.appId, page_name: page}).then(function(result) {
         var mode = result.values.mode ? result.values.mode : 'popup';
         switch (result.values.mode) {
           case 'iframe':

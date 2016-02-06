@@ -70,6 +70,7 @@ class CRM_Contact_Form_Edit_Email {
           'entity' => 'email',
           'class' => 'eight',
           'placeholder' => NULL,
+          'option_url' => NULL,
         ));
 
       $multipleBulk = CRM_Core_BAO_Email::isMultipleBulkMail();

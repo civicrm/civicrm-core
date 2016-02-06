@@ -1,0 +1,11 @@
+<div ng-if="!status.is_visible">
+  <button ng-click="setPref(status, '', 1)" type="button" >{{ts('Unhide')}}</button>
+</div>
+<div ng-if="status.is_visible && status.severity_id >= 2">
+  <button type="button" class="hush-menu-button">{{ts('Hide')}}</button>
+  <ul style="display:none;">
+    <li ng-click="setPref(status, 'now + 1 week', 0)">{{ts('Remind me again in a week')}}</li>
+    <li ng-click="setPref(status, 'now + 1 month', 0)">{{ts('Remind me again in a month')}}</li>
+    <li ng-click="setPref(status, '', 0)">{{ts('Never remind me again')}}</li>
+  </ul>
+</div>
