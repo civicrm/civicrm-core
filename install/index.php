@@ -733,10 +733,14 @@ class InstallRequirements {
     $aboveMinVersion = version_compare($phpVersion, $minVersion) >= 0;
     $belowMaxVersion = $maxVersion ? version_compare($phpVersion, $maxVersion) < 0 : TRUE;
 
-    if ($maxVersion && $aboveMinVersion && $belowMaxVersion) {
-      return TRUE;
-    }
-    elseif (!$maxVersion && $aboveMinVersion) {
+    if ($aboveMinVersion && $belowMaxVersion) {
+      if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
+        $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk.', array(
+          1 => phpversion(),
+          2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+        ));
+        $this->warning($testDetails);
+      }
       return TRUE;
     }
 
