@@ -163,6 +163,9 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
           'status_id' => array(
             'title' => ts('Pledge Status'),
           ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+          ),
         ),
       ),
       'civicrm_pledge_payment' => array(
