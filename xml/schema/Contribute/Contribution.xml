@@ -77,7 +77,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type ID</title>
+    <title>Financial Type</title>
     <export>false</export>
     <type>int unsigned</type>
     <comment>FK to Financial Type for (total_amount - non_deductible_amount).</comment>
