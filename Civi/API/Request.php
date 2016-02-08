@@ -59,83 +59,56 @@ class Request {
    *   - chains: unspecified derived from params [v4-only]
    */
   public static function create($entity, $action, $params, $extra = NULL) {
-    $version = self::parseVersion($params);
-
+    $version = \CRM_Utils_Array::value('version', $params);
     switch ($version) {
-      case 2:
-      case 3:
-        $apiRequest = array(); // new \Civi\API\Request();
+      default:
+        $apiRequest = array();
         $apiRequest['id'] = self::$nextId++;
-        $apiRequest['version'] = $version;
+        $apiRequest['version'] = (int) $version;
         $apiRequest['params'] = $params;
         $apiRequest['extra'] = $extra;
         $apiRequest['fields'] = NULL;
-
-        $apiRequest['entity'] = $entity = self::normalizeEntityName($entity, $apiRequest['version']);
-        $apiRequest['action'] = $action = self::normalizeActionName($action, $apiRequest['version']);
-
+        $apiRequest['entity'] = self::normalizeEntityName($entity, $apiRequest['version']);
+        $apiRequest['action'] = self::normalizeActionName($action, $apiRequest['version']);
         return $apiRequest;
 
       case 4:
         $apiCall = call_user_func(array("Civi\\Api4\\$entity", $action));
+        $apiRequest['id'] = self::$nextId++;
         unset($params['version']);
         foreach ($params as $name => $param) {
           $setter = 'set' . ucfirst($name);
           $apiCall->$setter($param);
         }
         return $apiCall;
-
-      default:
     }
 
   }
 
   /**
-   * Normalize/validate entity and action names
+   * Normalize entity to be CamelCase.
+   *
+   * APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
    *
    * @param string $entity
    * @param int $version
    * @return string
-   * @throws \API_Exception
    */
   public static function normalizeEntityName($entity, $version) {
-    if ($version <= 3) {
-      // APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
-      // We normalize entity to be CamelCase.
-      return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
-    }
-    else {
-      throw new \API_Exception("Unknown api version");
-    }
-  }
-
-  public static function normalizeActionName($action, $version) {
-    if ($version <= 3) {
-      // APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
-      // We normalize action to be lowercase.
-      return strtolower(\CRM_Utils_String::munge($action));
-    }
-    else {
-      throw new \API_Exception("Unknown api version");
-    }
+    return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
   }
 
   /**
-   * We must be sure that every request uses only one version of the API.
+   * Normalize api action name to be lowercase.
    *
-   * @param array $params
-   *   API parameters.
-   * @return int
+   * APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
+   *
+   * @param $action
+   * @param $version
+   * @return string
    */
-  protected static function parseVersion($params) {
-    $desired_version = empty($params['version']) ? NULL : (int) $params['version'];
-    if (isset($desired_version) && is_int($desired_version)) {
-      return $desired_version;
-    }
-    else {
-      // we will set the default to version 3 as soon as we find that it works.
-      return 3;
-    }
+  public static function normalizeActionName($action, $version) {
+    return strtolower(\CRM_Utils_String::munge($action));
   }
 
 }

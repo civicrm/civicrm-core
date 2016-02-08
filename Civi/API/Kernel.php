@@ -86,14 +86,7 @@ class Kernel {
    * @throws \API_Exception
    */
   public function runSafe($entity, $action, $params, $extra = NULL) {
-    // TODO Define alternative calling convention makes it easier to construct $apiRequest
-    // without the ambiguity of "data" vs "options"
     $apiRequest = Request::create($entity, $action, $params, $extra);
-
-    /**
-     * @var $apiProvider \Civi\API\Provider\ProviderInterface|NULL
-     */
-    $apiProvider = NULL;
 
     try {
       $apiResponse = $this->runRequest($apiRequest);
@@ -159,9 +152,7 @@ class Kernel {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function runRequest($apiRequest) {
-    $this->validate($apiRequest);
-
-    $this->boot();
+    $this->boot($apiRequest);
     $errorScope = \CRM_Core_TemporaryErrorScope::useException();
 
     list($apiProvider, $apiRequest) = $this->resolve($apiRequest);
@@ -169,17 +160,35 @@ class Kernel {
     $apiRequest = $this->prepare($apiProvider, $apiRequest);
     $result = $apiProvider->invoke($apiRequest);
 
-    $apiResponse = $this->respond($apiProvider, $apiRequest, $result);
-    return $apiResponse;
+    return $this->respond($apiProvider, $apiRequest, $result);
   }
 
   /**
-   * Bootstrap - Load basic dependencies.
+   * Bootstrap - Load basic dependencies and sanity-check inputs.
+   *
+   * @param \Civi\API\V4\Action|array $apiRequest
+   * @throws \API_Exception
    */
-  public function boot() {
-    require_once 'api/v3/utils.php';
+  public function boot($apiRequest) {
     require_once 'api/Exception.php';
-    _civicrm_api3_initialize();
+
+    if (!is_array($apiRequest['params'])) {
+      throw new \API_Exception('Input variable `params` is not an array', 2000);
+    }
+    switch ($apiRequest['version']) {
+      case 2:
+      case 3:
+        require_once 'api/v3/utils.php';
+        _civicrm_api3_initialize();
+        break;
+
+      case 4:
+        // nothing to do
+        break;
+
+      default:
+        throw new \API_Exception('Unknown api version', 2000);
+    }
   }
 
   /**
@@ -187,11 +196,6 @@ class Kernel {
    * @throws \API_Exception
    */
   protected function validate($apiRequest) {
-    if ($apiRequest['version'] === 3) {
-      if (!is_array($apiRequest['params'])) {
-        throw new \API_Exception('Input variable `params` is not an array', 2000);
-      }
-    }
   }
 
   /**
