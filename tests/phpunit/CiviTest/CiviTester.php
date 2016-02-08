@@ -63,26 +63,27 @@ class CiviTester {
    * @return \CiviTesterBuilder
    *
    * @code
-   * CiviTester::builder()->apply();
-   * CiviTester::builder()->sqlFile('ex.sql')->apply();
+   * CiviTester::headless()->apply();
+   * CiviTester::headless()->sqlFile('ex.sql')->apply();
    * @endCode
    */
-  public static function builder() {
-    if (!isset(self::$singletons['builder'])) {
-      $civiRoot = dirname(dirname(dirname(dirname(__FILE__))));
-      self::$singletons['builder'] = new CiviTesterBuilder('CiviTesterSchema');
-      self::$singletons['builder']
-        ->callback(function ($ctx) {
-          $dbName = CiviTester::dsn('database');
-          echo "Installing {$dbName} schema\n";
-          CiviTester::schema()->dropAll();
-        }, 'msg-drop')
-        ->sqlFile($civiRoot . "/sql/civicrm.mysql")
-        ->callback(function ($ctx) {
-          CiviTester::data()->populate();
-        }, 'populate');
-    }
-    return self::$singletons['builder'];
+  public static function headless() {
+    $civiRoot = dirname(dirname(dirname(dirname(__FILE__))));
+    $builder = new CiviTesterBuilder('CiviTesterSchema');
+    $builder
+      ->callback(function ($ctx) {
+        if (CIVICRM_UF !== 'UnitTests') {
+          throw new \RuntimeException("CiviTester::headless() requires CIVICRM_UF=UnitTests");
+        }
+        $dbName = CiviTester::dsn('database');
+        echo "Installing {$dbName} schema\n";
+        CiviTester::schema()->dropAll();
+      }, 'msg-drop')
+      ->sqlFile($civiRoot . "/sql/civicrm.mysql")
+      ->callback(function ($ctx) {
+        CiviTester::data()->populate();
+      }, 'populate');
+    return $builder;
   }
 
   /**
@@ -354,6 +355,34 @@ class CiviTesterBuilder {
     return $this->addStep(new CiviTesterSqlFileStep($file));
   }
 
+  /**
+   * Require an extension (based on its name).
+   *
+   * @param string $name
+   * @return \CiviTesterBuilder
+   */
+  public function ext($name) {
+    return $this->addStep(new CiviTesterExtensionStep($name));
+  }
+
+  /**
+   * Require an extension (based on its directory).
+   *
+   * @param $dir
+   * @return \CiviTesterBuilder
+   * @throws \CRM_Extension_Exception_ParseException
+   */
+  public function extDir($dir) {
+    while ($dir && dirname($dir) !== $dir && !file_exists("$dir/info.xml")) {
+      $dir = dirname($dir);
+    }
+    if (file_exists("$dir/info.xml")) {
+      $info = CRM_Extension_Info::loadFromFile("$dir/info.xml");
+      $name = $info->key;
+    }
+    return $this->addStep(new CiviTesterExtensionStep($name));
+  }
+
   protected function assertValid() {
     foreach ($this->steps as $step) {
       if (!$step->isValid()) {
@@ -537,6 +566,33 @@ class CiviTesterCallbackStep implements CiviTesterStep {
 
   public function run($ctx) {
     call_user_func($this->callback, $ctx);
+  }
+
+}
+
+class CiviTesterExtensionStep implements CiviTesterStep {
+  private $name;
+
+  /**
+   * CiviTesterExtensionStep constructor.
+   * @param $name
+   */
+  public function __construct($name) {
+    $this->name = $name;
+  }
+
+  public function getSig() {
+    return 'ext:' . $this->name;
+  }
+
+  public function isValid() {
+    return is_string($this->name);
+  }
+
+  public function run($ctx) {
+    CRM_Extension_System::singleton()->getManager()->install(array(
+      $this->name,
+    ));
   }
 
 }
