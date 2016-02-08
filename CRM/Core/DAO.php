@@ -2559,4 +2559,31 @@ SELECT contact_id
     return $clauses;
   }
 
+  /**
+   * function to check valid db name
+   *
+   * @param $database
+   * @param $testDetails
+   *
+   * @return bool
+   */
+  public static function requireValidDBName($database, $testDetails, $object = NULL) {
+    $matches = array();
+    preg_match(
+      "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
+      $database,
+      $matches
+    );
+    if (empty($matches)) {
+      if ($object) {
+        $object->error($testDetails);
+      }
+      return FALSE;
+    }
+    if ($object) {
+      $object->testing($testDetails);
+    }
+    return TRUE;
+  }
+
 }
