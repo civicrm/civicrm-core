@@ -1558,7 +1558,6 @@ class CRM_Contact_BAO_Query {
    */
   public static function legacyConvertFormValues($id, &$values) {
     $legacyElements = array(
-      'group',
       'tag',
       'contact_tags',
       'contact_type',
