@@ -234,8 +234,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
       'net_amount' => 90.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
       'check_permissions' => TRUE,
@@ -266,9 +264,26 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'edit contributions',
       'add contributions of type Donation',
     );
-    $contribution = $this->callAPIFailure('contribution', 'create', $params);
-    $this->assertEquals('You do not have permission to create this contribution', $result['error_message'],
-      'lacking financial acl permissions for lineitems should not be enough to create a contribution of type Donation');
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+
+    $lineItemParams = array(
+      'contribution_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+    );
+    $lineItems = $this->callAPISuccess('LineItem', 'get', $lineItemParams);
+    $this->assertEquals(2, $lineItems['count']);
+    $this->assertEquals(100.00, $lineItems['values'][1]['line_total']);
+    $this->assertEquals(20, $lineItems['values'][2]['line_total']);
+    $this->assertEquals(1, $lineItems['values'][1]['financial_type_id']);
+    $this->assertEquals(1, $lineItems['values'][2]['financial_type_id']);
+
+    /* $this->assertEquals('You do not have permission to create this line item', $result['error_message'], */
+    /*   'lacking financial acl permissions for lineitems should not be enough to create a contribution of type Donation'); */
+
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
@@ -277,6 +292,20 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'add contributions of type Member Dues',
     );
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+
+    $lineItemParams = array(
+      'contribution_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+    );
+    $lineItems = $this->callAPISuccess('LineItem', 'get', $lineItemParams);
+    $this->assertEquals(3, $lineItems['count']);
+    $this->assertEquals(100.00, $lineItems['values'][1]['line_total']);
+    $this->assertEquals(20, $lineItems['values'][2]['line_total']);
+    $this->assertEquals(80, $lineItems['values'][3]['line_total']);
+    $this->assertEquals(1, $lineItems['values'][1]['financial_type_id']);
+    $this->assertEquals(1, $lineItems['values'][2]['financial_type_id']);
+    $this->assertEquals(2, $lineItems['values'][3]['financial_type_id']);
+
     $params = array(
       'contribution_id' => $contribution['id'],
     );
@@ -289,8 +318,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 50.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 90.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
 
@@ -300,7 +327,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
     ));
-    $this->assertEquals(2, $lineItems['count']);
+    $this->assertEquals(3, $lineItems['count']);
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
