@@ -663,6 +663,9 @@ HTACCESS;
    * @return array(string)
    */
   public static function findFiles($dir, $pattern, $relative = FALSE) {
+    if (!is_dir($dir)) {
+      return array();
+    }
     $dir = rtrim($dir, '/');
     $todos = array($dir);
     $result = array();
