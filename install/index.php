@@ -340,8 +340,9 @@ class InstallRequirements {
             ts("An auto_increment_increment value greater than 1 is not currently supported. Please see issue CRM-7923 for further details and potential workaround."),
           )
         );
-        if (!$this->requireValidDBName(
+        if (!CRM_Core_DAO::requireValidDBName(
           $databaseConfig['database'],
+          $this,
           array(
             ts("MySQL %1 Configuration", array(1 => $dbName)),
             ts("Is the provided database name valid?"),
@@ -1218,27 +1219,6 @@ class InstallRequirements {
    */
   public function hasWarnings() {
     return count($this->warnings);
-  }
-
-  /**
-   * function to check valid db name
-   *
-   * @param $database
-   * @param $testDetails
-   */
-  public function requireValidDBName($database, $testDetails) {
-    $matches = array();
-    preg_match(
-      "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
-      $database,
-      $matches
-    );
-    if (empty($matches)) {
-      $this->error($testDetails);
-      return FALSE;
-    }
-    $this->testing($testDetails);
-    return TRUE;
   }
 
 }
