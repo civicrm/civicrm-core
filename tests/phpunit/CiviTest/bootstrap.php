@@ -19,7 +19,7 @@ define('CIVICRM_TEST', 1);
 eval(cv('php:boot --level=settings', 'phpcode'));
 
 if (CIVICRM_UF === 'UnitTests') {
-  CiviTester::builder()->apply();
+  CiviTester::headless()->apply();
 }
 
 // ------------------------------------------------------------------------------
