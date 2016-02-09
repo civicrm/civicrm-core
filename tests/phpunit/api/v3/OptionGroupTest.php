@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_OptionGroupTest
+ * @group headless
  */
 class api_v3_OptionGroupTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

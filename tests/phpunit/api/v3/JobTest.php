@@ -38,6 +38,7 @@
 
 /**
  * Class api_v3_JobTest
+ * @group headless
  */
 class api_v3_JobTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

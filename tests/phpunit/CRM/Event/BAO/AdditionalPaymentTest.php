@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Event_BAO_AdditionalPaymentTest
+ * @group headless
  */
 class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 

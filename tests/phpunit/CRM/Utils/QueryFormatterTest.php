@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Utils_QueryFormatterTest
+ * @group headless
  */
 class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
 

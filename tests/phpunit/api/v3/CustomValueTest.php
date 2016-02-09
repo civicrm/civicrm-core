@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_CustomValueTest
+ * @group headless
  */
 class api_v3_CustomValueTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

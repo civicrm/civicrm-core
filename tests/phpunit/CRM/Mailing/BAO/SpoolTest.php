@@ -6,6 +6,7 @@
 
 /**
  * Class CRM_Mailing_BAO_SpoolTest
+ * @group headless
  */
 class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
 

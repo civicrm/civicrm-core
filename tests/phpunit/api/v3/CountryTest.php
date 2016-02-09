@@ -30,6 +30,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
+ * @group headless
  */
 class api_v3_CountryTest extends CiviUnitTestCase {
   protected $_apiversion;

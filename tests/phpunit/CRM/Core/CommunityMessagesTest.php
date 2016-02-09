@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_CommunityMessagesTest
+ * @group headless
  */
 class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
 

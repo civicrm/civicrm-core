@@ -29,6 +29,7 @@
  * Test class for CRM_Activity_BAO_ActivityTarget BAO
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
 

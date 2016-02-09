@@ -7,6 +7,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  * Class SequenceListenerTest
  *
  * @package Civi\CCase
+ * @group headless
  */
 class SequenceListenerTest extends \CiviCaseTestCase {
 

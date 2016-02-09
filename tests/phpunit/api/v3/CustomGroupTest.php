@@ -30,6 +30,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_CustomGroup
+ * @group headless
  */
 class api_v3_CustomGroupTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

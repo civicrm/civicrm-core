@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Core_DAOTest
+ * @group headless
  */
 class CRM_Core_DAOTest extends CiviUnitTestCase {
 

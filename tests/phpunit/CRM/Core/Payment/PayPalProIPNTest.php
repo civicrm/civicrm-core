@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
+ * @group headless
  */
 class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_contributionID;

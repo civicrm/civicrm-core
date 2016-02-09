@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Utils_HtmlToTextTest
+ * @group headless
  */
 class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
 

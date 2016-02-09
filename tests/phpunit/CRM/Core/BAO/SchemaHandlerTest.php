@@ -30,6 +30,7 @@
  *
  * These tests create and drop indexes on the civicrm_uf_join table. The indexes
  * being added and dropped we assume will never exist.
+ * @group headless
  */
 class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
 

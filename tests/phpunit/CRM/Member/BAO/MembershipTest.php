@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Member_BAO_MembershipTest
+ * @group headless
  */
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 

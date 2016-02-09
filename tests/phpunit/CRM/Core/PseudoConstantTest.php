@@ -27,6 +27,7 @@
 
 /**
  * Tests for pseudoconstant retrieval
+ * @group headless
  */
 class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 

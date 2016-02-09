@@ -24,6 +24,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ActionSchedule
+ * @group headless
  */
 class api_v3_DashboardTest extends CiviUnitTestCase {
   protected $_params;

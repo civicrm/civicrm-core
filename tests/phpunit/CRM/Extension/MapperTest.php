@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Extension_MapperTest
+ * @group headless
  */
 class CRM_Extension_MapperTest extends CiviUnitTestCase {
   public function setUp() {

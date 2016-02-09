@@ -4,6 +4,7 @@
  * Class for testing new DAO meet required standards.
  *
  * Class CRM_Core_DAOTest
+ * @group headless
  */
 class CRM_Core_DAOConformanceTest extends CiviUnitTestCase {
 

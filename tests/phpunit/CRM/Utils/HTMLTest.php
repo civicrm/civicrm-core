@@ -27,6 +27,7 @@
 
 /**
  * Tests for parsing translatable strings in HTML content.
+ * @group headless
  */
 class CRM_Utils_HTMLTest extends CiviUnitTestCase {
   /**
