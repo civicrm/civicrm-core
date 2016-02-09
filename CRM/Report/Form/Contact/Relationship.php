@@ -679,22 +679,4 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     return $clause;
   }
 
-  /**
-   * @param $valid bool - set to 1 if we are looking for a valid relationship, 0 if not
-   *
-   * @return array
-   */
-  public function buildValidityQuery($valid) {
-    $clause = NULL;
-    if ($valid == '1') {
-      // relationships dates are not expired
-      $clause = "((start_date <= CURDATE() OR start_date is null) AND (end_date >= CURDATE() OR end_date is null))";
-    }
-    elseif ($valid == '0') {
-      // relationships dates are expired or has not started yet
-      $clause = "(start_date >= CURDATE() OR end_date < CURDATE())";
-    }
-    return $clause;
-  }
-
 }
