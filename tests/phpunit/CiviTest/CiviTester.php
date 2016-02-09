@@ -80,6 +80,7 @@ class CiviTester {
         CiviTester::schema()->dropAll();
       }, 'msg-drop')
       ->sqlFile($civiRoot . "/sql/civicrm.mysql")
+      ->sql("DELETE FROM civicrm_extension")
       ->callback(function ($ctx) {
         CiviTester::data()->populate();
       }, 'populate');
