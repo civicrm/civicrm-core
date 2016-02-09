@@ -102,10 +102,14 @@ class CRM_Utils_File {
    *   The path name.
    * @param bool $abort
    *   Should we abort or just return an invalid code.
+   * @return bool|NULL
+   *   NULL: Folder already exists or was not specified.
+   *   TRUE: Creation succeeded.
+   *   FALSE: Creation failed.
    */
   public static function createDir($path, $abort = TRUE) {
     if (is_dir($path) || empty($path)) {
-      return;
+      return NULL;
     }
 
     CRM_Utils_File::createDir(dirname($path), $abort);
