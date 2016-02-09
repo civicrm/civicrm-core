@@ -162,6 +162,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_2($rev) {
     $this->addTask('Fix Index on civicrm_financial_item combined entity_id + entity_table', 'addCombinedIndexFinancialItemEntityIDEntityType');
     $this->addTask('enable financial account relationships for chargeback & refund', 'addRefundAndChargeBackAccountsIfNotExist');
+    $this->addTask('Add Index to civicrm_contribution.source', 'addIndexContributionSource');
   }
 
   /**
@@ -484,6 +485,18 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
       'is_active' => TRUE,
       'component_id' => 'CiviContribute',
     ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-17999 Add index to civicrm_contribution.source.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexContributionSource(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contribution' => array('source')));
     return TRUE;
   }
 
