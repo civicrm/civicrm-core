@@ -342,8 +342,8 @@ class CRM_Contact_Form_Edit_Address {
   public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = array();
     $blockId = $form->get('Address_Block_Count');
-    if (isset( $defaults['address'][$blockId]) && is_array( $defaults['address'][$blockId]) &&
-      !CRM_Utils_System::isNull( $defaults['address'][$blockId])
+    if (isset($defaults['address'][$blockId]) && is_array($defaults['address'][$blockId]) &&
+      !CRM_Utils_System::isNull($defaults['address'][$blockId])
     ) {
 
       // start of contact shared adddress defaults
