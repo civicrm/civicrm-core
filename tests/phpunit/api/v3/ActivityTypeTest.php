@@ -29,6 +29,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
+ * @group headless
  */
 class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   protected $_apiversion;

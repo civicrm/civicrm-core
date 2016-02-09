@@ -52,6 +52,7 @@
  *  Test contact custom search functions
  *
  * @package CiviCRM
+ * @group headless
  */
 class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = array(

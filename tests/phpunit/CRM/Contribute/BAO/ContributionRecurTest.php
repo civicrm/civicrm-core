@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Contribute_BAO_ContributionRecurTest
+ * @group headless
  */
 class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   protected $_params = array();

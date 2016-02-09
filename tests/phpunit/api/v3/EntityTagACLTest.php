@@ -38,6 +38,7 @@
  * This test class was introduced to ensure that the fix for CRM-17350 (reducing the required permission
  * from edit all contacts to has right to edit this contact) would not result in inappropriate permission opening on
  * other entities. Other entities are still too restricted but that is a larger job.
+ * @group headless
  */
 class api_v3_EntityTagACLTest extends CiviUnitTestCase {
 

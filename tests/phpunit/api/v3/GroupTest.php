@@ -29,6 +29,7 @@
  * Test class for Group API - civicrm_group_*
  *
  * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_GroupTest extends CiviUnitTestCase {
   protected $_apiversion;

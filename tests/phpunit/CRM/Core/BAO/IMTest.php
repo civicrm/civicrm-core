@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Core_BAO_IMTest
+ * @group headless
  */
 class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
   public function setUp() {

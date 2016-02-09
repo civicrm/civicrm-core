@@ -28,6 +28,7 @@
  *  Test APIv3 civicrm_mailing_* functions
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_groupID;

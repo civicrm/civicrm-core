@@ -37,6 +37,7 @@
  *  Test CRM_Member_Form_Membership functions.
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 

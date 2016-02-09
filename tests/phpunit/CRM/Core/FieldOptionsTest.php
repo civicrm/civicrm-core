@@ -27,6 +27,7 @@
 
 /**
  * Tests for field options
+ * @group headless
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
 

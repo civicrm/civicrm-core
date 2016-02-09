@@ -35,6 +35,7 @@ require_once 'CRM/Utils/DeprecatedUtils.php';
 
 /**
  * Class api_v3_ParticipantTest
+ * @group headless
  */
 class api_v3_ParticipantTest extends CiviUnitTestCase {
 

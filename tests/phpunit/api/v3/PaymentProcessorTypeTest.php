@@ -28,6 +28,7 @@
 /**
  * Class contains api test cases for "civicrm_payment_processor_type"
  *
+ * @group headless
  */
 class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   protected $_ppTypeID;

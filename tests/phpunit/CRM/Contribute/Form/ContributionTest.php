@@ -30,6 +30,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contribution
+ * @group headless
  */
 class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 

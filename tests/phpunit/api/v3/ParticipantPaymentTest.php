@@ -30,6 +30,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Event
+ * @group headless
  */
 class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 

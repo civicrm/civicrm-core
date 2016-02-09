@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Core_BAO_UFFieldTest
+ * @group headless
  */
 class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 

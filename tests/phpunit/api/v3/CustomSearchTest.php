@@ -2,6 +2,7 @@
 
 /**
  * Class api_v3_CustomSearchTest
+ * @group headless
  */
 class api_v3_CustomSearchTest extends CiviUnitTestCase {
   protected $_apiversion;

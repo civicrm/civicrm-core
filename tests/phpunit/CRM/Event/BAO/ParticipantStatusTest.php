@@ -29,6 +29,7 @@
  * Test class for CRM_Event_BAO_ParticipantStatus BAO
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
 

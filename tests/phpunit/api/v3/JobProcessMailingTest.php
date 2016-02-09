@@ -41,6 +41,7 @@ require_once 'CiviTest/CiviMailUtils.php';
 
 /**
  * Class api_v3_JobTest
+ * @group headless
  */
 class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

@@ -29,6 +29,7 @@
  *  Test APIv3 civicrm_profile_* functions
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_apiversion;
