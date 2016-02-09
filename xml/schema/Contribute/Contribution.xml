@@ -470,7 +470,7 @@
     </html>
   </field>
   <index>
-    <name>creditnote_id</name>
+    <name>index_creditnote_id</name>
     <fieldName>creditnote_id</fieldName>
     <add>4.7</add>
   </index>
