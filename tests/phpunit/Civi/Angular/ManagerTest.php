@@ -101,7 +101,7 @@ class ManagerTest extends \CiviUnitTestCase {
     $this->assertTrue($counts['js'] > 0, 'Expect to find at least one JS file');
     $this->assertTrue($counts['css'] > 0, 'Expect to find at least one CSS file');
     $this->assertTrue($counts['partials'] > 0, 'Expect to find at least one partial HTML file');
-    $this->assertTrue($counts['settings'] > 1, 'Expect to find at least one setting');
+    $this->assertTrue($counts['settings'] > 0, 'Expect to find at least one setting');
   }
 
   /**
