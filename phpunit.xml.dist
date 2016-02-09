@@ -32,5 +32,12 @@
       <directory suffix=".php">./api</directory>
     </whitelist>
   </filter>
+
+  <listeners>
+    <listener class="Civi\Test\CiviTestListener">
+      <arguments></arguments>
+    </listener>
+  </listeners>
+
 </phpunit>
 
