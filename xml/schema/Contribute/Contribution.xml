@@ -309,6 +309,11 @@
       <type>Text</type>
     </html>
   </field>
+  <index>
+    <name>index_source</name>
+    <fieldName>source</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>amount_level</name>
     <title>Amount Label</title>
