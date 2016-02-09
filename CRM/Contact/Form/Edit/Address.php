@@ -341,8 +341,9 @@ class CRM_Contact_Form_Edit_Address {
    */
   public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = array();
-    if (isset($defaults['address']) && is_array($defaults['address']) &&
-      !CRM_Utils_System::isNull($defaults['address'])
+    $blockId = $form->get('Address_Block_Count');
+    if (isset( $defaults['address'][$blockId]) && is_array( $defaults['address'][$blockId]) &&
+      !CRM_Utils_System::isNull( $defaults['address'][$blockId])
     ) {
 
       // start of contact shared adddress defaults
@@ -438,6 +439,11 @@ class CRM_Contact_Form_Edit_Address {
         $form->assign('loadShowHideAddressFields', empty($parsedAddress) ? FALSE : TRUE);
       }
       // end of parse address functionality
+    }
+    else {
+      $config = CRM_Core_Config::singleton();
+      $defaults['address'][$blockId]['state_province_id'] = $config->defaultContactStateProvince;
+      $defaults['address'][$blockId]['country_id'] = $config->defaultContactCountry;
     }
   }
 
