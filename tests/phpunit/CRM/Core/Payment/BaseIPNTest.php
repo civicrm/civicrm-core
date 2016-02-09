@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_Payment_BaseIPNTest
+ * @group headless
  */
 class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 

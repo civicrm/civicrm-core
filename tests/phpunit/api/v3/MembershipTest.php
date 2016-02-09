@@ -34,6 +34,7 @@
 
 /**
  * Class api_v3_MembershipTest
+ * @group headless
  */
 class api_v3_MembershipTest extends CiviUnitTestCase {
   protected $_apiversion;

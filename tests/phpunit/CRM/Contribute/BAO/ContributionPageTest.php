@@ -32,6 +32,7 @@ require_once 'CiviTest/PaypalPro.php';
 
 /**
  * Class CRM_Contribute_BAO_ContributionPageTest
+ * @group headless
  */
 class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 

@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_MailSettingsTest
+ * @group headless
  */
 class api_v3_MailSettingsTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

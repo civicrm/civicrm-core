@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Extension_Manager_ReportTest
+ * @group headless
  */
 class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
   public function setUp() {

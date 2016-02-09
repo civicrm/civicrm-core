@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Case_XMLRepositoryTest
+ * @group headless
  */
 class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
   protected $fixtures = array();

@@ -27,6 +27,7 @@
 
 /**
  * Test for CRM_Financial_Page_Ajax class.
+ * @group headless
  */
 class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
 

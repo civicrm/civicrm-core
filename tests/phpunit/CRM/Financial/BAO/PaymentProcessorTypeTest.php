@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Financial_BAO_PaymentProcessorTypeTest
+ * @group headless
  */
 class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
 

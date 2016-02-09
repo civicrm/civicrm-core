@@ -35,6 +35,7 @@
 /**
  * Class contains api test cases for civicrm settings
  *
+ * @group headless
  */
 class api_v3_SettingTest extends CiviUnitTestCase {
 

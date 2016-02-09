@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Extension_Manager_SearchTest
+ * @group headless
  */
 class CRM_Extension_Manager_SearchTest extends CiviUnitTestCase {
   public function setUp() {

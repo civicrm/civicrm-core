@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_TaxContributionPageTest
+ * @group headless
  */
 class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_MembershipTypeTest
+ * @group headless
  */
 class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_contactID;

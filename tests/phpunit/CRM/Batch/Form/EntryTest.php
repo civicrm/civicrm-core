@@ -28,6 +28,7 @@
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 

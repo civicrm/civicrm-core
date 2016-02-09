@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_JobManagerTest
+ * @group headless
  */
 class CRM_Core_JobManagerTest extends CiviUnitTestCase {
 

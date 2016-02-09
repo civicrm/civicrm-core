@@ -8,6 +8,7 @@
  *  Test APIv3 civicrm_activity_* functions
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_CRM11793Test extends CiviUnitTestCase {
 

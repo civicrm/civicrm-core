@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_ContactTypeTest
+ * @group headless
  */
 class api_v3_ContactTypeTest extends CiviUnitTestCase {
   protected $_apiversion;

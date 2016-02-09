@@ -29,6 +29,7 @@
  *  Test APIv3 civicrm_entity_batch_* functions
  *
  * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_EntityBatchTest extends CiviUnitTestCase {
 

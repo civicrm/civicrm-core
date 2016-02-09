@@ -30,6 +30,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Member
+ * @group headless
  */
 class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

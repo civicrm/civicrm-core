@@ -34,6 +34,7 @@
  *  Test contact import parser.
  *
  * @package CiviCRM
+ * @group headless
  */
 class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = array();

@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Utils_TimeTest
+ * @group headless
  */
 class CRM_Utils_TimeTest extends CiviUnitTestCase {
   /**

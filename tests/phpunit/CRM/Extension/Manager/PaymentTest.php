@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Extension_Manager_PaymentTest
+ * @group headless
  */
 class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
 
