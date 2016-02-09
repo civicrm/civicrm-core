@@ -416,7 +416,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('is_pay_later', TRUE);
     }
     $this->assign('contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $defaults));
-    if (CRM_Utils_Array::value('contribution_status_id', $defaults) == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded')) {
+    if (!empty($defaults['contribution_status_id']) && in_array(
+        CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'),
+        // Historically not 'Cancelled' hence not using CRM_Contribute_BAO_Contribution::isContributionStatusNegative.
+        array('Refunded', 'Chargeback')
+      )) {
       $defaults['refund_trxn_id'] = CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($this->_id);
     }
     else {
@@ -689,8 +693,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // define the status IDs that show the cancellation info, see CRM-17589
     $cancelInfo_show_ids = array();
-    foreach ($statusName as $status_id => $status_name) {
-      if ($status_name == 'Cancelled' || $status_name == 'Refunded') {
+    foreach (array_keys($statusName) as $status_id) {
+      if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($status_id)) {
         $cancelInfo_show_ids[] = "'$status_id'";
       }
     }
@@ -702,6 +706,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       switch ($name) {
         case 'Completed':
         case 'Cancelled':
+        case 'Chargeback':
         case 'Refunded':
           unset($status[CRM_Utils_Array::key('In Progress', $statusName)]);
           unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
@@ -711,12 +716,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         case 'Pending':
         case 'In Progress':
           unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
+          unset($status[CRM_Utils_Array::key('Chargeback', $statusName)]);
           break;
 
         case 'Failed':
           foreach (array(
                      'Pending',
                      'Refunded',
+                     'Chargeback',
                      'Completed',
                      'In Progress',
                      'Cancelled',
@@ -728,6 +735,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     else {
       unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
+      unset($status[CRM_Utils_Array::key('Chargeback', $statusName)]);
     }
 
     $this->add('select', 'contribution_status_id',
@@ -1633,8 +1641,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['receipt_date'] = date("Y-m-d");
       }
 
-      if ($params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name')
-        || $params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name')
+      if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($params['contribution_status_id'])
       ) {
         if (CRM_Utils_System::isNull(CRM_Utils_Array::value('cancel_date', $params))) {
           $params['cancel_date'] = date('YmdHis');
