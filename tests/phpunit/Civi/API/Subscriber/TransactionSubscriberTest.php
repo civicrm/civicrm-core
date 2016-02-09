@@ -67,15 +67,15 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
       FALSE,
     );
 
-    $r[] = array(4, 'Widget', 'get', array(), FALSE, FALSE, FALSE);
-    $r[] = array(4, 'Widget', 'create', array(), TRUE, FALSE, FALSE);
-
-    $r[] = array(4, 'Widget', 'create', array('is_transactional' => TRUE), TRUE, FALSE, FALSE);
-    $r[] = array(4, 'Widget', 'create', array('is_transactional' => FALSE), FALSE, FALSE, FALSE);
-    $r[] = array(4, 'Widget', 'create', array('is_transactional' => 'nest'), TRUE, FALSE, TRUE);
-
-    $r[] = array(4, 'Widget', 'create', array('options' => array('force_rollback' => TRUE)), TRUE, TRUE, TRUE);
-    $r[] = array(4, 'Widget', 'create', array('options' => array('force_rollback' => FALSE)), TRUE, FALSE, FALSE);
+    //  $r[] = array(4, 'Widget', 'get', array(), FALSE, FALSE, FALSE);
+    //  $r[] = array(4, 'Widget', 'create', array(), TRUE, FALSE, FALSE);
+    //
+    //  $r[] = array(4, 'Widget', 'create', array('is_transactional' => TRUE), TRUE, FALSE, FALSE);
+    //  $r[] = array(4, 'Widget', 'create', array('is_transactional' => FALSE), FALSE, FALSE, FALSE);
+    //  $r[] = array(4, 'Widget', 'create', array('is_transactional' => 'nest'), TRUE, FALSE, TRUE);
+    //
+    //  $r[] = array(4, 'Widget', 'create', array('options' => array('force_rollback' => TRUE)), TRUE, TRUE, TRUE);
+    //  $r[] = array(4, 'Widget', 'create', array('options' => array('force_rollback' => FALSE)), TRUE, FALSE, FALSE);
 
     return $r;
   }
