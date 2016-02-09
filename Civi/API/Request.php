@@ -73,7 +73,11 @@ class Request {
         return $apiRequest;
 
       case 4:
-        $apiCall = call_user_func(array("Civi\\Api4\\$entity", $action));
+        $callable = array("Civi\\Api4\\$entity", $action);
+        if (!is_callable($callable)) {
+          throw new Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
+        }
+        $apiCall = call_user_func($callable);
         $apiRequest['id'] = self::$nextId++;
         unset($params['version']);
         foreach ($params as $name => $param) {

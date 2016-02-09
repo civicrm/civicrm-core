@@ -716,7 +716,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     $result = civicrm_api($Entity, 'Get', array());
     $this->assertEquals(1, $result['is_error']);
-    $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
+    $this->assertContains("Unknown api version", $result['error_message']);
   }
 
   /**
@@ -1354,7 +1354,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     $result = civicrm_api($Entity, 'Delete', array());
     $this->assertEquals(1, $result['is_error']);
-    $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
+    $this->assertContains("Unknown api version", $result['error_message']);
   }
 
   /**
