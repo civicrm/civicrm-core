@@ -262,9 +262,12 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
+      'delete in CiviContribute',
       'add contributions of type Donation',
+      'delete contributions of type Donation',
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
 
     $lineItemParams = array(
       'contribution_id' => $contribution['id'],
@@ -283,13 +286,16 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
-
+    $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
-      'add contributions of type Donation',
+      'delete in CiviContribute',
       'add contributions of type Member Dues',
+      'add contributions of type Donation',
+      'delete contributions of type Donation',
+      'delete contributions of type Member Dues',
     );
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
 
@@ -299,35 +305,13 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     );
     $lineItems = $this->callAPISuccess('LineItem', 'get', $lineItemParams);
     $this->assertEquals(3, $lineItems['count']);
-    $this->assertEquals(100.00, $lineItems['values'][1]['line_total']);
-    $this->assertEquals(20, $lineItems['values'][2]['line_total']);
-    $this->assertEquals(80, $lineItems['values'][3]['line_total']);
-    $this->assertEquals(1, $lineItems['values'][1]['financial_type_id']);
-    $this->assertEquals(1, $lineItems['values'][2]['financial_type_id']);
-    $this->assertEquals(2, $lineItems['values'][3]['financial_type_id']);
+    $this->assertEquals(100.00, $lineItems['values'][3]['line_total']);
+    $this->assertEquals(20, $lineItems['values'][4]['line_total']);
+    $this->assertEquals(80, $lineItems['values'][5]['line_total']);
+    $this->assertEquals(1, $lineItems['values'][3]['financial_type_id']);
+    $this->assertEquals(1, $lineItems['values'][4]['financial_type_id']);
+    $this->assertEquals(2, $lineItems['values'][5]['financial_type_id']);
 
-    $params = array(
-      'contribution_id' => $contribution['id'],
-    );
-    $contribution = $this->callAPISuccess('contribution', 'get', $params);
-
-    $this->assertEquals(1, $contribution['count']);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 50.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 90.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
-
-    $lineItems = $this->callAPISuccess('line_item', 'get', array(
-      'entity_id' => $contribution['id'],
-      'contribution_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'sequential' => 1,
-    ));
-    $this->assertEquals(3, $lineItems['count']);
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
