@@ -149,7 +149,6 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
         $address['location_type_id'] = $locationType->id;
       }
 
-      $address['state_province_id'] = $config->defaultContactStateProvince;
       $address['country_id'] = $config->defaultContactCountry;
       $address['state_province_id'] = $config->defaultContactStateProvince;
       $defaults['address'][$this->_locBlockNo] = $address;
