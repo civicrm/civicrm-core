@@ -190,11 +190,13 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           ),
           'credit_accounting_code' => array(
             'title' => ts('Financial Account Code - Credit'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialAccount(NULL, NULL, 'accounting_code', 'accounting_code'),
           ),
           'debit_name' => array(
             'title' => ts('Financial Account Name - Debit'),
+            'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialAccount(),
             'name' => 'id',
@@ -202,6 +204,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           ),
           'credit_name' => array(
             'title' => ts('Financial Account Name - Credit'),
+            'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialAccount(),
           ),
@@ -218,6 +221,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'filters' => array(
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
@@ -288,6 +292,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'filters' => array(
           'payment_instrument_id' => array(
             'title' => ts('Payment Method'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           ),

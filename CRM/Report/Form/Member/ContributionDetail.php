@@ -195,6 +195,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
@@ -207,6 +208,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           ),
           'payment_instrument_id' => array(
             'title' => ts('Payment Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           ),
@@ -252,6 +254,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
         'filters' => array(
           'ordinality' => array(
             'title' => ts('Contribution Ordinality'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => array(
               0 => 'First by Contributor',
