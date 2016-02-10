@@ -137,6 +137,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       'filters' => array(
         'bounce_reason' => array(
           'title' => ts('Bounce Reason'),
+          'type' => CRM_Utils_Type::T_STRING,
         ),
         'time_stamp' => array(
           'title' => ts('Bounce Date'),

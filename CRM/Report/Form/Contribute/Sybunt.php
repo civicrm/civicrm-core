@@ -224,6 +224,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),

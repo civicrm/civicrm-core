@@ -1665,6 +1665,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           'tagid' => array(
             'name' => 'tag_id',
             'title' => ts('Tag'),
+            'type' => CRM_Utils_Type::T_INT,
             'tag' => TRUE,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $contactTags,
@@ -1682,6 +1683,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       'gid' => array(
         'name' => 'group_id',
         'title' => ts('Group'),
+        'type' => CRM_Utils_Type::T_INT,
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'group' => TRUE,
         'options' => CRM_Core_PseudoConstant::nestedGroup(),
@@ -1760,6 +1762,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   public function whereClause(&$field, $op, $value, $min, $max) {
 
     $type = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $field));
+
+    // CRM-18010: Ensure type of each report filters
+    if (!$type) {
+      trigger_error('Type is not defined for field ' . $field['name'], E_USER_WARNING);
+    }
     $clause = NULL;
 
     switch ($op) {
