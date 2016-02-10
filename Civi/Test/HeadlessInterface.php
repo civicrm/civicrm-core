@@ -23,11 +23,13 @@ namespace Civi\Test;
 interface HeadlessInterface {
 
   /**
-   * The setupHeadless functions runs at the start of each test case.
+   * The setupHeadless functions runs at the start of each test case, right before
+   * the headless environment reboots.
+   *
    * It should perform any necessary steps required for putting the database
    * in a consistent baseline -- such as loading schema and extensions.
    *
-   * The utility class `\Civi\Test` provides a number of helper functions
+   * The utility `\Civi\Test::headless()` provides a number of helper functions
    * for managing this setup, and it includes optimizations to avoid redundant
    * setup work.
    *
