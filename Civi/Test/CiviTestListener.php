@@ -86,7 +86,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    */
   protected function bootHeadless($test) {
     if (CIVICRM_UF !== 'UnitTests') {
-      throw new \RuntimeException('CiviHeadlessTestInterface requires CIVICRM_UF=UnitTests');
+      throw new \RuntimeException('HeadlessInterface requires CIVICRM_UF=UnitTests');
     }
 
     // Hrm, this seems wrong. Shouldn't we be resetting the entire session?
@@ -168,11 +168,11 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     }
     elseif (!empty($byInterface['HeadlessInterface'])) {
       putenv('CIVICRM_UF=UnitTests');
-      eval($this->cv('php:boot --level=settings', 'phpcode'));
+      eval($this->cv('php:boot --level=full', 'phpcode'));
     }
     elseif (!empty($byInterface['EndToEndInterface'])) {
       putenv('CIVICRM_UF=');
-      eval($this->cv('php:boot --level=settings', 'phpcode'));
+      eval($this->cv('php:boot --level=full', 'phpcode'));
     }
 
     $blurb = "Tip: Run the headless tests and end-to-end tests separately, e.g.\n"
