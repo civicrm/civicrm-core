@@ -100,11 +100,13 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           ),
           'membership_type_id' => array(
             'title' => ts('Membership Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Member_PseudoConstant::membershipType(),
           ),
           'status_id' => array(
             'title' => ts('Membership Status'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'),
           ),
