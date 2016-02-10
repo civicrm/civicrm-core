@@ -461,6 +461,8 @@ ORDER BY  cv.label
             }
             if ($fieldName == 'total_paid' || $fieldName == 'balance') {
               $this->_balance = TRUE;
+              // modify the select if filtered by fee_level as the from clause
+              // already selects the total_amount from civicrm_contribution table
               if (!empty($this->_params['price_field_value_id_value'])) {
                 $field['dbAlias'] = str_replace('SUM(ft.total_amount)', 'ft.total_amount', $field['dbAlias']);
               }
