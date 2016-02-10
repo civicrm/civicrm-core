@@ -67,7 +67,7 @@ class Test {
   }
 
   /**
-   * Get the schema manager.
+   * Create a builder for the headless environment.
    *
    * @return \Civi\Test\CiviEnvBuilder
    *
@@ -78,7 +78,7 @@ class Test {
    */
   public static function headless() {
     $civiRoot = dirname(__DIR__);
-    $builder = new \Civi\Test\CiviEnvBuilder('CiviTesterSchema');
+    $builder = new \Civi\Test\CiviEnvBuilder('CiviEnvBuilder');
     $builder
       ->callback(function ($ctx) {
         if (CIVICRM_UF !== 'UnitTests') {
@@ -87,12 +87,33 @@ class Test {
         $dbName = \Civi\Test::dsn('database');
         echo "Installing {$dbName} schema\n";
         \Civi\Test::schema()->dropAll();
-      }, 'msg-drop')
+      }, 'headless-drop')
       ->sqlFile($civiRoot . "/sql/civicrm.mysql")
       ->sql("DELETE FROM civicrm_extension")
       ->callback(function ($ctx) {
         \Civi\Test::data()->populate();
       }, 'populate');
+    return $builder;
+  }
+
+  /**
+   * Create a builder for end-to-end testing on the live environment.
+   *
+   * @return \Civi\Test\CiviEnvBuilder
+   *
+   * @code
+   * \Civi\Test::e2e()->apply();
+   * \Civi\Test::e2e()->install('foo.bar')->apply();
+   * @endCode
+   */
+  public static function e2e() {
+    $builder = new \Civi\Test\CiviEnvBuilder('CiviEnvBuilder');
+    $builder
+      ->callback(function ($ctx) {
+        if (CIVICRM_UF === 'UnitTests') {
+          throw new \RuntimeException("\\Civi\\Test::e2e() requires a real CMS. Found CIVICRM_UF=UnitTests.");
+        }
+      }, 'e2e-check');
     return $builder;
   }
 
