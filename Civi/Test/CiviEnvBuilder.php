@@ -2,7 +2,7 @@
 namespace Civi\Test;
 
 use Civi\Test\CiviEnvBuilder\CallbackStep;
-use Civi\Test\CiviEnvBuilder\ExtensionStep;
+use Civi\Test\CiviEnvBuilder\ExtensionsStep;
 use Civi\Test\CiviEnvBuilder\SqlFileStep;
 use Civi\Test\CiviEnvBuilder\SqlStep;
 use Civi\Test\CiviEnvBuilder\StepInterface;
@@ -50,31 +50,51 @@ class CiviEnvBuilder {
   }
 
   /**
-   * Require an extension (based on its name).
+   * Require that an extension be installed.
    *
-   * @param string $name
-   * @return \CiviEnvBuilder
+   * @param string|array $names
+   *   One or more extension names. You may use a wildcard '*'.
+   * @return $this
    */
-  public function ext($name) {
-    return $this->addStep(new ExtensionStep($name));
+  public function install($names) {
+    return $this->addStep(new ExtensionsStep('install', $names));
   }
 
   /**
-   * Require an extension (based on its directory).
+   * Require an extension be installed (identified by its directory).
    *
-   * @param $dir
-   * @return \CiviEnvBuilder
+   * @param string $dir
+   *   The current test directory. We'll search for info.xml to
+   *   see what this extension is.
+   * @return $this
    * @throws \CRM_Extension_Exception_ParseException
    */
-  public function extDir($dir) {
-    while ($dir && dirname($dir) !== $dir && !file_exists("$dir/info.xml")) {
-      $dir = dirname($dir);
-    }
-    if (file_exists("$dir/info.xml")) {
-      $info = \CRM_Extension_Info::loadFromFile("$dir/info.xml");
-      $name = $info->key;
-    }
-    return $this->addStep(new ExtensionStep($name));
+  public function installMe($dir) {
+    return $this->addStep(new ExtensionsStep('install', $this->whoAmI($dir)));
+  }
+
+  /**
+   * Require an extension be uninstalled.
+   *
+   * @param string|array $names
+   *   One or more extension names. You may use a wildcard '*'.
+   * @return $this
+   */
+  public function uninstall($names) {
+    return $this->addStep(new ExtensionsStep('uninstall', $names));
+  }
+
+  /**
+   * Require an extension be uninstalled (identified by its directory).
+   *
+   * @param string $dir
+   *   The current test directory. We'll search for info.xml to
+   *   see what this extension is.
+   * @return $this
+   * @throws \CRM_Extension_Exception_ParseException
+   */
+  public function uninstallMe($dir) {
+    return $this->addStep(new ExtensionsStep('uninstall', $this->whoAmI($dir)));
   }
 
   protected function assertValid() {
@@ -137,9 +157,14 @@ class CiviEnvBuilder {
   }
 
   /**
-   * Determine if the schema is correct. If necessary, destroy and recreate.
+   * Determine if there's been a change in the preferred configuration.
+   * If the preferred-configuration matches the last test, keep it. Otherwise,
+   * destroy and recreate.
    *
    * @param bool $force
+   *   Forcibly execute the build, even if the configuration hasn't changed.
+   *   This will slow-down the tests, but it may be appropriate for some very sloppy
+   *   tests.
    * @return $this
    */
   public function apply($force = FALSE) {
@@ -161,6 +186,23 @@ class CiviEnvBuilder {
     }
     $this->setSavedSignature($this->getTargetSignature());
     return $this;
+  }
+
+  /**
+   * @param $dir
+   * @return null
+   * @throws \CRM_Extension_Exception_ParseException
+   */
+  protected function whoAmI($dir) {
+    while ($dir && dirname($dir) !== $dir && !file_exists("$dir/info.xml")) {
+      $dir = dirname($dir);
+    }
+    if (file_exists("$dir/info.xml")) {
+      $info = \CRM_Extension_Info::loadFromFile("$dir/info.xml");
+      $name = $info->key;
+      return $name;
+    }
+    return $name;
   }
 
 }
