@@ -27,11 +27,11 @@ interface HeadlessInterface {
    * It should perform any necessary steps required for putting the database
    * in a consistent baseline -- such as loading schema and extensions.
    *
-   * The utility class `CiviTester` provides a number of helper functions
+   * The utility class `\Civi\Test` provides a number of helper functions
    * for managing this setup, and it includes optimizations to avoid redundant
    * setup work.
    *
-   * @see CiviTester
+   * @see \Civi\Test
    */
   public function setUpHeadless();
 

@@ -16,7 +16,7 @@ class ExampleHookTest extends \PHPUnit_Framework_TestCase implements HeadlessInt
   protected $contact;
 
   public function setUpHeadless() {
-    return \CiviTester::headless()->apply();
+    return \Civi\Test::headless()->apply();
   }
 
   protected function setUp() {

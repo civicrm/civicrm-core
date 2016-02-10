@@ -221,7 +221,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       self::$dbInit = TRUE;
     }
 
-    return $this->createDefaultDBConnection(CiviTester::pdo(), $dbName);
+    return $this->createDefaultDBConnection(Civi\Test::pdo(), $dbName);
   }
 
   /**
@@ -253,7 +253,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     self::$populateOnce = NULL;
 
-    CiviTester::data()->populate();
+    Civi\Test::data()->populate();
 
     return TRUE;
   }

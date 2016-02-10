@@ -77,7 +77,6 @@ class CRM_Core_ClassLoader {
       'CiviMailUtils',
       'CiviReportTestCase',
       'CiviSeleniumTestCase',
-      'CiviTester',
       'CiviTestSuite',
       'CiviUnitTestCase',
       'Contact',
