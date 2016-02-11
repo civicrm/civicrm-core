@@ -72,17 +72,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   protected $groupTempTable = '';
 
   /**
-   * Status clause to be added in to both contact based & contribution based queries.
-   *
-   * The rationale seems to be that we construct a list of contacts and then show the relevant contributions for them.
-   *
-   * Presumably the clause originally was only status but now type is included too.
-   *
-   * @var string
-   */
-  protected $_statusClause = '';
-
-  /**
    * Class constructor.
    */
   public function __construct() {
@@ -399,9 +388,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     else {
       $clause = parent::whereClause($field, $op, $value, $min, $max);
     }
-    if ($field['name'] == 'contribution_status_id' || $field['name'] == 'financial_type_id') {
-      $this->_statusClause .= " AND " . $clause;
-    }
     return $clause;
   }
 
@@ -617,7 +603,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->buildQuery();
     // @todo this acl has no test coverage and is very hard to test manually so could be fragile.
     $this->getPermissionedFTQuery($this);
-    $this->resetFormSql();
+    $this->resetFormSqlAndWhereHavingClauses();
 
     $this->contactTempTable = 'civicrm_report_temp_lybunt_c_' . date('Ymd_') . uniqid();
     $this->limit();
@@ -708,10 +694,19 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   }
 
   /**
-   * Reset the form sql to prevent misleading developer tab info.
+   * Reset the form sql and where / having clause arrays.
+   *
+   * We do an early iteration of the report queries to generate the temp table.
+   *
+   * However, that iteration populates the sql for the developer tab,
+   * the whereClauses & the havingClauses and they are populated again in the normal
+   * report flow. This is harmless but confusing - ie. the where clause winds up repeating
+   * the same filters and the dev tab shows the query twice, so we rest them.
    */
-  protected function resetFormSql() {
+  protected function resetFormSqlAndWhereHavingClauses() {
     $this->sql = '';
+    $this->_havingClauses = array();
+    $this->_whereClauses = array();
     $this->sqlArray = array();
   }
 
