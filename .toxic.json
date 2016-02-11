@@ -12,6 +12,7 @@
     "CRM_Contact_Import_Form_MapField::buildQuickForm()": "toxicAlert",
     "CRM_Contribute_Form_Contribution_Main::formRule()": "toxicAlert",
     "CRM_Event_Form_Registration_Confirm::postProcess()": "toxicAlert",
+    "CRM_Event_BAO_Event::displayProfile()": "toxicAlert",
     "CRM_Contribute_Form_Contribution_Confirm::postProcess()": "toxicAlert"
   }
 }
