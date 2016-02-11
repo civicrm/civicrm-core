@@ -482,7 +482,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
     $transaction = new CRM_Core_Transaction();
 
-    $addToGroupID = isset($this->_addToGroupID) ? $this->_addToGroupID : NULL;
+    // CRM-17029 - get the add_to_group_id from the _contactProfileFields array.
+    $firstField = array_shift(array_slice($this->_contactProfileFields, 0, 1));
+    $addToGroupID = isset($firstField['add_to_group_id']) ? $firstField['add_to_group_id'] : NULL;
     $this->_contactId = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_contactProfileFields,
       $this->_contactId, $addToGroupID,
       $this->_contactProfileId, $this->_ctype,
