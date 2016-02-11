@@ -139,10 +139,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         'filters' => array(
           'sort_name' => array(
             'title' => ts('Participant Name'),
+            'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
           ),
           'id' => array(
             'title' => ts('Contact ID'),
+            'type' => CRM_Utils_Type::T_INT,
             'no_display' => TRUE,
           ),
           'birth_date' => array(
@@ -151,9 +153,11 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
           'contact_type' => array(
             'title' => ts('Contact Type'),
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'contact_sub_type' => array(
             'title' => ts('Contact Subtype'),
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'receive_date' => array(
             'default' => 'this.year',
@@ -174,6 +178,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           'financial_type_id' => array(
             'name' => 'financial_type_id',
             'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
