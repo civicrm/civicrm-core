@@ -269,7 +269,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @return bool
    */
   public function addGettingStartedDashlet(CRM_Queue_TaskContext $ctx) {
-    $sql = "SELECT count(*) FROM civicrm_dashboard WHERE name='gettingStarted'";
+    $sql = "SELECT count(*) FROM civicrm_dashboard WHERE name='getting-started'";
     $res = CRM_Core_DAO::singleValueQuery($sql);
     $domainId = CRM_Core_Config::domainID();
     if ($res <= 0) {
