@@ -453,15 +453,15 @@
 
   angular.module('crmMailing').factory('crmMailingStats', function (crmApi, crmLegacy) {
     var statTypes = [
-      // {name: 'Recipients', title: ts('Intended Recipients'),   searchFilter: '',                           eventsFilter: '&event=queue'},
-      {name: 'Delivered',     title: ts('Successful Deliveries'), searchFilter: '&mailing_delivery_status=Y', eventsFilter: '&event=delivered'},
-      {name: 'Opened',        title: ts('Tracked Opens'),         searchFilter: '&mailing_open_status=Y',     eventsFilter: '&event=opened'},
-      {name: 'Unique Clicks', title: ts('Click-throughs'),        searchFilter: '&mailing_click_status=Y',    eventsFilter: '&event=click&distinct=1'},
-      // {name: 'Forward',    title: ts('Forwards'),              searchFilter: '&mailing_forward=1',         eventsFilter: '&event=forward'},
-      // {name: 'Replies',    title: ts('Replies'),               searchFilter: '&mailing_reply_status=Y',    eventsFilter: '&event=reply'},
-      {name: 'Bounces',       title: ts('Bounces'),               searchFilter: '&mailing_delivery_status=N', eventsFilter: '&event=bounce'},
-      {name: 'Unsubscribers', title: ts('Unsubscribes'),          searchFilter: '&mailing_unsubscribe=1',     eventsFilter: '&event=unsubscribe'}
-      // {name: 'OptOuts',    title: ts('Opt-Outs'),              searchFilter: '&mailing_optout=1',          eventsFilter: '&event=optout'}
+      // {name: 'Recipients', title: ts('Intended Recipients'),   searchFilter: '',                           eventsFilter: '&event=queue', reportType: 'detail', reportFilter: ''},
+      {name: 'Delivered',     title: ts('Successful Deliveries'), searchFilter: '&mailing_delivery_status=Y', eventsFilter: '&event=delivered', reportType: 'detail', reportFilter: '&delivery_status_value=successful'},
+      {name: 'Opened',        title: ts('Tracked Opens'),         searchFilter: '&mailing_open_status=Y',     eventsFilter: '&event=opened', reportType: 'open', reportFilter: ''},
+      {name: 'Unique Clicks', title: ts('Click-throughs'),        searchFilter: '&mailing_click_status=Y',    eventsFilter: '&event=click&distinct=1', reportType: 'clicks', reportFilter: ''},
+      // {name: 'Forward',    title: ts('Forwards'),              searchFilter: '&mailing_forward=1',         eventsFilter: '&event=forward', reportType: 'detail', reportFilter: '&is_forwarded_value=1'},
+      // {name: 'Replies',    title: ts('Replies'),               searchFilter: '&mailing_reply_status=Y',    eventsFilter: '&event=reply', reportType: 'detail', reportFilter: '&is_replied_value=1'},
+      {name: 'Bounces',       title: ts('Bounces'),               searchFilter: '&mailing_delivery_status=N', eventsFilter: '&event=bounce', reportType: 'bounce', reportFilter: ''},
+      {name: 'Unsubscribers', title: ts('Unsubscribes'),          searchFilter: '&mailing_unsubscribe=1',     eventsFilter: '&event=unsubscribe', reportType: 'detail', reportFilter: '&is_unsubscribed_value=1'},
+      // {name: 'OptOuts',    title: ts('Opt-Outs'),              searchFilter: '&mailing_optout=1',          eventsFilter: '&event=optout', reportType: 'detail', reportFilter: ''}
     ];
 
     return {
@@ -505,12 +505,14 @@
             var retParams = returnPath ? '&context=angPage&angPage=' + returnPath : '';
             return crmLegacy.url('civicrm/mailing/report/event',
               'reset=1&mid=' + mailing.id + statType.eventsFilter + retParams);
-
           case 'search':
             return crmLegacy.url('civicrm/contact/search/advanced',
               'force=1&mailing_id=' + mailing.id + statType.searchFilter);
-
-          // TODO: case 'report':
+          case 'report':
+            var type = statType.reportType;
+            var reportIds = CRM.crmMailing.reportIds; 
+            return crmLegacy.url('civicrm/mailing/report/' + reportIds[statType.reportType],
+                'reset=1&mailing_id_value=' + mailing.id + statType.reportFilter);
           default:
             return null;
         }

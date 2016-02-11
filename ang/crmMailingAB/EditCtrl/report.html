@@ -78,6 +78,12 @@
           ng-href="{{statUrl(am.mailing, statType, 'events')}}"
           title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}"
           >{{stats[am.name][statType.name] || ts('n/a')}}</a>
+        <a
+          class="crm-hover-button action-item"
+          ng-href="{{statUrl(am.mailing, statType, 'report')}}"
+          title="{{ts('Search for contacts using \'%1\'', {1: statType.title})}}"
+          crm-icon="chevron-right"
+          ></a>
       </td>
       <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
