@@ -247,4 +247,30 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
   }
 
+  /**
+   * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
+   */
+  public function testLybuntReportWithFYDataOrderByLastYearAmount() {
+    $inInd = $this->individualCreate();
+    $outInd = $this->individualCreate();
+    $this->contributionCreate(array('contact_id' => $inInd, 'receive_date' => '2014-10-01'));
+    $this->contributionCreate(array('contact_id' => $outInd, 'receive_date' => '2015-03-01', 'trxn_id' => NULL, 'invoice_id' => NULL));
+    $this->callAPISuccess('Setting', 'create', array('fiscalYearStart' => array('M' => 7, 'd' => 1)));
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => 'contribute/lybunt',
+      'yid_value' => 2015,
+      'yid_op' => 'fiscal',
+      'options' => array('metadata' => array('sql')),
+      'fields' => array('first_name'),
+      'order_bys' => array(
+        array(
+          'column' => 'last_year_total_amount',
+          'order' => 'ASC',
+        ),
+      ),
+    ));
+
+    $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+  }
+
 }
