@@ -213,6 +213,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'title' => ts('Last Year Total'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_MONEY,
+            'required' => TRUE,
           ),
           'civicrm_life_time_total' => array(
             'title' => ts('Lifetime Total'),
@@ -712,26 +713,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   protected function resetFormSql() {
     $this->sql = '';
     $this->sqlArray = array();
-  }
-
-  /**
-   * Are we ordering by the latest year total.
-   *
-   * If we are we need to drop the rollup to do the ordering.
-   *
-   * Without bigger changes we can't get the lifetime total and order by
-   * the latest year total in the same query.
-   *
-   * @return bool
-   */
-  public function isOrderByLastYearTotal() {
-    $this->storeOrderByArray();
-    foreach ($this->_orderByArray as $orderBy) {
-      if (stristr($orderBy, 'contribution_civireport.total_amount')) {
-        return TRUE;
-      }
-    }
-    return FALSE;
   }
 
   /**
