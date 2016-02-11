@@ -37,7 +37,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   protected $_summary = NULL;
 
   protected $_contribField = FALSE;
-  protected $_lineitemField = FALSE;
   protected $_groupFilter = TRUE;
   protected $_tagFilter = TRUE;
   protected $_balance = FALSE;
@@ -457,9 +456,6 @@ ORDER BY  cv.label
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
     }
     foreach ($this->_columns as $tableName => $table) {
-      if ($tableName == 'civicrm_line_item') {
-        $this->_lineitemField = TRUE;
-      }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) ||
@@ -470,6 +466,11 @@ ORDER BY  cv.label
             }
             if ($fieldName == 'total_paid' || $fieldName == 'balance') {
               $this->_balance = TRUE;
+              // modify the select if filtered by fee_level as the from clause
+              // already selects the total_amount from civicrm_contribution table
+              if (!empty($this->_params['price_field_value_id_value'])) {
+                $field['dbAlias'] = str_replace('SUM(ft.total_amount)', 'ft.total_amount', $field['dbAlias']);
+              }
             }
             $alias = "{$tableName}_{$fieldName}";
             $select[] = "{$field['dbAlias']} as $alias";
@@ -532,7 +533,7 @@ ORDER BY  cv.label
                     ON (pp.contribution_id  = {$this->_aliases['civicrm_contribution']}.id)
       ";
     }
-    if ($this->_lineitemField) {
+    if (!empty($this->_params['price_field_value_id_value'])) {
       $this->_from .= "
             LEFT JOIN civicrm_line_item line_item_civireport
                   ON line_item_civireport.entity_table = 'civicrm_participant' AND
