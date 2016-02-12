@@ -158,7 +158,7 @@ function civicrm_api3_order_delete($params) {
  */
 function civicrm_api3_order_cancel($params) {
   $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-  $params['contribution_status_id'] = 'Cancelled';
+  $params['contribution_status_id'] = array_search('Cancelled', $contributionStatuses);
   $result = civicrm_api3('Contribution', 'create', $params);
   CRM_Contribute_BAO_Contribution::transitionComponents($params);
   return civicrm_api3_create_success($result['values'], $params, 'Order', 'cancel');
