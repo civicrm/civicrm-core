@@ -168,6 +168,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * @return void
    */
   public function browse($action = NULL) {
+    CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
