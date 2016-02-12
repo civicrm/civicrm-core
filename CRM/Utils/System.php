@@ -438,7 +438,7 @@ class CRM_Utils_System {
       ));
     }
 
-    self::setHttpHeader('Location', $url);
+    header('Location: ' . $url);
     self::civiExit();
   }
 
