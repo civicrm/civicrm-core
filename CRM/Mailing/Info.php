@@ -73,13 +73,14 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ) {
       return array();
     }
+
     $reportIds = array();
-    $reportTypes = array('detail', 'opened','bounce','clicks');
+    $reportTypes = array('detail', 'opened', 'bounce', 'clicks');
     foreach ($reportTypes as $report) {
       $result = civicrm_api3('ReportInstance', 'get', array(
-        'sequential' => 1, 
+        'sequential' => 1,
         'report_id' => 'mailing/' . $report));
-      $reportIds[$report] = $result['values'][0]['id']; 
+      $reportIds[$report] = $result['values'][0]['id'];
     }
     $result = array();
     $result['crmMailing'] = array(
