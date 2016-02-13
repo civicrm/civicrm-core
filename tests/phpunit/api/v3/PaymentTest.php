@@ -495,7 +495,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create payment api for paylater contribution with partial payment
+   * Test create payment api for paylater contribution with partial payment.
    */
   public function testCreatePaymentPayLaterPartialPayment() {
     $this->createLoggedInUser();

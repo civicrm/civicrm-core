@@ -134,16 +134,16 @@ function civicrm_api3_payment_create(&$params) {
   }
   // Get contribution
   $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $params['contribution_id']));
-  $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-  if ($contributionStatus[$contribution['contribution_status_id']] != 'Partially paid'
-    && !($contributionStatus[$contribution['contribution_status_id']] == 'Pending' && $contribution['is_pay_later'] == TRUE)
+  $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($contribution['contribution_status_id'], 'name');
+  if ($contributionStatus != 'Partially paid'
+    && !($contributionStatus == 'Pending' && $contribution['is_pay_later'] == TRUE)
   ) {
     throw new API_Exception('Please select a contribution which has a partial or pending payment');
   }
   else {
     // Check if pending contribution
     $fullyPaidPayLater = FALSE;
-    if ($contributionStatus[$contribution['contribution_status_id']] == 'Pending') {
+    if ($contributionStatus == 'Pending') {
       $cmp = bccomp($contribution['total_amount'], $params['total_amount'], 5);
       // Total payment amount is the whole amount paid against pending contribution
       if ($cmp == 0 || $cmp == -1) {
@@ -158,7 +158,7 @@ function civicrm_api3_payment_create(&$params) {
         civicrm_api3('Contribution', 'create',
           array(
             'id' => $contribution['id'],
-            'contribution_status_id' => array_search('Partially paid', $contributionStatus),
+            'contribution_status_id' => 'Partially paid',
           )
         );
       }
@@ -176,7 +176,7 @@ function civicrm_api3_payment_create(&$params) {
             // get financial item
             $sql = "SELECT fi.id
               FROM civicrm_financial_item fi
-              INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
+              INNER JOIN civicrm_line_item li ON li.id = fi.entity_id and fi.entity_table = 'civicrm_line_item'
               WHERE li.contribution_id = %1 AND li.id = %2";
             $sqlParams = array(
               1 => array($params['contribution_id'], 'Integer'),
