@@ -990,6 +990,7 @@ class CRM_Utils_Token {
         'reset=1',
         TRUE, NULL, TRUE, TRUE
       );
+      $url = str_replace('&amp;', '&', $url);
       $str = preg_replace('/\{action\.subscribeUrl\}/', $url, $str);
     }
 
