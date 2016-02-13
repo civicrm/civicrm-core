@@ -4836,7 +4836,7 @@ LIMIT 1;";
       // get financial item
       $sql = "SELECT fi.id, li.price_field_value_id
       FROM civicrm_financial_item fi
-      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
+      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id and fi.entity_table = 'civicrm_line_item'
       WHERE li.contribution_id = %1";
       $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['contribution_id'], 'Integer')));
       while ($dao->fetch()) {
