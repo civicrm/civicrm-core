@@ -3358,7 +3358,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     if ((($previousContributionStatus == 'Partially paid'
       && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))
-      || ($previousContributionStatus == 'Pending'
+      || ($previousContributionStatus == 'Pending' && $params['prevContribution']->is_pay_later == TRUE
       && $params['contribution']->contribution_status_id == array_search('Partially paid', $contributionStatus)))
       && $context == 'changedStatus'
     ) {
