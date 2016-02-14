@@ -449,7 +449,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
         else {
           // handle indices over substrings, CRM-6245
           // $lengthName is appended to index name, $lengthSize is the field size modifier
-          $lengthName = isset($substrLenghts[$table][$fieldName]) ? "_{$substrLenghts[$table][$fieldName]})" : '';
+          $lengthName = isset($substrLenghts[$table][$fieldName]) ? "_{$substrLenghts[$table][$fieldName]}" : '';
           $lengthSize = isset($substrLenghts[$table][$fieldName]) ? "({$substrLenghts[$table][$fieldName]})" : '';
         }
 
