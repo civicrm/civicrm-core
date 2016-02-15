@@ -312,6 +312,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         );
         $this->_columns['civicrm_activity']['filters']['campaign_id'] = array(
           'title' => ts('Campaign'),
+          'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $this->activeCampaigns,
         );
@@ -323,6 +324,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         );
         $this->_columns['civicrm_activity']['filters']['engagement_level'] = array(
           'title' => ts('Engagement Index'),
+          'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $this->engagementLevels,
         );

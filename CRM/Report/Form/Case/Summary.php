@@ -130,6 +130,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
           ),
           'status_id' => array(
             'title' => ts('Status'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Case_BAO_Case::buildOptions('status_id', 'search'),
           ),
@@ -161,6 +162,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
         'filters' => array(
           'relationship_type_id' => array(
             'title' => ts('Staff Relationship'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->rel_types,
           ),

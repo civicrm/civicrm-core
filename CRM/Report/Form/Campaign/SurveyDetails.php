@@ -204,12 +204,14 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'state_province_id' => array(
             'name' => 'state_province_id',
             'title' => ts('State/Province'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::stateProvince(),
           ),
           'country_id' => array(
             'name' => 'country_id',
             'title' => ts('Country'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::country(),
           ),
