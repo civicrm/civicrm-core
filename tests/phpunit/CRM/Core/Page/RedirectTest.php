@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Core_Page_RedirectTest
+ * @group headless
  */
 class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
   /**

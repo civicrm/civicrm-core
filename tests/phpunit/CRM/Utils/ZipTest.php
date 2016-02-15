@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Utils_ZipTest
+ * @group headless
  */
 class CRM_Utils_ZipTest extends CiviUnitTestCase {
 

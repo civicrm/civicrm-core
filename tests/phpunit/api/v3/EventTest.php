@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_EventTest
+ * @group headless
  */
 class api_v3_EventTest extends CiviUnitTestCase {
   protected $_params;

@@ -30,6 +30,7 @@
  * @todo Split UFGroup and UFJoin tests
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_UFFieldTest extends CiviUnitTestCase {
   // ids from the uf_group_test.xml fixture

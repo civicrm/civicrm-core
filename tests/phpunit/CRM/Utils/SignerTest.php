@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Utils_SignerTest
+ * @group headless
  */
 class CRM_Utils_SignerTest extends CiviUnitTestCase {
 

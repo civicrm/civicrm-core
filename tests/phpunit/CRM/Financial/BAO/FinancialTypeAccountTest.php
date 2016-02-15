@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Financial_BAO_FinancialTypeAccountTest
+ * @group headless
  */
 class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
 

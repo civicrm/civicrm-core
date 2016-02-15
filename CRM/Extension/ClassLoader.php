@@ -68,10 +68,7 @@ class CRM_Extension_ClassLoader {
   }
 
   public function __destruct() {
-    if ($this->loader) {
-      $this->loader->unregister();
-      $this->loader = NULL;
-    }
+    $this->unregister();
   }
 
   /**
@@ -80,12 +77,11 @@ class CRM_Extension_ClassLoader {
    */
   public function register() {
     // In pre-installation environments, don't bother with caching.
-    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') || !defined('CIVICRM_DSN') || \CRM_Utils_System::isInUpgradeMode()) {
+    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') || !defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || \CRM_Utils_System::isInUpgradeMode()) {
       return $this->buildClassLoader()->register();
     }
 
-    $envId = \CRM_Core_Config_Runtime::getId();
-    $file = CIVICRM_TEMPLATE_COMPILEDIR . "/CachedExtLoader.{$envId}.php";
+    $file = $this->getCacheFile();
     if (file_exists($file)) {
       $loader = require $file;
     }
@@ -127,6 +123,31 @@ class CRM_Extension_ClassLoader {
     }
 
     return $loader;
+  }
+
+  public function unregister() {
+    if ($this->loader) {
+      $this->loader->unregister();
+      $this->loader = NULL;
+    }
+  }
+
+  public function refresh() {
+    $this->unregister();
+    $file = $this->getCacheFile();
+    if (file_exists($file)) {
+      unlink($file);
+    }
+    $this->register();
+  }
+
+  /**
+   * @return string
+   */
+  protected function getCacheFile() {
+    $envId = \CRM_Core_Config_Runtime::getId();
+    $file = CIVICRM_TEMPLATE_COMPILEDIR . "/CachedExtLoader.{$envId}.php";
+    return $file;
   }
 
 }

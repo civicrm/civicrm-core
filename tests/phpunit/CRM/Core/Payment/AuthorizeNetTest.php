@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_Payment_AuthorizeNetTest
+ * @group headless
  */
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 

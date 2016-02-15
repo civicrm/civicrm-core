@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_ParticipantStatusTypeTest
+ * @group headless
  */
 class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   protected $_apiversion;

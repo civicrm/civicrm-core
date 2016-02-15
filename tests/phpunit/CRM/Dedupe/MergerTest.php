@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Dedupe_DedupeMergerTest
+ * @group headless
  */
 class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 

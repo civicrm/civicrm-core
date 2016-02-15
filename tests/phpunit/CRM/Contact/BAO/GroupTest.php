@@ -29,6 +29,7 @@
  * Test class for CRM_Contact_BAO_Group BAO
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 

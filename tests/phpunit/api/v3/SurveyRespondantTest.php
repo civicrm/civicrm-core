@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_SurveyRespondantTest
+ * @group headless
  */
 class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

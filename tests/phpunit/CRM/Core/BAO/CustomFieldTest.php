@@ -5,6 +5,7 @@ require_once 'CiviTest/Custom.php';
 
 /**
  * Class CRM_Core_BAO_CustomFieldTest
+ * @group headless
  */
 class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 

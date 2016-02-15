@@ -30,6 +30,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Core
+ * @group headless
  */
 class api_v3_TagTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

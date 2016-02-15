@@ -29,6 +29,7 @@
  * Test class for API functions.
  *
  * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_APITest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;

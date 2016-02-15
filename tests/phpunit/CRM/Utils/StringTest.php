@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Utils_StringTest
+ * @group headless
  */
 class CRM_Utils_StringTest extends CiviUnitTestCase {
 
@@ -158,6 +159,68 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   public function testStrToBool($input, $expected) {
     $actual = CRM_Utils_String::strtobool($input);
     $this->assertTrue($expected === $actual);
+  }
+
+  public function startEndCases() {
+    $cases = array();
+    $cases[] = array('startsWith', 'foo', '', TRUE);
+    $cases[] = array('startsWith', 'foo', 'f', TRUE);
+    $cases[] = array('startsWith', 'foo', 'fo', TRUE);
+    $cases[] = array('startsWith', 'foo', 'foo', TRUE);
+    $cases[] = array('startsWith', 'foo', 'fooo', FALSE);
+    $cases[] = array('startsWith', 'foo', 'o', FALSE);
+    $cases[] = array('endsWith', 'foo', 'f', FALSE);
+    $cases[] = array('endsWith', 'foo', '', TRUE);
+    $cases[] = array('endsWith', 'foo', 'o', TRUE);
+    $cases[] = array('endsWith', 'foo', 'oo', TRUE);
+    $cases[] = array('endsWith', 'foo', 'foo', TRUE);
+    $cases[] = array('endsWith', 'foo', 'fooo', FALSE);
+    $cases[] = array('endsWith', 'foo*', '*', TRUE);
+    return $cases;
+  }
+
+  /**
+   * @param string $func
+   *   One of: 'startsWith' or 'endsWith'.
+   * @param $string
+   * @param $fragment
+   * @param $expectedResult
+   * @dataProvider startEndCases
+   */
+  public function testStartEndWith($func, $string, $fragment, $expectedResult) {
+    $actualResult = \CRM_Utils_String::$func($string, $fragment);
+    $this->assertEquals($expectedResult, $actualResult, "Checking $func($string,$fragment)");
+  }
+
+  public function wildcardCases() {
+    $cases = array();
+    $cases[] = array('*', array('foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang'));
+    $cases[] = array('foo.*', array('foo.bar.1', 'foo.bar.2', 'foo.whiz'));
+    $cases[] = array('foo.bar.*', array('foo.bar.1', 'foo.bar.2'));
+    $cases[] = array(array('foo.bar.*', 'foo.bar.2'), array('foo.bar.1', 'foo.bar.2'));
+    $cases[] = array(array('foo.bar.2', 'foo.w*'), array('foo.bar.2', 'foo.whiz'));
+    return $cases;
+  }
+
+  /**
+   * @param $patterns
+   * @param $expectedResults
+   * @dataProvider wildcardCases
+   */
+  public function testFilterByWildCards($patterns, $expectedResults) {
+    $data = array('foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang');
+
+    $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data);
+    $this->assertEquals($expectedResults, $actualResults);
+
+    $patterns = (array) $patterns;
+    $patterns[] = 'noise';
+
+    $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data, FALSE);
+    $this->assertEquals($expectedResults, $actualResults);
+
+    $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data, TRUE);
+    $this->assertEquals(array_merge($expectedResults, array('noise')), $actualResults);
   }
 
 }

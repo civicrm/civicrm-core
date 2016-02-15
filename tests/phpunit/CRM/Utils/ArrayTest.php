@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Utils_ArrayTest
+ * @group headless
  */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
