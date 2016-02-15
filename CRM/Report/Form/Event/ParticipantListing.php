@@ -187,6 +187,9 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'registered_by_id' => array(
             'title' => ts('Registered by Participant ID'),
           ),
+          'source' => array(
+            'title' => ts('Source'),
+          ),
           'participant_fee_level' => NULL,
           'participant_fee_amount' => array('title' => ts('Participant Fee')),
           'participant_register_date' => array('title' => ts('Registration Date')),
@@ -239,6 +242,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
           'registered_by_id' => array(
             'title' => ts('Registered by Participant ID'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operator' => 'like',
+          ),
+          'source' => array(
+            'title' => ts('Source'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
           ),
