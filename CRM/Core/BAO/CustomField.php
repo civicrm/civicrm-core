@@ -1240,15 +1240,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
 
         $v = array();
-        if ($html_type == 'CheckBox') {
-          foreach ($checkedData as $key => $val) {
-            $v[] = CRM_Utils_Array::value($key, $option);
-          }
-        }
-        else {
-          foreach ($checkedData as $key => $val) {
-            $v[] = CRM_Utils_Array::value($val, $option);
-          }
+        foreach ($checkedData as $key => $val) {
+          $v[] = CRM_Utils_Array::value($val, $option);
         }
         if (!empty($v)) {
           $display = implode(', ', $v);
