@@ -2869,7 +2869,7 @@ class CRM_Contact_BAO_Query {
     }
 
     $statii = array();
-    $gcsValues = &$this->getWhereValues('group_contact_status', $grouping);
+    $gcsValues = $this->getWhereValues('group_contact_status', $grouping);
     if ($gcsValues &&
       is_array($gcsValues[2])
     ) {
