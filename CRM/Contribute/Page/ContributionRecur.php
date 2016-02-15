@@ -67,6 +67,16 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
         $values['contribution_status'] = CRM_Core_OptionGroup::getLabel('contribution_status', $values['contribution_status_id']);
       }
 
+      $idFields = array('contribution_status_id', 'campaign_id');
+      if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($values['id'])) {
+        $idFields[] = 'financial_type_id';
+      }
+      foreach ($idFields as $idField) {
+        if (!empty($values[$idField])) {
+          $values[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $values[$idField]);
+        }
+      }
+
       $this->assign('recur', $values);
     }
   }
