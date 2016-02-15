@@ -27,6 +27,7 @@
 
 /**
  * Class contains api test cases for "civicrm_note"
+ * @group headless
  */
 class api_v3_NoteTest extends CiviUnitTestCase {
 

@@ -4,6 +4,7 @@ require_once 'CRM/Utils/DeprecatedUtils.php';
 
 /**
  * Class CRM_Utils_DeprecatedUtilsTest
+ * @group headless
  */
 class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
 

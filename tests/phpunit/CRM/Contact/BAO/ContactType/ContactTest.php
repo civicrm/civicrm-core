@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Contact_BAO_ContactType_ContactTest
+ * @group headless
  */
 class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
 

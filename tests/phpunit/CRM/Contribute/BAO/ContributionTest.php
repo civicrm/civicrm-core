@@ -30,6 +30,7 @@ require_once 'CiviTest/Custom.php';
 
 /**
  * Class CRM_Contribute_BAO_ContributionTest
+ * @group headless
  */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 

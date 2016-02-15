@@ -29,6 +29,7 @@
  *  Test APIv3 civicrm_create_custom_group
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_CustomFieldTest extends CiviUnitTestCase {
   protected $_apiversion;

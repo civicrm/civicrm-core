@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Core_BAO_CustomValueTableSetGetTest
+ * @group headless
  */
 class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 

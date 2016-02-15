@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_BAO_SettingTest
+ * @group headless
  */
 class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   public function setUp() {

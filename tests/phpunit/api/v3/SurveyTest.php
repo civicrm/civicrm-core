@@ -42,6 +42,7 @@
  *
  * @author eileen
  *
+ * @group headless
  */
 class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $params;

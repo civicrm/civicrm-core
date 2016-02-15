@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_BAO_RecurringEntityTest
+ * @group headless
  */
 class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
 

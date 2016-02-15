@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Core_InnoDBIndexerTest
+ * @group headless
  */
 class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
   public function tearDown() {

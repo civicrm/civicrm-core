@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Extension_ManagerTest
+ * @group headless
  */
 class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   const TESTING_TYPE = 'report';

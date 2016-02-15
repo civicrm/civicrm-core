@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Core_Permission_JoomlaTest
+ * @group headless
  */
 class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
 

@@ -38,6 +38,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
+ * @group headless
  */
 class api_v3_ActivityTest extends CiviUnitTestCase {
   protected $_params;

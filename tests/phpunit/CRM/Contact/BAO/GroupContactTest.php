@@ -31,6 +31,7 @@ require_once 'CiviTest/Contact.php';
  * Test class for CRM_Contact_BAO_GroupContact BAO
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 

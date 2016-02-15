@@ -2,6 +2,7 @@
 
 /**
  *  Include dataProvider for tests
+ * @group headless
  */
 class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
 

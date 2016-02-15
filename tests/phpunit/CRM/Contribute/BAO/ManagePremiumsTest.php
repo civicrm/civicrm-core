@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Contribute_BAO_ManagePremiumsTest
+ * @group headless
  */
 class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
 

@@ -33,6 +33,7 @@
  * an error.
  *
  * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_SystemCheckTest extends CiviUnitTestCase {
   protected $_apiversion;

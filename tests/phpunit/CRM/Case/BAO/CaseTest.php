@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Case_BAO_CaseTest
+ * @group headless
  */
 class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 

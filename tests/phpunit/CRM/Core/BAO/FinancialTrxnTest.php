@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_BAO_FinancialTrxnTest
+ * @group headless
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   public function setUp() {

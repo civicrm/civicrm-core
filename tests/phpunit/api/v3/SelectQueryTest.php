@@ -29,6 +29,7 @@
  * Test APIv3 ability to join across multiple entities
  *
  * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_SelectQueryTest extends CiviUnitTestCase {
 

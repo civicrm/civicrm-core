@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_GroupContactTest
+ * @group headless
  */
 class api_v3_GroupContactTest extends CiviUnitTestCase {
 

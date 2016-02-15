@@ -27,6 +27,7 @@
 
 /**
  * Class api_v3_CampaignTest
+ * @group headless
  */
 class api_v3_CampaignTest extends CiviUnitTestCase {
   protected $_apiversion;

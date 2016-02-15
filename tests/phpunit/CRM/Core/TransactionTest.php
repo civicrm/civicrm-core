@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Core_TransactionTest
+ * @group headless
  */
 class CRM_Core_TransactionTest extends CiviUnitTestCase {
 

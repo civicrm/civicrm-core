@@ -3,6 +3,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
 
 /**
  * Class CRM_Case_PseudoConstantTest
+ * @group headless
  */
 class CRM_Case_PseudoConstantTest extends CiviCaseTestCase {
 

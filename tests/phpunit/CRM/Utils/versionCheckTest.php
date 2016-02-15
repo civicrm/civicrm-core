@@ -2,6 +2,7 @@
 
 /**
  * Class CRM_Utils_versionCheckTest
+ * @group headless
  */
 class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 

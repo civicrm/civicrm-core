@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Extension_Container_CollectionTest
+ * @group headless
  */
 class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
 

@@ -29,6 +29,7 @@
  * Test class for CRM_Pledge_BAO_PledgeBlock BAO
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 

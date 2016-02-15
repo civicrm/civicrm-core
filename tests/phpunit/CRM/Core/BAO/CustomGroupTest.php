@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Core_BAO_CustomGroupTest
+ * @group headless
  */
 class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
