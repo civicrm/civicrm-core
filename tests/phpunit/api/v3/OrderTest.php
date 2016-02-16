@@ -524,7 +524,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'net_amount' => 100,
       ),
     );
-    $this->checkPaymentResult($order, $expectedResult); 
+    $this->checkPaymentResult($order, $expectedResult);
     $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $params);
     $participant = $this->callAPISuccess('participant', 'get', array('id' => $participantPayment['participant_id']));
     $this->assertEquals($participant['values'][$participant['id']]['participant_status'], 'Cancelled');
