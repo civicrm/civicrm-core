@@ -236,6 +236,34 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   );
   $permissions['line_item'] = $permissions['contribution'];
 
+  // Payment permissions
+  $permissions['payment'] = array(
+    'get' => array(
+      'access CiviCRM',
+      'access CiviContribute',
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      'access CiviContribute',
+      'delete in CiviContribute',
+    ),
+    'cancel' => array(
+      'access CiviCRM',
+      'access CiviContribute',
+      'edit contributions',
+    ),
+    'create' => array(
+      'access CiviCRM',
+      'access CiviContribute',
+      'edit contributions',
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'access CiviContribute',
+      'edit contributions',
+    ),
+  );
+
   // Custom field permissions
   $permissions['custom_field'] = array(
     'default' => array(
