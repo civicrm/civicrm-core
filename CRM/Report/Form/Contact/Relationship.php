@@ -620,7 +620,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
         $rows[$rowNum]['civicrm_contact_display_name_a']
-          = $rows[$rowNum]['civicrm_contact_sort_name_a'] . ' (' .
+          = $rows[$rowNum]['civicrm_contact_display_name_a'] . ' (' .
           $rows[$rowNum]['civicrm_contact_id'] . ')';
         $rows[$rowNum]['civicrm_contact_display_name_a_link'] = $url;
         $rows[$rowNum]['civicrm_contact_display_name_a_hover'] = ts("View Contact details for this contact.");
