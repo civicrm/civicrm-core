@@ -57,7 +57,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    *
    * @return array
    */
-  public function &actionLinks() {
+  public static function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!self::$_actionLinks) {
       // helper variable for nicer formatting
@@ -331,7 +331,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id]['is_reserved'] = $value['is_reserved'];
 
       // form all action links
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
 
       // update enable/disable links depending on uf_group properties.
       if ($value['is_active']) {

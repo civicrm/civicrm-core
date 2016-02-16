@@ -79,7 +79,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @return array
    *   array of action links that we need to display for the browse screen
    */
-  public function &actionLinks() {
+  public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
@@ -142,7 +142,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
     foreach ($customOption as $id => $values) {
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
       // Adding the required fields in the array
       if (isset($taxRate[$values['financial_type_id']])) {
         $customOption[$id]['tax_rate'] = $taxRate[$values['financial_type_id']];
