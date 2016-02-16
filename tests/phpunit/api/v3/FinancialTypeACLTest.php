@@ -126,7 +126,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   /**
    * Test Get.
    */
-  public function testGetACLContributionCreate() {
+  public function testCreateACLContribution() {
     $this->setACL();
     $p = array(
       'contact_id' => $this->_individualId,
@@ -263,26 +263,15 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'add contributions of type Donation',
       'delete contributions of type Donation',
     );
-    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution = $this->callAPIFailure('contribution', 'create', $params, 'You do not have permission to create this line item');
+    
+    // Check that the entire contribution has rolled back.
+    $contribution = $this->callAPISuccess('contribution', 'get', array());
+    $this->assertEquals(0, $contribution['count']);
+    
+
     CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
 
-    $lineItemParams = array(
-      'contribution_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-    );
-    $lineItems = $this->callAPISuccess('LineItem', 'get', $lineItemParams);
-    $this->assertEquals(2, $lineItems['count']);
-    $this->assertEquals(100.00, $lineItems['values'][1]['line_total']);
-    $this->assertEquals(20, $lineItems['values'][2]['line_total']);
-    $this->assertEquals(1, $lineItems['values'][1]['financial_type_id']);
-    $this->assertEquals(1, $lineItems['values'][2]['financial_type_id']);
-
-    /* $this->assertEquals('You do not have permission to create this line item', $result['error_message'], */
-    /*   'lacking financial acl permissions for lineitems should not be enough to create a contribution of type Donation'); */
-
-    $this->callAPISuccess('Contribution', 'Delete', array(
-      'id' => $contribution['id'],
-    ));
     $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
