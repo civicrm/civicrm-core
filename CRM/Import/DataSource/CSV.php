@@ -229,6 +229,12 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
 
       $first = FALSE;
+
+      // CRM-17859 Trim non-breaking spaces from columns.
+      $row = array_map(
+        function($string) {
+          return trim($string, chr(0xC2) . chr(0xA0));
+        }, $row);
       $row = array_map('civicrm_mysql_real_escape_string', $row);
       $sql .= "('" . implode("', '", $row) . "')";
       $count++;

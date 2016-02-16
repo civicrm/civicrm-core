@@ -855,5 +855,4 @@ class CRM_Utils_String {
     }
     return array_values(array_unique($result));
   }
-
 }
