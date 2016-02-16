@@ -168,6 +168,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'title' => ts('Email'),
             'default' => TRUE,
           ),
+          'on_hold' => array(
+            'title' => ts('Email on hold'),
+          ),
         ),
       ),
       'civicrm_phone' => array(
@@ -778,6 +781,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
           $entryFound = TRUE;
         }
+      }
+      // Display 'Yes' if the email is on hold (leave blank for no so it stands out better).
+      if (array_key_exists('civicrm_email_on_hold', $row)) {
+        $rows[$rowNum]['civicrm_email_on_hold'] = $row['civicrm_email_on_hold'] ? ts('Yes') : '';
+        $entryFound = TRUE;
       }
 
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, 'List all contribution(s)') ? TRUE : $entryFound;
