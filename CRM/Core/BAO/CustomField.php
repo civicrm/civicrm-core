@@ -1224,17 +1224,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Multi-Select':
         if (is_array($value)) {
           if ($html_type == 'CheckBox') {
-            $newData = array();
-            foreach ($checkedData as $k => $v) {
-              if (!empty($v)) {
-                $newData[] = $k;
-              }
-            }
-            $checkedData = $newData;
+            CRM_Utils_Array::formatArrayKeys($value);
           }
-          else {
-            $checkedData = $value;
-          }
+          $checkedData = $value;
         }
         else {
           $checkedData = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -1249,6 +1241,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             $checkedData = $newData;
           }
         }
+
         $v = array();
         foreach ($checkedData as $key => $val) {
           $v[] = CRM_Utils_Array::value($val, $option);
