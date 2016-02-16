@@ -149,6 +149,38 @@ function civicrm_api3_order_delete($params) {
 }
 
 /**
+ * Cancel an Order.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @return array
+ */
+function civicrm_api3_order_cancel($params) {
+  $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+  $params['contribution_status_id'] = array_search('Cancelled', $contributionStatuses);
+  $result = civicrm_api3('Contribution', 'create', $params);
+  CRM_Contribute_BAO_Contribution::transitionComponents($params);
+  return civicrm_api3_create_success($result['values'], $params, 'Order', 'cancel');
+}
+
+/**
+ * Adjust Metadata for Cancel action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_order_cancel_spec(&$params) {
+  $params['contribution_id'] = array(
+    'api.required' => 1 ,
+    'title' => 'Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+}
+
+/**
  * Adjust Metadata for Create action.
  *
  * The metadata is used for setting defaults, documentation & validation.
