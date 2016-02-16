@@ -83,6 +83,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $row->context['controller']
       );
 
+      // merge the custom tokens in the $contact array
+      if (!empty($contactArray[$contactId])) {
+        $contact = array_merge($contact, $contactArray[$contactId]);
+      }
       $row->context('contact', $contact);
     }
   }
