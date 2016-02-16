@@ -52,7 +52,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
         'fields' => array(
-          'display_name_a' => array(
+          'sort_name_a' => array(
             'title' => ts('Contact A'),
             'name' => 'display_name',
             'required' => TRUE,
@@ -91,7 +91,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'dao' => 'CRM_Contact_DAO_Contact',
         'alias' => 'contact_b',
         'fields' => array(
-          'display_name_b' => array(
+          'sort_name_b' => array(
             'title' => ts('Contact B'),
             'name' => 'display_name',
             'required' => TRUE,
@@ -612,33 +612,33 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      if (array_key_exists('civicrm_contact_display_name_a', $row) &&
+      if (array_key_exists('civicrm_contact_sort_name_a', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
         $url = CRM_Report_Utils_Report::getNextUrl('contact/detail',
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        $rows[$rowNum]['civicrm_contact_display_name_a']
-          = $rows[$rowNum]['civicrm_contact_display_name_a'] . ' (' .
+        $rows[$rowNum]['civicrm_contact_sort_name_a']
+          = $rows[$rowNum]['civicrm_contact_sort_name_a'] . ' (' .
           $rows[$rowNum]['civicrm_contact_id'] . ')';
-        $rows[$rowNum]['civicrm_contact_display_name_a_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_display_name_a_hover'] = ts("View Contact details for this contact.");
+        $rows[$rowNum]['civicrm_contact_sort_name_a_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_sort_name_a_hover'] = ts("View Contact details for this contact.");
         $entryFound = TRUE;
       }
 
-      if (array_key_exists('civicrm_contact_b_display_name_b', $row) &&
+      if (array_key_exists('civicrm_contact_b_sort_name_b', $row) &&
         array_key_exists('civicrm_contact_b_id', $row)
       ) {
         $url = CRM_Report_Utils_Report::getNextUrl('contact/detail',
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_b_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        $rows[$rowNum]['civicrm_contact_b_display_name_b']
-          = $rows[$rowNum]['civicrm_contact_b_display_name_b'] . ' (' .
+        $rows[$rowNum]['civicrm_contact_b_sort_name_b']
+          = $rows[$rowNum]['civicrm_contact_b_sort_name_b'] . ' (' .
           $rows[$rowNum]['civicrm_contact_b_id'] . ')';
-        $rows[$rowNum]['civicrm_contact_b_display_name_b_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_b_display_name_b_hover'] = ts("View Contact details for this contact.");
+        $rows[$rowNum]['civicrm_contact_b_sort_name_b_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_b_sort_name_b_hover'] = ts("View Contact details for this contact.");
         $entryFound = TRUE;
       }
 
