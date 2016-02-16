@@ -3285,7 +3285,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           // CRM-17751.
           if (isset($params['refund_trxn_id'])) {
             $refundIDs = CRM_Core_BAO_FinancialTrxn::getRefundTransactionIDs($params['id']);
-            if ($refundIDs['trxn_id'] != $params['refund_trxn_id']) {
+            if (!empty($refundIDs['financialTrxnId']) && $refundIDs['trxn_id'] != $params['refund_trxn_id']) {
               civicrm_api3('FinancialTrxn', 'create', array('id' => $refundIDs['financialTrxnId'], 'trxn_id' => $params['refund_trxn_id']));
             }
           }
