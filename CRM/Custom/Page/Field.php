@@ -65,7 +65,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @return array
    *   array of action links that we need to display for the browse screen
    */
-  public function &actionLinks() {
+  public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
@@ -136,7 +136,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
     while ($customFieldBAO->fetch()) {
       $customField[$customFieldBAO->id] = array();
       CRM_Core_DAO::storeValues($customFieldBAO, $customField[$customFieldBAO->id]);
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
       if ($customFieldBAO->is_active) {
         $action -= CRM_Core_Action::ENABLE;
       }
