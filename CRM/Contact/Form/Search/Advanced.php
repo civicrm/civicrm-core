@@ -423,35 +423,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     }
 
     if ($this->_ssID && empty($_POST)) {
-      $specialFields = array('contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id');
-
-      foreach ($defaults as $element => $value) {
-        if (!empty($value) && is_array($value)) {
-          if (in_array($element, $specialFields)) {
-            $element = str_replace('member_membership_type_id', 'membership_type_id', $element);
-            $element = str_replace('member_status_id', 'membership_status_id', $element);
-            $defaults[$element] = array_keys($value);
-          }
-          // As per the OK (Operator as Key) value format, value array may contain key
-          // as an operator so to ensure the default is always set actual value
-          elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-            $defaults[$element] = CRM_Utils_Array::value(key($value), $value);
-            if (is_string($defaults[$element])) {
-              $defaults[$element] = str_replace("%", '', $defaults[$element]);
-            }
-          }
-        }
-        if (substr($element, 0, 7) == 'custom_' &&
-          (substr($element, -5, 5) == '_from' || substr($element, -3, 3) == '_to')
-          ) {
-          // Ensure the _relative field is set if from or to are set to ensure custom date
-          // fields with 'from' or 'to' values are displayed when the are set in the smart group
-          // being loaded. (CRM-17116)
-          if (!isset($defaults[CRM_Contact_BAO_Query::getCustomFieldName($element) . '_relative'])) {
-            $defaults[CRM_Contact_BAO_Query::getCustomFieldName($element) . '_relative'] = 0;
-          }
-        }
-      }
+      $defaults = array_merge($defaults, CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID));
     }
     return $defaults;
   }

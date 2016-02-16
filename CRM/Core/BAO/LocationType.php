@@ -160,7 +160,12 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
       $baoString = 'CRM_Core_BAO_' . $name;
       $object = new $baoString();
       $object->location_type_id = $locationTypeId;
-      $object->delete();
+      if ($object->find()) {
+        throw new CRM_Core_Exception('Deleting this will delete address, phone, email or im data.'
+        . 'You are using the Fuzion CiviCRM repo and we have blocked you from doing this due to the catastrophic nature of a mistake here'
+        . 'If you really want to do this log a Redmine ticket to us (assuming you are a customer)
+        ');
+      }
     }
 
     $locationType = new CRM_Core_DAO_LocationType();

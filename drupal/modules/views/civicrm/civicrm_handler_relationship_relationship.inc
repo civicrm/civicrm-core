@@ -53,7 +53,7 @@ class civicrm_handler_relationship_relationship extends views_handler_relationsh
       '#multiple' => TRUE,
       '#title' => 'Choose a specific relationship type',
       '#options' => self::$relationship_types,
-      '#description' => t('Choose to limit this relationship to one or more specific types of CiviCRM relationship. Hold the Shift key to select or
+      '#description' => t('Choose to limit this relationship to one or more specific types of CiviCRM relationship.'),
       '#default_value' => $this->options['relationship_type'],
     );
     $form['relationship_state'] = array(

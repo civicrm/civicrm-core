@@ -33,8 +33,6 @@
 class CRM_Member_BAO_Query {
 
   /**
-   * Get available fields.
-   *
    * @return array
    */
   public static function &getFields() {
@@ -43,9 +41,9 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * If membership are involved, add the specific membership fields.
+   * If membership are involved, add the specific membership fields
    *
-   * @param CRM_Contact_BAO_Query $query
+   * @param $query
    */
   public static function select(&$query) {
     // if membership mode add membership id
@@ -129,11 +127,10 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * Generate where clause.
-   *
-   * @param CRM_Contact_BAO_Query $query
+   * @param $query
    */
   public static function where(&$query) {
+    $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
         continue;
@@ -142,19 +139,18 @@ class CRM_Member_BAO_Query {
         if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
+        $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }
   }
 
   /**
-   * Generate where for a single parameter.
-   *
-   * @param array $values
-   * @param CRM_Contact_BAO_Query $query
+   * @param $values
+   * @param $query
    */
   public static function whereClauseSingle(&$values, &$query) {
-    list($name, $op, $value, $grouping) = $values;
+    list($name, $op, $value, $grouping, $wildcard) = $values;
     switch ($name) {
       case 'member_join_date_low':
       case 'member_join_date_high':
@@ -185,6 +181,7 @@ class CRM_Member_BAO_Query {
         $date = CRM_Utils_Date::format($value);
         if ($date) {
           $query->_where[$grouping][] = "civicrm_membership.join_date {$op} {$date}";
+          $date = CRM_Utils_Date::customFormat($value);
           $format = CRM_Utils_Date::customFormat(CRM_Utils_Date::format(array_reverse($value), '-'));
           $query->_qill[$grouping][] = ts('Member Since %2 %1', array(1 => $format, 2 => $op));
         }
@@ -331,13 +328,11 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * Generate from clause.
-   *
    * @param string $name
-   * @param int $mode
-   * @param string $side
+   * @param $mode
+   * @param $side
    *
-   * @return string
+   * @return null|string
    */
   public static function from($name, $mode, $side) {
     $from = NULL;
@@ -373,9 +368,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * Get default return properties.
-   *
-   * @param string $mode
+   * @param $mode
    * @param bool $includeCustomFields
    *
    * @return array|null
@@ -480,20 +473,17 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * Possibly un-required function.
-   *
-   * @param array $row
+   * @param $row
    * @param int $id
    */
   public static function searchAction(&$row, $id) {
   }
 
   /**
-   * Add membership table.
-   *
-   * @param array $tables
+   * @param $tables
    */
   public static function tableNames(&$tables) {
+    //add membership table
     if (!empty($tables['civicrm_membership_log']) || !empty($tables['civicrm_membership_status']) || CRM_Utils_Array::value('civicrm_membership_type', $tables)) {
       $tables = array_merge(array('civicrm_membership' => 1), $tables);
     }

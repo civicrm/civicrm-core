@@ -3780,7 +3780,7 @@ WHERE con.id = {$contributionId}
    * @throws \CiviCRM_API3_Exception
    */
   public static function isSingleLineItem($id) {
-    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('id' => $id));
+    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('contribution_id' => $id));
     return ($lineItemCount == 1);
   }
 

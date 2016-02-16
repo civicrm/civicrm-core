@@ -1490,10 +1490,14 @@ class CRM_Contact_BAO_Query {
     }
 
     foreach ($formValues as $id => $values) {
+
       if (self::isAlreadyProcessedForQueryFormat($values)) {
         $params[] = $values;
         continue;
       }
+
+      self::legacyConvertFormValues($id, $values);
+
       if ($id == 'privacy') {
         if (is_array($formValues['privacy'])) {
           $op = !empty($formValues['privacy']['do_not_toggle']) ? '=' : '!=';
@@ -1568,6 +1572,30 @@ class CRM_Contact_BAO_Query {
       }
     }
     return $params;
+  }
+
+  /**
+   * Function to support legacy format for groups and tags.
+   *
+   * @param string $id
+   * @param array|int $values
+   *
+   */
+  public static function legacyConvertFormValues($id, &$values) {
+    $legacyElements = array(
+      'tag',
+      'contact_tags',
+      'contact_type',
+      'membership_type_id',
+      'membership_status_id',
+      'activity_type_id',
+      'location_type',
+    );
+    if (in_array($id, $legacyElements) && is_array($values)) {
+      // prior to 4.6, formValues for some attributes (e.g. group, tag) are stored in array(id1 => 1, id2 => 1),
+      // as per the recent Search fixes $values need to be in standard array(id1, id2) format
+      CRM_Utils_Array::formatArrayKeys($values);
+    }
   }
 
   /**
@@ -4544,7 +4572,7 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @return bool;
    */
-  protected static function isAlreadyProcessedForQueryFormat($values) {
+  public static function isAlreadyProcessedForQueryFormat($values) {
     if (!is_array($values)) {
       return FALSE;
     }
