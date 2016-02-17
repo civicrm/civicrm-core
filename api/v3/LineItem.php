@@ -49,23 +49,25 @@ function civicrm_api3_line_item_create($params) {
       $op = CRM_Core_Action::ADD;
     }
     else {
-      if (empty($params['financial_type_id'])) {
-        $params['financial_type_id'] = civicrm_api3('LineItem', 'getvalue', array(
-          'id' => $params['id'],
-          'return' => 'financial_type_id',
-        ));
-      }
       $op = CRM_Core_Action::UPDATE;
     }
+    if (empty($params['financial_type_id'])) {
+      $params['financial_type_id'] = civicrm_api3('LineItem', 'getvalue', array(
+        'id' => $params['id'],
+        'return' => 'financial_type_id',
+      ));
+    }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
+    if (in_array($params['financial_type_id'], array_keys($types))) {
+      $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
+      return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+    }
+    else {
+      throw new API_Exception('You do not have permission to create this line item');
+    }
   }
-  if (in_array($params['financial_type_id'], array_keys($types))) {
-    $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
-    return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-  }
-  else {
-    throw new API_Exception('You do not have permission to create this line item');
-  }
+  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -114,5 +116,17 @@ function civicrm_api3_line_item_get($params) {
  *   API result array
  */
 function civicrm_api3_line_item_delete($params) {
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+    if (empty($params['financial_type_id'])) {
+      $params['financial_type_id'] = civicrm_api3('LineItem', 'getvalue', array(
+        'id' => $params['id'],
+        'return' => 'financial_type_id',
+      ));
+    }
+    if (!in_array($params['financial_type_id'], array_keys($types))) {
+      throw new API_Exception('You do not have permission to delete this line item');
+    }
+  }
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
