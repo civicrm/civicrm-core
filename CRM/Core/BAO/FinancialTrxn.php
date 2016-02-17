@@ -541,6 +541,9 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
   }
 
   /**
+   * Function records partial payment, complete's contribution if payment is fully paid
+   * and returns latest payment ie financial trxn
+   *
    * @param array $contribution
    * @param array $params
    *
