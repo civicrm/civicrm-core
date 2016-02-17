@@ -86,10 +86,11 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGroupListViewAllContacts() {
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
-    list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
-    $this->assertEquals(2, $total);
-    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
-    $this->assertEquals('<span class="crm-editable crmf-title">not-me-active</span>', $groups[4]['group_name']);
+    $params = $this->_params;
+    $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
+    $this->assertEquals(2, $groups['recordsTotal']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups['data'][2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-active</span>', $groups['data'][4]['group_name']);
   }
 
   /**

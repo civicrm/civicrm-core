@@ -57,7 +57,7 @@ class CRM_Group_Page_AJAX {
       $sortMapper = array();
       foreach ($_GET['columns'] as $key => $value) {
         $sortMapper[$key] = $value['data'];
-      };
+      }
 
       $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
       $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
@@ -86,12 +86,6 @@ class CRM_Group_Page_AJAX {
         }
       }
 
-      //add setting so this can be tested by unit test
-      //@todo - ideally the portion of this that retrieves the groups should be extracted into a function separate
-      // from the one which deals with web inputs & outputs so we have a properly testable & re-usable function
-      if (!empty($params['is_unit_test'])) {
-        return array($groups, $iFilteredTotal);
-      }
       CRM_Utils_JSON::output($groups);
     }
   }
