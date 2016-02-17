@@ -117,7 +117,7 @@ function civicrm_api3_line_item_get($params) {
  */
 function civicrm_api3_line_item_delete($params) {
   if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::DELETE);
     if (empty($params['financial_type_id'])) {
       $params['financial_type_id'] = civicrm_api3('LineItem', 'getvalue', array(
         'id' => $params['id'],
