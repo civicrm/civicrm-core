@@ -70,7 +70,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     );
 
-    $order = $this->callAPISuccess('Order', 'get', $params);
+    $order = $this->callAPIAndDocument('Order', 'get', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals(1, $order['count']);
     $expectedResult = array(
@@ -244,7 +244,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'status_id' => 1,
       ),
     );
-    $order = $this->callAPISuccess('order', 'create', $p);
+    $order = $this->callAPIAndDocument('order', 'create', $p, __FUNCTION__, __FILE__);
     $params = array(
       'contribution_id' => $order['id'],
     );
@@ -333,7 +333,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'source' => 'Online Event Registration: API Testing',
       ),
     );
-    $order = $this->callAPISuccess('order', 'create', $p);
+    $order = $this->callAPIAndDocument('order', 'create', $p, __FUNCTION__, __FILE__, 'Create order for participant', 'CreateOrderParticipant');
     $params = array(
       'contribution_id' => $order['id'],
     );
@@ -451,7 +451,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'contribution_id' => $order['id'],
         'is_test' => TRUE,
       ));
-      $this->callAPISuccess('order', 'delete', $params);
+      $this->callAPIAndDocument('order', 'delete', $params, __FUNCTION__, __FILE__);
       $order = $this->callAPISuccess('order', 'get', $params);
       $this->assertEquals(0, $order['count']);
     }
@@ -465,7 +465,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $params = array(
       'contribution_id' => $contribution['id'],
     );
-    $this->callAPISuccess('order', 'cancel', $params);
+    $this->callAPIAndDocument('order', 'cancel', $params, __FUNCTION__, __FILE__);
     $order = $this->callAPISuccess('Order', 'get', $params);
     $expectedResult = array(
       $contribution['id'] => array(
