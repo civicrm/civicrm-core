@@ -171,7 +171,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
-   
+
     $this->assertEquals(1, $contribution['count']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
@@ -359,7 +359,8 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'delete contributions of type Donation',
     );
     $contribution = $this->callAPISuccess('Contribution', 'delete', $params);
-   
+
     $this->assertEquals($contribution['count'], 1);
   }
+
 }
