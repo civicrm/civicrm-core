@@ -84,16 +84,19 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPIFailure('payment', 'get', $params, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and access CiviContribute');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviContribute');
+    $payment = $this->callAPISuccess('payment', 'get', $params);
 
     $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $payment['count']);
 
     $expectedResult = array(
-      'total_amount' => 100,
-      'trxn_id' => 23456,
-      'trxn_date' => '2010-01-20 00:00:00',
-      'contribution_id' => $contribution['id'],
-      'is_payment' => 1,
+      $contribution['id'] => array(
+        'total_amount' => 100,
+        'trxn_id' => 23456,
+        'trxn_date' => '2010-01-20 00:00:00',
+        'contribution_id' => $contribution['id'],
+        'is_payment' => 1,
+      ),
     );
     $this->checkPaymentResult($payment, $expectedResult);
     $this->callAPISuccess('Contribution', 'Delete', array(
@@ -114,11 +117,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     );
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
     $expectedResult = array(
-      'from_financial_account_id' => 7,
-      'to_financial_account_id' => 6,
-      'total_amount' => 50,
-      'status_id' => 1,
-      'is_payment' => 1,
+      $payment['id'] => array(
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 50,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
     );
     $this->checkPaymentResult($payment, $expectedResult);
 
@@ -148,13 +153,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 100,
     );
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = array(
-      'from_financial_account_id' => 7,
-      'to_financial_account_id' => 6,
-      'total_amount' => 100,
-      'status_id' => 1,
-      'is_payment' => 1,
+      $payment['id'] => array(
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 100,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
     );
     $this->checkPaymentResult($payment, $expectedResult);
     $params = array(
@@ -186,7 +193,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Function to assert db values
    */
   public function checkPaymentResult($payment, $expectedResult) {
-    foreach ($expectedResult as $key => $value) {
+    foreach ($expectedResult[$payment['id']] as $key => $value) {
       $this->assertEquals($payment['values'][$payment['id']][$key], $value);
     }
   }
@@ -207,13 +214,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($lineItems['values'] as $id => $ignore) {
       $params['line_item'][] = array($id => array_pop($amounts));
     }
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Payment with line item', 'CreatePaymentWithLineItems');
     $expectedResult = array(
-      'from_financial_account_id' => 7,
-      'to_financial_account_id' => 6,
-      'total_amount' => 50,
-      'status_id' => 1,
-      'is_payment' => 1,
+      $payment['id'] => array(
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 50,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
     );
     $this->checkPaymentResult($payment, $expectedResult);
 
@@ -247,13 +256,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($lineItems['values'] as $id => $ignore) {
       $params['line_item'][] = array($id => array_pop($amounts));
     }
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = array(
-      'from_financial_account_id' => 7,
-      'to_financial_account_id' => 6,
-      'total_amount' => 100,
-      'status_id' => 1,
-      'is_payment' => 1,
+      $payment['id'] => array(
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 100,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
     );
     $this->checkPaymentResult($payment, $expectedResult);
     $params = array(
@@ -305,7 +316,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $this->callAPIAndDocument('payment', 'cancel', $cancelParams, __FUNCTION__, __FILE__);
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(2, $payment['count']);
     $amounts = array(-150.00, 150.00);
     foreach ($payment['values'] as $value) {
@@ -328,7 +339,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     );
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(1, $payment['count']);
 
     $deleteParams = array(
@@ -340,7 +351,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'delete in CiviContribute');
     $this->callAPIAndDocument('payment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(0, $payment['count']);
 
     $this->callAPISuccess('Contribution', 'Delete', array(
@@ -361,13 +372,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 50,
     );
 
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = array(
-      'from_financial_account_id' => 7,
-      'to_financial_account_id' => 6,
-      'total_amount' => 50,
-      'status_id' => 1,
-      'is_payment' => 1,
+      $payment['id'] => array(
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 50,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
     );
     $this->checkPaymentResult($payment, $expectedResult);
 
@@ -392,7 +405,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPIFailure('payment', 'create', $params, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and edit contributions');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');
 
     $params = array(
       'entity_table' => 'civicrm_financial_item',
@@ -407,7 +420,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $params = array(
       'contribution_id' => $contribution['id'],
     );
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $amounts = array(100.00, -50.00, 50.00, 150.00);
     foreach ($payment['values'] as $value) {
       $amount = array_pop($amounts);
@@ -423,6 +436,143 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       $this->assertEquals($eft['values'][$eft['id']]['amount'], $amount);
     }
 
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+  }
+
+  /**
+   * Test create payment api for paylater contribution
+   */
+  public function testCreatePaymentPayLater() {
+    $this->createLoggedInUser();
+    $contributionParams = array(
+      'total_amount' => 100,
+      'currency' => 'USD',
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 2,
+      'is_pay_later' => 1,
+    );
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    //add payment for pay later transaction
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 100,
+    );
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+    $expectedResult = array(
+      $payment['id'] => array(
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 100,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
+    // Check entity financial trxn created properly
+    $params = array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 100);
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 100);
+    // Check contribution for completed status
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->callAPISuccess('Contribution', 'Delete', array(
+      'id' => $contribution['id'],
+    ));
+  }
+
+  /**
+   * Test create payment api for paylater contribution with partial payment.
+   */
+  public function testCreatePaymentPayLaterPartialPayment() {
+    $this->createLoggedInUser();
+    $contributionParams = array(
+      'total_amount' => 100,
+      'currency' => 'USD',
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 2,
+      'is_pay_later' => 1,
+    );
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    //Create partial payment
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 60,
+    );
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+    $expectedResult = array(
+      $payment['id'] => array(
+        'total_amount' => 60,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
+    // Check entity financial trxn created properly
+    $params = array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 60);
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 60);
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Partially paid');
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    //Create full payment
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 40,
+    );
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+    $expectedResult = array(
+      $payment['id'] => array(
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 40,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ),
+    );
+    $this->checkPaymentResult($payment, $expectedResult);
+    // Check entity financial trxn created properly
+    $params = array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 40);
+    $params = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    );
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], 40);
+    // Check contribution for completed status
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
