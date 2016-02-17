@@ -146,7 +146,7 @@ class CRM_Contact_Task {
           'result' => TRUE,
         ),
         self::PRINT_FOR_CONTACTS => array(
-          'title' => ts('PDF letters - print'),
+          'title' => ts('Print/merge document'),
           'class' => 'CRM_Contact_Form_Task_PDF',
           'result' => TRUE,
         ),

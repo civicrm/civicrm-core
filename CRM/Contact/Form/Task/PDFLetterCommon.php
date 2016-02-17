@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $form->assign('message', $messageText);
     $form->assign('messageSubject', $messageSubject);
-    CRM_Utils_System::setTitle('Create Printable Letters (PDF)');
+    CRM_Utils_System::setTitle('Print/Merge Document');
   }
 
   /**
@@ -64,7 +64,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   public static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
     // put contact display name in title for single contact mode
-    CRM_Utils_System::setTitle(ts('Create Printable Letter (PDF) for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
+    CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
   }
 
   /**
@@ -173,7 +173,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     if ($form->get('action') != CRM_Core_Action::VIEW) {
       $buttons[] = array(
         'type' => 'submit',
-        'name' => $form->_single ? ts('Make PDF') : ts('Make PDFs'),
+        'name' => ts('Download Document'),
         'isDefault' => TRUE,
       );
       $buttons[] = array(
