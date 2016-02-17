@@ -115,7 +115,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
     );
-    $payment = $this->callAPISuccess('payment', 'create', $params);
+    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
     $expectedResult = array(
       $payment['id'] => array(
         'from_financial_account_id' => 7,
@@ -214,7 +214,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($lineItems['values'] as $id => $ignore) {
       $params['line_item'][] = array($id => array_pop($amounts));
     }
-    $payment = $this->callAPISuccess('payment', 'create', $params);
+    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Payment with line item', 'CreatePaymentWithLineItems');
     $expectedResult = array(
       $payment['id'] => array(
         'from_financial_account_id' => 7,
@@ -314,7 +314,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
 
-    $this->callAPIAndDocument('payment', 'cancel', $cancelParams);
+    $this->callAPIAndDocument('payment', 'cancel', $cancelParams, __FUNCTION__, __FILE__);
 
     $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(2, $payment['count']);
@@ -349,7 +349,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPIFailure('payment', 'delete', $deleteParams, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and delete in CiviContribute');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'delete in CiviContribute');
-    $this->callAPISuccess('payment', 'delete', $cancelParams);
+    $this->callAPIAndDocument('payment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
 
     $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(0, $payment['count']);
@@ -405,7 +405,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPIFailure('payment', 'create', $params, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and edit contributions');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
-    $payment = $this->callAPISuccess('payment', 'create', $params);
+    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');
 
     // Check for proportional cancelled payment against lineitems.
     $minParams = array(
@@ -469,7 +469,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'is_pay_later' => 1,
     );
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    //Create partial payment
+    //add payment for pay later transaction
     $params = array(
       'contribution_id' => $contribution['id'],
       'total_amount' => 100,
