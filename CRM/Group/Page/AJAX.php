@@ -38,8 +38,6 @@
 class CRM_Group_Page_AJAX {
   /**
    * Get list of groups.
-   *
-   * @return array
    */
   public static function getGroupList() {
     $params = $_GET;
