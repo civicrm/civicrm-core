@@ -54,8 +54,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'fields' => array(
           'sort_name_a' => array(
             'title' => ts('Contact A'),
-            'name' => 'display_name',
+            'name' => 'sort_name',
             'required' => TRUE,
+          ),
+          'display_name_a' => array(
+            'title' => ts('Contact A Name'),
+            'name' => 'display_name',
           ),
           'id' => array(
             'no_display' => TRUE,
@@ -71,9 +75,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'display_name_a' => array(
+          'sort_name_a' => array(
             'title' => ts('Contact A'),
-            'name' => 'display_name',
+            'name' => 'sort_name',
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
           ),
@@ -93,8 +97,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'fields' => array(
           'sort_name_b' => array(
             'title' => ts('Contact B'),
-            'name' => 'display_name',
+            'name' => 'sort_name',
             'required' => TRUE,
+          ),
+          'display_name_b' => array(
+            'title' => ts('Contact B Name'),
+            'name' => 'display_name',
           ),
           'id' => array(
             'no_display' => TRUE,
@@ -110,9 +118,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'display_name_b' => array(
+          'sort_name_b' => array(
             'title' => ts('Contact B'),
-            'name' => 'display_name',
+            'name' => 'sort_name',
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
           ),
