@@ -97,15 +97,7 @@ function _civicrm_api3_line_item_create_spec(&$params) {
 function civicrm_api3_line_item_get($params) {
   if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
-    $lineItems = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-    if ($lineItems['count'] > 0) {
-      foreach ($lineItems['values'] as $key => $items) {
-        if (!in_array($items['financial_type_id'], array_keys($types))) {
-          unset($lineItems['values'][$key]);
-        }
-      }
-      return $lineItems;
-    }
+    $params['financial_type_id'] = array('IN' => array_keys($types));
   }
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
