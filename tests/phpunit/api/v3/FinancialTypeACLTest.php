@@ -157,19 +157,19 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'add contributions of type Donation',
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $p);
-   
+
     $params = array(
       'contribution_id' => $contribution['id'],
     );
-    
+
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
       'view contributions of type Donation',
-      'delete contributions of type Donation'
+      'delete contributions of type Donation',
     );
-   
+
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
    
     $this->assertEquals(1, $contribution['count']);
@@ -206,14 +206,14 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
     $this->assertEquals($contribution['count'], 0);
-    
+
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
       'view contributions of type Donation',
     );
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
-   
+
     $this->assertEquals($contribution['count'], 1);
   }
 
@@ -264,11 +264,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'delete contributions of type Donation',
     );
     $contribution = $this->callAPIFailure('contribution', 'create', $params, 'You do not have permission to create this line item');
-    
+
     // Check that the entire contribution has rolled back.
     $contribution = $this->callAPISuccess('contribution', 'get', array());
     $this->assertEquals(0, $contribution['count']);
-    
 
     CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
 
@@ -322,7 +321,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'edit contributions',
     );
     $contribution = $this->callAPIFailure('Contribution', 'create', $params);
-    
+
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
@@ -352,7 +351,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'delete in CiviContribute',
     );
     $contribution = $this->callAPIFailure('Contribution', 'delete', $params);
-    
+
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
@@ -363,5 +362,4 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    
     $this->assertEquals($contribution['count'], 1);
   }
-
 }
