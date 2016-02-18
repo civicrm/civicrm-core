@@ -59,7 +59,7 @@ class CRM_Utils_Recent {
    * Initialize this class and set the static variables.
    */
   public static function initialize() {
-    $maxItemsSetting = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'recentItemsMaxCount');
+    $maxItemsSetting = Civi::settings()->get('recentItemsMaxCount');
     if (isset($maxItemsSetting) && $maxItemsSetting > 0 && $maxItemsSetting < 100) {
       self::$_maxItems = $maxItemsSetting;
     }
@@ -220,7 +220,7 @@ class CRM_Utils_Recent {
     $allowed = TRUE;
 
     // Use core setting recentItemsProviders if configured
-    $providersPermitted = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'recentItemsProviders');
+    $providersPermitted = Civi::settings()->get('recentItemsProviders');
     if ($providersPermitted) {
       $allowed = in_array($providerName, $providersPermitted);
     }
