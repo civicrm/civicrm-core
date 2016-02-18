@@ -57,6 +57,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'sort_name',
             'required' => TRUE,
           ),
+          'display_name_a' => array(
+            'title' => ts('Contact A Full Name'),
+            'name' => 'display_name',
+          ),
           'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
@@ -95,6 +99,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Contact B'),
             'name' => 'sort_name',
             'required' => TRUE,
+          ),
+          'display_name_b' => array(
+            'title' => ts('Contact B Full Name'),
+            'name' => 'display_name',
           ),
           'id' => array(
             'no_display' => TRUE,
