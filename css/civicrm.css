@@ -3330,6 +3330,7 @@ div.m ul#civicrm-menu,
   text-align: center;
   height: 23px;
   width: 32px;
+  z-index: 1;
 }
 
 .crm-editable-form button[type=cancel] {
