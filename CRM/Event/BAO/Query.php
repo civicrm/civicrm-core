@@ -466,7 +466,8 @@ class CRM_Event_BAO_Query {
         break;
 
       case 'civicrm_event':
-        $from = " INNER JOIN civicrm_event ON civicrm_participant.event_id = civicrm_event.id ";
+        //CRM-17121
+        $from = " LEFT JOIN civicrm_event ON civicrm_participant.event_id = civicrm_event.id ";
         break;
 
       case 'event_type':
