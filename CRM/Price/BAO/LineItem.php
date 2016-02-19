@@ -57,15 +57,23 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $id = CRM_Utils_Array::value('id', $params);
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
+      $op = CRM_Core_Action::UPDATE;
     }
     else {
       CRM_Utils_Hook::pre('create', 'LineItem', $params['entity_id'], $params);
+      $op = CRM_Core_Action::ADD;
     }
 
     // unset entity table and entity id in $params
     // we never update the entity table and entity id during update mode
     if ($id) {
       unset($params['entity_id'], $params['entity_table']);
+    }
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
+      if (!in_array($params['financial_type_id'], array_keys($types))) {
+        throw new API_Exception('You do not have permission to create this line item');
+      }
     }
 
     $lineItemBAO = new CRM_Price_BAO_LineItem();
