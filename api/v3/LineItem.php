@@ -88,7 +88,9 @@ function civicrm_api3_line_item_get($params) {
       elseif (!in_array($params['financial_type_id'], array_keys($types))) {
         $invalidFts = $params['financial_type_id'];
       }
-      $params['financial_type_id'] = array('NOT IN' => $invalidFts);
+      if ($invalidFts) {
+        $params['financial_type_id'] = array('NOT IN' => $invalidFts);
+      }
     }
   }
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
