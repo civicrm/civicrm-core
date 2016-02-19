@@ -44,28 +44,6 @@
  *   api result array
  */
 function civicrm_api3_line_item_create($params) {
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-    if (empty($params['id'])) {
-      $op = CRM_Core_Action::ADD;
-    }
-    else {
-      $op = CRM_Core_Action::UPDATE;
-    }
-    if (empty($params['financial_type_id'])) {
-      $params['financial_type_id'] = civicrm_api3('LineItem', 'getvalue', array(
-        'id' => $params['id'],
-        'return' => 'financial_type_id',
-      ));
-    }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
-    if (in_array($params['financial_type_id'], array_keys($types))) {
-      $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
-      return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-    }
-    else {
-      throw new API_Exception('You do not have permission to create this line item');
-    }
-  }
   $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
@@ -83,6 +61,7 @@ function _civicrm_api3_line_item_create_spec(&$params) {
   $params['qty']['api.required'] = 1;
   $params['unit_price']['api.required'] = 1;
   $params['line_total']['api.required'] = 1;
+  $params['financial_type_id']['api.required'] = 1;
   $params['label']['api.default'] = 'line item';
 }
 
