@@ -72,7 +72,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
       CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
       if (!in_array($params['financial_type_id'], array_keys($types))) {
-        throw new API_Exception('You do not have permission to create this line item');
+        throw new Exception('You do not have permission to create this line item');
       }
     }
 
