@@ -1865,6 +1865,7 @@ class CRM_Contact_BAO_Query {
       case 'activity_id':
       case 'activity_result':
       case 'source_contact':
+      case 'activity_fulltext_query':
         CRM_Activity_BAO_Query::whereClauseSingle($values, $this);
         return;
 

@@ -33,6 +33,20 @@
 class CRM_Activity_BAO_Query {
 
   /**
+   * Various operators for full-text search.
+   */
+  const
+    CONTAIN = 1,
+    CONTAIN_ANY = 2,
+    CONTAIN_ALL = 3,
+    NOT_CONTAIN = 4,
+    START = 5,
+    NOT_START = 6,
+    END = 7,
+    NOT_END = 8,
+    REGEXP = 9;
+
+  /**
    * Build select for Case.
    *
    * @param CRM_Contact_BAO_Query $query
@@ -333,7 +347,79 @@ class CRM_Activity_BAO_Query {
           $query->_qill[$grouping][] = ts('Activities which are not Followup Activities');
         }
         break;
+      case 'activity_fulltext_query':
+        list(,,$operator) = $query->getWhereValues('activity_fulltext_query_operator', $grouping);
+        $query->_where[$grouping][] = self::fullTextWhereClause($operator, $value);
+        $qill = '';
+        switch ($operator) {
+          case self::CONTAIN: $qill = 'Activities containing';
+            break;
+          case self::CONTAIN_ANY: $qill = 'Activities containing any of';
+            break;
+          case self::CONTAIN_ALL: $qill = 'Activities containing all of';
+            break;
+          case self::NOT_CONTAIN: $qill = 'Activities not containing';
+            break;
+          case self::START: $qill = 'Activities starting with';
+            break;
+          case self::NOT_START: $qill = 'Activities not starting with';
+            break;
+          case self::END: $qill = 'Activities ending with';
+            break;
+          case self::NOT_END: $qill = 'Activities not ending with';
+            break;
+          case self::REGEXP: $qill = 'Activities matching expression';
+            break;
+        }
+        $query->_qill[$grouping][] = ts($qill) . " \"{$value}\"";
+        break;
     }
+  }
+
+  /**
+   * Returns 'where' clause for full-text search on activities.
+   * @param $operator int
+   * @param $query string
+   * @return string
+   * @throws CRM_Core_Exception
+   */
+  public static function fullTextWhereClause($operator, $query) {
+    $fields = array('civicrm_activity.subject', 'civicrm_activity.details');
+    // preparing query
+    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+    $query = str_replace('_', '\_', str_replace('%', '\%', $strtolower(CRM_Core_DAO::escapeString($query))));
+
+    $condition = '';
+    if (in_array($operator,
+        array(self::CONTAIN, self::NOT_CONTAIN, self::START, self::NOT_START, self::END, self::NOT_END))) {
+      $comparator = in_array($operator, array(self::CONTAIN, self::START, self::END)) ? 'LIKE' : 'NOT LIKE';
+      $pre = (in_array($operator, array(self::START, self::NOT_START))) ? '' : '%';
+      $post = (in_array($operator, array(self::END, self::NOT_END))) ? '' : '%';
+      foreach ($fields as $i => $field) {
+        $fields[$i] = "{$field} {$comparator} '{$pre}{$query}{$post}'";
+      }
+      $glue = in_array($operator, array(self::CONTAIN, self::START, self::END)) ? ' OR ' : ' AND ';
+      $condition = '(' . implode($glue, $fields) . ')';
+    }
+    else if($operator == self::CONTAIN_ANY || $operator == self::CONTAIN_ALL) {
+      $words = preg_split('/[ ]+/', $query, -1, PREG_SPLIT_NO_EMPTY);
+      $wordComps = array();
+      foreach ($words as $i => $word) {
+        $comparisons = array();
+        foreach ($fields as $field)
+          $comparisons[] = "{$field} LIKE '%{$word}%'";
+        $wordComps[] = '(' . implode(' OR ', $comparisons) . ')';
+      }
+      $glue = ($operator == self::CONTAIN_ANY) ? ' OR ' : ' AND ';
+      $condition = '(' . implode($glue, $wordComps) . ')';
+    }
+    else if ($operator == self::REGEXP) {
+      foreach ($fields as $i => $field) {
+        $fields[$i] = "{$field} REGEXP '{$query}'";
+      }
+      $condition = '(' . implode(' OR ', $fields) . ')';
+    }
+    return $condition;
   }
 
   /**
@@ -421,6 +507,23 @@ class CRM_Activity_BAO_Query {
     );
     $form->addRadio('parent_id', NULL, $followUpActivity, array('allowClear' => TRUE));
     $form->addRadio('followup_parent_id', NULL, $followUpActivity, array('allowClear' => TRUE));
+    $form->addElement('text', 'activity_fulltext_query', ts('Text search'));
+    $form->addSelect('activity_fulltext_query_operator', array(
+      'entity' => 'activity',
+      'placeholder' => ts('- select condition -'),
+      'options' => array(
+        self::CONTAIN => ts('Contains'),
+        self::CONTAIN_ANY => ts('Contains any word'),
+        self::CONTAIN_ALL => ts('Contains all words'),
+        self::NOT_CONTAIN => ts('Does not contain'),
+        self::START => ts('Starts with'),
+        self::NOT_START => ts('Does not start with'),
+        self::END => ts('Ends with'),
+        self::NOT_END => ts('Does not end with'),
+        self::REGEXP => ts('Regular expression'),
+      ),
+    ));
+    $form->setDefaults(array('activity_fulltext_query_operator' => self::CONTAIN));
     $activityRoles = array(
       3 => ts('With'),
       2 => ts('Assigned to'),
