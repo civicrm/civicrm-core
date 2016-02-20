@@ -286,7 +286,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     global $base_url;
     $base_url = str_replace('http://', 'https://', $base_url);
   }
-  
+
   protected function getUsersTableName() {
     $userFrameworkUsersTableName = Civi::settings()->get('userFrameworkUsersTableName');
     if (empty($userFrameworkUsersTableName)) {
