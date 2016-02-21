@@ -385,11 +385,29 @@ class CRM_Activity_BAO_Query {
    */
   public static function fullTextWhereClause($operator, $query) {
     $fields = array('civicrm_activity.subject', 'civicrm_activity.details');
+
+    // adding custom fields
+    $sql = "
+SELECT     cg.table_name, cf.column_name
+FROM       civicrm_custom_group cg
+INNER JOIN civicrm_custom_field cf ON cf.custom_group_id = cg.id
+WHERE      cg.extends = 'Activity'
+AND        cg.is_active = 1
+AND        cf.is_active = 1
+AND        cf.is_searchable = 1
+AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      // FIXME: would be probably better to join custom tables instead of subqueries
+      $fields[] = "(SELECT {$dao->column_name} FROM {$dao->table_name} WHERE entity_id = civicrm_activity.id)";
+    }
+
     // preparing query
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $query = str_replace('_', '\_', str_replace('%', '\%', $strtolower(CRM_Core_DAO::escapeString($query))));
 
     $condition = '';
+    // single comparison conditions
     if (in_array($operator,
         array(self::CONTAIN, self::NOT_CONTAIN, self::START, self::NOT_START, self::END, self::NOT_END))) {
       $comparator = in_array($operator, array(self::CONTAIN, self::START, self::END)) ? 'LIKE' : 'NOT LIKE';
@@ -401,18 +419,20 @@ class CRM_Activity_BAO_Query {
       $glue = in_array($operator, array(self::CONTAIN, self::START, self::END)) ? ' OR ' : ' AND ';
       $condition = '(' . implode($glue, $fields) . ')';
     }
+    // multiple comparison conditions
     else if($operator == self::CONTAIN_ANY || $operator == self::CONTAIN_ALL) {
       $words = preg_split('/[ ]+/', $query, -1, PREG_SPLIT_NO_EMPTY);
       $wordComps = array();
       foreach ($words as $i => $word) {
-        $comparisons = array();
+        $fieldComps = array();
         foreach ($fields as $field)
-          $comparisons[] = "{$field} LIKE '%{$word}%'";
-        $wordComps[] = '(' . implode(' OR ', $comparisons) . ')';
+          $fieldComps[] = "{$field} LIKE '%{$word}%'";
+        $wordComps[] = '(' . implode(' OR ', $fieldComps) . ')';
       }
       $glue = ($operator == self::CONTAIN_ANY) ? ' OR ' : ' AND ';
       $condition = '(' . implode($glue, $wordComps) . ')';
     }
+    // other conditions
     else if ($operator == self::REGEXP) {
       foreach ($fields as $i => $field) {
         $fields[$i] = "{$field} REGEXP '{$query}'";
