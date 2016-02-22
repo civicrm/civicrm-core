@@ -599,8 +599,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * This function is called by both the api (tests) and the UI.
    */
   public function beginPostProcessCommon() {
-    // Call this first so we can construct the WHERE temp table before we get into the FROM stuff.
-    $this->storeWhereHavingClauseArray();
     $this->buildQuery();
     // @todo this acl has no test coverage and is very hard to test manually so could be fragile.
     $this->getPermissionedFTQuery($this);
