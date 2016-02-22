@@ -545,7 +545,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery($dropTempTable);
 
     $sql = 'CREATE TEMPORARY TABLE civireport_membership_contribution_detail
-            (contribution_id int, INDEX USING HASH(contribution_id), contact_id int, INDEX USING HASH(contact_id), 
+            (contribution_id int, INDEX USING HASH(contribution_id), contact_id int, INDEX USING HASH(contact_id),
             membership_id int, INDEX USING HASH(membership_id), payment_id int, INDEX USING HASH(payment_id)) ENGINE=MEMORY';
     CRM_Core_DAO::executeQuery($sql);
 
