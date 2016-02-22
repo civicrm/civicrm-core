@@ -214,7 +214,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'access CiviCRM',
       'access CiviContribute',
       'view contributions of type Donation',
-      'view debug output',
     );
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
 
