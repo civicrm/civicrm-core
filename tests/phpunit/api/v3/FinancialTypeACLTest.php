@@ -196,7 +196,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
 
     $params = array(
-      'contribution_id' => $contribution['id'],
+      'id' => $contribution['id'],
       'check_permissions' => TRUE,
     );
     $config = &CRM_Core_Config::singleton();
@@ -207,10 +207,14 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
     $this->assertEquals($contribution['count'], 0);
 
+    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
+
+    $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
       'view contributions of type Donation',
+      'view debug output',
     );
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
 
@@ -279,6 +283,8 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'delete in CiviContribute',
       'add contributions of type Member Dues',
       'add contributions of type Donation',
+      'view contributions of type Donation',
+      'view contributions of type Member Dues',
       'delete contributions of type Donation',
       'delete contributions of type Member Dues',
     );
@@ -319,6 +325,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
+      'view contributions of type Donation',
     );
     $contribution = $this->callAPIFailure('Contribution', 'create', $params);
 
