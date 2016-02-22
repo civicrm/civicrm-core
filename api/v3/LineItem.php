@@ -75,7 +75,7 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  *   Array of matching line_items
  */
 function civicrm_api3_line_item_get($params) {
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Utils_Array::value('check_permissions', $params)) {
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
     if (empty($params['financial_type_id'])) {
       $params['financial_type_id'] = array('IN' => array_keys($types));
@@ -107,7 +107,7 @@ function civicrm_api3_line_item_get($params) {
  *   API result array
  */
 function civicrm_api3_line_item_delete($params) {
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Utils_Array::value('check_permissions', $params)) {
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::DELETE);
     if (empty($params['financial_type_id'])) {
       $params['financial_type_id'] = civicrm_api3('LineItem', 'getvalue', array(
