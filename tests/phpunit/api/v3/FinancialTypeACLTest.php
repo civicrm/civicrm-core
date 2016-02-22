@@ -116,6 +116,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   }
 
   public function setACL() {
+    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
     $params = array(
       'domain_id' => 1,
       'contribution_invoice_settings' => array('acl_financial_type' => 1),
@@ -150,12 +151,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIFailure('contribution', 'create', $p);
     $this->assertEquals('You do not have permission to create this contribution', $result['error_message']);
-    $config->userPermissionClass->permissions = array(
-      'access CiviCRM',
-      'access CiviContribute',
-      'edit contributions',
-      'add contributions of type Donation',
-    );
+    $config->userPermissionClass->permissions[] = 'add contributions of type Donation';
     $contribution = $this->callAPISuccess('contribution', 'create', $p);
 
     $params = array(
@@ -193,28 +189,25 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    */
   public function testGetACLContribution() {
     $this->setACL();
+    $config = &CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array(
+      'access CiviCRM',
+      'access CiviContribute',
+      'view all contacts',
+      'add contributions of type Donation',
+    );
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
 
     $params = array(
       'id' => $contribution['id'],
       'check_permissions' => TRUE,
     );
-    $config = &CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
-      'access CiviCRM',
-      'access CiviContribute',
-    );
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
     $this->assertEquals($contribution['count'], 0);
 
     CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
 
-    $config = &CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
-      'access CiviCRM',
-      'access CiviContribute',
-      'view contributions of type Donation',
-    );
+    $config->userPermissionClass->permissions[3] = 'view contributions of type Donation';
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
 
     $this->assertEquals($contribution['count'], 1);
@@ -275,18 +268,12 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
 
     $config = &CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
-      'access CiviCRM',
-      'access CiviContribute',
-      'edit contributions',
-      'delete in CiviContribute',
+    $config->userPermissionClass->permissions = array_merge($config->userPermissionClass->permissions, array(
       'add contributions of type Member Dues',
-      'add contributions of type Donation',
       'view contributions of type Donation',
       'view contributions of type Member Dues',
-      'delete contributions of type Donation',
       'delete contributions of type Member Dues',
-    );
+    ));
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
 
     $lineItemParams = array(
@@ -328,12 +315,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPIFailure('Contribution', 'create', $params);
 
-    $config->userPermissionClass->permissions = array(
-      'access CiviCRM',
-      'access CiviContribute',
-      'edit contributions',
-      'edit contributions of type Donation',
-    );
+    $config->userPermissionClass->permissions[3] = 'edit contributions of type Donation';
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 200.00);
@@ -344,26 +326,23 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    */
   public function testDeleteACLContribution() {
     $this->setACL();
+    $config = &CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array(
+      'access CiviCRM',
+      'access CiviContribute',
+      'view all contacts',
+      'add contributions of type Donation',
+    );
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
 
     $params = array(
       'contribution_id' => $contribution['id'],
       'check_permissions' => TRUE,
     );
-    $config = &CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
-      'access CiviCRM',
-      'access CiviContribute',
-      'delete in CiviContribute',
-    );
+    $config->userPermissionClass->permissions[3] = 'delete in CiviContribute';
     $contribution = $this->callAPIFailure('Contribution', 'delete', $params);
 
-    $config->userPermissionClass->permissions = array(
-      'access CiviCRM',
-      'access CiviContribute',
-      'delete in CiviContribute',
-      'delete contributions of type Donation',
-    );
+    $config->userPermissionClass->permissions[] = 'delete contributions of type Donation';
     $contribution = $this->callAPISuccess('Contribution', 'delete', $params);
 
     $this->assertEquals($contribution['count'], 1);
