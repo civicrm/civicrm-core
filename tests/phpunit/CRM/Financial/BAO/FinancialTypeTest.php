@@ -33,6 +33,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
+    $this->_orgContactID = $this->organizationCreate();
   }
 
   public function teardown() {
@@ -119,6 +120,83 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $params = array('id' => $financialType->id);
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
+  }
+
+  /**
+   * Set ACLs for Financial Types()
+   */
+  public function setACL() {
+    CRM_Core_BAO_Setting::setItem(array('acl_financial_type' => 1), NULL, 'contribution_invoice_settings');
+  }
+
+  /**
+   * Check method testgetAvailableFinancialTypes()
+   */
+  public function testgetAvailableFinancialTypes() {
+    $this->setACL();
+    $config = &CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array(
+      'view contributions of type Donation',
+      'view contributions of type Member Dues',
+    );
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+    $expectedResult = array(
+      1 => "Donation",
+      2 => "Member Dues",
+    );
+    $this->assertEquals($expectedResult, $types, 'Verify that only certain financial types can be retrieved');
+    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
+    $config->userPermissionClass->permissions = array(
+      'view contributions of type Donation',
+    );
+    unset($expectedResult[2]);
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+    $this->assertEquals($expectedResult, $types, 'Verify that removing permission for a financial type restricts the available financial types');
+  }
+
+  /**
+   * Check method testgetAvailableMembershipTypes()
+   */
+  public function testgetAvailableMembershipTypes() {
+    // Create Membership types
+    $ids = array();
+    $params = array(
+      'name' => 'Type One',
+      'domain_id' => 1,
+      'minimum_fee' => 10,
+      'duration_unit' => 'year',
+      'member_of_contact_id' => $this->_orgContactID,
+      'period_type' => 'fixed',
+      'duration_interval' => 1,
+      'financial_type_id' => 1,
+      'visibility' => 'Public',
+      'is_active' => 1,
+    );
+
+    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+    // Add another
+    $params['name'] = 'Type Two';
+    $params['financial_type_id'] = 2;
+    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+
+    $this->setACL();
+    $config = &CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array(
+      'view contributions of type Donation',
+      'view contributions of type Member Dues',
+    );
+    CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($types);
+    $expectedResult = array(
+      1 => "Type One",
+      2 => "Type Two",
+    );
+    $this->assertEquals($expectedResult, $types, 'Verify that only certain membership types can be retrieved');
+    $config->userPermissionClass->permissions = array(
+      'view contributions of type Donation',
+    );
+    unset($expectedResult[2]);
+    CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($types);
+    $this->assertEquals($expectedResult, $types, 'Verify that removing permission for a financial type restricts the available membership types');
   }
 
 }
