@@ -228,7 +228,7 @@
                 appendHTML += "</tr>";
               });
               $( rowID ).after( appendHTML );
-              $( rowID ).next().trigger('crmLoad');
+              $( '.parent_is_'+parent_id ).trigger('crmLoad');
             }
         });
       }
