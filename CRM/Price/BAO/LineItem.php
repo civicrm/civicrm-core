@@ -70,6 +70,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       unset($params['entity_id'], $params['entity_table']);
     }
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      if (empty($params['financial_type_id'])) {
+        throw new Exception('Mandatory key(s) missing from params array: financial_type_id');
+      }
       CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
       if (!in_array($params['financial_type_id'], array_keys($types))) {
         throw new Exception('You do not have permission to create this line item');
