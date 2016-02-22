@@ -61,7 +61,6 @@ function _civicrm_api3_line_item_create_spec(&$params) {
   $params['qty']['api.required'] = 1;
   $params['unit_price']['api.required'] = 1;
   $params['line_total']['api.required'] = 1;
-  $params['financial_type_id']['api.required'] = 1;
   $params['label']['api.default'] = 'line item';
 }
 
