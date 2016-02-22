@@ -180,6 +180,7 @@ AND    {$this->_componentClause}";
       $input['net_amount'] = $contribution->net_amount;
       $input['trxn_id'] = $contribution->trxn_id;
       $input['trxn_date'] = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
+      $input['receipt_date'] = $contribution->receipt_date;
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);

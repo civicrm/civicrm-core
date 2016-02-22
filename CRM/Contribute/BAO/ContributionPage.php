@@ -166,6 +166,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'useForMember',
       'membership_assign',
       'amount',
+      'receipt_date',
     );
 
     foreach ($valuesRequiredForTemplate as $valueRequiredForTemplate) {
