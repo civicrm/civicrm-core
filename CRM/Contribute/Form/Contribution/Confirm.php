@@ -945,7 +945,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $form->_params['pledge_id'] = $pledge->id;
 
         //send acknowledgment email. only when pledge is created
-        if ($pledge->id) {
+        if ($pledge->id && $isEmailReceipt) {
           //build params to send acknowledgment.
           $pledgeParams['id'] = $pledge->id;
           $pledgeParams['receipt_from_name'] = $form->_values['receipt_from_name'];
