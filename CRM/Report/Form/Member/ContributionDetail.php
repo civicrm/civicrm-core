@@ -590,6 +590,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     }
 
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+    $this->addToDeveloperTab($sql);
     return $sql;
   }
 
