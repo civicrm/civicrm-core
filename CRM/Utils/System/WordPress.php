@@ -420,6 +420,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
     require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
     $uid = CRM_Utils_Array::value('uid', $name);
+
+    // Disable magic quotes
+    $wp = new CiviCRM_For_WordPress();
+    $wp->remove_wp_magic_quotes();
+
     if (!$uid) {
       $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
       $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
