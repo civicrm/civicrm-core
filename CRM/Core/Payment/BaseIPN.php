@@ -121,6 +121,7 @@ class CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
+    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
 
     $objects['contact'] = &$contact;
     $objects['contribution'] = &$contribution;

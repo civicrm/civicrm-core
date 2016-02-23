@@ -2388,6 +2388,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     //not really sure what params might be passed in but lets merge em into values
     $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $values);
+    if (!empty($input['receipt_date'])) {
+      $values['receipt_date'] = $input['receipt_date'];
+    }
+
     $template = CRM_Core_Smarty::singleton();
     $this->_assignMessageVariablesToTemplate($values, $input, $template, $recur, $returnMessageText);
     //what does recur 'mean here - to do with payment processor return functionality but
@@ -4338,6 +4342,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'is_test',
       'campaign_id',
       'receive_date',
+      'receipt_date',
     );
     if (self::isSingleLineItem($primaryContributionID)) {
       $inputContributionWhiteList[] = 'financial_type_id';
@@ -4604,6 +4609,7 @@ LIMIT 1;";
    */
   public static function sendMail(&$input, &$ids, $contribution, &$values, $recur = FALSE, $returnMessageText = FALSE) {
     $input['is_recur'] = $recur;
+    $input['receipt_date'] = $contribution->receipt_date;
     // set receipt from e-mail and name in value
     if (!$returnMessageText) {
       $session = CRM_Core_Session::singleton();
