@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -226,6 +226,21 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'financial_type_id' => array('title' => ts('Financial Type')),
         ),
       ),
+      'civicrm_batch' => array(
+        'dao' => 'CRM_Batch_DAO_Batch',
+        'fields' => array(
+          'title' => array(
+            'title' => ts('Batch Title'),
+            'alias' => 'batch',
+            'default' => FALSE,
+          ),
+          'name' => array(
+            'title' => ts('Batch Name'),
+            'alias' => 'batch',
+            'default' => TRUE,
+          ),
+        ),
+      ),
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
         'fields' => array(
@@ -409,7 +424,11 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               LEFT JOIN civicrm_financial_account {$this->_aliases['civicrm_financial_account']}_credit_2
                     ON fitem.financial_account_id = {$this->_aliases['civicrm_financial_account']}_credit_2.id
               LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
-                    ON  fitem.entity_id = {$this->_aliases['civicrm_line_item']}.id AND fitem.entity_table = 'civicrm_line_item' ";
+                    ON  fitem.entity_id = {$this->_aliases['civicrm_line_item']}.id AND fitem.entity_table = 'civicrm_line_item'
+              LEFT JOIN civicrm_entity_batch ent_batch
+                    ON  {$this->_aliases['civicrm_financial_trxn']}.id = ent_batch.entity_id AND ent_batch.entity_table = 'civicrm_financial_trxn' 
+              LEFT JOIN civicrm_batch batch
+                    ON  ent_batch.batch_id = batch.id";
   }
 
   public function orderBy() {
