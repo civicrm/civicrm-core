@@ -125,17 +125,16 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     $this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
     $this->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Update Activities'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'submit',
+        'name' => ts('Update Activities'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_activityHolderIds);

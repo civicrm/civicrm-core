@@ -80,13 +80,12 @@ INNER JOIN civicrm_contact ct ON ( ac.contact_id = ct.id )
    */
   public function buildQuickForm() {
     $this->addButtons(array(
-        array(
-          'type' => 'done',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+      array(
+        'type' => 'done',
+        'name' => ts('Done'),
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
 }

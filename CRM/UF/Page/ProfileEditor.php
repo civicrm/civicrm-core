@@ -235,9 +235,11 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   public static function convertCiviModelToBackboneModel($extends, $title, $availableFields) {
     $locationFields = CRM_Core_BAO_UFGroup::getLocationFields();
 
+    // schema in format array($fieldName => $fieldSchema)
+    // sections in format array($sectionName => $section)
     $result = array(
-      'schema' => array(), // array($fieldName => $fieldSchema)
-      'sections' => array(), // array($sectionName => $section)
+      'schema' => array(),
+      'sections' => array(),
     );
 
     // build field list
@@ -259,8 +261,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             continue 2;
           }
       }
+      // FIXME: type set to "Text"
       $result['schema'][$fieldName] = array(
-        'type' => 'Text', // FIXME,
+        'type' => 'Text',
         'title' => $field['title'],
         'civiFieldType' => $field['field_type'],
       );

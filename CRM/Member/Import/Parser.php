@@ -245,32 +245,26 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
         $headers = array_merge(array(
-            ts('Line Number'),
-            ts('Reason'),
-          ),
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ), $customHeaders);
         $this->_errorFileName = self::errorFileName(self::ERROR);
 
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
         $headers = array_merge(array(
-            ts('Line Number'),
-            ts('Reason'),
-          ),
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ), $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
         $headers = array_merge(array(
-            ts('Line Number'),
-            ts('View Membership URL'),
-          ),
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('View Membership URL'),
+        ), $customHeaders);
 
         $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);

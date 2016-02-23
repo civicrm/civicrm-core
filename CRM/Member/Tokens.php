@@ -74,8 +74,9 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       return;
     }
 
+    // FIXME: `select('e.*')` seems too broad.
     $e->query
-      ->select('e.*') // FIXME: seems too broad.
+      ->select('e.*')
       ->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type')
       ->join('mt', "!casMailingJoinType civicrm_membership_type mt ON e.membership_type_id = mt.id")
       ->join('ms', "!casMailingJoinType civicrm_membership_status ms ON e.status_id = ms.id");

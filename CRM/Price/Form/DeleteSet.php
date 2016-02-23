@@ -73,17 +73,16 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
   public function buildQuickForm() {
     $this->assign('title', $this->_title);
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Delete Price Set'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Delete Price Set'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
   /**

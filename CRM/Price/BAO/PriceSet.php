@@ -476,7 +476,8 @@ WHERE     ct.id = cp.financial_type_id AND
       $query .= ' AND s.financial_type_id IN (' . $types . ') AND v.financial_type_id IN (' . $types . ') ';
     }
     else {
-      $query .= " AND 0 "; // Do not display any price sets
+      // Do not display any price sets
+      $query .= " AND 0 ";
     }
     $query .= " GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($query);

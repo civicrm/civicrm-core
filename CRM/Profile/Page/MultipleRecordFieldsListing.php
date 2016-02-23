@@ -415,7 +415,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 FALSE,
                 $op,
                 'customValue',
-                $fieldId // not ideal, but the one thing not sent in $actionParams
+                $fieldId
               );
             }
           }

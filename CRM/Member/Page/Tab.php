@@ -166,9 +166,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $membership[$dao->id]['auto_renew'] = 0;
       }
 
-      // if relevant, count related memberships
-      if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id]) // membership is active
-        && CRM_Utils_Array::value('relationship_type_id', $statusANDType[$dao->id]) // membership type allows inheritance
+      // if relevant--membership is active and type allows inheritance--count related memberships
+      if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id])
+        && CRM_Utils_Array::value('relationship_type_id', $statusANDType[$dao->id])
         && empty($dao->owner_membership_id)
       ) {
         // not an related membership
@@ -181,10 +181,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $num_related = CRM_Core_DAO::singleValueQuery($query);
         $max_related = CRM_Utils_Array::value('max_related', $membership[$dao->id]);
         $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', array(1 => $num_related)) : ts('%1 out of %2', array(
-            1 => $num_related,
-            2 => $max_related,
-          ))
-        );
+          1 => $num_related,
+          2 => $max_related,
+        )));
       }
       else {
         $membership[$dao->id]['related_count'] = ts('N/A');
