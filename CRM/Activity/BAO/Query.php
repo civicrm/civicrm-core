@@ -214,7 +214,26 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'activity_type':
+        $qillName = $name;
+        if (in_array($name, array('activity_engagement_level', 'activity_id'))) {
+          $name = $qillName = str_replace('activity_', '', $name);
+        }
+        if (in_array($name, array('activity_type'))) {
+          $name = $name."_id";
+          $qillName = str_replace('_id', '', $qillName);
+        }
+        $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
+
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.$name", $op, $value, $dataType);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
+        break;
       case 'activity_status':
+       $status = CRM_Core_PseudoConstant::activityStatus();
+        if(array_key_exists($value,$status))
+        {
+          $value=$status[$value];
+        }
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$name]['title'], 2 => $op, 3 => $value));
