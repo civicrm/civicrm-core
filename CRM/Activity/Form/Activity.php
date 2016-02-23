@@ -767,18 +767,17 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       );
       $js = array('onclick' => "return activityStatus(" . json_encode($message) . ");");
       $this->addButtons(array(
-          array(
-            'type' => 'upload',
-            'name' => ts('Save'),
-            'js' => $js,
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'js' => $js,
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
     }
 
     if ($this->_activityTypeFile) {

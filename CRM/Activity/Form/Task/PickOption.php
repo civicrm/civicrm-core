@@ -74,9 +74,9 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     //validations
     if (count($this->_activityHolderIds) > $this->_maxActivities) {
       CRM_Core_Session::setStatus(ts("The maximum number of Activities you can select to send an email is %1. You have selected %2. Please select fewer Activities from your search results and try again.", array(
-            1 => $this->_maxActivities,
-            2 => count($this->_activityHolderIds),
-          )), ts("Maximum Exceeded"), "error");
+        1 => $this->_maxActivities,
+        2 => count($this->_activityHolderIds),
+      )), ts("Maximum Exceeded"), "error");
       $validate = TRUE;
     }
     // then redirect
