@@ -378,6 +378,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param bool $test
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
+    if ($test == TRUE) {
+      $values['user_name'] = $values['test_user_name'];
+      $values['password'] = $values['test_password'];
+    }	
     $params  = array_merge(array(
       'id' => $test ? $this->_testID : $this->_id,
       'domain_id' => $domainID,
