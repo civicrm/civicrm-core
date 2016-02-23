@@ -333,7 +333,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function loadUser($user) {
     $userdata = get_user_by('login', $user);
     if (!$userdata->data->ID) {
-      return false;
+      return FALSE;
     }
 
     $uid = $userdata->data->ID;
