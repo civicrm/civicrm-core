@@ -183,18 +183,17 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete Profile Field'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => ts('Delete Profile Field'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
       return;
     }
 
@@ -464,24 +463,23 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     // add buttons
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-          'js' => $js,
-        ),
-        array(
-          'type' => 'next',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-          'js' => $js,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+        'js' => $js,
+      ),
+      array(
+        'type' => 'next',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+        'js' => $js,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     $this->addFormRule(array('CRM_UF_Form_Field', 'formRule'), $this);
 
@@ -560,9 +558,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $config = CRM_Core_Config::singleton();
       $showBestResult = FALSE;
       if (in_array($ufField->field_name, array(
-          'country',
-          'state_province',
-        )) && count($config->countryLimit) > 1
+        'country',
+        'state_province',
+      )) && count($config->countryLimit) > 1
       ) {
         // get state or country field weight if exists
         $field = 'state_province';
@@ -788,11 +786,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     if ($in_selector && in_array($entityName, array(
-        'Contribution',
-        'Participant',
-        'Membership',
-        'Activity',
-      ))
+      'Contribution',
+      'Participant',
+      'Membership',
+      'Activity',
+    ))
     ) {
       $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $entityName));
     }
@@ -982,9 +980,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
             if ($fieldType != $profileType) {
               $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
-                  1 => $fieldType,
-                  2 => $profileType,
-                ));
+                1 => $fieldType,
+                2 => $profileType,
+              ));
             }
           }
           else {
@@ -994,9 +992,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
               $profileType != 'Contact'
             ) {
               $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
-                  1 => $fieldType,
-                  2 => $profileType,
-                ));
+                1 => $fieldType,
+                2 => $profileType,
+              ));
             }
           }
         }

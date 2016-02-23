@@ -72,9 +72,9 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
     //validations
     if (count($this->_memberIds) > $this->_maxMembers) {
       CRM_Core_Session::setStatus(ts("The maximum number of members you can select for Update multiple memberships is %1. You have selected %2. Please select fewer members from your search results and try again.", array(
-            1 => $this->_maxMembers,
-            2 => count($this->_memberIds),
-          )), ts('Update multiple records error'), 'error');
+        1 => $this->_maxMembers,
+        2 => count($this->_memberIds),
+      )), ts('Update multiple records error'), 'error');
       $validate = TRUE;
     }
 

@@ -346,22 +346,21 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     // add buttons
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'next',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'next',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
     // is public?
     $this->add('select', 'visibility_id', ts('Visibility'), CRM_Core_PseudoConstant::visibility());
 
