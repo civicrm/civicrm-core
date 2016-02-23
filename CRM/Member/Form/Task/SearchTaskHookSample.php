@@ -78,13 +78,12 @@ WHERE      mem.id IN ( $memberIDs )";
    */
   public function buildQuickForm() {
     $this->addButtons(array(
-        array(
-          'type' => 'done',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+      array(
+        'type' => 'done',
+        'name' => ts('Done'),
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
 }

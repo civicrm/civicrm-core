@@ -129,15 +129,15 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
 
       $status = array(
         ts('%count activity un-tagged', array(
-            'count' => $removed,
-            'plural' => '%count activities un-tagged',
-          )),
+          'count' => $removed,
+          'plural' => '%count activities un-tagged',
+        )),
       );
       if ($notRemoved) {
         $status[] = ts('1 activity already did not have this tag', array(
-            'count' => $notRemoved,
-            'plural' => '%count activities already did not have this tag',
-          ));
+          'count' => $notRemoved,
+          'plural' => '%count activities already did not have this tag',
+        ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));

@@ -75,13 +75,12 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    */
   public function buildQuickForm() {
     $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+      array(
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ),
+    ));
 
     // also add a hidden element for to trick drupal
     $this->addElement('hidden', "edit[civicrm_dummy_field]", "CiviCRM Dummy Field for Drupal");

@@ -439,7 +439,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $eidRefs = self::eidRefs();
     $cpTables = self::cpTables();
     $paymentTables = self::paymentTables();
-    $membershipMerge = FALSE; // CRM-12695
+    // CRM-12695:
+    $membershipMerge = FALSE;
 
     $affected = array_merge(array_keys($cidRefs), array_keys($eidRefs));
     if ($tables !== FALSE) {
@@ -467,8 +468,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // retrieve main contact's related table(s)
       $activeMainRelTables = CRM_Dedupe_Merger::getActiveRelTables($mainId);
       // check if membership table exists in main contact's related table(s)
+      // set membership flag - CRM-12695
       if (in_array('rel_table_memberships', $activeMainRelTables)) {
-        $membershipMerge = TRUE; // set membership flag - CRM-12695
+        $membershipMerge = TRUE;
       }
     }
 
