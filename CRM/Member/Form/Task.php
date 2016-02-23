@@ -175,17 +175,16 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => $backType,
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
 }

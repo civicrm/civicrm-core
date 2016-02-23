@@ -371,9 +371,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
         }
         elseif (!empty($this->_multiRecordFields)
           && (!$this->_multiRecord || !in_array($this->_multiRecord, array(
-                CRM_Core_Action::DELETE,
-                CRM_Core_Action::UPDATE,
-              )))
+            CRM_Core_Action::DELETE,
+            CRM_Core_Action::UPDATE,
+          )))
         ) {
           CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multirecord listing page
@@ -976,20 +976,20 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
             $duplicateContactsLinks = '<div class="matching-contacts-found">';
             $duplicateContactsLinks .= ts('One matching contact was found. ', array(
-                'count' => count($contactLinks['rows']),
-                'plural' => '%count matching contacts were found.<br />',
-              ));
+              'count' => count($contactLinks['rows']),
+              'plural' => '%count matching contacts were found.<br />',
+            ));
             if ($contactLinks['msg'] == 'view') {
               $duplicateContactsLinks .= ts('You can View the existing contact.', array(
-                  'count' => count($contactLinks['rows']),
-                  'plural' => 'You can View the existing contacts.',
-                ));
+                'count' => count($contactLinks['rows']),
+                'plural' => 'You can View the existing contacts.',
+              ));
             }
             else {
               $duplicateContactsLinks .= ts('You can View or Edit the existing contact.', array(
-                  'count' => count($contactLinks['rows']),
-                  'plural' => 'You can View or Edit the existing contacts.',
-                ));
+                'count' => count($contactLinks['rows']),
+                'plural' => 'You can View or Edit the existing contacts.',
+              ));
             }
             $duplicateContactsLinks .= '</div>';
             $duplicateContactsLinks .= '<table class="matching-contacts-actions">';

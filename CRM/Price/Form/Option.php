@@ -122,16 +122,15 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     }
     if ($this->_action == CRM_Core_Action::DELETE) {
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => ts('Delete'),
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
       return NULL;
     }
     else {
@@ -166,10 +165,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         $this->assign('showMember', TRUE);
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         $this->add('select', 'membership_type_id', ts('Membership Type'), array(
-            '' => ' ',
-          ) + $membershipTypes, FALSE,
-          array('onClick' => "calculateRowValues( );")
-        );
+          '' => ' ',
+        ) + $membershipTypes, FALSE,
+        array('onClick' => "calculateRowValues( );"));
         $this->add('text', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
       }
       else {
@@ -239,28 +237,26 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       }
       // add buttons
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Save'),
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => ts('Save'),
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
 
       // if view mode pls freeze it with the done button.
       if ($this->_action & CRM_Core_Action::VIEW) {
         $this->freeze();
         $this->addButtons(array(
-            array(
-              'type' => 'cancel',
-              'name' => ts('Done'),
-              'isDefault' => TRUE,
-            ),
-          )
-        );
+          array(
+            'type' => 'cancel',
+            'name' => ts('Done'),
+            'isDefault' => TRUE,
+          ),
+        ));
       }
     }
 

@@ -78,17 +78,16 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Delete Price Field'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Delete Price Field'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
   /**

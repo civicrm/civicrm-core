@@ -271,7 +271,7 @@ class CRM_Activity_Page_AJAX {
         $contactType = $contactType == 'Contact' ? '' : $contactType;
         switch ($row['source']) {
           case 'caseRel':
-            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="'  . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<i class="crm-i fa-pencil"></i>' .
               '</a>' .
               '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
@@ -368,8 +368,8 @@ class CRM_Activity_Page_AJAX {
       }
       else {
         $otherActivity->subject = ts('(Filed on case %1)', array(
-            1 => $params['caseID'],
-          )) . ' ' . $otherActivity->subject;
+          1 => $params['caseID'],
+        )) . ' ' . $otherActivity->subject;
       }
       $otherActivity->activity_date_time = $actDateTime;
       $otherActivity->save();
