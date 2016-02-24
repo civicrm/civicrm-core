@@ -1474,6 +1474,20 @@ abstract class CRM_Utils_Hook {
       'civicrm_triggerInfo'
     );
   }
+  /**
+   * This hook allows changes to the spec of which tables to log.
+   *
+   * @param array $logTableSpec
+   *
+   * @return mixed
+   */
+  public static function alterLogTables(&$logTableSpec) {
+    return self::singleton()->invoke(1, $logTableSpec, $_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject,
+      'civicrm_alterLogTables'
+    );
+  }
 
   /**
    * This hook is called when a module-extension is installed.
