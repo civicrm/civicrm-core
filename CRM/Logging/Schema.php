@@ -57,6 +57,18 @@ class CRM_Logging_Schema {
   );
 
   /**
+   * Specifications of all log table including
+   *  - engine (default is archive, if not set.)
+   *  - indexes (default is none and they cannot be added unless engine is innodb. If they are added and
+   *    engine is not set to innodb an exception will be thrown since quiet acquiescence is easier to miss).
+   *  - exceptions (by default those stored in $this->exceptions are included). These are
+   *    excluded from the triggers.
+   *
+   * @var array
+   */
+  private $logTableSpec = array();
+
+  /**
    * Setting Callback - Validate.
    *
    * @param mixed $value
@@ -136,6 +148,12 @@ AND    TABLE_NAME LIKE 'civicrm_%'
 
     // do not log civicrm_mailing_recipients table, CRM-16193
     $this->tables = array_diff($this->tables, array('civicrm_mailing_recipients'));
+    $this->logTableSpec = array_fill_keys($this->tables, array());
+    foreach ($this->exceptions as $tableName => $fields) {
+      $this->logTableSpec[$tableName]['exceptions'] = $fields;
+    }
+    CRM_Utils_Hook::logTableSpec($this->logTableSpec);
+    $this->tables = array_keys($this->logTableSpec);
 
     if (defined('CIVICRM_LOGGING_DSN')) {
       $dsn = DB::parseDSN(CIVICRM_LOGGING_DSN);
@@ -583,6 +601,15 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
             log_action  ENUM('Initialization', 'Insert', 'Update', 'Delete')
 COLS;
 
+    if (!empty($this->logTableSpec[$table]['indexes'])) {
+      foreach ($this->logTableSpec[$table]['indexes'] as $indexName => $indexSpec) {
+        if (is_array($indexSpec)) {
+          $indexSpec = implode(" , ", $indexSpec);
+        }
+        $cols .= ", INDEX {$indexName}($indexSpec)";
+      }
+    }
+
     // - prepend the name with log_
     // - drop AUTO_INCREMENT columns
     // - drop non-column rows of the query (keys, constraints, etc.)
@@ -591,7 +618,8 @@ COLS;
     $query = preg_replace("/^CREATE TABLE `$table`/i", "CREATE TABLE `{$this->db}`.log_$table", $query);
     $query = preg_replace("/ AUTO_INCREMENT/i", '', $query);
     $query = preg_replace("/^  [^`].*$/m", '', $query);
-    $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=ARCHIVE ', $query);
+    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], 'ARCHIVE'));
+    $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
 
     // log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
     // so there's no need for a default timestamp and therefore we remove such default timestamps
@@ -687,8 +715,9 @@ COLS;
       // only do the change if any data has changed
       $cond = array();
       foreach ($columns as $column) {
+        $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[$table]) ? $this->logTableSpec[$table]['exceptions'] : array();
         // ignore modified_date changes
-        if ($column != 'modified_date' && !in_array($column, CRM_Utils_Array::value($table, $this->exceptions, array()))) {
+        if ($column != 'modified_date' && !in_array($column, $tableExceptions)) {
           $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
         }
       }
