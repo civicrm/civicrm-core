@@ -167,6 +167,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $form->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
     $form->assign('totalSelectedContacts', count($form->_contactIds));
 
+    $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
+
     CRM_Mailing_BAO_Mailing::commonCompose($form);
 
     $buttons = array();
@@ -175,6 +177,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         'type' => 'submit',
         'name' => ts('Download Document'),
         'isDefault' => TRUE,
+        'icon' => 'fa-download',
       );
       $buttons[] = array(
         'type' => 'submit',
@@ -322,6 +325,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
+    $html = array();
 
     foreach ($form->_contactIds as $item => $contactId) {
       $params = array('contact_id' => $contactId);
@@ -360,7 +364,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       self::createActivities($form, $html_message, $form->_contactIds);
     }
 
-    CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+    $type = $formValues['document_type'];
+
+    if ($type == 'pdf') {
+      CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+    }
+    else {
+      CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
+    }
 
     $form->postProcessHook();
 
