@@ -1444,6 +1444,12 @@ GROUP BY     mt.member_of_contact_id";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
+    //CRM-18050: Check count of price set fields which has been set with auto-renew option. 
+    //If price set field is already present with auto-renew option then, it will restrict for adding another price set field with auto-renew option.
+    if ($dao->N == 0) {
+      return 0;
+    }
+
     $autoRenewOption = 2;
     $priceFields = array();
     while ($dao->fetch()) {
