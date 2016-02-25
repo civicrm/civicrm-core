@@ -32,7 +32,7 @@
  * the DSN, CMS type, CMS URL, etc. Generally, runtime properties must be
  * determined externally (before loading CiviCRM).
  */
-class CRM_Core_Config_Runtime {
+class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
 
   public $dsn;
 
@@ -135,17 +135,26 @@ class CRM_Core_Config_Runtime {
 
     $this->templateDir = array(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
 
-    // FIXME
-    if (isset($this->customPHPPathDir) && $this->customPHPPathDir) {
-      set_include_path($this->customPHPPathDir . PATH_SEPARATOR . get_include_path());
-    }
-
     $this->initialized = 1;
   }
 
   private function fatal($message) {
     echo $message;
     exit();
+  }
+
+  /**
+   * Include custom PHP and template paths
+   */
+  public function includeCustomPath() {
+    $customProprtyName = array('customPHPPathDir', 'customTemplateDir');
+    foreach ($customProprtyName as $property) {
+      $value = $this->getSettings()->get($property);
+      if (!empty($value)) {
+        $customPath = Civi::paths()->getPath($value);
+        set_include_path($customPath . PATH_SEPARATOR . get_include_path());
+      }
+    }
   }
 
   /**

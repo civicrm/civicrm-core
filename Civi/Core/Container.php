@@ -358,6 +358,8 @@ class Container {
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE)->getClassLoader()->register();
 
+      $runtime->includeCustomPath();
+
       $c = new self();
       $container = $c->loadContainer();
       foreach ($bootServices as $name => $obj) {
