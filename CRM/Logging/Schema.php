@@ -44,7 +44,13 @@ class CRM_Logging_Schema {
     'logging/contribute/summary',
   );
 
-  //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement
+  /**
+   * Columns that should never be subject to logging.
+   *
+   * CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement
+   *
+   * @var array
+   */
   private $exceptions = array(
     'civicrm_job' => array('last_run'),
     'civicrm_group' => array('cache_date', 'refresh_date'),
@@ -656,9 +662,7 @@ COLS;
    * @param bool $force
    */
   public function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
-    // check if we have logging enabled
-    $config =& CRM_Core_Config::singleton();
-    if (!$config->logging) {
+    if (!CRM_Core_Config::singleton()->logging) {
       return;
     }
 
@@ -743,13 +747,11 @@ COLS;
    * Disable logging temporarily.
    *
    * This allow logging to be temporarily disabled for certain cases
-   * where we want to do a mass cleanup but dont want to bother with
-   * an audit trail
+   * where we want to do a mass cleanup but do not want to bother with
+   * an audit trail.
    */
   public static function disableLoggingForThisConnection() {
-    // do this only if logging is enabled
-    $config = CRM_Core_Config::singleton();
-    if ($config->logging) {
+    if (CRM_Core_Config::singleton()->logging) {
       CRM_Core_DAO::executeQuery('SET @civicrm_disable_logging = 1');
     }
   }
