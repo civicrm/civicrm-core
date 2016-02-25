@@ -27,12 +27,12 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->_params = array(
-      'sEcho' => '1',
       'page' => 1,
       'rp' => 50,
       'offset' => 0,
       'rowCount' => 50,
       'sort' => NULL,
+      'parentsOnly' => FALSE,
       'is_unit_test' => TRUE,
     );
     $this->hookClass = CRM_Utils_Hook::singleton();
@@ -228,7 +228,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals('1 = 0', $permissionClause);
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data']);
+    $this->assertEquals(0, count($groups['data']));
     $this->assertEquals(0, $groups['recordsTotal'], 'Total returned should be accurate based on permissions');
   }
 
@@ -240,7 +240,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest('access CiviCRM');
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data']);
+    $this->assertEquals(0, count($groups['data']));
     $this->assertEquals(0, $groups['recordsTotal'], 'Total returned should be accurate based on permissions');
   }
 
@@ -252,7 +252,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest('access CiviCRM');
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data']);
+    $this->assertEquals(0, count($groups['data']));
     $this->assertEquals(0, $groups['recordsTotal'], 'Total returned should be accurate based on permissions');
   }
 
@@ -264,7 +264,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest('access CiviCRM');
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data']);
+    $this->assertEquals(0, count($groups['data']));
     $this->assertEquals(0, $groups['recordsTotal'], 'Total returned should be accurate based on permissions');
   }
 
@@ -276,7 +276,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest('access CiviCRM');
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data']);
+    $this->assertEquals(0, count($groups['data']));
     $this->assertEquals(0, $groups['recordsTotal'], 'Total returned should be accurate based on permissions');
   }
 
@@ -288,7 +288,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest('access CiviCRM');
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data']);
+    $this->assertEquals(0, count($groups['data']));
     $this->assertEquals(0, $groups['recordsTotal'], 'Total returned should be accurate based on permissions');
   }
 
@@ -307,7 +307,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setupACL();
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data'], 'Returned groups should exclude disabled by default');
+    $this->assertEquals(0, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $groups['recordsTotal'], 'Total needs to be set correctly');
   }
 
@@ -352,7 +352,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setupACL();
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data'], 'Returned groups should exclude disabled by default');
+    $this->assertEquals(0, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $groups['recordsTotal'], 'Total needs to be set correctly');
   }
 
@@ -415,7 +415,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    $this->assertEquals(0, $groups['data'], 'Returned groups should exclude disabled by default');
+    $this->assertEquals(0, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $groups['recordsTotal'], 'Total needs to be set correctly');
   }
 
