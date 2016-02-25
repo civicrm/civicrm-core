@@ -864,7 +864,7 @@ class CRM_Contribute_BAO_Query {
    * kills a small kitten so add carefully.
    */
   public static function selectorReturnProperties() {
-    return array(
+    $properties = array(
       'contact_type' => 1,
       'contact_sub_type' => 1,
       'sort_name' => 1,
@@ -887,6 +887,11 @@ class CRM_Contribute_BAO_Query {
       'contribution_product_id' => 1,
       'product_name' => 1,
     );
+    if (self::isSoftCreditOptionEnabled()) {
+      $properties = array_merge($properties, self::softCreditReturnProperties());
+    }
+
+    return $properties;
   }
 
   /**
