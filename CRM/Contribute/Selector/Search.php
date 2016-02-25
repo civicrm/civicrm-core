@@ -311,7 +311,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     if ($this->_includeSoftCredits) {
       // especial sort order when rows include soft credits
-      $sort = "civicrm_contribution.receive_date DESC, civicrm_contribution.id, civicrm_contribution_soft.id";
+      $sort = $sort->orderBy() . ", civicrm_contribution.id, civicrm_contribution_soft.id";
     }
     $result = $this->_query->searchQuery($offset, $rowCount, $sort,
       FALSE, FALSE,
