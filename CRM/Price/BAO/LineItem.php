@@ -117,6 +117,34 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
+   * Modifies $params array for filtering financial types.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   *
+   */
+  public static function getAPILineItemParams(&$params) {
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+    if ($types && empty($params['financial_type_id'])) {
+      $params['financial_type_id'] = array('IN' => array_keys($types));
+    }
+    elseif ($types) {
+      if (is_array($params['financial_type_id'])) {
+        $invalidFts = array_diff($params['financial_type_id'], array_keys($types));
+      }
+      elseif (!in_array($params['financial_type_id'], array_keys($types))) {
+        $invalidFts = $params['financial_type_id'];
+      }
+      if ($invalidFts) {
+        $params['financial_type_id'] = array('NOT IN' => $invalidFts);
+      }
+    }
+    else {
+      $params['financial_type_id'] = 0;
+    }
+  }
+
+  /**
    * @param int $entityId
    * @param $entityTable
    *
