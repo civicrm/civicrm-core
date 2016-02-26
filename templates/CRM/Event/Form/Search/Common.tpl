@@ -98,7 +98,8 @@ CRM.$(function($) {
       if (!$(this).data('select2')) {
         $(this).crmEntityRef();
       }
-      if (!$.isEmptyObject($(this).select2('data')[0].extra)) {
+      // allow repeat checkbox to be shown for first event selected
+      if (!$.isEmptyObject($(this).select2('data')[0])) {
         isRepeating = $(this).select2('data')[0].extra.is_recur;
       }
     }
