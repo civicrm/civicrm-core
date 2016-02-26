@@ -198,7 +198,10 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($types);
     $this->assertEquals($expectedResult, $types, 'Verify that removing permission for a financial type restricts the available membership types');
   }
-  
+
+  /**
+   * Check method testpermissionedFinancialTypes()
+   */
   public function testpermissionedFinancialTypes() {
     // First get all core permissions
     $permissions = $checkPerms = CRM_Core_Permission::getCorePermissions();
