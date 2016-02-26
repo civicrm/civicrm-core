@@ -283,13 +283,13 @@ class CRM_Event_BAO_Query {
               $exEventId = $val;
               $extractEventId = explode(" ", $val);
               $value = $extractEventId[2];
-              unset($query->_where[$grouping][$key]);
+              $where = $query->_where[$grouping][$key];
             }
             else if (strstr($val, 'civicrm_event.id IN')) {
               //extract the first event id if multiple events are selected
               preg_match('/civicrm_event.id IN \(\"(\d+)/', $val, $matches);
               $value = $matches[1];
-              unset($query->_where[$grouping][$key]);
+              $where = $query->_where[$grouping][$key];
             }
           }
           if ($exEventId) {
@@ -299,7 +299,7 @@ class CRM_Event_BAO_Query {
           else if(!empty($matches[1])) {
             $value = $matches[1];
           }
-          unset($query->_where[$grouping][$key]);
+          $where = $query->_where[$grouping][$key];
         }
         $thisEventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($value, 'civicrm_event');
         if ($thisEventHasParent) {
@@ -313,7 +313,7 @@ class CRM_Event_BAO_Query {
             $value = "(" . implode(",", $allEventIds) . ")";
           }
         }
-        $query->_where[$grouping][] = "civicrm_event.id $op {$value}";
+        $query->_where[$grouping][] = "{$where} OR civicrm_event.id $op {$value}";
         $query->_qill[$grouping][] = ts('Include Repeating Events');
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
