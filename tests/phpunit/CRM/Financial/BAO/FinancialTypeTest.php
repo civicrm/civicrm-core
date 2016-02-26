@@ -198,5 +198,28 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($types);
     $this->assertEquals($expectedResult, $types, 'Verify that removing permission for a financial type restricts the available membership types');
   }
+  
+  public function testpermissionedFinancialTypes() {
+    // First get all core permissions
+    $permissions = $checkPerms = CRM_Core_Permission::getCorePermissions();
+    $this->setACL();
+    CRM_Financial_BAO_FinancialType::permissionedFinancialTypes($permissions, TRUE);
+    $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+    $prefix = ts('CiviCRM') . ': ';
+    $actions = array('add', 'view', 'edit', 'delete');
+    foreach ($financialTypes as $id => $type) {
+      foreach ($actions as $action) {
+        $checkPerms[$action . ' contributions of type ' . $type] = array(
+          $prefix . ts($action . ' contributions of type ') . $type,
+          ts(ucfirst($action) . ' contributions of type ') . $type,
+        );
+      }
+    }
+    $checkPerms['administer CiviCRM Financial Types'] = array(
+      $prefix . ts('administer CiviCRM Financial Types'),
+      ts('Administer access to Financial Types'),
+    );
+    $this->assertEquals($permissions, $checkPerms, 'Verify that permissions for each financial type have been added');
+  }
 
 }
