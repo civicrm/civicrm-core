@@ -405,6 +405,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $domain = CRM_Core_BAO_Domain::getDomain();
     $hookTokens = array();
     $mailing = new CRM_Mailing_BAO_Mailing();
+    $mailing->subject = $subject;
     $mailing->body_text = $text;
     $mailing->body_html = $html;
     $tokens = $mailing->getTokens();
@@ -416,6 +417,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     if ($contactID) {
       $contactParams = array('contact_id' => $contactID);
       $returnProperties = array();
+
+      if (isset($tokens['subject']['contact'])) {
+        foreach ($tokens['subject']['contact'] as $name) {
+          $returnProperties[$name] = 1;
+        }
+      }
 
       if (isset($tokens['text']['contact'])) {
         foreach ($tokens['text']['contact'] as $name) {
