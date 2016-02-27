@@ -519,6 +519,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * (Experimental) This hook is called when build the menu table.
+   *
+   * @param array $items
+   *   List of records to include in menu table.
+   * @return null
+   *   the return value is ignored
+   */
+  public static function alterMenu(&$items) {
+    return self::singleton()->invoke(1, $items,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterMenu'
+    );
+  }
+
+  /**
    * This hook is called for declaring managed entities via API.
    *
    * @param array $entities
