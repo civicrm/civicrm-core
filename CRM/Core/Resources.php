@@ -752,7 +752,7 @@ class CRM_Core_Resources {
     if (CRM_Core_Permission::check('administer CiviCRM') && $this->ajaxPopupsEnabled) {
       $items[] = "js/crm.optionEdit.js";
     }
-    
+
     global $tsLocale;
     // Add localized jQuery UI files
     if ($tsLocale && $tsLocale != 'en_US') {
