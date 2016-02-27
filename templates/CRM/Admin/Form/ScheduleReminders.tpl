@@ -44,15 +44,8 @@
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong id='OR'>OR</strong><br /></td>
-    </tr>
-
-    <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
-        <td class="right"></td>
-        <td colspan="3">{$form.start_action_offset.html}&nbsp;&nbsp;&nbsp;{$form.start_action_unit.html}&nbsp;&nbsp;&nbsp;{$form.start_action_condition.html}&nbsp;&nbsp;&nbsp;{$form.start_action_date.html}</td>
-    </tr>
-    <tr id="recordActivity" class="crm-scheduleReminder-form-block-record_activity"><td class="label" width="20%">{$form.record_activity.label}</td>
-        <td>{$form.record_activity.html}</td>
+        <td>{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong id='OR'>OR</strong> 
+		{$form.start_action_offset.html}&nbsp;&nbsp;&nbsp;{$form.start_action_unit.html}&nbsp;&nbsp;&nbsp;{$form.start_action_condition.html}&nbsp;&nbsp;&nbsp;{$form.start_action_date.html}</td>
     </tr>
     <tr id="relativeDateRepeat" class="crm-scheduleReminder-form-block-is_repeat"><td class="label" width="20%">{$form.is_repeat.label}</td>
         <td>{$form.is_repeat.html}&nbsp;&nbsp;<span class="description">{ts}Enable repetition.{/ts}</span></td>
@@ -109,7 +102,7 @@
     {/if}
     <tr class="crm-scheduleReminder-form-block-active">
       <td class="label"></td>
-      <td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
+      <td>{$form.send_email.html}&nbsp;{$form.send_email.label}</td>
     </tr>
   </table>
   <fieldset id="email" class="crm-collapsible" style="display: block;">
@@ -124,6 +117,9 @@
             <td class="label">{$form.subject.label}</td>
             <td>{$form.subject.html}</td>
          </tr>
+		 <tr id="recordActivity" class="crm-scheduleReminder-form-block-record_activity"><td class="label" width="20%">{$form.record_activity.label}</td>
+			<td>{$form.record_activity.html}</td>
+		 </tr>
        </table>
        {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
     </div>
@@ -280,6 +276,15 @@
           showSaveUpdateChkBox('SMS');
         }
       }
+	  
+	  //CRM-14097 - When un-checking the "send email" box, the email fields do not get hidden
+	  cj(function ( $ ) {
+		$(document).ready(function(){
+			$('body').on('change', '.crm-scheduleReminder-form-block-active #send_email', function () { 
+				$('.crm-collapsible').toggle();
+			});
+		});
+	  });
 
     });
   </script>
