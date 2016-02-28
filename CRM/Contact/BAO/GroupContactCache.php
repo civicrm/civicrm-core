@@ -336,18 +336,18 @@ SET    cache_date = null,
 DELETE     gc
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
-WHERE      g.cache_date >= %1
+WHERE      g.cache_date <= %1
 ";
         $update = "
 UPDATE civicrm_group g
 SET    cache_date = null,
        refresh_date = null
-WHERE  g.cache_date >= %1
+WHERE  g.cache_date <= %1
 ";
         $refresh = "
 UPDATE civicrm_group g
 SET    refresh_date = $refreshTime
-WHERE  g.cache_date < %1
+WHERE  g.cache_date > %1
 AND    refresh_date IS NULL
 ";
         $cacheTime = date('Y-m-d H-i-s', strtotime("- $smartGroupCacheTimeout minutes"));
