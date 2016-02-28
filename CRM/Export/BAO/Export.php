@@ -1388,7 +1388,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             }
           }
           else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+            $sqlColumns[$fieldName] = "$fieldName text";
           }
         }
       }
