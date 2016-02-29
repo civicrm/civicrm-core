@@ -269,7 +269,7 @@ class civicrm_cli {
         $this->_log(ts("Failed to login as %1. Wrong username or password.", array('1' => $this->_user)));
         return FALSE;
       }
-      if (!$cms->loadUser($this->_user)) {
+      if (($this->_config->userFramework == 'Joomla' && !$cms->loadUser($this->_user, $this->_password)) || !$cms->loadUser($this->_user)) {
         $this->_log(ts("Failed to login as %1", array('1' => $this->_user)));
         return FALSE;
       }
