@@ -2458,7 +2458,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
 
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereNoBobH'));
-    CRM_Contact_BAO_Contact_Permission::cache($userID, CRM_Core_Permission::VIEW, TRUE);
+    CRM_Contact_BAO_Contact_Permission::cache($userID, TRUE);
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
       'field_name' => 'first_name',
