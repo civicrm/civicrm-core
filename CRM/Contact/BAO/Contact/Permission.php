@@ -92,7 +92,6 @@ WHERE contact_a.id = %1 AND $permission";
   public static function cache($userID, $force = FALSE) {
     static $_processed = array();
     $operationClause = " operation IN ( 'Edit', 'View' ) ";
-    $operation = 'View';
 
     if (!$force) {
       if (!empty($_processed[$userID])) {
@@ -120,18 +119,14 @@ AND    $operationClause
     $permission = CRM_ACL_API::whereClause(CRM_Core_Permission::VIEW, $tables, $whereTables, $userID);
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
-
     CRM_Core_DAO::executeQuery("
 INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
-SELECT      $userID as user_id, contact_a.id as contact_id, '$operation' as operation
+SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, 'View' as operation
          $from
+         LEFT JOIN civicrm_acl_contact_cache ac ON ac.user_id = $userID AND contact_a.id AND ac.operation = 'View'
 WHERE    $permission
-GROUP BY contact_a.id
-ON DUPLICATE KEY UPDATE
-         user_id=VALUES(user_id),
-         contact_id=VALUES(contact_id),
-         operation=VALUES(operation)"
-    );
+AND ac.id IS NULL
+");
 
     $_processed[$userID] = 1;
   }
