@@ -141,7 +141,6 @@ ON DUPLICATE KEY UPDATE
          operation=VALUES(operation)"
     );
 
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_acl_contact_cache WHERE contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)');
     $_processed[$userID] = 1;
   }
 
