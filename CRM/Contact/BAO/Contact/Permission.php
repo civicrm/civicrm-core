@@ -48,13 +48,13 @@ class CRM_Contact_BAO_Contact_Permission {
     $tables = array();
     $whereTables = array();
 
-    # FIXME: push this somewhere below, to not give this permission so many rights
+    // FIXME: push this somewhere below, to not give this permission so many rights
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted');
     if (CRM_Core_Permission::check('access deleted contacts') && $isDeleted) {
       return TRUE;
     }
 
-    // short circuit for admin rights here so we avoid unneeeded queries
+    // short circuit for admin rights here so we avoid unneeded queries
     // some duplication of code, but we skip 3-5 queries
     if (CRM_Core_Permission::check('edit all contacts') ||
       ($type == CRM_ACL_API::VIEW && CRM_Core_Permission::check('view all contacts'))
@@ -84,23 +84,15 @@ WHERE contact_a.id = %1 AND $permission";
    * Fill the acl contact cache for this contact id if empty.
    *
    * @param int $userID
-   * @param int|string $type the type of operation (view|edit)
    * @param bool $force
    *   Should we force a recompute.
    *
    * @return void
    */
-  public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
+  public static function cache($userID, $force = FALSE) {
     static $_processed = array();
-
-    if ($type = CRM_Core_Permission::VIEW) {
-      $operationClause = " operation IN ( 'Edit', 'View' ) ";
-      $operation = 'View';
-    }
-    else {
-      $operationClause = " operation = 'Edit' ";
-      $operation = 'Edit';
-    }
+    $operationClause = " operation IN ( 'Edit', 'View' ) ";
+    $operation = 'View';
 
     if (!$force) {
       if (!empty($_processed[$userID])) {
@@ -125,7 +117,7 @@ AND    $operationClause
     $tables = array();
     $whereTables = array();
 
-    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID);
+    $permission = CRM_ACL_API::whereClause(CRM_Core_Permission::VIEW, $tables, $whereTables, $userID);
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
