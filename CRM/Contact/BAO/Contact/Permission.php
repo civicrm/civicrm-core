@@ -234,19 +234,14 @@ AND    $operationClause
     $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID);
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
-
-    // FIXME: don't use 'ON DUPLICATE KEY UPDATE'
     CRM_Core_DAO::executeQuery("
 INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
-SELECT      $userID as user_id, contact_a.id as contact_id, '$operation' as operation
+SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation
          $from
+         LEFT JOIN civicrm_acl_contact_cache ac ON ac.user_id = $userID AND ac.contact_id = contact_a.id AND ac.operation = '{$operation}'
 WHERE    $permission
-GROUP BY contact_a.id
-ON DUPLICATE KEY UPDATE
-         user_id=VALUES(user_id),
-         contact_id=VALUES(contact_id),
-         operation=VALUES(operation)"
-    );
+AND ac.user_id IS NULL
+");
     $_processed[$type][$userID] = 1;
   }
 
