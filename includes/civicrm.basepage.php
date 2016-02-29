@@ -263,24 +263,67 @@ class CiviCRM_For_WordPress_Basepage {
 
 
   /**
-   * Get CiviCRM base page template
-   * Callback method for 'template_include' hook, always called from WP front-end
+   * Get CiviCRM base page template.
+   *
+   * Callback method for 'template_include' hook, always called from WP front-end.
    *
    * @param string $template The path to the existing template
    * @return string $template The modified path to the desired template
    */
   public function basepage_template( $template ) {
 
-    // use the basic page template, but allow overrides
+    // get template filename
+    $template_name = basename( $template );
+
+    // use the provided page template, but allow overrides.
     $page_template = locate_template( array(
-      apply_filters( 'civicrm_basepage_template', 'page.php' )
+
+      /**
+       * In most cases, the logic will not progress beyond here. Shortcodes in
+       * posts and pages will have a template set, so we leave them alone unless
+       * specifically overridden by the filter.
+       *
+       * @param string $template_name The provided template name
+       * @return string The overridden template name
+       */
+      apply_filters( 'civicrm_basepage_template', $template_name )
+
     ) );
 
-    if ( '' != $page_template ) {
+    // if not homepage and template is found
+    if ( '' != $page_template && !is_front_page() ) {
       return $page_template;
     }
 
-    // fallback
+    // find homepage the template
+    $home_template = locate_template( array(
+
+      /**
+       * Override the template, but allow plugins to amend.
+       *
+       * This filter handles the scenario where no basepage has been set, in
+       * which case CiviCRM will try to load its content in the site's homepage.
+       * Many themes, however, do not have a call to "the_content()" on the
+       * homepage - it is often used as a gateway page to display widgets,
+       * archives and so forth.
+       *
+       * Be aware that if the homepage is set to show latest posts, then this
+       * template override will not have the desired effect. A basepage *must*
+       * be set if this is the case.
+       *
+       * @param string The template name (set to the default page template)
+       * @return string The overridden template name
+       */
+      apply_filters( 'civicrm_basepage_home_template', 'page.php' )
+
+    ) );
+
+    // use it if found
+    if ( '' != $home_template ) {
+      return $home_template;
+    }
+
+    // fall back to provided template
     return $template;
 
   }
