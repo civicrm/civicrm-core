@@ -379,8 +379,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * database population.
    */
   public function createDomainContacts() {
-    $default_domain_contact = $this->organizationCreate();
-    $second_domain_contact = $this->organizationCreate();
+    $this->organizationCreate();
+    $this->organizationCreate(array('organization_name' => 'Second Domain'));
   }
 
   /**
