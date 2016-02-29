@@ -69,9 +69,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function tearDown() {
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
     // truncate a few tables
     $tablesToTruncate = array(
-      'civicrm_contact',
       'civicrm_email',
       'civicrm_contribution',
       'civicrm_line_item',
@@ -80,9 +80,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_uf_match',
       'civicrm_phone',
       'civicrm_address',
+      'civicrm_acl_contact_cache',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   /**
@@ -2314,7 +2316,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testGetQuickEmail() {
     $this->getQuickSearchSampleData();
-    $userID = $this->createLoggedInUser();
+    $loggedInContactID = $this->createLoggedInUser();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'c',
     ));
@@ -2323,8 +2325,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'C Bobby, Bobby',
       'E Bobby, Bobby :: bob@bobby.com',
       'H Bobby, Bobby :: bob@h.com',
+      'Second Domain',
+      $this->callAPISuccessGetValue('Contact', array('id' => $loggedInContactID, 'return' => 'last_name')) . ', Logged In :: anthony_anderson@civicrm.org',
     );
-    $this->assertEquals(5, $result['count']);
+    $this->assertEquals(6, $result['count']);
     foreach ($expectedData as $index => $value) {
       $this->assertEquals($value, $result['values'][$index]['data']);
     }
@@ -2350,7 +2354,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testGetQuickEmailACL() {
     $this->getQuickSearchSampleData();
-    $userID = $this->createLoggedInUser();
+    $loggedInContactID = $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'c',
@@ -2358,16 +2362,19 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
 
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereNoBobH'));
-    CRM_Contact_BAO_Contact_Permission::cache($userID, CRM_Core_Permission::VIEW, TRUE);
+    CRM_Contact_BAO_Contact_Permission::cache($loggedInContactID, CRM_Core_Permission::VIEW, TRUE);
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'c',
     ));
-    // Without the acl it would be 5 like the previous email getquick test.
-    $this->assertEquals(4, $result['count']);
+
+    // Without the acl it would be 6 like the previous email getquick test.
+    $this->assertEquals(5, $result['count']);
     $expectedData = array(
       'Bob, Bob :: bob@bob.com',
       'C Bobby, Bobby',
       'E Bobby, Bobby :: bob@bobby.com',
+      'Second Domain',
+      $this->callAPISuccessGetValue('Contact', array('id' => $loggedInContactID, 'return' => 'last_name')) . ', Logged In :: anthony_anderson@civicrm.org',
     );
     foreach ($expectedData as $index => $value) {
       $this->assertEquals($value, $result['values'][$index]['data']);
@@ -2398,16 +2405,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test that getquick returns contacts with an exact first name match first.
    */
   public function testGetQuickID() {
+    $max = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_contact");
     $this->getQuickSearchSampleData();
     $result = $this->callAPISuccess('contact', 'getquick', array(
-      'name' => 2,
+      'name' => $max + 2,
       'field_name' => 'id',
       'table_name' => 'cc',
     ));
     $this->assertEquals(1, $result['count']);
     $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
     $result = $this->callAPISuccess('contact', 'getquick', array(
-      'name' => 2,
+      'name' => $max + 2,
       'field_name' => 'contact_id',
       'table_name' => 'cc',
     ));
