@@ -131,9 +131,10 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
 function civicrm_api3_create_error($msg, $data = array()) {
   $data['is_error'] = 1;
   $data['error_message'] = $msg;
+
   // we will show sql to privileged user only (not sure of a specific
   // security hole here but seems sensible - perhaps should apply to the trace as well?)
-  if (isset($data['sql']) && CRM_Core_Permission::check('Administer CiviCRM')) {
+  if (isset($data['sql']) && (CRM_Core_Permission::check('Administer CiviCRM') || CIVICRM_UF == 'UnitTests')) {
     // Isn't this redundant?
     $data['debug_information'] = $data['sql'];
   }
