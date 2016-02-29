@@ -317,4 +317,24 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $this->assertEquals($isACL, array('acl_financial_type' => 1));
   }
 
+  /**
+   * Check method testisACLFinancialTypeStatus()
+   */
+  public function testbuildPermissionedClause() {
+    $this->setACL();
+    $config = &CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array(
+      'view contributions of type Donation',
+      'view contributions of type Member Dues',
+    );
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
+    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,2)');
+    $config->userPermissionClass->permissions[] = 'view contributions of type Event Fee';
+    $whereClause = NULL;
+    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = array();
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
+    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,4,2)');
+    
+  }
+
 }
