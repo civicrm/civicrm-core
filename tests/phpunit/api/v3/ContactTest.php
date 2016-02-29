@@ -224,7 +224,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
 
-    $this->assertEquals(1, $contact['id']);
+    $this->assertEquals(3, $contact['id']);
     $email = $this->callAPISuccess('email', 'get', array('contact_id' => $contact['id']));
     $this->assertEquals(1, $email['count']);
     $this->assertEquals('man3@yahoo.com', $email['values'][$email['id']]['email']);
@@ -244,8 +244,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'last_name' => 'xyz1',
     );
 
-    $contact = $this->callAPISuccess('contact', 'create', $params);
-    $this->assertEquals(1, $contact['id']);
+    $this->callAPISuccess('contact', 'create', $params);
   }
 
   /**
@@ -326,8 +325,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'household_name' => 'The abc Household',
       'contact_type' => 'Household',
     );
-    $contact = $this->callAPISuccess('contact', 'create', $params);
-    $this->assertEquals(1, $contact['id']);
+    $this->callAPISuccess('contact', 'create', $params);
   }
 
   /**
@@ -341,8 +339,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'organization_name' => 'The abc Organization',
       'contact_type' => 'Organization',
     );
-    $contact = $this->callAPISuccess('contact', 'create', $params);
-    $this->assertEquals(1, $contact['id']);
+    $this->callAPISuccess('contact', 'create', $params);
   }
 
   /**
@@ -623,6 +620,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'return.first_name' => 1,
       'sequential' => 1,
       'rowCount' => 1,
+      'contact_type' => 'Individual',
     ));
 
     $this->assertEquals('abc1', $result['values'][0]['first_name']);
@@ -672,24 +670,29 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params['is_deleted'] = 1;
     $params['last_name'] = 'bcd';
     $contact2 = $this->callAPISuccess('contact', 'create', $params);
-    $countActive = $this->callAPISuccess('contact', 'getcount', array('showAll' => 'active'));
-    $countAll = $this->callAPISuccess('contact', 'getcount', array('showAll' => 'all'));
-    $countTrash = $this->callAPISuccess('contact', 'getcount', array('showAll' => 'trash'));
-    $countDefault = $this->callAPISuccess('contact', 'getcount', array());
+    $countActive = $this->callAPISuccess('contact', 'getcount', array(
+      'showAll' => 'active',
+      'contact_type' => 'Individual',
+    ));
+    $countAll = $this->callAPISuccess('contact', 'getcount', array('showAll' => 'all', 'contact_type' => 'Individual'));
+    $countTrash = $this->callAPISuccess('contact', 'getcount', array('showAll' => 'trash', 'contact_type' => 'Individual'));
+    $countDefault = $this->callAPISuccess('contact', 'getcount', array('contact_type' => 'Individual'));
     $countDeleted = $this->callAPISuccess('contact', 'getcount', array(
+      'contact_type' => 'Individual',
       'contact_is_deleted' => 1,
     ));
     $countNotDeleted = $this->callAPISuccess('contact', 'getcount', array(
       'contact_is_deleted' => 0,
+      'contact_type' => 'Individual',
     ));
     $this->callAPISuccess('contact', 'delete', array('id' => $contact1['id']));
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
-    $this->assertEquals(1, $countNotDeleted, 'contact_is_deleted => 0 is respected in line ' . __LINE__);
+    $this->assertEquals(1, $countNotDeleted, 'contact_is_deleted => 0 is respected');
     $this->assertEquals(1, $countActive);
     $this->assertEquals(1, $countTrash);
     $this->assertEquals(2, $countAll);
     $this->assertEquals(1, $countDeleted);
-    $this->assertEquals(1, $countDefault, 'Only active by default in line ' . __LINE__);
+    $this->assertEquals(1, $countDefault, 'Only active by default in line');
   }
 
   /**
@@ -704,15 +707,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ));
     $result = $this->callAPISuccess($this->_entity, 'getvalue', array(
       'return' => 'first_name',
+      'contact_type' => 'Individual',
       'options' => array(
         'limit' => 1,
         'sort' => 'first_name',
       ),
     ));
-    $this->assertEquals('abc1', $result, 'in line' . __LINE__);
+    $this->assertEquals('abc1', $result);
 
     $result = $this->callAPISuccess($this->_entity, 'getvalue', array(
       'return' => 'first_name',
+      'contact_type' => 'Individual',
       'options' => array(
         'limit' => 1,
         'sort' => 'first_name DESC',
@@ -969,7 +974,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__, $description, $subFile);
 
-    $this->assertEquals(1, $result['id']);
     // checking child function result not covered in callAPIAndDocument
     $this->assertAPISuccess($result['values'][$result['id']]['api.website.create']);
     $this->assertEquals("http://chained.org", $result['values'][$result['id']]['api.website.create.2']['values'][0]['url']);
@@ -1016,7 +1020,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $subfile = "ChainTwoWebsitesSyntax2";
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
 
-    $this->assertEquals(1, $result['id']);
     // the callAndDocument doesn't check the chained call
     $this->assertEquals(0, $result['values'][$result['id']]['api.website.create'][0]['is_error']);
     $this->assertEquals("http://chained.org", $result['values'][$result['id']]['api.website.create'][1]['values'][0]['url']);
@@ -1109,7 +1112,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
-    $this->assertEquals(1, $contact['id']);
 
     $this->callAPISuccess('contact', 'delete', $contact);
   }
@@ -1136,8 +1138,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'location_type_id' => 1,
     );
     $result = $this->callAPISuccess('contact', 'create', $params);
-
-    $this->assertEquals(1, $result['id']);
 
     $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
   }
@@ -1200,8 +1200,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
-
-    $this->assertEquals(1, $contact['id']);
 
     $this->callAPISuccess('contact', 'delete', $contact);
   }
@@ -1539,16 +1537,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
 
-    $this->assertEquals(1, $contact['id']);
-
     $params = array(
       'email' => 'man2@yahoo.com',
     );
     $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['values'][1]['contact_id']);
-    $this->assertEquals('man2@yahoo.com', $result['values'][1]['email']);
+    $this->assertEquals('man2@yahoo.com', $result['values'][$result['id']]['email']);
 
-    // delete the contact
     $this->callAPISuccess('contact', 'delete', $contact);
   }
 
@@ -1870,7 +1864,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', $result);
     $this->customGroupDelete($ids['custom_group_id']);
     $this->customGroupDelete($moreIDs['custom_group_id']);
-    $this->assertEquals(1, $result['id']);
     $this->assertEquals(0, $result['values'][$result['id']]['api.website.get']['is_error']);
     $this->assertEquals("http://civicrm.org", $result['values'][$result['id']]['api.website.get']['values'][0]['url']);
   }
@@ -1970,7 +1963,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.Membership.getCount' => array(),
     );
     $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals(1, $result['id']);
     $this->assertEquals(2, $result['values'][$result['id']]['api.Contribution.getCount']);
     $this->assertEquals(0, $result['values'][$result['id']]['api.Note.get']['is_error']);
     $this->assertEquals("http://civicrm.org", $result['values'][$result['id']]['api.website.getValue']);
@@ -2056,7 +2048,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
     $this->customGroupDelete($moreIDs['custom_group_id']);
     $this->customGroupDelete($andMoreIDs['custom_group_id']);
-    $this->assertEquals(1, $result['id']);
     $this->assertEquals(0, $result['values'][$result['id']]['api.CustomValue.get']['is_error']);
     $this->assertEquals('http://civicrm.org', $result['values'][$result['id']]['api.website.getValue']);
   }
