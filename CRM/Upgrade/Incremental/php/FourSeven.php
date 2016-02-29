@@ -166,6 +166,15 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_3($rev) {
+    $this->addTask('Add Index to civicrm_contribution.total_amount', 'addIndexContributionAmount');
+  }
+
+  /**
    * CRM-16354
    *
    * @return int
@@ -497,6 +506,23 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
    */
   public function addIndexContributionSource(CRM_Queue_TaskContext $ctx) {
     CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contribution' => array('source')));
+    return TRUE;
+  }
+
+  /**
+   * CRM-18124 Add index to civicrm_contribution.total_amount.
+   *
+   * Note that I made this a combined index with receive_date because the issue included
+   * both criteria and they seemed likely to be used in conjunction to me in other cases.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexContributionAmount(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::createIndexes(array(
+      'civicrm_contribution' => array(array('total_amount', 'receive_date')),
+    ));
     return TRUE;
   }
 
