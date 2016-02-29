@@ -29,10 +29,12 @@
   ],
   "scripts": {
     "post-install-cmd": [
-      "bash tools/scripts/composer/dompdf-cleanup.sh"
+      "bash tools/scripts/composer/dompdf-cleanup.sh",
+      "bash tools/scripts/composer/tcpdf-cleanup.sh"
     ],
     "post-update-cmd": [
-      "bash tools/scripts/composer/dompdf-cleanup.sh"
+      "bash tools/scripts/composer/dompdf-cleanup.sh",
+      "bash tools/scripts/composer/tcpdf-cleanup.sh"
     ]
   }
 }
