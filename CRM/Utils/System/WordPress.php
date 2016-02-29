@@ -326,13 +326,24 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * FIXME: Do something
-   *
-   * @param \obj $user
+   * @param \string $user
    *
    * @return bool
    */
   public function loadUser($user) {
+    $userdata = get_user_by('login', $user);
+    if (!$userdata->data->ID) {
+      return FALSE;
+    }
+
+    $uid = $userdata->data->ID;
+    wp_set_current_user($uid);
+    $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
+
+    // lets store contact id and user id in session
+    $session = CRM_Core_Session::singleton();
+    $session->set('ufID', $uid);
+    $session->set('userID', $contactID);
     return TRUE;
   }
 

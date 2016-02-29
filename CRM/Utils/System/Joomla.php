@@ -430,13 +430,30 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * FIXME: Do something
-   *
-   * @param \obj $user
+   * @param \string $username
+   * @param \string $password
    *
    * @return bool
    */
-  public function loadUser($user) {
+  public function loadUser($username, $password = NULL) {
+    $uid = JUserHelper::getUserId($username);
+    if (empty($uid)) {
+      return FALSE;
+    }
+    $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
+    if (!empty($password)) {
+      $instance = JFactory::getApplication('site');
+      $params = array(
+        'username' => $username,
+        'password' => $password,
+      );
+      //perform the login action
+      $instance->login($params);
+    }
+
+    $session = CRM_Core_Session::singleton();
+    $session->set('ufID', $uid);
+    $session->set('userID', $contactID);
     return TRUE;
   }
 
