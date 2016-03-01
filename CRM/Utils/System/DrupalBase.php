@@ -100,8 +100,12 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     // compares $url (which is some unknown/untrusted value from a third-party dev) to the CMS's base url (which is independent of civi's url)
     // to see if the url is within our drupal dir, if it is we are able to treated it as an internal url
     if (strpos($url, $base_url) === 0) {
-      $internal = TRUE;
-      $url = trim(str_replace($base_url, '', $url), '/');
+      $file = trim(str_replace($base_url, '', $url), '/');
+      // CRM-18130: Custom CSS URL not working if aliased or rewritten
+      if (file_exists(DRUPAL_ROOT . $file)) {
+        $url = $file;
+        $internal = TRUE;
+      }
     }
     // Handle relative urls that are within the CiviCRM module directory
     elseif (strpos($url, $base) === 0) {
