@@ -150,7 +150,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  protected $entityReferenceFields = array('membership_type_id');
+  protected $entityReferenceFields = array('event_id', 'membership_type_id');
 
   /**
    * Name of the selector to use.
