@@ -705,7 +705,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $name = CRM_Utils_Array::value($contributionStatus, $statusName);
       switch ($name) {
         case 'Completed':
-		  // [CRM-17498] Removing unsupported status change options.
+          // [CRM-17498] Removing unsupported status change options.
           unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
           unset($status[CRM_Utils_Array::key('Failed', $statusName)]);
           unset($status[CRM_Utils_Array::key('Partially paid', $statusName)]);
