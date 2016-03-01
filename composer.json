@@ -6,6 +6,7 @@
       "Civi\\": [".", "tests/phpunit/"]
     }
   },
+  "include-path": ["vendor/tecnickcom"],
   "require": {
     "dompdf/dompdf" : "0.6.*",
     "symfony/config": "~2.5.0",
