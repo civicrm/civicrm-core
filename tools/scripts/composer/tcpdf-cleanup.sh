@@ -44,6 +44,5 @@ safe_delete vendor/tecnickcom/tcpdf/fonts/k*
 safe_delete vendor/tecnickcom/tcpdf/fonts/m*
 safe_delete vendor/tecnickcom/tcpdf/fonts/p*
 safe_delete vendor/tecnickcom/tcpdf/fonts/s*
-safe_delete vendor/tecnickcom/tcpdf/fonts/t*
 safe_delete vendor/tecnickcom/tcpdf/fonts/u*
 safe_delete vendor/tecnickcom/tcpdf/fonts/z*
