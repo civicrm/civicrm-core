@@ -1507,6 +1507,8 @@ class CRM_Contact_BAO_Query {
       return $params;
     }
 
+    self::filterCountryFromValuesIfStateExists($formValues);
+
     foreach ($formValues as $id => $values) {
 
       if (self::isAlreadyProcessedForQueryFormat($values)) {
@@ -4454,6 +4456,31 @@ civicrm_relationship.is_permission_a_b = 0
       return FALSE;
     }
     return in_array($operator, CRM_Core_DAO::acceptedSQLOperators());
+  }
+
+  /**
+   * If the state and country are passed remove state.
+   *
+   * Country is implicit from the state, but including both results in
+   * a poor query as there is no combined index on state AND country.
+   *
+   * CRM-18125
+   *
+   * @param array $formValues
+   */
+  public static function filterCountryFromValuesIfStateExists(&$formValues) {
+    if (!empty($formValues['country'])) {
+      if (isset($formValues['state_province'])) {
+        // The use of array map sanitises the data by ensuring we are dealing with integers.
+        $states = implode(', ', array_map('intval', $formValues['state_province']));
+        $countryList = CRM_Core_DAO::singleValueQuery(
+          "SELECT GROUP_CONCAT(country_id) FROM civicrm_state_province WHERE id IN ($states)"
+        );
+        if ($countryList == $formValues['country']) {
+          unset($formValues['country']);
+        }
+      }
+    }
   }
 
   /**
