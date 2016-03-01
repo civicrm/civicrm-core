@@ -603,8 +603,9 @@ class CRM_Core_Resources {
         }
       }
 
+      global $tsLocale;
       // Dynamic localization script
-      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $config->lcMessages, array('r' => $this->getCacheCode())), $jsWeight++, $region);
+      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $tsLocale, array('r' => $this->getCacheCode())), $jsWeight++, $region);
 
       // Add global settings
       $settings = array(
@@ -752,12 +753,13 @@ class CRM_Core_Resources {
       $items[] = "js/crm.optionEdit.js";
     }
 
+    global $tsLocale;
     // Add localized jQuery UI files
-    if ($config->lcMessages && $config->lcMessages != 'en_US') {
+    if ($tsLocale && $tsLocale != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
-      list($lang) = explode('_', $config->lcMessages);
+      list($lang) = explode('_', $tsLocale);
       $path = "bower_components/jquery-ui/ui/i18n";
-      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
+      foreach (array(str_replace('_', '-', $tsLocale), $lang) as $language) {
         $localizationFile = "$path/datepicker-{$language}.js";
         if ($this->getPath('civicrm', $localizationFile)) {
           $items[] = $localizationFile;
