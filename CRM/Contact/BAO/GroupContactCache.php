@@ -67,7 +67,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    */
   public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
-    $expiryTime =  date_format(date_create(CRM_Utils_Date::getUTCTime(-($smartGroupCacheTimeout * 60))), 'Y-m-d H:i:s');
+    $expiryTime = date_format(date_create(CRM_Utils_Date::getUTCTime(-($smartGroupCacheTimeout * 60))), 'Y-m-d H:i:s');
 
     $query = "
 SELECT  g.id
@@ -291,7 +291,7 @@ WHERE id IN ( $groupIDs )
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
 
     //expire everything older than this date/time
-    $expiryTime =  date_format(date_create(CRM_Utils_Date::getUTCTime(-($smartGroupCacheTimeout * 60))), 'Y-m-d H:i:s');
+    $expiryTime = date_format(date_create(CRM_Utils_Date::getUTCTime(-($smartGroupCacheTimeout * 60))), 'Y-m-d H:i:s');
 
     if (!isset($groupID)) {
       if ($smartGroupCacheTimeout == 0) {
