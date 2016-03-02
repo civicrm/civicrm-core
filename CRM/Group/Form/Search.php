@@ -64,7 +64,7 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
       unset($groupTypes['Access Control']);
     }
 
-    $this->addCheckBox('group_type',
+    $this->addCheckBox('group_type_search',
       ts('Type'),
       $groupTypes,
       NULL, NULL, NULL, NULL, '&nbsp;&nbsp;&nbsp;'

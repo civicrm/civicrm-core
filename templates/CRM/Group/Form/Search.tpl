@@ -43,8 +43,8 @@
       </span>
     </td>
     <td id="group_type-block">
-      {$form.group_type.label}<br />
-      {$form.group_type.html}<br />
+      {$form.group_type_search.label}<br />
+      {$form.group_type_search.html}<br />
       <span class="description font-italic">
           {ts}Filter search by group type(s).{/ts}
       </span>
