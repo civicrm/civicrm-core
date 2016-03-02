@@ -178,6 +178,12 @@
      <type>Text</type>
    </html>
   </field>
+  <index>
+    <name>index_total_amount_receive_date</name>
+    <fieldName>total_amount</fieldName>
+    <fieldName>receive_date</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>fee_amount</name>
     <type>decimal</type>
