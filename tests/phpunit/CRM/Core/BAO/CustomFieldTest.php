@@ -1,10 +1,11 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
 
 /**
  * Class CRM_Core_BAO_CustomFieldTest
+ * @group headless
  */
 class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
@@ -84,7 +85,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     Custom::deleteGroup($customGroup);
   }
-
 
   public function testGetFields() {
     $customGroup = Custom::createGroup(array(), 'Individual');

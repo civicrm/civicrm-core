@@ -35,10 +35,10 @@
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class api_v3_JobTest
+ * @group headless
  */
 class api_v3_JobTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

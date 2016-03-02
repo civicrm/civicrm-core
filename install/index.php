@@ -174,9 +174,12 @@ global $tsLocale;
 $tsLocale = 'en_US';
 $seedLanguage = 'en_US';
 
-if (isset($_POST['seedLanguage']) and isset($langs[$_POST['seedLanguage']])) {
-  $seedLanguage = $_POST['seedLanguage'];
-  $tsLocale = $_POST['seedLanguage'];
+// CRM-16801 This validates that seedLanguage is valid by looking in $langs.
+// NB: the variable is initial a $_REQUEST for the initial page reload,
+// then becomes a $_POST when the installation form is submitted.
+if (isset($_REQUEST['seedLanguage']) and isset($langs[$_REQUEST['seedLanguage']])) {
+  $seedLanguage = $_REQUEST['seedLanguage'];
+  $tsLocale = $_REQUEST['seedLanguage'];
 }
 
 $config = CRM_Core_Config::singleton(FALSE);
@@ -184,6 +187,11 @@ $GLOBALS['civicrm_default_error_scope'] = NULL;
 
 // The translation files are in the parent directory (l10n)
 $i18n = CRM_Core_I18n::singleton();
+
+// Support for Arabic, Hebrew, Farsi, etc.
+// Used in the template.html
+$short_lang_code = CRM_Core_I18n_PseudoConstant::shortForLong($tsLocale);
+$text_direction = (CRM_Core_I18n::isLanguageRTL($tsLocale) ? 'rtl' : 'ltr');
 
 global $cmsPath;
 if ($installType == 'drupal') {
@@ -202,7 +210,7 @@ elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
   $upload_dir = wp_upload_dir();
   $files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
-  $wp_civi_settings = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settingsphp';
+  $wp_civi_settings = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
   $wp_civi_settings_deprectated = CIVICRM_PLUGIN_DIR . 'civicrm.settings.php';
   if (file_exists($wp_civi_settings_deprectated)) {
     $alreadyInstalled = $wp_civi_settings_deprectated;
@@ -725,10 +733,14 @@ class InstallRequirements {
     $aboveMinVersion = version_compare($phpVersion, $minVersion) >= 0;
     $belowMaxVersion = $maxVersion ? version_compare($phpVersion, $maxVersion) < 0 : TRUE;
 
-    if ($maxVersion && $aboveMinVersion && $belowMaxVersion) {
-      return TRUE;
-    }
-    elseif (!$maxVersion && $aboveMinVersion) {
+    if ($aboveMinVersion && $belowMaxVersion) {
+      if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
+        $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk.', array(
+          1 => phpversion(),
+          2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+        ));
+        $this->warning($testDetails);
+      }
       return TRUE;
     }
 
@@ -1392,10 +1404,6 @@ class Installer extends InstallRequirements {
 
         //change the default language to one chosen
         if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
-          // This ensures that defaults get set, otherwise the user will login
-          // and most configurations will be empty, not set to en_US defaults.
-          civicrm_api3('Setting', 'revert');
-
           civicrm_api3('Setting', 'create', array(
               'domain_id' => 'current_domain',
               'lcMessages' => $config['seedLanguage'],

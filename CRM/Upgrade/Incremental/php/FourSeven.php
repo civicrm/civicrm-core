@@ -142,6 +142,36 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_beta6($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Disable flexible jobs extension', 'disableFlexibleJobsExtension');
+    $this->addTask('Add Index to financial_trxn trxn_id field', 'addIndexFinancialTrxnTrxnID');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_1($rev) {
+    $this->addTask('Add Index to civicrm_contribution creditnote_id field', 'addIndexContributionCreditNoteID');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_2($rev) {
+    $this->addTask('Fix Index on civicrm_financial_item combined entity_id + entity_table', 'addCombinedIndexFinancialItemEntityIDEntityType');
+    $this->addTask('enable financial account relationships for chargeback & refund', 'addRefundAndChargeBackAccountsIfNotExist');
+    $this->addTask('Add Index to civicrm_contribution.source', 'addIndexContributionSource');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_3($rev) {
+    $this->addTask('Add Index to civicrm_contribution.total_amount', 'addIndexContributionAmount');
   }
 
   /**
@@ -248,7 +278,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @return bool
    */
   public function addGettingStartedDashlet(CRM_Queue_TaskContext $ctx) {
-    $sql = "SELECT count(*) FROM civicrm_dashboard WHERE name='gettingStarted'";
+    $sql = "SELECT count(*) FROM civicrm_dashboard WHERE name='getting-started'";
     $res = CRM_Core_DAO::singleValueQuery($sql);
     $domainId = CRM_Core_Config::domainID();
     if ($res <= 0) {
@@ -388,6 +418,111 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
       // just ignore if the extension isn't installed
     }
 
+    return TRUE;
+  }
+
+  /**
+   * CRM-17752 add index to civicrm_financial_trxn.trxn_id (deliberately non-unique).
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexFinancialTrxnTrxnID(CRM_Queue_TaskContext $ctx) {
+    $tables = array('civicrm_financial_trxn' => array('trxn_id'));
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+    return TRUE;
+  }
+
+  /**
+   * CRM-17882 Add index to civicrm_contribution.credit_note_id.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexContributionCreditNoteID(CRM_Queue_TaskContext $ctx) {
+    $tables = array('civicrm_contribution' => array('creditnote_id'));
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+    return TRUE;
+  }
+
+  /**
+   * CRM-17775 Add correct index for table civicrm_financial_item.
+   *
+   * Note that the entity ID should always precede the entity_table as
+   * it is more unique. This is better for performance and does not cause fallback
+   * to no index if table it omitted.
+   *
+   * @return bool
+   */
+  public function addCombinedIndexFinancialItemEntityIDEntityType() {
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_financial_item', 'UI_id');
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_financial_item', 'IX_Entity');
+    CRM_Core_BAO_SchemaHandler::createIndexes(array(
+      'civicrm_financial_item' => array(array('entity_id', 'entity_table')),
+    ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-17951 Add accounts option values for refund and chargeback.
+   *
+   * Add Chargeback contribution status and Chargeback and Contra account relationships,
+   * checking first if one exists.
+   */
+  public function addRefundAndChargeBackAccountsIfNotExist() {
+    // First we enable and edit the record for Credit contra - this exists but is disabled for most sites.
+    // Using the ensure function (below) will not enabled a disabled option (by design).
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value v
+     INNER JOIN civicrm_option_group g on v.option_group_id=g.id and g.name='account_relationship'
+     SET v.is_active=1, v.label='Credit/Contra Revenue Account is', v.name='Credit/Contra Revenue Account is', v.description='Credit/Contra Revenue Account is'
+     WHERE v.name = 'Credit/Contra Account is';");
+
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
+      'option_group_id' => 'account_relationship',
+      'name' => 'Chargeback Account is',
+      'label' => ts('Chargeback Account is'),
+      'is_active' => TRUE,
+      'component_id' => 'CiviContribute',
+    ));
+
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
+      'option_group_id' => 'contribution_status',
+      'name' => 'Chargeback',
+      'label' => ts('Chargeback'),
+      'is_active' => TRUE,
+      'component_id' => 'CiviContribute',
+    ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-17999 Add index to civicrm_contribution.source.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexContributionSource(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contribution' => array('source')));
+    return TRUE;
+  }
+
+  /**
+   * CRM-18124 Add index to civicrm_contribution.total_amount.
+   *
+   * Note that I made this a combined index with receive_date because the issue included
+   * both criteria and they seemed likely to be used in conjunction to me in other cases.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexContributionAmount(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::createIndexes(array(
+      'civicrm_contribution' => array(array('total_amount', 'receive_date')),
+    ));
     return TRUE;
   }
 

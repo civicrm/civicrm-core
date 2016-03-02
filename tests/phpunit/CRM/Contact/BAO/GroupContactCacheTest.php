@@ -25,14 +25,13 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 
 /**
  * Test class for CRM_Contact_BAO_GroupContact BAO
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
 

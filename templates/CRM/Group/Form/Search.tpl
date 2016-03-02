@@ -211,7 +211,7 @@
               $.each( response.data, function( i, val ) {
                 appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="crm-entity parent_is_'+parent_id+' crm-row-child">';
                 if ( val.is_parent ) {
-                  appendHTML += '<td class="crm-group-name crmf-title crm-editable ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.group_name + '</td>';
+                  appendHTML += '<td class="crm-group-name crmf-title crm-editable ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.title + '</td>';
                 }
                 else {
                   appendHTML += '<td class="crm-group-name  crmf-title crm-editable ' + levelClass + '"><span class="crm-no-children"></span>' + val.title + '</td>';
@@ -228,7 +228,7 @@
                 appendHTML += "</tr>";
               });
               $( rowID ).after( appendHTML );
-              $( rowID ).next().trigger('crmLoad');
+              $( '.parent_is_'+parent_id ).trigger('crmLoad');
             }
         });
       }

@@ -177,19 +177,19 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         $findMembersURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
         $deleteURL = CRM_Utils_System::url('civicrm/contact/search/advanced', 'reset=1');
         $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', array(
-              1 => $findMembersURL,
-              2 => $deleteURL,
-              3 => $cnt,
-            ));
+          1 => $findMembersURL,
+          2 => $deleteURL,
+          3 => $cnt,
+        ));
         $cnt++;
       }
 
       if (in_array('MembershipBlock', $status)) {
         $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
         $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', array(
-            1 => $deleteURL,
-            2 => $cnt,
-          ));
+          1 => $deleteURL,
+          2 => $cnt,
+        ));
         throw new CRM_Core_Exception($message);
       }
     }
@@ -315,10 +315,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
     // Convert all dates to 'Y-m-d' format.
     foreach (array(
-               'joinDate',
-               'startDate',
-               'endDate',
-             ) as $dateParam) {
+      'joinDate',
+      'startDate',
+      'endDate',
+    ) as $dateParam) {
       if (!empty($$dateParam)) {
         $$dateParam = CRM_Utils_Date::processDate($$dateParam, NULL, FALSE, 'Y-m-d');
       }

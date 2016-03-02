@@ -245,11 +245,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    //only fetch own cases.
-    if (!CRM_Core_Permission::check('access all cases and activities')) {
-      $this->_formValues['case_owner'] = 2;
-    }
-
     if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }

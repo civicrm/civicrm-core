@@ -1,8 +1,8 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_Utils_Migrate_ImportExportTest
+ * @group headless
  */
 class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
   protected $_apiversion;

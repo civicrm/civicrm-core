@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Extension_Manager_ModuleTest
+ * @group headless
  */
 class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 

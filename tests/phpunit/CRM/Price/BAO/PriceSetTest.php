@@ -25,10 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for CRM_Price_BAO_PriceSet.
+ * @group headless
  */
 class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
 

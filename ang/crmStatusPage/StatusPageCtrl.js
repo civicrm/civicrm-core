@@ -26,7 +26,7 @@
       
       $scope.countVisible = function(visibility) {
         return _.filter($scope.statuses, function(s) {
-          return s.is_visible == visibility && s.severity_id >= 3;
+          return s.is_visible == visibility && s.severity_id >= 2;
         }).length;
       };
     });

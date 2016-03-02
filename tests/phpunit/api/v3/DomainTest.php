@@ -25,13 +25,12 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for Domain API - civicrm_domain_*
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Domain
+ * @group headless
  */
 class api_v3_DomainTest extends CiviUnitTestCase {
 

@@ -603,8 +603,9 @@ class CRM_Core_Resources {
         }
       }
 
+      global $tsLocale;
       // Dynamic localization script
-      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $config->lcMessages, array('r' => $this->getCacheCode())), $jsWeight++, $region);
+      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $tsLocale, array('r' => $this->getCacheCode())), $jsWeight++, $region);
 
       // Add global settings
       $settings = array(
@@ -752,12 +753,13 @@ class CRM_Core_Resources {
       $items[] = "js/crm.optionEdit.js";
     }
 
+    global $tsLocale;
     // Add localized jQuery UI files
-    if ($config->lcMessages && $config->lcMessages != 'en_US') {
+    if ($tsLocale && $tsLocale != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
-      list($lang) = explode('_', $config->lcMessages);
+      list($lang) = explode('_', $tsLocale);
       $path = "bower_components/jquery-ui/ui/i18n";
-      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
+      foreach (array(str_replace('_', '-', $tsLocale), $lang) as $language) {
         $localizationFile = "$path/datepicker-{$language}.js";
         if ($this->getPath('civicrm', $localizationFile)) {
           $items[] = $localizationFile;
@@ -792,20 +794,32 @@ class CRM_Core_Resources {
    */
   public static function getEntityRefFilters() {
     $filters = array();
+    $config = CRM_Core_Config::singleton();
 
-    $filters['event'] = array(
-      array('key' => 'event_type_id', 'value' => ts('Event Type')),
-      array(
-        'key' => 'start_date',
-        'value' => ts('Start Date'),
-        'options' => array(
-          array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
-          array('key' => '{"BETWEEN":["now - 3 month","now"]}', 'value' => ts('Past 3 Months')),
-          array('key' => '{"BETWEEN":["now - 6 month","now"]}', 'value' => ts('Past 6 Months')),
-          array('key' => '{"BETWEEN":["now - 1 year","now"]}', 'value' => ts('Past Year')),
+    if (in_array('CiviEvent', $config->enableComponents)) {
+      $filters['event'] = array(
+        array('key' => 'event_type_id', 'value' => ts('Event Type')),
+        array(
+          'key' => 'start_date',
+          'value' => ts('Start Date'),
+          'options' => array(
+            array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
+            array(
+              'key' => '{"BETWEEN":["now - 3 month","now"]}',
+              'value' => ts('Past 3 Months'),
+            ),
+            array(
+              'key' => '{"BETWEEN":["now - 6 month","now"]}',
+              'value' => ts('Past 6 Months'),
+            ),
+            array(
+              'key' => '{"BETWEEN":["now - 1 year","now"]}',
+              'value' => ts('Past Year'),
+            ),
+          ),
         ),
-      ),
-    );
+      );
+    }
 
     $filters['activity'] = array(
       array('key' => 'activity_type_id', 'value' => ts('Activity Type')),
@@ -821,6 +835,26 @@ class CRM_Core_Resources {
       array('key' => 'gender_id', 'value' => ts('Gender')),
       array('key' => 'is_deceased', 'value' => ts('Deceased')),
     );
+
+    if (in_array('CiviCase', $config->enableComponents)) {
+      $filters['case'] = array(
+        array(
+          'key' => 'case_id.case_type_id',
+          'value' => ts('Case Type'),
+          'entity' => 'Case',
+        ),
+        array(
+          'key' => 'case_id.status_id',
+          'value' => ts('Case Status'),
+          'entity' => 'Case',
+        ),
+      );
+      foreach ($filters['contact'] as $filter) {
+        $filter += array('entity' => 'contact');
+        $filter['key'] = 'contact_id.' . $filter['key'];
+        $filters['case'][] = $filter;
+      }
+    }
 
     return $filters;
   }

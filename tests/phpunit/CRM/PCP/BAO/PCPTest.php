@@ -25,13 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for CRM_PCP_BAO_PCPTest BAO
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 

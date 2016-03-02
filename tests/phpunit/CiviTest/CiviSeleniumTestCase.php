@@ -25,17 +25,7 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *  Include configuration
- */
-define('CIVICRM_SETTINGS_PATH', __DIR__ . '/civicrm.settings.dist.php');
-define('CIVICRM_SETTINGS_LOCAL_PATH', __DIR__ . '/civicrm.settings.local.php');
 define('CIVICRM_WEBTEST', 1);
-
-if (file_exists(CIVICRM_SETTINGS_LOCAL_PATH)) {
-  require_once CIVICRM_SETTINGS_LOCAL_PATH;
-}
-require_once CIVICRM_SETTINGS_PATH;
 
 /**
  *  Base class for CiviCRM Selenium tests
@@ -69,7 +59,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     parent::__construct($name, $data, $dataName, $browser);
     $this->loggedInAs = NULL;
 
-    require_once 'CiviSeleniumSettings.php';
     $this->settings = new CiviSeleniumSettings();
     if (property_exists($this->settings, 'serverStartupTimeOut') && $this->settings->serverStartupTimeOut) {
       global $CiviSeleniumTestCase_polled;
@@ -856,13 +845,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         'test_user_name' => '5ULu56ex',
         'password' => '7ARxW575w736eF5p',
         'test_password' => '7ARxW575w736eF5p',
-      );
-    }
-    elseif ($processorType == 'Google_Checkout') {
-      // FIXME: we 'll need to make a new separate account for testing
-      $processorSettings = array(
-        'user_name' => '559999327053114',
-        'password' => 'R2zv2g60-A7GXKJYl0nR0g',
       );
     }
     elseif ($processorType == 'PayPal') {

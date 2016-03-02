@@ -66,6 +66,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($this->_params['is_pay_later']) {
       $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
+    $this->assign('is_for_organization', CRM_Utils_Array::value('is_for_organization', $this->_params));
   }
 
   /**

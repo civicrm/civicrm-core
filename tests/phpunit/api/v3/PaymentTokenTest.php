@@ -25,11 +25,9 @@
 +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class api_v3_PaymentTokenTest
+ * @group headless
  */
 class api_v3_PaymentTokenTest extends CiviUnitTestCase {
   protected $_apiversion;

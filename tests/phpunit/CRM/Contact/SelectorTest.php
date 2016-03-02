@@ -28,12 +28,12 @@
 /**
  *  Include parent class definition
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  *  Test contact custom search functions
  *
  * @package CiviCRM
+ * @group headless
  */
 class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
 

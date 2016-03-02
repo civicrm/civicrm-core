@@ -1,11 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/Custom.php';
-
 /**
  * Class CRM_Core_BAO_CustomValueTableMultipleTest
+ * @group headless
  */
 class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
 

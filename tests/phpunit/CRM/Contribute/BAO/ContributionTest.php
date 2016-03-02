@@ -25,13 +25,12 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
 
 /**
  * Class CRM_Contribute_BAO_ContributionTest
+ * @group headless
  */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
@@ -633,6 +632,202 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     //Delete Contact
     Contact::delete($contactId);
+  }
+
+  /**
+   * addPayments() method (add and edit modes of participant)
+   */
+  public function testAddPayments() {
+    list($lineItems, $contribution) = $this->addParticipantWithContribution();
+    foreach ($lineItems as $value) {
+      CRM_Contribute_BAO_Contribution::addPayments($value, array($contribution));
+    }
+    $this->checkItemValues($contribution);
+  }
+
+  /**
+   * checks db values for financial item
+   */
+  public function checkItemValues($contribution) {
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+    $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType(4, $relationTypeId);
+    $query = "SELECT eft1.entity_id, ft.total_amount, eft1.amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') 
+INNER JOIN civicrm_entity_financial_trxn eft1 ON (eft1.financial_trxn_id = eft.financial_trxn_id AND eft1.entity_table = 'civicrm_financial_item')
+WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
+
+    $queryParams[1] = array($contribution->id, 'Integer');
+    $queryParams[2] = array($toFinancialAccount, 'Integer');
+
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    $amounts = array(100.00, 50.00);
+    while ($dao->fetch()) {
+      $this->assertEquals(150.00, $dao->total_amount, 'Mismatch of total amount paid.');
+      $this->assertEquals($dao->amount, array_pop($amounts), 'Mismatch of amount proportionally assigned to financial item');
+    }
+
+    Contact::delete($this->_contactId);
+    Event::delete($this->_eventId);
+  }
+
+  /**
+   * assignProportionalLineItems() method (add and edit modes of participant)
+   */
+  public function testAssignProportionalLineItems() {
+    list($lineItems, $contribution) = $this->addParticipantWithContribution();
+    $contributions['total_amount'] = $contribution->total_amount;
+    $params = array(
+      'contribution_id' => $contribution->id,
+      'total_amount' => 150.00,
+    );
+    $trxn = new CRM_Financial_DAO_FinancialTrxn();
+    $trxn->orderBy('id DESC');
+    $trxn->find(TRUE);
+    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contributions);
+    $this->checkItemValues($contribution);
+  }
+
+  /**
+   * Add participant with contribution
+   *
+   * @return array
+   */
+  public function addParticipantWithContribution() {
+    // creating price set, price field
+    require_once 'CiviTest/Event.php';
+    $this->_contactId = Contact::createIndividual();
+    $this->_eventId = Event::create($this->_contactId);
+    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 4);
+    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
+    $paramsSet['is_active'] = TRUE;
+    $paramsSet['financial_type_id'] = 4;
+    $paramsSet['extends'] = 1;
+
+    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
+    $priceSetId = $priceset->id;
+
+    //Checking for priceset added in the table.
+    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
+      'id', $paramsSet['title'], 'Check DB for created priceset'
+    );
+    $paramsField = array(
+      'label' => 'Price Field',
+      'name' => CRM_Utils_String::titleToVar('Price Field'),
+      'html_type' => 'CheckBox',
+      'option_label' => array('1' => 'Price Field 1', '2' => 'Price Field 2'),
+      'option_value' => array('1' => 100, '2' => 200),
+      'option_name' => array('1' => 'Price Field 1', '2' => 'Price Field 2'),
+      'option_weight' => array('1' => 1, '2' => 2),
+      'option_amount' => array('1' => 100, '2' => 200),
+      'is_display_amounts' => 1,
+      'weight' => 1,
+      'options_per_line' => 1,
+      'is_active' => array('1' => 1, '2' => 1),
+      'price_set_id' => $priceset->id,
+      'is_enter_qty' => 1,
+      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+    );
+    $priceField = CRM_Price_BAO_PriceField::create($paramsField);
+    $eventParams = array(
+      'id' => $this->_eventId,
+      'financial_type_id' => 4,
+      'is_monetary' => 1,
+    );
+    CRM_Event_BAO_Event::create($eventParams);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetId);
+
+    $priceFields = $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $priceField->id));
+    $participantParams = array(
+      'financial_type_id' => 4,
+      'event_id' => $this->_eventId,
+      'role_id' => 1,
+      'status_id' => 14,
+      'fee_currency' => 'USD',
+      'contact_id' => $this->_contactId,
+    );
+    $participant = CRM_Event_BAO_Participant::add($participantParams);
+    $contributionParams = array(
+      'total_amount' => 150,
+      'currency' => 'USD',
+      'contact_id' => $this->_contactId,
+      'financial_type_id' => 4,
+      'contribution_status_id' => 1,
+      'partial_payment_total' => 300.00,
+      'partial_amount_pay' => 150,
+      'contribution_mode' => 'participant',
+      'participant_id' => $participant->id,
+    );
+
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[1][$key] = array(
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+      );
+    }
+    $contributionParams['line_item'] = $lineItems;
+    $contributions = CRM_Contribute_BAO_Contribution::create($contributionParams);
+
+    $paymentParticipant = array(
+      'participant_id' => $participant->id,
+      'contribution_id' => $contributions->id,
+    );
+    $ids = array();
+    CRM_Event_BAO_ParticipantPayment::create($paymentParticipant, $ids);
+
+    return array($lineItems, $contributions);
+  }
+
+  /**
+   * checkLineItems() check if total amount matches the sum of line total
+   */
+  public function testcheckLineItems() {
+    $params = array(
+      'contact_id' => 202,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 3,
+      'line_items' => array(
+        array(
+          'line_item' => array(
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 16,
+              'label' => 'test 1',
+              'qty' => 1,
+              'unit_price' => 100,
+              'line_total' => 100,
+            ),
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 17,
+              'label' => 'Test 2',
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'financial_type_id' => 1,
+            ),
+          ),
+          'params' => array(),
+        ),
+      ),
+    );
+    try {
+      $error = CRM_Contribute_BAO_Contribution::checkLineItems($params);
+      $this->fail("Missed expected exception");
+    }
+    catch (Exception $e) {
+      $this->assertEquals("Line item total doesn't match with total amount.", $e->getMessage());
+    }
+    $this->assertEquals(3, $params['line_items'][0]['line_item'][0]['financial_type_id']);
+    $params['total_amount'] = 300;
+    CRM_Contribute_BAO_Contribution::checkLineItems($params);
   }
 
 }

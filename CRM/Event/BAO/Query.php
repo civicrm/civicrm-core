@@ -283,12 +283,23 @@ class CRM_Event_BAO_Query {
               $exEventId = $val;
               $extractEventId = explode(" ", $val);
               $value = $extractEventId[2];
-              unset($query->_where[$grouping][$key]);
+              $where = $query->_where[$grouping][$key];
+            }
+            else if (strstr($val, 'civicrm_event.id IN')) {
+              //extract the first event id if multiple events are selected
+              preg_match('/civicrm_event.id IN \(\"(\d+)/', $val, $matches);
+              $value = $matches[1];
+              $where = $query->_where[$grouping][$key];
             }
           }
-          $extractEventId = explode(" ", $exEventId);
-          $value = $extractEventId[2];
-          unset($query->_where[$grouping][$key]);
+          if ($exEventId) {
+            $extractEventId = explode(" ", $exEventId);
+            $value = $extractEventId[2];
+          }
+          else if(!empty($matches[1])) {
+            $value = $matches[1];
+          }
+          $where = $query->_where[$grouping][$key];
         }
         $thisEventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($value, 'civicrm_event');
         if ($thisEventHasParent) {
@@ -302,7 +313,7 @@ class CRM_Event_BAO_Query {
             $value = "(" . implode(",", $allEventIds) . ")";
           }
         }
-        $query->_where[$grouping][] = "civicrm_event.id $op {$value}";
+        $query->_where[$grouping][] = "{$where} OR civicrm_event.id $op {$value}";
         $query->_qill[$grouping][] = ts('Include Repeating Events');
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
@@ -328,12 +339,13 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'participant_fee_id':
-        $feeLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $value, 'label');
-        $feeLabel = CRM_Core_DAO::escapeString(trim($feeLabel));
-        if ($value) {
-          $query->_where[$grouping][] = "civicrm_participant.fee_level LIKE '%$feeLabel%'";
-          $query->_qill[$grouping][] = ts("Fee level") . " contains $feeLabel";
+        foreach ($value as $k => &$val) {
+          $val = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
+          $val = CRM_Core_DAO::escapeString(trim($val));
         }
+        $feeLabel = implode('|', $value);
+        $query->_where[$grouping][] = "civicrm_participant.fee_level REGEXP '{$feeLabel}'";
+        $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $value);
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;
 
@@ -466,7 +478,8 @@ class CRM_Event_BAO_Query {
         break;
 
       case 'civicrm_event':
-        $from = " INNER JOIN civicrm_event ON civicrm_participant.event_id = civicrm_event.id ";
+        //CRM-17121
+        $from = " LEFT JOIN civicrm_event ON civicrm_participant.event_id = civicrm_event.id ";
         break;
 
       case 'event_type':
@@ -574,6 +587,7 @@ class CRM_Event_BAO_Query {
     $form->addEntityRef('event_id', ts('Event Name'), array(
         'entity' => 'event',
         'placeholder' => ts('- any -'),
+        'multiple' => 1,
         'select' => array('minimumInputLength' => 0),
       )
     );
@@ -586,7 +600,12 @@ class CRM_Event_BAO_Query {
         ),
       )
     );
-    $form->add('text', 'participant_fee_id', ts('Fee Level'), array('class' => 'big crm-ajax-select'));
+    $obj = new CRM_Report_Form_Event_ParticipantListing();
+    $form->add('select', 'participant_fee_id',
+       ts('Fee Level'),
+       $obj->getPriceLevels(),
+       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
+    );
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 

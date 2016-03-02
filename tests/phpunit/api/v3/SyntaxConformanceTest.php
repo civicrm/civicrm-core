@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  * Test that the core actions for APIv3 entities comply with standard syntax+behavior.
  *
@@ -38,6 +35,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Core
+ * @group headless
  */
 class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
@@ -108,6 +106,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'System',
       'User',
       'Payment',
+      'Order',
       'SavedSearch', //work fine in local
     );
     $this->toBeImplemented['delete'] = array(
@@ -122,6 +121,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Extension',
       'System',
       'Payment',
+      'Order',
     );
     $this->onlyIDNonZeroCount['get'] = array(
       'ActivityType',
@@ -402,7 +402,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $entities;
   }
 
-
   /**
    * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
    * @param bool $sequential
@@ -445,6 +444,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ActivityType',
       'MailingEventConfirm',
       'Case',
+      'CaseContact',
       'Contact',
       'ContactType',
       'MailingEventResubscribe',
@@ -1172,9 +1172,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     foreach ($fields as $field => $specs) {
       $resetFKTo = NULL;
       $fieldName = $field;
-      if (!empty($specs['uniquename'])) {
-        $fieldName = $specs['uniquename'];
-      }
       if ($field == 'currency' || $field == 'id' || $field == strtolower($entityName) . '_id'
         || in_array($field, $entityValuesThatDoNotWork)
       ) {
@@ -1234,11 +1231,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
               $entity[$fieldName] = (string) $entity2['id'];
             }
             else {
-              $uniqueName = CRM_Utils_Array::value('uniqueName', $specs, $fieldName);
               if (!empty($entity[$fieldName])) {
-                $resetFKTo = array($fieldName => $entity[$fieldName], $uniqueName => $entity[$fieldName]);
+                $resetFKTo = array($fieldName => $entity[$fieldName]);
               }
-              $entity[$fieldName] = (string) empty($entity2[$field]) ? CRM_Utils_Array::value($uniqueName, $entity2) : $entity2[$field];
+              $entity[$fieldName] = (string) empty($entity2[$field]) ? '' : $entity2[$field];
               //todo - there isn't always something set here - & our checking on unset values is limited
               if (empty($entity[$field])) {
                 unset($entity[$field]);
@@ -1293,10 +1289,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       if (isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
-      }
-
-      if (!empty($specs['uniqueName'])) {
-        $entity[$specs['uniqueName']] = $entity[$specs['name']];
       }
 
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
@@ -1513,7 +1505,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     return $baos;
   }
-
 
   /**
    * Verify that HTML metacharacters provided as inputs appear consistently.

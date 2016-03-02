@@ -30,12 +30,11 @@
  * File for the CRM_Contact_Imports_Parser_ContactTest class.
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  *  Test contact import parser.
  *
  * @package CiviCRM
+ * @group headless
  */
 class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = array();

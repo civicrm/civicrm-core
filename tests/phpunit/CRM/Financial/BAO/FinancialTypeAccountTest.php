@@ -24,10 +24,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_Financial_BAO_FinancialTypeAccountTest
+ * @group headless
  */
 class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
 

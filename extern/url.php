@@ -54,4 +54,6 @@ if (strlen($query_string) > 0) {
   }
 }
 
-CRM_Utils_System::redirect($url);
+// CRM-17953 - The CMS is not bootstrapped so cannot use CRM_Utils_System::redirect
+header('Location: ' . $url);
+CRM_Utils_System::civiExit();

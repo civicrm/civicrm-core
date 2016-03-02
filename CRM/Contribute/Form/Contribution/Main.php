@@ -806,7 +806,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
 
-        if (empty($priceFieldMemTypes)) {
+        if (empty($priceFieldMemTypes) && $self->_membershipBlock['is_required'] == 1) {
           $errors['_qf_default'] = ts('Please select at least one membership option.');
         }
       }

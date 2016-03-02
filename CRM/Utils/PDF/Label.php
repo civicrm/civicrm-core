@@ -33,8 +33,6 @@
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 
-require_once 'tcpdf/tcpdf.php';
-
 /**
  * Class CRM_Utils_PDF_Label
  */

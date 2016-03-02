@@ -25,10 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Tests for field options
+ * @group headless
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
 

@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/ContributionPage.php';
 require_once 'CiviTest/Custom.php';
@@ -34,6 +32,7 @@ require_once 'CiviTest/PaypalPro.php';
 
 /**
  * Class CRM_Contribute_BAO_ContributionPageTest
+ * @group headless
  */
 class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 

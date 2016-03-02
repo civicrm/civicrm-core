@@ -1,10 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
-
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
+ * @group headless
  */
 class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   protected $_contributionID;

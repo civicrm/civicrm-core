@@ -78,4 +78,20 @@ class CRM_Core_I18n_PseudoConstant {
     return substr($long, 0, 2);
   }
 
+  /**
+   * Returns a list of ISO 639-1 "right-to-left" language codes.
+   *
+   * @return array
+   */
+  public static function getRTLlanguages() {
+    $rtl = array(
+      'ar',
+      'fa',
+      'he',
+      'ur',
+    );
+
+    return $rtl;
+  }
+
 }

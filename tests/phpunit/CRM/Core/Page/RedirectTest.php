@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Core_Page_RedirectTest
+ * @group headless
  */
 class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
   /**

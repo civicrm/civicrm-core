@@ -51,11 +51,10 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class contains api test cases for "civicrm_relationship_type"
  *
+ * @group headless
  */
 class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   protected $_cId_a;

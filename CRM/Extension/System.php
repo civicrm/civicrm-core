@@ -44,6 +44,11 @@ class CRM_Extension_System {
   private $downloader = NULL;
 
   /**
+   * @var CRM_Extension_ClassLoader
+   * */
+  private $classLoader;
+
+  /**
    * The URL of the remote extensions repository.
    *
    * @var string|FALSE
@@ -180,6 +185,16 @@ class CRM_Extension_System {
       $this->mapper = new CRM_Extension_Mapper($this->getFullContainer(), $this->getCache(), 'mapper');
     }
     return $this->mapper;
+  }
+
+  /**
+   * @return \CRM_Extension_ClassLoader
+   */
+  public function getClassLoader() {
+    if ($this->classLoader === NULL) {
+      $this->classLoader = new CRM_Extension_ClassLoader($this->getMapper(), $this->getFullContainer(), $this->getManager());
+    }
+    return $this->classLoader;
   }
 
   /**

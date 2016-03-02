@@ -26,14 +26,10 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
-
-/**
  *  Test APIv3 civicrm_profile_* functions
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_apiversion;

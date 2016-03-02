@@ -1549,13 +1549,13 @@ class CRM_Contact_BAO_Query {
         }
       }
       elseif (substr($id, 0, 7) == 'custom_'
-          &&  (
-            substr($id, -9, 9) == '_relative'
-            || substr($id, -5, 5) == '_from'
-            || substr($id, -3, 3) == '_to'
-          )
+        &&  (
+          substr($id, -9, 9) == '_relative'
+          || substr($id, -5, 5) == '_from'
+          || substr($id, -3, 3) == '_to'
+        )
       ) {
-        self::convertCustomDateRelativeFields($formValues, $params, $values, $id);
+        self::convertCustomRelativeFields($formValues, $params, $values, $id);
       }
       elseif (preg_match('/_date_relative$/', $id) ||
         $id == 'event_relative' ||
@@ -4357,7 +4357,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * Convert submitted values for relative custom date fields to query object format.
+   * Convert submitted values for relative custom fields to query object format.
    *
    * The query will support the sqlOperator format so convert to that format.
    *
@@ -4370,7 +4370,7 @@ civicrm_relationship.is_permission_a_b = 0
    * @param string $fieldName
    *   Submitted field name. (Matches form field not DB field.)
    */
-  protected static function convertCustomDateRelativeFields(&$formValues, &$params, $values, $fieldName) {
+  protected static function convertCustomRelativeFields(&$formValues, &$params, $values, $fieldName) {
     if (empty($values)) {
       // e.g we might have relative set & from & to empty. The form flow is a bit funky &
       // this function gets called again after they fields have been converted which can get ugly.
@@ -4387,11 +4387,12 @@ civicrm_relationship.is_permission_a_b = 0
         return;
       }
 
-      list($from, $to) = CRM_Utils_Date::getFromTo(
-        NULL,
-        (empty($formValues[$customFieldName . '_from']) ? NULL : $formValues[$customFieldName . '_from']),
-        CRM_Utils_Array::value($customFieldName . '_to', $formValues)
-      );
+      $from = CRM_Utils_Array::value($customFieldName . '_from', $formValues, NULL);
+      $to = CRM_Utils_Array::value($customFieldName . '_to', $formValues, NULL);
+
+      if (self::isCustomDateField($customFieldName)) {
+        list($from, $to) = CRM_Utils_Date::getFromTo(NULL, $from, $to);
+      }
     }
 
     if ($from) {
@@ -4412,6 +4413,23 @@ civicrm_relationship.is_permission_a_b = 0
       0,
       0,
     );
+  }
+
+  /**
+   * Are we dealing with custom field of type date.
+   *
+   * @param $fieldName
+   *
+   * @return bool
+   */
+  public static function isCustomDateField($fieldName) {
+    if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($fieldName)) == FALSE) {
+      return FALSE;
+    }
+    if ('Date' == civicrm_api3('CustomField', 'getvalue', array('id' => $customFieldID, 'return' => 'data_type'))) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -5360,7 +5378,9 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
           // We could get away with keeping this in 4.6 if we make it such that it throws an enotice in 4.7 so
           // people have to de-slopify it.
           if (!empty($value[0])) {
-            $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReport;
+            if ($op != 'BETWEEN') {
+              $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReport;
+            }
             if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => $value), $dataType)) != FALSE) {
               return $queryString;
             }

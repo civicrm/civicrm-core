@@ -56,12 +56,10 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       // we can handle all the ones defined in the metadata here. Others to be converted
       foreach ($this->_settings as $setting => $group) {
-        $settingMetaData = civicrm_api('setting', 'getfields', array('version' => 3, 'name' => $setting));
         $this->_defaults[$setting] = civicrm_api('setting', 'getvalue', array(
             'version' => 3,
             'name' => $setting,
             'group' => $group,
-            'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting]),
           )
         );
       }
@@ -130,6 +128,9 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
           $this->addChainSelect($setting, array(
             'label' => ts($props['title']),
           ));
+        }
+        elseif ($add == 'addMonthDay') {
+          $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
         }
         else {
           $this->$add($setting, ts($props['title']));

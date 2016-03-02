@@ -111,10 +111,6 @@
      <access_arguments>access all cases and activities</access_arguments>
   </item>
   <item>
-     <path>civicrm/case/ajax/unclosed</path>
-     <page_callback>CRM_Case_Page_AJAX::unclosedCases</page_callback>
-  </item>
-  <item>
      <path>civicrm/case/ajax/addclient</path>
      <page_callback>CRM_Case_Page_AJAX::addClient</page_callback>
   </item>

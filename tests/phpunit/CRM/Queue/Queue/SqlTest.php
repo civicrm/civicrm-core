@@ -25,13 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Ensure that the extended interface for SQL-backed queues
  * work. For example, the createItem() interface supports
  * priority-queueing.
+ * @group headless
  */
 class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 

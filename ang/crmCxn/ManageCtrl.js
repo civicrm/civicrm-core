@@ -98,7 +98,7 @@
     };
 
     $scope.openLink = function openLink(appMeta, page, options) {
-      var promise = crmApi('Cxn', 'getlink', {app_guid: appMeta.appId, page: page}).then(function(result) {
+      var promise = crmApi('Cxn', 'getlink', {app_guid: appMeta.appId, page_name: page}).then(function(result) {
         var mode = result.values.mode ? result.values.mode : 'popup';
         switch (result.values.mode) {
           case 'iframe':

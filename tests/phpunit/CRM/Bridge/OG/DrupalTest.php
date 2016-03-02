@@ -31,13 +31,14 @@
 /**
  *  Include parent class definition
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 require_once 'api/api.php';
 
 /**
  *  Test contact custom search functions
  *
  * @package CiviCRM
+ * @group headless
  */
 class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
   /**

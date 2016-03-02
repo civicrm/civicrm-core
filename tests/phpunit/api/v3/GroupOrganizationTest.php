@@ -25,13 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  * Test class for GroupOrganization API - civicrm_group_organization_*
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected $_apiversion;

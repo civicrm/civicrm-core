@@ -25,13 +25,12 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
+ * @group headless
  */
 class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   protected $_contactID;

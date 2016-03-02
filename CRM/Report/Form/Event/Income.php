@@ -279,7 +279,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   }
 
   /**
-   * @inheritdoc
+   * @inheritDoc
    */
   public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);

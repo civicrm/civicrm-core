@@ -25,10 +25,9 @@
  * +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class contains api test cases for "civicrm_relationship"
+ * @group headless
  */
 class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

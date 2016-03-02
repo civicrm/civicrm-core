@@ -34,17 +34,10 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
-
-require_once 'HTML/QuickForm/Page.php';
-
-/**
  *  Test CRM_Member_Form_Membership functions.
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 

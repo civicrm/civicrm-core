@@ -71,11 +71,7 @@ class CRM_Contact_Form_Edit_Individual {
       foreach ($nameFields as $name) {
         $props = array();
         if ($name == 'prefix_id' || $name == 'suffix_id') {
-          $options = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name);
-          // Skip if we have no options available
-          if (!CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name)) {
-            //continue;
-          }
+          //override prefix/suffix label name as Prefix/Suffix respectively and adjust select size
           $props = array('class' => 'eight', 'placeholder' => ' ', 'label' => $name == 'prefix_id' ? ts('Prefix') : ts('Suffix'));
         }
         $form->addField($name, $props);

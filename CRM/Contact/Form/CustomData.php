@@ -156,7 +156,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       for ($i = 0; $i <= $_POST['hidden_custom_group_count'][$this->_groupID]; $i++) {
-        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_contactSubType, $i);
+        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_contactSubType, $i, $this->_contactType, $this->_groupID);
         CRM_Custom_Form_CustomData::buildQuickForm($this);
         CRM_Custom_Form_CustomData::setDefaultValues($this);
       }
@@ -282,7 +282,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   public function postProcess() {
     // Get the form values and groupTree
-    $params = $this->controller->exportValues($this->_name);
+    $params = CRM_Utils_Request::exportValues();
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',

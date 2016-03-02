@@ -66,17 +66,16 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     parent::buildQuickForm();
 
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -94,9 +93,9 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     );
 
     $this->addRule('title', ts('This Title already exists in Database.'), 'objectExists', array(
-        'CRM_SMS_DAO_Provider',
-        $this->_id,
-      ));
+      'CRM_SMS_DAO_Provider',
+      $this->_id,
+    ));
 
     $this->add('text', 'username', ts('Username'),
       $attributes['username'], TRUE

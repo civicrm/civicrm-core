@@ -24,10 +24,10 @@
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_Extension_Manager_PaymentTest
+ * @group headless
  */
 class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
 

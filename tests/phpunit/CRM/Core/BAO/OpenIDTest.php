@@ -1,9 +1,10 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 require_once 'CiviTest/Contact.php';
 
 /**
  * Class CRM_Core_BAO_OpenIDTest
+ * @group headless
  */
 class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
   public function tearDown() {

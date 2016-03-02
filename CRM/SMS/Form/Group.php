@@ -180,10 +180,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $groups = array();
 
     foreach (array(
-               'name',
-               'group_id',
-               'is_sms',
-             ) as $n) {
+      'name',
+      'group_id',
+      'is_sms',
+    ) as $n) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
       }
@@ -242,9 +242,9 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
       // delete previous includes/excludes, if mailing already existed
       foreach (array(
-                 'groups',
-                 'mailings',
-               ) as $entity) {
+        'groups',
+        'mailings',
+      ) as $entity) {
         $mg = new CRM_Mailing_DAO_MailingGroup();
         $mg->mailing_id = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;

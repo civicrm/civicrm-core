@@ -794,4 +794,66 @@ class CRM_Utils_String {
     return ltrim($output);
   }
 
+  /**
+   * Determine if $string starts with $fragment.
+   *
+   * @param string $string
+   *   The long string.
+   * @param string $fragment
+   *   The fragment to look for.
+   * @return bool
+   */
+  public static function startsWith($string, $fragment) {
+    if ($fragment === '') {
+      return TRUE;
+    }
+    $len = strlen($fragment);
+    return substr($string, 0, $len) === $fragment;
+  }
+
+  /**
+   * Determine if $string ends with $fragment.
+   *
+   * @param string $string
+   *   The long string.
+   * @param string $fragment
+   *   The fragment to look for.
+   * @return bool
+   */
+  public static function endsWith($string, $fragment) {
+    if ($fragment === '') {
+      return TRUE;
+    }
+    $len = strlen($fragment);
+    return substr($string, -1 * $len) === $fragment;
+  }
+
+  /**
+   * @param string|array $patterns
+   * @param array $allStrings
+   * @param bool $allowNew
+   *   Whether to return new, unrecognized names.
+   * @return array
+   */
+  public static function filterByWildcards($patterns, $allStrings, $allowNew = FALSE) {
+    $patterns = (array) $patterns;
+    $result = array();
+    foreach ($patterns as $pattern) {
+      if (!\CRM_Utils_String::endsWith($pattern, '*')) {
+        if ($allowNew || in_array($pattern, $allStrings)) {
+          $result[] = $pattern;
+        }
+      }
+      else {
+        $prefix = rtrim($pattern, '*');
+        foreach ($allStrings as $key) {
+          if (\CRM_Utils_String::startsWith($key, $prefix)) {
+            $result[] = $key;
+          }
+        }
+      }
+    }
+    return array_values(array_unique($result));
+  }
+
 }

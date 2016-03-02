@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Core_DAO_AllCoreTablesTest
+ * @group headless
  */
 class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
   public function testGetTableForClass() {

@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
@@ -51,6 +49,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   /**
    */
   public function __construct() {
+    $this->_rollup = 'WITH ROLLUP';
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $yearsInPast = 10;
     $yearsInFuture = 1;
@@ -221,9 +220,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $optionYear,
             'default' => date('Y'),
+            'type' => CRM_Utils_Type::T_INT,
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
@@ -395,7 +396,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->assign('chartSupported', TRUE);
     $this->_groupBy = "Group BY {$this->_aliases['civicrm_contribution']}.contact_id, " .
       self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
-        '.receive_date') . " WITH ROLLUP ";
+        '.receive_date') . " "  . " " . $this->_rollup;
   }
 
   /**

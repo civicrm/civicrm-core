@@ -1,11 +1,10 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class for testing new DAO meet required standards.
  *
  * Class CRM_Core_DAOTest
+ * @group headless
  */
 class CRM_Core_DAOConformanceTest extends CiviUnitTestCase {
 
@@ -26,6 +25,7 @@ class CRM_Core_DAOConformanceTest extends CiviUnitTestCase {
    * Get all DAO classes.
    */
   public function getAllDAO() {
+    $this->setUp(); // Ugh. Need full bootstrap to enumerate classes.
     $classList = CRM_Core_DAO_AllCoreTables::getClasses();
     $return = array();
     foreach ($classList as $class) {

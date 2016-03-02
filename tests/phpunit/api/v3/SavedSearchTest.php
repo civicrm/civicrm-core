@@ -26,12 +26,11 @@
   +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  *  Class api_v3_SavedSearchTest
  *
  * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_SavedSearchTest extends CiviUnitTestCase {
 

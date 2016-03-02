@@ -69,7 +69,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
    *
    * @return array
    */
-  public function &actionLinks() {
+  public static function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
       // helper variable for nicer formatting
@@ -464,7 +464,7 @@ ORDER BY is_active desc, title asc
       CRM_Core_DAO::storeValues($dao, $contribution[$dao->id]);
 
       // form all action links
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
 
       //add configure actions links.
       $action += array_sum(array_keys($configureActionLinks));

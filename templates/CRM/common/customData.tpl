@@ -48,9 +48,6 @@
       }
 
       {/literal}
-      {if $urlPathVar}
-        dataUrl += '&' + '{$urlPathVar}';
-      {/if}
       {if $groupID}
         dataUrl += '&groupID=' + '{$groupID}';
       {/if}

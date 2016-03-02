@@ -25,10 +25,9 @@
 +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Tests for parsing translatable strings in HTML content.
+ * @group headless
  */
 class CRM_Core_Resources_StringsTest extends CiviUnitTestCase {
 

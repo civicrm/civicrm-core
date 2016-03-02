@@ -25,14 +25,12 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  *  Test APIv3 civicrm_website_* functions
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
+ * @group headless
  */
 class api_v3_WebsiteTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

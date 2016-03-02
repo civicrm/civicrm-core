@@ -260,9 +260,10 @@ class CRM_Financial_Page_AJAX {
   }
 
   /**
-   * Get output of financial transactions.
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    *
-   * @return string
+   * @return string|wtf??
    */
   public static function getFinancialTransactionsList() {
     $sortMapper = array(

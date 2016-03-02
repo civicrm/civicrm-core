@@ -33,12 +33,9 @@
  *
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/Event.php';
-
 /**
  * Class CRM_Core_BAO_LocationTest
+ * @group headless
  */
 class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   public function setUp() {

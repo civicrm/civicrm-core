@@ -5,6 +5,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
 /**
  * Case Types support an optional forking mechanism wherein the local admin
  * creates a custom DB-based definition that deviates from the file-based definition.
+ * @group headless
  */
 class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
   public function setUp() {

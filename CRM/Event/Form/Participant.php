@@ -1346,6 +1346,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         //insert financial type name in receipt.
+        $this->assign('financialTypeName', CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
+          $contributionParams['financial_type_id']));
+        // legacy support
         $this->assign('contributionTypeName', CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $contributionParams['financial_type_id']));
         $contributionParams['skipLineItem'] = 1;
         if ($this->_id) {
@@ -1447,6 +1450,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
             CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, CRM_Utils_Array::value($num, $contributions, NULL), 'civicrm_participant');
+            CRM_Contribute_BAO_Contribution::addPayments($value, $contributions);
           }
         }
       }

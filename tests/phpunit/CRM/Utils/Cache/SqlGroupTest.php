@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Utils_Cache_SqlGroupTest
+ * @group headless
  */
 class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   public function setUp() {

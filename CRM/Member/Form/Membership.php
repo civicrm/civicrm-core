@@ -243,7 +243,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     if (!$this->_memType) {
       $params = CRM_Utils_Request::exportValues();
-      if (isset($params['membership_type_id'][1])) {
+      if (!empty($params['membership_type_id'][1])) {
         $this->_memType = $params['membership_type_id'][1];
       }
     }
@@ -479,26 +479,25 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
       return;
     }
 
     if ($this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Contact'), array(
-          'create' => TRUE,
-          'api' => array('extra' => array('email')),
-        ), TRUE);
+        'create' => TRUE,
+        'api' => array('extra' => array('email')),
+      ), TRUE);
     }
 
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');

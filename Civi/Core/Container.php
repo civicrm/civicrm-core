@@ -174,9 +174,7 @@ class Container {
       throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
     }
     foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
-      $container->setDefinition($bootService, new Definition($def['class'], array($bootService)))
-        ->setFactoryClass(__CLASS__)
-        ->setFactoryMethod('getBootService');
+      $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE);
     }
 
     // Expose legacy singletons as services in the container.
@@ -226,6 +224,7 @@ class Container {
   public function createEventDispatcher($container) {
     $dispatcher = new ContainerAwareEventDispatcher($container);
     $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, array('\Civi\Core\InstallationCanary', 'check'));
+    $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, array('\Civi\Core\DatabaseInitializer', 'initialize'));
     $dispatcher->addListener('hook_civicrm_post::Activity', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
@@ -328,64 +327,50 @@ class Container {
    * @throws \CRM_Core_Exception
    */
   public static function boot($loadFromDB) {
+    // Array(string $serviceId => object $serviceInstance).
     $bootServices = array();
     \Civi::$statics[__CLASS__]['boot'] = &$bootServices;
 
-    $bootServices['runtime'] = array(
-      'class' => 'CRM_Core_Config_Runtime',
-      'obj' => ($runtime = new \CRM_Core_Config_Runtime()),
-    );
+    $bootServices['runtime'] = $runtime = new \CRM_Core_Config_Runtime();
     $runtime->initialize($loadFromDB);
 
-    $bootServices['paths'] = array(
-      'class' => 'Civi\Core\Paths',
-      'obj' => new \Civi\Core\Paths(),
-    );
+    $bootServices['paths'] = new \Civi\Core\Paths();
 
     $class = $runtime->userFrameworkClass;
-    $bootServices['userSystem'] = array(
-      'class' => 'CRM_Utils_Cache_Interface',
-      'obj' => ($userSystem = new $class()),
-    );
+    $bootServices['userSystem'] = $userSystem = new $class();
     $userSystem->initialize();
 
     $userPermissionClass = 'CRM_Core_Permission_' . $runtime->userFramework;
-    $bootServices['userPermissionClass'] = array(
-      // Ugh, silly name.
-      'class' => 'CRM_Core_Permission_Base',
-      'obj' => new $userPermissionClass(),
-    );
+    $bootServices['userPermissionClass'] = new $userPermissionClass();
 
-    $bootServices['cache.settings'] = array(
-      'class' => 'CRM_Utils_Cache_Interface',
-      'obj' => \CRM_Utils_Cache::create(array(
-        'name' => 'settings',
-        'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
-      )),
-    );
+    $bootServices['cache.settings'] = \CRM_Utils_Cache::create(array(
+      'name' => 'settings',
+      'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+    ));
 
-    $bootServices['settings_manager'] = array(
-      'class' => 'Civi\Core\SettingsManager',
-      'obj' => new \Civi\Core\SettingsManager($bootServices['cache.settings']['obj']),
-    );
+    $bootServices['settings_manager'] = new \Civi\Core\SettingsManager($bootServices['cache.settings']);
 
-    $bootServices['lockManager'] = array(
-      'class' => 'Civi\Core\Lock\LockManager',
-      'obj' => self::createLockManager(),
-    );
+    $bootServices['lockManager'] = self::createLockManager();
 
     if ($loadFromDB && $runtime->dsn) {
       \CRM_Core_DAO::init($runtime->dsn);
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
+      \CRM_Extension_System::singleton(TRUE)->getClassLoader()->register();
+
+      $runtime->includeCustomPath();
 
       $c = new self();
-      \Civi::$statics[__CLASS__]['container'] = $c->loadContainer();
+      $container = $c->loadContainer();
+      foreach ($bootServices as $name => $obj) {
+        $container->set($name, $obj);
+      }
+      \Civi::$statics[__CLASS__]['container'] = $container;
     }
   }
 
   public static function getBootService($name) {
-    return \Civi::$statics[__CLASS__]['boot'][$name]['obj'];
+    return \Civi::$statics[__CLASS__]['boot'][$name];
   }
 
 }

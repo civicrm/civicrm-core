@@ -25,10 +25,9 @@
  * +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class api_v3_NavigationTest
+ * @group headless
  */
 class api_v3_NavigationTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

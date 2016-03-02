@@ -24,10 +24,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Test for CRM_Financial_Page_Ajax class.
+ * @group headless
  */
 class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
 
@@ -48,6 +48,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST['entityID'] = $batch['id'];
     $_REQUEST['return'] = TRUE;
     $json = CRM_Financial_Page_AJAX::getFinancialTransactionsList();
+    $json = str_replace(rtrim(CIVICRM_UF_BASEURL, '/'), 'http://FIX ME', $json);
     $this->assertEquals($json, '{"sEcho": 1, "iTotalRecords": 1, "iTotalDisplayRecords": 1, "aaData": [ ["","<a href=\"/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4\" class=\"crm-summary-link\"><div'
     . ' class=\"icon crm-icon Individual-icon\"></div></a>","<a href=/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3>Anderson, Anthony</a>","$ 100.00","12345","' . CRM_Utils_Date::customFormat(date('Ymd')) . ' 12:00 AM",'
     . '"Credit Card","Completed","Donation","<span><a href=\"http://FIX ME/index.php?q=civicrm/contact/view/contribution&amp;reset=1&amp;id=1&amp;cid=3&amp;action=view&amp;context=contribution&amp;'

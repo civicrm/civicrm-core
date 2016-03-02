@@ -166,6 +166,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'useForMember',
       'membership_assign',
       'amount',
+      'receipt_date',
     );
 
     foreach ($valuesRequiredForTemplate as $valueRequiredForTemplate) {
@@ -383,9 +384,12 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       );
 
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {
-        $tplParams['contributionTypeId'] = $contributionTypeId;
-        $tplParams['contributionTypeName'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
+        $tplParams['financialTypeId'] = $contributionTypeId;
+        $tplParams['financialTypeName'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
           $contributionTypeId);
+        // Legacy support
+        $tplParams['contributionTypeName'] = $tplParams['financialTypeName'];
+        $tplParams['contributionTypeId'] = $contributionTypeId;
       }
 
       if ($contributionPageId = CRM_Utils_Array::value('id', $values)) {

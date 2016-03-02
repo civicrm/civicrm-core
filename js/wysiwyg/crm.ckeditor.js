@@ -75,6 +75,7 @@
         filebrowserUploadUrl: uploadUrl + '&type=files',
         filebrowserImageUploadUrl: uploadUrl + '&type=images',
         filebrowserFlashUploadUrl: uploadUrl + '&type=flash',
+        allowedContent: true, // For CiviMail!
         customConfig: CRM.config.CKEditorCustomConfig,
         on: {
           instanceReady: onReady
