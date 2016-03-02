@@ -159,17 +159,8 @@ AND     ( g.cache_date IS NULL OR
 
     $dao = CRM_Core_DAO::executeQuery($query);
     $processGroupIDs = array();
-    $refreshGroupIDs = $groupIDs;
     while ($dao->fetch()) {
       $processGroupIDs[] = $dao->id;
-
-      // remove this id from refreshGroupIDs
-      foreach ($refreshGroupIDs as $idx => $gid) {
-        if ($gid == $dao->id) {
-          unset($refreshGroupIDs[$idx]);
-          break;
-        }
-      }
     }
 
     if (empty($processGroupIDs)) {
