@@ -49,6 +49,7 @@ function civicrm_api3_entity_tag_get($params) {
   else {
     //do legacy non-standard behaviour
     $values = CRM_Core_BAO_EntityTag::getTag($params['entity_id'], $params['entity_table']);
+
     $result = array();
     foreach ($values as $v) {
       $result[$v] = array('tag_id' => $v);
@@ -128,6 +129,7 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
       }
     }
   }
+
   if (empty($entityIDs)) {
     return civicrm_api3_create_error('contact_id is a required field');
   }
@@ -145,7 +147,8 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
   if ($op == 'add') {
     $values['total_count'] = $values['added'] = $values['not_added'] = 0;
     foreach ($tagIDs as $tagID) {
-      list($te, $a, $na) = CRM_Core_BAO_EntityTag::addEntitiesToTag($entityIDs, $tagID, $entityTable);
+      list($te, $a, $na) = CRM_Core_BAO_EntityTag::addEntitiesToTag($entityIDs, $tagID, $entityTable,
+        CRM_Utils_Array::value('check_permissions', $params));
       $values['total_count'] += $te;
       $values['added'] += $a;
       $values['not_added'] += $na;
@@ -154,7 +157,7 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
   else {
     $values['total_count'] = $values['removed'] = $values['not_removed'] = 0;
     foreach ($tagIDs as $tagID) {
-      list($te, $r, $nr) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($entityIDs, $tagID, $entityTable);
+      list($te, $r, $nr) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($entityIDs, $tagID, $entityTable, CRM_Utils_Array::value('check_permissions', $params));
       $values['total_count'] += $te;
       $values['removed'] += $r;
       $values['not_removed'] += $nr;

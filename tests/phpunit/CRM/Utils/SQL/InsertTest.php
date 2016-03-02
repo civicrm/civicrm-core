@@ -1,8 +1,8 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_Utils_SQL_SelectTest
+ * @group headless
  */
 class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
   public function testRow_twice() {

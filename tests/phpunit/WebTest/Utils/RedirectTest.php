@@ -24,26 +24,12 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviSeleniumSettings.php';
-
-/**
- *  Include configuration
- */
-define('CIVICRM_SETTINGS_PATH', __DIR__ . '/civicrm.settings.dist.php');
-define('CIVICRM_SETTINGS_LOCAL_PATH', __DIR__ . '/civicrm.settings.local.php');
 define('CIVICRM_WEBTEST', 1);
-
-if (file_exists(CIVICRM_SETTINGS_LOCAL_PATH)) {
-  require_once CIVICRM_SETTINGS_LOCAL_PATH;
-}
-require_once CIVICRM_SETTINGS_PATH;
-
 
 /**
  * Check that we handle redirects appropriately.
  */
-class WebTest_Utils_RedirectTest extends CiviUnitTestCase {
+class WebTest_Utils_RedirectTest extends PHPUnit_Framework_TestCase {
   protected $url;
   protected $ch;
 
@@ -53,6 +39,7 @@ class WebTest_Utils_RedirectTest extends CiviUnitTestCase {
   public function __construct($name = NULL) {
     parent::__construct($name);
 
+    // TODO: Just use $GLOBALS['_CV'] and don't bother with CiviSeleniumSettings.
     $this->settings = new CiviSeleniumSettings();
     if (property_exists($this->settings, 'serverStartupTimeOut') && $this->settings->serverStartupTimeOut) {
       global $CiviSeleniumTestCase_polled;

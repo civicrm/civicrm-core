@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Extension_Container_StaticTest
+ * @group headless
  */
 class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
   public function setUp() {

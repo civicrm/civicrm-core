@@ -25,10 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Tests for linking to resource files
+ * @group headless
  */
 class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 

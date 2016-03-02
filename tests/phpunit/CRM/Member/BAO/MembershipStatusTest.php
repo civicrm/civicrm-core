@@ -25,11 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Member_BAO_MembershipStatusTest
+ * @group headless
  */
 class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 

@@ -101,19 +101,23 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     $permissions = array(
       'delete in CiviCase' => array(
         ts('delete in CiviCase'),
-        ts('Delete Cases'),
+        ts('Delete cases'),
       ),
       'administer CiviCase' => array(
         ts('administer CiviCase'),
+        ts('Define case types, access deleted cases'),
       ),
       'access my cases and activities' => array(
         ts('access my cases and activities'),
+        ts('View and edit only those cases managed by this user'),
       ),
       'access all cases and activities' => array(
         ts('access all cases and activities'),
+        ts('View and edit all cases (for visible contacts)'),
       ),
       'add cases' => array(
         ts('add cases'),
+        ts('Open a new case'),
       ),
     );
 
@@ -245,8 +249,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       (!$oldValue || !in_array('CiviCase', $oldValue))
     ) {
       $pathToCaseSampleTpl = __DIR__ . '/xml/configuration.sample/';
-      $config = CRM_Core_Config::singleton();
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $pathToCaseSampleTpl . 'case_sample.mysql.tpl');
+      CRM_Admin_Form_Setting_Component::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
         $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
         CRM_Core_Error::fatal($msg);

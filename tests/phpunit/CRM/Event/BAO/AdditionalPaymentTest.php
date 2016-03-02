@@ -25,14 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/Event.php';
-require_once 'CiviTest/Participant.php';
-
 /**
  * Class CRM_Event_BAO_AdditionalPaymentTest
+ * @group headless
  */
 class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 

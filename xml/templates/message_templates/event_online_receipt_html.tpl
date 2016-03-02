@@ -366,13 +366,13 @@
         </tr>
        {/if}
 
-       {if $contributionTypeName}
+       {if $financialTypeName}
         <tr>
          <td {$labelStyle}>
           {ts}Financial Type{/ts}
          </td>
          <td {$valueStyle}>
-          {$contributionTypeName}
+          {$financialTypeName}
          </td>
         </tr>
        {/if}

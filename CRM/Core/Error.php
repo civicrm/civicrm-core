@@ -440,7 +440,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // Case C: Default error handler
 
     // log to file
-    CRM_Core_Error::debug_var('Fatal Error Details', $vars);
+    CRM_Core_Error::debug_var('Fatal Error Details', $vars, FALSE);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
     // print to screen
@@ -607,11 +607,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function debug_query($string) {
     if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
-      if (CIVICRM_DEBUG_LOG_QUERY == 'backtrace') {
+      if (CIVICRM_DEBUG_LOG_QUERY === 'backtrace') {
         CRM_Core_Error::backtrace($string, TRUE);
       }
       elseif (CIVICRM_DEBUG_LOG_QUERY) {
-        CRM_Core_Error::debug_var('Query', $string, FALSE, TRUE);
+        CRM_Core_Error::debug_var('Query', $string, TRUE, TRUE, 'sql_log');
       }
     }
   }
@@ -634,31 +634,33 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @return Log
    */
   public static function createDebugLogger($comp = '') {
-    $config = CRM_Core_Config::singleton();
+    if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $comp])) {
+      $config = CRM_Core_Config::singleton();
 
-    if ($comp) {
-      $comp = $comp . '.';
-    }
-
-    $fileName = "{$config->configAndLogDir}CiviCRM." . $comp . md5($config->dsn) . '.log';
-
-    // Roll log file monthly or if greater than 256M
-    // note that PHP file functions have a limit of 2G and hence
-    // the alternative was introduce
-    if (file_exists($fileName)) {
-      $fileTime = date("Ym", filemtime($fileName));
-      $fileSize = filesize($fileName);
-      if (($fileTime < date('Ym')) ||
-        ($fileSize > 256 * 1024 * 1024) ||
-        ($fileSize < 0)
-      ) {
-        rename($fileName,
-          $fileName . '.' . date('YmdHi')
-        );
+      if ($comp) {
+        $comp = $comp . '.';
       }
-    }
 
-    return Log::singleton('file', $fileName);
+      $fileName = "{$config->configAndLogDir}CiviCRM." . $comp . md5($config->dsn) . '.log';
+
+      // Roll log file monthly or if greater than 256M
+      // note that PHP file functions have a limit of 2G and hence
+      // the alternative was introduce
+      if (file_exists($fileName)) {
+        $fileTime = date("Ym", filemtime($fileName));
+        $fileSize = filesize($fileName);
+        if (($fileTime < date('Ym')) ||
+          ($fileSize > 256 * 1024 * 1024) ||
+          ($fileSize < 0)
+        ) {
+          rename($fileName,
+            $fileName . '.' . date('YmdHi')
+          );
+        }
+      }
+      \Civi::$statics[__CLASS__]['logger_file' . $comp] = $fileName;
+    }
+    return Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $comp]);
   }
 
   /**

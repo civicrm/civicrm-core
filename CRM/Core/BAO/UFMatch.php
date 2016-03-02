@@ -254,18 +254,19 @@ AND    domain_id = %2
       }
 
       if (!$found) {
-        if ($config->userSystem->is_drupal) {
-          $mail = 'mail';
-        }
-        elseif ($uf == 'WordPress') {
-          $mail = 'user_email';
-        }
-        else {
-          $mail = 'email';
-        }
-
+        // Not sure why we're testing for this. Is there ever a case
+        // in which $user is not an object?
         if (is_object($user)) {
-          $params = array('email-Primary' => $user->$mail);
+          if ($config->userSystem->is_drupal) {
+            $primary_email = $uniqId;
+          }
+          elseif ($uf == 'WordPress') {
+            $primary_email = $user->user_email;
+          }
+          else {
+            $primary_email = $user->email;
+          }
+          $params = array('email-Primary' => $primary_email);
         }
 
         if ($ctype == 'Organization') {
@@ -631,6 +632,16 @@ AND    domain_id    = %4
       }
     }
     return $ufValues[$ufID];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function addSelectWhereClause() {
+    // Prevent default behavior of joining ACLs onto the contact_id field
+    $clauses = array();
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
 }

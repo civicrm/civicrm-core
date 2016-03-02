@@ -1,9 +1,10 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 require_once 'CiviTest/Contact.php';
 
 /**
  * Class CRM_Dedupe_DedupeFinderTest
+ * @group headless
  */
 class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   public function testFuzzyDupes() {

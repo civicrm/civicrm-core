@@ -2225,4 +2225,32 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
+  /**
+   * CRM-17797 -- Format fields and setDefaults for primary and additional participants profile
+   * @param int $contactId
+   * @param CRM_Core_Form $form
+   */
+  public static function formatFieldsAndSetProfileDefaults($contactId, &$form) {
+    if (!$contactId) {
+      return;
+    }
+    $fields = array();
+    if (!empty($form->_fields)) {
+      $removeCustomFieldTypes = array('Participant');
+
+      foreach ($form->_fields as $name => $dontCare) {
+        if ((substr($name, 0, 7) == 'custom_' && !$form->_allowConfirmation
+          && !CRM_Core_BAO_CustomGroup::checkCustomField(substr($name, 7), $removeCustomFieldTypes))
+          || substr($name, 0, 12) == 'participant_') {
+          continue;
+        }
+        $fields[$name] = 1;
+      }
+
+      if (!empty($fields)) {
+        CRM_Core_BAO_UFGroup::setProfileDefaults($contactId, $fields, $form->_defaults);
+      }
+    }
+  }
+
 }

@@ -586,10 +586,12 @@ if (!CRM.vars) CRM.vars = {};
       combined = _.cloneDeep(params),
       filter = $.extend({}, $el.data('user-filter') || {});
     if (filter.key && filter.value) {
+      // Fieldname may be prefixed with joins
+      var fieldName = _.last(filter.key.split('.'));
       // Special case for contact type/sub-type combo
-      if (filter.key === 'contact_type' && (filter.value.indexOf('__') > 0)) {
-        combined.params.contact_type = filter.value.split('__')[0];
-        combined.params.contact_sub_type = filter.value.split('__')[1];
+      if (fieldName === 'contact_type' && (filter.value.indexOf('__') > 0)) {
+        combined.params[filter.key] = filter.value.split('__')[0];
+        combined.params[filter.key.replace('contact_type', 'contact_sub_type')] = filter.value.split('__')[1];
       } else {
         // Allow json-encoded api filters e.g. {"BETWEEN":[123,456]}
         combined.params[filter.key] = filter.value.charAt(0) === '{' ? $.parseJSON(filter.value) : filter.value;
@@ -731,6 +733,7 @@ if (!CRM.vars) CRM.vars = {};
       var defaults = {
         "processing": true,
         "serverSide": true,
+        "aaSorting": [],
         "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
         "pageLength": 25,
         "drawCallback": function(settings) {
@@ -871,7 +874,9 @@ if (!CRM.vars) CRM.vars = {};
         CRM.utils.setOptions($valField, filterSpec.options, false, filter.value);
       } else {
         $valField.prop('disabled', true);
-        CRM.api3(filterSpec.entity || $el.data('api-entity'), 'getoptions', {field: filter.key, context: 'search', sequential: 1})
+        // Fieldname may be prefixed with joins - strip those out
+        var fieldName = _.last(filter.key.split('.'));
+        CRM.api3(filterSpec.entity || $el.data('api-entity'), 'getoptions', {field: fieldName, context: 'search', sequential: 1})
           .done(function(result) {
             var entity = $el.data('api-entity').toLowerCase(),
               globalFilterSpec = _.find(CRM.config.entityRef.filters[entity], {key: filter.key}) || {};
@@ -1427,7 +1432,7 @@ if (!CRM.vars) CRM.vars = {};
       })
 
       // Allow normal clicking of links within accordions
-      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
+      .on('click.crmAccordions', 'div.crm-accordion-header a, .collapsible-title a', function (e) {
         e.stopPropagation();
       })
       // Handle accordions

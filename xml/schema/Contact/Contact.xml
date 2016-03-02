@@ -477,6 +477,9 @@
     <type>varchar</type>
     <length>64</length>
     <import>true</import>
+    <html>
+      <type>Text</type>
+    </html>
     <headerPattern>/^title/i</headerPattern>
     <comment>Formal (academic or similar) title in front of name. (Prof., Dr. etc.)</comment>
     <add>4.5</add>

@@ -36,8 +36,14 @@
  */
 class CRM_Badge_BAO_Badge {
 
+  /**
+   * @var bool
+   */
   public $debug = FALSE;
 
+  /**
+   * @var int
+   */
   public $border = 0;
 
   /**

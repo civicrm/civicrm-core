@@ -447,7 +447,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param int $contactId
    *   Id of the contact.
    * @param int $groupID
-   *   Id of a perticuler group.
+   *   Id of a particular group.
    * @param string $method
    *   If we want the subscription history details for a specific method.
    *
@@ -489,7 +489,7 @@ SELECT    *
    * Method to get Group Id.
    *
    * @param int $groupContactID
-   *   Id of a perticuler group.
+   *   Id of a particular group.
    *
    *
    * @return groupID
@@ -576,7 +576,7 @@ SELECT    *
     }
 
     $params = array(
-      array('group', 'IN', array($groupID => 1), 0, 0),
+      array('group', 'IN', array($groupID), 0, 0),
       array('contact_id', '=', $contactID, 0, 0),
     );
     list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, array('contact_id'));

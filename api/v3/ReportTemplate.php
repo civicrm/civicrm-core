@@ -154,7 +154,8 @@ function _civicrm_api3_report_template_getrows($params) {
   $sql = $reportInstance->buildQuery();
   $rows = $metadata = $requiredMetadata  = array();
   $reportInstance->buildRows($sql, $rows);
-  $requiredMetadata = array();
+  $reportInstance->formatDisplay($rows);
+
   if (isset($params['options']) && !empty($params['options']['metadata'])) {
     $requiredMetadata = $params['options']['metadata'];
     if (in_array('title', $requiredMetadata)) {
@@ -162,10 +163,13 @@ function _civicrm_api3_report_template_getrows($params) {
     }
     if (in_array('labels', $requiredMetadata)) {
       foreach ($reportInstance->_columnHeaders as $key => $header) {
-        //would be better just to expect reports to provide titles but reports are not consistent so we anticipate empty
+        // Would be better just to expect reports to provide titles but reports are not consistent so we anticipate empty
         //NB I think these are already translated
         $metadata['metadata']['labels'][$key] = !empty($header['title']) ? $header['title'] : '';
       }
+    }
+    if (in_array('sql', $requiredMetadata)) {
+      $metadata['metadata']['sql'] = $reportInstance->getReportSql();
     }
   }
   return array($rows, $reportInstance, $metadata);

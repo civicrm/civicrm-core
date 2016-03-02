@@ -25,10 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Tests for pseudoconstant retrieval
+ * @group headless
  */
 class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
@@ -88,7 +87,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     $pp_name = md5(microtime());
     $api_params = array(
       'domain_id' => 1,
-      'payment_processor_type_id' => 10,
+      'payment_processor_type_id' => 'Dummy',
       'name' => $pp_name,
       'user_name' => $pp_name,
       'class_name' => 'Payment_Dummy',

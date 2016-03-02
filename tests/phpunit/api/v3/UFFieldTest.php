@@ -25,14 +25,12 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for UFGroup API - civicrm_uf_*
  * @todo Split UFGroup and UFJoin tests
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_UFFieldTest extends CiviUnitTestCase {
   // ids from the uf_group_test.xml fixture

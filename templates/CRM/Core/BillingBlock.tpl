@@ -204,29 +204,17 @@
       });
     });
 
-    $('input[name="payment_processor_id"]').change( function() {
-      function toggleConfirmButton() {
-        var suppressSubmitButton = {/literal}"{$suppressSubmitButton}"{literal};
-        var elementObj = $('input[name="payment_processor"]');
-        if ( elementObj.attr('type') == 'hidden' ) {
-          var processorTypeId = elementObj.val( );
-        }
-        else {
-          var processorTypeId = elementObj.filter(':checked').val();
-        }
-
-        if (suppressSubmitButton) {
-          $("#crm-submit-buttons").hide();
-        }
-        else {
-          $("#crm-submit-buttons").show();
-        }
-      }
-      toggleConfirmButton();
-    });
-
   </script>
   {/literal}
+{/if}
+{if $suppressSubmitButton}
+{literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      $('.crm-submit-buttons', $('#billing-payment-block').closest('form')).hide();
+    });
+  </script>
+{/literal}
 {/if}
 {/crmRegion}
 {crmRegion name="billing-block-post"}

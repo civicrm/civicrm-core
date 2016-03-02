@@ -24,13 +24,11 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
  * @package   CiviCRM
+ * @group headless
  */
 class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 

@@ -1,7 +1,6 @@
 <?php
 
 namespace Civi\Core {
-  require_once 'CiviTest/CiviUnitTestCase.php';
 
   /**
    * Class ResolverTest

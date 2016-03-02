@@ -25,10 +25,9 @@
 +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class api_v3_TaxContributionPageTest
+ * @group headless
  */
 class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
@@ -160,7 +159,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $paymentProceParams = array(
       'domain_id' => 1,
       'name' => 'dummy' . substr(sha1(rand()), 0, 7),
-      'payment_processor_type_id' => 10,
+      'payment_processor_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_PaymentProcessor', 'payment_processor_type_id', 'Dummy'),
       'financial_account_id' => 12,
       'is_active' => 1,
       'is_default' => 1,

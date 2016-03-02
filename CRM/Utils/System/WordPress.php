@@ -76,29 +76,48 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Moved from CRM_Utils_System_Base
    */
   public function getDefaultFileStorage() {
-    global $civicrm_root;
-    $config  = CRM_Core_Config::singleton();
-    $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
-
-    $filesURL        = NULL;
-    $filesPath       = NULL;
-    $upload_dir      = wp_upload_dir();
-    $settingsDir     = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
-    $settingsURL     = $upload_dir['baseurl'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
-    if (is_dir(WP_PLUGIN_DIR . '/files/civicrm/')) {
-      //for legacy path
-      $filesURL = WP_PLUGIN_URL . "/files/civicrm/";
-    }
-    elseif (is_dir($settingsDir)) {
-      $filesURL = $settingsURL;
-    }
-    else {
-      throw new CRM_Core_Exception("Failed to locate default file storage ($config->userFramework)");
-    }
-
+    $config = CRM_Core_Config::singleton();
+    $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+    $cmsPath = $this->cmsRootPath();
+    $filesPath = CRM_Utils_File::baseFilePath();
+    $filesRelPath = CRM_Utils_File::relativize($filesPath, $cmsPath);
+    $filesURL = rtrim($cmsUrl, '/') . '/' . ltrim($filesRelPath, ' /');
     return array(
-      'url'  => $filesURL,
-      'path' => CRM_Utils_File::baseFilePath(),
+      'url' => CRM_Utils_File::addTrailingSlash($filesURL, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($filesPath),
+    );
+  }
+
+  /**
+   * Determine the location of the CiviCRM source tree.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
+   */
+  public function getCiviSourceStorage() {
+    global $civicrm_root;
+
+    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
+    // More generally, we shouldn't be using $config here.
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+
+    $cmsPath = $this->cmsRootPath();
+
+    // $config  = CRM_Core_Config::singleton();
+    // overkill? // $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+    $cmsUrl = CIVICRM_UF_BASEURL;
+    if (CRM_Utils_System::isSSL()) {
+      $cmsUrl = str_replace('http://', 'https://', $cmsUrl);
+    }
+
+    $civiRelPath = CRM_Utils_File::relativize($civicrm_root, $cmsPath);
+    $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
     );
   }
 
@@ -307,13 +326,24 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * FIXME: Do something
-   *
-   * @param \obj $user
+   * @param \string $user
    *
    * @return bool
    */
   public function loadUser($user) {
+    $userdata = get_user_by('login', $user);
+    if (!$userdata->data->ID) {
+      return FALSE;
+    }
+
+    $uid = $userdata->data->ID;
+    wp_set_current_user($uid);
+    $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
+
+    // lets store contact id and user id in session
+    $session = CRM_Core_Session::singleton();
+    $session->set('ufID', $uid);
+    $session->set('userID', $contactID);
     return TRUE;
   }
 
@@ -559,9 +589,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $errors[$emailName] = "Your email is invaid";
       }
       elseif (email_exists($params['mail'])) {
-        $resetUrl = $config->userFrameworkBaseURL . 'wp-login.php?action=lostpassword';
         $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
-          array(1 => $params['mail'], 2 => $resetUrl)
+          array(1 => $params['mail'], 2 => wp_lostpassword_url())
         );
       }
     }
@@ -631,8 +660,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getLoginURL($destination = '') {
     $config = CRM_Core_Config::singleton();
-    $loginURL = $config->userFrameworkBaseURL;
-    $loginURL .= 'wp-login.php';
+    $loginURL = wp_login_url();
     return $loginURL;
   }
 

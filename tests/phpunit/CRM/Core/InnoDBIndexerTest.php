@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Core_InnoDBIndexerTest
+ * @group headless
  */
 class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
   public function tearDown() {

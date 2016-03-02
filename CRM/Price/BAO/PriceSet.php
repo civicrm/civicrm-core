@@ -476,7 +476,8 @@ WHERE     ct.id = cp.financial_type_id AND
       $query .= ' AND s.financial_type_id IN (' . $types . ') AND v.financial_type_id IN (' . $types . ') ';
     }
     else {
-      $query .= " AND 0 "; // Do not display any price sets
+      // Do not display any price sets
+      $query .= " AND 0 ";
     }
     $query .= " GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -1442,6 +1443,12 @@ GROUP BY     mt.member_of_contact_id";
     $params = array(1 => array($priceSetId, 'Integer'));
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+    //CRM-18050: Check count of price set fields which has been set with auto-renew option.
+    //If price set field is already present with auto-renew option then, it will restrict for adding another price set field with auto-renew option.
+    if ($dao->N == 0) {
+      return 0;
+    }
 
     $autoRenewOption = 2;
     $priceFields = array();

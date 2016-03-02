@@ -35,6 +35,9 @@
  *  Access Control List
  */
 class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
+  /**
+   * @var string
+   */
   static $_entityTable = NULL;
   static $_objectTable = NULL;
   static $_operation = NULL;

@@ -450,7 +450,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     chdir($root);
 
     // Create a mock $request object
-    $autoloader = require_once $root . '/core/vendor/autoload.php';
+    $autoloader = require_once $root . '/vendor/autoload.php';
     // @Todo: do we need to handle case where $_SERVER has no HTTP_HOST key, ie. when run via cli?
     $request = new \Symfony\Component\HttpFoundation\Request(array(), array(), array(), array(), array(), $_SERVER);
 
@@ -544,6 +544,77 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     foreach (Drupal\Core\Cache\Cache::getBins() as $service_id => $cache_backend) {
       $cache_backend->deleteAll();
     }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getModules() {
+    $modules = array();
+
+    $module_data = system_rebuild_module_data();
+    foreach ($module_data as $module_name => $extension) {
+      if (!isset($extension->info['hidden']) && $extension->origin != 'core') {
+        $extension->schema_version = drupal_get_installed_schema_version($module_name);
+        $modules[] = new CRM_Core_Module('drupal.' . $module_name, ($extension->status == 1 ? TRUE : FALSE));
+      }
+    }
+    return $modules;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUniqueIdentifierFromUserObject($user) {
+    return $user->get('mail')->value;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUserIDFromUserObject($user) {
+    return $user->get('uid')->value;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+
+    $users = array();
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties();
+
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+    foreach ($users as $user) {
+      $mail = $user->get('mail')->value;
+      if (empty($mail)) {
+        continue;
+      }
+      $uid = $user->get('uid')->value;
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $uid, $mail, $uf, 1, 'Individual', TRUE)) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
   }
 
 }

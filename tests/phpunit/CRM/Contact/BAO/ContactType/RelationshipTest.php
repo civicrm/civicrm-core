@@ -1,9 +1,10 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 require_once 'CiviTest/Contact.php';
 
 /**
  * Class CRM_Contact_BAO_ContactType_RelationshipTest
+ * @group headless
  */
 class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
 

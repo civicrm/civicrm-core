@@ -25,10 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Core_BAO_FinancialTrxnTest
+ * @group headless
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   public function setUp() {
@@ -109,6 +108,25 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
     $this->assertEquals('200.00', $totalPaymentAmount, 'Amount not matching.');
+  }
+
+  /**
+   * Test getPartialPaymentTrxn function.
+   */
+  public function testGetPartialPaymentTrxn() {
+    $contributionTest = new CRM_Contribute_BAO_ContributionTest();
+    list($lineItems, $contribution) = $contributionTest->addParticipantWithContribution();
+    $contribution = (array) $contribution;
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 100.00,
+    );
+    $trxn = CRM_Core_BAO_FinancialTrxn::getPartialPaymentTrxn($contribution, $params);
+
+    $this->assertEquals('100.00', $trxn->total_amount, 'Amount does not match.');
+
+    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
+    $this->assertEquals('250.00', $totalPaymentAmount, 'Amount does not match.');
   }
 
 }

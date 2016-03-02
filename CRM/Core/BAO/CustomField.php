@@ -542,6 +542,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cfTable.options_per_line, $cfTable.text_length,
                             $cfTable.custom_group_id,
                             $cfTable.is_required,
+                            $cfTable.column_name,
                             $cgTable.extends, $cfTable.is_search_range,
                             $cgTable.extends_entity_column_value,
                             $cgTable.extends_entity_column_id,
@@ -550,6 +551,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cfTable.date_format,
                             $cfTable.time_format,
                             $cgTable.is_multiple,
+                            $cgTable.table_name,
                             og.name as option_group_name
                      FROM $cfTable
                      INNER JOIN $cgTable
@@ -620,6 +622,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['date_format'] = $dao->date_format;
           $fields[$dao->id]['time_format'] = $dao->time_format;
           $fields[$dao->id]['is_required'] = $dao->is_required;
+          $fields[$dao->id]['table_name'] = $dao->table_name;
+          $fields[$dao->id]['column_name'] = $dao->column_name;
           self::getOptionsForField($fields[$dao->id], $dao->option_group_name);
         }
 

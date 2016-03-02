@@ -25,15 +25,12 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
-
-
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contribution
+ * @group headless
  */
 class api_v3_ContributionTest extends CiviUnitTestCase {
 
@@ -92,7 +89,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_processorParams = array(
       'domain_id' => 1,
       'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
+      'payment_processor_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_PaymentProcessor', 'payment_processor_type_id', 'Dummy'),
       'financial_account_id' => 12,
       'is_active' => 1,
       'user_name' => '',
@@ -1069,6 +1066,108 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
       'return' => 'trxn_id',
     )));
+  }
+
+  /**
+   * Refund a contribution for a financial type with a contra account.
+   *
+   * CRM-17951 the contra account is a financial account with a relationship to a
+   * financial type. It is not always configured but should be reflected
+   * in the financial_trxn & financial_item table if it is.
+   */
+  public function testCreateUpdateChargebackContributionDefaultAccount() {
+    $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
+    $this->callAPISuccess('Contribution', 'create', array(
+      'id' => $contribution['id'],
+      'contribution_status_id' => 'Chargeback',
+    ));
+    $this->callAPISuccessGetSingle('Contribution', array('contribution_status_id' => 'Chargeback'));
+
+    $lineItems = $this->callAPISuccessGetSingle('LineItem', array(
+      'contribution_id' => $contribution['id'],
+      'api.FinancialItem.getsingle' => array('amount' => array('<' => 0)),
+    ));
+    $this->assertEquals(1, $lineItems['api.FinancialItem.getsingle']['financial_account_id']);
+    $this->callAPISuccessGetSingle('FinancialTrxn', array(
+      'total_amount' => -100,
+      'status_id' => 'Chargeback',
+      'to_financial_account_id' => 6,
+    ));
+  }
+
+  /**
+   * Refund a contribution for a financial type with a contra account.
+   *
+   * CRM-17951 the contra account is a financial account with a relationship to a
+   * financial type. It is not always configured but should be reflected
+   * in the financial_trxn & financial_item table if it is.
+   */
+  public function testCreateUpdateChargebackContributionCustomAccount() {
+    $financialAccount = $this->callAPISuccess('FinancialAccount', 'create', array(
+      'name' => 'Chargeback Account',
+      'is_active' => TRUE,
+    ));
+
+    $entityFinancialAccount = $this->callAPISuccess('EntityFinancialAccount', 'create', array(
+      'entity_id' => $this->_financialTypeId,
+      'entity_table' => 'civicrm_financial_type',
+      'account_relationship' => 'Chargeback Account is',
+      'financial_account_id' => 'Chargeback Account',
+    ));
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
+    $this->callAPISuccess('Contribution', 'create', array(
+      'id' => $contribution['id'],
+      'contribution_status_id' => 'Chargeback',
+    ));
+    $this->callAPISuccessGetSingle('Contribution', array('contribution_status_id' => 'Chargeback'));
+
+    $lineItems = $this->callAPISuccessGetSingle('LineItem', array(
+      'contribution_id' => $contribution['id'],
+      'api.FinancialItem.getsingle' => array('amount' => array('<' => 0)),
+    ));
+    $this->assertEquals($financialAccount['id'], $lineItems['api.FinancialItem.getsingle']['financial_account_id']);
+
+    $this->callAPISuccess('Contribution', 'delete', array('id' => $contribution['id']));
+    $this->callAPISuccess('EntityFinancialAccount', 'delete', array('id' => $entityFinancialAccount['id']));
+    $this->callAPISuccess('FinancialAccount', 'delete', array('id' => $financialAccount['id']));
+  }
+
+  /**
+   * Refund a contribution for a financial type with a contra account.
+   *
+   * CRM-17951 the contra account is a financial account with a relationship to a
+   * financial type. It is not always configured but should be reflected
+   * in the financial_trxn & financial_item table if it is.
+   */
+  public function testCreateUpdateRefundContributionConfiguredContraAccount() {
+    $financialAccount = $this->callAPISuccess('FinancialAccount', 'create', array(
+      'name' => 'Refund Account',
+      'is_active' => TRUE,
+    ));
+
+    $entityFinancialAccount = $this->callAPISuccess('EntityFinancialAccount', 'create', array(
+      'entity_id' => $this->_financialTypeId,
+      'entity_table' => 'civicrm_financial_type',
+      'account_relationship' => 'Credit/Contra Revenue Account is',
+      'financial_account_id' => 'Refund Account',
+    ));
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
+    $this->callAPISuccess('Contribution', 'create', array(
+      'id' => $contribution['id'],
+      'contribution_status_id' => 'Refunded',
+    ));
+
+    $lineItems = $this->callAPISuccessGetSingle('LineItem', array(
+      'contribution_id' => $contribution['id'],
+      'api.FinancialItem.getsingle' => array('amount' => array('<' => 0)),
+    ));
+    $this->assertEquals($financialAccount['id'], $lineItems['api.FinancialItem.getsingle']['financial_account_id']);
+
+    $this->callAPISuccess('Contribution', 'delete', array('id' => $contribution['id']));
+    $this->callAPISuccess('EntityFinancialAccount', 'delete', array('id' => $entityFinancialAccount['id']));
+    $this->callAPISuccess('FinancialAccount', 'delete', array('id' => $financialAccount['id']));
   }
 
   /**
@@ -2319,9 +2418,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check financial transaction.
+   *
+   * @todo break this down into sensible functions - most calls to it only use a few lines out of the big if.
+   *
    * @param array $contribution
    * @param string $context
    * @param int $instrumentId
+   * @param array $extraParams
    */
   public function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL, $extraParams = array()) {
     $trxnParams = array(

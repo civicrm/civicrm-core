@@ -1,8 +1,6 @@
 <?php
 namespace Civi\Token;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;

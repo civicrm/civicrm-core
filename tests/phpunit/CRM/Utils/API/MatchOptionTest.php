@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test that the API accepts the 'match' and 'match-mandatory' options.
+ * @group headless
  */
 class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
 

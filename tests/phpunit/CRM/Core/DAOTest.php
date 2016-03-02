@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Core_DAOTest
+ * @group headless
  */
 class CRM_Core_DAOTest extends CiviUnitTestCase {
 
@@ -142,13 +141,15 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals($expectSql, $actualSql);
   }
 
-  // CASE: Two params where the %2 is already present in the query
-  // NOTE: This case should rightly FAIL, as using strstr in the replace mechanism will turn
-  // the query into: SELECT * FROM whatever WHERE name = 'Alice' AND title = 'Bob' AND year LIKE ''Bob'012'
-  // So, to avoid such ERROR, the query should be framed like:
-  // 'SELECT * FROM whatever WHERE name = %1 AND title = %3 AND year LIKE '%2012'
-  // $params[3] = array('Bob', 'String');
-  // i.e. the place holder should be unique and should not contain in any other operational use in query
+  /**
+   * CASE: Two params where the %2 is already present in the query
+   * NOTE: This case should rightly FAIL, as using strstr in the replace mechanism will turn
+   * the query into: SELECT * FROM whatever WHERE name = 'Alice' AND title = 'Bob' AND year LIKE ''Bob'012'
+   * So, to avoid such ERROR, the query should be framed like:
+   * 'SELECT * FROM whatever WHERE name = %1 AND title = %3 AND year LIKE '%2012'
+   * $params[3] = array('Bob', 'String');
+   * i.e. the place holder should be unique and should not contain in any other operational use in query
+   */
   public function testComposeQueryFailure() {
     $cases[] = array(
       'SELECT * FROM whatever WHERE name = %1 AND title = %2 AND year LIKE \'%2012\' ',
@@ -173,25 +174,25 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
         'this is an even longer string which is exactly 60 character',
         60,
         FALSE,
-        'this is an even longer string which is exactly 60 character'
+        'this is an even longer string which is exactly 60 character',
       ),
       array(
         'this is an even longer string which is exactly 60 character',
         60,
         TRUE,
-        'this is an even longer string which is exactly 60 character'
+        'this is an even longer string which is exactly 60 character',
       ),
       array(
         'this is an even longer string which is a bit more than 60 character',
         60,
         FALSE,
-        'this is an even longer string which is a bit more than 60 ch'
+        'this is an even longer string which is a bit more than 60 ch',
       ),
       array(
         'this is an even longer string which is a bit more than 60 character',
         60,
         TRUE,
-        'this is an even longer string which is a bit more th_c1cbd519'
+        'this is an even longer string which is a bit more th_c1cbd519',
       ),
     );
   }
@@ -223,4 +224,5 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
     $this->assertTrue($exception_thrown);
   }
+
 }

@@ -758,17 +758,27 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     if (!$this->templates) {
       $this->getHeaderFooter();
       $this->templates = array();
-
-      if ($this->body_text) {
+      if ($this->body_text || !empty($this->header)) {
         $template = array();
-        if ($this->header) {
+        if (!empty($this->header->body_text)) {
           $template[] = $this->header->body_text;
         }
+        elseif (!empty($this->header->body_html)) {
+          $template[] = CRM_Utils_String::htmlToText($this->header->body_html);
+        }
 
-        $template[] = $this->body_text;
+        if ($this->body_text) {
+          $template[] = $this->body_text;
+        }
+        else {
+          $template[] = CRM_Utils_String::htmlToText($this->body_html);
+        }
 
-        if ($this->footer) {
+        if (!empty($this->footer->body_text)) {
           $template[] = $this->footer->body_text;
+        }
+        elseif (!empty($this->footer->body_html)) {
+          $template[] = CRM_Utils_String::htmlToText($this->footer->body_html);
         }
 
         $this->templates['text'] = implode("\n", $template);
@@ -792,7 +802,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         // this is where we create a text template from the html template if the text template did not exist
         // this way we ensure that every recipient will receive an email even if the pref is set to text and the
         // user uploads an html email only
-        if (!$this->body_text) {
+        if (empty($this->templates['text'])) {
           $this->templates['text'] = CRM_Utils_String::htmlToText($this->templates['html']);
         }
       }
@@ -1403,7 +1413,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * Get mailing object and replaces subscribeInvite, domain and mailing tokens.
    *
-   * @param array $mailing
+   * @param CRM_Mailing_BAO_Mailing $mailing
    */
   public static function tokenReplace(&$mailing) {
     $domain = CRM_Core_BAO_Domain::getDomain();
@@ -3131,6 +3141,19 @@ AND        m.id = %1
       }
     }
     return $fieldPerms;
+  }
+
+  /**
+   * Whitelist of possible values for the entity_table field
+   * @return array
+   */
+  public static function mailingGroupEntityTables() {
+    $tables = array(
+      CRM_Contact_BAO_Group::getTableName(),
+      CRM_Mailing_BAO_Mailing::getTableName(),
+    );
+    // Identical keys & values
+    return array_combine($tables, $tables);
   }
 
 }

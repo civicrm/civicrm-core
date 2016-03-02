@@ -25,10 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CiviReportTestCase
+ * @group headless
  */
 class CRM_Core_BAO_ConfigSettingTest extends CiviUnitTestCase {
   public function testToggleComponent() {

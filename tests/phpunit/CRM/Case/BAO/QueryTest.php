@@ -1,7 +1,8 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 /**
  *  Include dataProvider for tests
+ * @group headless
  */
 class CRM_Case_BAO_QueryTest extends CiviUnitTestCase {
 

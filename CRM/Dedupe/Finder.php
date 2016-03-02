@@ -235,9 +235,9 @@ class CRM_Dedupe_Finder {
 
     // handle {birth,deceased}_date
     foreach (array(
-               'birth_date',
-               'deceased_date',
-             ) as $date) {
+      'birth_date',
+      'deceased_date',
+    ) as $date) {
       if (!empty($fields[$date])) {
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {

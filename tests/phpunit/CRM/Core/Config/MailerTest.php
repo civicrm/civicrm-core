@@ -33,10 +33,9 @@
  *
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Core_Config_MailerTest
+ * @group headless
  */
 class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
 

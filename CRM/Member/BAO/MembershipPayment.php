@@ -82,10 +82,10 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
       WHERE pv.membership_type_id = %2
       AND contribution_id = %3";
     CRM_Core_DAO::executeQuery($sql, array(
-        1 => array($dao->membership_id, 'Integer'),
-        2 => array($membership_type_id, 'Integer'),
-        3 => array($dao->contribution_id, 'Integer'),
-      ));
+      1 => array($dao->membership_id, 'Integer'),
+      2 => array($membership_type_id, 'Integer'),
+      3 => array($dao->contribution_id, 'Integer'),
+    ));
     return $dao;
   }
 

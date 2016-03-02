@@ -15,4 +15,9 @@
      <page_callback>CRM_Custom_Page_AJAX::fixOrdering</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+     <path>civicrm/ajax/multirecordfieldlist</path>
+     <page_callback>CRM_Custom_Page_AJAX::getMultiRecordFieldList</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

@@ -48,10 +48,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->clickLink("newCustomDataGroup");
     $this->type("title", $customGrp1);
     $this->select("extends[0]", "value=Case");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(1);
+    $this->waitForAjaxContent();
     $this->select("extends_1", "value=2");
     $this->clickLink("_qf_Group_next-bottom");
 
@@ -142,6 +139,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
+    $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[1][text()='Manage']");
     $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[1][text()='Manage']");
 
     $this->clickAjaxLink("css=#{$customGrp1} .crm-accordion-header", "css=#{$customGrp1} a.button");
@@ -398,7 +396,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $cusId_1 = 'custom_' . $customId[0] . '_1';
     $cusId_2 = 'custom_' . $customId[1] . '_1';
     $this->clickLink("css=#{$customGrp1} a.button", '_qf_CustomData_cancel-bottom', FALSE);
-
+    $this->waitForElementPresent("xpath=//span[@class='ui-dialog-title']");
     $this->assertElementContainsText("xpath=//span[@class='ui-dialog-title']", "Edit $customGrp1");
 
     $custFname = "Miky" . substr(sha1(rand()), 0, 7);

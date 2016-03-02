@@ -519,6 +519,9 @@ AND li.entity_id = {$entityId}
     else {
       $setID = NULL;
       $totalEntityId = count($entityId);
+      if ($entityTable == 'contribution') {
+        $isRelatedID = TRUE;
+      }
       foreach ($entityId as $id) {
         $lineItems = CRM_Price_BAO_LineItem::getLineItems($id, $entityTable, NULL, TRUE, $isRelatedID);
         foreach ($lineItems as $key => $values) {

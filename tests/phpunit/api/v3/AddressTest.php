@@ -32,10 +32,9 @@
  * @subpackage API_Contact
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class api_v3_AddressTest
+ * @group headless
  */
 class api_v3_AddressTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

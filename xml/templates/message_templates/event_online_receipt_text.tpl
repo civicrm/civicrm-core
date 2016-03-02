@@ -201,8 +201,8 @@ You were registered by: {$payer.name}
 {if $receive_date}
 {ts}Transaction Date{/ts}: {$receive_date|crmDate}
 {/if}
-{if $contributionTypeName}
-{ts}Financial Type{/ts}: {$contributionTypeName}
+{if $financialTypeName}
+{ts}Financial Type{/ts}: {$financialTypeName}
 {/if}
 {if $trxn_id}
 {ts}Transaction #{/ts}: {$trxn_id}

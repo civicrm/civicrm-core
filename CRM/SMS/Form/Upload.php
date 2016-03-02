@@ -405,7 +405,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       if (!empty($dataErrors)) {
         $errors['textFile'] = ts('The following errors were detected in %1:', array(
           1 => $name,
-          )) . ' <ul>' . implode('', $dataErrors) . '</ul>';
+        )) . ' <ul>' . implode('', $dataErrors) . '</ul>';
       }
     }
 

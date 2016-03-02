@@ -44,7 +44,13 @@ class CRM_Logging_Schema {
     'logging/contribute/summary',
   );
 
-  //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement
+  /**
+   * Columns that should never be subject to logging.
+   *
+   * CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement
+   *
+   * @var array
+   */
   private $exceptions = array(
     'civicrm_job' => array('last_run'),
     'civicrm_group' => array('cache_date', 'refresh_date'),
@@ -567,6 +573,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
 
     // rewrite the queries into CREATE TABLE queries for log tables:
     $cols = <<<COLS
+            ,
             log_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             log_conn_id INTEGER,
             log_user_id INTEGER,
@@ -587,7 +594,7 @@ COLS;
     // so there's no need for a default timestamp and therefore we remove such default timestamps
     // also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
     $query = self::fixTimeStampAndNotNullSQL($query);
-    $query = preg_replace("/^\) /m", "$cols\n) ", $query);
+    $query = preg_replace("/(,*\n*\) )ENGINE/m", "$cols\n) ENGINE", $query);
 
     CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
 
@@ -655,9 +662,7 @@ COLS;
    * @param bool $force
    */
   public function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
-    // check if we have logging enabled
-    $config =& CRM_Core_Config::singleton();
-    if (!$config->logging) {
+    if (!CRM_Core_Config::singleton()->logging) {
       return;
     }
 
@@ -742,13 +747,11 @@ COLS;
    * Disable logging temporarily.
    *
    * This allow logging to be temporarily disabled for certain cases
-   * where we want to do a mass cleanup but dont want to bother with
-   * an audit trail
+   * where we want to do a mass cleanup but do not want to bother with
+   * an audit trail.
    */
   public static function disableLoggingForThisConnection() {
-    // do this only if logging is enabled
-    $config = CRM_Core_Config::singleton();
-    if ($config->logging) {
+    if (CRM_Core_Config::singleton()->logging) {
       CRM_Core_DAO::executeQuery('SET @civicrm_disable_logging = 1');
     }
   }

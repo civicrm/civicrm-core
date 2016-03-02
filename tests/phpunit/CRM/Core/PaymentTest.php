@@ -25,11 +25,9 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Core_PaymentTest
+ * @group headless
  */
 class CRM_Core_PaymentTest extends CiviUnitTestCase {
 

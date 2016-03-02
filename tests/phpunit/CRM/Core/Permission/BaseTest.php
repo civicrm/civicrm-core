@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class CRM_Core_Permission_BaseTest
+ * @group headless
  */
 class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
 

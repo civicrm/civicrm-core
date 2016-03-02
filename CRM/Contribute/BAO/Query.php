@@ -583,6 +583,11 @@ class CRM_Contribute_BAO_Query {
         $query->_tables['civicrm_product'] = $query->_whereTables['civicrm_product'] = 1;
         return;
 
+      case 'contribution_is_payment':
+        $query->_where[$grouping][] = " civicrm_financial_trxn.is_payment $op $value";
+        $query->_tables['contribution_financial_trxn'] = $query->_whereTables['contribution_financial_trxn'] = 1;
+        return;
+
       default:
         //all other elements are handle in this case
         $fldName = substr($name, 13);
@@ -859,7 +864,7 @@ class CRM_Contribute_BAO_Query {
    * kills a small kitten so add carefully.
    */
   public static function selectorReturnProperties() {
-    return array(
+    $properties = array(
       'contact_type' => 1,
       'contact_sub_type' => 1,
       'sort_name' => 1,
@@ -882,6 +887,11 @@ class CRM_Contribute_BAO_Query {
       'contribution_product_id' => 1,
       'product_name' => 1,
     );
+    if (self::isSoftCreditOptionEnabled()) {
+      $properties = array_merge($properties, self::softCreditReturnProperties());
+    }
+
+    return $properties;
   }
 
   /**

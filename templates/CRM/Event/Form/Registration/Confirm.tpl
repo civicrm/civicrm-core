@@ -193,21 +193,6 @@
     </div>
     {/if}
 
-    {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout' and $paidEvent and !$is_pay_later and ! $isAmountzero and !$isOnWaitlist and !$isRequireApproval}
-        <fieldset><legend>{ts}Checkout with Google{/ts}</legend>
-            <div class="crm-section google_checkout-section">
-                <table class="form-layout-compressed">
-                  <tr>
-                    <td class="description">{ts}Click the Google Checkout button to continue.{/ts}</td>
-                  </tr>
-                  <tr>
-                    <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</span></td>
-                  </tr>
-                </table>
-            </div>
-        </fieldset>
-    {/if}
-
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>

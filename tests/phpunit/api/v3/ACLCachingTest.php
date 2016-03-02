@@ -25,13 +25,12 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * This class is intended to test ACL permission using the multisite module
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
+ * @group headless
  */
 class api_v3_ACLCachingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

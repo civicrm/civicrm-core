@@ -30,7 +30,7 @@
 /**
  *  Include parent class definition
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 
 /**
  *  Include class under test
@@ -52,6 +52,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *  Test contact custom search functions
  *
  * @package CiviCRM
+ * @group headless
  */
 class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = array(
@@ -89,8 +90,6 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testCount($fv, $count, $ids, $full) {
-    $this->foreignKeyChecksOff();
-
     $this->quickCleanup($this->_tablesToTruncate);
 
     // echo "testCount\n";

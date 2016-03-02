@@ -1,9 +1,10 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 require_once 'CiviTest/Contact.php';
 
 /**
  *  Include dataProvider for tests
+ * @group headless
  */
 class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 

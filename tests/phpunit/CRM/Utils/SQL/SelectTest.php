@@ -1,8 +1,8 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_Utils_SQL_SelectTest
+ * @group headless
  */
 class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
   public function testGetDefault() {

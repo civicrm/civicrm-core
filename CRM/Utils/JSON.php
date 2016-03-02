@@ -47,7 +47,7 @@ class CRM_Utils_JSON {
   }
 
   /**
-   * encode data for dataTable plugin.
+   * Do not use this function. See CRM-16353.
    * @deprecated
    *
    * @param array $params

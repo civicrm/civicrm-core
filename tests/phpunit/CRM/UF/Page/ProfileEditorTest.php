@@ -1,8 +1,8 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_UF_Page_ProfileEditorTest
+ * @group headless
  */
 class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
   public function setUp() {

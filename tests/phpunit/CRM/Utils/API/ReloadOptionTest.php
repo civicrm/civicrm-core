@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test that the API accepts the 'reload' option.
  *
@@ -9,6 +7,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * to munge the database. If the reload option is present, then the return value should reflect
  * the final SQL content (after calling hook_civicrm_post). If the reload option is missing,
  * then the return should reflect the inputted (unmodified) data.
+ * @group headless
  */
 class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
 

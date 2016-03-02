@@ -25,12 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for Template API - civicrm_msg_template*
  *
  * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   /**

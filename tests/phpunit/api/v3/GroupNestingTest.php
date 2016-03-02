@@ -25,13 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for GroupNesting API - civicrm_group_nesting_*
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_GroupNestingTest extends CiviUnitTestCase {
   protected $_apiversion;

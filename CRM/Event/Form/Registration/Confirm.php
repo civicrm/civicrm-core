@@ -304,44 +304,20 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //consider total amount.
     $this->assign('isAmountzero', ($this->_totalAmount <= 0) ? TRUE : FALSE);
 
-    // @todo this needs to GO! We are getting rid of references to processor types in the code base in favour of
-    // over-ride-able functions on them.
-    // The processor effectively has a 'buildForm' hook it can use if it needs to.
-    // The tricky thing is that we have no way of testing this code out - perhaps it hasn't worked for years!
-    if ($this->_paymentProcessor['payment_processor_type'] == 'Google_Checkout' && empty($this->_params[0]['is_pay_later']) && !($this->_params[0]['amount'] == 0) &&
-      !$this->_allowWaitlist && !$this->_requireApproval
-    ) {
-      $this->_checkoutButtonName = $this->getButtonName('next', 'checkout');
-      $this->add('image',
-        $this->_checkoutButtonName,
-        $this->_paymentProcessor['url_button'],
-        array('class' => 'crm-form-submit')
-      );
-
-      $this->addButtons(array(
-          array(
-            'type' => 'back',
-            'name' => ts('Go Back'),
-          ),
-        )
-      );
-    }
-    else {
-      $contribButton = ts('Continue');
-      $this->addButtons(array(
-          array(
-            'type' => 'back',
-            'name' => ts('Go Back'),
-          ),
-          array(
-            'type' => 'next',
-            'name' => $contribButton,
-            'isDefault' => TRUE,
-            'js' => array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"),
-          ),
-        )
-      );
-    }
+    $contribButton = ts('Continue');
+    $this->addButtons(array(
+        array(
+          'type' => 'back',
+          'name' => ts('Go Back'),
+        ),
+        array(
+          'type' => 'next',
+          'name' => $contribButton,
+          'isDefault' => TRUE,
+          'js' => array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"),
+        ),
+      )
+    );
 
     $defaults = array();
     $fields = array();

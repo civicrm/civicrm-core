@@ -1,9 +1,8 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
 
 /**
  * Class CRM_Core_BAO_IMTest
+ * @group headless
  */
 class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
   public function setUp() {

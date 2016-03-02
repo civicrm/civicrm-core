@@ -64,7 +64,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    *
    * @return array
    */
-  public function &actionLinks() {
+  public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
@@ -154,7 +154,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
 
       $ufField[$ufFieldBAO->id]['label'] = $ufFieldBAO->label;
 
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
       if ($ufFieldBAO->is_active) {
         $action -= CRM_Core_Action::ENABLE;
       }

@@ -243,7 +243,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param array $freezeOptions
    *
    * @return null
-   * @internal param bool $search true if used for search else false
    */
   public static function addQuickFormElement(
     &$qf,
@@ -314,10 +313,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $qf->assign('invoicing', $invoicing);
         }
         $priceVal = implode($seperator, array(
-            $customOption[$optionKey][$valueFieldName] + $taxAmount,
-            $count,
-            $max_value,
-          ));
+          $customOption[$optionKey][$valueFieldName] + $taxAmount,
+          $count,
+          $max_value,
+        ));
 
         $extra = array();
         if (!empty($qf->_membershipBlock) && !empty($qf->_quickConfig) && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
@@ -634,9 +633,9 @@ WHERE
     AND option_value.label = %2";
 
     $dao = CRM_Core_DAO::executeQuery($query, array(
-        1 => array($optionGroupName, 'String'),
-        2 => array($optionLabel, 'String'),
-      ));
+      1 => array($optionGroupName, 'String'),
+      2 => array($optionLabel, 'String'),
+    ));
 
     while ($dao->fetch()) {
       return $dao->id;

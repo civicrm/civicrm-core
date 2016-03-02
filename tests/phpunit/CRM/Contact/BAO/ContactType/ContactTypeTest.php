@@ -1,8 +1,8 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_Contact_BAO_ContactType_ContactTypeTest
+ * @group headless
  */
 class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
 
