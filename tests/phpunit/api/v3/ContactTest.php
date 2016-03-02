@@ -81,6 +81,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_phone',
       'civicrm_address',
       'civicrm_acl_contact_cache',
+      'civicrm_activity_contact',
+      'civicrm_activity',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -2832,13 +2834,44 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test merging 2 contacts.
+   *
+   * Someone kindly bequethed us the legacy of mixed up use of main_id & other_id
+   * in the params for contact.merge api.
+   *
+   * This test protects that legacy.
    */
-  public function testMerge() {
+  public function testMergeBizzareOldParams() {
+    $this->createLoggedInUser();
     $otherContact = $this->callAPISuccess('contact', 'create', $this->_params);
     $mainContact = $this->callAPISuccess('contact', 'create', $this->_params);
-    $this->callAPISuccess('contact', 'merge', array('main_id' => $mainContact['id'], 'other_id' => $otherContact['id']));
+    $this->callAPISuccess('contact', 'merge', array(
+      'main_id' => $mainContact['id'],
+      'other_id' => $otherContact['id'],
+    ));
     $contacts = $this->callAPISuccess('contact', 'get', $this->_params);
     $this->assertEquals($otherContact['id'], $contacts['id']);
+  }
+
+  /**
+   * Test merging 2 contacts.
+   */
+  public function testMerge() {
+    $this->createLoggedInUser();
+    $otherContact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $retainedContact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $this->callAPISuccess('contact', 'merge', array(
+      'to_keep_id' => $retainedContact['id'],
+      'to_remove_id' => $otherContact['id'],
+      'auto_flip' => FALSE,
+    ));
+
+    $contacts = $this->callAPISuccess('contact', 'get', $this->_params);
+    $this->assertEquals($retainedContact['id'], $contacts['id']);
+    $activity = $this->callAPISuccess('Activity', 'getsingle', array(
+      'target_contact_id' => $retainedContact['id'],
+      'activity_type_id' => 'Contact Merged',
+    ));
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($activity['activity_date_time'])));
 
   }
 
