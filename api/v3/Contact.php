@@ -1021,39 +1021,45 @@ function _civicrm_api3_contact_deprecation() {
  * @throws CiviCRM_API3_Exception
  */
 function civicrm_api3_contact_merge($params) {
-  $mode = CRM_Utils_Array::value('mode', $params, 'safe');
-  $autoFlip = CRM_Utils_Array::value('auto_flip', $params, TRUE);
-
-  $dupePairs = array(
-    array(
-      'srcID' => CRM_Utils_Array::value('main_id', $params),
-      'dstID' => CRM_Utils_Array::value('other_id', $params),
-    ),
-  );
-
-  if (($result = CRM_Dedupe_Merger::merge($dupePairs, array(), $mode, $autoFlip)) != FALSE) {
+  if (($result = CRM_Dedupe_Merger::merge(array(
+      array(
+        'srcID' => $params['to_remove_id'],
+        'dstID' => $params['to_keep_id'],
+      ),
+    ), array(), $params['mode'], $params['auto_flip'])) != FALSE) {
     return civicrm_api3_create_success($result, $params);
   }
   throw new CiviCRM_API3_Exception('Merge failed');
 }
 
 /**
- * Adjust metadata for contact_proximity api function.
+ * Adjust metadata for contact_merge api function.
  *
  * @param array $params
  */
 function _civicrm_api3_contact_merge_spec(&$params) {
-  $params['main_id'] = array(
+  $params['to_remove_id'] = array(
     'title' => 'ID of the contact to merge & remove',
     'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
+    'api.aliases' => array('main_id'),
   );
-  $params['other_id'] = array(
+  $params['to_keep_id'] = array(
     'title' => 'ID of the contact to keep',
     'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
+    'api.aliases' => array('other_id'),
+  );
+  $params['auto_flip'] = array(
+    'title' => 'Swap destination and source to retain lowest id?',
+    'api.default' => TRUE,
+  );
+  $params['mode'] = array(
+    // @todo need more detail on what this means.
+    'title' => 'Dedupe mode',
+    'api.default' => 'safe',
   );
 }
 
