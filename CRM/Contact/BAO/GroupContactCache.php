@@ -67,7 +67,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    */
   public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
-    $now = CRM_Utils_Date::getUTCTime();
+    $expiryTime =  date_format(date_create(CRM_Utils_Date::getUTCTime(-($smartGroupCacheTimeout * 60))), 'Y-m-d H:i:s');
 
     $query = "
 SELECT  g.id
@@ -75,9 +75,8 @@ FROM    civicrm_group g
 WHERE   ( g.saved_search_id IS NOT NULL OR g.children IS NOT NULL )
 AND     g.is_active = 1
 AND     ( g.cache_date IS NULL OR
-          ( TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout ) OR
-          ( $now >= g.refresh_date )
-        )
+          g.cache_date <= '$expiryTime'
+          )
 ";
 
     if (!$includeHiddenGroups) {
@@ -105,6 +104,7 @@ AND     ( g.cache_date IS NULL OR
    *   the sql query which lists the groups that need to be refreshed
    */
   public static function shouldGroupBeRefreshed($groupID, $includeHiddenGroups = FALSE) {
+
     $query = self::groupRefreshedClause("g.id = %1", $includeHiddenGroups);
     $params = array(1 => array($groupID, 'Integer'));
 
@@ -149,7 +149,7 @@ AND     ( g.cache_date IS NULL OR
     $limitClause = $orderClause = NULL;
     if ($limit > 0) {
       $limitClause = " LIMIT 0, $limit";
-      $orderClause = " ORDER BY g.cache_date, g.refresh_date";
+      $orderClause = " ORDER BY g.cache_date";
     }
     // We ignore hidden groups and disabled groups
     $query .= "
@@ -170,18 +170,6 @@ AND     ( g.cache_date IS NULL OR
           break;
         }
       }
-    }
-
-    if (!empty($refreshGroupIDs)) {
-      $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
-      $time = CRM_Utils_Date::getUTCTime(self::smartGroupCacheTimeout() * 60);
-      $query = "
-UPDATE civicrm_group g
-SET    g.refresh_date = $time
-WHERE  g.id IN ( {$refreshGroupIDString} )
-AND    g.refresh_date IS NULL
-";
-      CRM_Core_DAO::executeQuery($query);
     }
 
     if (empty($processGroupIDs)) {
@@ -255,20 +243,15 @@ AND    g.refresh_date IS NULL
       // also update the group with cache date information
       //make sure to give original timezone settings again.
       $now = CRM_Utils_Date::getUTCTime();
-      $refresh = 'null';
-    }
-    else {
-      $now = 'null';
-      $refresh = 'null';
-    }
-
-    $groupIDs = implode(',', $groupID);
-    $sql = "
-UPDATE civicrm_group
-SET    cache_date = $now, refresh_date = $refresh
-WHERE  id IN ( $groupIDs )
+      $setClause = "SET cache_date = '$now'";
+      $groupIDs = implode(',', $groupID);
+      $sql = "
+UPDATE civicrm_group " . $setClause . "
+WHERE id IN ( $groupIDs )
 ";
-    CRM_Core_DAO::executeQuery($sql);
+      CRM_Core_DAO::executeQuery($sql);
+
+    }
   }
 
   /**
@@ -316,8 +299,8 @@ WHERE  id IN ( $groupIDs )
     $params = array();
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
 
-    $now = CRM_Utils_Date::getUTCTime();
-    $refreshTime = CRM_Utils_Date::getUTCTime($smartGroupCacheTimeout * 60);
+    //expire everything older than this date/time
+    $expiryTime =  date_format(date_create(CRM_Utils_Date::getUTCTime(-($smartGroupCacheTimeout * 60))), 'Y-m-d H:i:s');
 
     if (!isset($groupID)) {
       if ($smartGroupCacheTimeout == 0) {
@@ -326,8 +309,7 @@ TRUNCATE civicrm_group_contact_cache
 ";
         $update = "
 UPDATE civicrm_group g
-SET    cache_date = null,
-       refresh_date = null
+SET    cache_date = null
 ";
       }
       else {
@@ -336,48 +318,40 @@ SET    cache_date = null,
 DELETE     gc
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
-WHERE      g.cache_date <= %1
+WHERE      g.cache_date <= '$expiryTime'
 ";
         $update = "
 UPDATE civicrm_group g
-SET    cache_date = null,
-       refresh_date = null
-WHERE  g.cache_date <= %1
+SET    cache_date = null
+WHERE  g.cache_date <= '$expiryTime'
 ";
-        $refresh = "
-UPDATE civicrm_group g
-SET    refresh_date = $refreshTime
-WHERE  g.cache_date > %1
-AND    refresh_date IS NULL
-";
-        $cacheTime = date('Y-m-d H-i-s', strtotime("- $smartGroupCacheTimeout minutes"));
-        $params = array(1 => array($cacheTime, 'String'));
       }
     }
     elseif (is_array($groupID)) {
       $groupIDs = implode(', ', $groupID);
       $query = "
-DELETE     g
-FROM       civicrm_group_contact_cache g
-WHERE      g.group_id IN ( $groupIDs )
+DELETE     gc
+FROM       civicrm_group_contact_cache gc
+INNER JOIN civicrm_group g ON g.id = gc.group_id
+WHERE      g.id IN ( $groupIDs )
+AND        g.cache_date <= '$expiryTime'
 ";
       $update = "
 UPDATE civicrm_group g
-SET    cache_date = null,
-       refresh_date = null
+SET    cache_date = null
 WHERE  id IN ( $groupIDs )
+AND (  g.cache_date <= '$expiryTime');
 ";
     }
     else {
       $query = "
-DELETE     g
-FROM       civicrm_group_contact_cache g
-WHERE      g.group_id = %1
+DELETE g
+FROM   civicrm_group_contact_cache g
+WHERE  g.group_id = %1
 ";
       $update = "
 UPDATE civicrm_group g
-SET    cache_date = null,
-       refresh_date = null
+SET    cache_date = null
 WHERE  id = %1
 ";
       $params = array(1 => array($groupID, 'Integer'));
