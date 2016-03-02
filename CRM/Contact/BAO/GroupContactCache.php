@@ -331,19 +331,22 @@ AND        g.cache_date <= '$expiryTime'
 UPDATE civicrm_group g
 SET    cache_date = null
 WHERE  id IN ( $groupIDs )
-AND (  g.cache_date <= '$expiryTime');
+AND    g.cache_date <= '$expiryTime';
 ";
     }
     else {
       $query = "
-DELETE g
-FROM   civicrm_group_contact_cache g
-WHERE  g.group_id = %1
+DELETE     gc
+FROM       civicrm_group_contact_cache gc
+INNER JOIN civicrm_group g ON g.id = gc.group_id
+WHERE      g.id = %1
+AND        g.cache_date <= '$expiryTime'
 ";
       $update = "
 UPDATE civicrm_group g
 SET    cache_date = null
 WHERE  id = %1
+AND    g.cache_date <= '$expiryTime'
 ";
       $params = array(1 => array($groupID, 'Integer'));
     }
