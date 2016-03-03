@@ -1025,7 +1025,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                 $this->_params['selectMembership'] = $params['selectMembership'] = CRM_Utils_Array::value('membership_type_id', $priceOptions[$selectedPriceOptionID]);
                 $this->set('selectMembership', $params['selectMembership']);
 
-                case 'contribution_amount':
+              case 'contribution_amount':
                 $params['amount'] = $selectedPriceOptionID;
                 if ($priceField->name == 'contribution_amount' ||
                     ($priceField->name == 'membership_amount' &&
