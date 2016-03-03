@@ -1019,6 +1019,7 @@ class CRM_Contribute_BAO_Query {
     $form->addElement('text', 'contribution_source', ts('Contribution Source'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'source'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE);
+    $form->addFormRule(array('CRM_Contribute_BAO_Query', 'formRule'), $form);
 
     $form->add('text', 'contribution_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('contribution_amount_low', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('9.99', ' '))), 'money');
@@ -1195,6 +1196,32 @@ class CRM_Contribute_BAO_Query {
       'civicrm_' . $table, $field, $fieldName[1], $title
     );
     return TRUE;
+  }
+
+  /**
+   * Check if the values in the date range are in correct chronological order.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $form
+   *
+   * @return bool|array
+   */
+  public static function formRule($fields, $files, $form) {
+    $errors = array();
+
+    if (empty($fields['contribution_date_high']) || empty($fields['contribution_date_low'])) {
+      return TRUE;
+    }
+    $lowDate = strtotime($fields['contribution_date_low']);
+    $highDate = strtotime($fields['contribution_date_high']);
+
+    if ($lowDate > $highDate) {
+      $errors['contribution_date'] = ts('Please check your Contribution Date Range.');
+      // remove this after errors starts working.
+      echo ts('Please check your Contribution Date Range.');
+    }
+    return empty($errors) ? TRUE : $errors;
   }
 
 }
