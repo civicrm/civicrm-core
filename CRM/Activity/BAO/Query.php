@@ -215,7 +215,21 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_type':
       case 'activity_status':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
+       
+       //string Data Types for activity_type are REGEX LIKE and NOT LIKE
+      $stringDataTypeOp = array('RLIKE', 'LIKE', 'NOT LIKE');
+
+      //get the correct dataType and field
+      if(in_array($op, $stringDataTypeOp)){
+        $field = "$name.label";
+        $dataType = 'String';
+      }else{
+        $field = "$name.value";
+        $dataType = 'Integer';
+      }
+
+      $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($field, $op, $value, $dataType);
+      
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$name]['title'], 2 => $op, 3 => $value));
         $query->_tables[$name] = $query->_whereTables[$name] = 1;
