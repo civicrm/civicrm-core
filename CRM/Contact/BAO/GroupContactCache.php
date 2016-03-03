@@ -286,7 +286,6 @@ WHERE id IN ( $groupIDs )
       unset(self::$_alreadyLoaded[$groupID]);
     }
 
-    $refresh = NULL;
     $params = array();
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
 
@@ -351,13 +350,10 @@ AND    g.cache_date <= '$expiryTime'
       $params = array(1 => array($groupID, 'Integer'));
     }
 
+    // Delete the group_contact_cache entries
     CRM_Core_DAO::executeQuery($query, $params);
 
-    if ($refresh) {
-      CRM_Core_DAO::executeQuery($refresh, $params);
-    }
-
-    // also update the cache_date for these groups
+    // Update the cache_date on the group table
     CRM_Core_DAO::executeQuery($update, $params);
   }
 
