@@ -1024,14 +1024,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               case 'membership_amount':
                 $this->_params['selectMembership'] = $params['selectMembership'] = CRM_Utils_Array::value('membership_type_id', $priceOptions[$selectedPriceOptionID]);
                 $this->set('selectMembership', $params['selectMembership']);
-                if (CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock) == 0) {
+
+                case 'contribution_amount':
+                $params['amount'] = $selectedPriceOptionID;
+                if ($priceField->name == 'contribution_amount' ||
+                    ($priceField->name == 'membership_amount' &&
+                      CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock) == 0)
+                ) {
                   $this->_values['amount'] = CRM_Utils_Array::value('amount', $priceOptions[$selectedPriceOptionID]);
                 }
-                break;
-
-              case 'contribution_amount':
-                $params['amount'] = $selectedPriceOptionID;
-                $this->_values['amount'] = CRM_Utils_Array::value('amount', $priceOptions[$selectedPriceOptionID]);
                 $this->_values[$selectedPriceOptionID]['value'] = CRM_Utils_Array::value('amount', $priceOptions[$selectedPriceOptionID]);
                 $this->_values[$selectedPriceOptionID]['label'] = CRM_Utils_Array::value('label', $priceOptions[$selectedPriceOptionID]);
                 $this->_values[$selectedPriceOptionID]['amount_id'] = CRM_Utils_Array::value('id', $priceOptions[$selectedPriceOptionID]);
@@ -1048,7 +1049,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
     $params['amount'] = self::computeAmount($params, $this->_values);
-
     if (($this->_values['is_pay_later'] &&
         empty($this->_paymentProcessor) &&
         !array_key_exists('hidden_processor', $params)) ||
