@@ -407,6 +407,20 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');
 
+    // Check for proportional cancelled payment against lineitems.
+    $minParams = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'] - 1,
+    );
+
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $minParams);
+    $amounts = array(-33.33, -16.67);
+
+    foreach ($eft['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($amounts));
+    }
+
+    // Check for proportional updated payment against lineitems.
     $params = array(
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'],
