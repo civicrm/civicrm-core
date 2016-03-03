@@ -55,7 +55,7 @@ class CRM_Contribute_Form_SoftCredit {
 
       //check if any honree profile is enabled if yes then assign its profile type to $_honoreeProfileType
       // which will be used to constraint soft-credit contact type in formRule, CRM-13981
-      if ($profileId[0] && $profileId[2] == 1) {
+      if (!empty($profileId[0]) && !empty($profileId[2])) {
         $form->_honoreeProfileType = CRM_Core_BAO_UFGroup::getContactType($profileId[0]);
       }
     }
