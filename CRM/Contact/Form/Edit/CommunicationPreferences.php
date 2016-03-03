@@ -166,7 +166,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
     // CRM-17778 -- set preferred_mail_format to default if unset
     if (empty($defaults['preferred_mail_format'])) {
-      $defaults['preferred_mail_format'] = array_search('Both', CRM_Core_SelectValues::pmf());
+      $defaults['preferred_mail_format'] = 'Both';
     }
 
     //set default from greeting types CRM-4575, CRM-9739
