@@ -1832,27 +1832,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
 
       CRM_Contact_BAO_Contact::createProfileContact($submitted, CRM_Core_DAO::$_nullArray, $mainId);
-      unset($submitted);
     }
 
     CRM_Utils_Hook::post('merge', 'Contact', $mainId, CRM_Core_DAO::$_nullObject);
-
-    // Create activity for merge.
-    $messageActivity = ts('Contact ID %1 has been merged and deleted.', array(1 => $otherId));
-    civicrm_api3('activity', 'create', array(
-      'subject' => $messageActivity,
-      'source_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
-      'target_contact_id' => $mainId,
-      'activity_type_id' => 'Contact Merged',
-      'status_id' => 'Completed',
-    ));
+    self::createMergeActivities($mainId, $otherId);
 
     return TRUE;
   }
 
   /**
+   * Get fields in the contact table suitable for merging.
+   *
    * @return array
-   *   Array of field names which will be compared, so everything except ID.
+   *   Array of field names to be potentially merged.
    */
   public static function getContactFields() {
     $contactFields = CRM_Contact_DAO_Contact::fields();
@@ -1927,6 +1919,34 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     while ($customValueTables->fetch()) {
       $cidRefs[$customValueTables->table_name] = array('entity_id');
     }
+  }
+
+  /**
+   * Create activities tracking the merge on affected contacts.
+   *
+   * @param int $mainId
+   * @param int $otherId
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function createMergeActivities($mainId, $otherId) {
+    $params = array(
+      1 => $otherId,
+      2 => $mainId,
+    );
+    $activity = civicrm_api3('activity', 'create', array(
+      'subject' => ts('Contact ID %1 has been merged and deleted.', $params),
+      'target_contact_id' => $mainId,
+      'activity_type_id' => 'Contact Merged',
+      'status_id' => 'Completed',
+    ));
+    civicrm_api3('activity', 'create', array(
+      'subject' => ts('Contact ID %1 has been merged into Contact ID %2 and deleted.', $params),
+      'target_contact_id' => $otherId,
+      'activity_type_id' => 'Contact Deleted by Merge',
+      'parent_id' => $activity['id'],
+      'status_id' => 'Completed',
+    ));
   }
 
 }

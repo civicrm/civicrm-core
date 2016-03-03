@@ -2872,6 +2872,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'activity_type_id' => 'Contact Merged',
     ));
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($activity['activity_date_time'])));
+    $activity2 = $this->callAPISuccess('Activity', 'getsingle', array(
+      'target_contact_id' => $otherContact['id'],
+      'activity_type_id' => 'Contact Deleted by Merge',
+    ));
+    $this->assertEquals($activity['id'], $activity2['parent_id']);
+    $this->assertEquals('Normal', civicrm_api3('option_value', 'getvalue', array(
+      'value' => $activity['priority_id'],
+      'return' => 'label',
+      'option_group_id' => 'priority',
+    )));
 
   }
 
