@@ -979,11 +979,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $$moniker = $result['values'][$cid];
     }
 
-    static $fields = array();
-    if (empty($fields)) {
-      $fields = CRM_Contact_DAO_Contact::fields();
-      CRM_Core_DAO::freeResult();
-    }
+    $fields = CRM_Contact_DAO_Contact::fields();
 
     // FIXME: there must be a better way
     foreach (array('main', 'other') as $moniker) {
