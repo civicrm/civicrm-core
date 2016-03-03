@@ -1008,6 +1008,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
+    $is_quick_config = 0;
     if (!empty($params['priceSetId'])) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
       if ($is_quick_config) {
@@ -1053,7 +1054,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         empty($this->_paymentProcessor) &&
         !array_key_exists('hidden_processor', $params)) ||
       (CRM_Utils_Array::value('payment_processor_id', $params) == 0)
-      && $params['amount'] != 0
+      && ($is_quick_config == 0 || $params['amount'] != 0)
     ) {
       $params['is_pay_later'] = 1;
     }
