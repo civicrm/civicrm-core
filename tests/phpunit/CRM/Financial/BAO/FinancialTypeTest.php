@@ -333,7 +333,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $whereClause = NULL;
     CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = array();
     CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
-    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,4,2)');  
+    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,4,2)');
   }
 
 }
