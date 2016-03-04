@@ -525,4 +525,5 @@ class CRM_Member_BAO_Query {
 
     return empty($errors) ? TRUE : $errors;
   }
+
 }
