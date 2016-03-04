@@ -1019,6 +1019,9 @@ class CRM_Contribute_BAO_Query {
     $form->addElement('text', 'contribution_source', ts('Contribution Source'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'source'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE);
+    // CRM-17602
+    // This hidden element added for displaying Date Range error correctly. Definitely a dirty hack, but... it works.
+    $form->addElement('hidden', 'contribution_date_range_error');
     $form->addFormRule(array('CRM_Contribute_BAO_Query', 'formRule'), $form);
 
     $form->add('text', 'contribution_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
@@ -1217,9 +1220,8 @@ class CRM_Contribute_BAO_Query {
     $highDate = strtotime($fields['contribution_date_high']);
 
     if ($lowDate > $highDate) {
-      $errors['contribution_date'] = ts('Please check your Contribution Date Range.');
-      // remove this after errors starts working.
-      echo ts('Please check your Contribution Date Range.');
+
+      $errors['contribution_date_range_error'] = ts('Please check that your Date Range is in correct chronological order.');
     }
     return empty($errors) ? TRUE : $errors;
   }
