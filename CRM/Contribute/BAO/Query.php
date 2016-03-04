@@ -1220,7 +1220,6 @@ class CRM_Contribute_BAO_Query {
     $highDate = strtotime($fields['contribution_date_high']);
 
     if ($lowDate > $highDate) {
-
       $errors['contribution_date_range_error'] = ts('Please check that your Date Range is in correct chronological order.');
     }
     return empty($errors) ? TRUE : $errors;
