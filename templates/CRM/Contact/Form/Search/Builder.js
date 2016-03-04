@@ -123,7 +123,11 @@
       }
     }
     $.each(CRM.searchBuilder.fieldOptions[field], function(key, option) {
-      var selected = ($.inArray(''+option.key, options) > -1) ? 'selected="selected"' : '';
+      var optionKey = option.key;
+      if ($.inArray(field, CRM.searchBuilder.searchByLabelFields) >= 0) {
+        optionKey = option.value;
+      }
+      var selected = ($.inArray(''+optionKey, options) > -1) ? 'selected="selected"' : '';
       select.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
     });
     select.change();
