@@ -243,12 +243,15 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @return array
    */
   public static function getSoftContributionTotals($contact_id, $isTest = 0) {
-    $query = '
+    
+    $whereClause = "AND cc.cancel_date IS NULL";
+    
+    $query = "
     SELECT SUM(amount) as amount, AVG(total_amount) as average, cc.currency
     FROM civicrm_contribution_soft  ccs
       LEFT JOIN civicrm_contribution cc ON ccs.contribution_id = cc.id
-    WHERE cc.is_test = %2 AND ccs.contact_id = %1
-    GROUP BY currency';
+    WHERE cc.is_test = %2 AND ccs.contact_id = %1 {$whereClause}
+    GROUP BY currency";
 
     $params = array(
       1 => array($contact_id, 'Integer'),
@@ -258,7 +261,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $cs = CRM_Core_DAO::executeQuery($query, $params);
 
     $count = 0;
-    $amount = $average = array();
+    $amount = $average = $cancelAmount = array();
 
     while ($cs->fetch()) {
       if ($cs->amount > 0) {
@@ -268,12 +271,23 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         $currency[] = $cs->currency;
       }
     }
-
+    
+    //to get cancel amount
+    $cancelAmountWhereClause = "AND cc.cancel_date IS NOT NULL";
+    $query = str_replace($whereClause, $cancelAmountWhereClause, $query);
+    $cancelAmountSQL  = CRM_Core_DAO::executeQuery($query, $params);
+    while ($cancelAmountSQL->fetch()) {
+      if ($cancelAmountSQL->amount > 0) {
+        $cancelAmount[] = $cancelAmountSQL->amount;
+      }
+    }
+    
     if ($count > 0) {
       return array(
         implode(',&nbsp;', $amount),
         implode(',&nbsp;', $average),
         implode(',&nbsp;', $currency),
+        implode(',&nbsp;', $cancelAmount),
       );
     }
     return array(0, 0);
