@@ -317,13 +317,18 @@ WHERE cpse.id IS NOT NULL {$where}";
         1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -', 'String'),
         2 => array(CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -', 'String'),
       );
+      $participantIds = array();
       if (!empty($lineItem->contribution_id)) {
         CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution` SET `amount_level` = REPLACE(amount_level, %1, %2) WHERE id = {$lineItem->contribution_id}", $params);
         $participantIds = CRM_Event_BAO_Participant::getParticipantIds($lineItem->contribution_id);
-        foreach ($participantIds as $key => $id) {
-          if (!empty($id)) {
-            CRM_Core_DAO::executeQuery("UPDATE `civicrm_participant` SET `fee_level` = REPLACE(fee_level, %1, %2) WHERE id = {$id}", $params);
-          }
+      }
+      // if contribution is not attached to the participant.
+      if (empty($participantIds) && $lineItem->entity_table == 'civicrm_participant') {
+        $participantIds[] = $lineItem->entity_id;
+      }
+      foreach ($participantIds as $key => $id) {
+        if (!empty($id)) {
+          CRM_Core_DAO::executeQuery("UPDATE `civicrm_participant` SET `fee_level` = REPLACE(fee_level, %1, %2) WHERE id = {$id}", $params);
         }
       }
     }
