@@ -1342,4 +1342,40 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='crm-contact-thumbnail']/div/a/img"));
   }
 
+  public function testOnBehalfSetDefaults() {
+    $this->webtestLogin();
+    $hash = substr(sha1(rand()), 0, 7);
+    $pageTitle = 'Donate Online ' . $hash;
+    $rand = 2 * rand(2, 50);
+
+    // go to the New Contribution Page page
+    $this->openCiviPage('admin/contribute', 'action=add&reset=1');
+
+    // fill in step 1 (Title and Settings)
+    $this->type('title', $pageTitle);
+
+    //to select financial type
+    $this->select('financial_type_id', "label=Donation");
+    $this->clickLink('_qf_Settings_next');
+
+    $this->click('link=Profiles');
+    $this->waitForElementPresent('_qf_Custom_next-bottom');
+    $this->select('css=tr.crm-contribution-contributionpage-custom-form-block-custom_pre_id span.crm-profile-selector-select select', "value=1");
+    $this->click('_qf_Custom_next-bottom');
+    $this->waitForElementPresent('_qf_Custom_next-bottom');
+
+    $this->click('link=Title');
+    $this->waitForElementPresent('_qf_Settings_next');
+    $this->click('is_organization');
+    $this->clickLink('_qf_Settings_next');
+    $this->waitForElementPresent('_qf_Settings_next');
+    $this->click('is_organization');
+    $this->clickLink('_qf_Settings_next');
+    $this->waitForElementPresent('_qf_Settings_next');
+    $this->click('is_organization');
+    $this->waitForElementPresent("xpath=//*[@id='select2-chosen-2']");
+    $sel = $this->getText("xpath=//*[@id='select2-chosen-2']");
+    $this->assertEquals($sel, 'On Behalf Of Organization');
+  }
+
 }
