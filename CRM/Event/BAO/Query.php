@@ -611,6 +611,10 @@ class CRM_Event_BAO_Query {
 
     CRM_Core_Form_Date::buildDateRange($form, 'participant', 1, '_register_date_low', '_register_date_high', ts('From'), FALSE);
 
+    $form->addElement('hidden', 'event_date_range_error');
+    $form->addElement('hidden', 'participant_date_range_error');
+    $form->addFormRule(array('CRM_Event_BAO_Query', 'formRule'), $form);
+
     $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', array(1 => '<em>%1</em>')));
 
     $form->addSelect('participant_status_id',
@@ -675,6 +679,37 @@ class CRM_Event_BAO_Query {
     if (!empty($tables['civicrm_event'])) {
       $tables = array_merge(array('civicrm_participant' => 1), $tables);
     }
+  }
+
+  /**
+   * Check if the values in the date range are in correct chronological order.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $form
+   *
+   * @return bool|array
+   */
+  public static function formRule($fields, $files, $form) {
+    $errors = array();
+
+    if ((empty($fields['event_start_date_low']) || empty($fields['event_end_date_high'])) && (empty($fields['participant_register_date_low']) || empty($fields['participant_register_date_high']))) {
+      return TRUE;
+    }
+    $lowDate = strtotime($fields['event_start_date_low']);
+    $highDate = strtotime($fields['event_end_date_high']);
+
+    if ($lowDate > $highDate) {
+      $errors['event_date_range_error'] = ts('Please check that your Event Date Range is in correct chronological order.');
+    }
+
+    $lowDate1 = strtotime($fields['participant_register_date_low']);
+    $highDate1 = strtotime($fields['participant_register_date_high']);
+
+    if ($lowDate1 > $highDate1) {
+      $errors['participant_date_range_error'] = ts('Please check that your Registration Date Range is in correct chronological order.');
+    }
+    return empty($errors) ? TRUE : $errors;
   }
 
 }
