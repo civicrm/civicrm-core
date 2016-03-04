@@ -1,0 +1,58 @@
+// $Id: CHANGELOG.txt,v 1.1.2.2 2008/09/01 04:43:43 posco Exp $
+
+civimember_roles 6.x-3.0-beta1
+_____________________________________
+
+- This is the first version of CiviMember Roles that works with Drupal 6.x 
+  and CiviCRM 2.1 alpha.
+
+
+civimember_roles 5.x-2.0
+_____________________________________
+
+- This version works for CiviCRM 2.0 and Drupal 5.x. Use version 
+  5.x-1.2 if you are using CiviCRM 1.9 and Drupal 5.x.
+
+
+civimember_roles 5.x-2.0-alpha2
+_____________________________________
+
+- Bug fixes from version 1.1 have been merged into version 2.0.
+
+
+civimember_roles 5.x-2.0-alpha1
+_____________________________________
+
+- This release has all the same features as the 1.0 release but it works 
+  with CiviCRM 2.0 alpha 3 and Drupal 5.x.
+
+
+civimember_roles 5.x-1.2
+_____________________________________
+
+- Major code revision. Drupal UID to CiviCRM Contact ID is done my the 
+  CRM_Core_BAO_UFMatch class now instead of by email. This should increase stability.
+- Added initial watchdog error reporting.
+- Permission work-around implemented. Normal users can now apply roles 
+  using various synchronize methods.
+
+
+civimember_roles 5.x-1.1
+_____________________________________
+
+- #217237 by posco: Fixes a critical bug that prevents hook_cron() from 
+  running the sync function. Thanks to rallycivic for finding this bug.
+- #217201 by rallycivic: Fixed a bug that caused synchronization to fail if a 
+  Drupal user doesn't exist for every CiviCRM Contact.
+
+
+civimember_roles 5.x-1.0
+_____________________________________
+
+- Beta status was lifted
+
+
+civimember_roles 5.x-1.0-beta1
+_____________________________________
+
+- Initial version published on Drupal.org.

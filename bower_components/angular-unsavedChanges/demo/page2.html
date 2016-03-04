@@ -1,0 +1,33 @@
+<div>
+<h1>Page 2</h1>
+<div ng-controller="demoCtrl">
+    <form name="demoForm1" ng-submit="demoFormSubmit()" novalidate unsaved-warning-form>
+        <legend>Form 1</legend>
+        <input type="text" name="name" ng-model="user1.name">
+        <button type="submit">Submit Form</button>
+        <button id="clear" type="button" unsaved-warning-clear>Disregard Form 1 Changes</button>
+    </form>
+    <p>Is Form 1 Dirty?: {{demoForm1.$dirty}}</p>
+    <p ng-show="message">Message: {{message}}</p>
+</div>
+<div ng-controller="demoCtrl">
+    <form name="demoForm2" ng-submit="demoFormSubmit()" novalidate unsaved-warning-form>
+        <legend>Form 2</legend>
+        <input type="text" name="name" ng-model="user2.name">
+        <button type="submit">Submit Form</button>
+    </form>
+    <p>Is Form 2 Dirty?: {{demoForm2.$dirty}}</p>
+    <p ng-show="message">Message: {{message}}</p>
+</div>
+<div ng-controller="demoCtrl">
+    <form name="demoForm3" ng-submit="demoFormSubmit()" novalidate unsaved-warning-form>
+        <legend>Form 3</legend>
+        <input type="text" name="name" ng-model="user3.name">
+        <button type="submit">Submit Form</button>
+        <button type="button" unsaved-warning-clear>Disregard Form 3 Changes</button>
+    </form>
+    <p>Is Form 3 Dirty?: {{demoForm3.$dirty}}</p>
+    <p ng-show="message">Message: {{message}}</p>
+</div>
+
+</div>

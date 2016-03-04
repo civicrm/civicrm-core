@@ -1,0 +1,97 @@
+name = CiviCRM
+description = Constituent relationship management system. Allows sites to manage contacts, relationships and groups, and track contact activities, contributions, memberships and events. See the <a href="https://civicrm.org/">CiviCRM website</a> for more information.
+version = 7.x-4.6.14.0
+package = CiviCRM
+core = 7.x
+project = civicrm
+php = 5.3
+
+files[] = civicrm.module
+files[] = civicrm.install
+files[] = civicrm_user.inc
+
+; views handlers
+files[] = modules/views/civicrm.views.inc
+files[] = modules/views/civicrm.views_default.inc
+
+; field handlers
+files[] = modules/views/civicrm/civicrm_handler_field.inc
+files[] = modules/views/civicrm/civicrm_handler_field_pseudo_constant.inc
+files[] = modules/views/civicrm/civicrm_handler_field_address.inc
+files[] = modules/views/civicrm/civicrm_handler_field_component.inc
+files[] = modules/views/civicrm/civicrm_handler_field_contact_link.inc
+files[] = modules/views/civicrm/civicrm_handler_field_county.inc
+files[] = modules/views/civicrm/civicrm_handler_field_country.inc
+files[] = modules/views/civicrm/civicrm_handler_field_custom.inc
+files[] = modules/views/civicrm/civicrm_handler_field_datetime.inc
+files[] = modules/views/civicrm/civicrm_handler_field_drupalid.inc
+files[] = modules/views/civicrm/civicrm_handler_field_email.inc
+files[] = modules/views/civicrm/civicrm_handler_field_encounter_medium.inc
+files[] = modules/views/civicrm/civicrm_handler_field_event.inc
+files[] = modules/views/civicrm/civicrm_handler_field_event_link.inc
+files[] = modules/views/civicrm/civicrm_handler_field_event_price_set.inc
+files[] = modules/views/civicrm/civicrm_handler_field_file.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_activity.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_contact.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_contribution.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_delete.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_edit.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_event.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_participant.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_pcp.inc
+files[] = modules/views/civicrm/civicrm_handler_field_link_relationship.inc
+files[] = modules/views/civicrm/civicrm_handler_field_location.inc
+files[] = modules/views/civicrm/civicrm_handler_field_mail.inc
+files[] = modules/views/civicrm/civicrm_handler_field_markup.inc
+files[] = modules/views/civicrm/civicrm_handler_field_money.inc
+files[] = modules/views/civicrm/civicrm_handler_field_option.inc
+files[] = modules/views/civicrm/civicrm_handler_field_pcp_raised_amount.inc
+files[] = modules/views/civicrm/civicrm_handler_field_phone.inc
+files[] = modules/views/civicrm/civicrm_handler_field_prefix.inc
+files[] = modules/views/civicrm/civicrm_handler_field_relationship_type.inc
+files[] = modules/views/civicrm/civicrm_handler_field_state.inc
+files[] = modules/views/civicrm/civicrm_handler_field_suffix.inc
+files[] = modules/views/civicrm/civicrm_handler_field_custom_file.inc
+files[] = modules/views/civicrm/civicrm_handler_field_contact_image.inc
+
+; filter handlers
+files[] = modules/views/civicrm/civicrm_handler_filter_pseudo_constant.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_custom_option.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_datetime.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_encounter_medium.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_group_status.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_custom_option.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_custom_single_option.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_prefix.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_relationship_type.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_suffix.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_country_multi.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_state_multi.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_domain.inc
+
+; activity handlers
+files[] = modules/views/civicrm/civicrm_handler_field_activity.inc
+
+; sort handlers
+files[] = modules/views/civicrm/civicrm_handler_sort_date.inc
+files[] = modules/views/civicrm/civicrm_handler_sort_pcp_raised_amount.inc
+
+; argument handlers
+files[] = modules/views/civicrm/civicrm_plugin_argument_default.inc
+files[] = modules/views/civicrm/views_handler_argument_civicrm_day.inc
+files[] = modules/views/civicrm/views_handler_argument_civicrm_fulldate.inc
+files[] = modules/views/civicrm/views_handler_argument_civicrm_month.inc
+files[] = modules/views/civicrm/views_handler_argument_civicrm_week.inc
+files[] = modules/views/civicrm/views_handler_argument_civicrm_year.inc
+files[] = modules/views/civicrm/views_handler_argument_civicrm_year_month.inc
+
+; relationship handlers
+files[] = modules/views/civicrm/civicrm_handler_relationship.inc
+files[] = modules/views/civicrm/civicrm_handler_relationship_relationship.inc
+files[] = modules/views/civicrm/civicrm_handler_relationship_contact2users.inc
+
+; views plugins
+files[] = modules/views/plugins/calendar_plugin_row_civicrm.inc
+files[] = modules/views/plugins/calendar_plugin_row_civicrm_event.inc
+files[] = modules/views/plugins/civicrm_plugin_argument_default_civicrm_id.inc
