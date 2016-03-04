@@ -310,8 +310,10 @@ WHERE cpse.id IS NOT NULL {$where}";
     $lineItem->label = $prevLabel;
     $lineItem->find();
     while ($lineItem->fetch()) {
-      $lineItem->label = $newLabel;
-      $lineItem->save();
+      $lineItemParams['id'] = $lineItem->id;
+      $lineItemParams['label'] = $newLabel;
+      CRM_Price_BAO_LineItem::create($lineItemParams);
+
       // update amount and fee level in civicrm_contribution and civicrm_participant
       $params = array(
         1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -', 'String'),
