@@ -158,7 +158,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       TRUE, 'currency', $this->_subscriptionDetails->currency, TRUE
     );
 
-    $this->add('text', 'installments', ts('Number of Installments'), array('size' => 20), TRUE);
+    $this->add('text', 'installments', ts('Number of Installments'), array('size' => 20), FALSE);
 
     if ($this->_donorEmail) {
       $this->add('checkbox', 'is_notify', ts('Notify Contributor?'));

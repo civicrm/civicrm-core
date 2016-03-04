@@ -630,7 +630,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $links = self::links($this->_context, $this->_contextMenu, $this->_key);
 
     //check explicitly added contact to a Smart Group.
-    $groupID = CRM_Utils_Array::key('1', $this->_formValues['group']);
+    $groupID = CRM_Utils_Array::value('group', $this->_formValues);
 
     $pseudoconstants = array();
     // for CRM-3157 purposes

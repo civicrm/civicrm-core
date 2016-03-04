@@ -2247,6 +2247,11 @@ WHERE  contribution_id = %1 ";
     }
     // todo remove strtolower - check consistency
     if (strtolower($this->_component) == 'event') {
+
+      if (!empty($ids['contribution'])) {
+        $values['contributionId'] = $ids['contribution'];
+      }
+
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
         $this->_relatedObjects['participant']->id, $this->is_test, $returnMessageText
       );
@@ -3764,6 +3769,20 @@ WHERE con.id = {$contributionId}
     if ($result->N > 1) {
       $errors['financial_type_id'] = ts('One or more line items have a different financial type than the contribution. Editing the financial type is not yet supported in this situation.');
     }
+  }
+
+  /**
+   * Is there only one line item attached to the contribution.
+   *
+   * @param int $id
+   *   Contribution ID.
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function isSingleLineItem($id) {
+    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('contribution_id' => $id));
+    return ($lineItemCount == 1);
   }
 
   /**

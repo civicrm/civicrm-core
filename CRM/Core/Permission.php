@@ -838,6 +838,14 @@ class CRM_Core_Permission {
         $prefix . ts('view my invoices'),
         ts('Allow users to view/ download their own invoices'),
       ),
+      'edit api keys' => array(
+        $prefix . ts('edit api keys'),
+        ts('Edit API keys'),
+      ),
+      'edit own api keys' => array(
+        $prefix . ts('edit own api keys'),
+        ts('Edit user\'s own API keys'),
+      ),
     );
 
     return $permissions;

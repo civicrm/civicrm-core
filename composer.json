@@ -6,6 +6,7 @@
       "Civi\\": [".", "tests/phpunit/"]
     }
   },
+  "include-path": ["vendor/tecnickcom"],
   "require": {
     "dompdf/dompdf" : "0.6.*",
     "symfony/dependency-injection": "2.3.*",
@@ -13,15 +14,18 @@
     "symfony/process": "2.3.*",
     "psr/log": "1.0.0",
     "symfony/finder": "2.3.*",
+    "tecnickcom/tcpdf" : "6.2.*",
     "totten/ca-config": "~13.02",
     "civicrm/civicrm-cxn-rpc": "~0.15.12.04"
   },
   "scripts": {
     "post-install-cmd": [
-      "bash tools/scripts/composer/dompdf-cleanup.sh"
+      "bash tools/scripts/composer/dompdf-cleanup.sh",
+      "bash tools/scripts/composer/tcpdf-cleanup.sh"
     ],
     "post-update-cmd": [
-      "bash tools/scripts/composer/dompdf-cleanup.sh"
+      "bash tools/scripts/composer/dompdf-cleanup.sh",
+      "bash tools/scripts/composer/tcpdf-cleanup.sh"
     ]
   }
 }
