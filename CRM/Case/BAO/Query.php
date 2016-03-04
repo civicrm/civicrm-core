@@ -692,7 +692,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $form->addElement('hidden', 'case_to_date_range_error');
     $form->addFormRule(array('CRM_Case_BAO_Query', 'formRule'), $form);
 
-
     $form->assign('validCiviCase', TRUE);
 
     //give options when all cases are accessible.

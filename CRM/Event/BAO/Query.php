@@ -285,7 +285,7 @@ class CRM_Event_BAO_Query {
               $value = $extractEventId[2];
               $where = $query->_where[$grouping][$key];
             }
-            else if (strstr($val, 'civicrm_event.id IN')) {
+            elseif (strstr($val, 'civicrm_event.id IN')) {
               //extract the first event id if multiple events are selected
               preg_match('/civicrm_event.id IN \(\"(\d+)/', $val, $matches);
               $value = $matches[1];
@@ -296,7 +296,7 @@ class CRM_Event_BAO_Query {
             $extractEventId = explode(" ", $exEventId);
             $value = $extractEventId[2];
           }
-          else if(!empty($matches[1])) {
+          elseif (!empty($matches[1])) {
             $value = $matches[1];
           }
           $where = $query->_where[$grouping][$key];

@@ -581,4 +581,5 @@ class CRM_Activity_BAO_Query {
     }
     return empty($errors) ? TRUE : $errors;
   }
+
 }
