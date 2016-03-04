@@ -764,10 +764,10 @@ case_relation_type.id = case_relationship.relationship_type_id )";
       $errors['case_from_date_range_error'] = ts('Please check that your Case Start Date Range is in correct chronological order.');
     }
 
-    $lowDate = strtotime($fields['case_to_end_date_low']);
-    $highDate = strtotime($fields['case_to_end_date_high']);
+    $lowDate1 = strtotime($fields['case_to_end_date_low']);
+    $highDate1 = strtotime($fields['case_to_end_date_high']);
 
-    if ($lowDate > $highDate) {
+    if ($lowDate1 > $highDate1) {
       $errors['case_to_date_range_error'] = ts('Please check that your Case End Date Range is in correct chronological order.');
     }
     return empty($errors) ? TRUE : $errors;
