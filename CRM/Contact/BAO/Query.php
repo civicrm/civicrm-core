@@ -1583,8 +1583,6 @@ class CRM_Contact_BAO_Query {
    */
   public static function legacyConvertFormValues($id, &$values) {
     $legacyElements = array(
-      'membership_type_id',
-      'membership_status_id',
       'activity_type_id',
       'location_type',
     );
