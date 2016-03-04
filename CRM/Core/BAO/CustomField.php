@@ -1624,7 +1624,7 @@ SELECT id
         $fileDAO = new CRM_Core_DAO_File();
         $fileDAO->id = $value;
         $fileDAO->find(TRUE);
-        if ($fileDAO->N){
+        if ($fileDAO->N) {
           $fileID = $value;
           $fName = $fileDAO->uri;
           $mimeType = $fileDAO->mime_type;
