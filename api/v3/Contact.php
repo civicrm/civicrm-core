@@ -62,6 +62,18 @@ function civicrm_api3_contact_create($params) {
     return $values;
   }
 
+  if (array_key_exists('api_key', $params) && !empty($params['check_permissions'])) {
+    if (CRM_Core_Permission::check('edit api keys') || CRM_Core_Permission::check('administer CiviCRM')) {
+      // OK
+    }
+    elseif ($contactID && CRM_Core_Permission::check('edit own api keys') && CRM_Core_Session::singleton()->get('userID') == $contactID) {
+      // OK
+    }
+    else {
+      throw new API_Exception('Permission denied to modify api key');
+    }
+  }
+
   if (!$contactID) {
     // If we get here, we're ready to create a new contact
     if (($email = CRM_Utils_Array::value('email', $params)) && !is_array($params['email'])) {
