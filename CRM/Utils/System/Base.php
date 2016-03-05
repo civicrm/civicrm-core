@@ -50,6 +50,12 @@ abstract class CRM_Utils_System_Base {
    */
   var $supports_form_extensions = FALSE;
 
+  public function initialize() {
+    if (\CRM_Utils_System::isSSL()) {
+      $this->mapConfigToSSL();
+    }
+  }
+
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb.
    *
@@ -112,8 +118,6 @@ abstract class CRM_Utils_System_Base {
    *   Useful for links that will be displayed outside the site, such as in an RSS feed.
    * @param string $fragment
    *   A fragment identifier (named anchor) to append to the link.
-   * @param bool $htmlize
-   *   Whether to encode special html characters such as &.
    * @param bool $frontend
    *   This link should be to the CMS front end (applies to WP & Joomla).
    * @param bool $forceBackend
@@ -126,7 +130,6 @@ abstract class CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
@@ -284,6 +287,33 @@ abstract class CRM_Utils_System_Base {
     return 'left';
   }
 
+  public function getAbsoluteBaseURL() {
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      return FALSE;
+    }
+
+    $url = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
+
+    //format url for language negotiation, CRM-7803
+    $url = $this->languageNegotiationURL($url);
+
+    if (CRM_Utils_System::isSSL()) {
+      $url = str_replace('http://', 'https://', $url);
+    }
+
+    return $url;
+  }
+
+  public function getRelativeBaseURL() {
+    $absoluteBaseURL = $this->getAbsoluteBaseURL();
+    if ($absoluteBaseURL === FALSE) {
+      return FALSE;
+    }
+    $parts = parse_url($absoluteBaseURL);
+    return $parts['path'];
+    //$this->useFrameworkRelativeBase = empty($base['path']) ? '/' : $base['path'];
+  }
+
   /**
    * Get CMS Version.
    *
@@ -391,6 +421,10 @@ abstract class CRM_Utils_System_Base {
   public function getUfId($username) {
     $className = get_class($this);
     throw new CRM_Core_Exception("Not implemented: {$className}->getUfId");
+  }
+
+  public function setUFLocale($civicrm_language) {
+    return TRUE;
   }
 
   /**
@@ -516,6 +550,115 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Determine the default location for file storage.
+   *
+   * FIXME:
+   *  1. This was pulled out from a bigger function. It should be split
+   *     into even smaller pieces and marked abstract.
+   *  2. This would be easier to compute by a calling a CMS API, but
+   *     for whatever reason Civi gets it from config data.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/foo.com/files/civicrm"
+   *   - path: string. ex: "/var/www/sites/foo.com/files/civicrm"
+   */
+  public function getDefaultFileStorage() {
+    global $civicrm_root;
+    $config = CRM_Core_Config::singleton();
+    $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+
+    $filesURL = NULL;
+    $filesPath = NULL;
+
+    if ($config->userFramework == 'Joomla') {
+      // gross hack
+      // we need to remove the administrator/ from the end
+      $tempURL = str_replace("/administrator/", "/", $baseURL);
+      $filesURL = $tempURL . "media/civicrm/";
+    }
+    elseif ($this->is_drupal) {
+      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
+      if ($siteName) {
+        $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
+      }
+      else {
+        $filesURL = $baseURL . "sites/default/files/civicrm/";
+      }
+    }
+    elseif ($config->userFramework == 'UnitTests') {
+      $filesURL = $baseURL . "sites/default/files/civicrm/";
+    }
+    else {
+      throw new CRM_Core_Exception("Failed to locate default file storage ($config->userFramework)");
+    }
+
+    return array(
+      'url' => $filesURL,
+      'path' => CRM_Utils_File::baseFilePath(),
+    );
+  }
+
+  /**
+   * Determine the location of the CiviCRM source tree.
+   *
+   * FIXME:
+   *  1. This was pulled out from a bigger function. It should be split
+   *     into even smaller pieces and marked abstract.
+   *  2. This would be easier to compute by a calling a CMS API, but
+   *     for whatever reason we take the hard way.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
+   */
+  public function getCiviSourceStorage() {
+    global $civicrm_root;
+    $config = CRM_Core_Config::singleton();
+
+    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
+    // More generally, w shouldn't be using $config here.
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+    $baseURL = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
+    if (CRM_Utils_System::isSSL()) {
+      $baseURL = str_replace('http://', 'https://', $baseURL);
+    }
+
+    if ($config->userFramework == 'Joomla') {
+      $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
+    }
+    elseif ($config->userFramework == 'WordPress') {
+      $userFrameworkResourceURL = CIVICRM_PLUGIN_URL . "civicrm/";
+    }
+    elseif ($this->is_drupal) {
+      // Drupal setting
+      // check and see if we are installed in sites/all (for D5 and above)
+      // we dont use checkURL since drupal generates an error page and throws
+      // the system for a loop on lobo's macosx box
+      // or in modules
+      $cmsPath = $config->userSystem->cmsRootPath();
+      $userFrameworkResourceURL = $baseURL . str_replace("$cmsPath/", '',
+          str_replace('\\', '/', $civicrm_root)
+        );
+
+      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
+      if ($siteName) {
+        $civicrmDirName = trim(basename($civicrm_root));
+        $userFrameworkResourceURL = $baseURL . "sites/$siteName/modules/$civicrmDirName/";
+      }
+    }
+    else {
+      $userFrameworkResourceURL = NULL;
+    }
+
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    );
+  }
+
+  /**
    * Perform any post login activities required by the CMS.
    *
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
@@ -547,10 +690,6 @@ abstract class CRM_Utils_System_Base {
    */
   public function getTimeZoneOffset() {
     $timezone = $this->getTimeZoneString();
-    if (preg_match('/[0-9][0-9]:[0-9][0-9]/', $timezone))
-    {
-        return $timezone; // the time zone is already a numeric offset, so we don't need to do any more.
-    }
     if ($timezone) {
       if ($timezone == 'UTC') {
         // CRM-17072 Let's short-circuit all the zero handling & return it here!
@@ -559,14 +698,14 @@ abstract class CRM_Utils_System_Base {
       $tzObj = new DateTimeZone($timezone);
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
-      // Europe/London in winter has an offset of zero.
-      if ($tz===false) {
+
+      if (empty($tz)) {
         return FALSE;
       }
 
       $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
 
-      if ($tz >= 0) {  // $tz is a number, not a string, so it is better to test it.  00:00 needs a plus sigh.
+      if ($timeZoneOffset > 0) {
         $timeZoneOffset = '+' . $timeZoneOffset;
       }
       return $timeZoneOffset;
@@ -735,7 +874,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Log error to CMS.
    *
-   * $param string $message
+   * @param string $message
    */
   public function logger($message) {
   }
@@ -746,6 +885,25 @@ abstract class CRM_Utils_System_Base {
    * @param array $list
    */
   public function appendCoreResources(&$list) {
+  }
+
+  /**
+   * @param string $name
+   * @param string $value
+   */
+  public function setHttpHeader($name, $value) {
+    header("$name: $value");
+  }
+
+  /**
+   * Create CRM contacts for all existing CMS users
+   *
+   * @return array
+   * @throws \Exception
+   */
+  public function synchronizeUsers() {
+    throw new Exception('CMS user creation not supported for this framework');
+    return array();
   }
 
 }

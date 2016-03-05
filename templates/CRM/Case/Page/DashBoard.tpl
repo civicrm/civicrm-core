@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -34,9 +34,9 @@
 
 <div class="crm-submit-buttons crm-case-dashboard-buttons">
     {if $newClient and $allowToAddNewCase}
-      <a href="{$newCaseURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts}Add Case{/ts}</span></a>
+      <a href="{$newCaseURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Case{/ts}</span></a>
     {/if}
-    <a class="button no-popup" name="find_my_cases" href="{crmURL p="civicrm/case/search" q="reset=1&case_owner=2&force=1"}"><span><div class="icon ui-icon-search"></div> {ts}Find My Cases{/ts}</span></a>
+    <a class="button no-popup" name="find_my_cases" href="{crmURL p="civicrm/case/search" q="reset=1&case_owner=2&force=1"}"><span><i class="crm-i fa-search"></i> {ts}Find My Cases{/ts}</span></a>
 
     <div class="crm-case-dashboard-switch-view-buttons">
         {if $myCases}

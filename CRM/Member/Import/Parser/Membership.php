@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -162,7 +162,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       return CRM_Import_Parser::ERROR;
     }
 
-    $params = &$this->getActiveFieldParams();
+    $params = $this->getActiveFieldParams();
     $errorMessage = NULL;
 
     //To check whether start date or join date is provided
@@ -269,7 +269,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         return $response;
       }
 
-      $params = &$this->getActiveFieldParams();
+      $params = $this->getActiveFieldParams();
 
       //assign join date equal to start date if join date is not provided
       if (empty($params['join_date']) && !empty($params['membership_start_date'])) {
@@ -356,7 +356,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
       if ($onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
         $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
-          CRM_Core_DAO::$_nullObject,
           NULL,
           'Membership'
         );
@@ -380,7 +379,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           }
 
           $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
-            CRM_Core_DAO::$_nullObject,
             $formatValues['membership_id'],
             'Membership'
           );
@@ -518,7 +516,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           $checkCid->external_identifier = $formatValues['external_identifier'];
           $checkCid->find(TRUE);
           if ($checkCid->id != $formatted['contact_id']) {
-            array_unshift($values, 'Mismatch of External identifier :' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
+            array_unshift($values, 'Mismatch of External ID:' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
             return CRM_Import_Parser::ERROR;
           }
         }

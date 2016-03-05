@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,8 +24,15 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-url-form-block">
-<div id="help">
-    {ts}These settings define the URLs used to access CiviCRM resources (CSS files, Javascript files, images, etc.). Default values will be inserted the first time you access CiviCRM - based on the CIVICRM_UF_BASEURL specified in your installation's settings file (civicrm.settings.php).{/ts}
+<div class="help">
+  <p>
+    {ts}These settings define the URLs used to access CiviCRM resources (CSS files, Javascript files, images, etc.).{/ts}
+  </p>
+  <p>
+    {ts}You may configure these settings using absolute URLs or URL variables.{/ts}
+    {help id='id-url_vars'}
+  </p>
+
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <table class="form-layout">
@@ -87,13 +94,6 @@
             <p class="description font-red">{ts}{$verifySSL_description}{/ts}</p>
         </td>
     </tr>
-    <tr class="crm-miscellaneous-form-block-cvv-backoffice-required">
-          <td class="label">{$form.cvv_backoffice_required.label}</td>
-          <td>
-            {$form.cvv_backoffice_required.html}<br />
-            <p class="description">{ts}{$cvv_backoffice_required_description}{/ts}</p>
-          </td>
-        </tr>
 </table>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

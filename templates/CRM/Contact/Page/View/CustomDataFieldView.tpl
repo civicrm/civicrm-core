@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Edit{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="batch-edit"></span>{ts}Edit{/ts}
+        <span class="crm-i fa-pencil"></span> {ts}Edit{/ts}
       </div>
     {/if}
 
@@ -43,20 +43,7 @@
           </div>
         {else}
           <div class="crm-label">{$element.field_title}</div>
-          {if $element.field_type == 'File'}
-            {if $element.field_value.displayURL}
-                <div class="crm-content crm-custom_data crm-displayURL">
-                  <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
-                    <img src="{$element.field_value.displayURL}" height = "{$element.field_value.imageThumbHeight}"
-                         width="{$element.field_value.imageThumbWidth}">
-                  </a>
-                </div>
-            {else}
-                <div class="crm-content crm-custom_data crm-fileURL">
-                  <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
-                </div>
-            {/if}
-          {elseif $element.field_data_type EQ 'ContactReference' && $element.contact_ref_id}
+          {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_id}
             {*Contact ref id passed if user has sufficient permissions - so make a link.*}
             <div class="crm-content crm-custom-data crm-contact-reference">
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$element.contact_ref_id`"}" title="view contact">{$element.field_value}</a>

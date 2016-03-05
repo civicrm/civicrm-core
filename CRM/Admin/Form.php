@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Base class for admin forms
+ * Base class for admin forms.
  */
 class CRM_Admin_Form extends CRM_Core_Form {
 
@@ -60,9 +58,18 @@ class CRM_Admin_Form extends CRM_Core_Form {
   protected $_BAOName;
 
   /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Basic setup.
    */
   public function preProcess() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
     $this->_values = array();
@@ -106,8 +113,6 @@ class CRM_Admin_Form extends CRM_Core_Form {
 
   /**
    * Add standard buttons.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {

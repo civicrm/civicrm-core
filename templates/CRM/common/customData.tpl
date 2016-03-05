@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,105 +23,65 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* include wysiwyg related files*}
-{if !$includeWysiwygEditor}
-    {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-{/if}
 {literal}
 <script type="text/javascript">
-CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMultiple ) {
-  var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
+  (function($) {
+    CRM.buildCustomData = function (type, subType, subName, cgCount, groupID, isMultiple) {
+      var dataUrl = CRM.url('civicrm/custom', {type: type}),
+        prevCount = 1,
+        fname = '#customData',
+        storage = {};
 
-  if ( subType ) {
-    dataUrl = dataUrl + '&subType=' + subType;
-  }
+      if (subType) {
+        dataUrl += '&subType=' + subType;
+      }
 
-  if ( subName ) {
-    dataUrl = dataUrl + '&subName=' + subName;
-    cj('#customData' + subName ).show();
-  }
-  else {
-    cj('#customData').show();
-  }
-  if ( groupID ) {
-      dataUrl = dataUrl + '&groupID=' + groupID;
-  }
+      if (subName) {
+        dataUrl += '&subName=' + subName;
+        $('#customData' + subName).show();
+      }
+      else {
+        $('#customData').show();
+      }
+      if (groupID) {
+        dataUrl += '&groupID=' + groupID;
+      }
 
-  {/literal}
-    {if $urlPathVar}
-      dataUrl = dataUrl + '&' + '{$urlPathVar}'
-    {/if}
-    {if $groupID}
-      dataUrl = dataUrl + '&groupID=' + '{$groupID}'
-    {/if}
-    {if $qfKey}
-      dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
-    {/if}
-    {if $entityID}
-      dataUrl = dataUrl + '&entityID=' + '{$entityID}'
-    {/if}
-  {literal}
+      {/literal}
+      {if $groupID}
+        dataUrl += '&groupID=' + '{$groupID}';
+      {/if}
+      {if $entityID}
+        dataUrl += '&entityID=' + '{$entityID}';
+      {/if}
+      {literal}
 
-  if ( !cgCount ) {
-    cgCount = 1;
-    var prevCount = 1;
-  }
-  else if ( cgCount >= 1 ) {
-    var prevCount = cgCount;
-    cgCount++;
-  }
+      if (!cgCount) {
+        cgCount = 1;
+      }
+      else if (cgCount >= 1) {
+        prevCount = cgCount;
+        cgCount++;
+      }
 
-  dataUrl = dataUrl + '&cgcount=' + cgCount;
+      dataUrl += '&cgcount=' + cgCount;
 
 
-  if ( isMultiple ) {
-    var fname = '#custom_group_' + groupID + '_' + prevCount;
-    if (cj(".add-more-link-" + groupID + "-" + prevCount ).length) {
-      cj(".add-more-link-" + groupID + "-" + prevCount).hide();
-    }
-    else {
-      cj("#add-more-link-"+prevCount).hide();
-    }
-  }
-  else {
-    if ( subName && subName != 'null' ) {
-      var fname = '#customData' + subName ;
-    }
-    else {
-      var fname = '#customData';
-    }
-  }
-
-  cj.ajax({
-    url: dataUrl,
-    dataType: 'html',
-    async: false,
-    success: function(response) {
-      var target = cj(fname);
-      var storage = {};
-      target.children().each(function() {
-        var id = cj(this).attr('id');
-        if (id) {
-          // Help values survive storage
-          cj('textarea', this).each(function() {
-            cj(this).text(cj(this).val());
-          });
-          cj('option:selected', this).attr('selected', 'selected');
-          cj('option:not(:selected)', this).removeAttr('selected');
-          storage[id] = cj(this).detach();
+      if (isMultiple) {
+        fname = '#custom_group_' + groupID + '_' + prevCount;
+        if ($(".add-more-link-" + groupID + "-" + prevCount).length) {
+          $(".add-more-link-" + groupID + "-" + prevCount).hide();
         }
-      });
-      target.html(response).trigger('crmLoad');
-      target.children().each(function() {
-        var id = cj(this).attr('id');
-        if (id && storage[id]) {
-          cj(this).replaceWith(storage[id]);
+        else {
+          $("#add-more-link-" + prevCount).hide();
         }
-      });
-      storage = null;
-    }
-  });
-};
+      }
+      else if (subName && subName != 'null') {
+        fname += subName;
+      }
 
+      CRM.loadPage(dataUrl, {target: fname});
+    };
+  })(CRM.$);
 </script>
 {/literal}

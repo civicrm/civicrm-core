@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -113,6 +113,7 @@ class CRM_Core_BAO_CustomQuery {
     'Household' => 'civicrm_contact',
     'Organization' => 'civicrm_contact',
     'Contribution' => 'civicrm_contribution',
+    'ContributionRecur' => 'civicrm_contribution_recur',
     'Membership' => 'civicrm_membership',
     'Participant' => 'civicrm_participant',
     'Group' => 'civicrm_group',
@@ -197,56 +198,23 @@ SELECT f.id, f.label, f.data_type,
         'option_group_id' => $dao->option_group_id,
       );
 
-      // store it in the options cache to make things easier
-      // during option lookup
-      $this->_options[$dao->id] = array();
-      $this->_options[$dao->id]['attributes'] = array(
-        'label' => $dao->label,
-        'data_type' => $dao->data_type,
-        'html_type' => $dao->html_type,
+      // Deprecated (and poorly named) cache of field attributes
+      $this->_options[$dao->id] = array(
+        'attributes' => array(
+          'label' => $dao->label,
+          'data_type' => $dao->data_type,
+          'html_type' => $dao->html_type,
+        ),
       );
 
-      $optionGroupID = NULL;
-      $htmlTypes = array('CheckBox', 'Radio', 'Select', 'Multi-Select', 'AdvMulti-Select', 'Autocomplete-Select');
-      if (in_array($dao->html_type, $htmlTypes) && $dao->data_type != 'ContactReference') {
-        if ($dao->option_group_id) {
-          $optionGroupID = $dao->option_group_id;
-        }
-        elseif ($dao->data_type != 'Boolean') {
-          $errorMessage = ts("The custom field %1 is corrupt. Please delete and re-build the field",
-            array(1 => $dao->label)
-          );
-          CRM_Core_Error::fatal($errorMessage);
-        }
+      $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, array(), 'search');
+      if ($options) {
+        $this->_options[$dao->id] += $options;
       }
-      elseif ($dao->html_type == 'Select Date') {
+
+      if ($dao->html_type == 'Select Date') {
         $this->_options[$dao->id]['attributes']['date_format'] = $dao->date_format;
         $this->_options[$dao->id]['attributes']['time_format'] = $dao->time_format;
-      }
-
-      // build the cache for custom values with options (label => value)
-      if ($optionGroupID != NULL) {
-        $query = "
-SELECT label, value
-  FROM civicrm_option_value
- WHERE option_group_id = $optionGroupID
-";
-
-        $option = CRM_Core_DAO::executeQuery($query);
-        while ($option->fetch()) {
-          $dataType = $this->_fields[$dao->id]['data_type'];
-          if ($dataType == 'Int' || $dataType == 'Float') {
-            $num = round($option->value, 2);
-            $this->_options[$dao->id]["$num"] = $option->label;
-          }
-          else {
-            $this->_options[$dao->id][$option->value] = $option->label;
-          }
-        }
-        $options = $this->_options[$dao->id];
-        //unset attributes to avoid confussion
-        unset($options['attributes']);
-        CRM_Utils_Hook::customFieldOptions($dao->id, $options, FALSE);
       }
     }
   }
@@ -341,15 +309,15 @@ SELECT label, value
         $qillValue = NULL;
         if (!is_array($value)) {
           $value = CRM_Core_DAO::escapeString(trim($value));
-          $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
+          $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
         }
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
-          $qillValue = strstr($op, 'NULL') ? NULL : CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
+          $qillValue = strstr($op, 'NULL') ? NULL : CRM_Core_BAO_CustomField::displayValue($value[$op], $id);
         }
         else {
           $op = strstr($op, 'IN') ? $op : 'IN';
-          $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
+          $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
         }
 
         $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
@@ -382,21 +350,28 @@ SELECT label, value
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
               if ($isSerialized && !empty($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
+                $sp = CRM_Core_DAO::VALUE_SEPARATOR;
                 if (strstr($op, 'IN')) {
-                  $value = str_replace(",", "[[:cntrl:]]*|[[:cntrl:]]*", $value);
+                  $value = str_replace(",", "$sp|$sp", $value);
                   $value = str_replace('(', '[[.left-parenthesis.]]', $value);
                   $value = str_replace(')', '[[.right-parenthesis.]]', $value);
                 }
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
-                $value = "[[:cntrl:]]*" . $value . "[[:cntrl:]]*";
+                $value = $sp . $value . $sp;
                 if (!$wildcard) {
-                  $value = str_replace("[[:cntrl:]]*|", '', $value);
+                  foreach (explode("|", $value) as $val) {
+                    $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $val, 'String');
+                  }
+                }
+                else {
+                  $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
                 }
               }
-
-              //FIX for custom data query fired against no value(NULL/NOT NULL)
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-              $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
+              else {
+                //FIX for custom data query fired against no value(NULL/NOT NULL)
+                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+              }
+              $this->_qill[$grouping][] = $field['label'] . " $qillOp $qillValue";
             }
             break;
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,17 +29,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for custom data
+ * This class generates form components for custom data.
  *
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
@@ -106,11 +103,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   /**
    * Pre processing work done here.
    *
-   * gets session variables for table name, id of entity in table, type of entity and stores them.
-   *
-   * @param
-   *
-   * @return void
+   * Gets session variables for table name, id of entity in table, type of entity and stores them.
    */
   public function preProcess() {
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
@@ -163,7 +156,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       for ($i = 0; $i <= $_POST['hidden_custom_group_count'][$this->_groupID]; $i++) {
-        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_contactSubType, $i);
+        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_contactSubType, $i, $this->_contactType, $this->_groupID);
         CRM_Custom_Form_CustomData::buildQuickForm($this);
         CRM_Custom_Form_CustomData::setDefaultValues($this);
       }
@@ -172,8 +165,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
@@ -288,16 +279,12 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
   /**
    * Process the user submitted custom data values.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // Get the form values and groupTree
-    $params = $this->controller->exportValues($this->_name);
+    $params = CRM_Utils_Request::exportValues();
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
-      $this->_groupTree[$this->_groupID]['fields'],
       'civicrm_contact',
       $this->_tableID,
       $this->_entityType

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 
@@ -54,7 +52,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $controller->run();
 
     //add honor block
-    $params = array();
     $params = CRM_Contribute_BAO_Contribution::getHonorContacts($this->_contactId);
 
     if (!empty($params)) {
@@ -82,9 +79,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       if (!$paymentProcessor) {
         continue;
       }
-
-      // note that we are passing a CRM_Core_Page object ($this) as if it were a form here:
-      $paymentObject = CRM_Core_Payment::singleton($mode, $paymentProcessor, $this);
 
       require_once 'api/v3/utils.php';
       //@todo calling api functions directly is not supported
@@ -145,7 +139,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    * loads, it decides the which action has to be taken for the page.
    */
   public function run() {
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $this->assign('invoicing', $invoicing);
     parent::preProcess();

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Campaign_BAO_Query {
   //since normal activity clause clause get collides.
@@ -65,9 +63,7 @@ class CRM_Campaign_BAO_Query {
   /**
    * If survey, campaign are involved, add the specific fields.
    *
-   * @param $query
-   *
-   * @return void
+   * @param CRM_Contact_BAO_Contact $query
    */
   public static function select(&$query) {
     self::$_applySurveyClause = FALSE;
@@ -337,9 +333,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
    * Add all the elements shared between,
    * normal voter search and voter listing (GOTV form)
    *
-   *
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function buildSearchForm(&$form) {
 
@@ -354,7 +348,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     $form->add('text', 'street_unit', ts('Street Unit'), $attributes['street_unit']);
     $form->add('text', 'street_address', ts('Street Address'), $attributes['street_address']);
     $form->add('text', 'city', ts('City'), $attributes['city']);
-    $form->add('text', 'postal_code', ts('Zip / Postal Code'), $attributes['postal_code']);
+    $form->add('text', 'postal_code', ts('Postal Code'), $attributes['postal_code']);
 
     //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
     // this is loaded onto then replace with something like '__' & test
@@ -412,7 +406,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
           $fieldId = $dao->id;
           $fieldName = 'custom_' . $dao->id;
           $customSearchFields[$name] = $fieldName;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form, $fieldName, $fieldId, FALSE, FALSE);
+          CRM_Core_BAO_CustomField::addQuickFormElement($form, $fieldName, $fieldId, FALSE);
           break;
         }
       }
@@ -566,59 +560,6 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     );
 
     return $voterClause;
-  }
-
-  /**
-   * Build the campaign clause for component serach.
-   *
-   */
-  public static function componentSearchClause(&$params, &$query) {
-    $op = CRM_Utils_Array::value('op', $params, '=');
-    $campaign = CRM_Utils_Array::value('campaign', $params);
-    $tableName = CRM_Utils_Array::value('tableName', $params);
-    $grouping = CRM_Utils_Array::value('grouping', $params);
-    if (CRM_Utils_System::isNull($campaign) || empty($tableName)) {
-      return;
-    }
-
-    // fixme - what is the purpose of this code? $campaign should be
-    // an integer, not an array
-    if (is_array($campaign)) {
-      foreach (array(
-                 'current_campaign',
-                 'past_campaign',
-               ) as $ignore) {
-        $index = array_search($ignore, $campaign);
-        if ($index !== FALSE) {
-          unset($campaign[$index]);
-        }
-      }
-    }
-
-    $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-
-    $campaignIds = $campaignTitles = array();
-    if (is_array($campaign)) {
-      foreach ($campaign as $campId) {
-        $campaignIds[$campId] = $campId;
-        $campaignTitles[$campId] = $allCampaigns[$campId];
-      }
-    }
-    else {
-      $campaignIds = $campaign;
-      if (array_key_exists($campaignIds, $allCampaigns)) {
-        $campaignTitles[$campaignIds] = $allCampaigns[$campaignIds];
-      }
-    }
-    $query->_qill[$grouping][] = ts('Campaigns %1',
-        array(1 => $op)
-      ) . ' ' . implode(' ' . ts('or') . ' ', $campaignTitles);
-    $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("{$tableName}.campaign_id",
-      $op,
-      $campaignIds,
-      'Integer'
-    );
-    $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
   }
 
 }

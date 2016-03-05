@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,9 +27,9 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/OptionGroup.tpl"}
 {else}
-<div id="help">
+<div class="help">
     {ts}CiviCRM stores configurable choices for various drop-down fields as 'option groups'. You can click <strong>Options</strong> to view the available choices.{/ts}
-    <p><div class="icon ui-icon-alert"></div> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
+    <p><i class="crm-i fa-exclamation-triangle"></i> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
 </div>
 {/if}
 
@@ -57,8 +57,8 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newOptionGroup"  icon="circle-plus"}{ts}Add Option Group{/ts}{/crmButton}
-          {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+          {crmButton q="action=add&reset=1" id="newOptionGroup"  icon="plus-circle"}{ts}Add Option Group{/ts}{/crmButton}
+          {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
         </div>
     {/if}
 </div>

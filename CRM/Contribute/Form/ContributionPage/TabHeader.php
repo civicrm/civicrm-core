@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Helper class to build navigation links
+ * Helper class to build navigation links.
  */
 class CRM_Contribute_Form_ContributionPage_TabHeader {
   /**
@@ -136,6 +134,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     );
 
     $contribPageId = $form->getVar('_id');
+    CRM_Utils_Hook::tabset('civicrm/admin/contribute', $tabs, array('contribution_page_id' => $contribPageId));
     $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
 

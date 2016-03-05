@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -72,6 +72,7 @@ function _civicrm_api3_dashboard_create_spec(&$params) {
  * @return array
  */
 function civicrm_api3_dashboard_get($params) {
+  // NEVER COPY THIS. No idea why a newish api would not use basic_get.
   $bao = new CRM_Core_BAO_Dashboard();
   _civicrm_api3_dao_set_filter($bao, $params, TRUE);
   $dashlets = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Dashboard');

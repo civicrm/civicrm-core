@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign=docLink}{docURL page="user/current/initial-set-up/permissions-and-access-control/" text="Access Control Documentation"}{/capture}
-<div id="help">
+<div class="help">
     <p>{ts 1=$docLink}ACLs (Access Control Lists) allow you control access to CiviCRM data. An ACL consists of an <strong>Operation</strong> (e.g. 'View' or 'Edit'), a <strong>set of Data</strong> that the operation can be performed on (e.g. a group of contacts), and a <strong>Role</strong> that has permission to do this operation. Refer to the %1 for more info.{/ts}
     {if $config->userSystem->is_drupal EQ '1'}{ts}Note that a CiviCRM ACL Role is not related to the Drupal Role.{/ts}{/if}</p>
     <p>{ts}<strong>EXAMPLE:</strong> 'Team Leaders' (<em>ACL Role</em>) can 'Edit' (<em>Operation</em>) all contacts in the 'Active Volunteers Group' (<em>Data</em>).{/ts}</p>

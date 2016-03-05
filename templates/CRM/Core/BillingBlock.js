@@ -76,7 +76,4 @@
 
   civicrm_billingblock_creditcard_helper();
 
-  $(function() {
-    $('#billing-payment-block').on('crmFormLoad', civicrm_billingblock_creditcard_helper);
-  });
 })(CRM.$);

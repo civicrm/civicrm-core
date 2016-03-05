@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,7 @@
 *}
 <div class="crm-block crm-form-block crm-sms-schedule-form-block">
 {include file="CRM/common/WizardHeader.tpl"}
-<div id="help">
+<div class="help">
     {ts}You can schedule this Mass SMS to be sent starting at a specific date and time, OR you can request that it be sent as soon as possible by checking &quot;Send Immediately&quot;.{/ts} {help id="sending"}
 </div>
 {include file="CRM/Mailing/Form/Count.tpl"}

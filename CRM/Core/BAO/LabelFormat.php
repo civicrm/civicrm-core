@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -30,12 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains functions for managing Label Formats
+ * This class contains functions for managing Label Formats.
  */
 class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
@@ -452,8 +450,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Return the name of the group for customized labels.
-   *
-   * @return void
    */
   public static function customGroupName() {
     return ts('Custom');
@@ -467,8 +463,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   Id of the database record (null = new record).
    * @param string $groupName
    *   Group name of the label format.
-   *
-   * @return void
    */
   public function saveLabelFormat(&$values, $id = NULL, $groupName = 'label_format') {
     // get the Option Group ID for Label Formats (create one if it doesn't exist)

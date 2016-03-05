@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                               |
+ | CiviCRM version 4.7                                               |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,17 +23,18 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-editor_id-title"}
+{htxt id="editor_id-title"}
   {ts}WYSIWYG Editor{/ts}
 {/htxt}
-{htxt id="id-editor_id"}
-  <p>{ts}Select the HTML WYSIWYG Editor provided for fields that allow HTML formatting. Select 'Textarea' if you don't want to provide a WYSIWYG Editor (users will type text and / or HTML code into plain text fields).{/ts}</p>
-  <p>{ts}<strong>Spell-checking:</strong> ckEditor includes a Spell-check button by default. There is also an optional plugin which does spell-checking automatically (as you type). However, this plugin is not enabled by default since it sends user input to a 3rd party service (spellchecker.net) without informing the user - and this may pose privacy issues for some sites.{/ts}
-  <p>{ts}To enable auto spell check, in packages/ckeditor/config.js - change this value to true:{/ts}<br />
-  config.scayt_autoStartup = false;
-  <p>{ts}To remove the Spell Check button, in packages/ckeditor/config.js - remove this item in the config.toolbar_Full list:{/ts}<br />
-  'SpellChecker'
-  <p>{ts}<strong>NOTE:</strong> If you are modifying config.js you should first have configured a Custom PHP Path under Administer > System Settings > Directories, and place your modified version in the custom path.{/ts}</p>
+{htxt id="editor_id"}
+  <p>
+    {ts}A "WYSIWYG" (What You See Is What You Get) is a rich-text editor, like a mini word-processor, for editing HTML content in CiviCRM.{/ts}
+  </p>
+  <ul>
+    <li>{ts}Select 'CKEditor' for the built-in WYSIWYG option. You can customize the toolbar buttons and other settings by clicking "Configure CKEditor."{/ts}</li>
+    <li>{ts}Select 'Textarea' if you want users to type text and/or HTML code into plain text fields.{/ts}</li>
+    <li>{ts 1='target="_blank" href="https://civicrm.org/extensions/home?body_value=wysiwyg&field_extension_cms_tid=127"'}Other WYSIWYG editors are available for download from the <a %1>CiviCRM Extension Directory</a>.{/ts}</li>
+  </ul>
 {/htxt}
 
 {htxt id="id-invoices_id-title"}

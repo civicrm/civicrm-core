@@ -48,7 +48,7 @@ div#crm-contact-thumbnail {
   right: 0;
   top: 0;
   opacity: .8;
-  padding: .4em;
+  padding: .4em .9em;
   border-bottom-left-radius: 1em;
 }
 
@@ -115,6 +115,8 @@ div#crm-contact-thumbnail {
 
 #crm-container div.contactCardLeft .label,
 #crm-container div.contactCardRight .label {
+  color: #2f2f2f;
+  font-weight: normal;
   font-size: 11px;
   vertical-align: top;
   margin-right: 10px;
@@ -160,6 +162,9 @@ div#crm-contact-thumbnail {
   line-height: 1.4em;
   padding: 4px;
   width: 100%;
+}
+.crm-container div.contact_panel td.grouplabel {
+  border-bottom: 2px solid #D7D7D0 !important;
 }
 
 #crm-container div.contact_panel .crm-address-block {
@@ -338,4 +343,11 @@ div#crm-contact-thumbnail {
   -moz-box-sizing: border-box;
   float: none;
   width: 100%;
+}
+
+#tagGroup table .label {
+  color: #FFF;
+}
+#tagGroup table {
+  color: #000;
 }

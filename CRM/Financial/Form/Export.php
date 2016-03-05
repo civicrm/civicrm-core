@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -64,8 +62,6 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -73,7 +69,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     // this mean it's a batch action
     if (!$this->_id) {
       if (!empty($_GET['batch_id'])) {
-        //validate batch ids
+        // validate batch ids
         $batchIds = explode(',', $_GET['batch_id']);
         foreach ($batchIds as $batchId) {
           CRM_Utils_Type::validate($batchId, 'Positive');
@@ -96,7 +92,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     $allBatchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     $this->_exportStatusId = CRM_Utils_Array::key('Exported', $allBatchStatus);
 
-    //check if batch status is valid, do not allow exported batches to export again
+    // check if batch status is valid, do not allow exported batches to export again
     $batchStatus = CRM_Batch_BAO_Batch::getBatchStatuses($this->_batchIds);
 
     foreach ($batchStatus as $batchStatusId) {
@@ -112,8 +108,6 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // this mean it's a batch action
@@ -151,8 +145,6 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   * @return void
    */
   public function postProcess() {
     if (!$this->_exportFormat) {

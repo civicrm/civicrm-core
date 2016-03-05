@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* success.tpl: Display page for Upgrades. Provides complete HTML doc.*}
+{* Display page for Upgrades. *}
 {if $config->userSystem->is_drupal neq '1'}
     <h2>{$pageTitle}</h2>
 {/if}
@@ -32,18 +32,27 @@
     <form method="post">
         <p>
           <span class="crm-status-icon info"> </span>
-          {ts 1=$currentVersion 2=$newVersion}Use this utility to upgrade your CiviCRM database from %1 to %2.{/ts}
+          {ts 1=$currentVersion 2=$newVersion}The database will be upgraded from %1 to %2.{/ts}
         </p>
         {if $preUpgradeMessage}
-            <div style="background-color: #E43D2B; padding: 10px;"><strong>{ts}Warning:{/ts}&nbsp;</strong>{$preUpgradeMessage}</div>
+            <div style="border: 2px solid #E43D2B; background-color: rgba(228, 61, 43, 0.08); padding: 10px; margin-bottom: 15px;">
+              <span class="crm-status-icon"></span>
+              <strong style="vertical-align: middle; font-size: 1.2em;">{ts}Warning:{/ts}</strong>
+              {$preUpgradeMessage}
+            </div>
         {/if}
         <p><strong>{ts}Back up your database before continuing.{/ts}</strong>
             {capture assign=docLink}{docURL page="Installation and Upgrades" text="Upgrade Documentation" style="text-decoration: underline;" resource="wiki"}{/capture}
             {ts 1=$docLink}This process may change your database structure and values. In case of emergency you may need to revert to a backup. For more detailed information, refer to the %1.{/ts}</p>
-        <p>{ts}Click 'Upgrade Now' if you are ready to proceed. Otherwise click 'Cancel' to return to the CiviCRM home page.{/ts}</p>
         <input type="hidden" name="action" value="begin" />
-        <input type="submit" value="{ts}Upgrade Now{/ts}" name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" /> &nbsp;&nbsp;
-        <a class="button cancel crm-form-submit" value="{ts}Cancel{/ts}" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+        <button type="submit" class="crm-button" name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" >
+          <i class="crm-i fa-rocket"></i>
+          {ts}Upgrade Now{/ts}
+        </button>&nbsp;&nbsp;
+        <a class="button cancel crm-form-submit" href="{$cancelURL}">
+          <i class="crm-i fa-times"></i>
+          {ts}Cancel{/ts}
+        </a>
     </form>
   </div>
 
@@ -52,10 +61,7 @@
       <div class="bold" style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
-          {ts 1="https://civicrm.org/become-a-member?src=ug&sid=$sid" 2="https://civicrm.org/contribute?src=ug&sid=$sid"}The CiviCRM Core Team has been hard at work and is proud to release 4.6, the first major update of 2015. Though it is packed with enhancements and continues to mature the leading open source CRM for nonprofits worldwide, it does come with a cost to produce, maintain and improve upon. Without funding from organizations like yours, future releases are at risk of never being realized. We invite you to enjoy the improvements in 4.6 and ask that you <a href="%1" target="_blank">support CiviCRM by becoming a member</a> or by <a href="%2" target="_blank">making a donation</a>. ~ Dave Greenberg, Co-Founder{/ts}
-        </p>
-        <p>
-          {ts 1="https://civicrm.org/register-your-site?src=ug&sid=$sid"}Not ready for a membership yet? You can still help us learn how to improve CiviCRM by <a href="%1" target="_blank">registering your site</a>.{/ts}
+          {ts 1="https://civicrm.org/core-team" 2="https://civicrm.org/providers/contributors" 3="https://civicrm.org/become-a-member?src=ug&sid=$sid"}Thank you for upgrading to 4.7, the latest version of CiviCRM. Packed with new features and improvements, this release was made possible by both the <a href="%1">CiviCRM Core Team</a> and an incredible group of <a href="%2">contributors</a>, combined with the financial support of CiviCRM Members and Partners, without whom the project could not exist. We invite you to join their ranks by <a href="%3">becoming a member of CiviCRM today</a>. There is no better way to say thanks than to support those that have made CiviCRM 4.7 possible. <a href="%3">Join today</a>.{/ts}
         </p>
       </div>
       <p><span class="crm-status-icon success"> </span>{$message}</p>

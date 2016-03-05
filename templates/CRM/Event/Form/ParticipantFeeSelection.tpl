@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -103,7 +103,7 @@ CRM.$(function($) {
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if !$email}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+    <i class="crm-i fa-info-circle"></i>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
   </div>
   {/if}
   <table class="form-layout">
@@ -130,7 +130,7 @@ CRM.$(function($) {
       <table class='form-layout'>
         <tr class="crm-event-eventfees-form-block-price_set_amount">
           <td class="label" style="padding-top: 10px;">{$form.amount.label}</td>
-          <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event" dontInclCal="true" context="participant"}</table></td>
+          <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event" noCalcValueDisplay=0 context="participant"}</table></td>
         </tr>
      {if $paymentInfo}
        <tr><td></td><td>
@@ -139,11 +139,11 @@ CRM.$(function($) {
          <div class='label'>{ts}Total Paid{/ts}</div>
          <div class='content'>
            {$paymentInfo.paid|crmMoney}<br/>
-           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><span class="icon ui-icon-zoomin"></span> {ts}view payments{/ts}</a>
+           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><i class="crm-i fa-list-alt"></i> {ts}view payments{/ts}</a>
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>
-       {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol noCalcValueDisplay='false' displayOveride='true'}
+       {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol noCalcValueDisplay=1 displayOveride='true'}
        {/if}
       </table>
     </fieldset>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -78,18 +78,17 @@ class CRM_Member_Form_Task_Print extends CRM_Member_Form_Task {
     // just need to add a javacript to popup the window for printing
     //
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Print Members'),
-          'js' => array('onclick' => 'window.print()'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'back',
-          'name' => ts('Done'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Print Members'),
+        'js' => array('onclick' => 'window.print()'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'back',
+        'name' => ts('Done'),
+      ),
+    ));
   }
 
   /**

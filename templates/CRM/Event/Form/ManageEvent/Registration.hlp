@@ -1,6 +1,6 @@
-{*
+﻿{*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -67,6 +67,14 @@
 <p>{ts}You can use different profile for the person who is registering than for "Additional Participants". For example, you may want to require an email address from the person entering the registration while not requiring (or even requesting) emails for additional participants (i.e. their "guests").{/ts}</p>
 {/htxt}
 
+{htxt id="id-max_additional-title"}
+  {ts}Maximum Additional Participants{/ts}
+{/htxt}
+{htxt id="id-max_additional"}
+  <p>{ts}Limit the number of additional participants that can be registered in a single booking.{/ts}</p>
+  <p>{ts}Eg: if you choose '2' then the lead booker can bring 2 guests; there would be a limit of 3 participants in total per booking.{/ts}</p>
+{/htxt}
+
 {htxt id="id-allow_same_email-title"}
   {ts}Allow Shared Email{/ts}
 {/htxt}
@@ -85,7 +93,7 @@
   {ts}Require Approval{/ts}
 {/htxt}
 {htxt id="id-requires_approval"}
-{ts}Check this box to require administrative approval for all the participants who self-register, prior to being able to complete the registration process. Participants will be placed in 'Awaiting Approval' status. You can review and approve participants from 'Find Participants' - select the 'Change Participant Status' task. Approved participants will move to 'Pending from approval' status, and will be sent an email with a link to complete their registration (including paying event fees - if any). {/ts}
+{ts}Check this box to require administrative approval for all the participants who self-register, prior to being able to complete the registration process. Participants will be placed in 'Awaiting Approval' status. You can review and approve participants from 'Find Participants' - select the 'Participant status - change' task. Approved participants will move to 'Pending from approval' status, and will be sent an email with a link to complete their registration (including paying event fees - if any). {/ts}
 {/htxt}
 
 {htxt id="id-expiration_time-title"}
@@ -93,4 +101,19 @@
 {/htxt}
 {htxt id="id-expiration_time"}
 {ts}Time limit <strong>in hours</strong> for confirming/finishing registration by participants with any of the pending statuses. Enter 0 (or leave empty) to disable this feature.{/ts}
+{/htxt}
+
+{htxt id="id-allow_selfcancelxfer-title"}
+  {ts}Allow Self-service Cancellation or Transfer?{/ts}
+{/htxt}
+{htxt id="id-allow_selfcancelxfer"}
+  <p>{ts}Check this box if you want to allow registered participants to either cancel their registration OR transfer it to another participant. If this feature is enabled, event confirmation emails will include a link to a Cancel or Transfer form.{/ts}</p>
+  <p>{ts}<strong>Automated refunds for cancellations are NOT currently supported.</strong> Participants who have paid for an event will be notified that cancellations are not refundable.{/ts}</p>
+{/htxt}
+
+{htxt id="id-selfcancelxfer_time-title"}
+  {ts}Cancellation or Transfer Time Limit{/ts}
+{/htxt}
+{htxt id="id-selfcancelxfer_time"}
+  {ts}Number of hours prior to event start date to allow self-service cancellation or transfer. Enter 0 (or leave empty) to allow cancellation or transfer up until the event has started.{/ts}
 {/htxt}

@@ -55,11 +55,13 @@ class CRM_Case_ManagedEntities {
   }
 
   /**
-   * Get a list of managed activity-types by searching CiviCase XML files
+   * Get a list of managed activity-types by searching CiviCase XML files.
+   *
+   * @param \CRM_Case_XMLRepository $xmlRepo
+   * @param \CRM_Core_ManagedEntities $me
    *
    * @return array
    * @see CRM_Utils_Hook::managed
-   * @throws CRM_Core_Exception
    */
   public static function createManagedActivityTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
     $result = array();
@@ -97,17 +99,22 @@ class CRM_Case_ManagedEntities {
   }
 
   /**
-   * Get a list of managed relationship-types by searching CiviCase XML files
+   * Get a list of managed relationship-types by searching CiviCase XML files.
+   *
+   * @param \CRM_Case_XMLRepository $xmlRepo
+   * @param \CRM_Core_ManagedEntities $me
    *
    * @return array
    * @see CRM_Utils_Hook::managed
-   * @throws CRM_Core_Exception
    */
   public static function createManagedRelationshipTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
     $result = array();
 
-    $p = new CRM_Case_XMLProcessor();
-    $validRelTypes = $p->allRelationshipTypes();
+    if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
+      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
+      Civi::$statics[__CLASS__]['reltypes'] = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::REL_TYPE_CNAME, $relationshipInfo);
+    }
+    $validRelTypes = Civi::$statics[__CLASS__]['reltypes'];
 
     $relTypes = $xmlRepo->getAllDeclaredRelationshipTypes();
     foreach ($relTypes as $relType) {

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
 
@@ -94,16 +92,10 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
+   * Set the default values of various form elements.
    *
    * @return array
    *   reference to the array of default values
-   */
-  /**
-   * @return array
    */
   public function setDefaultValues() {
     if (method_exists($this->_customSearchClass, 'setDefaultValues')) {
@@ -172,11 +164,8 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Return a descriptive name for the page, used in wizard header
+   * Return a descriptive name for the page, used in wizard header.
    *
-   * @return string
-   */
-  /**
    * @return string
    */
   public function getTitle() {

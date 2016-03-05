@@ -80,13 +80,22 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     // the back-end's canonical set of parameters.  But if a processor
     // does this, it needs to invoke this hook after it has done translation,
     // but before it actually starts talking to its proprietary back-end.
-
+    if (!empty($params['is_recur'])) {
+      $throwAnENoticeIfNotSetAsTheseAreRequired = $params['frequency_interval'] . $params['frequency_unit'];
+    }
     // no translation in Dummy processor
     $cookedParams = $params;
     CRM_Utils_Hook::alterPaymentProcessorParams($this,
       $params,
       $cookedParams
     );
+    // This means we can test failing transactions by setting a past year in expiry. A full expiry check would
+    // be more complete.
+    if (!empty($params['credit_card_exp_date']['Y']) && date('Y') >
+      CRM_Core_Payment_Form::getCreditCardExpirationYear($params)) {
+      $error = new CRM_Core_Error(ts('transaction failed'));
+      return $error;
+    }
     //end of hook invocation
     if (!empty($this->_doDirectPaymentResult)) {
       $result = $this->_doDirectPaymentResult;
@@ -99,7 +108,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
       $trxn_id = str_replace('test_', '', $trxn_id);
       $trxn_id = intval($trxn_id) + 1;
-      $params['trxn_id'] = sprintf('test_%08d', $trxn_id);
+      $params['trxn_id'] = 'test_' . $trxn_id . '_' . uniqid();
     }
     else {
       $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'live_%'";
@@ -107,7 +116,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
       $trxn_id = str_replace('live_', '', $trxn_id);
       $trxn_id = intval($trxn_id) + 1;
-      $params['trxn_id'] = sprintf('live_%08d', $trxn_id);
+      $params['trxn_id'] = 'live_' . $trxn_id . '_' . uniqid();
     }
     $params['gross_amount'] = $params['amount'];
     // Add a fee_amount so we can make sure fees are handled properly in underlying classes.
@@ -118,11 +127,14 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are back office payments supported.
+   *
+   * E.g paypal standard won't permit you to enter a credit card associated with someone else's login.
+   *
    * @return bool
    */
   protected function supportsLiveMode() {
-    return FALSE;
+    return TRUE;
   }
 
   /**
@@ -155,6 +167,35 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    */
   public function checkConfig() {
     return NULL;
+  }
+
+  /**
+   * Get an array of the fields that can be edited on the recurring contribution.
+   *
+   * Some payment processors support editing the amount and other scheduling details of recurring payments, especially
+   * those which use tokens. Others are fixed. This function allows the processor to return an array of the fields that
+   * can be updated from the contribution recur edit screen.
+   *
+   * The fields are likely to be a subset of these
+   *  - 'amount',
+   *  - 'installments',
+   *  - 'frequency_interval',
+   *  - 'frequency_unit',
+   *  - 'cycle_day',
+   *  - 'next_sched_contribution_date',
+   *  - 'end_date',
+   *  - 'failure_retry_day',
+   *
+   * The form does not restrict which fields from the contribution_recur table can be added (although if the html_type
+   * metadata is not defined in the xml for the field it will cause an error.
+   *
+   * Open question - would it make sense to return membership_id in this - which is sometimes editable and is on that
+   * form (UpdateSubscription).
+   *
+   * @return array
+   */
+  public function getEditableRecurringScheduleFields() {
+    return array('amount', 'next_sched_contribution_date');
   }
 
 }

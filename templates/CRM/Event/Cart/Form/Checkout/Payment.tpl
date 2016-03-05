@@ -93,16 +93,18 @@
   </tfoot>
 </table>
 {if $payment_required == true}
-<div class="crm-section {$form.is_pay_later.name}-section">
-  <div class="label">{$form.is_pay_later.label}</div>
-  <div class="content">{$form.is_pay_later.html}
-  </div>
-  <div class="clear"></div>
-</div>
-<div class="pay-later-instructions" style="display:none">
-  {$pay_later_instructions}
-</div>
-{include file='CRM/Core/BillingBlock.tpl'}
+  {if $form.is_pay_later.label}
+    <div class="crm-section {$form.is_pay_later.name}-section">
+      <div class="label">{$form.is_pay_later.label}</div>
+      <div class="content">{$form.is_pay_later.html}
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="pay-later-instructions" style="display:none">
+      {$pay_later_instructions}
+    </div>
+{/if}
+{include file='CRM/Core/BillingBlockWrapper.tpl'}
 {/if}
 {if $collect_billing_email == true}
 <div class="crm-section {$form.billing_contact_email.name}-section">

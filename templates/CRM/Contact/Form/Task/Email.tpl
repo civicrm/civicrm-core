@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -45,14 +45,14 @@
       <td class="label">{$form.cc_id.label}</td>
       <td>
         {$form.cc_id.html}
-        <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts}Clear{/ts}" href="#"><span class="icon ui-icon-close"></span></a>
+        <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts}Clear{/ts}" href="#"><i class="crm-i fa-times"></i></a>
       </td>
     </tr>
     <tr class="crm-contactEmail-form-block-bcc_id" {if !$form.bcc_id.value}style="display:none;"{/if}>
       <td class="label">{$form.bcc_id.label}</td>
       <td>
         {$form.bcc_id.html}
-        <a class="crm-hover-button clear-cc-link" rel="bcc_id" title="{ts}Clear{/ts}" href="#"><span class="icon ui-icon-close"></span></a>
+        <a class="crm-hover-button clear-cc-link" rel="bcc_id" title="{ts}Clear{/ts}" href="#"><i class="crm-i fa-times"></i></a>
       </td>
     </tr>
     <tr>
@@ -82,6 +82,7 @@
 </table>
 
 {include file="CRM/Contact/Form/Task/EmailCommon.tpl"}
+{include file="CRM/Activity/Form/FollowUp.tpl" type='email-'}
 
 <div class="spacer"> </div>
 

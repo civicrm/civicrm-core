@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Core\Event\SystemInstallEvent;
 use Civi\Core\Lock\LockManager;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
@@ -9,10 +10,14 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\Setup;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 // TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
@@ -25,32 +30,83 @@ class Container {
   const SELF = 'civi_container_factory';
 
   /**
-   * @var ContainerBuilder
-   */
-  private static $singleton;
-
-  /**
    * @param bool $reset
    *   Whether to forcibly rebuild the entire container.
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
   public static function singleton($reset = FALSE) {
-    if ($reset || self::$singleton === NULL) {
-      $c = new self();
-      self::$singleton = $c->createContainer();
+    if ($reset || !isset(\Civi::$statics[__CLASS__]['container'])) {
+      self::boot(TRUE);
     }
-    return self::$singleton;
+    return \Civi::$statics[__CLASS__]['container'];
   }
 
   /**
+   * Find a cached container definition or construct a new one.
+   *
+   * There are many weird contexts in which Civi initializes (eg different
+   * variations of multitenancy and different permutations of CMS/CRM bootstrap),
+   * and hook_container may fire a bit differently in each context. To mitigate
+   * risk of leaks between environments, we compute a unique envID
+   * (md5(DB_NAME, HTTP_HOST, SCRIPT_FILENAME, etc)) and use separate caches for
+   * each (eg "templates_c/CachedCiviContainer.$ENVID.php").
+   *
+   * Constants:
+   *   - CIVICRM_CONTAINER_CACHE -- 'always' [default], 'never', 'auto'
+   *   - CIVICRM_DSN
+   *   - CIVICRM_DOMAIN_ID
+   *   - CIVICRM_TEMPLATE_COMPILEDIR
+   *
+   * @return ContainerInterface
+   */
+  public function loadContainer() {
+    // Note: The container's raison d'etre is to manage construction of other
+    // services. Consequently, we assume a minimal service available -- the classloader
+    // has been setup, and civicrm.settings.php is loaded, but nothing else works.
+
+    $cacheMode = defined('CIVICRM_CONTAINER_CACHE') ? CIVICRM_CONTAINER_CACHE : 'always';
+
+    // In pre-installation environments, don't bother with caching.
+    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') || !defined('CIVICRM_DSN') || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
+      return $this->createContainer();
+    }
+
+    $envId = \CRM_Core_Config_Runtime::getId();
+    $file = CIVICRM_TEMPLATE_COMPILEDIR . "/CachedCiviContainer.{$envId}.php";
+    $containerConfigCache = new ConfigCache($file, $cacheMode === 'auto');
+    if (!$containerConfigCache->isFresh()) {
+      $containerBuilder = $this->createContainer();
+      $containerBuilder->compile();
+      $dumper = new PhpDumper($containerBuilder);
+      $containerConfigCache->write(
+        $dumper->dump(array('class' => 'CachedCiviContainer')),
+        $containerBuilder->getResources()
+      );
+    }
+
+    require_once $file;
+    $c = new \CachedCiviContainer();
+    $c->set('service_container', $c);
+    return $c;
+  }
+
+  /**
+   * Construct a new container.
+   *
    * @var ContainerBuilder
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
    */
   public function createContainer() {
     $civicrm_base_path = dirname(dirname(__DIR__));
     $container = new ContainerBuilder();
+    $container->addCompilerPass(new RegisterListenersPass('dispatcher'));
+    $container->addObjectResource($this);
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
-    $container->set(self::SELF, $this);
+    //$container->set(self::SELF, $this);
+    $container->setDefinition(self::SELF, new Definition(
+      'Civi\Core\Container',
+      array()
+    ));
 
     // TODO Move configuration to an external file; define caching structure
     //    if (empty($configDirectories)) {
@@ -68,45 +124,65 @@ class Container {
     //      }
     //    }
 
-    $container->setDefinition('lockManager', new Definition(
-      '\Civi\Core\Lock\LockManager',
-      array()
-    ))
-      ->setFactoryService(self::SELF)->setFactoryMethod('createLockManager');
-
     $container->setDefinition('angular', new Definition(
-      '\Civi\Angular\Manager',
+      'Civi\Angular\Manager',
       array()
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
 
     $container->setDefinition('dispatcher', new Definition(
-      '\Symfony\Component\EventDispatcher\EventDispatcher',
-      array()
+      'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher',
+      array(new Reference('service_container'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
 
     $container->setDefinition('magic_function_provider', new Definition(
-      '\Civi\API\Provider\MagicFunctionProvider',
+      'Civi\API\Provider\MagicFunctionProvider',
       array()
     ));
 
     $container->setDefinition('civi_api_kernel', new Definition(
-      '\Civi\API\Kernel',
+      'Civi\API\Kernel',
       array(new Reference('dispatcher'), new Reference('magic_function_provider'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
     $container->setDefinition('cxn_reg_client', new Definition(
-      '\Civi\Cxn\Rpc\RegistrationClient',
+      'Civi\Cxn\Rpc\RegistrationClient',
       array()
     ))
       ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
+
+    $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
+
+    foreach (array('js_strings', 'community_messages') as $cacheName) {
+      $container->setDefinition("cache.{$cacheName}", new Definition(
+        'CRM_Utils_Cache_Interface',
+        array(
+          array(
+            'name' => $cacheName,
+            'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+          ),
+        )
+      ))->setFactoryClass('CRM_Utils_Cache')->setFactoryMethod('create');
+    }
+
+    $container->setDefinition('pear_mail', new Definition('Mail'))
+      ->setFactoryClass('CRM_Utils_Mail')->setFactoryMethod('createMailer');
+
+    if (empty(\Civi::$statics[__CLASS__]['boot'])) {
+      throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
+    }
+    foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
+      $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE);
+    }
 
     // Expose legacy singletons as services in the container.
     $singletons = array(
       'resources' => 'CRM_Core_Resources',
       'httpClient' => 'CRM_Utils_HttpClient',
+      'cache.default' => 'CRM_Utils_Cache',
+      'i18n' => 'CRM_Core_I18n',
       // Maybe? 'config' => 'CRM_Core_Config',
       // Maybe? 'smarty' => 'CRM_Core_Smarty',
     );
@@ -116,6 +192,20 @@ class Container {
       ))
         ->setFactoryClass($class)->setFactoryMethod('singleton');
     }
+
+    $container->setDefinition('civi_token_compat', new Definition(
+      'Civi\Token\TokenCompatSubscriber',
+      array()
+    ))->addTag('kernel.event_subscriber');
+
+    foreach (array('Activity', 'Contribute', 'Event', 'Member') as $comp) {
+      $container->setDefinition("crm_" . strtolower($comp) . "_tokens", new Definition(
+        "CRM_{$comp}_Tokens",
+        array()
+      ))->addTag('kernel.event_subscriber');
+    }
+
+    \CRM_Utils_Hook::container($container);
 
     return $container;
   }
@@ -128,10 +218,13 @@ class Container {
   }
 
   /**
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @param ContainerInterface $container
+   * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
-  public function createEventDispatcher() {
-    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+  public function createEventDispatcher($container) {
+    $dispatcher = new ContainerAwareEventDispatcher($container);
+    $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, array('\Civi\Core\InstallationCanary', 'check'));
+    $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, array('\Civi\Core\DatabaseInitializer', 'initialize'));
     $dispatcher->addListener('hook_civicrm_post::Activity', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
@@ -143,13 +236,20 @@ class Container {
       'CRM_Core_LegacyErrorHandler',
       'handleException',
     ));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Activity_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contact_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByPage', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByType', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Event_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Member_ActionMapping', 'onRegisterActionMappings'));
+
     return $dispatcher;
   }
 
   /**
    * @return LockManager
    */
-  public function createLockManager() {
+  public static function createLockManager() {
     // Ideally, downstream implementers could override any definitions in
     // the container. For now, we'll make-do with some define()s.
     $lm = new LockManager();
@@ -216,6 +316,61 @@ class Container {
     ));
 
     return $kernel;
+  }
+
+  /**
+   * Get a list of boot services.
+   *
+   * These are services which must be setup *before* the container can operate.
+   *
+   * @param bool $loadFromDB
+   * @throws \CRM_Core_Exception
+   */
+  public static function boot($loadFromDB) {
+    // Array(string $serviceId => object $serviceInstance).
+    $bootServices = array();
+    \Civi::$statics[__CLASS__]['boot'] = &$bootServices;
+
+    $bootServices['runtime'] = $runtime = new \CRM_Core_Config_Runtime();
+    $runtime->initialize($loadFromDB);
+
+    $bootServices['paths'] = new \Civi\Core\Paths();
+
+    $class = $runtime->userFrameworkClass;
+    $bootServices['userSystem'] = $userSystem = new $class();
+    $userSystem->initialize();
+
+    $userPermissionClass = 'CRM_Core_Permission_' . $runtime->userFramework;
+    $bootServices['userPermissionClass'] = new $userPermissionClass();
+
+    $bootServices['cache.settings'] = \CRM_Utils_Cache::create(array(
+      'name' => 'settings',
+      'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+    ));
+
+    $bootServices['settings_manager'] = new \Civi\Core\SettingsManager($bootServices['cache.settings']);
+
+    $bootServices['lockManager'] = self::createLockManager();
+
+    if ($loadFromDB && $runtime->dsn) {
+      \CRM_Core_DAO::init($runtime->dsn);
+      \CRM_Utils_Hook::singleton(TRUE);
+      \CRM_Extension_System::singleton(TRUE);
+      \CRM_Extension_System::singleton(TRUE)->getClassLoader()->register();
+
+      $runtime->includeCustomPath();
+
+      $c = new self();
+      $container = $c->loadContainer();
+      foreach ($bootServices as $name => $obj) {
+        $container->set($name, $obj);
+      }
+      \Civi::$statics[__CLASS__]['container'] = $container;
+    }
+  }
+
+  public static function getBootService($name) {
+    return \Civi::$statics[__CLASS__]['boot'][$name];
   }
 
 }

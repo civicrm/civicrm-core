@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -60,7 +60,7 @@
     </table>
 
     <h3>{ts}Default Organization Address{/ts}</h3>
-        <div class="description">{ts 1=&#123;domain.address&#125;}CiviMail mailings must include the sending organization's address. This is done by putting the %1 token in either the body or footer of the mailing. This token may also be used in regular 'Send Email to Contacts' messages and in other Message Templates. The token is replaced by the address entered below when the message is sent.{/ts}</div>
+        <div class="description">{ts 1=&#123;domain.address&#125;}CiviMail mailings must include the sending organization's address. This is done by putting the %1 token in either the body or footer of the mailing. This token may also be used in regular 'Email - send now' messages and in other Message Templates. The token is replaced by the address entered below when the message is sent.{/ts}</div>
         {include file="CRM/Contact/Form/Edit/Address.tpl"}
     <h3>{ts}Organization Contact Information{/ts}</h3>
         <div class="description">{ts}You can also include general email and/or phone contact information in mailings.{/ts} {help id="additional-contact"}</div>

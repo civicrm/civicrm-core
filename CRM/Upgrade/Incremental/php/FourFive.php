@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,39 +26,9 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * Upgrade logic for 4.5
  */
-class CRM_Upgrade_Incremental_php_FourFive {
-  const BATCH_SIZE = 5000;
-
-  /**
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
-
-  /**
-   * Compute any messages which should be displayed beforeupgrade.
-   *
-   * Note: This function is called iteratively for each upcoming
-   * revision to the database.
-   *
-   * @param $preUpgradeMessage
-   * @param string $rev
-   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
-   * @param null $currentVer
-   *
-   * @return void
-   */
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-  }
+class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_Base {
 
   /**
    * Compute any messages which should be displayed after upgrade.
@@ -67,7 +37,6 @@ class CRM_Upgrade_Incremental_php_FourFive {
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.5.alpha1') {
@@ -90,9 +59,9 @@ class CRM_Upgrade_Incremental_php_FourFive {
    */
   public function upgrade_4_5_alpha1($rev) {
     // task to process sql
-    $this->addTask(ts('Migrate honoree information to module_data'), 'migrateHonoreeInfo');
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.alpha1')), 'task_4_5_x_runSql', $rev);
-    $this->addTask(ts('Set default for Individual name fields configuration'), 'addNameFieldOptions');
+    $this->addTask('Migrate honoree information to module_data', 'migrateHonoreeInfo');
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.alpha1')), 'runSql', $rev);
+    $this->addTask('Set default for Individual name fields configuration', 'addNameFieldOptions');
 
     // CRM-14522 - The below schema checking is done as foreign key name
     // for pdf_format_id column varies for different databases
@@ -128,7 +97,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    * @return bool
    */
   public function upgrade_4_5_beta9($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.beta9')), 'task_4_5_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.beta9')), 'runSql', $rev);
 
     $entityTable = array(
       'Participant' => 'civicrm_participant_payment',
@@ -317,10 +286,11 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    * Upgrade function.
    *
    * @param string $rev
+   * @return bool
    */
   public function upgrade_4_5_9($rev) {
     // Task to process sql.
-    $this->addTask(ts('Upgrade DB to 4.5.9: Fix saved searches consisting of multi-choice custom field(s)'), 'updateSavedSearch');
+    $this->addTask('Upgrade DB to 4.5.9: Fix saved searches consisting of multi-choice custom field(s)', 'updateSavedSearch');
 
     return TRUE;
   }
@@ -398,41 +368,6 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
       }
     }
     return TRUE;
-  }
-
-
-  /**
-   * (Queue Task Callback)
-   */
-  public static function task_4_5_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
-    $upgrade = new CRM_Upgrade_Form();
-    $upgrade->processSQL($rev);
-
-    return TRUE;
-  }
-
-  /**
-   * Syntactic sugar for adding a task which (a) is in this class and (b) has
-   * a high priority.
-   *
-   * After passing the $funcName, you can also pass parameters that will go to
-   * the function. Note that all params must be serializable.
-   */
-  protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load(array(
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ));
-
-    $args = func_get_args();
-    $title = array_shift($args);
-    $funcName = array_shift($args);
-    $task = new CRM_Queue_Task(
-      array(get_class($this), $funcName),
-      $args,
-      $title
-    );
-    $queue->createItem($task, array('weight' => -1));
   }
 
 }

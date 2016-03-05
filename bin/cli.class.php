@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2008                 |
  +--------------------------------------------------------------------+
@@ -46,6 +46,7 @@ class civicrm_cli {
   var $_action = NULL;
   var $_output = FALSE;
   var $_joblog = FALSE;
+  var $_semicolon = FALSE;
   var $_config;
 
   // optional arguments
@@ -88,7 +89,7 @@ class civicrm_cli {
       return TRUE;
     }
     else {
-      trigger_error("cli.php can only be run from command line.", E_USER_ERROR);
+      die("cli.php can only be run from command line.");
     }
   }
 
@@ -111,7 +112,7 @@ class civicrm_cli {
       $result = civicrm_api($this->_entity, $this->_action, $this->_params);
     }
 
-    if ($result['is_error'] != 0) {
+    if (!empty($result['is_error'])) {
       $this->_log($result['error_message']);
       return FALSE;
     }
@@ -184,6 +185,9 @@ class civicrm_cli {
       }
       elseif ($arg == '-j' || $arg == '--joblog') {
         $this->_joblog = TRUE;
+      }
+      elseif ($arg == '-sem' || $arg == '--semicolon') {
+        $this->_semicolon = TRUE;
       }
       else {
         foreach ($this->_additional_arguments as $short => $long) {
@@ -265,7 +269,7 @@ class civicrm_cli {
         $this->_log(ts("Failed to login as %1. Wrong username or password.", array('1' => $this->_user)));
         return FALSE;
       }
-      if (!$cms->loadUser($this->_user)) {
+      if (($this->_config->userFramework == 'Joomla' && !$cms->loadUser($this->_user, $this->_password)) || !$cms->loadUser($this->_user)) {
         $this->_log(ts("Failed to login as %1", array('1' => $this->_user)));
         return FALSE;
       }
@@ -342,7 +346,14 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
     parent::initialize();
   }
 
+  /**
+   * Run the script.
+   */
   public function run() {
+    if ($this->_semicolon) {
+      $this->separator = ';';
+    }
+
     $out = fopen("php://output", 'w');
     fputcsv($out, $this->columns, $this->separator, '"');
 

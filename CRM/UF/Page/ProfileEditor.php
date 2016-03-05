@@ -7,10 +7,18 @@ require_once 'CRM/Core/Page.php';
  * widgets
  */
 class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
+  /**
+   * Run page.
+   *
+   * @throws \Exception
+   */
   public function run() {
     CRM_Core_Error::fatal('This is not a real page!');
   }
 
+  /**
+   * Register profile scripts.
+   */
   public static function registerProfileScripts() {
     static $loaded = FALSE;
     if ($loaded || CRM_Core_Resources::isAjaxMode()) {
@@ -72,7 +80,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   }
 
   /**
-   * Register entity schemas for use in the editor's palette
+   * Register entity schemas for use in the editor's palette.
    *
    * @param array $entityTypes
    *   Strings, e.g. "IndividualModel", "ActivityModel".
@@ -227,9 +235,11 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   public static function convertCiviModelToBackboneModel($extends, $title, $availableFields) {
     $locationFields = CRM_Core_BAO_UFGroup::getLocationFields();
 
+    // schema in format array($fieldName => $fieldSchema)
+    // sections in format array($sectionName => $section)
     $result = array(
-      'schema' => array(), // array($fieldName => $fieldSchema)
-      'sections' => array(), // array($sectionName => $section)
+      'schema' => array(),
+      'sections' => array(),
     );
 
     // build field list
@@ -251,8 +261,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             continue 2;
           }
       }
+      // FIXME: type set to "Text"
       $result['schema'][$fieldName] = array(
-        'type' => 'Text', // FIXME,
+        'type' => 'Text',
         'title' => $field['title'],
         'civiFieldType' => $field['field_type'],
       );

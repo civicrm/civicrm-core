@@ -9,6 +9,11 @@ require_once 'CRM/Core/Page.php';
 class CRM_Core_Page_QUnit extends CRM_Core_Page {
   protected $tplFile = NULL;
 
+  /**
+   * Run.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function run() {
     list ($ext, $suite) = $this->getRequestExtAndSuite();
     if (empty($ext) || empty($suite)) {
@@ -46,7 +51,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
   }
 
   /**
-   * Extrac the extension and suite from the request path.
+   * Extract the extension and suite from the request path.
    *
    * @return array
    */

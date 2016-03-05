@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -129,9 +129,9 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     if ($isPerMembership) {
       $labelRows = array();
       $memberships = civicrm_api3('membership', 'get', array(
-          'id' => array('IN' => $this->_memberIds),
-          'return' => 'contact_id',
-        ));
+        'id' => array('IN' => $this->_memberIds),
+        'return' => 'contact_id',
+      ));
       foreach ($memberships['values'] as $id => $membership) {
         $labelRows[$id] = $rows[$membership['contact_id']];
       }

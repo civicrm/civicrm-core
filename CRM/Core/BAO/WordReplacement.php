@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
@@ -56,7 +55,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_WordRepalcement
+   * @return CRM_Core_DAO_WordReplacement
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_WordRepalcement', $params, $defaults);
@@ -172,16 +171,11 @@ WHERE  domain_id = %1
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
 
-    if ($domain->locales && $config->localeCustomStrings) {
-      // for multilingual
-      $addReplacements = $config->localeCustomStrings;
-      $addReplacements[$config->lcMessages] = $overrides;
-      $stringOverride = $addReplacements;
-    }
-    else {
-      // for single language
-      $stringOverride = array($config->lcMessages => $overrides);
-    }
+    // So. Weird. Some bizarre/probably-broken multi-lingual thing where
+    // data isn't really stored in civicrm_word_replacements. Probably
+    // shouldn't exist.
+    $stringOverride = self::_getLocaleCustomStrings($id);
+    $stringOverride[$config->lcMessages] = $overrides;
 
     return $stringOverride;
   }
@@ -195,24 +189,17 @@ WHERE  domain_id = %1
    */
   public static function rebuild($clearCaches = TRUE) {
     $id = CRM_Core_Config::domainID();
-    $stringOverride = self::getAllAsConfigArray($id);
-    $params = array('locale_custom_strings' => serialize($stringOverride));
-    $wordReplacementSettings = CRM_Core_BAO_Domain::edit($params, $id);
-    if ($wordReplacementSettings) {
-      CRM_Core_Config::singleton()->localeCustomStrings = $stringOverride;
+    self::_setLocaleCustomStrings($id, self::getAllAsConfigArray($id));
 
-      // Partially mitigate the inefficiency introduced in CRM-13187 by doing this conditionally
-      if ($clearCaches) {
-        // Reset navigation
-        CRM_Core_BAO_Navigation::resetNavigation();
-        // Clear js localization
-        CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
-      }
-
-      return TRUE;
+    // Partially mitigate the inefficiency introduced in CRM-13187 by doing this conditionally
+    if ($clearCaches) {
+      // Reset navigation
+      CRM_Core_BAO_Navigation::resetNavigation();
+      // Clear js localization
+      CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
     }
 
-    return FALSE;
+    return TRUE;
   }
 
   /**
@@ -289,6 +276,71 @@ WHERE  domain_id = %1
       'values' => self::getConfigArraysAsAPIParams(FALSE),
     ));
     CRM_Core_BAO_WordReplacement::rebuild();
+  }
+
+  /**
+   * Get WordReplacements for a locale.
+   *
+   * @param string $locale
+   * @param int $domainId
+   *
+   * @return array
+   *   List of word replacements (enabled/disabled) for the given locale.
+   */
+  public static function getLocaleCustomStrings($locale, $domainId = NULL) {
+    if ($domainId === NULL) {
+      $domainId = CRM_Core_Config::domainID();
+    }
+
+    return CRM_Utils_Array::value($locale, self::_getLocaleCustomStrings($domainId));
+  }
+
+  /**
+   * Get custom locale strings.
+   *
+   * @param int $domainId
+   *
+   * @return array|mixed
+   */
+  private static function _getLocaleCustomStrings($domainId) {
+    // TODO: Would it be worthwhile using memcache here?
+    $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', array(
+      1 => array($domainId, 'Integer'),
+    ));
+    while ($domain->fetch()) {
+      return empty($domain->locale_custom_strings) ? array() : unserialize($domain->locale_custom_strings);
+    }
+  }
+
+  /**
+   * Set locale strings.
+   *
+   * @param string $locale
+   * @param array $values
+   * @param int $domainId
+   */
+  public static function setLocaleCustomStrings($locale, $values, $domainId = NULL) {
+    if ($domainId === NULL) {
+      $domainId = CRM_Core_Config::domainID();
+    }
+
+    $lcs = self::_getLocaleCustomStrings($domainId);
+    $lcs[$locale] = $values;
+
+    self::_setLocaleCustomStrings($domainId, $lcs);
+  }
+
+  /**
+   * Set locale strings.
+   *
+   * @param int $domainId
+   * @param string $lcs
+   */
+  private static function _setLocaleCustomStrings($domainId, $lcs) {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_domain SET locale_custom_strings = %1 WHERE id = %2", array(
+      1 => array(serialize($lcs), 'String'),
+      2 => array($domainId, 'Integer'),
+    ));
   }
 
 }

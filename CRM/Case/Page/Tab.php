@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class handle case related functions
- *
+ * This class handle case related functions.
  */
 class CRM_Case_Page_Tab extends CRM_Core_Page {
 
@@ -97,8 +94,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
 
   /**
    * View details of a case.
-   *
-   * @return void
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple(
@@ -137,13 +132,11 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * called when action is browse.
-   *
-   * @return void
+   * Called when action is browse.
    */
   public function browse() {
 
-    $controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Search', ts('Case'), NULL);
+    $controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Search', ts('Case'), CRM_Core_Action::BROWSE);
     $controller->setEmbedded(TRUE);
     $controller->reset();
     $controller->set('limit', 20);

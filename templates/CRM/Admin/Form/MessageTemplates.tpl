@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
 
 <h3>{if $action eq 1}{ts}New Message Template{/ts}{elseif $action eq 2}{ts}Edit Message Template{/ts}{else}{ts}Delete Message Template{/ts}{/if}</h3>
 {if $action neq 8}
-<div id="help">
+<div class="help">
     {ts}Use this form to add or edit re-usable message templates.{/ts} {help id="id-intro" file="CRM/Admin/Page/MessageTemplates.hlp"}
 </div>
 {/if}
@@ -68,11 +68,11 @@
         </div><!-- /.crm-accordion-header -->
          <div class="crm-accordion-body">
            <div class="helpIcon" id="helphtml">
-             <input class="crm-token-selector big" data-field="html_message" />
-             {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
+             <input class="crm-token-selector big" data-field="msg_html" />
+             {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
            </div>
                 <div class="clear"></div>
-                <div class='html resizable-textarea'>
+                <div class='html'>
                     {$form.msg_html.html}
                     <div class="description">{ts}An HTML formatted version of this message will be sent to contacts whose Email Format preference is 'HTML' or 'Both'.{/ts} {ts 1=$tokenDocsRepeated}Tokens may be included (%1).{/ts}</div>
                 </div>

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-member-task-batch-form-block">
-<div id="help">
+<div class="help">
     {ts}Update field values for each member as needed. Click <strong>Update Memberships</strong> below to save all your changes. To set a field to the same value for ALL rows, enter that value for the first member and then click the <strong>Copy icon</strong> (next to the column title).{/ts}
 </div>
          <div class="crm-submit-buttons">

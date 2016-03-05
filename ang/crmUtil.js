@@ -2,8 +2,8 @@
 (function (angular, $, _) {
   angular.module('crmUtil', []);
 
-  // usage:
-  //   crmApi('Entity', 'action', {...}).then(function(apiResult){...})
+  // Angular implementation of CRM.api3
+  // @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3
   //
   // Note: To mock API results in unit-tests, override crmApi.backend, e.g.
   //   var apiSpy = jasmine.createSpy('crmApi');
@@ -19,7 +19,7 @@
       if (_.isObject(entity)) {
         // eval content is locally generated.
         /*jshint -W061 */
-        p = backend(eval('('+angular.toJson(entity)+')'), message);
+        p = backend(eval('('+angular.toJson(entity)+')'), action);
       } else {
         // eval content is locally generated.
         /*jshint -W061 */

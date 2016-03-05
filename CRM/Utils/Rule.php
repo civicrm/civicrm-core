@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
@@ -81,7 +79,7 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    // make sure it include valid characters, alpha numeric and underscores
+    // make sure it includes valid characters, alpha numeric and underscores
     if (!preg_match('/^[\w]+$/i', $str)) {
       return FALSE;
     }
@@ -101,7 +99,7 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    // make sure it include valid characters, alpha numeric and underscores
+    // make sure it includes valid characters, alpha numeric and underscores
     // added (. and ,) option (CRM-1336)
     if (!preg_match('/^[\w\s\.\,]+$/i', $str)) {
       return FALSE;
@@ -121,7 +119,7 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    // make sure it include valid characters, (, \s and numeric
+    // make sure it includes valid characters, (, \s and numeric
     if (preg_match('/^[\d\(\)\-\.\s]+$/', $phone)) {
       return TRUE;
     }
@@ -139,7 +137,7 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    // make sure it include valid characters, alpha numeric and underscores
+    // make sure it includes valid characters, alpha numeric and underscores
     if (!preg_match('/^[\w\s\%\'\&\,\$\#]+$/i', $query)) {
       return FALSE;
     }
@@ -157,6 +155,19 @@ class CRM_Utils_Rule {
       // allow relative URL's (CRM-15598)
       $url = 'http://' . $_SERVER['HTTP_HOST'] . $url;
     }
+    return (bool) filter_var($url, FILTER_VALIDATE_URL);
+  }
+
+  /**
+   * @param $url
+   *
+   * @return bool
+   */
+  public static function urlish($url) {
+    if (empty($url)) {
+      return TRUE;
+    }
+    $url = Civi::paths()->getUrl($url, 'absolute');
     return (bool) filter_var($url, FILTER_VALIDATE_URL);
   }
 
@@ -468,11 +479,11 @@ class CRM_Utils_Rule {
   public static function money($value) {
     $config = CRM_Core_Config::singleton();
 
-    //only edge case when we have a decimal point in the input money
-    //field and not defined in the decimal Point in config settings
+    // only edge case when we have a decimal point in the input money
+    // field and not defined in the decimal Point in config settings
     if ($config->monetaryDecimalPoint &&
       $config->monetaryDecimalPoint != '.' &&
-      /* CRM-7122 also check for Thousands Separator in config settings */
+      // CRM-7122 also check for Thousands Separator in config settings
       $config->monetaryThousandSeparator != '.' &&
       substr_count($value, '.')
     ) {
@@ -558,8 +569,10 @@ class CRM_Utils_Rule {
    * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is ascii
    *
+   * @param string $elementValue
+   *
    * @return bool
-   *   true if file has been uploaded, false otherwise
+   *   True if file has been uploaded, false otherwise
    */
   public static function asciiFile($elementValue) {
     if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||
@@ -573,8 +586,10 @@ class CRM_Utils_Rule {
   /**
    * Checks to make sure the uploaded file is in UTF-8, recodes if it's not
    *
+   * @param array $elementValue
+   *
    * @return bool
-   *   whether file has been uploaded properly and is now in UTF-8
+   *   Whether file has been uploaded properly and is now in UTF-8.
    */
   public static function utf8File($elementValue) {
     $success = FALSE;
@@ -601,8 +616,10 @@ class CRM_Utils_Rule {
    * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is html
    *
+   * @param array $elementValue
+   *
    * @return bool
-   *   true if file has been uploaded, false otherwise
+   *   True if file has been uploaded, false otherwise
    */
   public static function htmlFile($elementValue) {
     if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||
@@ -708,20 +725,16 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   * @param $options
+   * Determine whether the value contains a valid reference to a directory.
    *
+   * Paths stored in the setting system may be absolute -- or may be
+   * relative to the default data directory.
+   *
+   * @param string $path
    * @return bool
    */
-  public static function autocomplete($value, $options) {
-    if ($value) {
-      $selectOption = CRM_Core_BAO_CustomOption::valuesByID($options['fieldID'], $options['optionGroupID']);
-
-      if (!in_array($value, $selectOption)) {
-        return FALSE;
-      }
-    }
-    return TRUE;
+  public static function settingPath($path) {
+    return is_dir(Civi::paths()->getPath($path));
   }
 
   /**

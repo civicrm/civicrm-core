@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,11 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-
-{* Include a modified version of jquery-fieldselection
- * FIXME: we use this plugin for so little it's hard to justify having it at all *}
-<script type="text/javascript" src="{$config->resourceBase}packages/jquery/plugins/jquery-fieldselection.js"></script>
-
 <script type="text/javascript">
 cj('form.{$form.formClass}').data('tokens', {$tokens|@json_encode});
 var text_message = null;
@@ -75,7 +70,6 @@ var isMailing    = false;
 {/if}
 {literal}
 
-var editor = {/literal}"{$editor}"{literal};
 function showSaveUpdateChkBox(prefix) {
   prefix = prefix || '';
   if (document.getElementById(prefix + "template") == null) {
@@ -127,33 +121,7 @@ function selectValue( val, prefix) {
         document.getElementById("text_message").value ="";
       }
     }
-    if ( editor == "ckeditor" ) {
-      oEditor = CKEDITOR.instances[html_message];
-      oEditor.setData('');
-    }
-    else if ( editor == "tinymce" ) {
-      tinyMCE.getInstanceById(html_message).setContent( html_body );
-    }
-    else if ( editor == "joomlaeditor" ) {
-      document.getElementById(html_message).value = '' ;
-      tinyMCE.execCommand('mceSetContent',false, '');
-    }
-    else if ( editor =="drupalwysiwyg" ) {
-      if (Drupal.wysiwyg.instances[html_message].setContent) {
-        Drupal.wysiwyg.instances[html_message].setContent(html_body);
-      }
-      // @TODO: Remove this when http://drupal.org/node/614146 drops
-      else if (Drupal.wysiwyg.instances[html_message].insert) {
-        alert("Please note your editor doesn't completely support this function. You may need to clear the contents of the editor prior to choosing a new template.");
-        Drupal.wysiwyg.instances[html_message].insert(html_body);
-      }
-      else {
-        alert("Sorry, your editor doesn't support this function yet.");
-      }
-    }
-    else {
-      document.getElementById(html_message).value = '' ;
-    }
+    CRM.wysiwyg.setVal('#' + html_message, '');
     if ( isPDF ) {
       showBindFormatChkBox();
     }
@@ -184,38 +152,9 @@ function selectValue( val, prefix) {
     else {
       cj("#subject").val( data.subject );
     }
-    var html_body  = "";
-    if (  data.msg_html ) {
-      html_body = data.msg_html;
-    }
 
-    if (editor == "ckeditor") {
-      oEditor = CKEDITOR.instances[html_message];
-      oEditor.setData( html_body );
-    }
-    else if (editor == "tinymce") {
-      tinyMCE.execInstanceCommand('html_message',"mceInsertContent",false, html_body );
-    }
-    else if (editor == "joomlaeditor") {
-      cj("#"+ html_message).val( html_body );
-      tinyMCE.execCommand('mceSetContent',false, html_body);
-    }
-    else if ( editor =="drupalwysiwyg") {
-      if (Drupal.wysiwyg.instances[html_message].setContent) {
-        Drupal.wysiwyg.instances[html_message].setContent(html_body);
-      }
-      // @TODO: Remove this when http://drupal.org/node/614146 drops
-      else if (Drupal.wysiwyg.instances[html_message].insert) {
-        alert("Please note your editor doesn't completely support this function. You may need to clear the contents of the editor prior to choosing a new template.");
-        Drupal.wysiwyg.instances[html_message].insert(html_body);
-      }
-      else {
-        alert("Sorry, your editor doesn't support this function yet.");
-      }
-    }
-    else {
-      cj("#"+ html_message).val( html_body );
-    }
+    CRM.wysiwyg.setVal('#' + html_message, data.msg_html || '');
+
     if (isPDF) {
       var bind = data.pdf_format_id ? true : false ;
       selectFormat( data.pdf_format_id, bind );
@@ -270,52 +209,7 @@ if ( isMailing ) {
     showSaveUpdateChkBox();
   }
 
-  {/literal}
-  {if $editor eq "ckeditor"}
-  {literal}
-    CRM.$(function($) {
-      oEditor = CKEDITOR.instances['html_message'];
-      oEditor.BaseHref = '' ;
-      oEditor.UserFilesPath = '' ;
-      oEditor.on( 'focus', verify );
-    });
-  {/literal}
-  {elseif $editor eq "tinymce"}
-  {literal}
-    CRM.$(function($) {
-      if ( isMailing ) {
-        $('div.html').hover(
-          function( ) {
-            if ( tinyMCE.get(html_message) ) {
-              tinyMCE.get(html_message).onKeyUp.add(function() {
-                verify( );
-              });
-            }
-          },
-          function( ) {
-            if ( tinyMCE.get(html_message) ) {
-              if ( tinyMCE.get(html_message).getContent() ) {
-                verify( );
-              }
-            }
-          }
-        );
-      }
-    });
-  {/literal}
-  {elseif $editor eq "drupalwysiwyg"}
-  {literal}
-    CRM.$(function($) {
-      if ( isMailing ) {
-        $('div.html').hover(
-          verify,
-          verify
-        );
-      }
-    });
-  {/literal}
-  {/if}
-  {literal}
+  cj('#' + html_message).on('focus change', verify);
 }
 
 CRM.$(function($) {
@@ -323,12 +217,10 @@ CRM.$(function($) {
     var
       token = $(this).val(),
       field = $(this).data('field');
-    if (field === 'html_message') {
-      tokenReplHtml(token);
-    } else {
+    if (field.indexOf('html') < 0) {
       field = textMsgID($(this));
-      $('#' + field).replaceSelection(token);
     }
+    CRM.wysiwyg.insert('#' + field, token);
     $(this).select2('val', '');
     if (isMailing) {
       verify();
@@ -349,53 +241,18 @@ CRM.$(function($) {
     return field;
   }
 
-  function tokenReplHtml(token) {
-    var editor     = {/literal}"{$editor}"{literal};
-    if ( editor == "tinymce" ) {
-      tinyMCE.execInstanceCommand('html_message',"mceInsertContent",false, token );
-    }
-    else if ( editor == "joomlaeditor" ) {
-      tinyMCE.execCommand('mceInsertContent',false, token);
-      var msg       = document.getElementById(html_message).value;
-      var cursorlen = document.getElementById(html_message).selectionStart;
-      var textlen   = msg.length;
-      document.getElementById(html_message).value = msg.substring(0, cursorlen) + token + msg.substring(cursorlen, textlen);
-      var cursorPos = (cursorlen + token.length);
-      document.getElementById(html_message).selectionStart = cursorPos;
-      document.getElementById(html_message).selectionEnd   = cursorPos;
-      document.getElementById(html_message).focus();
-    }
-    else if ( editor == "ckeditor" ) {
-      oEditor = CKEDITOR.instances[html_message];
-      oEditor.insertHtml(token.toString() );
-    }
-    else if ( editor == "drupalwysiwyg" ) {
-      if (Drupal.wysiwyg.instances[html_message].insert) {
-        Drupal.wysiwyg.instances[html_message].insert(token.toString() );
-      }
-      else {
-        alert("Sorry, your editor doesn't support this function yet.");
-      }
-    }
-    else {
-      $( "#"+ html_message ).replaceSelection( token );
-    }
-  }
-
   // Initialize token selector widgets
   var form = $('form.{/literal}{$form.formClass}{literal}');
   $('input.crm-token-selector', form)
-    .addClass('crm-action-menu action-icon-token')
+    .addClass('crm-action-menu fa-code')
     .change(insertToken)
     .crmSelect2({
       data: form.data('tokens'),
       placeholder: '{/literal}{ts escape='js'}Tokens{/ts}{literal}'
     });
 
-  $('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ");
-  $('.resizable-textarea textarea').css( 'width', '99%' );
-  $('.grippie').css( 'margin-right', '3px');
-  $('.accordion .head').hover( function() { $(this).addClass( "ui-state-hover");
+  $('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ")
+    .hover( function() { $(this).addClass( "ui-state-hover");
   }, function() { $(this).removeClass( "ui-state-hover");
   }).bind('click', function() {
     var checkClass = $(this).find('span').attr( 'class' );
@@ -422,44 +279,15 @@ CRM.$(function($) {
     if ( !isNaN( emailID ) ) {
       var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0 }"{literal};
       $.post( dataUrl, {emailID: emailID}, function( data ) {
-        var editor     = {/literal}"{$editor}"{literal};
 
         if (data.signature_text) {
-          // get existing text & html and append signatue
           var textMessage =  $("#"+ text_message).val( ) + '\n\n--\n' + data.signature_text;
-
-          // append signature
           $("#"+ text_message).val( textMessage );
         }
 
-        if ( data.signature_html ) {
-          var htmlMessage =  $("#"+ html_message).val( ) + '<br/><br/>--<br/>' + data.signature_html;
-
-          // set wysiwg editor
-          if ( editor == "ckeditor" ) {
-            oEditor = CKEDITOR.instances[html_message];
-            var htmlMessage = oEditor.getData( ) + '<br/><br/>--' + data.signature_html;
-            oEditor.setData( htmlMessage  );
-          }
-          else if ( editor == "tinymce" ) {
-            tinyMCE.execInstanceCommand('html_message',"mceInsertContent",false, htmlMessage);
-          }
-          else if ( editor == "drupalwysiwyg" ) {
-            if (Drupal.wysiwyg.instances[html_message].setContent) {
-              Drupal.wysiwyg.instances[html_message].setContent(htmlMessage);
-            }
-            // @TODO: Remove this when http://drupal.org/node/614146 drops
-            else if (Drupal.wysiwyg.instances[html_message].insert) {
-              alert("Please note your editor doesn't completely support this function. You may need to clear the contents of the editor prior to choosing a new template.");
-              Drupal.wysiwyg.instances[html_message].insert(htmlMessage);
-            }
-            else {
-              alert("Sorry, your editor doesn't support this function yet.");
-            }
-          }
-          else {
-            $("#"+ html_message).val(htmlMessage);
-          }
+        if (data.signature_html) {
+          var htmlMessage = CRM.wysiwyg.getVal("#" + html_message) + '<br/><br/>--<br/>' + data.signature_html;
+          CRM.wysiwyg.setVal("#" + html_message, htmlMessage);
         }
       }, 'json');
     }

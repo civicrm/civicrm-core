@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,10 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* include wysiwyg related files*}
-{if !$includeWysiwygEditor}
-  {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-{/if}
 {* Custom Data view mode*}
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {foreach from=$customValues item=cd_edit key=cvID}
@@ -48,22 +44,8 @@
                 {/foreach}
               </td>
               {else}
-              <td class="label">{$element.field_title}</td>
-              {if $element.field_type == 'File'}
-                {if $element.field_value.displayURL}
-                  <td class="html-adjust">
-                    <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
-                      <img src="{$element.field_value.displayURL}" height = "100" width="100">
-                    </a>
-                  </td>
-                  {else}
-                  <td class="html-adjust">
-                    <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
-                  </td>
-                {/if}
-                {else}
+                <td class="label">{$element.field_title}</td>
                 <td class="html-adjust">{$element.field_value}</td>
-              {/if}
             {/if}
           </tr>
         </table>

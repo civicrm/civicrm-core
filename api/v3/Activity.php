@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -40,7 +40,7 @@
  *
  * @throws API_Exception
  * @return array
- *   Array containing 'is_error' to denote success or failure and details of the created activity.
+ *   API result array
  */
 function civicrm_api3_activity_create($params) {
 
@@ -230,6 +230,7 @@ function _civicrm_api3_activity_create_spec(&$params) {
  *   Array per getfields documentation.
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_activity_get($params) {
   if (!empty($params['contact_id'])) {
@@ -241,7 +242,30 @@ function civicrm_api3_activity_get($params) {
     }
   }
   else {
-    $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
+    $sql = CRM_Utils_SQL_Select::fragment();
+    $options = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
+    $options = $options['values'];
+    $activityContactOptions = array(
+      'target_contact_id' => array_search('Activity Targets', $options),
+      'source_contact_id' => array_search('Activity Source', $options),
+      'assignee_contact_id' => array_search('Activity Assignees', $options),
+    );
+    foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
+      if (!empty($params[$activityContactName])) {
+        // If the intent is to have multiple joins -- one for each relation -- then you would
+        // need different table aliases. Consider replacing 'ac' and passing in a '!alias' param,
+        // with a different value for each relation.
+        $sql->join(
+          'activity_' . $activityContactName,
+          'LEFT JOIN civicrm_activity_contact ac ON a.id = ac.activity_id AND ac.record_type_id = #typeId',
+          array('typeId' => $activityContactValue)
+        );
+        $sql->where('ac.contact_id IN (#cid)', array(
+          'cid' => $params[$activityContactName],
+        ));
+      }
+    }
+    $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
   }
   $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   if ($options['is_count']) {
@@ -279,6 +303,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
       $returns[$returnkey] = $v;
     }
   }
+
   $returns['source_contact_id'] = 1;
   foreach ($returns as $n => $v) {
     switch ($n) {
@@ -309,7 +334,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
   if (!empty($activities) && (!empty($returnProperties) || !empty($params['contact_id']))) {
     foreach ($activities as $activityId => $values) {
       //@todo - should possibly load activity type id if not loaded (update with id)
-      _civicrm_api3_custom_data_get($activities[$activityId], 'Activity', $activityId, NULL, CRM_Utils_Array::value('activity_type_id', $values));
+      _civicrm_api3_custom_data_get($activities[$activityId], CRM_Utils_Array::value('check_permissions', $params), 'Activity', $activityId, NULL, CRM_Utils_Array::value('activity_type_id', $values));
     }
   }
   return $activities;
@@ -325,6 +350,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
  * @throws API_Exception
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_activity_delete($params) {
 

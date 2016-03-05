@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -41,7 +41,7 @@
         <label for="recur-all-entity">{ts 1=$entity_type}Every %1{/ts}</label>
         <div class="description">{ts 1=$entity_type}Change applies to every %1 in the series.{/ts}</div>
       </div>
-      <div class="status help"><div class="icon ui-icon-lightbulb"></div>{ts}Changes to date or time will <em>not</em> be applied to others in the series.{/ts}</div>
+      <div class="status help"><i class="crm-i fa-info-circle"></i> {ts}Changes to date or time will <em>not</em> be applied to others in the series.{/ts}</div>
     </div>
   </script>
 {literal}

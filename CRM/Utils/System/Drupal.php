@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -113,8 +111,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *   Array of errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   * @return void
    */
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
@@ -154,7 +150,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
         )->fetchField();
         if ((bool) $uid) {
           $resetUrl = $config->userFrameworkBaseURL . 'user/password';
-          $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
+          $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
             array(1 => $params['mail'], 2 => $resetUrl)
           );
         }
@@ -303,6 +299,14 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
+  protected function getUsersTableName() {
+    $userFrameworkUsersTableName = Civi::settings()->get('userFrameworkUsersTableName');
+    if (empty($userFrameworkUsersTableName)) {
+      $userFrameworkUsersTableName = 'users';
+    }
+    return $userFrameworkUsersTableName;
+  }
+
   /**
    * @inheritDoc
    */
@@ -344,9 +348,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $name = $dbDrupal->escapeSimple($strtolower($name));
+      $userFrameworkUsersTableName = $this->getUsersTableName();
       $sql = "
 SELECT u.*
-FROM   {$config->userFrameworkUsersTableName} u
+FROM   {$userFrameworkUsersTableName} u
 WHERE  LOWER(u.name) = '$name'
 AND    u.status = 1
 ";
@@ -554,6 +559,11 @@ AND    u.status = 1
   }
 
   /**
+   * Get CMS root path.
+   *
+   * @param string $scriptFilename
+   *
+   * @return null|string
    */
   public function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;
@@ -699,8 +709,6 @@ AND    u.status = 1
    * @param string $oldPerm
    * @param array $newPerms
    *   Array, strings.
-   *
-   * @return void
    */
   public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);
@@ -772,6 +780,55 @@ AND    u.status = 1
       $timezone = parent::getTimeZoneString();
     }
     return $timezone;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setHttpHeader($name, $value) {
+    drupal_add_http_header($name, $value);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+    $id = 'uid';
+    $mail = 'mail';
+    $name = 'name';
+
+    $result = db_query("SELECT uid, mail, name FROM {users} where mail != ''");
+
+    $user = new StdClass();
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+    foreach ($result as $row) {
+      $user->$id = $row->$id;
+      $user->$mail = $row->$mail;
+      $user->$name = $row->$name;
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $row->$id, $row->$mail, $uf, 1, 'Individual', TRUE)) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
   }
 
 }

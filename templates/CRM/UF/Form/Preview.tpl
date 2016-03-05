@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -108,8 +108,7 @@
                 {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n}
               {elseif $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
                 {include file="CRM/Profile/Form/GreetingType.tpl"}
-              {elseif ( $field.data_type eq 'Date' AND $element.skip_calendar NEQ true ) or
-                ( $n|substr:-5:5 eq '_date' ) or ( $field.name eq 'activity_date_time' )  }
+              {elseif ( $n|substr:-5:5 eq '_date' ) or ( $field.name eq 'activity_date_time' )  }
                 {include file="CRM/common/jcalendar.tpl" elementName=$form.$n.name}
               {elseif $n|substr:0:5 eq 'phone'}
                 {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}

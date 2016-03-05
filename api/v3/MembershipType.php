@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -66,6 +66,7 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['duration_unit']['api.required'] = 1;
   $params['duration_interval']['api.required'] = 1;
+  $params['is_active']['api.default'] = 1;
 }
 
 /**
@@ -92,6 +93,25 @@ function civicrm_api3_membership_type_get($params) {
     }
   }
   return $results;
+}
+
+/**
+ * Adjust input for getlist action.
+ *
+ * We want to only return active membership types for getlist. It's a bit
+ * arguable whether this should be applied at the 'get' level but, since it's hard
+ * to unset we'll just do it here.
+ *
+ * The usage of getlist is entity-reference fields & the like
+ * so using only active ones makes sense.
+ *
+ * @param array $request
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_membership_type_getlist_params(&$request) {
+  if (!isset($request['params']['is_active'])) {
+    $request['params']['is_active'] = 1;
+  }
 }
 
 /**

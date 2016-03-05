@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -47,7 +47,7 @@ function pollLoop( ){
 }
 
 function verify( ) {
-    if (! confirm('{/literal}{ts escape='js'}Are you sure you want to Import now{/ts}{literal}?') ) {
+    if (! confirm('Backing up your database before importing is recommended, as there is no Undo for this. {/literal}{ts escape='js'}Are you sure you want to Import now{/ts}{literal}?') ) {
         return false;
     }
 
@@ -74,7 +74,7 @@ function verify( ) {
 
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
-<div id="help">
+<div class="help">
     <p>
     {ts}The information below previews the results of importing your data in CiviCRM. Review the totals to ensure that they represent your expected results.{/ts}
     </p>

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Add or edit website{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="batch-edit"></span>{if empty($website)}{ts}Add website{/ts}{else}{ts}Add or edit website{/ts}{/if}
+        <span class="crm-i fa-pencil"></span> {if empty($website)}{ts}Add website{/ts}{else}{ts}Add or edit website{/ts}{/if}
       </div>
     {/if}
     {if empty($website)}

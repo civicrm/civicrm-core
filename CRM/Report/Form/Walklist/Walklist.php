@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -97,6 +97,7 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
           'state_province_id' => array(
             'title' => ts('State/Province'),
             'default' => TRUE,
+            'type' => CRM_Utils_Type::T_INT,
           ),
           'country_id' => array(
             'title' => ts('Country'),

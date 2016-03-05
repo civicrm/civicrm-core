@@ -1,7 +1,7 @@
 
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
-<div id="help">
+<div class="help">
     {if $action eq 0}
         <p>{ts}This is the first step in creating a new online Contribution Page. You can create one or more different Contribution Pages for different purposes, audiences, campaigns, etc. Each page can have it's own introductory message, pre-configured contribution amounts, custom data collection fields, etc.{/ts}</p>
         <p>{ts}In this step, you will configure the page title, financial type (donation, campaign contribution, etc.), goal amount, and introductory message. You will be able to go back and modify all aspects of this page at any time after completing the setup wizard.{/ts}</p>
@@ -68,7 +68,7 @@
               </tr>
             {/if}
             <tr id="for_org_text" class="crm-contribution-contributionpage-settings-form-block-for_organization">
-                <td class="label">{$form.for_organization.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='for_organization' id=$contributionPageID}{/if}</td>
+                <td class="label">{$form.for_organization.label}</td>
                 <td>{$form.for_organization.html}<br />
                     <span class="description">{ts}Text displayed next to the checkbox on the contribution form.{/ts}</span>
                 </td>

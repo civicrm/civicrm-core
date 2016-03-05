@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,9 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing other (custom) activities. *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
   {if $action eq 4}
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
@@ -99,12 +96,12 @@
         {if $action neq 4}
           {if !$form.target_contact_id.frozen}
             <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
-              <span class="icon ui-icon-shuffle"></span>
+              <i class="crm-i fa-random"></i>
             </a>
           {/if}
           {if $activityAssigneeNotification}
             <br />
-            <span class="description"><span class="icon ui-icon-mail-closed"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+            <span class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
           {/if}
         {/if}
       </td>
@@ -155,13 +152,11 @@
     <td class="label">{$form.details.label}</td>
     {if $activityTypeName eq "Print PDF Letter"}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-      {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+      {$form.details.html}
       </td>
       {else}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-       {if $defaultWysiwygEditor eq 0}{$form.details.html|crmStripAlternatives|crmAddClass:huge}{else}{$form.details.html|crmStripAlternatives}{/if}
+       {$form.details.html|crmStripAlternatives}
       </td>
     {/if}
   </tr>
@@ -219,34 +214,7 @@
   {if $action neq 4} {* Don't include "Schedule Follow-up" section in View mode. *}
   <tr class="crm-activity-form-block-schedule_followup">
     <td colspan="2">
-      <div class="crm-accordion-wrapper collapsed">
-        <div class="crm-accordion-header">
-          {ts}Schedule Follow-up{/ts}
-        </div><!-- /.crm-accordion-header -->
-        <div class="crm-accordion-body">
-          <table class="form-layout-compressed">
-            <tr><td class="label">{ts}Schedule Follow-up Activity{/ts}</td>
-              <td>{$form.followup_activity_type_id.html}&nbsp;&nbsp;{ts}on{/ts}
-              {include file="CRM/common/jcalendar.tpl" elementName=followup_date}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.followup_activity_subject.label}</td>
-              <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
-            </tr>
-              <tr>
-                  <td class="label">
-                    {$form.followup_assignee_contact_id.label}
-                    {edit}
-                    {/edit}
-                  </td>
-                  <td>
-                    {$form.followup_assignee_contact_id.html}
-                  </td>
-              </tr>
-          </table>
-        </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+      {include file="CRM/Activity/Form/FollowUp.tpl" type=""}
       {literal}
         <script type="text/javascript">
           CRM.$(function($) {
@@ -286,7 +254,7 @@
       {if ($context eq 'fulltext' || $context eq 'search') && $searchKey}
         {assign var='urlParams' value="reset=1&atype=$atype&action=update&reset=1&id=$entityID&cid=$contactId&context=$context&key=$searchKey"}
       {/if}
-      <a href="{crmURL p='civicrm/activity/add' q=$urlParams}" class="edit button" title="{ts}Edit{/ts}"><span><div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span></a>
+      <a href="{crmURL p='civicrm/activity/add' q=$urlParams}" class="edit button" title="{ts}Edit{/ts}"><span><i class="crm-i fa-pencil"></i> {ts}Edit{/ts}</span></a>
     {/if}
 
     {if call_user_func(array('CRM_Core_Permission','check'), 'delete activities')}
@@ -294,11 +262,11 @@
       {if ($context eq 'fulltext' || $context eq 'search') && $searchKey}
         {assign var='urlParams' value="reset=1&atype=$atype&action=delete&reset=1&id=$entityID&cid=$contactId&context=$context&key=$searchKey"}
       {/if}
-      <a href="{crmURL p='civicrm/contact/view/activity' q=$urlParams}" class="delete button" title="{ts}Delete{/ts}"><span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
+      <a href="{crmURL p='civicrm/contact/view/activity' q=$urlParams}" class="delete button" title="{ts}Delete{/ts}"><span><i class="crm-i fa-trash"></i> {ts}Delete{/ts}</span></a>
     {/if}
   {/if}
   {if $action eq 4 and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
-    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><div class="icon ui-icon-clipboard"></div>{ts}File on Case{/ts}</span></a>
+    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><i class="crm-i fa-clipboard"></i> {ts}File on Case{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
@@ -323,5 +291,5 @@
     {/literal}
   {/if}
   </div>{* end of form block*}
-{/if} {* end of snippet if*}
+
 {include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}

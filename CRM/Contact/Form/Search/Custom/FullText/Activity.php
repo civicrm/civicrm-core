@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
@@ -66,6 +64,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
   /**
    * @param string $queryText
    * @param string $entityIDTableName
+   *
    * @return array
    *   list tables/queries (for runQueries)
    */

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
 
@@ -46,8 +44,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *
    * @param array $params
    *   Associative array of delivery event values.
-   *
-   * @return void
    */
   public static function &create(&$params) {
     $q = &CRM_Mailing_Event_BAO_Queue::verify($params['job_id'],
@@ -89,6 +85,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Optional ID of a job to filter on.
    * @param bool $is_distinct
    *   Group by queue ID?.
+   * @param string $toDate
    *
    * @return int
    *   Number of rows in result set
@@ -154,6 +151,8 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Number of rows.
    * @param array $sort
    *   Sort array.
+   *
+   * @param int $is_test
    *
    * @return array
    *   Result set
@@ -264,11 +263,11 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
   }
 
   /**
-   * Since we never no when a mailing really bounces (hard bounce == NOW, soft bounce == NOW to NOW + 3 days?)
+   * Since we never know when a mailing really bounces (hard bounce == NOW, soft bounce == NOW to NOW + 3 days?)
    * we cannot decide when an email address last got an email.
    *
    * We want to avoid putting on hold an email address which had a few bounces (mbox full) and then got quite a few
-   * successfull deliveries before starting the bounce again. The current code does not set the resetDate and hence
+   * successful deliveries before starting the bounce again. The current code does not set the resetDate and hence
    * the above scenario results in the email being put on hold
    *
    * This function rectifies that by considering all non-test mailing jobs which have completed between $minDays and $maxDays
@@ -278,8 +277,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Consider mailings that were completed at least $minDays ago.
    * @param int $maxDays
    *   Consider mailings that were completed not more than $maxDays ago.
-   *
-   * @return void
    */
   public static function updateEmailResetDate($minDays = 3, $maxDays = 7) {
     $dao = new CRM_Core_Dao();

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,7 +30,7 @@
     {include file="CRM/Admin/Form/Tag.tpl"}
 {else}
 <div class="crm-content-block">
-    <div id="help">
+    <div class="help">
         {ts 1=$docLink}Tags can be assigned to any contact record, and are a convenient way to find contacts. You can create as many tags as needed to organize and segment your records.{/ts} {$docLink}
     </div>
 
@@ -38,9 +38,9 @@
         {if !($action eq 1 and $action eq 2)}
             <div class="crm-submit-buttons">
               <div class="action-link">
-                    {crmButton q="action=add&reset=1" id="newTag"  icon="circle-plus"}{ts}Add Tag{/ts}{/crmButton}
+                    {crmButton q="action=add&reset=1" id="newTag"  icon="plus-circle"}{ts}Add Tag{/ts}{/crmButton}
                     {if $adminTagSet}
-                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="circle-plus"}{ts}Add Tag Set{/ts}{/crmButton}
+                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="plus-circle"}{ts}Add Tag Set{/ts}{/crmButton}
                     {/if}
                 </div>
             </div>
@@ -81,9 +81,9 @@
         {if !($action eq 1 and $action eq 2)}
             <div class="crm-submit-buttons">
                 <div class="action-link">
-                    {crmButton q="action=add&reset=1" id="newTag"  icon="circle-plus"}{ts}Add Tag{/ts}{/crmButton}
+                    {crmButton q="action=add&reset=1" id="newTag"  icon="plus-circle"}{ts}Add Tag{/ts}{/crmButton}
                     {if $adminTagSet}
-                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="circle-plus"}{ts}Add Tag Set{/ts}{/crmButton}
+                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="plus-circle"}{ts}Add Tag Set{/ts}{/crmButton}
                     {/if}
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -48,6 +48,10 @@ class CRM_Event_Controller_Search extends CRM_Core_Controller {
 
   /**
    * Class constructor.
+   *
+   * @param string $title
+   * @param bool|int $action
+   * @param bool $modal
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
 

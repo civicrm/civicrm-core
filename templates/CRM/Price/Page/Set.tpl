@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,7 +30,7 @@
 {elseif $action eq 8 and !$usedBy}
     {include file="CRM/Price/Form/DeleteSet.tpl"}
 {else}
-    <div id="help">
+    <div class="help">
       {ts}Price sets allow you to set up flexible multi-option pricing schemes for your contribution, event and membership pages. Use a price set if the standard pricing options are insufficient for your needs.{/ts}
     </div>
 
@@ -76,7 +76,7 @@
 
         {if NOT ($action eq 1 or $action eq 2) }
         <div class="action-link">
-            {crmButton p='civicrm/admin/price' q="action=add&reset=1" id="newPriceSet"  icon="circle-plus"}{ts}Add Set of Price Fields{/ts}{/crmButton}
+            {crmButton p='civicrm/admin/price' q="action=add&reset=1" id="newPriceSet"  icon="plus-circle"}{ts}Add Set of Price Fields{/ts}{/crmButton}
         </div>
         {/if}
 

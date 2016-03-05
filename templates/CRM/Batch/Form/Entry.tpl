@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,13 +24,19 @@
  +--------------------------------------------------------------------+
 *}
 <div class="batch-entry form-item">
-  <div id="help">
-    {ts}Click Validate & Process below when you've entered all items for the batch. You can also Save & Continue Later at any time. Go to Administer > Customize Data and Screens > Profiles > Reserved Profiles > to add, remove or change the order of columns.{/ts}
+  <div class="help">
+    {ts}Click Validate & Process below when you've entered all items for the batch. You can also Save & Continue Later at any time.{/ts}
+    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+      {capture assign=batchEntryProfileURL}{crmURL p="civicrm/admin/uf/group" q="reset=1&selectedChild=reserved-profiles"}{/capture}
+      {ts 1=$batchEntryProfileURL}Add, remove or change the order of columns by editing the corresponding <a href="%1" target="_blank">Bulk Entry profile</a>.{/ts}
+      {if $batchType EQ 1}
+        {ts}Custom fields and a Personal Campaign Page field can be added if needed.{/ts}
+      {/if}
+    {/if}
   </div>
   {if $batchAmountMismatch}
     <div class="status message status-warning">
-      <div
-        class="icon ui-icon-alert"></div> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
+      <i class="crm-i fa-exclamation-triangle"></i> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
     </div>
     <div class="crm-button crm-button_qf_Entry_upload_force-save">
       {$form._qf_Entry_upload_force.html}
@@ -99,6 +105,14 @@
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
             </div>
             <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
+          {elseif $n eq 'soft_credit_type'}
+          {elseif $n eq 'contribution_soft_credit_pcp_id'}
+            <div class="compressed crm-grid-cell">
+              <div>{$form.pcp_made_through_id.$rowNumber.html}{$form.pcp_made_through.$rowNumber.html}</div>
+              <div>{$form.pcp_display_in_roll.$rowNumber.label}&nbsp;{$form.pcp_display_in_roll.$rowNumber.html}</div>
+              <div class="pcp_roll_display">{$form.pcp_roll_nickname.$rowNumber.label}&nbsp;{$form.pcp_roll_nickname.$rowNumber.html}</div>
+              <div class="pcp_roll_display">{$form.pcp_personal_note.$rowNumber.label}&nbsp;{$form.pcp_personal_note.$rowNumber.html}</div>
+            </div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
           {elseif $n eq 'total_amount'}
@@ -125,10 +139,10 @@ CRM.$(function($) {
   $('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
-    }; 
+    };
     $($form).ajaxSubmit(options);
   });
- 
+
  $('input[id*="primary_contact_"]').change(function() {
  var temp = this.id.split('_');
    var ROWID = temp[3];
@@ -427,9 +441,6 @@ function setFieldValue(fname, fieldValue, blockNo) {
   //check if it is date element
   var isDateElement = elementId.attr('format');
 
-  // check if it is wysiwyg element
-  var editor = elementId.attr('editor');
-
   //get the element type
   var elementType = elementId.attr('type');
 
@@ -455,24 +466,8 @@ function setFieldValue(fname, fieldValue, blockNo) {
       }
     }
     else {
-      if (editor) {
-        switch (editor) {
-          case 'ckeditor':
-            var elemtId = elementId.attr('id');
-            oEditor = CKEDITOR.instances[elemtId];
-            oEditor.setData(htmlContent);
-            break;
-          case 'tinymce':
-            var elemtId = element.attr('id');
-            tinyMCE.get(elemtId).setContent(htmlContent);
-            break;
-          case 'joomlaeditor':
-          // TO DO
-          case 'drupalwysiwyg':
-          // TO DO
-          default:
-            elementId.val(fieldValue);
-        }
+      if (elementId.is('textarea')) {
+        CRM.wysiwyg.setVal(elementId, fieldValue);
       }
       else {
         elementId.val(fieldValue);
@@ -528,7 +523,7 @@ if (CRM.batch.type_id == 3){
 function setPledgeAmount(form, pledgeID) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');
   var dataUrl = CRM.url('civicrm/ajax/pledgeAmount');
-  if (pledgeID) { 
+  if (pledgeID) {
     cj.post(dataUrl, {pid: pledgeID}, function (data) {
     cj('#field_' + rowID + '_financial_type').val(data.financial_type_id).change();
     cj('#field_' + rowID + '_total_amount').val(data.amount).change();
@@ -537,7 +532,7 @@ function setPledgeAmount(form, pledgeID) {
   }
   else {
     cj('#field_' + rowID + '_total_amount').val('').change();
-    cj('#field_' + rowID + '_financial_type').val('').change(); 
+    cj('#field_' + rowID + '_financial_type').val('').change();
     cj('#field_' + rowID + '_total_amount').removeAttr('readonly');
   }
 }

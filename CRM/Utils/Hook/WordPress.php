@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
@@ -91,22 +89,20 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
     $fnSuffix
   ) {
 
-    /**
-     * do_action_ref_array is the default way of calling WordPress hooks
-     * because for the most part no return value is wanted. However, this is
-     * only generally true, so using do_action_ref_array() is only called for those
-     * hooks which do not require a return value. We exclude the following, which
-     * are incompatible with the WordPress Plugin API:
-     *
-     * civicrm_upgrade
-     * http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_upgrade
-     *
-     * civicrm_caseSummary
-     * http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_caseSummary
-     *
-     * civicrm_dashboard
-     * http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_dashboard
-     */
+    // do_action_ref_array is the default way of calling WordPress hooks
+    // because for the most part no return value is wanted. However, this is
+    // only generally true, so using do_action_ref_array() is only called for those
+    // hooks which do not require a return value. We exclude the following, which
+    // are incompatible with the WordPress Plugin API:
+    //
+    // civicrm_upgrade
+    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_upgrade
+    //
+    // civicrm_caseSummary
+    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_caseSummary
+    //
+    // civicrm_dashboard
+    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_dashboard
 
     // distinguish between types of hook
     if (!in_array($fnSuffix, $this->hooksThatReturn)) {
@@ -118,12 +114,10 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
         $numParams
       );
 
-      /**
-       * Use WordPress Plugins API to modify $args
-       *
-       * Because $args are passed as references to the WordPress callbacks,
-       * runHooks subsequently receives appropriately modified parameters.
-       */
+      // Use WordPress Plugins API to modify $args
+      //
+      // Because $args are passed as references to the WordPress callbacks,
+      // runHooks subsequently receives appropriately modified parameters.
 
       // protect from REST calls
       if (function_exists('do_action_ref_array')) {
@@ -132,25 +126,23 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
     }
 
-    /**
-     * The following is based on the logic of the Joomla hook file by allowing
-     * WordPress callbacks to do their stuff before runHooks gets called.
-     *
-     * It also follows the logic of the Drupal hook file by building the "module"
-     * (read "plugin") list and then calling runHooks directly. This should avoid
-     * the need for the post-processing that the Joomla hook file does.
-     *
-     * Note that hooks which require a return value are incompatible with the
-     * signature of apply_filters_ref_array and must therefore be called in
-     * global scope, like in Drupal. It's not ideal, but plugins can always route
-     * these calls to methods in their classes.
-     *
-     * At some point, those hooks could be pre-processed and called via the WordPress
-     * Plugin API, but it would change their signature and require the CiviCRM docs
-     * to be rewritten for those calls in WordPress. So it's been done this way for
-     * now. Ideally these hooks will be deprecated in favour of hooks that do not
-     * require return values.
-     */
+    // The following is based on the logic of the Joomla hook file by allowing
+    // WordPress callbacks to do their stuff before runHooks gets called.
+
+    // It also follows the logic of the Drupal hook file by building the "module"
+    // (read "plugin") list and then calling runHooks directly. This should avoid
+    // the need for the post-processing that the Joomla hook file does.
+
+    // Note that hooks which require a return value are incompatible with the
+    // signature of apply_filters_ref_array and must therefore be called in
+    // global scope, like in Drupal. It's not ideal, but plugins can always route
+    // these calls to methods in their classes.
+
+    // At some point, those hooks could be pre-processed and called via the WordPress
+    // Plugin API, but it would change their signature and require the CiviCRM docs
+    // to be rewritten for those calls in WordPress. So it's been done this way for
+    // now. Ideally these hooks will be deprecated in favour of hooks that do not
+    // require return values.
 
     // build list of registered plugin codes
     $this->buildModuleList();
@@ -171,6 +163,7 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
   /**
    * Build the list of plugins ("modules" in CiviCRM terminology) to be processed for hooks.
+   *
    * We need to do this to preserve the CiviCRM hook signatures for hooks that require
    * a return value, since the WordPress Plugin API seems to be incompatible with them.
    *
@@ -192,11 +185,9 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
         // initialise with the pre-existing 'wordpress' prefix
         $this->wordpressModules = array('wordpress');
 
-        /**
-         * Use WordPress Plugin API to build list
-         * a plugin simply needs to declare its "unique_plugin_code" thus:
-         * add_filter('civicrm_wp_plugin_codes', 'function_that_returns_my_unique_plugin_code');
-         */
+        // Use WordPress Plugin API to build list
+        // a plugin simply needs to declare its "unique_plugin_code" thus:
+        // add_filter('civicrm_wp_plugin_codes', 'function_that_returns_my_unique_plugin_code');
 
         // protect from REST calls
         if (function_exists('apply_filters')) {

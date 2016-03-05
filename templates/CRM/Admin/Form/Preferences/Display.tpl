@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -75,7 +75,7 @@
                 {foreach from=$contactBlocks item="title" key="opId"}
                   <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
                       style="padding-left:1px;">
-                    <span class='ui-icon ui-icon-arrowthick-2-n-s' style="float:left;"></span>
+                    <i class='crm-i fa-arrows crm-grip' style="float:left;"></i>
                     <span>{$form.contact_edit_options.$opId.html}</span>
                   </li>
                 {/foreach}
@@ -87,7 +87,7 @@
                 {foreach from=$editOptions item="title" key="opId"}
                   <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
                       style="padding-left:1px;">
-                    <span class='ui-icon ui-icon-arrowthick-2-n-s' style="float:left;"></span>
+                    <i class='crm-i fa-arrows crm-grip' style="float:left;"></i>
                     <span>{$form.contact_edit_options.$opId.html}</span>
                   </li>
                 {/foreach}
@@ -154,34 +154,14 @@
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-editor_id">
-      <td class="label">{$form.editor_id.label}</td>
-      <td>{$form.editor_id.html}</td>
-    </tr>
-    {if $form.wysiwyg_input_format.html}
-      <tr id="crm-preferences-display-form-block-wysiwyg_input_format" style="display:none;">
-        <td class="label">{$form.wysiwyg_input_format.label}</td>
-        <td>
-          {$form.wysiwyg_input_format.html}{literal}
-            <script type="text/javascript">
-              CRM.$(function($) {
-                if ($('#editor_id').val() == 4) {
-                  $('#crm-preferences-display-form-block-wysiwyg_input_format').show();
-                }
-              });
-            </script>
-          {/literal}
-          <br/>
-          <span class="description">
-            {ts}You will need to enable and configure several modules if you want to allow users to upload images while using a Drupal Default Editor.{/ts}
-            {docURL page="Configuring CiviCRM to Use the Default Drupal Editor" resource="wiki"}
-          </span>
-        </td>
-      </tr>
-    {/if}
-    <tr class="crm-preferences-display-form-block-description">
-      <td>&nbsp;</td>
-      <td class="description">
-        {ts}Select the HTML WYSIWYG Editor provided for fields that allow HTML formatting. Select 'Textarea' if you don't want to provide a WYSIWYG Editor (users will type text and / or HTML code into plain text fields).{/ts} {help id="id-editor_id"}
+      <td class="label">{$form.editor_id.label} {help id="editor_id"}</td>
+      <td>
+        {$form.editor_id.html}
+        &nbsp;
+        <span class="crm-button crm-icon-button" style="display:inline-block;vertical-align:middle;float:none!important;">
+          <i class="crm-i fa-wrench" style="margin: 0 -18px 0 2px;"></i>
+          {$form.ckeditor_config.html}
+        </span>
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
@@ -249,6 +229,11 @@
           placeholder: 'ui-state-highlight',
           update: getSorting
         });
+
+        function showCKEditorConfig() {
+          $('.crm-preferences-display-form-block-editor_id .crm-button').toggle($(this).val() == 'CKEditor');
+        }
+        $('select[name=editor_id]').each(showCKEditorConfig).change(showCKEditorConfig);
       });
     </script>
   {/literal}

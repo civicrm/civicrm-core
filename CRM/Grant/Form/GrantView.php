@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -118,7 +118,7 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
 
     $grantType = CRM_Core_DAO::getFieldValue("CRM_Grant_DAO_Grant", $this->_id, "grant_type_id");
     $groupTree = &CRM_Core_BAO_CustomGroup::getTree("Grant", $this, $this->_id, 0, $grantType);
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_id);
 
     $this->assign('id', $this->_id);
 

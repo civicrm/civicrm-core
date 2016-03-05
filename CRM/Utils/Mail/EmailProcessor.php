@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 // we should consider moving these to the settings table
@@ -39,7 +37,7 @@ define('EMAIL_ACTIVITY_TYPE_ID', NULL);
 define('MAIL_BATCH_SIZE', 50);
 
 /**
- * Class CRM_Utils_Mail_EmailProcessor
+ * Class CRM_Utils_Mail_EmailProcessor.
  */
 class CRM_Utils_Mail_EmailProcessor {
 
@@ -65,14 +63,12 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Delete old files from a given directory (recursively)
+   * Delete old files from a given directory (recursively).
    *
    * @param string $dir
    *   Directory to cleanup.
    * @param int $age
    *   Files older than this many seconds will be deleted (default: 60 days).
-   *
-   * @return void
    */
   public static function cleanupDir($dir, $age = 5184000) {
     // return early if we can’t read/write the dir
@@ -96,9 +92,7 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce)
-   *
-   * @return void
+   * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce).
    */
   public static function processActivities() {
     $dao = new CRM_Core_DAO_MailSettings();
@@ -120,8 +114,6 @@ class CRM_Utils_Mail_EmailProcessor {
    * Process the mailbox for all the settings from civicrm_mail_settings.
    *
    * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
-   *
-   * @return void
    */
   public static function process($civiMail = TRUE) {
     $dao = new CRM_Core_DAO_MailSettings();
@@ -168,7 +160,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $regex = '/^' . preg_quote($dao->localpart) . '(b|c|e|o|r|u)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '$/';
 
     // a tighter regex for finding bounce info in soft bounces’ mail bodies
-    $rpRegex = '/Return-Path: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
+    $rpRegex = '/Return-Path:\s*' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
 
     // a regex for finding bound info X-Header
     $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/i';
@@ -246,7 +238,14 @@ class CRM_Utils_Mail_EmailProcessor {
         // preseve backward compatibility
         if ($usedfor == 0 || !$civiMail) {
           // if its the activities that needs to be processed ..
-          $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
+          try {
+            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
+          }
+          catch (Exception $e) {
+            echo $e->getMessage();
+            $store->markIgnored($key);
+            continue;
+          }
 
           require_once 'CRM/Utils/DeprecatedUtils.php';
           $params = _civicrm_api3_deprecated_activity_buildmailparams($mailParams, $emailActivityTypeId);
@@ -289,7 +288,40 @@ class CRM_Utils_Mail_EmailProcessor {
                 $text = $mail->body->text;
               }
               elseif ($mail->body instanceof ezcMailMultipart) {
-                if ($mail->body instanceof ezcMailMultipartRelated) {
+                if ($mail->body instanceof ezcMailMultipartReport) {
+                  $part = $mail->body->getMachinePart();
+                  if ($part instanceof ezcMailDeliveryStatus) {
+                    foreach ($part->recipients as $rec) {
+                      if (isset($rec["Diagnostic-Code"])) {
+                        $text = $rec["Diagnostic-Code"];
+                        break;
+                      }
+                      elseif (isset($rec["Description"])) {
+                        $text = $rec["Description"];
+                        break;
+                      }
+                      // no diagnostic info present - try getting the human readable part
+                      elseif (isset($rec["Status"])) {
+                        $text = $rec["Status"];
+                        $textpart = $mail->body->getReadablePart();
+                        if ($textpart != NULL and isset($textpart->text)) {
+                          $text .= " " . $textpart->text;
+                        }
+                        else {
+                          $text .= " Delivery failed but no diagnostic code or description.";
+                        }
+                        break;
+                      }
+                    }
+                  }
+                  elseif ($part != NULL and isset($part->text)) {
+                    $text = $part->text;
+                  }
+                  elseif (($part = $mail->body->getReadablePart()) != NULL) {
+                    $text = $part->text;
+                  }
+                }
+                elseif ($mail->body instanceof ezcMailMultipartRelated) {
                   foreach ($mail->body->getRelatedParts() as $part) {
                     if (isset($part->subType) and $part->subType == 'plain') {
                       $text = $part->text;
@@ -308,7 +340,7 @@ class CRM_Utils_Mail_EmailProcessor {
               }
 
               if (
-                $text == NULL &&
+                empty($text) &&
                 $mail->subject == "Delivery Status Notification (Failure)"
               ) {
                 // Exchange error - CRM-9361
@@ -316,7 +348,12 @@ class CRM_Utils_Mail_EmailProcessor {
                   if ($part instanceof ezcMailDeliveryStatus) {
                     foreach ($part->recipients as $rec) {
                       if ($rec["Status"] == "5.1.1") {
-                        $text = "Delivery to the following recipients failed";
+                        if (isset($rec["Description"])) {
+                          $text = $rec["Description"];
+                        }
+                        else {
+                          $text = $rec["Status"] . " Delivery to the following recipients failed";
+                        }
                         break;
                       }
                     }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,21 +26,16 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *
  * This class extends the PEAR pager object by substituting standard default pager arguments
  * We also extract the pageId from either the GET variables or the POST variable (since we
  * use a POST to jump to a specific page). At some point we should evaluate if we want
  * to use Pager_Jumping instead. We've changed the format to allow navigation by jumping
  * to a page and also First, Prev CURRENT Next Last
- *
  */
 
 require_once 'Pager/Sliding.php';
@@ -58,6 +53,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * The output of the pager. This is a name/value array with various keys
    * that an application could use to display the pager
+   *
    * @var array
    */
   public $_response;
@@ -113,8 +109,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
     /**
      * A page cannot have two variables with the same form name. Hence in the
      * pager display, we have a form submission at the top with the normal
-     * page variable, but a different form element for one at the bottom
-     *
+     * page variable, but a different form element for one at the bottom.
      */
     $this->_response['titleTop'] = ts('Page %1 of %2', array(
         1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />',
@@ -131,22 +126,20 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * values.
    *
    * @param array $params
-   *   The set of options needed to initialize the parent.
-   *                             constructor
+   *   The set of options needed to initialize the parent constructor.
    *
-   *
-   * @return void
+   * @return array
    */
   public function initialize(&$params) {
-    /* set the mode for the pager to Sliding */
+    // set the mode for the pager to Sliding
 
     $params['mode'] = 'Sliding';
 
-    /* also set the urlVar to be a crm specific get variable */
+    // also set the urlVar to be a crm specific get variable.
 
     $params['urlVar'] = self::PAGE_ID;
 
-    /* set this to a small value, since we dont use this functionality */
+    // set this to a small value, since we dont use this functionality
 
     $params['delta'] = 1;
 
@@ -316,6 +309,11 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
   /**
    * Build a url for pager links.
+   *
+   * @param string $key
+   * @param string $value
+   *
+   * @return string
    */
   public function makeURL($key, $value) {
     $href = CRM_Utils_System::makeURL($key, TRUE);

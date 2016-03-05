@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,23 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * advanced search, extends basic search
+ * Advanced search, extends basic search.
  */
 class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Advanced');
@@ -58,9 +50,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->set('context', 'advanced');
@@ -87,7 +76,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     );
 
     //check if there are any custom data searchable fields
-    $groupDetails = array();
     $extends = array_merge(array('Contact', 'Individual', 'Household', 'Organization'),
       CRM_Contact_BAO_ContactType::subTypes()
     );
@@ -223,17 +211,13 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * The post processing of the form gets done here.
    *
    * Key things done during post processing are
-   *      - check for reset or next request. if present, skip post procesing.
+   *      - check for reset or next request. if present, skip post processing.
    *      - now check if user requested running a saved search, if so, then
    *        the form values associated with the saved search are used for searching.
-   *      - if user has done a submit with new values the regular post submissing is
+   *      - if user has done a submit with new values the regular post submitting is
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     $this->set('isAdvanced', '1');
@@ -325,17 +309,16 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
-    $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
     $this->_returnProperties = &$this->returnProperties();
     parent::postProcess();
   }
 
   /**
-   * Normalize the form values to make it look similar to the advanced form values
-   * this prevents a ton of work downstream and allows us to use the same code for
-   * multiple purposes (queries, save/edit etc)
+   * Normalize the form values to make it look similar to the advanced form values.
    *
-   * @return void
+   * This prevents a ton of work downstream and allows us to use the same code for
+   * multiple purposes (queries, save/edit etc)
    */
   public function normalizeFormValues() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);
@@ -348,51 +331,27 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     }
 
     $config = CRM_Core_Config::singleton();
-    $group = CRM_Utils_Array::value('group', $this->_formValues);
-    if ($group && is_array($group)) {
-      unset($this->_formValues['group']);
-      foreach ($group as $key => $value) {
-        $this->_formValues['group'][$value] = 1;
-      }
-    }
-
-    $tag = CRM_Utils_Array::value('contact_tags', $this->_formValues);
-    if ($tag && is_array($tag)) {
-      unset($this->_formValues['contact_tags']);
-      foreach ($tag as $key => $value) {
-        $this->_formValues['contact_tags'][$value] = 1;
-      }
-    }
-
     $specialParams = array(
       'financial_type_id',
       'contribution_soft_credit_type_id',
       'contribution_status',
       'contribution_status_id',
       'contribution_source',
-      'membership_type_id',
       'membership_status_id',
       'participant_status_id',
       'contribution_trxn_id',
       'activity_type_id',
       'status_id',
       'activity_subject',
+      'contribution_page_id',
+      'contribution_product_id',
+      'payment_instrument_id',
+      'group',
+      'contact_tags',
+      'preferred_communication_method',
     );
-    foreach ($specialParams as $element) {
-      $value = CRM_Utils_Array::value($element, $this->_formValues);
-      if ($value) {
-        if (is_array($value)) {
-          if ($element == 'status_id') {
-            unset($this->_formValues[$element]);
-            $element = 'activity_' . $element;
-          }
-          $this->_formValues[$element] = array('IN' => $value);
-        }
-        else {
-          $this->_formValues[$element] = array('LIKE' => "%$value%");
-        }
-      }
-    }
+    $changeNames = array('status_id' => 'activity_status_id');
+    CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
 
     $taglist = CRM_Utils_Array::value('contact_taglist', $this->_formValues);
 
@@ -403,7 +362,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
           $value = explode(',', $value);
           foreach ($value as $tId) {
             if (is_numeric($tId)) {
-              $this->_formValues['contact_tags'][$tId] = 1;
+              $this->_formValues['contact_tags'][] = $tId;
             }
           }
         }

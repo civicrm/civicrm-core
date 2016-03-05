@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -54,10 +54,6 @@ class CRM_Core_DAO extends DB_DataObject {
     VALUE_SEPARATOR = "",
     BULK_INSERT_COUNT = 200,
     BULK_INSERT_HIGH_COUNT = 200,
-    // special value for mail bulk inserts to avoid
-    // potential duplication, assuming a smaller number reduces number of queries
-    // by some factor, so some tradeoff. CRM-8678
-    BULK_MAIL_INSERT_COUNT = 10,
     QUERY_FORMAT_WILDCARD = 1,
     QUERY_FORMAT_NO_QUOTES = 2;
 
@@ -74,6 +70,12 @@ class CRM_Core_DAO extends DB_DataObject {
   static $_factory = NULL;
 
   static $_checkedSqlFunctionsExist = FALSE;
+
+  /**
+   * https://issues.civicrm.org/jira/browse/CRM-17748
+   * internal variable for DAO to hold per-query settings
+   */
+  protected $_options = array();
 
   /**
    * Class constructor.
@@ -99,11 +101,17 @@ class CRM_Core_DAO extends DB_DataObject {
    *   The database connection string.
    */
   public static function init($dsn) {
+    Civi::$statics[__CLASS__]['init'] = 1;
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
     $options['database'] = $dsn;
     if (defined('CIVICRM_DAO_DEBUG')) {
       self::DebugLevel(CIVICRM_DAO_DEBUG);
     }
+    CRM_Core_DAO::setFactory(new CRM_Contact_DAO_Factory());
+    if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
+      CRM_Core_DAO::executeQuery('SET SESSION sql_mode = STRICT_TRANS_TABLES');
+    }
+    CRM_Core_DAO::executeQuery('SET NAMES utf8');
   }
 
   /**
@@ -313,12 +321,20 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function query($query, $i18nRewrite = TRUE) {
     // rewrite queries that should use $dbLocale-based views for multi-language installs
-    global $dbLocale;
+    global $dbLocale, $_DB_DATAOBJECT;
+
+    $conn = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
+    $orig_options = $conn->options;
+    $this->_setDBOptions($this->_options);
+
     if ($i18nRewrite and $dbLocale) {
       $query = CRM_Core_I18n_Schema::rewriteQuery($query);
     }
 
-    return parent::query($query);
+    $ret = parent::query($query);
+
+    $this->_setDBOptions($orig_options);
+    return $ret;
   }
 
   /**
@@ -350,7 +366,12 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function initialize() {
     $this->_connect();
-    $this->query("SET NAMES utf8");
+    if (empty(Civi::$statics[__CLASS__]['init'])) {
+      // CRM_Core_DAO::init() must be called before CRM_Core_DAO->initialize().
+      // This occurs very early in bootstrap - error handlers may not be wired up.
+      echo "Inconsistent system initialization sequence. Premature access of (" . get_class($this) . ")";
+      CRM_Utils_System::civiExit();
+    }
   }
 
   /**
@@ -429,24 +450,32 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Save DAO object.
    *
+   * @param bool $hook
+   *
    * @return $this
    */
-  public function save() {
+  public function save($hook = TRUE) {
     if (!empty($this->id)) {
       $this->update();
 
-      $event = new \Civi\Core\DAO\Event\PostUpdate($this);
-      \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-update", $event);
+      if ($hook) {
+        $event = new \Civi\Core\DAO\Event\PostUpdate($this);
+        \Civi::service('dispatcher')->dispatch("DAO::post-update", $event);
+      }
     }
     else {
       $this->insert();
 
-      $event = new \Civi\Core\DAO\Event\PostUpdate($this);
-      \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-insert", $event);
+      if ($hook) {
+        $event = new \Civi\Core\DAO\Event\PostUpdate($this);
+        \Civi::service('dispatcher')->dispatch("DAO::post-insert", $event);
+      }
     }
     $this->free();
 
-    CRM_Utils_Hook::postSave($this);
+    if ($hook) {
+      CRM_Utils_Hook::postSave($this);
+    }
 
     return $this;
   }
@@ -480,7 +509,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $result = parent::delete($useWhere);
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-delete", $event);
+    \Civi::service('dispatcher')->dispatch("DAO::post-delete", $event);
 
     return $result;
   }
@@ -1138,6 +1167,64 @@ FROM   civicrm_domain
   }
 
   /**
+   * execute an unbuffered query.  This is a wrapper around new functionality
+   * exposed with CRM-17748.
+   *
+   * @param string $query query to be executed
+   *
+   * @return Object CRM_Core_DAO object that points to an unbuffered result set
+   * @static
+   * @access public
+   */
+  static public function executeUnbufferedQuery(
+    $query,
+    $params = array(),
+    $abort = TRUE,
+    $daoName = NULL,
+    $freeDAO = FALSE,
+    $i18nRewrite = TRUE,
+    $trapException = FALSE
+  ) {
+    $queryStr = self::composeQuery($query, $params, $abort);
+    //CRM_Core_Error::debug( 'q', $queryStr );
+    if (!$daoName) {
+      $dao = new CRM_Core_DAO();
+    }
+    else {
+      $dao = new $daoName();
+    }
+
+    if ($trapException) {
+      CRM_Core_Error::ignoreException();
+    }
+
+    // set the DAO object to use an unbuffered query
+    $dao->setOptions(array('result_buffering' => 0));
+
+    $result = $dao->query($queryStr, $i18nRewrite);
+
+    if ($trapException) {
+      CRM_Core_Error::setCallback();
+    }
+
+    if (is_a($result, 'DB_Error')) {
+      return $result;
+    }
+
+    // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
+    $dao->N = TRUE;
+
+    if ($freeDAO ||
+      preg_match('/^(insert|update|delete|create|drop|replace)/i', $queryStr)
+    ) {
+      // we typically do this for insert/update/delete stataments OR if explicitly asked to
+      // free the dao
+      $dao->free();
+    }
+    return $dao;
+  }
+
+  /**
    * Execute a query.
    *
    * @param string $query
@@ -1753,7 +1840,7 @@ SELECT contact_id
    * @param $defaults
    */
   public static function setCreateDefaults(&$params, $defaults) {
-    if (isset($params['id'])) {
+    if (!empty($params['id'])) {
       return;
     }
     foreach ($defaults as $key => $value) {
@@ -2266,7 +2353,7 @@ SELECT contact_id
    *   a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    */
-  public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
+  public static function createSQLFilter($fieldName, $filter, $type = NULL, $alias = NULL, $returnSanitisedArray = FALSE) {
     foreach ($filter as $operator => $criteria) {
       if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {
@@ -2386,9 +2473,90 @@ SELECT contact_id
   }
 
   /**
+   * https://issues.civicrm.org/jira/browse/CRM-17748
+   * Sets the internal options to be used on a query
+   *
+   * @param array $options
+   *
+   */
+  public function setOptions($options) {
+    if (is_array($options)) {
+      $this->_options = $options;
+    }
+  }
+
+  /**
+   * https://issues.civicrm.org/jira/browse/CRM-17748
+   * wrapper to pass internal DAO options down to DB_mysql/DB_Common level
+   *
+   * @param array $options
+   *
+   */
+  protected function _setDBOptions($options) {
+    global $_DB_DATAOBJECT;
+
+    if (is_array($options) && count($options)) {
+      $conn = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
+      foreach ($options as $option_name => $option_value) {
+        $conn->setOption($option_name, $option_value);
+      }
+    }
+  }
+
+  /**
+   * @deprecated
    * @param array $params
    */
   public function setApiFilter(&$params) {
+  }
+
+  /**
+   * Generates acl clauses suitable for adding to WHERE or ON when doing an api.get for this entity
+   *
+   * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
+   * @code
+   *   array(
+   *     'location_type_id' => array('IS NOT NULL', 'IN (1,2,3)')
+   *   )
+   * @endcode
+   *
+   * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
+   *
+   * @return array
+   */
+  public function addSelectWhereClause() {
+    // This is the default fallback, and works for contact-related entities like Email, Relationship, etc.
+    $clauses = array();
+    foreach ($this->fields() as $fieldName => $field) {
+      if (strpos($fieldName, 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+        $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
+      }
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
+  /**
+   * This returns the final permissioned query string for this entity
+   *
+   * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
+   *
+   * @param string $tableAlias
+   * @return array
+   */
+  public static function getSelectWhereClause($tableAlias = NULL) {
+    $bao = new static();
+    if ($tableAlias === NULL) {
+      $tableAlias = $bao->tableName();
+    }
+    $clauses = array();
+    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+      $clauses[$field] = NULL;
+      if ($vals) {
+        $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+      }
+    }
+    return $clauses;
   }
 
 }

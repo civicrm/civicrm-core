@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -361,7 +361,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -565,17 +565,17 @@ class CRM_Campaign_Page_AJAX {
   }
 
   /**
-   * Retrieve campaigns as for campaign dashboard.
-   *
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    */
-  public function campaignList() {
+  public static function campaignList() {
     //get the search criteria params.
     $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (isset($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -662,14 +662,14 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
 
   /**
-   * Retrieve survey for survey dashboard.
-   *
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    */
   public function surveyList() {
     //get the search criteria params.
@@ -767,14 +767,14 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
 
   /**
-   * Retrieve petitions for petition dashboard.
-   *
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    */
   public function petitionList() {
     //get the search criteria params.
@@ -867,7 +867,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

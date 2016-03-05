@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
@@ -46,11 +44,9 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *
    * @param int $queue_id
    *   The Queue Event ID of the recipient.
-   *
-   * @return void
    */
   public static function open($queue_id) {
-    /* First make sure there's a matching queue event */
+    // First make sure there's a matching queue event.
 
     $success = FALSE;
 
@@ -76,6 +72,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *   Optional ID of a job to filter on.
    * @param bool $is_distinct
    *   Group by queue ID?.
+   *
+   * @param string $toDate
    *
    * @return int
    *   Number of rows in result set

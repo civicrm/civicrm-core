@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,8 +31,8 @@
     {include file="CRM/UF/Form/Preview.tpl"}
 {elseif $action eq 8192}
     {* Display HTML Form Snippet Code *}
-    <div id="help">
-        {ts}The HTML code below will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on ANY website where you want to collect contact information.{/ts} {help id='standalone'}
+    <div class="help">
+        {ts}The HTML code below will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on your website where you want to collect contact information.{/ts} {help id='standalone'}
     </div>
     <br />
     <form name="html_code" action="{crmURL p='civicrm/admin/uf/group' q="action=profile&gid=$gid"}">
@@ -47,20 +47,20 @@
     </form>
 
 {else}
-    <div id="help">
+    <div class="help">
         {ts}CiviCRM Profile(s) allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features. They provide a powerful set of tools for you to collect information from constituents and selectively share contact information.{/ts} {help id='profile_overview'}
     </div>
 
     {if NOT ($action eq 1 or $action eq 2)}
     <div class="crm-submit-buttons">
-        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
+        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
     </div>
     {/if}
     {if $rows}
     <div id='mainTabContainer'>
         <ul>
-            <li id='tab_user'>    <a href='#user-profiles'     title='{ts}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a></li>
-            <li id='tab_reserved'><a href='#reserved-profiles' title='{ts}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a></li>
+            <li id='tab_user-profiles'>    <a href='#user-profiles'     title='{ts}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a></li>
+            <li id='tab_reserved-profiles'><a href='#reserved-profiles' title='{ts}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a></li>
         </ul>
 
         {* handle enable/disable actions*}
@@ -83,7 +83,7 @@
             <tbody>
             {foreach from=$rows item=row}
             {if !$row.is_reserved }
-              <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
+              <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td class="crmf-title crm-editable">{$row.title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
@@ -103,7 +103,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
@@ -146,7 +146,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
@@ -154,10 +154,11 @@
 
   </div> {* maincontainer*}
   <script type='text/javascript'>
-      CRM.$(function($) {ldelim}
-        var selectedTab = '{if $selectedChild}{$selectedChild}{else}user-profiles{/if}';
-        var tabIndex = $('#tab_' + selectedTab).prevAll().length;
-        {literal}
+    var selectedTab = 'user-profiles';
+    {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
+    {literal}
+      CRM.$(function($) {
+        var tabIndex = $('#tab_' + selectedTab).prevAll().length
         $("#mainTabContainer").tabs( {active: tabIndex} );
       });
     {/literal}

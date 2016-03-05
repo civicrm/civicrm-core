@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: Display.php 45499 2013-02-08 12:31:05Z kurund $
- *
  */
 
 /**
@@ -114,26 +112,11 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $defaults = parent::setDefaultValues();
     parent::cbsDefaultValues($defaults);
 
-    if ($this->_config->editor_id) {
-      $defaults['editor_id'] = $this->_config->editor_id;
-    }
-    if (empty($this->_config->display_name_format)) {
-      $defaults['display_name_format'] = "{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}";
-    }
-    else {
+    if ($this->_config->display_name_format) {
       $defaults['display_name_format'] = $this->_config->display_name_format;
     }
-
-    if (empty($this->_config->sort_name_format)) {
-      $defaults['sort_name_format'] = "{contact.last_name}{, }{contact.first_name}";
-    }
-    else {
+    if ($this->_config->sort_name_format) {
       $defaults['sort_name_format'] = $this->_config->sort_name_format;
-    }
-
-    $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal == '1' && module_exists("wysiwyg")) {
-      $defaults['wysiwyg_input_format'] = variable_get('civicrm_wysiwyg_input_format', 0);
     }
 
     return $defaults;
@@ -141,49 +124,18 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
-    $wysiwyg_options = array('' => ts('Textarea')) + CRM_Core_OptionGroup::values('wysiwyg_editor');
+    $wysiwyg_options = CRM_Core_OptionGroup::values('wysiwyg_editor', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
 
     //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $this->assign('invoicing', $invoicing);
-    $config = CRM_Core_Config::singleton();
     $extra = array();
 
-    //if not using Joomla, remove Joomla default editor option
-    if ($config->userFramework != 'Joomla') {
-      unset($wysiwyg_options[3]);
-    }
-
-    $drupal_wysiwyg = FALSE;
-    if (!$config->userSystem->is_drupal || !module_exists("wysiwyg")) {
-      unset($wysiwyg_options[4]);
-    }
-    else {
-      $extra['onchange'] = '
-      if (this.value==4) {
-        cj("#crm-preferences-display-form-block-wysiwyg_input_format").show();
-      }
-      else {
-        cj("#crm-preferences-display-form-block-wysiwyg_input_format").hide()
-      }';
-
-      $formats = filter_formats();
-      $format_options = array();
-      foreach ($formats as $id => $format) {
-        $format_options[$id] = $format->name;
-      }
-      $drupal_wysiwyg = TRUE;
-    }
     $this->addElement('select', 'editor_id', ts('WYSIWYG Editor'), $wysiwyg_options, $extra);
-
-    if ($drupal_wysiwyg) {
-      $this->addElement('select', 'wysiwyg_input_format', ts('Input Format'), $format_options, NULL);
-    }
+    $this->addElement('submit', 'ckeditor_config', ts('Configure CKEditor'));
 
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');
     $this->assign('editOptions', $editOptions);
@@ -204,9 +156,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::VIEW) {
@@ -226,18 +175,18 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       CRM_Core_BAO_OptionValue::updateOptionWeights($opGroupId, array_flip($preferenceWeights));
     }
 
-    $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal == '1' && module_exists("wysiwyg")) {
-      variable_set('civicrm_wysiwyg_input_format', $this->_params['wysiwyg_input_format']);
-    }
-
     $this->_config->editor_id = $this->_params['editor_id'];
 
-    // set default editor to session if changed
-    $session = CRM_Core_Session::singleton();
-    $session->set('defaultWysiwygEditor', $this->_params['editor_id']);
-
     $this->postProcessCommon();
+
+    // If "Configure CKEditor" button was clicked
+    if (!empty($this->_params['ckeditor_config'])) {
+      // Suppress the "Saved" status message and redirect to the CKEditor Config page
+      $session = CRM_Core_Session::singleton();
+      $session->getStatus(TRUE);
+      $url = CRM_Utils_System::url('civicrm/admin/ckeditor', 'reset=1');
+      $session->pushUserContext($url);
+    }
   }
 
 }

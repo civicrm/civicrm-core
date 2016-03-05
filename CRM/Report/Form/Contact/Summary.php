@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -56,44 +56,19 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-            'required' => TRUE,
-            'no_repeat' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-          ),
-          'middle_name' => array(
-            'title' => ts('Middle Name'),
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-          ),
-          'age' => array(
-            'title' => ts('Age'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
+        'fields' => array_merge(
+          $this->getBasicContactFields(),
+          array(
+            'modified_date' => array(
+              'title' => ts('Modified Date'),
+              'default' => FALSE,
+            ),
+          )
         ),
         'filters' => array(
-          'sort_name' => array('title' => ts('Contact Name')),
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+          ),
           'source' => array(
             'title' => ts('Contact Source'),
             'type' => CRM_Utils_Type::T_STRING,
@@ -116,6 +91,11 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           ),
           'contact_sub_type' => array(
             'title' => ts('Contact Subtype'),
+          ),
+          'modified_date' => array(
+            'title' => ts('Modified Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
         'grouping' => 'contact-fields',
@@ -273,7 +253,15 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * Initialise basic row.
+   *
+   * @param array $rows
+   *
+   * @param bool $entryFound
+   * @param array $row
+   * @param int $rowId
+   * @param int $rowNum
+   * @param array $types
    *
    * @return bool
    */
@@ -300,8 +288,6 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-
-    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
 
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
@@ -332,8 +318,8 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      // handle gender id
-      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contact_gender_id', $rowNum, $genders);
+      // Handle ID to label conversion for contact fields
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/summary', 'View Contact Summary') ? TRUE : $entryFound;
 
       // display birthday in the configured custom format
       if (array_key_exists('civicrm_contact_birth_date', $row)) {

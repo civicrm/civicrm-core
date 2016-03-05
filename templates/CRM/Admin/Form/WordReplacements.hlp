@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
   {ts}Word Replacements{/ts}
 {/htxt}
 {htxt id="id-word_replace"}
-    <p>{ts}Change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurences of 'Contribution' with 'Donation').{/ts}
+    <p>{ts}Change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurrences of 'Contribution' with 'Donation').{/ts}
     {ts}Partial matches will be replaced unless you click "Exact Match". EXAMPLE: replacing 'Contribution' with 'Donation' will also replace 'Contributions' with 'Donations' unless 'Exact Match' is checked.{/ts}
     <p>{ts}Use 'Exact Match' if you don't want partial matches to be replaced OR you are replacing a complete phrase (e.g. replace 'Create Printable Letters (PDF)' with  'Write Letters').{/ts}</p>
     <p>{ts}IMPORTANT: Replacements are case-sensitive whether 'Exact Match' is checked or not.{/ts}</p>

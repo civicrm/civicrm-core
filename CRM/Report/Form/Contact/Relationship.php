@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -44,6 +44,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   );
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
+  /**
+   * This will be a_b or b_a.
+   *
+   * @var string
+   */
+  protected $relationType;
+
+  /**
+   * Class constructor.
+   */
   public function __construct() {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
@@ -239,11 +249,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'relationship_type_id' => array(
             'title' => ts('Relationship'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array(
-              '' => '- any relationship type -',
-            ) +
-            CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'start_date' => array(
@@ -262,11 +269,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'filters' => array(
           'country_id' => array(
             'title' => ts('Country'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::country(),
           ),
           'state_province_id' => array(
             'title' => ts('State/Province'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::stateProvince(),
           ),
@@ -512,9 +521,14 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         //for displaying relationship type filter
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
-          $statistics['filters'][$id]['value'] = 'Is equal to ' .
-            $relTypes[$this->_params['relationship_type_id_value']]['label_' .
-            $this->relationType];
+          $op = CRM_Utils_array::value('relationship_type_id_op', $this->_params) == 'in' ?
+            ts('Is one of') . ' ' : ts('Is not one of') . ' ';
+          $relationshipTypes = array();
+          foreach ($this->_params['relationship_type_id_value'] as $relationship) {
+            $relationshipTypes[] = $relTypes[$relationship]['label_' . $this->relationType];
+          }
+          $statistics['filters'][$id]['value'] = $op .
+            implode(', ', $relationshipTypes);
         }
 
         //for displaying relationship status
@@ -560,13 +574,20 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function postProcess() {
     $this->beginPostProcess();
 
-    $this->relationType = NULL;
-    $relType = array();
+    $originalRelationshipTypeIdValue = $this->_params['relationship_type_id_value'];
     if (!empty($this->_params['relationship_type_id_value'])) {
-      $relType = explode('_', $this->_params['relationship_type_id_value']);
-
-      $this->relationType = $relType[1] . '_' . $relType[2];
-      $this->_params['relationship_type_id_value'] = intval($relType[0]);
+      $relationshipTypes = array();
+      $direction = array();
+      $relType = array();
+      foreach ($this->_params['relationship_type_id_value'] as $relationship_type) {
+        $relType = explode('_', $relationship_type);
+        $direction[] = $relType[1] . '_' . $relType[2];
+        $relationshipTypes[] = intval($relType[0]);
+      }
+      // Lets take the first relationship type to guide us in the relationship direction
+      // we should use.
+      $this->relationType = $direction[0];
+      $this->_params['relationship_type_id_value'] = $relationshipTypes;
     }
 
     $this->buildACLClause(array(
@@ -579,9 +600,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
 
-    if (!empty($relType)) {
+    if (!empty($originalRelationshipTypeIdValue)) {
       // store its old value, CRM-5837
-      $this->_params['relationship_type_id_value'] = implode('_', $relType);
+      $this->_params['relationship_type_id_value'] = $originalRelationshipTypeIdValue;
     }
     $this->endPostProcess($rows);
   }

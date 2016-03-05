@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class gets the name of the file to upload
+ * This class gets the name of the file to upload.
  */
 class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_mapperFields = $this->get('fields');
@@ -107,8 +103,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //to save the current mappings
@@ -475,10 +469,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
+   * Process the mapped fields and map it into the uploaded file preview the file and extract some summary statistics.
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');

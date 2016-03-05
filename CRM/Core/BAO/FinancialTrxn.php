@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -58,10 +58,9 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   public static function create(&$params, $trxnEntityTable = NULL) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
-    $fids = array();
+
     if (!CRM_Utils_Rule::currencyCode($trxn->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $trxn->currency = $config->defaultCurrency;
+      $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
     $trxn->save();
@@ -144,16 +143,18 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
    * @param $entity_id
-   *   Id of the entity usually the contactID.
+   *   Id of the entity usually the contributionID.
    * @param string $orderBy
    *   To get single trxn id for a entity table i.e last or first.
    * @param bool $newTrxn
+   * @param string $whereClause
+   *   Additional where parameters
    *
    * @return array
    *   array of category id's the contact belongs to.
    *
    */
-  public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE) {
+  public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE, $whereClause = '') {
     $ids = array('entityFinancialTrxnId' => NULL, 'financialTrxnId' => NULL);
 
     $condition = "";
@@ -165,7 +166,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
       $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
     }
 
-    $query = "SELECT ceft.id, ceft.financial_trxn_id FROM `civicrm_financial_trxn` cft
+    $query = "SELECT ceft.id, ceft.financial_trxn_id, cft.trxn_id FROM `civicrm_financial_trxn` cft
 LEFT JOIN civicrm_entity_financial_trxn ceft
 ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
 LEFT JOIN civicrm_entity_financial_trxn ceft1
@@ -173,6 +174,7 @@ ON ceft1.financial_trxn_id = cft.id AND ceft1.entity_table = 'civicrm_financial_
 LEFT JOIN civicrm_financial_item cfi ON ceft1.entity_table = 'civicrm_financial_item' and cfi.id = ceft1.entity_id
 WHERE ceft.entity_id = %1 AND (cfi.entity_table <> 'civicrm_financial_trxn' or cfi.entity_table is NULL)
 {$condition}
+{$whereClause}
 ORDER BY cft.id {$orderBy}
 LIMIT 1;";
 
@@ -181,8 +183,31 @@ LIMIT 1;";
     if ($dao->fetch()) {
       $ids['entityFinancialTrxnId'] = $dao->id;
       $ids['financialTrxnId'] = $dao->financial_trxn_id;
+      $ids['trxn_id'] = $dao->trxn_id;
     }
     return $ids;
+  }
+
+  /**
+   * Get the transaction id for the (latest) refund associated with a contribution.
+   *
+   * @param int $contributionID
+   * @return string
+   */
+  public static function getRefundTransactionTrxnID($contributionID) {
+    $ids = self::getRefundTransactionIDs($contributionID);
+    return isset($ids['trxn_id']) ? $ids['trxn_id'] : NULL;
+  }
+
+  /**
+   * Get the transaction id for the (latest) refund associated with a contribution.
+   *
+   * @param int $contributionID
+   * @return string
+   */
+  public static function getRefundTransactionIDs($contributionID) {
+    $refundStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+    return self::getFinancialTrxnId($contributionID, 'DESC', FALSE, " AND cft.status_id = $refundStatusID");
   }
 
   /**
@@ -193,7 +218,7 @@ LIMIT 1;";
    *   Id of the entity usually the contactID.
    *
    * @return array
-   *   array of catagory id's the contact belongs to.
+   *   array of category id's the contact belongs to.
    *
    */
   public static function getFinancialTrxnTotal($entity_id) {
@@ -269,7 +294,7 @@ WHERE  ef2.financial_trxn_id =%1
    *   Name of the entity table usually 'civicrm_contact'.
    *
    * @return array
-   *   array of catagory id's the contact belongs to.
+   *   array of category id's the contact belongs to.
    *
    */
   public static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
@@ -314,6 +339,13 @@ WHERE ceft.entity_id = %1";
   /**
    * Create financial transaction for premium.
    *
+   * @param array $params
+   *   - oldPremium
+   *   - financial_type_id
+   *   - contributionId
+   *   - isDeleted
+   *   - cost
+   *   - currency
    */
   public static function createPremiumTrxn($params) {
     if ((empty($params['financial_type_id']) || empty($params['contributionId'])) && empty($params['oldPremium'])) {
@@ -323,7 +355,7 @@ WHERE ceft.entity_id = %1";
     if (!empty($params['cost'])) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
-      $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND label IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
+      $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
       $toFinancialAccount = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
       $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
       $accountRelationship = array_flip($accountRelationship);
@@ -389,7 +421,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
     $params['trxnParams']['total_amount'] = $amount;
     $params['trxnParams']['fee_amount'] = $params['trxnParams']['net_amount'] = 0;
-    $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $params['trxnParams']['status_id'] = $params['contribution_status_id'];
     $params['trxnParams']['contribution_id'] = $contributionId;
     $trxn = self::create($params['trxnParams']);
     if (empty($params['entity_id'])) {
@@ -486,6 +518,46 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
       }
     }
     return $value;
+  }
+
+  /**
+   * @param int $contributionId
+   *
+   * @return array
+   */
+  public static function getTotalPayments($contributionId) {
+    $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+
+    $sql = "SELECT SUM(ft.total_amount) FROM civicrm_financial_trxn ft
+      INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution')
+      WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id = %2";
+
+    $params = array(
+      1 => array($contributionId, 'Integer'),
+      2 => array($statusId, 'Integer'),
+    );
+
+    return CRM_Core_DAO::singleValueQuery($sql, $params);
+  }
+
+  /**
+   * Function records partial payment, complete's contribution if payment is fully paid
+   * and returns latest payment ie financial trxn
+   *
+   * @param array $contribution
+   * @param array $params
+   *
+   * @return CRM_Core_BAO_FinancialTrxn
+   */
+  public static function getPartialPaymentTrxn($contribution, $params) {
+    $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+    $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
+    $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
+    $cmp = bccomp($total, $paid, 5);
+    if ($cmp == 0 || $cmp == -1) {// If paid amount is greater or equal to total amount
+      civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+    }
+    return $trxn;
   }
 
 }

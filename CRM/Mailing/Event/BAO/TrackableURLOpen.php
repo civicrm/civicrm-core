@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_TrackableURLOpen {
 
@@ -42,8 +40,9 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   }
 
   /**
-   * Track a click-through and return the URL to redirect.  If the numbers
-   * don't match up, return the base url.
+   * Track a click-through and return the URL to redirect.
+   *
+   * If the numbers don't match up, return the base url.
    *
    * @param int $queue_id
    *   The Queue Event ID of the clicker.
@@ -57,9 +56,8 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
 
     $search = new CRM_Mailing_BAO_TrackableURL();
 
-    /* To find the url, we also join on the queue and job tables.  This
-     * prevents foreign key violations. */
-
+    // To find the url, we also join on the queue and job tables.  This
+    // prevents foreign key violations.
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $eq = CRM_Mailing_Event_BAO_Queue::getTableName();
     $turl = CRM_Mailing_BAO_TrackableURL::getTableName();
@@ -81,7 +79,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     );
 
     if (!$search->fetch()) {
-      /* Whoops, error, don't track it.  Return the base url. */
+      // Whoops, error, don't track it.  Return the base url.
 
       return CRM_Utils_System::baseURL();
     }
@@ -106,6 +104,8 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    *   Group by queue ID?.
    * @param int $url_id
    *   Optional ID of a url to filter on.
+   *
+   * @param string $toDate
    *
    * @return int
    *   Number of rows in result set
@@ -160,10 +160,11 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   }
 
   /**
-   * CRM-12814
-   * Get tracked url count for each mailing for a given set of mailing IDs
+   * Get tracked url count for each mailing for a given set of mailing IDs.
    *
-   * @param $mailingIDs
+   * CRM-12814
+   *
+   * @param array $mailingIDs
    *
    * @return array
    *   trackable url count per mailing ID

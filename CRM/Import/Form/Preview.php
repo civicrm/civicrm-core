@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,18 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class previews the uploaded file and returns summary statistics
+ * This class previews the uploaded file and returns summary statistics.
+ *
  * TODO: CRM-11254 - if preProcess and postProcess functions can be reconciled between the 5 child classes,
  * those classes can be removed entirely and this class will not need to be abstract
  */
 abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
   /**
-   * Return a descriptive name for the page, used in wizard header
+   * Return a descriptive name for the page, used in wizard header.
    *
    * @return string
    */
@@ -50,8 +49,6 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 

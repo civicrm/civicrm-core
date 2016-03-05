@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -77,9 +77,7 @@
         {/if}
     {/if}
     <div class="action-link">
-      {crmButton p='civicrm/admin/custom/group/field/add' q="reset=1&action=add&gid=$gid" id="newCustomField"  class="action-item" icon="circle-plus"}{ts}Add Custom Field{/ts}{/crmButton}
-      {crmButton p="civicrm/admin/custom/group" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+      {crmButton p='civicrm/admin/custom/group/field/add' q="reset=1&action=add&gid=$gid" id="newCustomField"  class="action-item" icon="plus-circle"}{ts}Add Custom Field{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/custom/group" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
 {/if}
-
-

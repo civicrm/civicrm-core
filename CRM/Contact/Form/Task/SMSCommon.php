@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the common functionality for sending sms to
- * one or a group of contact ids.
+ * This class provides the common functionality for sending sms to one or a group of contact ids.
  */
 class CRM_Contact_Form_Task_SMSCommon {
   const RECIEVED_SMS_ACTIVITY_SUBJECT = "SMS Received";
@@ -48,6 +45,8 @@ class CRM_Contact_Form_Task_SMSCommon {
 
 
   /**
+   * Pre process the provider.
+   *
    * @param CRM_Core_Form $form
    */
   public static function preProcessProvider(&$form) {
@@ -85,10 +84,7 @@ class CRM_Contact_Form_Task_SMSCommon {
   /**
    * Build the form object.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
 
@@ -341,10 +337,7 @@ class CRM_Contact_Form_Task_SMSCommon {
   /**
    * Process the form after the input has been submitted and validated.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function postProcess(&$form) {
 

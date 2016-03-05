@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -70,6 +70,55 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $template = CRM_Core_Smarty::singleton();
         $template->assign('pageTitle', $pageTitle);
     }
+  }
+
+  /**
+   * Moved from CRM_Utils_System_Base
+   */
+  public function getDefaultFileStorage() {
+    $config = CRM_Core_Config::singleton();
+    $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+    $cmsPath = $this->cmsRootPath();
+    $filesPath = CRM_Utils_File::baseFilePath();
+    $filesRelPath = CRM_Utils_File::relativize($filesPath, $cmsPath);
+    $filesURL = rtrim($cmsUrl, '/') . '/' . ltrim($filesRelPath, ' /');
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($filesURL, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($filesPath),
+    );
+  }
+
+  /**
+   * Determine the location of the CiviCRM source tree.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
+   */
+  public function getCiviSourceStorage() {
+    global $civicrm_root;
+
+    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
+    // More generally, we shouldn't be using $config here.
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+
+    $cmsPath = $this->cmsRootPath();
+
+    // $config  = CRM_Core_Config::singleton();
+    // overkill? // $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+    $cmsUrl = CIVICRM_UF_BASEURL;
+    if (CRM_Utils_System::isSSL()) {
+      $cmsUrl = str_replace('http://', 'https://', $cmsUrl);
+    }
+
+    $civiRelPath = CRM_Utils_File::relativize($civicrm_root, $cmsPath);
+    $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    );
   }
 
   /**
@@ -150,13 +199,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
     $script = '';
-    $separator = $htmlize ? '&amp;' : '&';
+    $separator = '&';
     $wpPageParam = '';
     $fragment = isset($fragment) ? ('#' . $fragment) : '';
 
@@ -227,11 +275,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   private function getBaseUrl($absolute, $frontend, $forceBackend) {
     $config = CRM_Core_Config::singleton();
 
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
-
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
     if ((is_admin() && !$frontend) || $forceBackend) {
@@ -276,14 +319,31 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * FIXME: Do something
+   *
+   * @param string $message
    */
   public function setMessage($message) {
   }
 
   /**
-   * FIXME: Do something
+   * @param \string $user
+   *
+   * @return bool
    */
   public function loadUser($user) {
+    $userdata = get_user_by('login', $user);
+    if (!$userdata->data->ID) {
+      return FALSE;
+    }
+
+    $uid = $userdata->data->ID;
+    wp_set_current_user($uid);
+    $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
+
+    // lets store contact id and user id in session
+    $session = CRM_Core_Session::singleton();
+    $session->set('ufID', $uid);
+    $session->set('userID', $contactID);
     return TRUE;
   }
 
@@ -326,6 +386,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    // TODO (probably not possible with WPML?)
+    return TRUE;
+  }
+
+  /**
    * Load wordpress bootstrap.
    *
    * @param string $name
@@ -346,7 +414,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (!$cmsRootPath) {
       CRM_Core_Error::fatal("Could not find the install directory for WordPress");
     }
-    $path = CRM_Core_BAO_Setting::getItem('CiviCRM Preferences', 'wpLoadPhp');
+    $path = Civi::settings()->get('wpLoadPhp');
     if (!empty($path)) {
       require_once $path;
     }
@@ -521,9 +589,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $errors[$emailName] = "Your email is invaid";
       }
       elseif (email_exists($params['mail'])) {
-        $resetUrl = $config->userFrameworkBaseURL . 'wp-login.php?action=lostpassword';
-        $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
-          array(1 => $params['mail'], 2 => $resetUrl)
+        $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
+          array(1 => $params['mail'], 2 => wp_lostpassword_url())
         );
       }
     }
@@ -593,13 +660,16 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getLoginURL($destination = '') {
     $config = CRM_Core_Config::singleton();
-    $loginURL = $config->userFrameworkBaseURL;
-    $loginURL .= 'wp-login.php';
+    $loginURL = wp_login_url();
     return $loginURL;
   }
 
   /**
-   * FIXME: Do something
+   * FIXME: Do something.
+   *
+   * @param \CRM_Core_Form $form
+   *
+   * @return NULL|string
    */
   public function getLoginDestination(&$form) {
     return NULL;
@@ -638,9 +708,59 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * Append WP js to coreResourcesList.
+   *
+   * @param array $list
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.wordpress.js';
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+    $id = 'ID';
+    $mail = 'user_email';
+
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+
+    global $wpdb;
+    $wpUserIds = $wpdb->get_col("SELECT $wpdb->users.ID FROM $wpdb->users");
+
+    foreach ($wpUserIds as $wpUserId) {
+      $wpUserData = get_userdata($wpUserId);
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($wpUserData,
+        $wpUserData->$id,
+        $wpUserData->$mail,
+        $uf,
+        1,
+        'Individual',
+        TRUE
+      )
+      ) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
   }
 
 }

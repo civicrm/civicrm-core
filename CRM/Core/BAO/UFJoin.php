@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -178,6 +178,19 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
       }
     }
     return array($first, $second, $firstActive, $secondActive);
+  }
+
+  /**
+   * Whitelist of possible values for the entity_table field
+   * @return array
+   */
+  public static function entityTables() {
+    $tables = array(
+      'civicrm_event',
+      'civicrm_contribution_page',
+    );
+    // Identical keys & values
+    return array_combine($tables, $tables);
   }
 
 }

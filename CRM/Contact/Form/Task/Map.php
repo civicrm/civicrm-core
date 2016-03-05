@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -50,8 +48,6 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive',
@@ -115,9 +111,6 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -132,9 +125,6 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
   }
@@ -142,15 +132,12 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   /**
    * Assign smarty variables to the template that will be used by google api to plot the contacts.
    *
-   * @param $ids
+   * @param array $ids
    * @param int $locationId
    *   Location_id.
-   * @param $page
-   * @param $addBreadCrumb
+   * @param CRM_Core_Page $page
+   * @param bool $addBreadCrumb
    * @param string $type
-   *
-   * @return void
-   *   the location of the file we have created
    */
   public static function createMapXML($ids, $locationId, &$page, $addBreadCrumb, $type = 'Contact') {
     $config = CRM_Core_Config::singleton();

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,7 @@
 *}
 {* this template is for synchronizing CMS user*}
 <div class="crm-block crm-form-block crm-cms-user-form-block">
-<div id="help">
+<div class="help">
     <p>{ts 1=$config->userFramework}Synchronize %1 Users{/ts}</p>
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,7 +32,7 @@
   <div class="crm-section no-label {$form.$expressButtonName.name}-section">
     <div class="content description">
       {$form.$expressButtonName.html}
-      <div class="description">Save time. Checkout securely. Pay without sharing your financial information.</div>
+      <div class="description">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</div>
     </div>
   </div>
 {/if}

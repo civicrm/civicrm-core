@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -61,13 +61,35 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $dao->query($query, FALSE);
     $dao->fetch();
 
-    // we want TEXTAREAs for long fields and INPUTs for short ones
-    $this->_structure[$table][$field] == 'text' ? $type = 'textarea' : $type = 'text';
+    // get html type and attributes for this field
+    $widgets = CRM_Core_I18n_SchemaStructure::widgets();
+    $widget = $widgets[$table][$field];
+
+    // attributes
+    $attributes = array('class' => '');
+    if (isset($widget['rows'])) {
+      $attributes['rows'] = $widget['rows'];
+    }
+    if (isset($widget['cols'])) {
+      $attributes['cols'] = $widget['cols'];
+    }
+    $required = !empty($widget['required']);
+
+    if ($widget['type'] == 'RichTextEditor') {
+      $widget['type'] = 'wysiwyg';
+      $attributes['class'] .= ' collapsed';
+    }
 
     $languages = CRM_Core_I18n::languages(TRUE);
     foreach ($this->_locales as $locale) {
-      $this->addElement($type, "{$field}_{$locale}", $languages[$locale], array('class' => 'huge huge12' . ($locale == $tsLocale ? ' default-lang' : '')));
-      $this->_defaults["{$field}_{$locale}"] = $dao->$locale;
+      $attr = $attributes;
+      $name = "{$field}_{$locale}";
+      if ($locale == $tsLocale) {
+        $attr['class'] .= ' default-lang';
+      }
+      $this->add($widget['type'], $name, $languages[$locale], $attr, $required);
+
+      $this->_defaults[$name] = $dao->$locale;
     }
 
     $this->addDefaultButtons(ts('Save'), 'next', NULL);

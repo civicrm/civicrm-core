@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,10 +29,19 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
+
+  /**
+   * @var int
+   */
+  protected $_paymentProcessorID;
+  protected $currency;
+
+  /**
+   * @var array
+   */
+  public $_paymentProcessor;
   /**
    * Set variables up before form is built.
    */
@@ -40,25 +49,49 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     parent::preProcess();
     $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
       TRUE);
+    $this->currency = CRM_Utils_Request::retrieve('currency', 'String', CRM_Core_DAO::$_nullObject,
+      TRUE);
 
     $this->assignBillingType();
 
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID);
+
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
     self::addCreditCardJs();
 
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+    $this->assign('currency', $this->currency);
 
     $this->assign('suppressForm', TRUE);
+    $this->controller->_generateQFKey = FALSE;
   }
 
+  /**
+   * @return string
+   */
+  public function getCurrency() {
+    return $this->currency;
+  }
+
+  /**
+   * Build quickForm.
+   */
   public function buildQuickForm() {
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
   }
 
   /**
-   * Add JS to show icons for the accepted credit cards
+   * Set default values for the form.
+   */
+  public function setDefaultValues() {
+    $contactID = $this->getContactID();
+    CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
+    return $this->_defaults;
+  }
+
+  /**
+   * Add JS to show icons for the accepted credit cards.
    */
   public static function addCreditCardJs() {
     $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,9 +24,16 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-path-form-block">
-<div id="help">
-    {ts}Default values will be supplied for these upload directories the first time you access CiviCRM - based on the CIVICRM_TEMPLATE_COMPILEDIR specified in civicrm.settings.php. If you need to modify the defaults, make sure that your web server has write access to the directories.{/ts}
-</div>
+  <div class="help">
+    <p>
+      {ts}You may configure these upload directories using absolute paths or path variables.{/ts}
+      {help id='id-path_vars'}
+    </p>
+    <p>
+      {ts}If you modify the defaults, make sure that your web server has write access to the directories.{/ts}
+    </p>
+
+  </div>
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
            <table class="form-layout">
             <tr class="crm-path-form-block-uploadDir">

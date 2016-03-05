@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
+<div class="help">
   {ts}Badge Layout screen for creating custom labels{/ts}
 </div>
 
@@ -67,8 +67,7 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newbadge-layout"
-             class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts}New Badge Layout{/ts}</span></a>
+          {crmButton q="action=add&reset=1" id="newbadge-layout" icon="crm-i fa-plus-circle"}{ts}New Badge Layout{/ts}{/crmButton}
         </div>
       {/if}
     </div>

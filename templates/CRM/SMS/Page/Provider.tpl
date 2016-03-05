@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
    {include file="CRM/SMS/Form/Provider.tpl"}
 {else}
   {capture assign=wikiLink}{docURL page="Setting up a SMS Provider for CiviSMS" text="(How to add a SMS Provider)" resource="wiki"}{/capture}
-  <div id="help">
+  <div class="help">
     {ts}You can configure one or more SMS Providers for your CiviCRM installation. To learn more about the procedure to install SMS extension and Provider, refer{/ts} {$wikiLink}
   </div>
 
@@ -68,6 +68,6 @@
 
   {/if}
   <div class="action-link">
-    {crmButton p='civicrm/admin/sms/provider' q="action=add&reset=1" icon="circle-plus"}{ts}Add SMS Provider{/ts}{/crmButton}
+    {crmButton p='civicrm/admin/sms/provider' q="action=add&reset=1" icon="plus-circle"}{ts}Add SMS Provider{/ts}{/crmButton}
   </div>
 {/if}

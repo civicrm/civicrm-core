@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Drupal specific stuff goes here
+ * Drupal specific stuff goes here.
  */
 class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
@@ -109,7 +107,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    $user = user_load($ufID);
+    $user = entity_load('user', $ufID);
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
@@ -128,9 +126,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *   Errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   *
-   * @return void
    */
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     // If we are given a name, let's check to see if it already exists.
@@ -185,7 +180,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
-
     \Drupal::service('civicrm.page_state')->setTitle($pageTitle);
   }
 
@@ -217,19 +211,26 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScriptUrl($url, $region) {
-    $options = array('group' => JS_LIBRARY, 'weight' => 10);
+    static $weight = 0;
+
     switch ($region) {
       case 'html-header':
       case 'page-footer':
-        $options['scope'] = substr($region, 5);
         break;
 
       default:
         return FALSE;
     }
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $options['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    \Drupal::service('civicrm.page_state')->addJS($url, $options);
+
+    $script = array(
+      '#tag' => 'script',
+      '#attributes' => array(
+        'src' => $url,
+      ),
+      '#weight' => $weight,
+    );
+    $weight++;
+    \Drupal::service('civicrm.page_state')->addJS($script);
     return TRUE;
   }
 
@@ -237,17 +238,20 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScript($code, $region) {
-    $options = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
     switch ($region) {
       case 'html-header':
       case 'page-footer':
-        $options['scope'] = substr($region, 5);
         break;
 
       default:
         return FALSE;
     }
-    \Drupal::service('civicrm.page_state')->addJS($code, $options);
+
+    $script = array(
+      '#tag' => 'script',
+      '#value' => $code,
+    );
+    \Drupal::service('civicrm.page_state')->addJS($script);
     return TRUE;
   }
 
@@ -258,10 +262,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $options = array();
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $options['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    \Drupal::service('civicrm.page_state')->addCSS($url, $options);
+    $css = array(
+      '#tag' => 'link',
+      '#attributes' => array(
+        'href' => $url,
+        'rel' => 'stylesheet',
+      ),
+    );
+    \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
 
@@ -272,8 +280,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $options = array('type' => 'inline');
-    \Drupal::service('civicrm.page_state')->addCSS($code, $options);
+    $css = array(
+      '#tag' => 'style',
+      '#value' => $code,
+    );
+    \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
 
@@ -317,27 +328,34 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $query = '',
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
     $query = html_entity_decode($query);
+
     $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
 
+    // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal::url($url['route_name'], array(), array(
+      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", array(
         'query' => $url['query'],
-        'absolute' => $absolute,
         'fragment' => $fragment,
-      ));
+        'absolute' => $absolute,
+      ))->toString();
     }
     catch (Exception $e) {
+      // @Todo: log to watchdog
       $url = '';
     }
 
-    if ($htmlize) {
-      $url = htmlentities($url);
+    // Special case: CiviCRM passes us "*path*?*query*" as a skeleton, but asterisks
+    // are invalid and Drupal will attempt to escape them. We unescape them here:
+    if ($path == '*path*') {
+      // First remove trailing equals sign that has been added since the key '?*query*' has no value.
+      $url = rtrim($url, '=');
+      $url = urldecode($url);
     }
+
     return $url;
   }
 
@@ -432,7 +450,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     chdir($root);
 
     // Create a mock $request object
-    $autoloader = require_once $root . '/core/vendor/autoload.php';
+    $autoloader = require_once $root . '/vendor/autoload.php';
     // @Todo: do we need to handle case where $_SERVER has no HTTP_HOST key, ie. when run via cli?
     $request = new \Symfony\Component\HttpFoundation\Request(array(), array(), array(), array(), array(), $_SERVER);
 
@@ -459,7 +477,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
    * Determine the location of the CMS root.
-   * @param null $path
+   *
+   * @param string $path
    *
    * @return NULL|string
    */
@@ -513,6 +532,89 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function getDefaultBlockLocation() {
     return 'sidebar_first';
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function flush() {
+    // CiviCRM and Drupal both provide (different versions of) Symfony (and possibly share other classes too).
+    // If we call drupal_flush_all_caches(), Drupal will attempt to rediscover all of its classes, use Civicrm's
+    // alternatives instead and then die. Instead, we only clear cache bins and no more.
+    foreach (Drupal\Core\Cache\Cache::getBins() as $service_id => $cache_backend) {
+      $cache_backend->deleteAll();
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getModules() {
+    $modules = array();
+
+    $module_data = system_rebuild_module_data();
+    foreach ($module_data as $module_name => $extension) {
+      if (!isset($extension->info['hidden']) && $extension->origin != 'core') {
+        $extension->schema_version = drupal_get_installed_schema_version($module_name);
+        $modules[] = new CRM_Core_Module('drupal.' . $module_name, ($extension->status == 1 ? TRUE : FALSE));
+      }
+    }
+    return $modules;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUniqueIdentifierFromUserObject($user) {
+    return $user->get('mail')->value;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUserIDFromUserObject($user) {
+    return $user->get('uid')->value;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+
+    $users = array();
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties();
+
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+    foreach ($users as $user) {
+      $mail = $user->get('mail')->value;
+      if (empty($mail)) {
+        continue;
+      }
+      $uid = $user->get('uid')->value;
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $uid, $mail, $uf, 1, 'Individual', TRUE)) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
   }
 
 }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -40,7 +40,7 @@
 <div class="block-crm crm-container">
     <form method="post" id="id_fulltext_search">
     <div style="margin-bottom: 8px;">
-    <input type="text" name="text" id='text' value="" style="width: 10em;" />&nbsp;<input type="submit" name="submit" id="fulltext_submit" value="{ts}Go{/ts}" class="crm-form-submit"/ onclick='submitForm();'>
+    <input type="text" name="text" id='text' value="" class="crm-form-text" style="width: 10em;" />&nbsp;<input type="submit" name="submit" id="fulltext_submit" value="{ts}Go{/ts}" class="crm-form-submit"/ onclick='submitForm();'>
     <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Controller_Search' addSequence=1}" />
   </div>
   <select class="form-select" id="fulltext_table" name="fulltext_table">

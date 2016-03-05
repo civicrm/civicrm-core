@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -284,7 +284,7 @@ function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, 
       $membershipValues[$membershipId]['relationship_name'] = $relationshipType->name_a_b;
     }
 
-    _civicrm_api3_custom_data_get($membershipValues[$membershipId], 'Membership', $membershipId, NULL, $values['membership_type_id']);
+    _civicrm_api3_custom_data_get($membershipValues[$membershipId], CRM_Utils_Array::value('check_permissions', $params), 'Membership', $membershipId, NULL, $values['membership_type_id']);
   }
 
   $members = $membershipValues;

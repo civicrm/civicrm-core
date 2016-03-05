@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to save a search
+ * This class provides the functionality to save a search.
+ *
  * Saved Searches are used for saving frequently used queries
  */
 class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
@@ -48,8 +47,6 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_id = NULL;
@@ -75,12 +72,11 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object - it consists of
+   * Build the form object.
+   *
+   * It consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // get the qill
@@ -147,9 +143,6 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // saved search form values
@@ -187,7 +180,21 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     //save the search
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
-    $savedSearch->form_values = serialize($this->get('formValues'));
+    // Use the query parameters rather than the form values - these have already been assessed / converted
+    // with the extra knowledge that the form has.
+    // Note that we want to move towards a standardised way of saving the query that is not
+    // an exact match for the form requirements & task the form layer with converting backwards and forwards.
+    // Ideally per CRM-17075 we will use entity reference fields heavily in the form layer & convert to the
+    // sql operator syntax at the query layer.
+    if (!$isSearchBuilder) {
+      $savedSearch->form_values = serialize($this->get('queryParams'));
+    }
+    else {
+      // We want search builder to be able to convert back & forth at the form layer
+      // to a standardised style - but it can't yet!
+      $savedSearch->form_values = serialize($formValues);
+    }
+
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = $this->get('customSearchID');
     $savedSearch->save();

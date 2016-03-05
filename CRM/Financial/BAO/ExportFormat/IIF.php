@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -38,12 +36,18 @@
  */
 class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat {
 
-  // Tab character. Some people's editors replace tabs with spaces so I'm scared to use actual tabs.
-  // Can't set it here using chr() because static. Same thing if a const. So it's set in constructor.
+  /**
+   * Tab character. Some people's editors replace tabs with spaces so I'm scared to use actual tabs.
+   * Can't set it here using chr() because static. Same thing if a const. So it's set in constructor.
+   */
   static $SEPARATOR;
 
-  // For this phase, we always output these records too so that there isn't data referenced in the journal entries that isn't defined anywhere.
-  // Possibly in the future this could be selected by the user.
+  /**
+   * For this phase, we always output these records too so that there isn't data
+   * referenced in the journal entries that isn't defined anywhere.
+   *
+   * Possibly in the future this could be selected by the user.
+   */
   public static $complementaryTables = array(
     'ACCNT',
     'CUST',

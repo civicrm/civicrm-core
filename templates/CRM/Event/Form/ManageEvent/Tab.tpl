@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
     <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">
       <ul id="actions">
       <li><div id="crm-event-links-wrapper">
-            <a id="crm-event-links-link" class="button"><span><div class="icon ui-icon-arrow-1-se css_right"></div>{ts}Event Links{/ts}</span></a>
+            {crmButton id="crm-event-links-link" href="#" icon="bars"}{ts}Event Links{/ts}{/crmButton}
             <div class="ac_results" id="crm-event-links-list">
                  <div class="crm-event-links-list-inner">
                    <ul>
@@ -44,7 +44,7 @@
         </div></li>
 
       <li><div id="crm-participant-wrapper">
-            <a id="crm-participant-link" class="button"><span><div class="icon ui-icon-arrow-1-se css_right"></div>{ts}Find Participants{/ts}</span></a>
+            {crmButton id="crm-participant-link" href="#" icon="bars"}{ts}Find Participants{/ts}{/crmButton}
             <div class="ac_results" id="crm-participant-list">
                  <div class="crm-participant-list-inner">
                    <ul>

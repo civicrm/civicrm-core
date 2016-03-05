@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -204,12 +204,14 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'state_province_id' => array(
             'name' => 'state_province_id',
             'title' => ts('State/Province'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::stateProvince(),
           ),
           'country_id' => array(
             'name' => 'country_id',
             'title' => ts('Country'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::country(),
           ),
@@ -841,10 +843,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
           $value = implode(' | ', array_keys($options));
         }
         else {
-          $value = $this->formatCustomValues($value,
-            $responseFields[$name],
-            $fieldValueMap
-          );
+          $value = CRM_Core_BAO_CustomField::displayValue($value, $responseFields[$name]['id']);
         }
       }
 

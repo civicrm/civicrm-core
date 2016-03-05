@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -128,9 +126,21 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_preEditValues;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Contact';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -390,15 +400,12 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
-    $params = array();
 
     if ($this->_action & CRM_Core_Action::ADD) {
       if (array_key_exists('TagsAndGroups', $this->_editOptions)) {
@@ -457,8 +464,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Do the set default related to location type id,
-   * primary location,  default country
+   * Do the set default related to location type id, primary location,  default country.
+   *
+   * @param array $defaults
    */
   public function blockSetDefaults(&$defaults) {
     $locationTypeKeys = array_filter(array_keys(CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id')), 'is_int');
@@ -558,7 +566,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return void
    * @see valid_date
    */
   public function addRules() {
@@ -724,8 +731,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //load form for child blocks
@@ -771,14 +776,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // subtype is a common field. lets keep it here
     $subtypes = CRM_Contact_BAO_Contact::buildOptions('contact_sub_type', 'create', array('contact_type' => $this->_contactType));
     if (!empty($subtypes)) {
-      $sel = $this->add('select', 'contact_sub_type', ts('Contact Type'),
-        $subtypes, FALSE,
-        array(
-          'id' => 'contact_sub_type',
-          'multiple' => 'multiple',
-          'class' => $buildCustomData . ' crm-select2',
-        )
-      );
+      $this->addField('contact_sub_type', array(
+        'label' => ts('Contact Type'),
+        'options' => $subtypes,
+        'class' => $buildCustomData,
+        'multiple' => 'multiple',
+        'option_url' => NULL,
+      ));
     }
 
     // build edit blocks ( custom data, demographics, communication preference, notes, tags and groups )
@@ -803,8 +807,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Contact_Form_Location::buildQuickForm($this);
 
     // add attachment
-    $this->addElement('file', 'image_URL', ts('Browse/Upload Image'), 'size=30 maxlength=60');
-    $this->addUploadElement('image_URL');
+    $this->addField('image_URL', array('maxlength' => '60', 'label' => ts('Browse/Upload Image')));
 
     // add the dedupe button
     $this->addElement('submit',
@@ -853,9 +856,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Form submission of new/edit contact is processed.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // check if dedupe button, if so return.
@@ -932,7 +932,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $customFieldExtends = (CRM_Utils_Array::value('contact_sub_type', $params)) ? $params['contact_sub_type'] : $params['contact_type'];
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_contactId,
       $customFieldExtends,
       TRUE
@@ -974,6 +973,18 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if ($this->_parseStreetAddress) {
       $parseResult = self::parseAddress($params);
       $parseStatusMsg = self::parseAddressStatusMsg($parseResult);
+    }
+
+    $blocks = array('email', 'phone', 'im', 'openid', 'address', 'website');
+    foreach ($blocks as $block) {
+      if (!empty($this->_preEditValues[$block]) && is_array($this->_preEditValues[$block])) {
+        foreach ($this->_preEditValues[$block] as $count => $value) {
+          if (!empty($value['id'])) {
+            $params[$block][$count]['id'] = $value['id'];
+            $params[$block]['isIdSet'] = TRUE;
+          }
+        }
+      }
     }
 
     // Allow un-setting of location info, CRM-5969
@@ -1221,7 +1232,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *   of key value consist of address blocks.
    *
    * @return array
-   *   as array of sucess/fails for each address block
+   *   as array of success/fails for each address block
    */
   public function parseAddress(&$params) {
     $parseSuccess = $parsedFields = array();

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,7 +91,7 @@ function civicrm_api3_cxn_register($params) {
 
   try {
     /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
-    $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+    $client = \Civi::service('cxn_reg_client');
     list($cxnId, $result) = $client->register($appMeta);
     CRM_Cxn_BAO_Cxn::updateAppMeta($appMeta);
   }
@@ -103,6 +103,11 @@ function civicrm_api3_cxn_register($params) {
   return $result;
 }
 
+/**
+ * Adjust metadata for cxn unregister.
+ *
+ * @param array $spec
+ */
 function _civicrm_api3_cxn_unregister_spec(&$spec) {
   $daoFields = CRM_Cxn_DAO_Cxn::fields();
   $spec['cxn_guid'] = $daoFields['cxn_guid'];
@@ -133,7 +138,7 @@ function civicrm_api3_cxn_unregister($params) {
   $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
 
   /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
-  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+  $client = \Civi::service('cxn_reg_client');
   list($cxnId, $result) = $client->unregister($appMeta, CRM_Utils_Array::value('force', $params, FALSE));
 
   return $result;
@@ -167,6 +172,11 @@ function _civicrm_api3_cxn_parseCxnId($params) {
   return $cxnId;
 }
 
+/**
+ * Adjust metadata for cxn get action.
+ *
+ * @param array $spec
+ */
 function _civicrm_api3_cxn_get_spec(&$spec) {
   // Don't trust AJAX callers or other external code to modify, filter, or return the secret.
   unset($spec['secret']);
@@ -241,7 +251,7 @@ function civicrm_api3_cxn_getlink($params) {
   }
 
   /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
-  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+  $client = \Civi::service('cxn_reg_client');
   return $client->call($appMeta, 'Cxn', 'getlink', array(
     'page' => $params['page_name'],
   ));

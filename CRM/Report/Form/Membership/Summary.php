@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
 
@@ -146,16 +145,6 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
   }
 
   /**
-   * Set default values.
-   *
-   * @return array
-   *   Default values.
-   */
-  public function setDefaultValues() {
-    return parent::setDefaultValues();
-  }
-
-  /**
    * Generate select clause.
    */
   public function select() {
@@ -186,22 +175,8 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
   }
 
   /**
-   * Set form rules.
-   *
-   * @param $fields
-   * @param $files
-   * @param $self
-   *
-   * @return array
+   * Generate from clause.
    */
-  public static function formRule($fields, $files, $self) {
-    $errors = $grouping = array();
-    //check for searching combination of dispaly columns and
-    //grouping criteria
-
-    return $errors;
-  }
-
   public function from() {
     $this->_from = NULL;
 
@@ -225,6 +200,11 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
   }
 
+  /**
+   * Generate where clause.
+   *
+   * @todo this looks like it duplicates the parent & could go.
+   */
   public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -283,6 +263,11 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     return $statistics;
   }
 
+  /**
+   * Generate group by clause.
+   *
+   * @todo looks like a broken duplicate of the parent.
+   */
   public function groupBy() {
     $this->_groupBy = "";
     if (is_array($this->_params['group_bys']) &&
@@ -311,6 +296,9 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
   }
 
+  /**
+   * PostProcess function.
+   */
   public function postProcess() {
     $this->_params = $this->controller->exportValues($this->_name);
     if (empty($this->_params) &&

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -62,12 +62,8 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_prefix = 'case_';
 
-  protected $_defaults;
-
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
@@ -165,9 +161,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -230,10 +223,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_done) {
@@ -254,11 +243,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       if (array_key_exists('case_owner', $this->_formValues) && !$this->_formValues['case_owner']) {
         $this->_formValues['case_owner'] = 0;
       }
-    }
-
-    //only fetch own cases.
-    if (!CRM_Core_Permission::check('access all cases and activities')) {
-      $this->_formValues['case_owner'] = 2;
     }
 
     if (empty($this->_formValues['case_deleted'])) {
@@ -326,10 +310,10 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * add the rules (mainly global rules) for form.
+   * Add the rules (mainly global rules) for form.
+   *
    * All local rules are added near the element
    *
-   * @return void
    * @see valid_date
    */
   public function addRules() {
@@ -342,7 +326,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return void
+   * @return array|bool
    */
   public static function formRule($fields) {
     $errors = array();
@@ -383,8 +367,8 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       CRM_Core_DAO::$_nullObject
     );
     if ($caseType) {
-      $this->_formValues['case_type_id'] = $caseType;
-      $this->_defaults['case_type_id'] = $caseType;
+      $this->_formValues['case_type_id'] = (array) $caseType;
+      $this->_defaults['case_type_id'] = (array) $caseType;
     }
 
     $caseFromDate = CRM_Utils_Request::retrieve('pstart', 'Date',

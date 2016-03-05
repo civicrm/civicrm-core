@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,15 +26,15 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Financial/Form/FinancialAccount.tpl"}
 {else}
-  <div id="help">
+  <div class="help">
     {capture assign="typeLink"}{crmURL p="civicrm/admin/financial/financialType" q="reset=1"}{/capture}
     {capture assign="paymentLink"}{crmURL p="civicrm/admin/options/payment_instrument" q="reset=1"}{/capture}
     {capture assign="premiumLink"}{crmURL p="civicrm/admin/contribute/managePremiums" q="reset=1"}{/capture}
-    <p>{ts 1=$typeLink 2=$paymentLink 3=$premiumLink}Financial accounts correspond to those in your accounting system.  <a href="%1">Financial types</a>, <a href="%2">payment instruments</a>, and <a href="%3">premiums</a> are associated with financial accounts so that they can result in the proper double-entry transactions to export to your accounting system.{/ts}</p>
+    <p>{ts 1=$typeLink 2=$paymentLink 3=$premiumLink}Financial accounts correspond to those in your accounting system.  <a href="%1">Financial types</a>, <a href="%2">payment methods</a>, and <a href="%3">premiums</a> are associated with financial accounts so that they can result in the proper double-entry transactions to export to your accounting system.{/ts}</p>
   </div>
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-top" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Financial Account{/ts}</span></a>
+      <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-top" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Financial Account{/ts}</span></a>
     </div>
   {/if}
 
@@ -76,7 +76,7 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Financial Account{/ts}</span></a>
+          <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-bottom" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Financial Account{/ts}</span></a>
         </div>
       {/if}
       </div>

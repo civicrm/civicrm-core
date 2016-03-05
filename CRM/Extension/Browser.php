@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,13 +31,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_Browser {
 
   /**
    * An URL for public extensions repository.
+   *
+   * Note: This default is now handled through setting/*.php.
+   *
+   * @deprecated
    */
   const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
 
@@ -50,6 +52,9 @@ class CRM_Extension_Browser {
    * The name of the single JSON extension cache file.
    */
   const CACHE_JSON_FILE = 'extensions.json';
+
+  // timeout for when the connection or the server is slow
+  const CHECK_TIMEOUT = 5;
 
   /**
    * @param string $repoUrl
@@ -165,7 +170,6 @@ class CRM_Extension_Browser {
       return $exts[$key];
     }
     else {
-      // throw new CRM_Extension_Exception("Unknown remote extension: $key");
       return NULL;
     }
   }
@@ -221,14 +225,15 @@ class CRM_Extension_Browser {
   }
 
   /**
-   * Connects to public server and grabs the list of publically available
+   * Connects to public server and grabs the list of publicly available
    * extensions.
    *
    * @return string
+   * @throws \CRM_Extension_Exception
    */
   private function grabRemoteJson() {
 
-    ini_set('default_socket_timeout', CRM_Utils_VersionCheck::CHECK_TIMEOUT);
+    ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
     set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
 
     if (!ini_get('allow_url_fopen')) {
@@ -238,37 +243,24 @@ class CRM_Extension_Browser {
     if (FALSE === $this->getRepositoryUrl()) {
       // don't check if the user has configured civi not to check an external
       // url for extensions. See CRM-10575.
-      CRM_Core_Session::setStatus(ts('Not checking remote URL for extensions since ext_repo_url is set to false.'), ts('Check Settings'), 'alert');
       return array();
     }
 
     $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE;
     $url = $this->getRepositoryUrl() . $this->indexPath;
     $status = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
-    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
-      CRM_Core_Session::setStatus(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests or contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.<br />', array(1 => $this->getRepositoryUrl())), ts('Connection Error'), 'error');
-    }
-    else {
-      // Don't call grabCachedJson here, that would risk infinite recursion
-      $json = file_get_contents($filename);
-    }
-
-    // CRM-13141 There may not be any compatible extensions available for the requested CiviCRM version + CMS. If so, $extdir is empty so just return a notification.
-    if (empty($json)) {
-      $config = CRM_Core_Config::singleton();
-      CRM_Core_Session::setStatus(ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %2 (<a href="%1">requested extensions from here</a>). If you want to install an extension which is not marked as compatible, you may be able to <a href="%3">download and install extensions manually</a> (depending on access to your web server).<br />', array(
-        1 => $this->getRepositoryUrl(),
-        2 => $config->civiVersion,
-        3 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions',
-      )), ts('No Extensions Available for this Version'), 'info');
-    }
 
     ini_restore('allow_url_fopen');
     ini_restore('default_socket_timeout');
 
     restore_error_handler();
 
-    return $json;
+    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
+      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests or contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.', array(1 => $this->getRepositoryUrl())), 'connection_error');
+    }
+
+    // Don't call grabCachedJson here, that would risk infinite recursion
+    return file_get_contents($filename);
   }
 
   /**

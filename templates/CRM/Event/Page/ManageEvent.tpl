@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,28 +29,17 @@
 {capture assign=rssFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&rss=1" fe=1}{/capture}
 {capture assign=htmlFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&html=1" fe=1}{/capture}
 <div class="float-right">
-  <a href="{$htmlFeed}" target="_blank" title="{ts}HTML listing of current and future public events.{/ts}">
-    <img src="{$config->resourceBase}i/applications-internet.png"
-         alt="{ts}HTML listing of current and future public events.{/ts}" />
-  </a>&nbsp;&nbsp;
-  <a href="{$rssFeed}" target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}">
-    <img src="{$config->resourceBase}i/feed-icon.png"
-         alt="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" />
-  </a>&nbsp;&nbsp;
-  <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}">
-    <img src="{$config->resourceBase}i/office-calendar.png"
-         alt="{ts}Download iCalendar file for current and future public events.{/ts}" />
-  </a>&nbsp;&nbsp;
-  <a href="{$icalFeed}" target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}">
-    <img src="{$config->resourceBase}i/ical_feed.gif"
-         alt="{ts}Get iCalendar feed for current and future public events.{/ts}" />
-  </a>&nbsp;&nbsp;&nbsp;{help id='icalendar'}
+  <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar"></i></a>
+  <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-rss"></i></a>
+  <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-download"></i></a>
+  <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar-o"></i></a>
+  {help id='icalendar'}
 </div>
 {include file="CRM/Event/Form/SearchEvent.tpl"}
 
 <div class="action-link">
   <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button crm-popup">
-    <span><div class="icon ui-icon-circle-plus"></div>{ts}Add Event{/ts}</span>
+    <span><i class="crm-i fa-calendar-plus-o"></i> {ts}Add Event{/ts}</span>
   </a>
   <div class="clear"></div>
 </div>
@@ -93,8 +82,8 @@
           <td class="crm-event-state_province">{$row.state_province}</td>
           <td class="crm-event-event_type">{$row.event_type}</td>
           <td class="crm-event-is_public">{if $row.is_public eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td class="crm-event-start_date">{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
-          <td class="crm-event-end_date">{$row.end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
+          <td class="crm-event-start_date" data-order="{$row.start_date|crmDate:'%Y-%m-%d'}">{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
+          <td class="crm-event-end_date" data-order="{$row.end_date|crmDate:'%Y-%m-%d'}">{$row.end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
           {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
             <td class="crm-event-campaign">{$row.campaign}</td>
           {/if}

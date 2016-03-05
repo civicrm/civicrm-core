@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -36,6 +36,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
   protected $_emailField = FALSE;
   protected $_phoneField = FALSE;
+  protected $_tempTableName;
+  protected $_tempDurationSumTableName;
 
   /**
    */
@@ -52,7 +54,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'sort_name' => array(
             'title' => ts('Contact Name'),
-            'default' => TRUE,
             'no_repeat' => TRUE,
           ),
         ),
@@ -65,7 +66,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           'sort_name' => array(
             'name' => 'id',
             'title' => ts('Contact'),
-            'default' => TRUE,
           ),
         ),
         'order_bys' => array(
@@ -80,7 +80,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'fields' => array(
           'email' => array(
             'title' => 'Email',
-            'default' => TRUE,
           ),
         ),
         'order_bys' => array(
@@ -104,20 +103,23 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'fields' => array(
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
+            'required' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'status_id' => array(
+            'title' => ts('Activity Status'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'duration' => array(
-            'title' => 'Duration',
-            'statistics' => array(
-              'sum' => ts('Total Duration'),
-            ),
+            'title' => ts('Duration'),
+            'default' => TRUE,
           ),
           'id' => array(
-            'title' => 'Total Activities',
+            'title' => ts('Total Activities'),
             'required' => TRUE,
             'statistics' => array(
-              'count' => ts('Activity Count'),
+              'count' => ts('Count'),
             ),
           ),
         ),
@@ -127,16 +129,19 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
+            'default' => 0,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           ),
           'status_id' => array(
             'title' => ts('Activity Status'),
+            'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityStatus(),
           ),
           'priority_id' => array(
             'title' => ts('Priority'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
           ),
@@ -148,6 +153,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
+            'default' => TRUE,
+          ),
+          'status_id' => array(
+            'title' => ts('Activity Status'),
             'default' => TRUE,
           ),
         ),
@@ -163,6 +172,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'alias' => 'activity',
       ),
     );
+    $this->_groupFilter = TRUE;
 
     parent::__construct();
   }
@@ -174,6 +184,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
           if (!empty($this->_params['group_bys'][$fieldName])) {
+            //include column in report when selected in group by but not in column section.
+            if (empty($this->_params['fields'][$fieldName])) {
+              $this->_params['fields'][$fieldName] = TRUE;
+            }
             if (isset($this->_params['group_bys_freq']) && !empty($this->_params['group_bys_freq'][$fieldName])) {
               switch ($this->_params['group_bys_freq'][$fieldName]) {
                 case 'YEARWEEK':
@@ -210,7 +224,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
 
-              // just to make sure these values are transfered to rows.
+              // just to make sure these values are transferred to rows.
               // since we need that for calculation purpose,
               // e.g making subtotals look nicer or graphs
               $this->_columnHeaders["{$tableName}_{$fieldName}_interval"] = array('no_display' => TRUE);
@@ -233,13 +247,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                 switch (strtolower($stat)) {
                   case 'count':
                     $select[] = "COUNT(DISTINCT({$field['dbAlias']})) as {$tableName}_{$fieldName}_{$stat}";
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = CRM_Utils_Type::T_INT;
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
-                    $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
-                    break;
-
-                  case 'sum':
-                    $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}_{$stat}";
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = CRM_Utils_Type::T_INT;
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
                     $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
@@ -272,62 +279,82 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  public function from() {
+  /**
+   * Generate from clause.
+   *
+   * @param bool|FALSE $durationMode
+   */
+  public function from($durationMode = FALSE) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
-    $this->_from = "
-        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
+    if (!$durationMode) {
+      $this->_from = "
+          FROM civicrm_activity {$this->_aliases['civicrm_activity']}
 
-             LEFT JOIN civicrm_activity_contact target_activity
-                    ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
-                       target_activity.record_type_id = {$targetID}
-             LEFT JOIN civicrm_activity_contact assignment_activity
-                    ON {$this->_aliases['civicrm_activity']}.id = assignment_activity.activity_id AND
-                       assignment_activity.record_type_id = {$assigneeID}
-             LEFT JOIN civicrm_activity_contact source_activity
-                    ON {$this->_aliases['civicrm_activity']}.id = source_activity.activity_id AND
-                       source_activity.record_type_id = {$sourceID}
-             LEFT JOIN civicrm_contact contact_civireport
-                    ON target_activity.contact_id = contact_civireport.id
-             LEFT JOIN civicrm_contact civicrm_contact_assignee
-                    ON assignment_activity.contact_id = civicrm_contact_assignee.id
-             LEFT JOIN civicrm_contact civicrm_contact_source
-                    ON source_activity.contact_id = civicrm_contact_source.id
-             {$this->_aclFrom}
-             LEFT JOIN civicrm_option_value
-                    ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
-             LEFT JOIN civicrm_option_group
-                    ON civicrm_option_group.id = civicrm_option_value.option_group_id
-             LEFT JOIN civicrm_case_activity
-                    ON civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
-             LEFT JOIN civicrm_case
-                    ON civicrm_case_activity.case_id = civicrm_case.id
-             LEFT JOIN civicrm_case_contact
-                    ON civicrm_case_contact.case_id = civicrm_case.id ";
+               LEFT JOIN civicrm_activity_contact target_activity
+                      ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
+                         target_activity.record_type_id = {$targetID}
+               LEFT JOIN civicrm_activity_contact assignment_activity
+                      ON {$this->_aliases['civicrm_activity']}.id = assignment_activity.activity_id AND
+                         assignment_activity.record_type_id = {$assigneeID}
+               LEFT JOIN civicrm_activity_contact source_activity
+                      ON {$this->_aliases['civicrm_activity']}.id = source_activity.activity_id AND
+                         source_activity.record_type_id = {$sourceID}
+               LEFT JOIN civicrm_contact contact_civireport
+                      ON target_activity.contact_id = contact_civireport.id
+               LEFT JOIN civicrm_contact civicrm_contact_assignee
+                      ON assignment_activity.contact_id = civicrm_contact_assignee.id
+               LEFT JOIN civicrm_contact civicrm_contact_source
+                      ON source_activity.contact_id = civicrm_contact_source.id
+               {$this->_aclFrom}
+               LEFT JOIN civicrm_option_value
+                      ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
+               LEFT JOIN civicrm_option_group
+                      ON civicrm_option_group.id = civicrm_option_value.option_group_id
+               LEFT JOIN civicrm_case_activity
+                      ON civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
+               LEFT JOIN civicrm_case
+                      ON civicrm_case_activity.case_id = civicrm_case.id
+               LEFT JOIN civicrm_case_contact
+                      ON civicrm_case_contact.case_id = civicrm_case.id ";
 
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                     {$this->_aliases['civicrm_email']}.is_primary = 1 ";
+      if ($this->_emailField) {
+        $this->_from .= "
+              LEFT JOIN civicrm_email  {$this->_aliases['civicrm_email']}
+                     ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
+                       {$this->_aliases['civicrm_email']}.is_primary = 1 ";
+      }
+
+      if ($this->_phoneField) {
+        $this->_from .= "
+              LEFT JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
+                     ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
+                       {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
+      }
     }
-
-    if ($this->_phoneField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                     {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
+    else {
+      $this->_from = "
+      FROM civicrm_activity {$this->_aliases['civicrm_activity']} {$this->_aclFrom} ";
     }
   }
 
-  public function where() {
-    $this->_where = " WHERE civicrm_option_group.name = 'activity_type' AND
-                                {$this->_aliases['civicrm_activity']}.is_test = 0 AND
-                                {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
-                                {$this->_aliases['civicrm_activity']}.is_current_revision = 1";
+  /**
+   * Generate where clause.
+   *
+   * @param bool|FALSE $durationMode
+   */
+  public function where($durationMode = FALSE) {
+    $optionGroupClause = '';
+    if (!$durationMode) {
+      $optionGroupClause = 'civicrm_option_group.name = "activity_type" AND ';
+    }
+    $this->_where = " WHERE {$optionGroupClause}
+                            {$this->_aliases['civicrm_activity']}.is_test = 0 AND
+                            {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
+                            {$this->_aliases['civicrm_activity']}.is_current_revision = 1";
 
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -368,16 +395,15 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       $this->_where .= " AND " . implode(' AND ', $clauses);
     }
 
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
+    if ($this->_aclWhere && !$durationMode) {
+      $this->_where .= " AND ({$this->_aclWhere} OR civicrm_contact_source.is_deleted=0 OR civicrm_contact_assignee.is_deleted=0)";
     }
   }
 
   public function groupBy() {
     $this->_groupBy = array();
-    if (is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
-    ) {
+    if (!empty($this->_params['group_bys']) &&
+      is_array($this->_params['group_bys'])) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
@@ -409,7 +435,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
     }
     else {
-      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id ";
+      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id ";
     }
   }
 
@@ -420,20 +446,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
    *
    * @return array
    */
-  public function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $contactFields = array('sort_name', 'email', 'phone');
     if (!empty($fields['group_bys'])) {
-
-      if (!empty($fields['group_bys']['activity_type_id']) && empty($fields['group_bys']['sort_name'])) {
-        foreach ($fields['fields'] as $fieldName => $val) {
-          if (in_array($fieldName, $contactFields)) {
-            $errors['fields'] = ts("Please select GroupBy 'Contact' to display Contact Fields");
-            break;
-          }
-        }
-      }
-
       if (!empty($fields['group_bys']['activity_date_time'])) {
         if (!empty($fields['group_bys']['sort_name'])) {
           $errors['fields'] = ts("Please do not select GroupBy 'Activity Date' with GroupBy 'Contact'");
@@ -448,13 +464,170 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         }
       }
     }
+
+    // don't allow add to group action unless contact fields are selected.
+    if (isset($fields['_qf_ActivitySummary_submit_group'])) {
+      $contactFieldSelected = FALSE;
+      foreach ($fields['fields'] as $fieldName => $val) {
+        if (in_array($fieldName, $contactFields)) {
+          $contactFieldSelected = TRUE;
+          break;
+        }
+      }
+
+      if (!$contactFieldSelected) {
+        $errors['fields'] = ts('You cannot use "Add Contacts to Group" action unless contacts fields are selected.');
+      }
+    }
     return $errors;
   }
 
   public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
-    parent::postProcess();
+
+    // get ready with post process params
+    $this->beginPostProcess();
+
+    // build query
+    $sql = $this->buildQuery();
+
+    // main sql statement
+    $this->select();
+    $this->from();
+    $this->customDataFrom();
+    $this->where();
+    $this->groupBy();
+    $this->orderBy();
+
+    // order_by columns not selected for display need to be included in SELECT
+    $unselectedSectionColumns = $this->unselectedSectionColumns();
+    foreach ($unselectedSectionColumns as $alias => $section) {
+      $this->_select .= ", {$section['dbAlias']} as {$alias}";
+    }
+
+    if (!empty($applyLimit) && empty($this->_params['charts'])) {
+      $this->limit();
+    }
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
+
+    // store the duration count in temp table
+    $this->_tempTableName = CRM_Core_DAO::createTempTableName('civicrm_activity');
+
+    // build temporary table column names base on column headers of result
+    $dbColumns = array();
+    foreach ($this->_columnHeaders as $fieldName => $dontCare) {
+      $dbColumns[] = $fieldName . ' VARCHAR(128)';
+    }
+
+    // create temp table to store main result
+    $tempQuery = "CREATE TEMPORARY TABLE {$this->_tempTableName} (
+      id int unsigned NOT NULL AUTO_INCREMENT, " . implode(', ', $dbColumns) . ' , PRIMARY KEY (id))';
+    CRM_Core_DAO::executeQuery($tempQuery);
+
+    // build main report query
+    $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+
+    // store the result in temporary table
+    $insertCols = '';
+    $insertQuery = "INSERT INTO {$this->_tempTableName} ( " . implode(',', array_keys($this->_columnHeaders)) . " )
+{$sql}";
+    CRM_Core_DAO::executeQuery($insertQuery);
+
+    // now build the query for duration sum
+    $this->from(TRUE);
+    $this->where(TRUE);
+
+    // build the query to calulate duration sum
+    $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+
+    // create temp table to store duration
+    $this->_tempDurationSumTableName = CRM_Core_DAO::createTempTableName('civicrm_activity');
+    $tempQuery = "CREATE TEMPORARY TABLE {$this->_tempDurationSumTableName} (
+      id int unsigned NOT NULL AUTO_INCREMENT, civicrm_activity_duration_total VARCHAR(128), PRIMARY KEY (id))";
+    CRM_Core_DAO::executeQuery($tempQuery);
+
+    // store the result in temporary table
+    $insertQuery = "INSERT INTO {$this->_tempDurationSumTableName} (civicrm_activity_duration_total)
+    {$sql}";
+    CRM_Core_DAO::executeQuery($insertQuery);
+
+    // build array of result based on column headers. This method also allows
+    // modifying column headers before using it to build result set i.e $rows.
+    $rows = array();
+    $query = "SELECT {$this->_tempTableName}.*,  {$this->_tempDurationSumTableName}.civicrm_activity_duration_total
+    FROM {$this->_tempTableName} INNER JOIN {$this->_tempDurationSumTableName}
+      ON ({$this->_tempTableName}.id = {$this->_tempDurationSumTableName}.id)";
+
+    // finally add duration total to column headers
+    $this->_columnHeaders['civicrm_activity_duration_total'] = array('no_display' => 1);
+
+    $this->buildRows($query, $rows);
+
+    // format result set.
+    $this->formatDisplay($rows);
+
+    // assign variables to templates
+    $this->doTemplateAssignment($rows);
+
+    //reset the sql building to default, which is used / called during other actions like "add to group"
+    // now build the query for duration sum
+    $this->from();
+    $this->where();
+
+    // do print / pdf / instance stuff if needed
+    $this->endPostProcess($rows);
+  }
+
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
+  public function statistics(&$rows) {
+    $statistics = parent::statistics($rows);
+    $totalType = $totalActivity = $totalDuration = 0;
+
+    $query = "SELECT {$this->_tempTableName}.civicrm_activity_activity_type_id,
+        {$this->_tempTableName}.civicrm_activity_id_count,
+        {$this->_tempDurationSumTableName}.civicrm_activity_duration_total
+    FROM {$this->_tempTableName} INNER JOIN {$this->_tempDurationSumTableName}
+      ON ({$this->_tempTableName}.id = {$this->_tempDurationSumTableName}.id)";
+
+    $actDAO = CRM_Core_DAO::executeQuery($query);
+
+    $activityTypesCount = array();
+    while ($actDAO->fetch()) {
+      if (!in_array($actDAO->civicrm_activity_activity_type_id, $activityTypesCount)) {
+        $activityTypesCount[] = $actDAO->civicrm_activity_activity_type_id;
+      }
+
+      $totalActivity += $actDAO->civicrm_activity_id_count;
+      $totalDuration += $actDAO->civicrm_activity_duration_total;
+    }
+
+    $totalType = count($activityTypesCount);
+
+    $statistics['counts']['type'] = array(
+      'title' => ts('Total Types'),
+      'value' => $totalType,
+    );
+    $statistics['counts']['activities'] = array(
+      'title' => ts('Total Number of Activities'),
+      'value' => $totalActivity,
+    );
+    $statistics['counts']['duration'] = array(
+      'title' => ts('Total Duration (in Minutes)'),
+      'value' => $totalDuration,
+    );
+    return $statistics;
+  }
+
+  public function modifyColumnHeaders() {
+    //CRM-16719 modify name of column
+    if (!empty($this->_columnHeaders['civicrm_activity_status_id'])) {
+      $this->_columnHeaders['civicrm_activity_status_id']['title'] = "Status";
+    }
   }
 
   /**
@@ -467,13 +640,47 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
    *   Rows generated by SQL, with an array for each row.
    */
   public function alterDisplay(&$rows) {
-
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $flagContact = 0;
-
     $onHover = ts('View Contact Summary for this Contact');
     foreach ($rows as $rowNum => $row) {
+      // make count columns point to activity detail report
+      if (!empty($row['civicrm_activity_id_count'])) {
+        $url = array();
+        $urlParams = array('activity_type_id', 'gid', 'status_id', 'contact_id');
+        foreach ($urlParams as $field) {
+          if (!empty($row['civicrm_activity_' . $field])) {
+            $url[] = "{$field}_op=in&{$field}_value={$row['civicrm_activity_'.$field]}";
+          }
+          elseif (!empty($this->_params[$field . '_value'])) {
+            $val = implode(",", $this->_params[$field . '_value']);
+            $url[] = "{$field}_op=in&{$field}_value={$val}";
+          }
+        }
+        $date_suffixes = array('relative', 'from', 'to');
+        while (list(, $suffix) = each($date_suffixes)) {
+          if (!empty($this->_params['activity_date_time_' . $suffix])) {
+            list($from, $to)
+              = $this->getFromTo(
+                CRM_Utils_Array::value("activity_date_time_relative", $this->_params),
+                CRM_Utils_Array::value("activity_date_time_from", $this->_params),
+                CRM_Utils_Array::value("activity_date_time_to", $this->_params)
+                );
+            $url[] = "activity_date_time_from={$from}&activity_date_time_to={$to}";
+            break;
+          }
+        }
+        $url = implode('&', $url);
+        $url = CRM_Report_Utils_Report::getNextUrl('activity', "reset=1&force=1&{$url}",
+                 $this->_absoluteUrl,
+                 $this->_id,
+                 $this->_drilldownReport);
+        $rows[$rowNum]['civicrm_activity_id_count_link'] = $url;
+        $rows[$rowNum]['civicrm_activity_id_count_hover'] = ts('List all activity(s) for this row.');
+        $entryFound = TRUE;
+      }
 
       if (array_key_exists('civicrm_contact_sort_name', $row) && $this->_outputMode != 'csv') {
         if ($value = $row['civicrm_contact_id']) {
@@ -524,6 +731,20 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           }
 
           $rows[$rowNum]['civicrm_activity_activity_type_id'] = implode(' , ', $value);
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_activity_status_id', $row)) {
+        if ($value = $row['civicrm_activity_status_id']) {
+          $rows[$rowNum]['civicrm_activity_status_id'] = $activityStatus[$value];
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_activity_duration', $row)) {
+        if ($value = $row['civicrm_activity_duration']) {
+          $rows[$rowNum]['civicrm_activity_duration'] = $rows[$rowNum]['civicrm_activity_duration_total'];
           $entryFound = TRUE;
         }
       }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * a page for mailing preview
+ * A page for mailing preview.
  */
 class CRM_Mailing_Page_View extends CRM_Core_Page {
   protected $_mailingID;
@@ -43,9 +41,9 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
 
   /**
    * Lets do permission checking here.
-   * First check for valid mailing, if false return fatal
-   * Second check for visibility
-   * Call a hook to see if hook wants to override visibility setting
+   * First check for valid mailing, if false return fatal.
+   * Second check for visibility.
+   * Call a hook to see if hook wants to override visibility setting.
    */
   public function checkPermission() {
     if (!$this->_mailing) {
@@ -78,8 +76,6 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
    * @param int $contactID
    * @param bool $print
    * @param bool $allowID
-   *
-   * @return void
    */
   public function run($id = NULL, $contactID = NULL, $print = TRUE, $allowID = FALSE) {
     if (is_numeric($id)) {
@@ -103,7 +99,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
 
     // mailing key check
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'hash_mailing_url')) {
+    if (Civi::settings()->get('hash_mailing_url')) {
       $this->_mailing = new CRM_Mailing_BAO_Mailing();
 
       if (!is_numeric($this->_mailingID)) {
@@ -144,7 +140,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     // get contact detail and compose if contact id exists
     $returnProperties = $this->_mailing->getReturnProperties();
     if (isset($this->_contactID)) {
-      //get details of contact with token value including Custom Field Token Values.CRM-3734
+      // get details of contact with token value including Custom Field Token Values.CRM-3734
       $params = array('contact_id' => $this->_contactID);
       $details = CRM_Utils_Token::getTokenDetails($params,
         $returnProperties,
@@ -156,7 +152,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $contactId = $this->_contactID;
     }
     else {
-      //get tokens that are not contact specific resolved
+      // get tokens that are not contact specific resolved
       $params = array('contact_id' => 0);
       $details = CRM_Utils_Token::getAnonymousTokenDetails($params,
         $returnProperties,
@@ -176,14 +172,14 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
 
     $title = NULL;
     if (isset($this->_mailing->body_html) && empty($_GET['text'])) {
-      $header = 'Content-Type: text/html; charset=utf-8';
+      $header = 'text/html; charset=utf-8';
       $content = $mime->getHTMLBody();
       if (strpos($content, '<head>') === FALSE && strpos($content, '<title>') === FALSE) {
         $title = '<head><title>' . $this->_mailing->subject . '</title></head>';
       }
     }
     else {
-      $header = 'Content-Type: text/plain; charset=utf-8';
+      $header = 'text/plain; charset=utf-8';
       $content = $mime->getTXTBody();
     }
     CRM_Utils_System::setTitle($this->_mailing->subject);
@@ -192,7 +188,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       CRM_Core_Page_AJAX::returnJsonResponse($content);
     }
     if ($print) {
-      header($header);
+      CRM_Utils_System::setHttpHeader('Content-Type', $header);
       print $title;
       print $content;
       CRM_Utils_System::civiExit();

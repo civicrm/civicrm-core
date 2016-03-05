@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- *
  */
 
 /**
@@ -67,8 +66,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
@@ -139,9 +136,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -184,7 +178,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
     }
 
-    $this->addWysiwyg('email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array(
+    $this->add('wysiwyg', 'email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array(
       'rows' => 2,
       'cols' => 40,
     ));
@@ -223,9 +217,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -233,8 +224,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Process the PDf and email with activity and attachment.
-   * on click of Print Invoices
+   * Process the PDf and email with activity and attachment on click of Print Invoices.
    *
    * @param array $contribIDs
    *   Contribution Id.
@@ -255,9 +245,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $contributionStatusID = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $refundedStatusId = CRM_Utils_Array::key('Refunded', $contributionStatusID);
     $cancelledStatusId = CRM_Utils_Array::key('Cancelled', $contributionStatusID);
+    $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
 
     // getting data from admin page
-    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
 
     foreach ($invoiceElements['details'] as $contribID => $detail) {
       $input = $ids = $objects = array();
@@ -438,6 +429,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'lineItem' => $lineItem,
         'dataArray' => $dataArray,
         'refundedStatusId' => $refundedStatusId,
+        'pendingStatusId' => $pendingStatusId,
         'cancelledStatusId' => $cancelledStatusId,
         'contribution_status_id' => $contribution->contribution_status_id,
         'subTotal' => $subTotal,
@@ -643,6 +635,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * @param string $html
    *   Content for pdf in html format.
+   *
+   * @param string $name
    *
    * @return string
    *   Name of file which is in pdf format

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,15 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * customize the output to meet our specific requirements
+ * Customize the output to meet our specific requirements.
  */
 class CRM_Admin_Form_Persistent extends CRM_Core_Form {
 
+  /**
+   * Pre-process form.
+   */
   public function preProcess() {
     $this->_indexID = CRM_Utils_Request::retrieve('id', 'Integer', $this, FALSE);
     $this->_config = CRM_Utils_Request::retrieve('config', 'Integer', $this, 0);
@@ -50,6 +51,8 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
   }
 
   /**
+   * Set default values.
+   *
    * @return array
    */
   public function setDefaultValues() {

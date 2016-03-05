@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -100,7 +100,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @internal param bool $is_active value we want to set the is_active field
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
@@ -444,19 +444,20 @@ WHERE     ct.id = cp.financial_type_id AND
   public static function getAssoc($withInactive = FALSE, $extendComponentName = FALSE, $column = 'title') {
     $query = "
     SELECT
-       DISTINCT ( price_set_id ) as id, {$column}
+       DISTINCT ( price_set_id ) as id, s.{$column}
     FROM
-       civicrm_price_field,
-       civicrm_price_set
+       civicrm_price_set s
+       INNER JOIN civicrm_price_field f ON f.price_set_id = s.id
+       INNER JOIN civicrm_price_field_value v ON v.price_field_id = f.id
     WHERE
-       civicrm_price_set.id = civicrm_price_field.price_set_id  AND is_quick_config = 0 ";
+       is_quick_config = 0 ";
 
     if (!$withInactive) {
-      $query .= ' AND civicrm_price_set.is_active = 1 ';
+      $query .= ' AND s.is_active = 1 ';
     }
 
     if (self::eventPriceSetDomainID()) {
-      $query .= ' AND civicrm_price_set.domain_id = ' . CRM_Core_Config::domainID();
+      $query .= ' AND s.domain_id = ' . CRM_Core_Config::domainID();
     }
 
     $priceSets = array();
@@ -466,9 +467,19 @@ WHERE     ct.id = cp.financial_type_id AND
       if (!$componentId) {
         return $priceSets;
       }
-      $query .= " AND civicrm_price_set.extends LIKE '%$componentId%' ";
+      $query .= " AND s.extends LIKE '%$componentId%' ";
     }
-
+    // Check permissioned financial types
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialType, CRM_Core_Action::ADD);
+    if ($financialType) {
+      $types = implode(',', array_keys($financialType));
+      $query .= ' AND s.financial_type_id IN (' . $types . ') AND v.financial_type_id IN (' . $types . ') ';
+    }
+    else {
+      // Do not display any price sets
+      $query .= " AND 0 ";
+    }
+    $query .= " GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $priceSets[$dao->id] = $dao->$column;
@@ -736,7 +747,7 @@ WHERE  id = %1";
    *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
    *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
    */
-  public static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
+  public static function processAmount($fields, &$params, &$lineItem, $component = '') {
     // using price set
     $totalPrice = $totalTax = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
@@ -880,7 +891,24 @@ WHERE  id = %1";
     if (is_array($lineItem)) {
       foreach ($lineItem as $values) {
         $totalParticipant += $values['participant_count'];
-        $amount_level[] = $values['label'] . ' - ' . (float) $values['qty'];
+        // This is a bit nasty. The logic of 'quick config' was because price set configuration was
+        // (and still is) too difficult to replace the 'quick config' price set configuration on the contribution
+        // page.
+        //
+        // However, because the quick config concept existed all sorts of logic was hung off it
+        // and function behaviour sometimes depends on whether 'price set' is set - although actually it
+        // is always set at the functional level. In this case we are dealing with the default 'quick config'
+        // price set having a label of 'Contribution Amount' which could wind up creating a 'funny looking' label.
+        // The correct answer is probably for it to have an empty label in the DB - the label is never shown so it is a
+        // place holder.
+        //
+        // But, in the interests of being careful when capacity is low - avoiding the known default value
+        // will get us by.
+        // Crucially a test has been added so a better solution can be implemented later with some comfort.
+        // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
+        if ($values['label'] != ts('Contribution Amount')) {
+          $amount_level[] = $values['label'] . ' - ' . (float) $values['qty'];
+        }
       }
     }
 
@@ -888,7 +916,13 @@ WHERE  id = %1";
     if ($totalParticipant > 0) {
       $displayParticipantCount = ' Participant Count -' . $totalParticipant;
     }
-    $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
+    if (!empty($amount_level)) {
+      $params['amount_level'] = CRM_Utils_Array::implodePadded($amount_level);
+      if (!empty($displayParticipantCount)) {
+        $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+    }
     $params['amount'] = CRM_Utils_Money::format($totalPrice, NULL, NULL, TRUE);
     $params['tax_amount'] = $totalTax;
     if ($component) {
@@ -901,6 +935,91 @@ WHERE  id = %1";
         $params['autoRenew'] = $autoRenew;
       }
     }
+  }
+
+  /**
+   * Get the text to record for amount level.
+   *
+   * @param array $params
+   *   Submitted parameters
+   *   - priceSetId is required to be set in the calling function
+   *     (we don't e-notice check it to enforce that - all payments DO have a price set - even if it is the
+   *     default one & this function asks that be set if it is the case).
+   *
+   * @return string
+   *   Text for civicrm_contribution.amount_level field.
+   */
+  public static function getAmountLevelText($params) {
+    $priceSetID = $params['priceSetId'];
+    $priceFieldSelection = self::filterPriceFieldsFromParams($priceSetID, $params);
+    $priceFieldMetadata = self::getCachedPriceSetDetail($priceSetID);
+    $displayParticipantCount = NULL;
+
+    $amount_level = array();
+    foreach ($priceFieldMetadata['fields'] as $field) {
+      if (!empty($priceFieldSelection[$field['id']])) {
+        $qtyString = '';
+        if ($field['is_enter_qty']) {
+          $qtyString = ' - ' . (float) $params['price_' . $field['id']];
+        }
+        // We deliberately & specifically exclude contribution amount as it has a specific meaning.
+        // ie. it represents the default price field for a contribution. Another approach would be not
+        // to give it a label if we don't want it to show.
+        if ($field['label'] != ts('Contribution Amount')) {
+          $amount_level[] = $field['label'] . $qtyString;
+        }
+      }
+    }
+    return CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+  }
+
+  /**
+   * Get the fields relevant to the price field from the parameters.
+   *
+   * E.g we are looking for price_5 => 7 out of a big array of input parameters.
+   *
+   * @param int $priceSetID
+   * @param array $params
+   *
+   * @return array
+   *   Price fields found in the params array
+   */
+  public static function filterPriceFieldsFromParams($priceSetID, $params) {
+    $priceSet = self::getCachedPriceSetDetail($priceSetID);
+    $return = array();
+    foreach ($priceSet['fields'] as $field) {
+      if (!empty($params['price_' . $field['id']])) {
+        $return[$field['id']] = $params['price_' . $field['id']];
+      }
+    }
+    return $return;
+  }
+
+  /**
+   * Wrapper for getSetDetail with caching.
+   *
+   * We seem to be passing this array around in a painful way - presumably to avoid the hit
+   * of loading it - so lets make it callable with caching.
+   *
+   * Why not just add caching to the other function? We could do - it just seemed a bit unclear the best caching pattern
+   * & the function was already pretty fugly. Also, I feel like we need to migrate the interaction with price-sets into
+   * a more granular interaction - ie. retrieve specific data using specific functions on this class & have the form
+   * think less about the price sets.
+   *
+   * @param int $priceSetID
+   *
+   * @return array
+   */
+  public static function getCachedPriceSetDetail($priceSetID) {
+    $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID;
+    $cache = CRM_Utils_Cache::singleton();
+    $values = (array) $cache->get($cacheKey);
+    if (empty($values)) {
+      $data = self::getSetDetail($priceSetID);
+      $values = $data[$priceSetID];
+      $cache->set($cacheKey, $values);
+    }
+    return $values;
   }
 
   /**
@@ -953,7 +1072,18 @@ WHERE  id = %1";
     else {
       $feeBlock = &$form->_priceSet['fields'];
     }
-
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      foreach ($feeBlock as $key => $value) {
+        foreach ($value['options'] as $k => $options) {
+          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+            unset($feeBlock[$key]['options'][$k]);
+          }
+        }
+        if (empty($feeBlock[$key]['options'])) {
+          unset($feeBlock[$key]);
+        }
+      }
+    }
     // call the hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
@@ -1314,6 +1444,12 @@ GROUP BY     mt.member_of_contact_id";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
+    //CRM-18050: Check count of price set fields which has been set with auto-renew option.
+    //If price set field is already present with auto-renew option then, it will restrict for adding another price set field with auto-renew option.
+    if ($dao->N == 0) {
+      return 0;
+    }
+
     $autoRenewOption = 2;
     $priceFields = array();
     while ($dao->fetch()) {
@@ -1368,10 +1504,7 @@ GROUP BY     mt.member_of_contact_id";
    * @return object
    */
   public static function eventPriceSetDomainID() {
-    return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-      'event_price_set_domain_id',
-      NULL, FALSE
-    );
+    return Civi::settings()->get('event_price_set_domain_id');
   }
 
   /**
@@ -1383,48 +1516,23 @@ GROUP BY     mt.member_of_contact_id";
    *   Value we want to set the is_quick_config field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_quick_config', $isQuickConfig);
   }
 
   /**
-   * Check if price set id provides option for
-   * user to select both auto-renew and non-auto-renew memberships
+   * Check if price set id provides option for user to select both auto-renew and non-auto-renew memberships
    *
    * @param int $id
    *
    * @return bool
    */
-  public static function checkMembershipPriceSet($id) {
-    $query
-      = "SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
-FROM        civicrm_price_field_value pfv
-LEFT JOIN   civicrm_price_field pf ON pf.id = pfv.price_field_id
-LEFT JOIN   civicrm_price_set ps ON ps.id = pf.price_set_id
-LEFT JOIN   civicrm_membership_type mt ON mt.id = pfv.membership_type_id
-WHERE       ps.id = %1
-";
-
-    $params = array(1 => array($id, 'Integer'));
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    $autoRenew = array();
-    //FIXME: do a comprehensive check of whether
-    //2 membership types can be selected
-    //instead of comparing all of them
-    while ($dao->fetch()) {
-      //temp fix for #CRM-10370
-      //if its NULL consider it '0' i.e. 'No auto-renew option'
-      $daoAutoRenew = $dao->auto_renew;
-      if ($daoAutoRenew === NULL) {
-        $daoAutoRenew = 0;
-      }
-      if (!empty($autoRenew) && !in_array($daoAutoRenew, $autoRenew)) {
-        return TRUE;
-      }
-      $autoRenew[] = $daoAutoRenew;
+  public static function isMembershipPriceSetContainsMixOfRenewNonRenew($id) {
+    $membershipTypes = self::getMembershipTypesFromPriceSet($id);
+    if (!empty($membershipTypes['autorenew']) && !empty($membershipTypes['non_renew'])) {
+      return TRUE;
     }
     return FALSE;
   }

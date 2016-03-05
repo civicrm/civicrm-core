@@ -115,7 +115,7 @@
           if (designerDialog.undoAlert && designerDialog.undoAlert.close) designerDialog.undoAlert.close();
           if (designerDialog.isUfUnsaved) {
             designerDialog.undoAlert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: designerDialog.model.get('title')}) + '</p><a href="#" class="crm-undo">' + ts('Restore') + '</a>', ts('Unsaved Changes'), 'alert', {expires: 60000});
-            $('.ui-notify-message a.crm-undo').button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
+            $('.ui-notify-message a.crm-undo').button({icons: {primary: 'fa-undo'}}).click(function(e) {
               e.preventDefault();
               designerDialog.undoState = true;
               designerDialog.$el.dialog('open');
@@ -198,11 +198,11 @@
       'click .crm-designer-preview': 'doPreview'
     },
     onRender: function() {
-      this.$('.crm-designer-save').button({icons: {primary: 'ui-icon-check'}}).attr({
+      this.$('.crm-designer-save').button({icons: {primary: 'fa-check'}}).attr({
         disabled: 'disabled',
         style: 'opacity:.5; cursor:default;'
       });
-      this.$('.crm-designer-preview').button({icons: {primary: 'ui-icon-search'}});
+      this.$('.crm-designer-preview').button({icons: {primary: 'fa-television'}});
     },
     initialize: function(options) {
       CRM.designerApp.vent.on('ufUnsaved', this.onUfChanged, this);
@@ -254,7 +254,7 @@
       if (!this.previewMode) {
         $('.crm-designer-preview-canvas').html('');
         $('.crm-designer-canvas > *, .crm-designer-palette-region').show();
-        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-search'}}).find('span').text(ts('Preview'));
+        $('.crm-designer-preview').button('option', {icons: {primary: 'fa-television'}}).find('span').text(ts('Preview'));
         return;
       }
       if (this.model.getRel('ufFieldCollection').hasDuplicates()) {
@@ -277,7 +277,7 @@
         $dialog.unblock();
         $('.crm-designer-canvas > *, .crm-designer-palette-region').hide();
         $('.crm-designer-preview-canvas').html(data).show().trigger('crmLoad').find(':input').prop('readOnly', true);
-        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-pencil'}}).find('span').text(ts('Edit'));
+        $('.crm-designer-preview').button('option', {icons: {primary: 'fa-pencil'}}).find('span').text(ts('Edit'));
       });
     }
   });
@@ -662,7 +662,7 @@
         });
         if (this.model.get('field_name').split('_')[0] == 'custom') {
           this.$('.crm-designer-field-summary > div').append('<button class="crm-designer-edit-custom">' + ts('Edit Custom Field') + '</button>');
-          this.$('button.crm-designer-edit-custom').button({icons: {primary: 'ui-icon-pencil'}}).attr('title', ts('Edit global settings for this custom field.'));
+          this.$('button.crm-designer-edit-custom').button({icons: {primary: 'fa-pencil'}}).attr('title', ts('Edit global settings for this custom field.'));
         }
       }
     },
@@ -675,7 +675,7 @@
       });
       var form1 = CRM.loadForm(url)
         .on('crmFormLoad', function() {
-          $(this).prepend('<div class="messages status"><div class="icon inform-icon"></div>' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
+          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
         });
     },
     onChangeIsDuplicate: function(model, value, options) {

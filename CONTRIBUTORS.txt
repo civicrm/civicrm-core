@@ -1,6 +1,102 @@
 The following people and organizations sponsored and/or contributed new and improved features to the project.
 
 ************************************************
+Key Contributors and Sponsors for 4.7
+************************************************
+
+CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Eileen McNaughton,
+	       Jitendra Purohit, Josh Gowan, Kurund Jalmi,
+               Michael McAndrew, Monish Deb, Rohan Ramesh Katkar, Tim Otten,
+               Yashodha Chaku
+
+AGH Strategies - Andrew Hunt, Tyrell Cook, Nikki Murray
+Agileware - Francis Whittle
+Andrew West
+Aputsiaĸ Niels Janussen
+Aron Novak
+Backoffice Thinking
+Barbara Miller
+Borislav Zlatanov
+Brian Dombrowski
+Caroline Badley
+Christian Wach
+Charlie DeTar
+Circle Interactive - Dave Jenkins
+CiviCoop - Jaap Jansma
+CiviDesk - Nicolas Ganivet, Sunil Pawar, Virginie Ganivet
+Compucorp - Guanhuan Chen, Jamie Novick
+CiviCoop - Jaap Jansma
+Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove
+Dave D
+David Hayes
+Dhanesh Dhuri
+Dmitry Smirnov
+Elin Waring
+Emphanos LLC - Allen Shaw
+Esantanche
+Freeform Solutions - Lola Slade, Stephanie Gray, Herb van den Dool
+Future First - David Knoll, John Prescott
+Fuzion NZ - Chris Burgess, Eileen McNaughton, Peter Davis, Torrance Hodgson
+Giant Rabbit - Peter Haight
+Ginkgo Street Labs - Frank Gomez, Galata Tona, Michael Daryabeygi, Roshani Kothari, Toby Lounsbury
+Jake Martin White
+Joanne Chester
+Joe McLaughlin
+Johan Vervloet
+John P Kirk
+Joris
+JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
+gah242s
+Greenleaf Advancement - Guy Iaccarino
+K Sneed Consulting - Kate Sneed
+Kemal Bay
+Ken West
+Kevin Levie
+Korlon - Stuart Gaston
+kreynen
+Laryn
+Lesley Evensen (zorgalina)
+Lighthouse Consulting and Design - Brian Shaughnessy
+Marty Wright
+Matthew Wire
+Mattias Michaux
+Mohit Aggarwal
+National Urban League - Lisa Taliano
+Nicholai Burton
+Niels Heinemann
+New York City Council
+New York State Senate - Ken Zalewski
+Northbridge Digital - Oliver Gibson
+Olaf Buddenhagen
+Palante Technology Cooperative - Jon Goldberg, Joseph Lacey, Paul Campbell
+Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Richard Van Oosterhout
+RocXa
+Saurabh Batra
+Seamus Lee
+Seb35
+Semper IT - Karin Gerritsen
+Shawn Holt
+Skvare - Jeremy Proffitt, Peter Petrik
+Smiling Heart Enterprises - Neil Planchon
+Squiffle Consulting - Aidan Saunders
+Stephen Palmstrom
+Symbiotic - Mathieu Lutfy, Samuel Vanhove
+Systopia - Björn Endres, Niko Bochan
+Tadpole - Dana Skallman, Kevin Cristiano
+Tech to the People - Xavier Dutoit
+Thomas Leichtuss
+Tim Mallezie
+Torenware Networks - Rob Thorne
+University of Cambridge – Alex Corr, John Kingsnorth
+Veda Consulting - Parvez Saleh, Deepak Srivastava, Kajan
+Wanna Pixel - Nathan Porter, Marisa Porter
+Web Access - Sudha Bisht
+Wikimedia Foundation - Adam Wight
+yurg
+zarandras
+
+************************************************
 Key Contributors and Sponsors for 4.6
 ************************************************
 
@@ -448,7 +544,7 @@ Alpha: http://uk.alpha.org
 Cambridge Union: http://www.cus.org
 St Ethelburga's: http://stethelburgas.org
 Joomkit: http://www.joomkit.com
-International Mountain Biking Assocation: http://www.imba.com/
+International Mountain Biking Association: http://www.imba.com/
 Niro Solutions: http://www.nirosolutions.com/
 Fuzion: http://fuzion.co.nz
 ArtD Webdesign

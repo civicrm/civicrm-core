@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -46,7 +46,7 @@ class CRM_Cxn_ApiRouter {
     require_once 'api/v3/utils.php';
 
     // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL') &&
+    if (Civi::settings()->get('enableSSL') &&
       !CRM_Utils_System::isSSL() &&
       strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', CRM_Utils_System::getRequestHeaders())) != 'https'
     ) {
@@ -75,8 +75,7 @@ class CRM_Cxn_ApiRouter {
     }
 
     $whitelist = \Civi\API\WhitelistRule::createAll($cxn['perm']['api']);
-    Civi\Core\Container::singleton()
-      ->get('dispatcher')
+    \Civi::service('dispatcher')
       ->addSubscriber(new \Civi\API\Subscriber\WhitelistSubscriber($whitelist));
     CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
     if ($cxn['perm']['grant'] === '*') {

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -53,8 +53,8 @@
               <td class="crm-labelFormat-name">{$row.groupName}</td>
               <td class="crm-labelFormat-order nowrap">{$row.weight}</td>
               <td class="crm-labelFormat-description">{$row.grouping}</td>
-              <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}<img
-                src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
+              <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}
+              <img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
               <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
                 &nbsp;</td>
               <td>{$row.action|replace:'xx':$row.id}</td>
@@ -64,8 +64,7 @@
       {/strip}
 
       <div class="action-link">
-        <a href="{crmURL q="action=add&reset=1"}" id="newLabelFormat" class="button"><span><div
-              class="icon ui-icon-circle-plus"></div>{ts}Add Label Format{/ts}</span></a>
+        {crmButton q="action=add&reset=1" id="newLabelFormat" icon="crm-i fa-plus-circle"}{ts}Add Label Format{/ts}{/crmButton}
       </div>
     </div>
   {else}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -54,13 +52,19 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   public $_bltID;
 
-  public $_fields;
+  public $_fields = array();
 
   /**
    * @var array current payment processor including a copy of the object in 'object' key
    */
   public $_paymentProcessor;
-  public $_recurPaymentProcessors;
+
+  /**
+   * Available recurring processors.
+   *
+   * @var array
+   */
+  public $_recurPaymentProcessors = array();
 
   /**
    * Array of processor options in the format id => array($id => $label)
@@ -76,6 +80,14 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @var array
    */
   protected $_paymentProcessors = array();
+
+  /**
+   * Instance of the payment processor object.
+   *
+   * @var CRM_Core_Payment
+   */
+  protected $_paymentObject;
+
   /**
    * The id of the contribution that we are processing.
    *
@@ -183,11 +195,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $_formType;
 
   /**
-   * @var mystery variable screaming out for documentation
-   */
-  protected $_cdType;
-
-  /**
    * Array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
    * be all in this array in order like
    *  'credit_card' => array('credit_card_number' ...
@@ -197,6 +204,16 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @var array
    */
   public $billingFieldSets = array();
+
+  /**
+   * Pre process function with common actions.
+   */
+  public function preProcess() {
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->assign('contactID', $this->_contactID);
+    CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $this->_contactID));
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
+  }
 
   /**
    * @param int $id
@@ -289,6 +306,8 @@ WHERE  contribution_id = {$id}
    * @param int $contributionId
    * @param int $statusId
    * @param int|null $previousStatusId
+   *
+   * @param string $receiveDate
    *
    * @return null|string
    */
@@ -397,22 +416,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * Assign billing type id to bltID.
-   *
-   * @throws CRM_Core_Exception
-   * @return void
-   */
-  public function assignBillingType() {
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $this->_bltID = array_search('Billing', $locationTypes);
-    if (!$this->_bltID) {
-      throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
-    }
-    $this->set('bltID', $this->_bltID);
-    $this->assign('bltID', $this->_bltID);
-  }
-
-  /**
    * Assign $this->processors, $this->recurPaymentProcessors, and related Smarty variables
    */
   public function assignProcessors() {
@@ -431,15 +434,22 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       }
       $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
-        $this->_processors[$id] = ts($processor['name']);
-        if (!empty($processor['description'])) {
-          $this->_processors[$id] .= ' : ' . ts($processor['description']);
+        // @todo review this. The inclusion of this IF was to address test processors being incorrectly loaded.
+        // However the function $this->getValidProcessors() is expected to only return the processors relevant
+        // to the mode (using the actual id - ie. the id of the test processor for the test processor).
+        // for some reason there was a need to filter here per commit history - but this indicates a problem
+        // somewhere else.
+        if ($processor['is_test'] == ($this->_mode == 'test')) {
+          $this->_processors[$id] = ts($processor['name']);
+          if (!empty($processor['description'])) {
+            $this->_processors[$id] .= ' : ' . ts($processor['description']);
+          }
+          if ($processor['is_recur']) {
+            $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
+          }
         }
       }
-      //get the valid recurring processors.
-      $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
-      $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
-      $this->_recurPaymentProcessors = array_intersect_key($this->_processors, $recurring);
+      CRM_Financial_Form_Payment::addCreditCardJs();
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
@@ -577,7 +587,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @param $submittedValues
+   * @param array $submittedValues
    *
    * @return mixed
    */
@@ -624,13 +634,104 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
         $this->assignBillingType();
 
-        $this->_fields = array();
         CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE);
       }
     }
     catch (CRM_Core_Exception $e) {
       CRM_Core_Error::fatal($e->getMessage());
     }
+  }
+
+  /**
+   * Begin post processing.
+   *
+   * This function aims to start to bring together common postProcessing functions.
+   *
+   * Eventually these are also shared with the front end forms & may need to be moved to where they can also
+   * access this function.
+   */
+  protected function beginPostProcess() {
+    if ($this->_mode) {
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment(
+        $this->_params['payment_processor_id'],
+        ($this->_mode == 'test')
+      );
+      if (in_array('credit_card_exp_date', array_keys($this->_params))) {
+        $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
+        $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+      }
+      $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
+      $this->assign('credit_card_number',
+        CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
+      );
+      $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
+    }
+    $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
+  }
+
+
+  /**
+   * Add the billing address to the contact who paid.
+   *
+   * Note that this function works based on the presence or otherwise of billing fields & can be called regardless of
+   * whether they are 'expected' (due to assumptions about the payment processor type or the setting to collect billing
+   * for pay later.
+   */
+  protected function processBillingAddress() {
+    $fields = array();
+
+    $fields['email-Primary'] = 1;
+    $this->_params['email-5'] = $this->_params['email-Primary'] = $this->_contributorEmail;
+    // now set the values for the billing location.
+    foreach (array_keys($this->_fields) as $name) {
+      $fields[$name] = 1;
+    }
+
+    $fields["address_name-{$this->_bltID}"] = 1;
+
+    //ensure we don't over-write the payer's email with the member's email
+    if ($this->_contributorContactID == $this->_contactID) {
+      $fields["email-{$this->_bltID}"] = 1;
+    }
+
+    list($hasBillingField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+    $fields = $this->formatParamsForPaymentProcessor($fields);
+
+    if ($hasBillingField) {
+      $addressParams = array_merge($this->_params, $addressParams);
+      //here we are setting up the billing contact - if different from the member they are already created
+      // but they will get billing details assigned
+      CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
+        $this->_contributorContactID, NULL, NULL,
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
+      );
+    }
+  }
+
+  /**
+   * Get default values for billing fields.
+   *
+   * @todo this function still replicates code in several other places in the code.
+   *
+   * Also - the call to getProfileDefaults possibly covers the state_province & country already.
+   *
+   * @param $defaults
+   *
+   * @return array
+   */
+  protected function getBillingDefaults($defaults) {
+    // set default country from config if no country set
+    $config = CRM_Core_Config::singleton();
+    if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
+      $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
+    }
+
+    if (empty($defaults["billing_state_province_id-{$this->_bltID}"])) {
+      $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
+    }
+
+    $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
+    return array_merge($defaults, $billingDefaults);
   }
 
 }

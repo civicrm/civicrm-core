@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="batch-edit"></span>{if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}
+        <span class="crm-i fa-pencil"></span> {if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}
       </div>
     {/if}
     {if $add }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Conference Slots
- *
+ * This class generates form components for Conference Slots.
  */
 class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
 
@@ -45,8 +42,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   public $_action;
 
   /**
-   *
-   * @return void
+   * Build quick form.
    */
   public function buildQuickForm() {
     $slots = CRM_Core_OptionGroup::values('conference_slot');
@@ -70,6 +66,9 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
     parent::buildQuickForm();
   }
 
+  /**
+   * Post process form.
+   */
   public function postProcess() {
     $params = $this->exportValues();
 
@@ -80,7 +79,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Return a descriptive name for the page, used in wizard header
+   * Return a descriptive name for the page, used in wizard header.
    *
    * @return string
    */

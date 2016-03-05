@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -104,6 +104,14 @@ CRM.$(function($) {
     <tr class="crm-job-form-block-parameters">
       <td class="label">{$form.parameters.label}<br />{docURL page="Managing Scheduled Jobs" resource="wiki"}</td>
       <td>{$form.parameters.html}</td>
+    </tr>
+    <tr class="crm-job-form-block-scheduled-run-date">
+        <td class="label">{$form.scheduled_run_date.label}</td>
+        <td>{$form.scheduled_run_date.html}<br />
+            <div dlass="description">{ts}Do not run this job before this date / time. The run frequency selected above will apply thereafter.{/ts}<br />
+              {if $action eq 1}{ts}Leave blank to run as soon as possible.{/ts}{else}{ts}Leave blank to run at next run frequency.{/ts}{/if}
+            </div>
+        </td>
     </tr>
     <tr class="crm-job-form-block-is_active">
       <td></td><td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>

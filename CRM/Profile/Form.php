@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -135,8 +135,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   protected $_ctype = NULL;
 
-  protected $_defaults = NULL;
-
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode
@@ -181,6 +179,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   protected $_currentUserID = NULL;
   protected $_session = NULL;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Profile';
+  }
 
   /**
    * Pre processing work done here.
@@ -320,7 +325,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
             $this->_recordId = NULL;
             $this->set('recordId', NULL);
           }
-          //record id is neccessary for _multiRecord view and update/edit action
+          //record id is necessary for _multiRecord view and update/edit action
           if (!$this->_recordId
             && ($this->_multiRecord == CRM_Core_Action::UPDATE || $this->_multiRecord == CRM_Core_Action::DELETE)
           ) {
@@ -366,9 +371,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
         }
         elseif (!empty($this->_multiRecordFields)
           && (!$this->_multiRecord || !in_array($this->_multiRecord, array(
-                CRM_Core_Action::DELETE,
-                CRM_Core_Action::UPDATE,
-              )))
+            CRM_Core_Action::DELETE,
+            CRM_Core_Action::UPDATE,
+          )))
         ) {
           CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multirecord listing page
@@ -818,7 +823,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->setDefaultsValues();
 
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
-    if ($this->_mode == self::MODE_CREATE) {
+
+    if ($this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT) {
       CRM_Core_BAO_CMSUser::buildForm($this, $this->_gid, $emailPresent, $action);
     }
     else {
@@ -970,20 +976,20 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
             $duplicateContactsLinks = '<div class="matching-contacts-found">';
             $duplicateContactsLinks .= ts('One matching contact was found. ', array(
-                'count' => count($contactLinks['rows']),
-                'plural' => '%count matching contacts were found.<br />',
-              ));
+              'count' => count($contactLinks['rows']),
+              'plural' => '%count matching contacts were found.<br />',
+            ));
             if ($contactLinks['msg'] == 'view') {
               $duplicateContactsLinks .= ts('You can View the existing contact.', array(
-                  'count' => count($contactLinks['rows']),
-                  'plural' => 'You can View the existing contacts.',
-                ));
+                'count' => count($contactLinks['rows']),
+                'plural' => 'You can View the existing contacts.',
+              ));
             }
             else {
               $duplicateContactsLinks .= ts('You can View or Edit the existing contact.', array(
-                  'count' => count($contactLinks['rows']),
-                  'plural' => 'You can View or Edit the existing contacts.',
-                ));
+                'count' => count($contactLinks['rows']),
+                'plural' => 'You can View or Edit the existing contacts.',
+              ));
             }
             $duplicateContactsLinks .= '</div>';
             $duplicateContactsLinks .= '<table class="matching-contacts-actions">';
@@ -1319,7 +1325,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     //create CMS user (if CMS user option is selected in profile)
     if (!empty($params['cms_create_account']) &&
-      $this->_mode == self::MODE_CREATE
+      ($this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT)
     ) {
       $params['contactID'] = $this->_id;
       if (!CRM_Core_BAO_CMSUser::create($params, $this->_mail)) {

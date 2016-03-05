@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -33,7 +33,7 @@
 
 {if ($snippet !== 'json') and !$suppressForm and count($form.errors) gt 0}
    <div class="messages crm-error">
-       <div class="icon red-icon ui-icon-alert"></div>
+       <i class="crm-i fa-exclamation-triangle crm-i-red"></i>
      {ts}Please correct the following errors in the form fields below:{/ts}
      <ul id="errorList">
      {foreach from=$form.errors key=errorName item=error}
@@ -55,4 +55,3 @@
   {/foreach}
   </table>
 {/if}
-

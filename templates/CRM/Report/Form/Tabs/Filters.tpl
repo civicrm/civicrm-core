@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,7 +31,7 @@
         {assign  var="filterCount" value=$table|@count}
         {* Wrap custom field sets in collapsed accordion pane. *}
         {if $filterGroups.$tableName.group_title and $filterCount gte 1}
-          {* we should close table that contains other filter elements before we start building custom group accordian
+          {* we should close table that contains other filter elements before we start building custom group accordion
            *}
           {if $counter eq 1}
     </table>

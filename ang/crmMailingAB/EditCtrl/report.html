@@ -11,7 +11,7 @@
     <tr ng-show="abtest.ab.status == 'Testing'">
       <td></td>
       <td ng-repeat="am in getActiveMailings()">
-        <button crm-icon="mail-closed" ng-click="selectWinner(am.name)">{{ts('Select as Final')}}</button>
+        <button crm-icon="fa-trophy" ng-click="selectWinner(am.name)">{{ts('Select as Final')}}</button>
       </td>
       <td></td>
     </tr>
@@ -72,7 +72,7 @@
           ng-href="{{statUrl(am.mailing, statType, 'search')}}"
           ng-if="checkPerm('view all contacts')"
           title="{{ts('Search for contacts using \'%1\'', {1: statType.title})}}"
-          crm-icon="search"
+          crm-icon="fa-search"
           ></a>
         <a
           class="crm-hover-button action-item"
@@ -135,8 +135,8 @@
     <tr>
       <td>{{ts('Content')}}</td>
       <td ng-repeat="am in getActiveMailings()">
-        <a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'html')" ng-show="am.mailing.body_html">{{ts('HTML')}}</a>
-        <a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'text')" ng-show="am.mailing.body_text">{{ts('Text')}}</a>
+        <a crm-icon="fa-television" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'html')" ng-show="am.mailing.body_html">{{ts('HTML')}}</a>
+        <a crm-icon="fa-file-text-o" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'text')" ng-show="am.mailing.body_text">{{ts('Text')}}</a>
       </td>
       <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
@@ -161,10 +161,10 @@
         <div crm-mailing-review-bool crm-on="am.mailing.override_verp=='0'" crm-title="ts('Track Replies')"></div>
         <div crm-mailing-review-bool crm-on="am.mailing.override_verp=='0' && mailing.forward_replies=='1'" crm-title="ts('Forward Replies')"></div>
         <div ng-controller="PreviewComponentCtrl">
-          <div ng-show="am.mailing.override_verp == '0' && mailing.auto_responder"><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Auto-Respond'), am.mailing.reply_id)">{{ts('Auto-Respond')}}</a></div>
-          <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Opt-out'), am.mailing.optout_id)">{{ts('Opt-out')}}</a></div>
-          <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Resubscribe'), am.mailing.resubscribe_id)">{{ts('Resubscribe')}}</a></div>
-          <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Unsubscribe'), am.mailing.unsubscribe_id)">{{ts('Unsubscribe')}}</a></div>
+          <div ng-show="am.mailing.override_verp == '0' && mailing.auto_responder"><a crm-icon="fa-envelope" class="crm-hover-button action-item" ng-click="previewComponent(ts('Auto-Respond'), am.mailing.reply_id)">{{ts('Auto-Respond')}}</a></div>
+          <div><a crm-icon="fa-envelope" class="crm-hover-button action-item" ng-click="previewComponent(ts('Opt-out'), am.mailing.optout_id)">{{ts('Opt-out')}}</a></div>
+          <div><a crm-icon="fa-envelope" class="crm-hover-button action-item" ng-click="previewComponent(ts('Resubscribe'), am.mailing.resubscribe_id)">{{ts('Resubscribe')}}</a></div>
+          <div><a crm-icon="fa-envelope" class="crm-hover-button action-item" ng-click="previewComponent(ts('Unsubscribe'), am.mailing.unsubscribe_id)">{{ts('Unsubscribe')}}</a></div>
         </div>
       </td>
       <td ng-show="abtest.ab.status == 'Testing'"></td>

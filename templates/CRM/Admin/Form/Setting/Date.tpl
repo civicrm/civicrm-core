@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-date-form-block">
-<div id="help">
+<div class="help">
   {capture assign=crmURL}{crmURL p='civicrm/admin/setting/preferences/date' q='action=reset=1'}{/capture}
     {ts 1=$crmURL}Use this screen to configure default formats for date display and date input fields throughout your site. Settings use standard POSIX specifiers. New installations are preconfigured with standard United States formats. You can override this default setting and define the range of allowed dates for specific field types at <a href="%1">Administer > Customize Data and Screens > Date Preferences</a>{/ts} {help id='date-format'}
 </div>
@@ -65,8 +65,12 @@
        </tr>
    </table>
 </fieldset>
-<fieldset><legend>{ts}Fiscal Year{/ts}</legend>
+<fieldset><legend>{ts}Calendar{/ts}</legend>
    <table class="form-layout-compressed">
+       <tr class="crm-date-form-block-weekBegins">
+         <td class="label">{$form.weekBegins.label}</td>
+         <td>{$form.weekBegins.html}</td>
+       </tr>
        <tr class="crm-date-form-block-fiscalYearStart">
           <td class="label">{$form.fiscalYearStart.label}</td>
           <td>{$form.fiscalYearStart.html}</td>

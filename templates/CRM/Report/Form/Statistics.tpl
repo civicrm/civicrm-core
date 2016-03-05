@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
     <h1>{$reportTitle}</h1>
     <div id="report-date">{$reportDate}</div>
   {/if}
-  {if $statistics and $outputMode}
+  {if $statistics}
     <table class="report-layout statistics-table">
       {foreach from=$statistics.groups item=row}
         <tr>

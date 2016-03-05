@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -74,6 +74,10 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_
   /**
    * An alternative version which might perform a lot better
    * than the above. Will need to do some testing
+   *
+   * @param string $rg
+   *
+   * @return array
    */
   public static function internalOptimized($rg) {
     $sql = "

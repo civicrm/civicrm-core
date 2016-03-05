@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,7 +32,7 @@
 {/if}
 {assign var=defaultZoom value=12}
 {literal}
-<script src="http://openlayers.org/api/OpenLayers.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js" type="text/javascript"></script>
 <script type="text/javascript">
     var popup = new Popup();
 
@@ -69,7 +69,14 @@
 
     function initMap() {
         var map = new OpenLayers.Map("osm_map");
-        map.addLayer(new OpenLayers.Layer.OSM());
+        map.addLayer(new OpenLayers.Layer.OSM("MapQuest OSM", [
+            "https://otile1-s.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
+            "https://otile2-s.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
+            "https://otile3-s.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
+            "https://otile4-s.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
+        ], {
+            attribution: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a>. Data &copy; <a href='http://www.openstreetmap.org/' target='_blank'>OpenStreetMap</a> contributors.</p>"
+        }));
 
         var lonLat = new OpenLayers.LonLat(
             {/literal}{$center.lng}{literal},

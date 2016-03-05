@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class acts like a psuedo-BAO for transient import job tables
+ * This class acts like a psuedo-BAO for transient import job tables.
  */
 class CRM_Contact_Import_ImportJob {
 
@@ -413,7 +411,6 @@ class CRM_Contact_Import_ImportJob {
 
       $tagParams = array(
         'name' => $newTagName,
-        'title' => $newTagName,
         'description' => $newTagDesc,
         'is_selectable' => TRUE,
         'used_for' => 'civicrm_contact',
@@ -427,7 +424,7 @@ class CRM_Contact_Import_ImportJob {
     if (is_array($this->_tag)) {
       $tagAdditions = array();
       foreach ($this->_tag as $tagId => $val) {
-        $addTagCount = CRM_Core_BAO_EntityTag::addEntitiesToTag($contactIds, $tagId);
+        $addTagCount = CRM_Core_BAO_EntityTag::addEntitiesToTag($contactIds, $tagId, 'civicrm_contact', FALSE);
         $totalTagCount = $addTagCount[1];
         if (isset($addedTag) && $tagId == $addedTag->id) {
           $tagName = $newTagName;

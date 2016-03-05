@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,12 +26,12 @@
 {* Actions: 1=add, 2=edit, browse=16, delete=8 *}
 {if $action ne 1 and $action ne 2 and $action ne 8 and $groupPermission eq 1}
 <div class="crm-submit-buttons">
-    <a accesskey="N" href="{crmURL p='civicrm/group/add' q='reset=1'}" class="newGroup button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Group{/ts}</span></a><br/>
+    <a accesskey="N" href="{crmURL p='civicrm/group/add' q='reset=1'}" class="newGroup button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Group{/ts}</span></a><br/>
 </div>
 {/if} {* action ne add or edit *}
 <div class="crm-block crm-content-block">
 {if $action eq 16}
-<div id="help">
+<div class="help">
     {ts}Use Groups to organize contacts (e.g. these contacts are part of our 'Steering Committee'). You can also create 'smart' groups based on contact characteristics (e.g. this group consists of all people in our database who live in a specific locality).{/ts} {help id="manage_groups"}
 </div>
 {/if}
@@ -47,7 +47,7 @@
 
 {if $action ne 1 and $action ne 2 and $action ne 8 and $groupPermission eq 1}
 <div class="crm-submit-buttons">
-        <a accesskey="N" href="{crmURL p='civicrm/group/add' q='reset=1'}" class="newGroup button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Group{/ts}</span></a><br/>
+        <a accesskey="N" href="{crmURL p='civicrm/group/add' q='reset=1'}" class="newGroup button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Group{/ts}</span></a><br/>
 </div>
 {/if} {* action ne add or edit *}
 </div>

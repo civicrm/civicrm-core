@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,15 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
   public function run() {
     $parentEventId = $startDate = $endDate = NULL;

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -57,8 +57,8 @@
                title="{ts}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})
           </td>
           <td class="crm-event-is_public{$highlight}">{if $row.is_public eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td class="crm-event-start_date{$highlight}">{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
-          <td class="crm-event-end_date{$highlight}">{$row.end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
+              <td class="crm-event-start_date{$highlight}" data-order="{$row.start_date|crmDate:'%Y-%m-%d'}">{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
+              <td class="crm-event-end_date{$highlight}" data-order="{$row.end_date|crmDate:'%Y-%m-%d'}">{$row.end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
           <td class="crm-event_status{$highlight}" id="row_{$row.id}_status">
             {if $row.is_active eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}
           </td>

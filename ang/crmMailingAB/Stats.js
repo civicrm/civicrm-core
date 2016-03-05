@@ -189,7 +189,7 @@
                   .orient("left").ticks(5);
 
                 // Define the line
-                // Note you plot the time / score pair from each key you created ealier
+                // Note you plot the time / score pair from each key you created earlier
                 var valueline = d3.svg.line()
                   .x(function (d) {
                     return x(d.time);

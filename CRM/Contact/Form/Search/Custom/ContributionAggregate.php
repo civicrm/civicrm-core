@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -40,7 +38,9 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
   public $_permissionedComponent;
 
   /**
-   * @param $formValues
+   * Class constructor.
+   *
+   * @param array $formValues
    */
   public function __construct(&$formValues) {
     $this->_formValues = $formValues;
@@ -58,6 +58,8 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
   }
 
   /**
+   * Build form.
+   *
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {

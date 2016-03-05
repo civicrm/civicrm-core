@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Member/Form/MembershipStatus.tpl"}
 {else}
-  <div id="help">
+  <div class="help">
     <p>{ts}CiviMember automatically calculates the current status of each contact's membership based on the status names and rules configured here. The status 'rule' tells CiviMember what status to assign based on the start and end dates of a given membership. For example, the default <strong>Grace</strong> status rule says: 'assign Grace status if the membership period ended sometime within the past month.'{/ts} {docURL page="user/membership/defining-memberships/"}
     <p>{ts 1=$crmURL}The status rules provided by default may be sufficient for your organization. However, you can easily change the status names and/or adjust the rules by clicking the Edit links below. Or you can <a href='%1'>add a new status and rule</a>.{/ts}
   </div>
@@ -67,8 +67,8 @@
 
         {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newMembershipStatus"  icon="circle-plus"}{ts}Add Membership Status{/ts}{/crmButton}
-          {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+          {crmButton q="action=add&reset=1" id="newMembershipStatus"  icon="plus-circle"}{ts}Add Membership Status{/ts}{/crmButton}
+          {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
         </div>
         {/if}
     </div>

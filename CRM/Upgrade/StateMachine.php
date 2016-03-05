@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,25 +29,21 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * State machine for managing different states of the Import process.
- *
+ * State machine for managing different states of the upgrade process.
  */
 class CRM_Upgrade_StateMachine extends CRM_Core_StateMachine {
 
   /**
    * Class constructor.
    *
-   * @param object $controller
-   * @param const $pages
-   * @param \const|int $action
+   * @param CRM_Upgrade_Controller $controller
+   * @param array $pages
+   * @param int $action
    *
-   * @internal param \CRM_Upgrade_Controller_base $object
-   * @return \CRM_Upgrade_StateMachine CRM_Upgrade_StateMachine_Base
+   * @return CRM_Upgrade_StateMachine
    */
   public function __construct(&$controller, &$pages, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

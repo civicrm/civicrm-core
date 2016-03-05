@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -124,6 +124,10 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
       $params = $ids = array();
       // store the submitted values in an array
       $params = $this->exportValues();
+      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      $params['is_current_member'] = CRM_Utils_Array::value('is_current_member', $params, FALSE);
+      $params['is_admin'] = CRM_Utils_Array::value('is_admin', $params, FALSE);
+      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $ids['membershipStatus'] = $this->_id;

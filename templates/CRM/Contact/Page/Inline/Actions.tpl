@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,9 @@
 {* this template is used for the dropdown menu of the "Actions" button on contacts. *}
 
 <div id="crm-contact-actions-wrapper" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Page_Inline_Actions"{rdelim}'>
-  <a id="crm-contact-actions-link" href="#" class="button"><span><div class="icon ui-icon-arrow-1-se css_right"></div>{ts}Actions{/ts}</span></a>
+  {crmButton id="crm-contact-actions-link" href="#" icon="bars"}
+    {ts}Actions{/ts}
+  {/crmButton}
     <div class="ac_results" id="crm-contact-actions-list">
       <div class="crm-contact-actions-list-inner">
         <div class="crm-contact_activities-list">
@@ -37,31 +39,31 @@
               <ul class="contact-print">
                   <li class="crm-contact-print">
                      <a class="print" title="{ts}Printer-friendly view of this page.{/ts}" href='{crmURL p='civicrm/contact/view/print' q="reset=1&print=1&cid=$contactId"}'>
-                     <span><div class="icon ui-icon-print"></div>{ts}Print Summary{/ts}</span>
+                     <span><i class="crm-i fa-print"></i> {ts}Print Summary{/ts}</span>
                      </a>
                   </li>
                   <li>
-                        <a class="vcard " title="{ts}vCard record for this contact.{/ts}" href="{crmURL p='civicrm/contact/view/vcard' q="reset=1&cid=$contactId"}"><span><div class="icon ui-icon-extlink"></div>{ts}vCard{/ts}</span>
+                        <a class="vcard " title="{ts}vCard record for this contact.{/ts}" href="{crmURL p='civicrm/contact/view/vcard' q="reset=1&cid=$contactId"}"><span><i class="crm-i fa-list-alt"></i> {ts}vCard{/ts}</span>
                         </a>
                   </li>
                  {if !empty($dashboardURL)}
                    <li class="crm-contact-dashboard">
                       <a href="{$dashboardURL}" class="dashboard " title="{ts}dashboard{/ts}">
-                         <span><div class="icon ui-icon-contact"></div>{ts}Contact Dashboard{/ts}</span>
+                         <span><i class="crm-i fa-tachometer"></i> {ts}Contact Dashboard{/ts}</span>
                        </a>
                    </li>
                  {/if}
                  {if !empty($userRecordUrl)}
                    <li class="crm-contact-user-record">
                       <a href="{$userRecordUrl}" class="user-record " title="{ts}User Record{/ts}">
-                         <span><div class="icon ui-icon-person"></div>{ts}User Record{/ts}</span>
+                         <span><i class="crm-i fa-user"></i> {ts}User Record{/ts}</span>
                       </a>
                    </li>
                  {/if}
                  {if !empty($userAddUrl)}
                    <li class="crm-contact-user-record">
                       <a href="{$userAddUrl}" class="user-record " title="{ts}Create User Record{/ts}">
-                         <span><div class="icon ui-icon-person"></div>{ts}Create User Record{/ts}</span>
+                         <span><i class="crm-i fa-user-plus"></i> {ts}Create User Record{/ts}</span>
                       </a>
                    </li>
               {/if}

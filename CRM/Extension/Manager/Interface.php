@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 interface CRM_Extension_Manager_Interface {
   /**
@@ -61,15 +59,11 @@ interface CRM_Extension_Manager_Interface {
 
   /**
    * @param CRM_Extension_Info $info
-   *
-   * @return mixed
    */
   public function onPreEnable(CRM_Extension_Info $info);
 
   /**
    * @param CRM_Extension_Info $info
-   *
-   * @return mixed
    */
   public function onPostEnable(CRM_Extension_Info $info);
 
@@ -116,16 +110,12 @@ interface CRM_Extension_Manager_Interface {
   /**
    * @param CRM_Extension_Info $oldInfo
    * @param CRM_Extension_Info $newInfo
-   *
-   * @return mixed
    */
   public function onPreReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
 
   /**
    * @param CRM_Extension_Info $oldInfo
    * @param CRM_Extension_Info $newInfo
-   *
-   * @return mixed
    */
   public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
 

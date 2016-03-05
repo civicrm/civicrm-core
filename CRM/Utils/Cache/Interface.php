@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,31 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  *
+ * CRM_Utils_Cache_Interface
+ *
+ * PHP-FIG has been developing a draft standard for caching,
+ * PSR-6. The standard has not been ratified yet. When
+ * making changes to this interface, please take care to
+ * avoid *conflicst* with PSR-6's CacheItemPoolInterface. At
+ * time of writing, they do not conflict. Avoiding conflicts
+ * will enable more transition paths where Civi
+ * simultaneously supports both interfaces in the same
+ * implementation.
+ *
+ * For example, the current interface defines:
+ *
+ *   function get($key) => mixed $value
+ *
+ * and PSR-6 defines:
+ *
+ *   function getItem($key) => ItemInterface $item
+ *
+ * These are different styles (e.g. "weak item" vs "strong item"),
+ * but the two methods do not *conflict*. They can coexist,
+ * and you can trivially write adapters between the two.
+ *
+ * @see https://github.com/php-fig/fig-standards/blob/master/proposed/cache.md
  */
 interface CRM_Utils_Cache_Interface {
 
@@ -39,7 +62,6 @@ interface CRM_Utils_Cache_Interface {
    *
    * @param string $key
    * @param mixed $value
-   * @return void
    */
   public function set($key, &$value);
 
@@ -56,14 +78,11 @@ interface CRM_Utils_Cache_Interface {
    * Delete a value from the cache.
    *
    * @param string $key
-   * @return void
    */
   public function delete($key);
 
   /**
    * Delete all values from the cache.
-   *
-   * @return void
    */
   public function flush();
 

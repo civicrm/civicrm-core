@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,17 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * The basic class that interfaces with the external user framework
+ * The basic class that interfaces with the external user framework.
  */
 class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
 
   /**
-   * Create UF Match, Note that thsi function is here in it's simplest form @ the moment
+   * Create UF Match, Note that this function is here in it's simplest form @ the moment
    *
    * @param $params
    *
@@ -74,8 +72,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    *
    * @param $ctype
    * @param bool $isLogin
-   *
-   * @return void
    */
   public static function synchronize(&$user, $update, $uf, $ctype, $isLogin = FALSE) {
     $userSystem = CRM_Core_Config::singleton()->userSystem;
@@ -213,12 +209,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         $dedupeParams['check_permission'] = FALSE;
         $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
 
-        if (!empty($ids) &&
-          CRM_Core_BAO_Setting::getItem(
-            CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-            'uniq_email_per_site'
-          )
-        ) {
+        if (!empty($ids) && Civi::settings()->get('uniq_email_per_site')) {
           // restrict dupeIds to ones that belong to current domain/site.
           $siteContacts = CRM_Core_BAO_Domain::getContactList();
           foreach ($ids as $index => $dupeId) {
@@ -263,18 +254,19 @@ AND    domain_id = %2
       }
 
       if (!$found) {
-        if ($config->userSystem->is_drupal) {
-          $mail = 'mail';
-        }
-        elseif ($uf == 'WordPress') {
-          $mail = 'user_email';
-        }
-        else {
-          $mail = 'email';
-        }
-
+        // Not sure why we're testing for this. Is there ever a case
+        // in which $user is not an object?
         if (is_object($user)) {
-          $params = array('email-Primary' => $user->$mail);
+          if ($config->userSystem->is_drupal) {
+            $primary_email = $uniqId;
+          }
+          elseif ($uf == 'WordPress') {
+            $primary_email = $user->user_email;
+          }
+          else {
+            $primary_email = $user->email;
+          }
+          $params = array('email-Primary' => $primary_email);
         }
 
         if ($ctype == 'Organization') {
@@ -362,8 +354,6 @@ AND    domain_id    = %4
    *
    * @param int $contactId
    *   Id of the contact to update.
-   *
-   * @return void
    */
   public static function updateUFName($contactId) {
     if (!$contactId) {
@@ -415,10 +405,8 @@ AND    domain_id    = %4
    *
    * @param int $contactId
    *   Contact ID of the user.
-   * @param $emailAddress
+   * @param string $emailAddress
    *   Email to be modified for the user.
-   *
-   * @return void
    */
   public static function updateContactEmail($contactId, $emailAddress) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
@@ -471,8 +459,6 @@ AND    domain_id    = %4
    *
    * @param int $ufID
    *   Id of the user to delete.
-   *
-   * @return void
    */
   public static function deleteUser($ufID) {
     $ufmatch = new CRM_Core_DAO_UFMatch();
@@ -646,6 +632,16 @@ AND    domain_id    = %4
       }
     }
     return $ufValues[$ufID];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function addSelectWhereClause() {
+    // Prevent default behavior of joining ACLs onto the contact_id field
+    $clauses = array();
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
 }

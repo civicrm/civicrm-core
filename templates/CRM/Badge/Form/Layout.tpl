@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -52,7 +52,7 @@
          <table>
            <tr>
             <td>{$form.image_1.html}
-               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a>
+               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
              <br/>
              <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
             </td>
@@ -72,7 +72,7 @@
          <table>
           <tr>
            <td>{$form.image_2.html}
-              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a>
+              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
             <br/>
             <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
            </td>

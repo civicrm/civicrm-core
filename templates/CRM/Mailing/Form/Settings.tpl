@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -50,7 +50,7 @@ CRM.$(function($) {
 
 <div class="crm-block crm-form-block crm-mailing-settings-form-block">
 {include file="CRM/common/WizardHeader.tpl"}
-<div id="help">
+<div class="help">
     {ts}These settings control tracking and responses to recipient actions. The number of recipients selected to receive this mailing is shown in the box to the right. If this count doesn't match your expectations, click <strong>Previous</strong> to review your selection(s).{/ts}
 </div>
 {include file="CRM/Mailing/Form/Count.tpl"}

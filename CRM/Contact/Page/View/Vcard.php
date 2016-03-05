@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,24 +29,20 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'Contact/Vcard/Build.php';
 
 /**
- * vCard export class
- *
+ * vCard export class.
  */
 class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
 
   /**
-   * Heart of the vCard data assignment process. The runner gets all the meta
-   * data for the contact and calls the writeVcard method to output the vCard
-   * to the user.
+   * Heart of the vCard data assignment process.
    *
-   * @return void
+   * The runner gets all the metadata for the contact and calls the writeVcard method to output the vCard
+   * to the user.
    */
   public function run() {
     $this->preProcess();

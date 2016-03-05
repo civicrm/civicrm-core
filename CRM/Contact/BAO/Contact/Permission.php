@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_Contact_Permission {
 
@@ -87,8 +85,6 @@ WHERE contact_a.id = %1 AND $permission";
    * @param int|string $type the type of operation (view|edit)
    * @param bool $force
    *   Should we force a recompute.
-   *
-   * @return void
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     static $_processed = array();
@@ -186,11 +182,10 @@ AND    $operationClause LIMIT 1";
 
   /**
    * @param string $contactAlias
-   * @param int $contactID
    *
    * @return array
    */
-  public static function cacheClause($contactAlias = 'contact_a', $contactID = NULL) {
+  public static function cacheClause($contactAlias = 'contact_a') {
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
     ) {
@@ -208,13 +203,7 @@ AND    $operationClause LIMIT 1";
       }
     }
 
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-    if (!$contactID) {
-      $contactID = 0;
-    }
-    $contactID = CRM_Utils_Type::escape($contactID, 'Integer');
-
+    $contactID = (int) CRM_Core_Session::getLoggedInContactID();
     self::cache($contactID);
 
     if (is_array($contactAlias) && !empty($contactAlias)) {
@@ -233,6 +222,20 @@ AND    $operationClause LIMIT 1";
     }
 
     return array($fromClause, $whereClase);
+  }
+
+  /**
+   * Generate acl subquery that can be placed in the WHERE clause of a query or the ON clause of a JOIN
+   *
+   * @return string|null
+   */
+  public static function cacheSubquery() {
+    if (!CRM_Core_Permission::check(array(array('view all contacts', 'edit all contacts')))) {
+      $contactID = (int) CRM_Core_Session::getLoggedInContactID();
+      self::cache($contactID);
+      return "IN (SELECT contact_id FROM civicrm_acl_contact_cache WHERE user_id = $contactID)";
+    }
+    return NULL;
   }
 
   /**

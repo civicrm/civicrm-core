@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
 
 {if $searchtype eq 'ts_sel'}
 <div id="popupContainer">
-  <table id="selectedRecords-{$group.id}" class="display crm-copy-fields">
+  <table id="selectedRecords-{$group.id}" class="display crm-copy-fields crm-sortable">
     <thead>
     <tr class="columnheader">
       <th class="contact_details">{ts}Name{/ts}</th>
@@ -82,19 +82,6 @@
       count++;
     });
 
-    columns    = columns.substring(0, columns.length - 1 );
-    sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
-    eval('sortColumn =[' + sortColumn + ']');
-    eval('columns =[' + columns + ']');
-
-    //load jQuery data table.
-    $('#selectedRecords-{/literal}{$group.id}{literal}').dataTable( {
-      "sPaginationType": "full_numbers",
-      "bJQueryUI"  : true,
-      "aaSorting"  : sortColumn,
-      "aoColumns"  : columns,
-      "bFilter"    : false
-    });
   });
 
 </script>

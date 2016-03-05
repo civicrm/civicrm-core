@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
 
@@ -58,7 +56,7 @@ class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
    * @param string $actionName
    *   Current action name, as one Action object can serve multiple actions.
    *
-   * @return void
+   * @return object|void
    */
   public function perform(&$page, $actionName) {
     $page->isFormBuilt() or $page->buildForm();

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -217,9 +217,16 @@ class CRM_Core_BAO_CustomValueTable {
             default:
               break;
           }
-          $set[$field['column_name']] = "%{$count}";
-          $params[$count] = array($value, $type);
-          $count++;
+          if (strtolower($value) === "null") {
+            // when unsetting a value to null, we don't need to validate the type
+            // https://projectllr.atlassian.net/browse/VGQBMP-20
+            $set[$field['column_name']] = $value;
+          }
+          else {
+            $set[$field['column_name']] = "%{$count}";
+            $params[$count] = array($value, $type);
+            $count++;
+          }
         }
 
         if (!empty($set)) {
@@ -361,14 +368,12 @@ class CRM_Core_BAO_CustomValueTable {
    * Post process function.
    *
    * @param array $params
-   * @param $customFields
    * @param $entityTable
    * @param int $entityID
    * @param $customFieldExtends
    */
-  public static function postProcess(&$params, &$customFields, $entityTable, $entityID, $customFieldExtends) {
+  public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $entityID,
       $customFieldExtends
     );
@@ -395,13 +400,14 @@ class CRM_Core_BAO_CustomValueTable {
    *                                   is set the entityType is ignored
    *
    * @param bool $formatMultiRecordField
+   * @param array $DTparams - CRM-17810 dataTable params for the multiValued custom fields.
    *
    * @return array
    *   Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
    *                                   Empty array if no custom values found.
    */
-  public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE) {
+  public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE, $DTparams = NULL) {
     if (!$entityID) {
       // adding this here since an empty contact id could have serious repurcussions
       // like looping forever
@@ -423,6 +429,14 @@ class CRM_Core_BAO_CustomValueTable {
       $cond[] = "cg.extends IN ( 'Contact', 'Individual', 'Household', 'Organization' )";
     }
     $cond = implode(' AND ', $cond);
+
+    $limit = $orderBy = '';
+    if (!empty($DTparams['rowCount']) && $DTparams['rowCount'] > 0) {
+      $limit = " LIMIT " . CRM_Utils_Type::escape($DTparams['offset'], 'Integer') . ", " . CRM_Utils_Type::escape($DTparams['rowCount'], 'Integer');
+    }
+    if (!empty($DTparams['sort'])) {
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($DTparams['sort'], 'String');
+    }
 
     // First find all the fields that extend this type of entity.
     $query = "
@@ -456,8 +470,11 @@ AND    $cond
 
     $result = array();
     foreach ($select as $tableName => $clauses) {
-      $query = "SELECT id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID";
+      $query = "SELECT SQL_CALC_FOUND_ROWS id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
       $dao = CRM_Core_DAO::executeQuery($query);
+      if (!empty($DTparams)) {
+        $result['count'] = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
+      }
       while ($dao->fetch()) {
         foreach ($fields[$tableName] as $fieldID) {
           $fieldName = "custom_{$fieldID}";
@@ -623,7 +640,7 @@ AND    cf.id IN ( $fieldIDList )
    * To get the values of custom fields with IDs 13 and 43 for contact ID 1327, use:
    * $params = array( 'entityID' => 1327, 'custom_13' => 1, 'custom_43' => 1 );
    *
-   * Entity Type will be infered by the custom fields you request
+   * Entity Type will be inferred by the custom fields you request
    * Specify $params['entityType'] if you do not supply any custom fields to return
    * and entity type is other than Contact
    *

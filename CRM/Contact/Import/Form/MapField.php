@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class gets the name of the file to upload
+ * This class gets the name of the file to upload.
  */
 class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
@@ -60,10 +58,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Attempt to match header labels with our mapper fields.
+   *
    * FIXME: This is essentially the same function as parent::defaultFromHeader
    *
-   * @param $columnName name of column header
-   * @param $patterns pattern to match for the column
+   * @param string $columnName name of column header
+   * @param array $patterns pattern to match for the column
    *
    * @return string
    */
@@ -92,8 +91,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $dataSource = $this->get('dataSource');
@@ -200,8 +197,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //to save the current mappings
@@ -660,10 +655,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
+   * Process the mapped fields and map it into the uploaded file.
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');
@@ -855,7 +847,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $updateMappingFields->name = $mapper[$i];
           $updateMappingFields->relationship_type_id = 'NULL';
           $updateMappingFields->relationship_type_direction = 'NULL';
-          // to store phoneType id and provider id seperately
+          // to store phoneType id and provider id separately
           // before updating mappingFields for phone and IM, CRM-3140
           if (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'url') {
             $updateMappingFields->website_type_id = isset($mapperKeys[$i][1]) ? $mapperKeys[$i][1] : NULL;
@@ -917,7 +909,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $saveMappingFields->name = ucwords(str_replace("_", " ", $mapperKeys[$i][1]));
           $saveMappingFields->relationship_type_id = $id;
           $saveMappingFields->relationship_direction = "{$first}_{$second}";
-          // to get phoneType id and provider id seperately
+          // to get phoneType id and provider id separately
           // before saving mappingFields of phone and IM for related contact, CRM-3140
           if (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'url') {
             $saveMappingFields->website_type_id = isset($mapperKeys[$i][2]) ? $mapperKeys[$i][2] : NULL;
@@ -935,7 +927,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         else {
           $saveMappingFields->name = $mapper[$i];
           $location_id = array_keys($locationTypes, $locations[$i]);
-          // to get phoneType id and provider id seperately
+          // to get phoneType id and provider id separately
           // before saving mappingFields of phone and IM, CRM-3140
           if (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'url') {
             $saveMappingFields->website_type_id = isset($mapperKeys[$i][1]) ? $mapperKeys[$i][1] : NULL;
@@ -984,11 +976,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Format custom field name.
-   * combine group and field name to avoid conflict.
    *
-   * @param $fields
+   * Combine group and field name to avoid conflict.
    *
-   * @return void
+   * @param array $fields
+   *
+   * @return array
    */
   public function formatCustomFieldName(&$fields) {
     //CRM-2676, replacing the conflict for same custom field name from different custom group.

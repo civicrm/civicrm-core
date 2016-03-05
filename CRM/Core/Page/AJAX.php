@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -189,7 +189,7 @@ class CRM_Core_Page_AJAX {
 
     // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
-      header('Content-Type: application/json');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     }
     else {
       $output = "<textarea>$output</textarea>";
@@ -209,9 +209,9 @@ class CRM_Core_Page_AJAX {
       // Encourage browsers to cache for a long time - 1 year
       $ttl = 60 * 60 * 24 * 364;
     }
-    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
-    header('Content-Type:	application/javascript');
-    header("Cache-Control: max-age=$ttl, public");
+    CRM_Utils_System::setHttpHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/javascript');
+    CRM_Utils_System::setHttpHeader('Cache-Control', "max-age=$ttl, public");
   }
 
 }

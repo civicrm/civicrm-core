@@ -94,32 +94,23 @@
   margin:1.6em 0 0 26px;
 }
 
-#crm-container .widget-icon {
-  background-image:url('../bower_components/jquery-ui/themes/smoothness/images/ui-icons_222222_256x240.png');
-  height:16px;
-  width:16px;
-  padding-right:2px;
+#crm-container .widget-controls .crm-i {
+  font-size: 14px;
+  padding: 0 6px;
+  font-weight: normal;
   float: left;
-  border-radius: 2px;
-}
-#crm-container .widget-icon.minimize-icon {
-  background-position:-63px -17px;
-}
-
-#crm-container .widget-icon.maximize-icon {
-  background-position:-31px -18px;
+  cursor: pointer;
+  color: #222222;
+  opacity: .7;
 }
 
-#crm-container .widget-icon.fullscreen-icon {
-  background-position:-48px -80px;
-  float:right;
+#crm-container .widget-controls .crm-i:hover {
+  opacity: 1;
 }
-#crm-container .widget-icon.close-icon {
-  background-position: -80px -128px;
+
+#crm-container .widget-controls .crm-i.fa-expand,
+#crm-container .widget-controls .crm-i.fa-times {
   float:right;
-}
-#crm-container .widget-icon:hover {
-  background-color: rgba(255, 255, 255, 0.8);
 }
 
 /* CSS for Dashlets */
@@ -177,8 +168,9 @@
   width: auto;
 }
 
-#crm-container .portlet-header .ui-icon {
+#crm-container .portlet-header .crm-i {
   float: right;
+  color: #52534D;
 }
 
 #crm-container .portlet-content {

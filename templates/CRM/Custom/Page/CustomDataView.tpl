@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -36,8 +36,7 @@
           <td>
             <a
               href="{crmURL p="civicrm/contact/view/cd/edit" q="tableId=`$contactId`&cid=`$contactId`&groupID=`$groupId`&action=update&reset=1"}"
-              class="button" style="margin-left: 6px;"><span><div
-                  class="icon ui-icon-pencil"></div>{ts 1=$cd_edit.title}Edit %1{/ts}</span></a><br/><br/>
+              class="button" style="margin-left: 6px;"><span><i class="crm-i fa-pencil"></i> {ts 1=$cd_edit.title}Edit %1{/ts}</span></a><br/><br/>
           </td>
         </tr>
       {/if}
@@ -56,7 +55,7 @@
                   <a href="#" class="crm-hover-button crm-custom-value-del"
                      data-post='{ldelim}"valueID": "{$cvID}", "groupID": "{$customGroupId}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'
                      title="{ts 1=$cd_edit.title|cat:" `$rowCount`"}Delete %1{/ts}">
-                    <span class="icon delete-icon"></span> {ts}Delete{/ts}
+                    <i class="crm-i fa-trash"></i> {ts}Delete{/ts}
                   </a>
                 </div>
               {/if}
@@ -74,40 +73,26 @@
                       </td>
                     {else}
                       <td class="label">{$element.field_title}</td>
-                      {if $element.field_type == 'File'}
-                        {if $element.field_value.displayURL}
-                          <td class="html-adjust">
-                            <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
-                              <img src="{$element.field_value.displayURL}" height="100" width="100">
-                            </a>
-                          </td>
+                      {if $element.field_data_type == 'Money'}
+                        {if $element.field_type == 'Text'}
+                          <td class="html-adjust">{$element.field_value|crmMoney}</td>
                         {else}
-                          <td class="html-adjust">
-                            <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
-                          </td>
+                          <td class="html-adjust">{$element.field_value}</td>
                         {/if}
                       {else}
-                        {if $element.field_data_type == 'Money'}
-                          {if $element.field_type == 'Text'}
-                            <td class="html-adjust">{$element.field_value|crmMoney}</td>
-                          {else}
-                            <td class="html-adjust">{$element.field_value}</td>
-                          {/if}
-                        {else}
-                          <td class="html-adjust">
-                            {if $element.contact_ref_id}
+                        <td class="html-adjust">
+                          {if $element.contact_ref_id}
                             <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
-                              {/if}
-                              {if $element.field_data_type == 'Memo'}
-                                {$element.field_value|nl2br}
-                              {else}
-                                {$element.field_value}
-                              {/if}
-                              {if $element.contact_ref_id}
+                          {/if}
+                          {if $element.field_data_type == 'Memo'}
+                            {$element.field_value|nl2br}
+                          {else}
+                            {$element.field_value}
+                          {/if}
+                          {if $element.contact_ref_id}
                             </a>
-                            {/if}
-                          </td>
-                        {/if}
+                          {/if}
+                        </td>
                       {/if}
                     {/if}
                   </tr>
@@ -118,7 +103,7 @@
             <!-- end of body -->
             <div class="clear"></div>
           </div>
-          <!-- end of main accordian -->
+          <!-- end of main accordion -->
         </td>
       </tr>
     </table>
@@ -137,21 +122,13 @@
        {else}
           <div class="label">{$element.field_title}</div>
           {if $element.field_type == 'File'}
-          {if $element.field_value.displayURL}
-            <div class="content">
-              <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
-               <img src="{$element.field_value.displayURL}" height="100" width="100">
-              </a>
-            </div>
-          {else}
             <div class="content">
              {if $element.field_value}
-              <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
+               {$element.field_value}
              {else}
-              <br/>
+               <br/>
              {/if}
             </div>
-          {/if}
           {else}
             {if $element.field_data_type == 'Money'}
               {if $element.field_type == 'Text'}
@@ -205,4 +182,3 @@
     {/literal}
   </script>
 {/if}
-

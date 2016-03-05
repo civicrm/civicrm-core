@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,7 @@
 *}
 <div class="crm-block crm-content-block crm-activity-view-block">
       {if $activityTypeDescription}
-        <div id="help">{$activityTypeDescription}</div>
+        <div class="help">{$activityTypeDescription}</div>
       {/if}
       <table class="crm-info-panel">
         <tr>

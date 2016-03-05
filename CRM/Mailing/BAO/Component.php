@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
 
@@ -49,7 +47,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_LocaationType
+   * @return CRM_Core_BAO_LocationType.
    */
   public static function retrieve(&$params, &$defaults) {
     $component = new CRM_Mailing_DAO_Component();
@@ -70,7 +68,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Component', $id, 'is_active', $is_active);
@@ -85,7 +83,6 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    *   (deprecated) the array that holds all the db ids.
    *
    * @return CRM_Mailing_BAO_Component
-   *
    */
   public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));

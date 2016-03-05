@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -132,13 +132,9 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['created_id']['api.required'] = 1;
   $params['created_id']['api.default'] = 'user_contact_id';
 
-  $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'track_civimail_replies', NULL, FALSE
-  );
+  $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'track_civimail_replies');
   $params['visibility']['api.default'] = 'Public Pages';
-  $params['dedupe_email']['api.default'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'dedupe_email_default', NULL, FALSE
-  );
+  $params['dedupe_email']['api.default'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'dedupe_email_default');
 
   $params['forward_replies']['api.default'] = FALSE;
   $params['auto_responder']['api.default'] = FALSE;
@@ -161,12 +157,25 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   }
 }
 
+/**
+ * Adjust metadata for clone spec action.
+ *
+ * @param array $spec
+ */
 function _civicrm_api3_mailing_clone_spec(&$spec) {
   $mailingFields = CRM_Mailing_DAO_Mailing::fields();
   $spec['id'] = $mailingFields['id'];
   $spec['id']['api.required'] = 1;
 }
 
+/**
+ * Clone mailing.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \CiviCRM_API3_Exception
+ */
 function civicrm_api3_mailing_clone($params) {
   $BLACKLIST = array(
     'id',
@@ -535,7 +544,7 @@ function civicrm_api3_mailing_preview($params) {
 
   $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
 
-  $mime = &$mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
+  $mime = $mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
     TRUE, $details[0][$contactID], $attachments
   );
 
@@ -636,7 +645,7 @@ function civicrm_api3_mailing_send_test($params) {
 
   $isComplete = FALSE;
   $config = CRM_Core_Config::singleton();
-  $mailerJobSize = (property_exists($config, 'mailerJobSize')) ? $config->mailerJobSize : NULL;
+  $mailerJobSize = Civi::settings()->get('mailerJobSize');
   while (!$isComplete) {
     // Q: In CRM_Mailing_BAO_Mailing::processQueue(), the three runJobs*()
     // functions are all called. Why does Mailing.send_test only call one?

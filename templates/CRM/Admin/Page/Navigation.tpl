@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,13 +26,13 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
   {include file="CRM/Admin/Form/Navigation.tpl"}
 {else}
-  <div id="help">
-  {ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}
+  <div class="help">
+    {ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}
   </div>
 
   <div class="crm-block crm-content-block">
     <div id="new-menu-item">
-      <a href="{crmURL p="civicrm/admin/menu" q="action=add&reset=1"}" class="button" style="margin-left: 6px;"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Menu Item{/ts}</span></a>&nbsp;&nbsp;&nbsp;&nbsp;
+      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="crm-i fa-plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}&nbsp;&nbsp;&nbsp;&nbsp;
         <span id="reset-menu" class="status" style="display:none">
         {capture assign=rebuildURL}{crmURL p='civicrm/admin/menu' q="reset=1"}{/capture}
           {ts 1=$rebuildURL}<a href='%1' title="Reload page"><strong>Click here</strong></a> to reload the page and see your changes in the menu bar above.{/ts}
@@ -40,6 +40,13 @@
     </div>
     <div class="spacer"></div>
     <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
+    <div class="spacer"></div>
+    <div>
+      <a href="#" class="nav-reset crm-hover-button">
+        {* TODO: fa-broom would be better, but not implemented yet. https://github.com/FortAwesome/Font-Awesome/issues/239 *}
+        <i class="crm-i fa-undo"></i> {ts}Cleanup reports menu{/ts}
+      </a>
+    </div>
     <div class="spacer"></div>
   </div>
   {literal}
@@ -162,6 +169,23 @@
           $("#navigation-tree").jstree('refresh');
           $("#reset-menu").show();
         });
+
+      $('a.nav-reset').on('click', function(e) {
+        e.preventDefault();
+        CRM.confirm({
+          title: $(this).text(),
+          message: '{/literal}{ts escape='js'}This will add links for all currently active reports to the "Reports" menu under the relevant component. If you have added report instances to other menus, they will be moved to "Reports".  Are you sure?{/ts}{literal}'
+        })
+          .on('crmConfirm:yes', function() {
+            $('#crm-container').block();
+            CRM.api3('Navigation', 'reset', {'for': 'report'}, true)
+              .done(function() {
+                $('#crm-container').unblock();
+                $("#navigation-tree").jstree('refresh');
+                $("#reset-menu").show();
+              })
+          });
+      });
     });
 </script>
 {/literal}

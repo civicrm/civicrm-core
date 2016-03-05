@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,13 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * file contains functions used in civicrm configuration
- *
+ * File contains functions used in civicrm configuration.
  */
 class CRM_Core_BAO_ConfigSetting {
 
@@ -46,8 +43,6 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @param array $params
    *   Associated array of civicrm variables.
-   *
-   * @return void
    */
   public static function create($params) {
     self::add($params);
@@ -62,49 +57,16 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @param array $params
    *   Associated array of civicrm variables.
-   *
-   * @return void
    */
   public static function add(&$params) {
-    self::fixParams($params);
-
-    // also set a template url so js files can use this
-    // CRM-6194
-    $params['civiRelativeURL'] = CRM_Utils_System::url('CIVI_BASE_TEMPLATE');
-    $params['civiRelativeURL']
-      = str_replace(
-        'CIVI_BASE_TEMPLATE',
-        '',
-        $params['civiRelativeURL']
-      );
-
-    // also add the version number for use by template / js etc
-    $params['civiVersion'] = CRM_Utils_System::version();
-
     $domain = new CRM_Core_DAO_Domain();
     $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
     if ($domain->config_backend) {
-      $values = unserialize($domain->config_backend);
-      self::formatParams($params, $values);
+      $params = array_merge(unserialize($domain->config_backend), $params);
     }
 
-    // CRM-6151
-    if (isset($params['localeCustomStrings']) &&
-      is_array($params['localeCustomStrings'])
-    ) {
-      $domain->locale_custom_strings = serialize($params['localeCustomStrings']);
-    }
-
-    // unset any of the variables we read from file that should not be stored in the database
-    // the username and certpath are stored flat with _test and _live
-    // check CRM-1470
-    $skipVars = self::skipVars();
-    foreach ($skipVars as $var) {
-      unset($params[$var]);
-    }
-
-    CRM_Core_BAO_Setting::fixAndStoreDirAndURL($params);
+    $params = CRM_Core_BAO_ConfigSetting::filterSkipVars($params);
 
     // also skip all Dir Params, we dont need to store those in the DB!
     foreach ($params as $name => $val) {
@@ -113,87 +75,8 @@ class CRM_Core_BAO_ConfigSetting {
       }
     }
 
-    //keep user preferred language upto date, CRM-7746
-    $session = CRM_Core_Session::singleton();
-    $lcMessages = CRM_Utils_Array::value('lcMessages', $params);
-    if ($lcMessages && $session->get('userID')) {
-      $languageLimit = CRM_Utils_Array::value('languageLimit', $params);
-      if (is_array($languageLimit) &&
-        !in_array($lcMessages, array_keys($languageLimit))
-      ) {
-        $lcMessages = $session->get('lcMessages');
-      }
-
-      $ufm = new CRM_Core_DAO_UFMatch();
-      $ufm->contact_id = $session->get('userID');
-      if ($lcMessages && $ufm->find(TRUE)) {
-        $ufm->language = $lcMessages;
-        $ufm->save();
-        $session->set('lcMessages', $lcMessages);
-        $params['lcMessages'] = $lcMessages;
-      }
-    }
-
     $domain->config_backend = serialize($params);
     $domain->save();
-  }
-
-  /**
-   * Fix civicrm setting variables.
-   *
-   * @param array $params
-   *   Associated array of civicrm variables.
-   *
-   * @return void
-   */
-  public static function fixParams(&$params) {
-    // in our old civicrm.settings.php we were using ISO code for country and
-    // province limit, now we have changed it to use ids
-
-    $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-
-    $specialArray = array('countryLimit', 'provinceLimit');
-
-    foreach ($params as $key => $value) {
-      if (in_array($key, $specialArray) && is_array($value)) {
-        foreach ($value as $k => $val) {
-          if (!is_numeric($val)) {
-            $params[$key][$k] = array_search($val, $countryIsoCodes);
-          }
-        }
-      }
-      elseif ($key == 'defaultContactCountry') {
-        if (!is_numeric($value)) {
-          $params[$key] = array_search($value, $countryIsoCodes);
-        }
-      }
-    }
-  }
-
-  /**
-   * Format the array containing before inserting in db.
-   *
-   * @param array $params
-   *   Associated array of civicrm variables(submitted).
-   * @param array $values
-   *   Associated array of civicrm variables stored in db.
-   *
-   * @return void
-   */
-  public static function formatParams(&$params, &$values) {
-    if (empty($params) ||
-      !is_array($params)
-    ) {
-      $params = $values;
-    }
-    else {
-      foreach ($params as $key => $val) {
-        if (array_key_exists($key, $values)) {
-          unset($values[$key]);
-        }
-      }
-      $params = array_merge($params, $values);
-    }
   }
 
   /**
@@ -205,6 +88,7 @@ class CRM_Core_BAO_ConfigSetting {
    */
   public static function retrieve(&$defaults) {
     $domain = new CRM_Core_DAO_Domain();
+    $isUpgrade = CRM_Core_Config::isUpgradeMode();
 
     //we are initializing config, really can't use, CRM-7863
     $urlVar = 'q';
@@ -212,14 +96,11 @@ class CRM_Core_BAO_ConfigSetting {
       $urlVar = 'task';
     }
 
-    if (CRM_Core_Config::isUpgradeMode()) {
+    if ($isUpgrade && CRM_Core_DAO::checkFieldExists('civicrm_domain', 'config_backend')) {
       $domain->selectAdd('config_backend');
     }
-    elseif (CRM_Utils_Array::value($urlVar, $_GET) == 'admin/modules/list/confirm') {
-      $domain->selectAdd('config_backend', 'locales');
-    }
     else {
-      $domain->selectAdd('config_backend, locales, locale_custom_strings');
+      $domain->selectAdd('locales');
     }
 
     $domain->id = CRM_Core_Config::domainID();
@@ -237,276 +118,108 @@ class CRM_Core_BAO_ConfigSetting {
           unset($defaults[$skip]);
         }
       }
+    }
+    if (!$isUpgrade) {
+      CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
+    }
+  }
 
-      // check if there are any locale strings
-      if ($domain->locale_custom_strings) {
-        $defaults['localeCustomStrings'] = unserialize($domain->locale_custom_strings);
+  /**
+   * Evaluate locale preferences and activate a chosen locale by
+   * updating session+global variables.
+   *
+   * @param \Civi\Core\SettingsBag $settings
+   * @param string $activatedLocales
+   *   Imploded list of locales which are supported in the DB.
+   */
+  public static function applyLocale($settings, $activatedLocales) {
+    // are we in a multi-language setup?
+    $multiLang = $activatedLocales ? TRUE : FALSE;
+
+    // set the current language
+    $chosenLocale = NULL;
+
+    $session = CRM_Core_Session::singleton();
+
+    // on multi-lang sites based on request and civicrm_uf_match
+    if ($multiLang) {
+      $languageLimit = array();
+      if (is_array($settings->get('languageLimit'))) {
+        $languageLimit = $settings->get('languageLimit');
+      }
+
+      $requestLocale = CRM_Utils_Request::retrieve('lcMessages', 'String');
+      if (in_array($requestLocale, array_keys($languageLimit))) {
+        $chosenLocale = $requestLocale;
+
+        //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
+        // Ed: This doesn't sound good.
+        CRM_Core_BAO_Cache::deleteGroup('navigation');
       }
       else {
-        $defaults['localeCustomStrings'] = NULL;
+        $requestLocale = NULL;
       }
 
-      // are we in a multi-language setup?
-      $multiLang = $domain->locales ? TRUE : FALSE;
-
-      // set the current language
-      $lcMessages = NULL;
-
-      $session = CRM_Core_Session::singleton();
-
-      // on multi-lang sites based on request and civicrm_uf_match
-      if ($multiLang) {
-        $lcMessagesRequest = CRM_Utils_Request::retrieve('lcMessages', 'String', $this);
-        $languageLimit = array();
-        if (array_key_exists('languageLimit', $defaults) && is_array($defaults['languageLimit'])) {
-          $languageLimit = $defaults['languageLimit'];
-        }
-
-        if (in_array($lcMessagesRequest, array_keys($languageLimit))) {
-          $lcMessages = $lcMessagesRequest;
-
-          //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
-          CRM_Core_BAO_Cache::deleteGroup('navigation');
+      if (!$requestLocale) {
+        $sessionLocale = $session->get('lcMessages');
+        if (in_array($sessionLocale, array_keys($languageLimit))) {
+          $chosenLocale = $sessionLocale;
         }
         else {
-          $lcMessagesRequest = NULL;
-        }
-
-        if (!$lcMessagesRequest) {
-          $lcMessagesSession = $session->get('lcMessages');
-          if (in_array($lcMessagesSession, array_keys($languageLimit))) {
-            $lcMessages = $lcMessagesSession;
-          }
-          else {
-            $lcMessagesSession = NULL;
-          }
-        }
-
-        if ($lcMessagesRequest) {
-          $ufm = new CRM_Core_DAO_UFMatch();
-          $ufm->contact_id = $session->get('userID');
-          if ($ufm->find(TRUE)) {
-            $ufm->language = $lcMessages;
-            $ufm->save();
-          }
-          $session->set('lcMessages', $lcMessages);
-        }
-
-        if (!$lcMessages and $session->get('userID')) {
-          $ufm = new CRM_Core_DAO_UFMatch();
-          $ufm->contact_id = $session->get('userID');
-          if ($ufm->find(TRUE) &&
-            in_array($ufm->language, array_keys($languageLimit))
-          ) {
-            $lcMessages = $ufm->language;
-          }
-          $session->set('lcMessages', $lcMessages);
+          $sessionLocale = NULL;
         }
       }
-      global $dbLocale;
 
-      // try to inherit the language from the hosting CMS
-      if (!empty($defaults['inheritLocale'])) {
-        // FIXME: On multilanguage installs, CRM_Utils_System::getUFLocale() in many cases returns nothing if $dbLocale is not set
-        $dbLocale = $multiLang ? "_{$defaults['lcMessages']}" : '';
-        $lcMessages = CRM_Utils_System::getUFLocale();
-        if ($domain->locales and !in_array($lcMessages, explode(CRM_Core_DAO::VALUE_SEPARATOR,
-            $domain->locales
-          ))
+      if ($requestLocale) {
+        $ufm = new CRM_Core_DAO_UFMatch();
+        $ufm->contact_id = $session->get('userID');
+        if ($ufm->find(TRUE)) {
+          $ufm->language = $chosenLocale;
+          $ufm->save();
+        }
+        $session->set('lcMessages', $chosenLocale);
+      }
+
+      if (!$chosenLocale and $session->get('userID')) {
+        $ufm = new CRM_Core_DAO_UFMatch();
+        $ufm->contact_id = $session->get('userID');
+        if ($ufm->find(TRUE) &&
+          in_array($ufm->language, array_keys($languageLimit))
         ) {
-          $lcMessages = NULL;
+          $chosenLocale = $ufm->language;
         }
+        $session->set('lcMessages', $chosenLocale);
       }
+    }
+    global $dbLocale;
 
-      if (empty($lcMessages)) {
-        //CRM-11993 - if a single-lang site, use default
-        $lcMessages = CRM_Utils_Array::value('lcMessages', $defaults);
-      }
-
-      // set suffix for table names - use views if more than one language
-      $dbLocale = $multiLang ? "_{$lcMessages}" : '';
-
-      // FIXME: an ugly hack to fix CRM-4041
-      global $tsLocale;
-      $tsLocale = $lcMessages;
-
-      // FIXME: as bad aplace as any to fix CRM-5428
-      // (to be moved to a sane location along with the above)
-      if (function_exists('mb_internal_encoding')) {
-        mb_internal_encoding('UTF-8');
+    // try to inherit the language from the hosting CMS
+    if ($settings->get('inheritLocale')) {
+      // FIXME: On multilanguage installs, CRM_Utils_System::getUFLocale() in many cases returns nothing if $dbLocale is not set
+      $dbLocale = $multiLang ? ("_" . $settings->get('lcMessages')) : '';
+      $chosenLocale = CRM_Utils_System::getUFLocale();
+      if ($activatedLocales and !in_array($chosenLocale, explode(CRM_Core_DAO::VALUE_SEPARATOR, $activatedLocales))) {
+        $chosenLocale = NULL;
       }
     }
 
-    // dont add if its empty
-    if (!empty($defaults)) {
-      // retrieve directory and url preferences also
-      CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($defaults);
-
-      // Pickup enabled-components from settings table if found.
-      $enableComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
-      if (!empty($enableComponents)) {
-        $defaults['enableComponents'] = $enableComponents;
-
-        // Lookup component IDs. Note: Do *not* instantiate components.
-        // Classloading may not be fully setup yet.
-        $components = CRM_Core_Component::getComponentIDs();
-        $enabledComponentIDs = array();
-        foreach ($defaults['enableComponents'] as $name) {
-          $enabledComponentIDs[] = $components[$name];
-        }
-        $defaults['enableComponentIDs'] = $enabledComponentIDs;
-      }
-    }
-  }
-
-  /**
-   * @return array
-   */
-  public static function getConfigSettings() {
-    $config = CRM_Core_Config::singleton();
-
-    $url = $dir = $siteName = $siteRoot = NULL;
-    if ($config->userFramework == 'Joomla') {
-      $url = preg_replace(
-        '|administrator/components/com_civicrm/civicrm/|',
-        '',
-        $config->userFrameworkResourceURL
-      );
-
-      // lets use imageUploadDir since we dont mess around with its values
-      // in the config object, lets kep it a bit generic since folks
-      // might have different values etc
-
-      //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
-      if (DIRECTORY_SEPARATOR == '\\') {
-        $dir = preg_replace(
-          '|civicrm[/\\\\]templates_c[/\\\\].*$|',
-          '',
-          $config->templateCompileDir
-        );
-      }
-      else {
-        $dir = preg_replace(
-          '|civicrm/templates_c/.*$|',
-          '',
-          $config->templateCompileDir
-        );
-      }
-
-      $siteRoot = preg_replace(
-        '|/media/civicrm/.*$|',
-        '',
-        $config->imageUploadDir
-      );
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      $url = preg_replace(
-        '|wp-content/plugins/civicrm/civicrm/|',
-        '',
-        $config->userFrameworkResourceURL
-      );
-
-      // lets use imageUploadDir since we dont mess around with its values
-      // in the config object, lets kep it a bit generic since folks
-      // might have different values etc
-
-      //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
-      if (DIRECTORY_SEPARATOR == '\\') {
-        $dir = preg_replace(
-          '|civicrm[/\\\\]templates_c[/\\\\].*$|',
-          '',
-          $config->templateCompileDir
-        );
-      }
-      else {
-        $dir = preg_replace(
-          '|civicrm/templates_c/.*$|',
-          '',
-          $config->templateCompileDir
-        );
-      }
-
-      $siteRoot = preg_replace(
-        '|/wp-content/plugins/files/civicrm/.*$|',
-        '',
-        $config->imageUploadDir
-      );
-    }
-    else {
-      $url = preg_replace(
-        '|sites/[\w\.\-\_]+/modules/civicrm/|',
-        '',
-        $config->userFrameworkResourceURL
-      );
-
-      // lets use imageUploadDir since we dont mess around with its values
-      // in the config object, lets kep it a bit generic since folks
-      // might have different values etc
-
-      //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
-      if (DIRECTORY_SEPARATOR == '\\') {
-        $dir = preg_replace(
-          '|[/\\\\]files[/\\\\]civicrm[/\\\\].*$|',
-          '\\\\files\\\\',
-          $config->imageUploadDir
-        );
-      }
-      else {
-        $dir = preg_replace(
-          '|/files/civicrm/.*$|',
-          '/files/',
-          $config->imageUploadDir
-        );
-      }
-
-      $matches = array();
-      if (preg_match(
-        '|/sites/([\w\.\-\_]+)/|',
-        $config->imageUploadDir,
-        $matches
-      )) {
-        $siteName = $matches[1];
-        if ($siteName) {
-          $siteName = "/sites/$siteName/";
-          $siteNamePos = strpos($dir, $siteName);
-          if ($siteNamePos !== FALSE) {
-            $siteRoot = substr($dir, 0, $siteNamePos);
-          }
-        }
-      }
+    if (empty($chosenLocale)) {
+      //CRM-11993 - if a single-lang site, use default
+      $chosenLocale = $settings->get('lcMessages');
     }
 
-    return array($url, $dir, $siteName, $siteRoot);
-  }
+    // set suffix for table names - use views if more than one language
+    $dbLocale = $multiLang ? "_{$chosenLocale}" : '';
 
-  /**
-   * Return likely default settings.
-   * @return array
-   *   site settings
-   *   - $url
-   *   - $dir Base Directory
-   *   - $siteName
-   *   - $siteRoot
-   */
-  public static function getBestGuessSettings() {
-    $config = CRM_Core_Config::singleton();
+    // FIXME: an ugly hack to fix CRM-4041
+    global $tsLocale;
+    $tsLocale = $chosenLocale;
 
-    //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
-    if (DIRECTORY_SEPARATOR == '\\') {
-      $needle = 'civicrm[/\\\\]templates_c[/\\\\].*$';
+    // FIXME: as bad aplace as any to fix CRM-5428
+    // (to be moved to a sane location along with the above)
+    if (function_exists('mb_internal_encoding')) {
+      mb_internal_encoding('UTF-8');
     }
-    else {
-      $needle = 'civicrm/templates_c/.*$';
-    }
-
-    $dir = preg_replace(
-      "|$needle|",
-      '',
-      $config->templateCompileDir
-    );
-
-    list($url, $siteName, $siteRoot) = $config->userSystem->getDefaultSiteSettings($dir);
-    return array($url, $dir, $siteName, $siteRoot);
   }
 
   /**
@@ -517,106 +230,26 @@ class CRM_Core_BAO_ConfigSetting {
    */
   public static function doSiteMove($defaultValues = array()) {
     $moveStatus = ts('Beginning site move process...') . '<br />';
-    // get the current and guessed values
-    list($oldURL, $oldDir, $oldSiteName, $oldSiteRoot) = self::getConfigSettings();
-    list($newURL, $newDir, $newSiteName, $newSiteRoot) = self::getBestGuessSettings();
+    $settings = Civi::settings();
 
-    // retrieve these values from the argument list
-    $variables = array('URL', 'Dir', 'SiteName', 'SiteRoot', 'Val_1', 'Val_2', 'Val_3');
-    $states = array('old', 'new');
-    foreach ($variables as $varSuffix) {
-      foreach ($states as $state) {
-        $var = "{$state}{$varSuffix}";
-        if (!isset($$var)) {
-          if (isset($defaultValues[$var])) {
-            $$var = $defaultValues[$var];
-          }
-          else {
-            $$var = NULL;
-          }
+    foreach (array_merge(self::getPathSettings(), self::getUrlSettings()) as $key) {
+      $value = $settings->get($key);
+      if ($value && $value != $settings->getDefault($key)) {
+        if ($settings->getMandatory($key) === NULL) {
+          $settings->revert($key);
+          $moveStatus .= ts("WARNING: The setting (%1) has been reverted.", array(
+            1 => $key,
+          ));
+          $moveStatus .= '<br />';
         }
-        $$var = CRM_Utils_Request::retrieve($var,
-          'String',
-          CRM_Core_DAO::$_nullArray,
-          FALSE,
-          $$var,
-          'REQUEST'
-        );
-      }
-    }
-
-    $from = $to = array();
-    foreach ($variables as $varSuffix) {
-      $oldVar = "old{$varSuffix}";
-      $newVar = "new{$varSuffix}";
-      //skip it if either is empty or both are exactly the same
-      if ($$oldVar &&
-        $$newVar &&
-        $$oldVar != $$newVar
-      ) {
-        $from[] = $$oldVar;
-        $to[] = $$newVar;
-      }
-    }
-
-    $sql = "
-SELECT config_backend
-FROM   civicrm_domain
-WHERE  id = %1
-";
-    $params = array(1 => array(CRM_Core_Config::domainID(), 'Integer'));
-    $configBackend = CRM_Core_DAO::singleValueQuery($sql, $params);
-    if (!$configBackend) {
-      CRM_Core_Error::fatal(ts('Returning early due to unexpected error - civicrm_domain.config_backend column value is NULL. Try visiting CiviCRM Home page.'));
-    }
-    $configBackend = unserialize($configBackend);
-
-    $configBackend = str_replace($from,
-      $to,
-      $configBackend
-    );
-
-    $configBackend = serialize($configBackend);
-    $sql = "
-UPDATE civicrm_domain
-SET    config_backend = %2
-WHERE  id = %1
-";
-    $params[2] = array($configBackend, 'String');
-    CRM_Core_DAO::executeQuery($sql, $params);
-
-    // Apply the changes to civicrm_option_values
-    $optionGroups = array('url_preferences', 'directory_preferences');
-    foreach ($optionGroups as $option) {
-      foreach ($variables as $varSuffix) {
-        $oldVar = "old{$varSuffix}";
-        $newVar = "new{$varSuffix}";
-
-        $from = $$oldVar;
-        $to = $$newVar;
-
-        if ($from && $to && $from != $to) {
-          $sql = '
-UPDATE civicrm_option_value
-SET    value = REPLACE(value, %1, %2)
-WHERE  option_group_id = (
-  SELECT id
-  FROM   civicrm_option_group
-  WHERE  name = %3 )
-';
-          $params = array(
-            1 => array($from, 'String'),
-            2 => array($to, 'String'),
-            3 => array($option, 'String'),
-          );
-          CRM_Core_DAO::executeQuery($sql, $params);
+        else {
+          $moveStatus .= ts("WARNING: The setting (%1) is overridden and could not be reverted.", array(
+            1 => $key,
+          ));
+          $moveStatus .= '<br />';
         }
       }
     }
-
-    $moveStatus .=
-      ts('Directory and Resource URLs have been updated in the moved database to reflect current site location.') .
-      '<br />';
 
     $config = CRM_Core_Config::singleton();
 
@@ -673,8 +306,7 @@ WHERE  option_group_id = (
     }
 
     // get enabled-components from DB and add to the list
-    $enabledComponents
-      = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents = Civi::settings()->get('enable_components');
     $enabledComponents[] = $componentName;
 
     self::setEnabledComponents($enabledComponents);
@@ -699,8 +331,7 @@ WHERE  option_group_id = (
     }
 
     // get enabled-components from DB and add to the list
-    $enabledComponents
-      = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents = Civi::settings()->get('enable_components');
     $enabledComponents = array_diff($enabledComponents, array($componentName));
 
     self::setEnabledComponents($enabledComponents);
@@ -714,24 +345,11 @@ WHERE  option_group_id = (
    * @param array $enabledComponents
    */
   public static function setEnabledComponents($enabledComponents) {
-    $config = CRM_Core_Config::singleton();
-    $components = CRM_Core_Component::getComponents();
-
-    $enabledComponentIDs = array();
-    foreach ($enabledComponents as $name) {
-      $enabledComponentIDs[] = $components[$name]->componentID;
-    }
-
-    // fix the config object
-    $config->enableComponents = $enabledComponents;
-    $config->enableComponentIDs = $enabledComponentIDs;
+    // fix the config object. update db.
+    Civi::settings()->set('enable_components', $enabledComponents);
 
     // also force reset of component array
     CRM_Core_Component::getEnabledComponents(TRUE);
-
-    // update DB
-    CRM_Core_BAO_Setting::setItem($enabledComponents,
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components');
   }
 
   /**
@@ -757,11 +375,56 @@ WHERE  option_group_id = (
       'qfKey',
       'gettextResourceDir',
       'cleanURL',
+      'entryURL',
       'locale_custom_strings',
       'localeCustomStrings',
       'autocompleteContactSearch',
       'autocompleteContactReference',
       'checksumTimeout',
+      'checksum_timeout',
+    );
+  }
+
+  /**
+   * @param array $params
+   * @return array
+   */
+  public static function filterSkipVars($params) {
+    $skipVars = self::skipVars();
+    foreach ($skipVars as $var) {
+      unset($params[$var]);
+    }
+    foreach (array_keys($params) as $key) {
+      if (preg_match('/^_qf_/', $key)) {
+        unset($params[$key]);
+      }
+    }
+    return $params;
+  }
+
+  /**
+   * @return array
+   */
+  private static function getUrlSettings() {
+    return array(
+      'userFrameworkResourceURL',
+      'imageUploadURL',
+      'customCSSURL',
+      'extensionsURL',
+    );
+  }
+
+  /**
+   * @return array
+   */
+  private static function getPathSettings() {
+    return array(
+      'uploadDir',
+      'imageUploadDir',
+      'customFileUploadDir',
+      'customTemplateDir',
+      'customPHPPathDir',
+      'extensionsDir',
     );
   }
 

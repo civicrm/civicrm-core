@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign=runAllURL}{crmURL p='civicrm/admin/runjobs' q="reset=1"}{/capture}
-<div id="help">
+<div class="help">
     {ts 1=$runAllURL}You can configure scheduled jobs (cron tasks) for your CiviCRM installation. For most sites, your system administrator should set up one or more 'cron' tasks to run the enabled jobs. However, you can also <a href="%1">run all scheduled jobs manually</a>, or run specific jobs from this screen (click 'more' and then 'Execute Now').{/ts} {docURL page="Managing Scheduled Jobs" resource="wiki" text="(Job parameters and command line syntax documentation...)"}
 </div>
 
@@ -36,8 +36,8 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newJob"  icon="circle-plus"}{ts}Add New Scheduled Job{/ts}{/crmButton}
-          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog"  icon="zoomin"}{ts}View Log (all jobs){/ts}{/crmButton}
+          {crmButton q="action=add&reset=1" id="newJob"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog" icon="list-alt"}{ts}View Log (all jobs){/ts}{/crmButton}
         </div>
       {/if}
 
@@ -71,8 +71,8 @@
 
     {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newJob-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Scheduled Job{/ts}</span></a>
-          <a href="{crmURL p='civicrm/admin/joblog' q="reset=1"}" id="jobLog-bottom" class="button"><span><div class="icon ui-icon-zoomin"></div>{ts}View Log (all jobs){/ts}</span></a>
+          {crmButton q="action=add&reset=1" id="newJob-bottom"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog-bottom" icon="list-alt"}{ts}View Log (all jobs){/ts}{/crmButton}
         </div>
     {/if}
 </div>
@@ -82,7 +82,7 @@
         {ts}There are no jobs configured.{/ts}
      </div>
      <div class="action-link">
-       <a href="{crmURL p='civicrm/admin/job' q="action=add&reset=1"}" id="newJob-nojobs" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Scheduled Job{/ts}</span></a>
+       <a href="{crmURL p='civicrm/admin/job' q="action=add&reset=1"}" id="newJob-nojobs" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add New Scheduled Job{/ts}</span></a>
      </div>
 
 {/if}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Navigation
- *
+ * This class generates form components for Navigation.
  */
 class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
@@ -45,17 +42,12 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   protected $_currentParentID = NULL;
 
   /**
-   * Default values.
-   */
-  protected $_defaults = array();
-
-  /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+
+    $this->setPageTitle(ts('Menu Item'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -75,27 +67,22 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     );
 
     $this->add('text', 'url', ts('Url'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Navigation', 'url'));
-    $permissions = CRM_Core_Permission::basicPermissions(TRUE);
-    $include = &$this->addElement('advmultiselect', 'permission',
-      ts('Permission') . ' ', $permissions,
-      array(
-        'size' => 5,
-        'style' => 'width:auto',
-        'class' => 'advmultiselect',
-      )
+    $permissions = array();
+    foreach (CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $id => $vals) {
+      $permissions[] = array('id' => $id, 'label' => $vals[0], 'description' => (array) CRM_Utils_Array::value(1, $vals));
+    }
+    $this->add('text', 'permission', ts('Permission'),
+      array('placeholder' => ts('Unrestricted'), 'class' => 'huge', 'data-select-params' => json_encode(array('data' => $permissions)))
     );
 
-    $include->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $include->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-    $operators = array('AND' => 'AND', 'OR' => 'OR');
-    $this->add('select', 'permission_operator', ts('Operator'), $operators);
+    $operators = array('AND' => ts('AND'), 'OR' => ts('OR'));
+    $this->add('select', 'permission_operator', NULL, $operators);
 
     //make separator location configurable
-    $separator = array(0 => 'None', 1 => 'After Menu Element', 2 => 'Before Menu Element');
-    $this->add('select', 'has_separator', ts('Separator?'), $separator);
+    $separator = array(ts('None'), ts('After menu element'), ts('Before menu element'));
+    $this->add('select', 'has_separator', ts('Separator'), $separator);
 
-    $active = $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $active = $this->add('advcheckbox', 'is_active', ts('Enabled'));
 
     if (CRM_Utils_Array::value('name', $this->_defaults) == 'Home') {
       $active->freeze();
@@ -111,7 +98,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       $homeMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Home', 'id', 'name');
       unset($parentMenu[$homeMenuId]);
 
-      $parent = $this->add('select', 'parent_id', ts('Parent'), array('' => ts('- select -')) + $parentMenu);
+      $this->add('select', 'parent_id', ts('Parent'), array('' => ts('Top level')) + $parentMenu, FALSE, array('class' => 'crm-select2'));
     }
   }
 
@@ -121,12 +108,6 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   public function setDefaultValues() {
     $defaults = $this->_defaults;
     if (isset($this->_id)) {
-      if (!empty($this->_defaults['permission'])) {
-        foreach (explode(',', $this->_defaults['permission']) as $value) {
-          $components[$value] = $value;
-        }
-        $defaults['permission'] = $components;
-      }
       //Take parent id in object variable to calculate the menu
       //weight if menu parent id changed
       $this->_currentParentID = CRM_Utils_Array::value('parent_id', $this->_defaults);
@@ -143,9 +124,6 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // get the submitted form values.

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -69,9 +69,20 @@ function _civicrm_api3_uf_join_create_spec(&$params) {
  *
  * @return array
  *   API result array.
- *
- * @todo Delete function missing
  */
 function civicrm_api3_uf_join_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Delete a CiviCRM UF_Join.
+ *
+ * @param array $params
+ *   Array of name/value pairs.
+ *
+ * @return array
+ *   API result array.
+ */
+function civicrm_api3_uf_join_delete($params) {
+  return _civicrm_api3_basic_delete('CRM_Core_BAO_UFJoin', $params);
 }

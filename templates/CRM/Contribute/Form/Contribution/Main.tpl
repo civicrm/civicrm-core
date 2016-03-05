@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,37 +25,9 @@
 *}
 {* Callback snippet: On-behalf profile *}
 {if $snippet and !empty($isOnBehalfCallback)}
-{include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl" context="front-end"}
-{* Callback snippet: Load payment processor *}
-{elseif $snippet}
-{include file="CRM/Core/BillingBlock.tpl"}
-  {if $is_monetary}
-  {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
-    {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
-    <div id="paypalExpress">
-      {assign var=expressButtonName value='_qf_Main_upload_express'}
-      <fieldset class="crm-public-form-item crm-group paypal_checkout-group">
-        <legend>{ts}Checkout with PayPal{/ts}</legend>
-        <div class="section">
-          <div class="crm-public-form-item crm-section paypalButtonInfo-section">
-            <div class="content">
-              <span class="description">{ts}Click the PayPal button to continue.{/ts}</span>
-            </div>
-            <div class="clear"></div>
-          </div>
-          <div class="crm-public-form-item crm-section {$expressButtonName}-section">
-            <div class="content">
-              {$form.$expressButtonName.html} <span class="description">Checkout securely. Pay without sharing your financial information. </span>
-            </div>
-            <div class="clear"></div>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-    {/if}
-  {/if}
-
-{* Main Form *}
+  <div class="crm-public-form-item crm-section">
+    {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl" context="front-end"}
+  </div>
 {else}
   {literal}
   <script type="text/javascript">
@@ -96,7 +68,6 @@
 
   {include file="CRM/common/TrackingFields.tpl"}
 
-  {capture assign='reqMark'}<span class="marker" title="{ts}This field is required.{/ts}">*</span>{/capture}
   <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
 
   {if $contact_id}
@@ -110,7 +81,7 @@
   </div>
   {include file="CRM/common/cidzero.tpl"}
   {if $islifetime or $ispricelifetime }
-  <div id="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
+  <div class="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
   {/if}
 
   {if !empty($useForMember)}
@@ -127,7 +98,7 @@
     {if $pledgeBlock}
       {if $is_pledge_payment}
       <div class="crm-public-form-item crm-section {$form.pledge_amount.name}-section">
-        <div class="label">{$form.pledge_amount.label}&nbsp;<span class="marker">*</span></div>
+        <div class="label">{$form.pledge_amount.label}&nbsp;<span class="crm-marker">*</span></div>
         <div class="content">{$form.pledge_amount.html}</div>
         <div class="clear"></div>
       </div>
@@ -194,21 +165,9 @@
     <div class="clear"></div>
   </div>
 
-  {if $form.is_for_organization}
-  <div class="crm-public-form-item crm-section {$form.is_for_organization.name}-section">
-    <div class="label">&nbsp;</div>
-    <div class="content">
-      {$form.is_for_organization.html}&nbsp;{$form.is_for_organization.label}
-    </div>
-    <div class="clear"></div>
-  </div>
-  {/if}
-
-  {if $is_for_organization}
-  <div id='onBehalfOfOrg' class="crm-public-form-item crm-section">
+  <div class="crm-public-form-item crm-section">
     {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
   </div>
-  {/if}
 
   {* User account registration option. Displays if enabled for one of the profiles on this page. *}
   <div class="crm-public-form-item crm-section cms_user-section">
@@ -218,13 +177,26 @@
     {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="makeContribution"}
   </div>
 
-  {if $honor_block_is_active}
-  <fieldset class="crm-public-form-item crm-group honor_block-group">
-    {include file="CRM/Contribute/Form/SoftCredit.tpl"}
-    <div id="honorType" class="crm-public-form-item honoree-name-email-section">
-      {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
-    </div>
-  </fieldset>
+  {if $honoreeProfileFields|@count}
+    <fieldset class="crm-public-form-item crm-group honor_block-group">
+      {crmRegion name="contribution-soft-credit-block"}
+        <legend>{$honor_block_title}</legend>
+        <div class="crm-public-form-item crm-section honor_block_text-section">
+          {$honor_block_text}
+        </div>
+        {if $form.soft_credit_type_id.html}
+          <div class="crm-public-form-item crm-section {$form.soft_credit_type_id.name}-section">
+            <div class="content" >
+              {$form.soft_credit_type_id.html}
+              <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
+            </div>
+          </div>
+        {/if}
+      {/crmRegion}
+      <div id="honorType" class="honoree-name-email-section">
+        {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
+      </div>
+    </fieldset>
   {/if}
 
   <div class="crm-public-form-item crm-group custom_pre_profile-group">
@@ -266,13 +238,13 @@
   </fieldset>
   {/if}
 
-  {if $form.payment_processor.label}
+  {if $form.payment_processor_id.label}
   {* PP selection only works with JS enabled, so we hide it initially *}
   <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
     <legend>{ts}Payment Options{/ts}</legend>
     <div class="crm-public-form-item crm-section payment_processor-section">
-      <div class="label">{$form.payment_processor.label}</div>
-      <div class="content">{$form.payment_processor.html}</div>
+      <div class="label">{$form.payment_processor_id.label}</div>
+      <div class="content">{$form.payment_processor_id.html}</div>
       <div class="clear"></div>
     </div>
   </fieldset>
@@ -292,10 +264,7 @@
   {/if}
 
   <div id="billing-payment-block">
-    {* If we have a payment processor, load it - otherwise it happens via ajax *}
-    {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
-      {include file="CRM/Contribute/Form/Contribution/Main.tpl" snippet=4}
-    {/if}
+    {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
   </div>
   {include file="CRM/common/paymentBlock.tpl"}
 
@@ -358,15 +327,6 @@
     }
   }
 
-  {/literal}
-  {if $relatedOrganizationFound and $reset}
-    cj( "#is_for_organization" ).prop('checked', true );
-    showOnBehalf(false);
-  {elseif $onBehalfRequired}
-    showOnBehalf(true);
-  {/if}
-  {literal}
-
   cj('input[name="soft_credit_type_id"]').on('change', function() {
     enableHonorType();
   });
@@ -419,125 +379,29 @@
     }
   }
 
-  {/literal}
-  {if $form.is_pay_later and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
-  showHidePayPalExpressOption();
-  {/if}
-  {literal}
-
-  function toggleConfirmButton(flag) {
-    var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
-    var elementObj = cj('input[name="payment_processor"]');
-    if ( elementObj.attr('type') == 'hidden' ) {
-      var processorTypeId = elementObj.val( );
-    }
-    else {
-      var processorTypeId = elementObj.filter(':checked').val();
-    }
-
-    if (payPalExpressId !=0 && payPalExpressId == processorTypeId && flag === false) {
-      cj("#crm-submit-buttons").hide();
-      cj("#paypalExpress").show();
-    }
-    else {
-      cj("#crm-submit-buttons").show();
-      if (flag === true) {
-        cj("#paypalExpress").hide();
-      }
-    }
-  }
-
-  cj('input[name="payment_processor"]').change( function() {
-    toggleConfirmButton(false);
-  });
-
   CRM.$(function($) {
-    toggleConfirmButton(false);
     enableHonorType();
     showRecurHelp();
     skipPaymentMethod();
   });
 
-  function showHidePayPalExpressOption() {
-    if (cj('input[name="is_pay_later"]').is(':checked')) {
-      cj("#crm-submit-buttons").show();
-      cj("#paypalExpress").hide();
-    }
-    else {
-      cj("#paypalExpress").show();
-      cj("#crm-submit-buttons").hide();
-    }
-  }
-
-  function showHidePayment(flag) {
-    var payment_options = cj(".payment_options-group");
-    var payment_processor = cj("div.payment_processor-section");
-    var payment_information = cj("div#payment_information");
-    if (flag) {
-      payment_options.hide();
-      payment_processor.hide();
-      payment_information.hide();
-    }
-    else {
-      payment_options.show();
-      payment_processor.show();
-      payment_information.show();
-    }
-  }
-  
-  function skipPaymentMethod() {
-    var flag = false;
-    // If price-set is used then calculate the Total Amount
-    if (cj('#pricevalue').length !== 0) {
-      currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
-      flag = (currentTotal == 0) ? true : false;
-    }
-    // Else quick-config w/o other-amount scenarios
-    else {
-      cj('.price-set-option-content input').each( function() {
-        currentTotal = cj(this).is('[data-amount]') ? cj(this).attr('data-amount').replace(/[^\/\d]/g,'') : 0;
-        if( cj(this).is(':checked') &&  currentTotal == 0 ) {
-          flag = true;
-        }
-      });
-      cj('.price-set-option-content input, .other_amount-content input').on('input', function () {
-        currentTotal = cj(this).is('[data-amount]') ? cj(this).attr('data-amount').replace(/[^\/\d]/g,'') : (cj(this).val() ? cj(this).val() : 0);
-        if (currentTotal == 0 ) {
-          flag = true;
-        } else {
-          flag = false;
-        }
-        toggleConfirmButton(flag);
-        showHidePayment(flag);
-      });
-    }
-    toggleConfirmButton(flag);
-    showHidePayment(flag);
-  }
-
   CRM.$(function($) {
     // highlight price sets
     function updatePriceSetHighlight() {
-      cj('#priceset .price-set-row span').removeClass('highlight');
-      cj('#priceset .price-set-row input:checked').parent().addClass('highlight');
+      $('#priceset .price-set-row span').removeClass('highlight');
+      $('#priceset .price-set-row input:checked').parent().addClass('highlight');
     }
-    cj('#priceset input[type="radio"]').change(updatePriceSetHighlight);
+    $('#priceset input[type="radio"]').change(updatePriceSetHighlight);
     updatePriceSetHighlight();
 
-    function toggleBillingBlockIfFree(){
-      var total_amount_tmp =  $(this).data('raw-total');
-      // Hide billing questions if this is free
-      if (total_amount_tmp == 0){
-        cj("#billing-payment-block").hide();
-        cj(".payment_options-group").hide();
-      }
-      else {
-        cj("#billing-payment-block").show();
-        cj(".payment_options-group").show();
-      }
-    }
-
-    $('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
+    // Update pledge contribution amount when pledge checkboxes change
+    $("input[name^='pledge_amount']").on('change', function() {
+      var total = 0;
+      $("input[name^='pledge_amount']:checked").each(function() {
+        total += Number($(this).attr('amount'));
+      });
+      $("input[name^='price_']").val(total.toFixed(2));
+    });
   });
   {/literal}
 </script>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,28 +29,23 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class handle activity view mode
- *
+ * This class handle activity view mode.
  */
 class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
-    //get the activity values
+    // Get the activity values.
     $activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
-    //check for required permissions, CRM-6264
+    // Check for required permissions, CRM-6264.
     if ($activityId &&
       !CRM_Activity_BAO_Activity::checkPermission($activityId, CRM_Core_Action::VIEW)
     ) {
@@ -75,7 +70,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $params = array('id' => $activityId);
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
-    //set activity type name and description to template
+    // Set activity type name and description to template.
     list($activityTypeName, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($defaults['activity_type_id']);
 
     $this->assign('activityTypeName', $activityTypeName);
@@ -101,7 +96,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
       }
     }
 
-    //get the campaign
+    // Get the campaign.
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $defaults)) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
@@ -117,8 +112,6 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addButtons(array(

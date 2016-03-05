@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,16 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
   static $_alreadyLoaded = array();
 
   /**
-   * Check to see if we have cache entries for this group
-   * if not, regenerate, else return
+   * Check to see if we have cache entries for this group.
+   *
+   * If not, regenerate, else return.
    *
    * @param $groupIDs
    *   Of group that we are checking against.
@@ -137,7 +136,7 @@ AND     ( g.cache_date IS NULL OR
         $groupIDs = array($groupIDs);
       }
 
-      // note escapeString is a must here and we can't send the imploded value as second arguement to
+      // note escapeString is a must here and we can't send the imploded value as second argument to
       // the executeQuery(), since that would put single quote around the string and such a string
       // of comma separated integers would not work.
       $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
@@ -215,7 +214,7 @@ AND    g.refresh_date IS NULL
 
     $returnProperties = array('contact_id');
     foreach ($groupID as $gid) {
-      $params = array(array('group', 'IN', array($gid => 1), 0, 0));
+      $params = array(array('group', 'IN', array($gid), 0, 0));
       // the below call updates the cache table as a byproduct of the query
       CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, FALSE);
     }
@@ -284,8 +283,6 @@ WHERE  id IN ( $groupIDs )
    *   the groupID to delete cache entries, NULL for all groups.
    * @param bool $onceOnly
    *   run the function exactly once for all groups.
-   *
-   * @return void
    */
   public static function remove($groupID = NULL, $onceOnly = TRUE) {
     static $invoked = FALSE;
@@ -334,24 +331,27 @@ SET    cache_date = null,
 ";
       }
       else {
+
         $query = "
 DELETE     gc
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
-WHERE      TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout
+WHERE      g.cache_date <= %1
 ";
         $update = "
 UPDATE civicrm_group g
 SET    cache_date = null,
        refresh_date = null
-WHERE  TIMESTAMPDIFF(MINUTE, cache_date, $now) >= $smartGroupCacheTimeout
+WHERE  g.cache_date <= %1
 ";
         $refresh = "
 UPDATE civicrm_group g
 SET    refresh_date = $refreshTime
-WHERE  TIMESTAMPDIFF(MINUTE, cache_date, $now) < $smartGroupCacheTimeout
+WHERE  g.cache_date > %1
 AND    refresh_date IS NULL
 ";
+        $cacheTime = date('Y-m-d H-i-s', strtotime("- $smartGroupCacheTimeout minutes"));
+        $params = array(1 => array($cacheTime, 'String'));
       }
     }
     elseif (is_array($groupID)) {
@@ -434,7 +434,7 @@ WHERE  id = %1
     }
 
     // grab a lock so other processes dont compete and do the same query
-    $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.core.group.{$groupID}");
+    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
     if (!$lock->isAcquired()) {
       // this can cause inconsistent results since we dont know if the other process
       // will fill up the cache before our calling routine needs it.
@@ -445,7 +445,7 @@ WHERE  id = %1
 
     self::$_alreadyLoaded[$groupID] = 1;
 
-    // we now have the lock, but some other proces could have actually done the work
+    // we now have the lock, but some other process could have actually done the work
     // before we got here, so before we do any work, lets ensure that work needs to be
     // done
     // we allow hidden groups here since we dont know if the caller wants to evaluate an
@@ -489,7 +489,14 @@ WHERE  id = %1
       }
       else {
         $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-
+        // CRM-17075 using the formValues in this way imposes extra logic and complexity.
+        // we have the where_clause and where tables stored in the saved_search table
+        // and should use these rather than re-processing the form criteria (which over-works
+        // the link between the form layer & the query layer too).
+        // It's hard to think of when you would want to use anything other than return
+        // properties = array('contact_id' => 1) here as the point would appear to be to
+        // generate the list of contact ids in the group.
+        // @todo review this to use values in saved_search table (preferably for 4.8).
         $query
           = new CRM_Contact_BAO_Query(
             $ssParams, $returnProperties, NULL,
@@ -591,8 +598,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
 
     if (
       isset($config->smartGroupCacheTimeout) &&
-      is_numeric($config->smartGroupCacheTimeout) &&
-      $config->smartGroupCacheTimeout > 0
+      is_numeric($config->smartGroupCacheTimeout)
     ) {
       return $config->smartGroupCacheTimeout;
     }

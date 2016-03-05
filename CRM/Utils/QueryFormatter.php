@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,6 +24,11 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
+
+ /**
+  * @package CRM
+  * @copyright CiviCRM LLC (c) 2004-2015
+  */
 
 /**
  * Class CRM_Utils_QueryFormatter
@@ -76,14 +81,15 @@ class CRM_Utils_QueryFormatter {
    */
   public static function singleton($fresh = FALSE) {
     if ($fresh || self::$singleton === NULL) {
-      $mode = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'fts_query_mode', NULL, self::MODE_NONE);
+      $mode = Civi::settings()->get('fts_query_mode');
       self::$singleton = new CRM_Utils_QueryFormatter($mode);
     }
     return self::$singleton;
   }
 
   /**
-   * @var string eg MODE_NONE
+   * @var string
+   *   eg MODE_NONE
    */
   protected $mode;
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
+ * Files required.
  */
 class CRM_Campaign_Form_Search_Petition extends CRM_Core_Form {
 
@@ -47,8 +45,6 @@ class CRM_Campaign_Form_Search_Petition extends CRM_Core_Form {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_search = CRM_Utils_Array::value('search', $_GET);
@@ -69,9 +65,6 @@ class CRM_Campaign_Form_Search_Petition extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_search) {

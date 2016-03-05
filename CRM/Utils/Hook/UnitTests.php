@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,15 +29,13 @@
  *
  * @package CiviCRM_Hook
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
 
   protected $mockObject;
 
   /**
-   * @var array adhocHooks to call
+   * @var array $adhocHooks to call
    */
   protected $adhocHooks;
   protected $civiModules = NULL;
@@ -51,8 +49,10 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   }
 
   /**
-   * Use a unit-testing mock object to handle hook invocations
+   * Use a unit-testing mock object to handle hook invocations.
+   *
    * e.g. hook_civicrm_foo === $mockObject->foo()
+   *
    * @param object $mockObject
    */
   public function setMock($mockObject) {

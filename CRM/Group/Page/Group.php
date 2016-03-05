@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   protected $_sortByCharacter;
 
   /**
+   * Get BAO name.
+   *
    * @return string
    */
   public function getBAOName() {
@@ -115,12 +115,12 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
+   * Re-implement browse.
+   *
    * We need to do slightly different things for groups vs saved search groups, hence we
-   * reimplement browse from Page_Basic
+   * re-implement browse from Page_Basic.
    *
    * @param int $action
-   *
-   * @return void
    */
   public function browse($action = NULL) {
     $groupPermission = CRM_Core_Permission::check('edit groups') ? CRM_Core_Permission::EDIT : CRM_Core_Permission::VIEW;
@@ -150,6 +150,9 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     $this->search();
   }
 
+  /**
+   * Search for groups.
+   */
   public function search() {
     if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |

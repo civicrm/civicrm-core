@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -43,15 +43,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_Mapper {
 
   /**
    * An URL for public extensions repository.
    */
-  //const DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
 
   /**
    * Extension info file name.
@@ -418,6 +415,8 @@ class CRM_Extension_Mapper {
     if ($this->cache) {
       $this->cache->delete($this->cacheKey . '/moduleFiles');
     }
+    // FIXME: How can code so code wrong be so right?
+    CRM_Extension_System::singleton()->getClassLoader()->refresh();
   }
 
 }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Financial/Form/FinancialType.tpl"}
 {else}
-    <div id="help">
+    <div class="help">
       {capture assign="premiumLink"}{crmURL p="civicrm/admin/contribute/managePremiums" q="reset=1"}{/capture}
       <p>{ts 1=$premiumLink}Financial types are used to categorize contributions for reporting and accounting purposes. You may set up as many as needed, including commonly used types such as Donation, Campaign Contribution or Membership Dues.  Additionally, financial types can account for the inventory and expense of <a href="%1">premiums</a>.{/ts}</p>
       {capture assign="acctLink"}{crmURL p="civicrm/admin/financial/financialAccount" q="reset=1&action=browse"}{/capture}
@@ -74,8 +74,8 @@
 {/if}
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      {crmButton q="action=add&reset=1" id="newFinancialType"  icon="circle-plus"}{ts}Add Financial Type{/ts}{/crmButton}
-      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+      {crmButton q="action=add&reset=1" id="newFinancialType"  icon="plus-circle"}{ts}Add Financial Type{/ts}{/crmButton}
+      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

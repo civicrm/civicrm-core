@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -105,6 +105,16 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
           ),
         ),
+        'filters' => array(
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+        ),
+      ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
       ),
     );
     $this->_columns += $this->getAddressColumns();
@@ -129,15 +139,25 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         'filters' => array(
           'sort_name' => array(
             'title' => ts('Participant Name'),
+            'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
           ),
           'id' => array(
             'title' => ts('Contact ID'),
+            'type' => CRM_Utils_Type::T_INT,
             'no_display' => TRUE,
           ),
           'birth_date' => array(
             'title' => ts('Birth Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'receive_date' => array(
             'default' => 'this.year',
@@ -158,8 +178,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           'financial_type_id' => array(
             'name' => 'financial_type_id',
             'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
@@ -295,8 +316,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
                          AND {$this->_aliases['civicrm_email']}.is_primary = 1
              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                            {$this->_aliases['civicrm_phone']}.is_primary = 1
-  ";
+                            {$this->_aliases['civicrm_phone']}.is_primary = 1";
     $this->addAddressFromClause();
   }
 
@@ -367,6 +387,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->select();
 
     $this->from();
+    $this->getPermissionedFTQuery($this);
 
     $this->where();
 

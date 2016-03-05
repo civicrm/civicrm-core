@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -86,6 +86,16 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
 
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
+    $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
+    $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
+    if ($status == 'Transferred') {
+      $transferId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'transferred_to_contact_id', 'id');
+      $pid = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $transferId, 'id', 'contact_id');
+      $transferName = current(CRM_Contact_BAO_Contact::getContactDetails($transferId));
+      $this->assign('pid', $pid);
+      $this->assign('transferId', $transferId);
+      $this->assign('transferName', $transferName);
+    }
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
     if ($values[$participantID]['is_test']) {
@@ -142,7 +152,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
         $finalTree[$treeId] = $trees;
       }
     }
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree, FALSE, NULL, NULL, NULL, $participantID);
     $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values[$participantID]['event_id'], 'title');
     //CRM-7150, show event name on participant view even if the event is disabled
     if (empty($values[$participantID]['event'])) {
@@ -178,7 +188,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = array();
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {

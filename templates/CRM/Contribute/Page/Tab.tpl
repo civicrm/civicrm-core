@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,7 @@
     {include file="CRM/Contribute/Form/ContributionView.tpl"}
 {else}
     <div class="view-content">
-        <div id="help">
+        <div class="help">
             {if $permission EQ 'edit'}
               {capture assign=newContribURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
               {capture assign=link}class="action-item" href="{$newContribURL}"{/capture}
@@ -46,9 +46,9 @@
 
         {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-                <a accesskey="N" href="{$newContribURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
+                <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
                 {if $newCredit}
-                    <a accesskey="N" href="{$newCreditURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Submit Credit Card Contribution{/ts}</span></a>
+                    <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
                 {/if}
                 <br /><br />
             </div>

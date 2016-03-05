@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,18 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for configuring CKEditor options
+ * Page for configuring CKEditor options.
  *
  * Note that while this is implemented as a CRM_Core_Page, it is actually a form.
- * Because the form needs to be submitted and refreshed via javascrit, it seemed like
+ * Because the form needs to be submitted and refreshed via javascript, it seemed like
  * Quickform and CRM_Core_Form/Controller might get in the way.
  */
 class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
 
-  const CONFIG_FILENAME = 'crm-ckeditor-config.js';
+  const CONFIG_FILENAME = '[civicrm.files]/persist/crm-ckeditor-config.js';
 
   /**
    * Default settings if config file has not been initialized
@@ -55,6 +53,8 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   );
 
   /**
+   * Run page.
+   *
    * @return string
    */
   public function run() {
@@ -67,6 +67,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     }
 
     CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'bower_components/ckeditor/ckeditor.js', 0, 'page-header')
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/fulltoolbareditor.js', 1)
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/abstracttoolbarmodifier.js', 2)
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/toolbarmodifier.js', 3)
@@ -121,12 +122,13 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
+   * Get available CKEditor plugin list.
+   *
    * @return array
    */
   private function getCKPlugins() {
     $plugins = array();
-    global $civicrm_root;
-    $pluginDir = CRM_Utils_file::addTrailingSlash($civicrm_root, '/') . 'bower_components/ckeditor/plugins';
+    $pluginDir = Civi::paths()->getPath('[civicrm.root]/bower_components/ckeditor/plugins');
 
     foreach (glob($pluginDir . '/*', GLOB_ONLYDIR) as $dir) {
       $dir = rtrim(str_replace('\\', '/', $dir), '/');
@@ -155,12 +157,13 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
+   * Get available CKEditor skins.
+   *
    * @return array
    */
   private function getCKSkins() {
     $skins = array();
-    global $civicrm_root;
-    $skinDir = CRM_Utils_file::addTrailingSlash($civicrm_root, '/') . 'bower_components/ckeditor/skins';
+    $skinDir = Civi::paths()->getPath('[civicrm.root]/bower_components/ckeditor/skins');
     foreach (glob($skinDir . '/*', GLOB_ONLYDIR) as $dir) {
       $dir = rtrim(str_replace('\\', '/', $dir), '/');
       $skins[] = substr($dir, strrpos($dir, '/') + 1);
@@ -191,10 +194,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    */
   public static function getConfigUrl() {
     if (self::getConfigFile()) {
-      // FIXME: Basing file path off imageUploadURL sucks, but it's all we got
-      $url = CRM_Utils_file::addTrailingSlash(CRM_Core_Config::singleton()->imageUploadURL, '/');
-      $url = str_replace('/persist/contribute/', '/persist/', $url);
-      return $url . self::CONFIG_FILENAME;
+      return Civi::paths()->getUrl(self::CONFIG_FILENAME, 'absolute');
     }
     return NULL;
   }
@@ -206,11 +206,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    * @return null|string
    */
   public static function getConfigFile($checkIfFileExists = TRUE) {
-    // FIXME: Basing file path off imageUploadDir sucks, but it's all we got
-    $dir = CRM_Core_Config::singleton()->imageUploadDir;
-    $dir = CRM_Utils_file::addTrailingSlash(str_replace('\\', '/', $dir), '/');
-    $dir = str_replace('/persist/contribute/', '/persist/', $dir);
-    $fileName = $dir . self::CONFIG_FILENAME;
+    $fileName = Civi::paths()->getPath(self::CONFIG_FILENAME);
     return !$checkIfFileExists || is_file($fileName) ? $fileName : NULL;
   }
 
@@ -223,7 +219,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
-   * Delete self::CONFIG_FILENAME
+   * Delete config file.
    */
   public static function deleteConfigFile() {
     $file = self::getConfigFile();

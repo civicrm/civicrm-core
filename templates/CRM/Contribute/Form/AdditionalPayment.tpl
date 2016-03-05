@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,7 @@
      <tr class="columnheader">
        <th>{ts}Amount{/ts}</th>
        <th>{ts}Type{/ts}</th>
-       <th>{ts}Paid By{/ts}</th>
+       <th>{ts}Payment Method{/ts}</th>
        <th>{ts}Received{/ts}</th>
        <th>{ts}Transaction ID{/ts}</th>
        <th>{ts}Status{/ts}</th>
@@ -51,22 +51,18 @@
      {else}
        {assign var='entity' value=$component}
      {/if}
-    {ts 1=$entity}No additional payments found for this %1 record{/ts}
+     {ts 1=$entity}No payments found for this %1 record{/ts}
   {/if}
- <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
- </div>
-{elseif $formType}
+  {if !$suppressPaymentFormButtons}
+    <div class="crm-submit-buttons">
+       {include file="CRM/common/formButtons.tpl"}
+    </div>
+  {/if}
+ {elseif $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
 <div class="crm-block crm-form-block crm-payment-form-block">
-
-  {if $contributionMode == 'test'}
-    {assign var=contribMode value="TEST"}
-    {elseif $contributionMode == 'live'}
-    {assign var=contribMode value="LIVE"}
-  {/if}
 
   {if !$email}
   <div class="messages status no-popup">
@@ -91,7 +87,7 @@
       <td class="font-size12pt label"><strong>{ts}Participant{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
     </tr>
     {if $contributionMode}
-      <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
+      <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
     {/if}
     <tr>
       <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>

@@ -127,6 +127,60 @@ function civicrm_api3_order_create(&$params) {
 }
 
 /**
+ * Delete a Order.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @return array
+ */
+function civicrm_api3_order_delete($params) {
+  $contribution = civicrm_api3('Contribution', 'get', array(
+    'return' => array('is_test'),
+    'id' => $params['id'],
+  ));
+  if ($contribution['id'] && $contribution['values'][$contribution['id']]['is_test'] == TRUE) {
+    $result = civicrm_api3('Contribution', 'delete', $params);
+  }
+  else {
+    throw new API_Exception('Only test orders can be deleted.');
+  }
+  return civicrm_api3_create_success($result['values'], $params, 'Order', 'delete');
+}
+
+/**
+ * Cancel an Order.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @return array
+ */
+function civicrm_api3_order_cancel($params) {
+  $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+  $params['contribution_status_id'] = array_search('Cancelled', $contributionStatuses);
+  $result = civicrm_api3('Contribution', 'create', $params);
+  CRM_Contribute_BAO_Contribution::transitionComponents($params);
+  return civicrm_api3_create_success($result['values'], $params, 'Order', 'cancel');
+}
+
+/**
+ * Adjust Metadata for Cancel action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_order_cancel_spec(&$params) {
+  $params['contribution_id'] = array(
+    'api.required' => 1 ,
+    'title' => 'Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+}
+
+/**
  * Adjust Metadata for Create action.
  *
  * The metadata is used for setting defaults, documentation & validation.
@@ -152,4 +206,21 @@ function _civicrm_api3_order_create_spec(&$params) {
     'type' => CRM_Utils_Type::T_INT,
     'api.required' => TRUE,
   );
+}
+
+/**
+ * Adjust Metadata for Delete action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_order_delete_spec(&$params) {
+  $params['contribution_id'] = array(
+    'api.required' => TRUE,
+    'title' => 'Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['id']['api.aliases'] = array('contribution_id');
 }

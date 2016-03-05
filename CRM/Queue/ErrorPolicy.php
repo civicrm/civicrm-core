@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -113,9 +113,17 @@ class CRM_Queue_ErrorPolicy {
   }
 
   /**
-   * Receive (semi) recoverable error notices
+   * Receive (semi) recoverable error notices.
    *
    * @see set_error_handler
+   *
+   * @param string $errno
+   * @param string $errstr
+   * @param string $errfile
+   * @param int $errline
+   *
+   * @return bool
+   * @throws \Exception
    */
   public function onError($errno, $errstr, $errfile, $errline) {
     if (!(error_reporting() & $errno)) {

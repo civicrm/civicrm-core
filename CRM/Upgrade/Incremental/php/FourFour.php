@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,25 +26,10 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * Upgrade logic for 4.4
  */
-class CRM_Upgrade_Incremental_php_FourFour {
-  const BATCH_SIZE = 5000;
-
+class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base {
   const MAX_WORD_REPLACEMENT_SIZE = 255;
-
-  /**
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.
@@ -55,9 +40,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * @param $preUpgradeMessage
    * @param string $rev
    *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
-   * @param null $currentVer
-   *
-   * @return void
+   * @param string $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.4.beta1') {
@@ -83,7 +66,6 @@ class CRM_Upgrade_Incremental_php_FourFour {
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.4.1') {
@@ -115,13 +97,15 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
   }
 
   /**
-   * @param $rev
+   * Upgrade 4.4.alpha1.
+   *
+   * @param string $rev
    *
    * @return bool
    */
   public function upgrade_4_4_alpha1($rev) {
     // task to process sql
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'runSql', $rev);
 
     // Consolidate activity contacts CRM-12274.
     $this->addTask('Consolidate activity contacts', 'activityContacts');
@@ -133,7 +117,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    * @param $rev
    */
   public function upgrade_4_4_beta1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'runSql', $rev);
 
     // add new 'data' column in civicrm_batch
     $query = 'ALTER TABLE civicrm_batch ADD data LONGTEXT NULL COMMENT "cache entered data"';
@@ -202,8 +186,17 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
     // CRM-12578 - Prior to this version a CSS file under drupal would disable core css
     if (!empty($config->customCSSURL) && strpos($config->userFramework, 'Drupal') === 0) {
       // The new setting doesn't exist yet - need to create it first
-      CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-      CRM_Core_BAO_Setting::setItem('1', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css');
+      $sql = '
+        INSERT INTO civicrm_setting (group_name, name , value , domain_id , is_domain , created_date)
+        VALUES (%1, %2, %3, %4, %5, now())';
+      CRM_Core_DAO::executeQuery($sql, array(
+        1 => array(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'String'),
+        2 => array('disable_core_css', 'String'),
+        3 => array(serialize(1), 'String'),
+        4 => array(CRM_Core_Config::domainID(), 'Positive'),
+        5 => array(1, 'Int'),
+      ));
+      Civi::service('settings_manager')->flush();
     }
 
     // CRM-13701 - Fix $config->timeInputFormat
@@ -254,7 +247,7 @@ VALUES {$insertStatus}";
       CRM_Core_DAO::executeQuery($sql, $p);
     }
 
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'runSql', $rev);
     $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
 
@@ -297,7 +290,7 @@ WHERE a.id IS NULL;
     }
 
     // task to process sql
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'runSql', $rev);
 
     // CRM-13892 : add `name` column to dashboard schema
     $query = "
@@ -307,7 +300,6 @@ ALTER TABLE civicrm_dashboard
 
     $dashboard = new CRM_Core_DAO_Dashboard();
     $dashboard->find();
-    $values = '';
     while ($dashboard->fetch()) {
       $urlElements = explode('/', $dashboard->url);
       if ($urlElements[1] == 'dashlet') {
@@ -353,17 +345,17 @@ ALTER TABLE civicrm_dashboard
     $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact WHERE image_URL IS NOT NULL');
     for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
       $endId = $startId + self::BATCH_SIZE - 1;
-      $title = ts('Upgrade image_urls (%1 => %2)', array(1 => $startId, 2 => $endId));
+      $title = "Upgrade image_urls ($startId => $endId)";
       $this->addTask($title, 'upgradeImageUrls', $startId, $endId);
     }
   }
 
   /**
-   * @param $rev
-   * @param $originalVer
-   * @param $latestVer
+   * Upgrade script for 4.4.7.
    *
-   * @return void
+   * @param string $rev
+   * @param string $originalVer
+   * @param string $latestVer
    */
   public function upgrade_4_4_7($rev, $originalVer, $latestVer) {
     // For WordPress/Joomla(?), cleanup broken image_URL from 4.4.6 upgrades - https://issues.civicrm.org/jira/browse/CRM-14971
@@ -374,7 +366,7 @@ ALTER TABLE civicrm_dashboard
       $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact WHERE image_URL IS NOT NULL');
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
-        $title = ts('Upgrade image_urls (%1 => %2)', array(1 => $startId, 2 => $endId));
+        $title = "Upgrade image_urls ($startId => $endId)";
         $this->addTask($title, 'cleanupBackendImageUrls', $startId, $endId);
       }
     }
@@ -702,40 +694,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement ADD CONSTRAINT FK_civicrm_word_replacement_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain` (`id`);");
     }
     return TRUE;
-  }
-
-  /**
-   * (Queue Task Callback)
-   */
-  public static function task_4_4_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
-    $upgrade = new CRM_Upgrade_Form();
-    $upgrade->processSQL($rev);
-
-    return TRUE;
-  }
-
-  /**
-   * Syntatic sugar for adding a task which (a) is in this class and (b) has
-   * a high priority.
-   *
-   * After passing the $funcName, you can also pass parameters that will go to
-   * the function. Note that all params must be serializable.
-   */
-  protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load(array(
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ));
-
-    $args = func_get_args();
-    $title = array_shift($args);
-    $funcName = array_shift($args);
-    $task = new CRM_Queue_Task(
-      array(get_class($this), $funcName),
-      $args,
-      $title
-    );
-    $queue->createItem($task, array('weight' => -1));
   }
 
   /**

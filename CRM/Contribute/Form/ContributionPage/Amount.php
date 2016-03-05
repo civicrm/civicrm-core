@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -52,8 +50,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -137,7 +133,7 @@ SELECT id
       CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'pay_later_text'),
       FALSE
     );
-    $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'pay_later_receipt'));
+    $this->add('wysiwyg', 'pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'pay_later_receipt'));
     $this->addElement('checkbox', 'is_billing_required', ts('Billing address required'));
 
     //add partial payment options
@@ -191,8 +187,6 @@ SELECT id
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
-    $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-    CRM_Utils_System::setTitle(ts('Contribution Amounts') . " ($title)");
 
     if (empty($defaults['pay_later_text'])) {
       $defaults['pay_later_text'] = ts('I will send payment by check');
@@ -407,10 +401,6 @@ SELECT id
           'payment_processor_type_id'
         );
         $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessorTypeId, 'name');
-        if ($paymentProcessorType == 'Google_Checkout') {
-          $errors['is_recur_interval'] = ts('Google Checkout does not support recurring intervals');
-          break;
-        }
       }
     }
 
@@ -419,8 +409,6 @@ SELECT id
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     // get the submitted form values.

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
     <tr>
       <td>
         <a href="{$newCaseURL}" class="button">
-          <span><div class="icon ui-icon-circle-plus"></div> {ts}New Case{/ts}</span>
+          <span><i class="crm-i fa-plus-circle"></i> {ts}New Case{/ts}</span>
         </a>
       </td>
     </tr>

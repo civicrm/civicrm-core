@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -178,7 +178,7 @@ function civicrm_api3_job_send_reminder($params) {
   // in that case (ie. makes it non-configurable via the UI). Another approach would be to set a default of 0
   // in the _spec function - but since that is a deprecated value it seems more contentious than this approach
   $params['rowCount'] = 0;
-  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.core.ActionSchedule');
+  $lock = Civi::lockManager()->acquire('worker.core.ActionSchedule');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another ActionSchedule process is running');
   }
@@ -354,7 +354,7 @@ function civicrm_api3_job_process_sms($params) {
  * @return array
  */
 function civicrm_api3_job_fetch_bounces($params) {
-  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.mailing.EmailProcessor');
+  $lock = Civi::lockManager()->acquire('worker.mailing.EmailProcessor');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
   }
@@ -377,7 +377,7 @@ function civicrm_api3_job_fetch_bounces($params) {
  * @return array
  */
 function civicrm_api3_job_fetch_activities($params) {
-  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.mailing.EmailProcessor');
+  $lock = Civi::lockManager()->acquire('worker.mailing.EmailProcessor');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
   }
@@ -430,7 +430,7 @@ function civicrm_api3_job_process_participant($params) {
  *   true if success, else false
  */
 function civicrm_api3_job_process_membership($params) {
-  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.member.UpdateMembership');
+  $lock = Civi::lockManager()->acquire('worker.member.UpdateMembership');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
   }
@@ -568,6 +568,8 @@ function civicrm_api3_job_cleanup($params) {
   $prevNext  = CRM_Utils_Array::value('prevNext', $params, TRUE);
   $dbCache   = CRM_Utils_Array::value('dbCache', $params, FALSE);
   $memCache  = CRM_Utils_Array::value('memCache', $params, FALSE);
+  $tplCache  = CRM_Utils_Array::value('tplCache', $params, FALSE);
+  $wordRplc  = CRM_Utils_Array::value('wordRplc', $params, FALSE);
 
   if ($session || $tempTable || $prevNext) {
     CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext);
@@ -577,12 +579,21 @@ function civicrm_api3_job_cleanup($params) {
     CRM_Core_BAO_Job::cleanup();
   }
 
+  if ($tplCache) {
+    $config = CRM_Core_Config::singleton();
+    $config->cleanup(1, FALSE);
+  }
+
   if ($dbCache) {
     CRM_Core_Config::clearDBCache();
   }
 
   if ($memCache) {
     CRM_Utils_System::flushCache();
+  }
+
+  if ($wordRplc) {
+    CRM_Core_BAO_WordReplacement::rebuild();
   }
 }
 
@@ -616,7 +627,7 @@ function civicrm_api3_job_disable_expired_relationships($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_job_group_rebuild($params) {
-  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.core.GroupRebuild');
+  $lock = Civi::lockManager()->acquire('worker.core.GroupRebuild');
   if (!$lock->isAcquired()) {
     throw new API_Exception('Could not acquire lock, another EmailProcessor process is running');
   }
@@ -626,5 +637,16 @@ function civicrm_api3_job_group_rebuild($params) {
   CRM_Contact_BAO_GroupContactCache::loadAll(NULL, $limit);
   $lock->release();
 
+  return civicrm_api3_create_success();
+}
+
+/**
+ * Check for CiviCRM software updates.
+ *
+ * Anonymous site statistics are sent back to civicrm.org during this check.
+ */
+function civicrm_api3_job_version_check() {
+  $vc = new CRM_Utils_VersionCheck();
+  $vc->fetch();
   return civicrm_api3_create_success();
 }

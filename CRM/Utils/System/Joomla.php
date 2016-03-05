@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,15 +29,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Joomla specific stuff goes here
+ * Joomla specific stuff goes here.
  */
 class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
+   * Class constructor.
    */
   public function __construct() {
     /**
@@ -109,7 +108,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if username and email exists in the drupal db.
+   * Check if username and email exists in the Joomla db.
    *
    * @param array $params
    *   Array of name and mail values.
@@ -117,8 +116,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   Array of errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   * @return void
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
@@ -143,7 +140,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $db->setQuery($query, 0, 10);
     $users = $db->loadAssocList();
 
-    $row = array();;
+    $row = array();
     if (count($users)) {
       $row = $users[0];
     }
@@ -158,7 +155,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       }
       if (strtolower($dbEmail) == strtolower($email)) {
         $resetUrl = str_replace('administrator/', '', $config->userFrameworkBaseURL) . 'index.php?option=com_users&view=reset';
-        $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
+        $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
           array(1 => $email, 2 => $resetUrl)
         );
       }
@@ -254,12 +251,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
-    $separator = $htmlize ? '&amp;' : '&';
+    $separator = '&';
     $Itemid = '';
     $script = '';
     $path = CRM_Utils_String::stripPathChars($path);
@@ -275,10 +271,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $fragment = '#' . $fragment;
     }
 
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
     if (!empty($query)) {
@@ -318,12 +310,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @param object $user
    *   Handle to the user object.
-   *
-   * @return void
    */
   public function setEmail(&$user) {
     global $database;
-    $query = "SELECT email FROM #__users WHERE id='$user->id'";
+    $query = $db->getQuery(TRUE);
+    $query->select($db->quoteName('email'))
+          ->from($db->quoteName('#__users'))
+          ->where($db->quoteName('id') . ' = ' . $user->id);
     $database->setQuery($query);
     $user->email = $database->loadResult();
   }
@@ -383,17 +376,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         (version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt'))
       ) {
         // now check password
-        if (strpos($dbPassword, ':') === FALSE) {
-          if ($dbPassword != md5($password)) {
-            return FALSE;
-          }
-        }
-        else {
-          list($hash, $salt) = explode(':', $dbPassword);
-          $cryptpass = md5($password . $salt);
-          if ($hash != $cryptpass) {
-            return FALSE;
-          }
+        list($hash, $salt) = explode(':', $dbPassword);
+        $cryptpass = md5($password . $salt);
+        if ($hash != $cryptpass) {
+          return FALSE;
         }
       }
       else {
@@ -437,14 +423,37 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * FIXME: Do something
+   *
+   * @param string $message
    */
   public function setMessage($message) {
   }
 
   /**
-   * FIXME: Do something
+   * @param \string $username
+   * @param \string $password
+   *
+   * @return bool
    */
-  public function loadUser($user) {
+  public function loadUser($username, $password = NULL) {
+    $uid = JUserHelper::getUserId($username);
+    if (empty($uid)) {
+      return FALSE;
+    }
+    $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
+    if (!empty($password)) {
+      $instance = JFactory::getApplication('site');
+      $params = array(
+        'username' => $username,
+        'password' => $password,
+      );
+      //perform the login action
+      $instance->login($params);
+    }
+
+    $session = CRM_Core_Session::singleton();
+    $session->set('ufID', $uid);
+    $session->set('userID', $contactID);
     return TRUE;
   }
 
@@ -460,7 +469,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function logout() {
     session_destroy();
-    header("Location:index.php");
+    CRM_Utils_System::setHttpHeader("Location", "index.php");
   }
 
   /**
@@ -473,6 +482,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       return str_replace('-', '_', $locale);
     }
     return NULL;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    // TODO
+    return TRUE;
   }
 
   /**
@@ -684,8 +701,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     $userRecordUrl = NULL;
-    // if logged in user is super user, then he can view other users joomla profile
-    if (JFactory::getUser()->authorise('core.admin')) {
+    // if logged in user has user edit access, then allow link to other users joomla profile
+    if (JFactory::getUser()->authorise('core.edit', 'com_users')) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
     }
     elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
@@ -721,30 +738,70 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * Append Joomla js to coreResourcesList.
+   *
+   * @param array $list
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.joomla.js';
   }
-  /**
-   * Get the time zone from Joomla
-   */
-  public function getTimeZoneString() {
-      $config = JFactory::getConfig();
-      $user = JFactory::getUser();
-      $timezone = $user->getParam('timezone');
-      //$phpTimezone = ini_get('date.timezone');
-      if(!$timezone)
-      {
-          // Get the timezone configured in Joomla
-          $timezone = $config->get('offset');
-      }
-      if (!timezone)
-      {
-          // Get the time in PHP.
-          $timezone = ini_get('date.timezone');
-      }
 
-    return $timezone; 
-}
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+    $id = 'id';
+    $mail = 'email';
+    $name = 'name';
+
+    $JUserTable = &JTable::getInstance('User', 'JTable');
+
+    $db = $JUserTable->getDbo();
+    $query = $db->getQuery(TRUE);
+    $query->select($id . ', ' . $mail . ', ' . $name);
+    $query->from($JUserTable->getTableName());
+    $query->where($mail != '');
+
+    $db->setQuery($query);
+    $users = $db->loadObjectList();
+
+    $user = new StdClass();
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+    for ($i = 0; $i < count($users); $i++) {
+      $user->$id = $users[$i]->$id;
+      $user->$mail = $users[$i]->$mail;
+      $user->$name = $users[$i]->$name;
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user,
+        $users[$i]->$id,
+        $users[$i]->$mail,
+        $uf,
+        1,
+        'Individual',
+        TRUE
+      )
+      ) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
+  }
 
 }

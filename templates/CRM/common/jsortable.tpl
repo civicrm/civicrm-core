@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -154,6 +154,7 @@
           "bAutoWidth": false,
           "aoColumns": columns,
           "bSort": true,
+          "sDom": 'ti',
           "oLanguage":{
             "sEmptyTable": noRecordFoundMsg,
             "sZeroRecords": noRecordFoundMsg
@@ -165,7 +166,7 @@
 
   //plugin to sort on currency
   cj.fn.dataTableExt.oSort['currency-asc']  = function(a,b) {
-    var symbol = "{/literal}{$config->defaultCurrencySymbol($config->defaultSymbol)}{literal}";
+    var symbol = "{/literal}{$config->defaultCurrencySymbol()}{literal}";
     var x = (a == "-") ? 0 : a.replace( symbol, "" );
     var y = (b == "-") ? 0 : b.replace( symbol, "" );
     x = parseFloat( x );
@@ -174,7 +175,7 @@
   };
 
   cj.fn.dataTableExt.oSort['currency-desc'] = function(a,b) {
-    var symbol = "{/literal}{$config->defaultCurrencySymbol($config->defaultSymbol)}{literal}";
+    var symbol = "{/literal}{$config->defaultCurrencySymbol()}{literal}";
     var x = (a == "-") ? 0 : a.replace( symbol, "" );
     var y = (b == "-") ? 0 : b.replace( symbol, "" );
     x = parseFloat( x );

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,10 +25,9 @@
 *}
 <div class="crm-block crm-form-block crm-activity-task-batch-form-block">
 <fieldset>
-<div id="help">
+<div class="help">
     {ts}Update field values for each Activities as needed. Click <strong>Update Activities</strong> below to save all your changes. To set a field to the same value for ALL rows, enter that value for the first Activity and then click the <strong>Copy icon</strong> (next to the column title).{/ts}
 </div>
-    <legend>{$profileTitle}</legend>
     <div class="crm-submit-buttons">{if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     <table class="crm-copy-fields">
     <thead class="sticky">

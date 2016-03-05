@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,21 +26,17 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing Event
- *
+ * This class generates form components for processing Event.
  */
 class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
   /**
-   * The id of the event we are proceessing.
+   * The id of the event we are processing.
    *
    * @var int
    */
@@ -88,9 +84,21 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public $_isRepeatingEvent;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Event';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -242,11 +250,9 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * For edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -273,8 +279,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();

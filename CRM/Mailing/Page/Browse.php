@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -50,14 +48,14 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   /**
    * The mailing id of the mailing we're operating on
    *
-   * @int
+   * @var int
    */
   protected $_mailingId;
 
   /**
    * The action that we are performing (in CRM_Core_Action terms)
    *
-   * @int
+   * @var int
    */
   protected $_action;
 
@@ -69,7 +67,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   /**
    * Scheduled mailing.
    *
-   * @boolean
+   * @var boolean
    */
   public $_scheduled;
 
@@ -78,10 +76,10 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   /**
    * Heart of the viewing process. The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
-   *
-   * @return void
    */
   public function preProcess() {
+    Civi::resources()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     $this->_unscheduled = $this->_archived = $archiveLinks = FALSE;
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     $this->_sms = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
@@ -114,8 +112,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
   /**
    * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -124,8 +120,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     // since we want only first function argument
     $newArgs = $newArgs[0];
     if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
-      $config = CRM_Core_Config::singleton();
-      CRM_Mailing_BAO_MailingJob::runJobs_pre($config->mailerJobSize);
+      $mailerJobSize = Civi::settings()->get('mailerJobSize');
+      CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize);
       CRM_Mailing_BAO_MailingJob::runJobs();
       CRM_Mailing_BAO_MailingJob::runJobs_post();
     }
@@ -201,9 +197,9 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       }
     }
     elseif ($this->_action & CRM_Core_Action::RENEW) {
-      //archive this mailing, CRM-3752.
+      // archive this mailing, CRM-3752.
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
-        //set is_archived to 1
+        // set is_archived to 1
         CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingId, 'is_archived', TRUE);
         CRM_Utils_System::redirect($context);
       }
@@ -232,7 +228,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->run();
 
-    //hack to display results as per search
+    // hack to display results as per search
     $rows = $controller->getRows($controller);
 
     $this->assign('rows', $rows);
@@ -276,8 +272,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $url = CRM_Utils_System::url($urlString, $urlParams);
     $session->pushUserContext($url);
 
-    //CRM-6862 -run form cotroller after
-    //selector, since it erase $_POST
+    // CRM-6862 -run form cotroller after
+    // selector, since it erase $_POST
     $this->search();
 
     return parent::run();
@@ -312,7 +308,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
     $clauses = array();
     $title = $this->get('mailing_name');
-    //echo " name=$title  ";
+    // echo " name=$title  ";
     if ($title) {
       $clauses[] = 'name LIKE %1';
       if (strpos($title, '%') !== FALSE) {

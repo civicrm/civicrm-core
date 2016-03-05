@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
 
 /**
  * This class contains string functions.
- *
  */
 class CRM_Utils_String {
   const COMMA = ",", SEMICOLON = ";", SPACE = " ", TAB = "\t", LINEFEED = "\n", CARRIAGELINE = "\r\n", LINECARRIAGE = "\n\r", CARRIAGERETURN = "\r";
@@ -104,6 +102,16 @@ class CRM_Utils_String {
    * @return string
    */
   public static function convertStringToCamel($string) {
+    $map = array(
+      'acl' => 'Acl',
+      'ACL' => 'Acl',
+      'im' => 'Im',
+      'IM' => 'Im',
+    );
+    if (isset($map[$string])) {
+      return $map[$string];
+    }
+
     $fragments = explode('_', $string);
     foreach ($fragments as & $fragment) {
       $fragment = ucfirst($fragment);
@@ -211,13 +219,13 @@ class CRM_Utils_String {
       $str = preg_replace('/\s+/', '', $str);
       // FIXME:  This is a pretty brutal hack to make utf8 and 8859-1 work.
 
-      /* match low- or high-ascii characters */
+      // match low- or high-ascii characters
       if (preg_match('/[\x00-\x20]|[\x7F-\xFF]/', $str)) {
         // || // low ascii characters
         // high ascii characters
         //  preg_match( '/[\x7F-\xFF]/', $str ) ) {
         if ($utf8) {
-          /* if we did match, try for utf-8, or iso8859-1 */
+          // if we did match, try for utf-8, or iso8859-1
 
           return self::isUtf8($str);
         }
@@ -250,7 +258,7 @@ class CRM_Utils_String {
    *   array of strings w/ corresponding redacted outputs
    */
   public static function regex($str, $regexRules) {
-    //redact the regular expressions
+    // redact the regular expressions
     if (!empty($regexRules) && isset($str)) {
       static $matches, $totalMatches, $match = array();
       foreach ($regexRules as $pattern => $replacement) {
@@ -288,14 +296,14 @@ class CRM_Utils_String {
    * @return mixed
    */
   public static function redaction($str, $stringRules) {
-    //redact the strings
+    // redact the strings
     if (!empty($stringRules)) {
       foreach ($stringRules as $match => $replace) {
         $str = str_ireplace($match, $replace, $str);
       }
     }
 
-    //return the redacted output
+    // return the redacted output
     return $str;
   }
 
@@ -312,11 +320,9 @@ class CRM_Utils_String {
       // eliminate all white space from the string
       $str = preg_replace('/\s+/', '', $str);
 
-      /* pattern stolen from the php.net function documentation for
-       * utf8decode();
-       * comment by JF Sebastian, 30-Mar-2005
-       */
-
+      // pattern stolen from the php.net function documentation for
+      // utf8decode();
+      // comment by JF Sebastian, 30-Mar-2005
       return preg_match('/^([\x00-\x7f]|[\xc2-\xdf][\x80-\xbf]|\xe0[\xa0-\xbf][\x80-\xbf]|[\xe1-\xec][\x80-\xbf]{2}|\xed[\x80-\x9f][\x80-\xbf]|[\xee-\xef][\x80-\xbf]{2}|f0[\x90-\xbf][\x80-\xbf]{2}|[\xf1-\xf3][\x80-\xbf]{3}|\xf4[\x80-\x8f][\x80-\xbf]{2})*$/', $str);
       // ||
       // iconv('ISO-8859-1', 'UTF-8', $str);
@@ -328,7 +334,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Determine if two href's are equivalent (fuzzy match)
+   * Determine if two hrefs are equivalent (fuzzy match)
    *
    * @param string $url1
    *   The first url to be matched.
@@ -786,6 +792,68 @@ class CRM_Utils_String {
       $output .= " $name=\"" . htmlspecialchars(implode(' ', (array) $vals)) . '"';
     }
     return ltrim($output);
+  }
+
+  /**
+   * Determine if $string starts with $fragment.
+   *
+   * @param string $string
+   *   The long string.
+   * @param string $fragment
+   *   The fragment to look for.
+   * @return bool
+   */
+  public static function startsWith($string, $fragment) {
+    if ($fragment === '') {
+      return TRUE;
+    }
+    $len = strlen($fragment);
+    return substr($string, 0, $len) === $fragment;
+  }
+
+  /**
+   * Determine if $string ends with $fragment.
+   *
+   * @param string $string
+   *   The long string.
+   * @param string $fragment
+   *   The fragment to look for.
+   * @return bool
+   */
+  public static function endsWith($string, $fragment) {
+    if ($fragment === '') {
+      return TRUE;
+    }
+    $len = strlen($fragment);
+    return substr($string, -1 * $len) === $fragment;
+  }
+
+  /**
+   * @param string|array $patterns
+   * @param array $allStrings
+   * @param bool $allowNew
+   *   Whether to return new, unrecognized names.
+   * @return array
+   */
+  public static function filterByWildcards($patterns, $allStrings, $allowNew = FALSE) {
+    $patterns = (array) $patterns;
+    $result = array();
+    foreach ($patterns as $pattern) {
+      if (!\CRM_Utils_String::endsWith($pattern, '*')) {
+        if ($allowNew || in_array($pattern, $allStrings)) {
+          $result[] = $pattern;
+        }
+      }
+      else {
+        $prefix = rtrim($pattern, '*');
+        foreach ($allStrings as $key) {
+          if (\CRM_Utils_String::startsWith($key, $prefix)) {
+            $result[] = $key;
+          }
+        }
+      }
+    }
+    return array_values(array_unique($result));
   }
 
 }

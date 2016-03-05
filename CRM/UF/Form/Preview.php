@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -131,13 +131,12 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
     parent::buildQuickForm();
 
     $this->addButtons(array(
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done with Preview'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+      array(
+        'type' => 'cancel',
+        'name' => ts('Done with Preview'),
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
 }

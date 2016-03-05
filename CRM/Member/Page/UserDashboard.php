@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -56,9 +56,9 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
       //get the membership status and type values.
       $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($dao->id);
       foreach (array(
-                 'status',
-                 'membership_type',
-               ) as $fld) {
+        'status',
+        'membership_type',
+      ) as $fld) {
         $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
       }
       if (!empty($statusANDType[$dao->id]['is_current_member'])) {
@@ -68,9 +68,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
       $membership[$dao->id]['renewPageId'] = CRM_Member_BAO_Membership::getContributionPageId($dao->id);
       if (!$membership[$dao->id]['renewPageId']) {
         // Membership payment was not done via online contribution page or free membership. Check for default membership renewal page from CiviMember Settings
-        $defaultRenewPageId = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME,
-          'default_renewal_contribution_page'
-        );
+        $defaultRenewPageId = Civi::settings()->get('default_renewal_contribution_page');
         if ($defaultRenewPageId) {
           //CRM-14831 - check if membership type is present in contrib page
           $memBlock = CRM_Member_BAO_Membership::getMembershipBlock($defaultRenewPageId);

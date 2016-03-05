@@ -40,12 +40,12 @@ CRM.$(function($) {
   $form.closest('.ui-dialog-content').dialog('option', 'buttons', [
     {
       text: ts("Insert"),
-      icons: {primary: "ui-icon-check"},
+      icons: {primary: "fa-check"},
       click: insert
     },
     {
       text: ts("Cancel"),
-      icons: {primary: "ui-icon-close"},
+      icons: {primary: "fa-times"},
       click: close
     }
   ]);

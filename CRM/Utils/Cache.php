@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * Cache is an empty base object, we'll modify the scheme when we have different caching schemes
- *
  */
 class CRM_Utils_Cache {
   /**
@@ -61,7 +58,7 @@ class CRM_Utils_Cache {
   /**
    * Singleton function used to manage this object.
    *
-   * @return object
+   * @return CRM_Utils_Cache_Interface
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
@@ -104,6 +101,7 @@ class CRM_Utils_Cache {
         $defaults = array();
         break;
 
+      case 'Redis':
       case 'Memcache':
       case 'Memcached':
         $defaults = array(
@@ -113,7 +111,7 @@ class CRM_Utils_Cache {
           'prefix' => '',
         );
 
-        // Use old constants if needed to ensure backward compatability
+        // Use old constants if needed to ensure backward compatibility
         if (defined('CIVICRM_MEMCACHE_HOST')) {
           $defaults['host'] = CIVICRM_MEMCACHE_HOST;
         }
@@ -160,6 +158,54 @@ class CRM_Utils_Cache {
         break;
     }
     return $defaults;
+  }
+
+  /**
+   * Create a new, named, limited-use cache.
+   *
+   * This is a factory function. Generally, you should use Civi::cache($name)
+   * to locate managed cached instance.
+   *
+   * @param array $params
+   *   Array with keys:
+   *   - name: string, unique symbolic name.
+   *   - type: array|string, list of acceptable cache types, in order of preference.
+   *   - prefetch: bool, whether to prefetch all data in cache (if possible).
+   * @return CRM_Utils_Cache_Interface
+   * @throws CRM_Core_Exception
+   * @see Civi::cache()
+   */
+  public static function create($params = array()) {
+    $types = (array) $params['type'];
+
+    foreach ($types as $type) {
+      switch ($type) {
+        case '*memory*':
+          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, array('Memcache', 'Memcached', 'Redis'))) {
+            $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
+            $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
+            $settings['prefix'] = $settings['prefix'] . '_' . $params['name'];
+            return new $dbCacheClass($settings);
+          }
+          break;
+
+        case 'SqlGroup':
+          if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
+            return new CRM_Utils_Cache_SqlGroup(array(
+              'group' => $params['name'],
+              'prefetch' => CRM_Utils_Array::value('prefetch', $params, FALSE),
+            ));
+          }
+          break;
+
+        case 'Arraycache':
+        case 'ArrayCache':
+          return new CRM_Utils_Cache_ArrayCache(array());
+
+      }
+    }
+
+    throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
   }
 
 }

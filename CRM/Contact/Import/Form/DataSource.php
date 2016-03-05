@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class delegates to the chosen DataSource to grab the data to be
- *  imported.
+ * This class delegates to the chosen DataSource to grab the data to be imported.
  */
 class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
@@ -49,8 +46,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
 
@@ -74,7 +69,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     // check for post max size avoid when called twice
     $snippet = CRM_Utils_Array::value('snippet', $_GET, 0);
     if (empty($snippet)) {
-      CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
+      CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     }
 
     while ($file = readdir($handler)) {
@@ -128,8 +123,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -233,16 +226,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
+   * Set the default values of various form elements.
    *
    * access        public
    *
    * @return array
    *   reference to the array of default values
-   */
-  /**
-   * @return array
    */
   public function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
@@ -267,8 +256,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    */
   private function _getDataSources() {
     // Open the data source dir and scan it for class files
-    $config = CRM_Core_Config::singleton();
-    $dataSourceDir = $config->importDataSourceDir;
+    global $civicrm_root;
+    $dataSourceDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'Import' . DIRECTORY_SEPARATOR . 'DataSource' . DIRECTORY_SEPARATOR;
     $dataSources = array();
     if (!is_dir($dataSourceDir)) {
       CRM_Core_Error::fatal("Import DataSource directory $dataSourceDir does not exist");
@@ -295,10 +284,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Call the DataSource's postProcess method to take over
-   * and then setup some common data structures for the next step
-   *
-   * @return void
+   * Call the DataSource's postProcess method.
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');

@@ -9,7 +9,7 @@
  */
 function report_template_getstatistics_example() {
   $params = array(
-    'report_id' => 'contribute/recur',
+    'report_id' => 'contribute/recursummary',
   );
 
   try{
@@ -41,7 +41,8 @@ function report_template_getstatistics_expectedresult() {
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 2,
+    'count' => 1,
+    'id' => 'counts',
     'values' => array(
       'counts' => array(
         'rowCount' => array(
@@ -49,7 +50,6 @@ function report_template_getstatistics_expectedresult() {
           'value' => 0,
         ),
       ),
-      'filters' => array(),
     ),
   );
 

@@ -82,7 +82,7 @@
   crmCaseType.directive('crmAddName', function() {
     return {
       restrict: 'AE',
-      template: '<input class="add-activity crm-action-menu action-icon-plus" type="hidden" />',
+      template: '<input class="add-activity crm-action-menu fa-plus" type="hidden" />',
       link: function(scope, element, attrs) {
         /// Format list of options for select2's "data"
         var getFormattedOptions = function() {

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -107,7 +107,7 @@
         <div class="form-layout-compressed">
         {/if}
         {if $field.help_pre && $action neq 4 && $form.$n.html}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-pre" id="helprow-{$n}">
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
@@ -171,8 +171,8 @@
                 &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
-                {if ( $field.data_type eq 'Date' or
-                ( ( ( $n eq 'birth_date' ) or ( $n eq 'deceased_date' ) or ( $n eq 'activity_date_time' ) ) ) ) and $field.is_view neq 1 }
+                {if
+                ( ( $n eq 'birth_date' ) or ( $n eq 'deceased_date' ) or ( $n eq 'activity_date_time' ) ) and $field.is_view neq 1 }
                 {include file="CRM/common/jcalendar.tpl" elementName=$n}
                 {else}
                   {$form.$n.html}
@@ -195,7 +195,7 @@
 
       {* Show explanatory text for field if not in 'view' mode *}
         {if $field.help_post && $action neq 4 && $form.$n.html}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-post" id="helprow-{$n}">
             <div class="content description">{$field.help_post}</div>
           </div>
         {/if}
@@ -223,7 +223,12 @@
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
         {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
-        <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+        <a class="button cancel" href="{$cancelURL}">
+          <span>
+            <i class="crm-i fa-times"></i>
+            {ts}Cancel{/ts}
+          </span>
+        </a>
       </div>
     {/if}
     {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}

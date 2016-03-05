@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains functions that are called using AJAX
+ * This class contains functions that are called using AJAX.
  */
 class CRM_Batch_Page_AJAX {
 
@@ -52,7 +50,8 @@ class CRM_Batch_Page_AJAX {
   }
 
   /**
-   * Retrieve records.
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
    */
   public static function getBatchList() {
     $sortMapper = array(
@@ -114,7 +113,7 @@ class CRM_Batch_Page_AJAX {
         'links',
       );
     }
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($batches, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

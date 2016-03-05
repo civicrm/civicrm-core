@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: Email.php 26615 2010-03-21 21:05:35Z kurund $
- *
  */
 
 /**
- * This class provides the functionality to email a group of
- * contacts.
+ * This class provides the functionality to email a group of contacts.
  */
 class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
 
@@ -58,8 +55,6 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
@@ -73,12 +68,9 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
-    //enable form element
+    // Enable form element.
     $this->assign('emailTask', TRUE);
 
     CRM_Contact_Form_Task_EmailCommon::buildQuickForm($this);
@@ -86,12 +78,19 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
+  }
+
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
   }
 
 }

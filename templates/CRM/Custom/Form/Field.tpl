@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -152,7 +152,7 @@ function custom_option_html_type( ) {
     {if $action eq 2 and $changeFieldType}
     <br />
     <a class="action-item crm-hover-button" href='{crmURL p="civicrm/admin/custom/group/field/changetype" q="reset=1&id=`$id`"}'>
-      <span class="icon ui-icon-gear"></span>
+      <i class="crm-i fa-wrench"></i>
       {ts}Change Input Field Type{/ts}
     </a>
     <div class='clear'></div>
@@ -184,7 +184,7 @@ function custom_option_html_type( ) {
               {$form.group_id.html}
             &nbsp;&nbsp;<span><a href="#" onclick="toggleContactRefFilter('Advance'); return false;">{ts}Advanced Filter{/ts}</a></span>
               {capture assign=searchPreferences}{crmURL p="civicrm/admin/setting/search" q="reset=1"}{/capture}
-            <div class="messages status no-popup"><div class="icon ui-icon-alert"></div> {ts 1=$searchPreferences}If you are planning on using this field in front-end profile, event registration or contribution forms, you should 'Limit List to Group' or configure an 'Advanced Filter'  (so that you do not unintentionally expose your entire set of contacts). Users must have either 'access contact reference fields' OR 'access CiviCRM' permission in order to use contact reference autocomplete fields. You can assign 'access contact reference fields' to the anonymous role if you want un-authenticated visitors to use this field. Use <a href='%1'>Search Preferences - Contact Reference Options</a> to control the fields included in the search results.{/ts}
+            <div class="messages status no-popup"><i class="crm-i fa-exclamation-triangle"></i> {ts 1=$searchPreferences}If you are planning on using this field in front-end profile, event registration or contribution forms, you should 'Limit List to Group' or configure an 'Advanced Filter'  (so that you do not unintentionally expose your entire set of contacts). Users must have either 'access contact reference fields' OR 'access CiviCRM' permission in order to use contact reference autocomplete fields. You can assign 'access contact reference fields' to the anonymous role if you want un-authenticated visitors to use this field. Use <a href='%1'>Search Preferences - Contact Reference Options</a> to control the fields included in the search results.{/ts}
           </td>
         </tr>
       <tr id='field_advance_filter'>

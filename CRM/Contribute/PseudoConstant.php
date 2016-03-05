@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class holds all the Pseudo constants that are specific to Contributions. This avoids
- * polluting the core class and isolates the mass mailer class
+ * This class holds all the Pseudo constants that are specific to Contributions.
+ *
+ * This avoids polluting the core class and isolates the mass mailer class.
  */
 class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
 

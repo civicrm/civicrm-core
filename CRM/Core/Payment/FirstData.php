@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | FirstData Core Payment Module for CiviCRM version 4.6              |
+ | FirstData Core Payment Module for CiviCRM version 4.7              |
  +--------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0    |
  |                                                                    |
@@ -80,10 +80,16 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   }
 
   /**
+   * Map fields from params array.
+   *
    * This function is set up and put here to make the mapping of fields
-   * from the params object  as visually clear as possible for easy editing
+   * as visually clear as possible for easy editing
    *
    *  Comment out irrelevant fields
+   *
+   * @param array $params
+   *
+   * @return array
    */
   public function mapProcessorFieldstoParams($params) {
     /*concatenate full customer name first  - code from EWAY gateway
@@ -118,7 +124,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $requestFields['transactionorigin'] = "Eci";
     #32 character string
     $requestFields['invoice_number'] = $params['invoiceID'];
-    $requestFields['ordertype'] = $params['payment_action'];
+    $requestFields['ordertype'] = 'Sale';
     $requestFields['comments'] = $params['description'];
     //**********************set 'result' for live testing **************************
     //  $requestFields[       'result'  ]      =    "";  #set to "Good", "Decline" or "Duplicate"
@@ -142,10 +148,15 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   /**
    * This function sends request and receives response from
    * the processor
+   *
+   * @param array $params
+   *
+   * @return array|object
+   * @throws \Exception
    */
   public function doDirectPayment(&$params) {
     if ($params['is_recur'] == TRUE) {
-      CRM_Core_Error::fatal(ts('%1 - recurring payments not implemented', array(1 => $paymentProcessor)));
+      CRM_Core_Error::fatal(ts('First Data - recurring payments not implemented'));
     }
 
     if (!defined('CURLOPT_SSLCERT')) {
@@ -178,7 +189,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     // Check to see if we have a duplicate before we send
     //----------------------------------------------------------------------------------------------------
-    if ($this->_checkDupe($params['invoiceID'])) {
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from eWAY.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
     //----------------------------------------------------------------------------------------------------
@@ -199,8 +210,8 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $requestxml);
     curl_setopt($ch, CURLOPT_SSLCERT, $key);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL') ? 2 : 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, Civi::settings()->get('verifySSL') ? 2 : 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
     // return the result on success, FALSE on failure
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_TIMEOUT, 36000);
@@ -301,22 +312,12 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   // end function doDirectPayment
 
   /**
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
-  }
-
-  /**
    * Produces error message and returns from class.
+   *
+   * @param int $errorCode
+   * @param string $errorMessage
+   *
+   * @return object
    */
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
@@ -328,13 +329,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       $e->push(9000, 0, NULL, 'Unknown System Error.');
     }
     return $e;
-  }
-
-  /**
-   * NOTE: 'doTransferCheckout' not implemented
-   */
-  public function doTransferCheckout(&$params, $component) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
   /**

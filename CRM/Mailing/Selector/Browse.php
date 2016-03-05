@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -39,7 +37,7 @@
 class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
   /**
-   * Array of supported links, currenly null
+   * Array of supported links, currently null
    *
    * @var array
    */
@@ -179,7 +177,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param string $action
    *
    * @return int
    *   Total number of rows
@@ -189,7 +187,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL();
 
-    //get the where clause.
+    // get the where clause.
     $params = array();
     $whereClause = "$mailingACL AND " . $this->whereClause($params);
 
@@ -283,7 +281,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     if (CRM_Mailing_Info::workflowEnabled()) {
       $allAccess = FALSE;
       $workFlow = TRUE;
-      //supercedes all permission
+      // supercedes all permission
       if (CRM_Core_Permission::check('access CiviMail')) {
         $allAccess = TRUE;
       }
@@ -314,15 +312,15 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     }
     $rows = &$mailing->getRows($offset, $rowCount, $sort, $whereClause, $params);
 
-    //get the search base mailing Ids, CRM-3711.
+    // get the search base mailing Ids, CRM-3711.
     $searchMailings = $mailing->searchMailingIDs();
 
-    //check for delete CRM-4418
+    // check for delete CRM-4418
     $allowToDelete = CRM_Core_Permission::check('delete in CiviMail');
 
     if ($output != CRM_Core_Selector_Controller::EXPORT) {
 
-      //create the appropriate $op to use for hook_civicrm_links
+      // create the appropriate $op to use for hook_civicrm_links
       $pageTypes = array('view', 'mailing', 'browse');
       if ($this->_parent->_unscheduled) {
         $pageTypes[] = 'unscheduled';
@@ -385,7 +383,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           }
         }
 
-        //check for delete permission.
+        // check for delete permission.
         if ($allowToDelete) {
           $actionMask |= CRM_Core_Action::DELETE;
         }
@@ -393,7 +391,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         if ($actionMask == NULL) {
           $actionMask = CRM_Core_Action::ADD;
         }
-        //get status strings as per locale settings CRM-4411.
+        // get status strings as per locale settings CRM-4411.
         $rows[$key]['status'] = CRM_Mailing_BAO_MailingJob::status($row['status']);
 
         $rows[$key]['action'] = CRM_Core_Action::formLink($actionLinks,
@@ -406,7 +404,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $row['id']
         );
 
-        //unset($rows[$key]['id']);
+        // unset($rows[$key]['id']);
         // if the scheduled date is 0, replace it with an empty string
         if ($rows[$key]['scheduled_iso'] == '0000-00-00 00:00:00') {
           $rows[$key]['scheduled'] = '';

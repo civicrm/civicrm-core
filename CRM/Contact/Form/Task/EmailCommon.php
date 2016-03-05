@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -132,10 +130,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   /**
    * Build the form object.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     $toArray = $ccArray = $bccArray = array();
@@ -313,6 +308,51 @@ class CRM_Contact_Form_Task_EmailCommon {
       $form->addDefaultButtons(ts('Send Email'), 'upload');
     }
 
+    $fields = array(
+      'followup_assignee_contact_id' => array(
+        'type' => 'entityRef',
+        'label' => ts('Assigned to'),
+        'attributes' => array(
+          'multiple' => TRUE,
+          'create' => TRUE,
+          'api' => array('params' => array('is_deceased' => 0)),
+        ),
+      ),
+      'followup_activity_type_id' => array(
+        'type' => 'select',
+        'label' => ts('Followup Activity'),
+        'attributes' => array('' => '- ' . ts('select activity') . ' -') + CRM_Core_PseudoConstant::ActivityType(FALSE),
+        'extra' => array('class' => 'crm-select2'),
+      ),
+      'followup_activity_subject' => array(
+        'type' => 'text',
+        'label' => ts('Subject'),
+        'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity',
+          'subject'
+        ),
+      ),
+    );
+
+    //add followup date
+    $form->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
+
+    foreach ($fields as $field => $values) {
+      if (!empty($fields[$field])) {
+        $attribute = CRM_Utils_Array::value('attributes', $values);
+        $required = !empty($values['required']);
+
+        if ($values['type'] == 'select' && empty($attribute)) {
+          $form->addSelect($field, array('entity' => 'activity'), $required);
+        }
+        elseif ($values['type'] == 'entityRef') {
+          $form->addEntityRef($field, $values['label'], $attribute, $required);
+        }
+        else {
+          $form->add($values['type'], $field, $values['label'], $attribute, $required, CRM_Utils_Array::value('extra', $values));
+        }
+      }
+    }
+
     $form->addFormRule(array('CRM_Contact_Form_Task_EmailCommon', 'formRule'), $form);
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js', 0, 'html-header');
   }
@@ -350,10 +390,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   /**
    * Process the form after the input has been submitted and validated.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function postProcess(&$form) {
     if (count($form->_contactIds) > self::MAX_EMAILS_KILL_SWITCH) {
@@ -364,7 +401,6 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     // check and ensure that
     $formValues = $form->controller->exportValues($form->getName());
-
     $fromEmail = $formValues['fromEmailAddress'];
     $from = CRM_Utils_Array::value($fromEmail, $form->_emails);
     $subject = $formValues['subject'];
@@ -440,7 +476,6 @@ class CRM_Contact_Form_Task_EmailCommon {
     // format contact details array to handle multiple emails from same contact
     $formattedContactDetails = array();
     $tempEmails = array();
-
     foreach ($form->_contactIds as $key => $contactId) {
       // if we dont have details on this contactID, we should ignore
       // potentially this is due to the contact not wanting to receive email
@@ -476,12 +511,41 @@ class CRM_Contact_Form_Task_EmailCommon {
       $additionalDetails
     );
 
+    $followupStatus = '';
     if ($sent) {
+      $followupActivity = NULL;
+      if (!empty($formValues['followup_activity_type_id'])) {
+        $params['followup_activity_type_id'] = $formValues['followup_activity_type_id'];
+        $params['followup_activity_subject'] = $formValues['followup_activity_subject'];
+        $params['followup_date'] = $formValues['followup_date'];
+        $params['followup_date_time'] = $formValues['followup_date_time'];
+        $params['target_contact_id'] = $form->_contactIds;
+        $params['followup_assignee_contact_id'] = explode(',', $formValues['followup_assignee_contact_id']);
+        $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activityId, $params);
+        $followupStatus = ts('A followup activity has been scheduled.');
+
+        if (Civi::settings()->get('activity_assignee_notification')) {
+          if ($followupActivity) {
+            $mailToFollowupContacts = array();
+            $assignee = array($followupActivity->id);
+            $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($assignee, TRUE, FALSE);
+            foreach ($assigneeContacts as $values) {
+              $mailToFollowupContacts[$values['email']] = $values;
+            }
+
+            $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
+            if ($sentFollowup) {
+              $followupStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
+            }
+          }
+        }
+      }
+
       $count_success = count($form->_toContactDetails);
-      CRM_Core_Session::setStatus(ts('One message was sent successfully.', array(
-            'plural' => '%count messages were sent successfully.',
+      CRM_Core_Session::setStatus(ts('One message was sent successfully. ', array(
+            'plural' => '%count messages were sent successfully. ',
             'count' => $count_success,
-          )), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
+          )) . $followupStatus, ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
     }
 
     // Display the name and number of contacts for those email is not sent.

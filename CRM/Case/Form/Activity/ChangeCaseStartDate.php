@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for OpenCase Activity
- *
+ * This class generates form components for OpenCase Activity.
  */
 class CRM_Case_Form_Activity_ChangeCaseStartDate {
 
@@ -54,13 +51,13 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
+   * For edit/view mode the default values are retrieved from the database.
    *
    * @param CRM_Core_Form $form
    *
-   * @return void
+   * @return array
    */
   public static function setDefaultValues(&$form) {
     $defaults = array();
@@ -122,8 +119,6 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @param CRM_Core_Form $form
    * @param array $params
-   *
-   * @return void
    */
   public static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'case') {
@@ -138,8 +133,6 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    * @param CRM_Core_Form $form
    * @param array $params
    * @param $activity
-   *
-   * @return void
    */
   public static function endPostProcess(&$form, &$params, $activity) {
     if (!empty($params['start_date'])) {

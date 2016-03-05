@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -57,17 +55,13 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
 
+    // Initialize the task and row fields.
     parent::preProcess();
 
-    //get the contact read only fields to display.
+    // Get the contact read only fields to display.
     $readOnlyFields = array_merge(array('sort_name' => ts('Added By'), 'target_sort_name' => ts('With Contact')),
       CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_autocomplete_options',
@@ -75,7 +69,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       )
     );
 
-    //get the read only field data.
+    // Get the read only field data.
     $returnProperties = array_fill_keys(array_keys($readOnlyFields), 1);
     $contactDetails = CRM_Contact_BAO_Contact_Utils::contactDetails($this->_activityHolderIds,
       'Activity', $returnProperties
@@ -103,7 +97,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     if (!$ufGroupId) {
       CRM_Core_Error::fatal('ufGroupId is missing');
     }
-    $this->_title = ts('Batch Update for Activities') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
+    $this->_title = ts('Update multiple activities') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
@@ -121,9 +115,9 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
         unset($this->_fields[$name]);
       }
 
-      //fix to reduce size as we are using this field in grid
+      // Fix to reduce size as we are using this field in grid.
       if (is_array($field['attributes']) && !empty($this->_fields[$name]['attributes']['size']) && $this->_fields[$name]['attributes']['size'] > 19) {
-        //shrink class to "form-text-medium"
+        // Shrink class to "form-text-medium".
         $this->_fields[$name]['attributes']['size'] = 19;
       }
     }
@@ -131,23 +125,22 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     $this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
     $this->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Update Activities'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'submit',
+        'name' => ts('Update Activities'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_activityHolderIds);
     $fileFieldExists = FALSE;
 
-    //load all campaigns.
+    // Load all campaigns.
     if (array_key_exists('activity_campaign_id', $this->_fields)) {
       $this->_componentCampaigns = array();
       CRM_Core_PseudoConstant::populate($this->_componentCampaigns,
@@ -176,7 +169,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
           }
         }
         else {
-          // handle non custom fields
+          // Handle non custom fields.
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $activityId);
         }
       }
@@ -184,11 +177,11 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
     $this->assign('fields', $this->_fields);
 
-    // don't set the status message when form is submitted.
+    // Don't set the status message when form is submitted.
     // $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields) {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple activities."), ts('Some Fields Excluded'), 'info');
     }
 
     $this->addDefaultButtons(ts('Update Activities'));
@@ -221,7 +214,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       foreach ($params['field'] as $key => $value) {
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          CRM_Core_DAO::$_nullObject,
           $key, 'Activity'
         );
         $value['id'] = $key;

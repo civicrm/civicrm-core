@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Class for activity task actions
- *
+ * Class for activity task actions.
  */
 class CRM_Activity_Form_Task extends CRM_Core_Form {
 
@@ -76,16 +73,14 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @param
-   *
-   * @return void
    */
   public function preProcess() {
     self::preProcessCommon($this);
   }
 
   /**
+   * Common pre-process function.
+   *
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
@@ -113,7 +108,21 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
       );
       $query->_distinctComponentClause = '( civicrm_activity.id )';
       $query->_groupByComponentClause = " GROUP BY civicrm_activity.id ";
-      $result = $query->searchQuery(0, 0, NULL);
+
+      // CRM-12675
+      $activityClause = NULL;
+
+      $components = CRM_Core_Component::getNames();
+      $componentClause = array();
+      foreach ($components as $componentID => $componentName) {
+        if (!CRM_Core_Permission::check("access $componentName")) {
+          $componentClause[] = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
+        }
+      }
+      if (!empty($componentClause)) {
+        $activityClause = implode(' AND ', $componentClause);
+      }
+      $result = $query->searchQuery(0, 0, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, $activityClause);
 
       while ($result->fetch()) {
         if (!empty($result->activity_id)) {
@@ -129,7 +138,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
 
     $form->_activityHolderIds = $form->_componentIds = $ids;
 
-    //set the context for redirection for any task actions
+    // Set the context for redirection for any task actions.
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
@@ -150,7 +159,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
 
   /**
    * Given the membership id, compute the contact id
-   * since its used for things like send email
+   * since it's used for things like send email.
    */
   public function setContactIDs() {
     $IDs = implode(',', $this->_activityHolderIds);
@@ -180,22 +189,19 @@ WHERE  activity_id IN ( $IDs ) AND
    *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => $backType,
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
 }

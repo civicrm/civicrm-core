@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,21 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Smtp Server
- *
+ * This class generates form components for Smtp Server.
  */
 class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   protected $_testButtonName;
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -70,15 +65,12 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     $this->addFormRule(array('CRM_Admin_Form_Setting_Smtp', 'formRule'));
     parent::buildQuickForm();
     $buttons = $this->getElement('buttons')->getElements();
-    $buttons[] = $this->createElement('submit', $this->_testButtonName, ts('Save & Send Test Email'), array('crm-icon' => 'mail-closed'));
+    $buttons[] = $this->createElement('submit', $this->_testButtonName, ts('Save & Send Test Email'), array('crm-icon' => 'fa-envelope-o'));
     $this->getElement('buttons')->setElements($buttons);
   }
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // flush caches so we reload details for future requests
@@ -184,12 +176,10 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       }
     }
 
-    $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
+    $mailingBackend = Civi::settings()->get('mailing_backend');
 
     if (!empty($mailingBackend)) {
-      CRM_Core_BAO_ConfigSetting::formatParams($formValues, $mailingBackend);
+      $formValues = array_merge($mailingBackend, $formValues);
     }
 
     // if password is present, encrypt it
@@ -197,10 +187,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       $formValues['smtpPassword'] = CRM_Utils_Crypt::encrypt($formValues['smtpPassword']);
     }
 
-    CRM_Core_BAO_Setting::setItem($formValues,
-      CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
+    Civi::settings()->set('mailing_backend', $formValues);
   }
 
   /**
@@ -243,18 +230,12 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
   /**
    * Set default values for the form.
-   * default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     if (!$this->_defaults) {
       $this->_defaults = array();
 
-      $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'mailing_backend'
-      );
+      $mailingBackend = Civi::settings()->get('mailing_backend');
       if (!empty($mailingBackend)) {
         $this->_defaults = $mailingBackend;
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,16 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
-
-  /**#@+
-   * @var integer
-   */
 
   /**
    * Imported file size.
@@ -130,7 +124,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         continue;
       }
 
-      /* trim whitespace around the values */
+      // Trim whitespace around the values.
 
       $empty = TRUE;
       foreach ($values as $k => $v) {
@@ -199,8 +193,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode & self::DUPLICATE) {
         if ($returnCode & self::MULTIPLE_DUPE) {
-          /* TODO: multi-dupes should be counted apart from singles
-           * on non-skip action */
+          // TODO: multi-dupes should be counted apart from singles
+          // on non-skip action.
         }
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
@@ -270,17 +264,13 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
     return $this->fini();
   }
 
   /**
-   * Given a list of the importable field keys that the user has selected
-   * set the active fields array to this list
+   * Given a list of the importable field keys that the user has selected set the active fields array to this list.
    *
    * @param array $fieldKeys
-   *
-   * @return void
    */
   public function setActiveFields($fieldKeys) {
     $this->_activeFieldCount = count($fieldKeys);
@@ -343,8 +333,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @param CRM_Core_Session $store
    *
    * @param int $mode
-   *
-   * @return void
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
@@ -378,7 +366,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         $store->set('duplicatesFileName', $this->_duplicateFileName);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
   }
 
   /**
@@ -387,8 +374,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @param string $fileName
    * @param array $header
    * @param array $data
-   *
-   * @return void
    */
   public static function exportCSV($fileName, $header, $data) {
     $output = array();

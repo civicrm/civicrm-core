@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,18 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Drupal specific stuff goes here
+ * Drupal specific stuff goes here.
  */
 class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
   /**
-   * If we are using a theming system, invoke theme, else just print the
-   * content
+   * Theme output.
+   *
+   * If we are using a theming system, invoke theme, else just print the content.
    *
    * @param string $content
    *   The content that will be themed.
@@ -49,7 +48,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param bool $maintenance
    *   For maintenance mode.
    *
-   * @return void
+   * @return null|string
    *   prints content on stdout
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
@@ -73,9 +72,12 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
 
     print $out;
+    return NULL;
   }
 
   /**
+   * Create user.
+   *
    * @inheritDoc
    */
   public function createUser(&$params, $mail) {
@@ -137,8 +139,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *   Array of errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   * @return void
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
@@ -194,7 +194,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
           );
         }
         else {
-          $errors[$emailName] = ts('This email %1 is already registered. Please select another email.',
+          $errors[$emailName] = ts('This email %1 already has an account associated with it. Please select another email.',
             array(1 => $email)
           );
         }
@@ -253,8 +253,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $head
    *   The new string to be appended.
-   *
-   * @return void
    */
   public function addHTMLHead($head) {
     drupal_set_html_head($head);
@@ -289,6 +287,14 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
+  protected function getUsersTableName() {
+    $userFrameworkUsersTableName = Civi::settings()->get('userFrameworkUsersTableName');
+    if (empty($userFrameworkUsersTableName)) {
+      $userFrameworkUsersTableName = 'users';
+    }
+    return $userFrameworkUsersTableName;
+  }
+
   /**
    * @inheritDoc
    */
@@ -312,7 +318,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $dbpassword = md5($password);
     $name = $dbDrupal->escapeSimple($strtolower($name));
-    $sql = 'SELECT u.* FROM ' . $config->userFrameworkUsersTableName . " u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
+    $userFrameworkUsersTableName = $this->getUsersTableName();
+    $sql = 'SELECT u.* FROM ' . $userFrameworkUsersTableName . " u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
     $query = $dbDrupal->query($sql);
 
     $user = NULL;
@@ -510,6 +517,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * Get CMS root path.
+   *
+   * @param string $scriptFilename
+   *
+   * @return null|string
    */
   public function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;
@@ -591,7 +603,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       return $url;
     }
 
-    //upto d6 only, already we have code in place for d7
+    //up to d6 only, already we have code in place for d7
     $config = CRM_Core_Config::singleton();
     if (function_exists('variable_get') &&
       module_exists('locale')
@@ -652,8 +664,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param string $oldPerm
    * @param array $newPerms
    *   Array, strings.
-   *
-   * @return void
    */
   public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);
@@ -740,6 +750,60 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       $timezone = parent::getTimeZoneString();
     }
     return $timezone;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setHttpHeader($name, $value) {
+    drupal_set_header("$name: $value");
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function synchronizeUsers() {
+    $config = CRM_Core_Config::singleton();
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
+    $rows = array();
+    $id = 'uid';
+    $mail = 'mail';
+    $name = 'name';
+
+    $result = db_query("SELECT uid, mail, name FROM {users} where mail != ''");
+
+    while ($row = db_fetch_array($result)) {
+      $rows[] = $row;
+    }
+
+    $user = new StdClass();
+    $uf = $config->userFramework;
+    $contactCount = 0;
+    $contactCreated = 0;
+    $contactMatching = 0;
+    foreach ($rows as $row) {
+      $user->$id = $row[$id];
+      $user->$mail = $row[$mail];
+      $user->$name = $row[$name];
+      $contactCount++;
+      if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $row[$id], $row[$mail], $uf, 1, 'Individual', TRUE)) {
+        $contactCreated++;
+      }
+      else {
+        $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
+      }
+    }
+
+    return array(
+      'contactCount' => $contactCount,
+      'contactMatching' => $contactMatching,
+      'contactCreated' => $contactCreated,
+    );
   }
 
 }

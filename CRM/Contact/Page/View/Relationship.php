@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
@@ -53,8 +51,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
   /**
    * View details of a relationship.
-   *
-   * @return void
    */
   public function view() {
     $viewRelationship = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId, NULL, NULL, NULL, $this->_id);
@@ -91,7 +87,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $this->assign('viewNote', $viewNote);
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Relationship', $this, $this->_id, 0, $relType);
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_id);
 
     $rType = CRM_Utils_Array::value('rtype', $viewRelationship[$this->_id]);
     // add viewed contribution to recent items list

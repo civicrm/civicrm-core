@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
-require_once 'api/api.php';
-
 /**
- * Class CRM_Contact_Form_Merge
+ * Class CRM_Contact_Form_Merge.
  */
 class CRM_Contact_Form_Merge extends CRM_Core_Form {
   // the id of the contact that tere's a duplicate for; this one will
@@ -47,9 +43,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   var $_oid = NULL;
 
   var $_contactType = NULL;
-
-  // variable to keep all location block ids.
-  protected $_locBlockIds = array();
 
   // FIXME: QuickForm can't create advcheckboxes with value set to 0 or '0' :(
   // see HTML_QuickForm_advcheckbox::setValues() - but patching that doesn't
@@ -218,11 +211,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('mainLocBlock', json_encode($rowsElementsAndInfo['main_loc_block']));
     $this->assign('rows', $rowsElementsAndInfo['rows']);
 
-    $this->_locBlockIds = array(
-      'main' => $rowsElementsAndInfo['main_details']['loc_block_ids'],
-      'other' => $rowsElementsAndInfo['other_details']['loc_block_ids'],
-    );
-
     // add elements
     foreach ($rowsElementsAndInfo['elements'] as $element) {
       $this->addElement($element[0],
@@ -269,7 +257,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $buttons[] = array(
       'type' => 'next',
-      'name' => $this->next ? ts('Merge and Goto Next Pair') : ts('Merge'),
+      'name' => $this->next ? ts('Merge and go to Next Pair') : ts('Merge'),
       'isDefault' => TRUE,
       'icon' => $this->next ? 'circle-triangle-e' : 'check',
     );
@@ -277,12 +265,12 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     if ($this->next || $this->prev) {
       $buttons[] = array(
         'type' => 'submit',
-        'name' => ts('Merge and Goto Listing'),
+        'name' => ts('Merge and go to Listing'),
       );
       $buttons[] = array(
         'type' => 'done',
         'name' => ts('Merge and View Result'),
-        'icon' => 'circle-check',
+        'icon' => 'fa-check-circle',
       );
     }
 

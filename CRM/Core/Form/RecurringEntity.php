@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,13 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing Entity
- *
+ * This class generates form components for processing Entity.
  */
 class CRM_Core_Form_RecurringEntity {
   /**
@@ -170,8 +167,9 @@ class CRM_Core_Form_RecurringEntity {
    * @param CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
-    // For some reason this is using the following as keys rather than the standard numeric keys returned by CRM_Utils_Date
-    $dayOfTheWeek = array(
+    // FIXME: this is using the following as keys rather than the standard numeric keys returned by CRM_Utils_Date
+    $dayOfTheWeek = array();
+    $dayKeys = array(
       'sunday',
       'monday',
       'tuesday',
@@ -180,7 +178,9 @@ class CRM_Core_Form_RecurringEntity {
       'friday',
       'saturday',
     );
-    $dayOfTheWeek = array_combine($dayOfTheWeek, CRM_Utils_Date::getAbbrWeekdayNames());
+    foreach (CRM_Utils_Date::getAbbrWeekdayNames() as $k => $label) {
+      $dayOfTheWeek[$dayKeys[$k]] = $label;
+    }
     $form->add('select', 'repetition_frequency_unit', ts('Repeats every'), CRM_Core_SelectValues::getRecurringFrequencyUnits(), FALSE, array('class' => 'required'));
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
     $form->add('select', 'repetition_frequency_interval', NULL, $numericOptions, FALSE, array('class' => 'required'));
@@ -327,8 +327,11 @@ class CRM_Core_Form_RecurringEntity {
   /**
    * Process the form submission.
    *
+   * @param array $params
+   * @param string $type
+   * @param array $linkedEntities
    *
-   * @return void
+   * @throws \CiviCRM_API3_Exception
    */
   public static function postProcess($params = array(), $type, $linkedEntities = array()) {
     //Check entity_id not present in params take it from class variable

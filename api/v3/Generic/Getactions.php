@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -39,7 +39,7 @@
  */
 function civicrm_api3_generic_getActions($apiRequest) {
   civicrm_api3_verify_mandatory($apiRequest, NULL, array('entity'));
-  $mfp = \Civi\Core\Container::singleton()->get('magic_function_provider');
+  $mfp = \Civi::service('magic_function_provider');
   $actions = $mfp->getActionNames($apiRequest['version'], $apiRequest['entity']);
   return civicrm_api3_create_success($actions, $apiRequest['params'], $apiRequest['entity'], 'getactions');
 }

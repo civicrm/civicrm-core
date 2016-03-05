@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -173,8 +173,15 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   }
 
   /**
-   * A static function wrapper that deletes the various objects that are
-   * connected to a file object (i.e. file, entityFile and customValue
+   * A static function wrapper that deletes the various objects.
+   *
+   * Objects are those hat are connected to a file object (i.e. file, entityFile and customValue.
+   *
+   * @param int $fileID
+   * @param int $entityID
+   * @param int $fieldID
+   *
+   * @throws \Exception
    */
   public static function deleteFileReferences($fileID, $entityID, $fieldID) {
     $fileDAO = new CRM_Core_DAO_File();
@@ -218,12 +225,20 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    * } */
 
   /**
-   * Delete all the files and associated object associated with this
-   * combination
+   * Delete all the files and associated object associated with this combination.
+   *
+   * @param string $entityTable
+   * @param int $entityID
+   * @param int $fileTypeID
+   * @param int $fileID
+   *
+   * @return bool
+   *   Was file deleted?
    */
   public static function deleteEntityFile($entityTable, $entityID, $fileTypeID = NULL, $fileID = NULL) {
+    $isDeleted = FALSE;
     if (empty($entityTable) || empty($entityID)) {
-      return;
+      return $isDeleted;
     }
 
     $config = CRM_Core_Config::singleton();
@@ -242,6 +257,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $cefIDs = implode(',', $cefIDs);
       $sql = "DELETE FROM civicrm_entity_file where id IN ( $cefIDs )";
       CRM_Core_DAO::executeQuery($sql);
+      $isDeleted = TRUE;
     }
 
     if (!empty($cfIDs)) {
@@ -267,12 +283,19 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
         $sql = "DELETE FROM civicrm_file where id IN ( $deleteFiles )";
         CRM_Core_DAO::executeQuery($sql);
       }
+      $isDeleted = TRUE;
     }
+    return $isDeleted;
   }
 
   /**
-   * Get all the files and associated object associated with this
-   * combination
+   * Get all the files and associated object associated with this combination.
+   *
+   * @param string $entityTable
+   * @param int $entityID
+   * @param bool $addDeleteArgs
+   *
+   * @return array|null
    */
   public static function getEntityFile($entityTable, $entityID, $addDeleteArgs = FALSE) {
     if (empty($entityTable) || !$entityID) {
@@ -390,7 +413,7 @@ AND       CEF.entity_id    = %2";
   public static function buildAttachment(&$form, $entityTable, $entityID = NULL, $numAttachments = NULL, $ajaxDelete = FALSE) {
 
     if (!$numAttachments) {
-      $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
+      $numAttachments = Civi::settings()->get('max_attachments');
     }
     // Assign maxAttachments count to template for help message
     $form->assign('maxAttachments', $numAttachments);
@@ -507,7 +530,7 @@ AND       CEF.entity_id    = %2";
       CRM_Core_BAO_File::deleteEntityFile($entityTable, $entityID);
     }
 
-    $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
+    $numAttachments = Civi::settings()->get('max_attachments');
 
     $now = date('Ymdhis');
 
@@ -549,7 +572,7 @@ AND       CEF.entity_id    = %2";
    * @param int $entityID
    */
   public static function processAttachment(&$params, $entityTable, $entityID) {
-    $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
+    $numAttachments = Civi::settings()->get('max_attachments');
 
     for ($i = 1; $i <= $numAttachments; $i++) {
       if (
@@ -575,7 +598,7 @@ AND       CEF.entity_id    = %2";
    * @return array
    */
   public static function uploadNames() {
-    $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
+    $numAttachments = Civi::settings()->get('max_attachments');
 
     $names = array();
     for ($i = 1; $i <= $numAttachments; $i++) {
@@ -668,26 +691,27 @@ AND       CEF.entity_id    = %2";
     $currentAttachmentInfo = self::getEntityFile($entityTable, $entityID);
     foreach ($currentAttachmentInfo as $fileKey => $fileValue) {
       $fileID = $fileValue['fileID'];
-      $fileType = $fileValue['mime_type'];
       if ($fileID) {
+        $fileType = $fileValue['mime_type'];
+        $url = $fileValue['url'];
+        $title = $fileValue['cleanName'];
         if ($fileType == 'image/jpeg' ||
           $fileType == 'image/pjpeg' ||
           $fileType == 'image/gif' ||
           $fileType == 'image/x-png' ||
           $fileType == 'image/png'
         ) {
-          $url = $fileValue['url'];
-          $alt = $fileValue['cleanName'];
           $file_url[$fileID] = "
-              <a href=\"$url\" class='crm-image-popup'>
-              <div class='icon paper-icon' title=\"$alt\" alt=\"$alt\"></div>
+              <a href='$url' class='crm-image-popup' title='$title'>
+                <i class='crm-i fa-file-image-o'></i>
               </a>";
-          // for non image files
         }
+        // for non image files
         else {
-          $url = $fileValue['url'];
-          $alt = $fileValue['cleanName'];
-          $file_url[$fileID] = "<a href=\"$url\"><div class='icon paper-icon' title=\"$alt\" alt=\"$alt\"></div></a>";
+          $file_url[$fileID] = "
+              <a href='$url' title='$title'>
+                <i class='crm-i fa-paperclip'></i>
+              </a>";
         }
       }
     }

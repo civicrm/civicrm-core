@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -41,6 +41,16 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * @see install/index.php MINIMUM_THREAD_STACK
    */
   const MINIMUM_THREAD_STACK = 192;
+
+  /**
+   * Minimum previous CiviCRM version we can directly upgrade from
+   */
+  const MINIMUM_UPGRADABLE_VERSION = '4.0.8';
+
+  /**
+   * Minimum php version we support
+   */
+  const MINIMUM_PHP_VERSION = '5.3.4';
 
   protected $_config;
 
@@ -84,19 +94,11 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    *
    * @param object $state
    *   State associated with this form.
-   * @param \const|\enum $action The mode the form is operating in (None/Create/View/Update/Delete)
+   * @param const|\enum|int $action The mode the form is operating in (None/Create/View/Update/Delete)
    * @param string $method
    *   The type of http method used (GET/POST).
    * @param string $name
    *   The name of the form if different from class name.
-   *
-   * @return \CRM_Core_Form
-   */
-  /**
-   * @param null|object $state
-   * @param const|enum|int $action
-   * @param string $method
-   * @param null|string $name
    */
   public function __construct(
     $state = NULL,
@@ -113,7 +115,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     $this->locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
     $smarty = CRM_Core_Smarty::singleton();
-    $smarty->compile_dir = $this->_config->templateCompileDir;
+    //$smarty->compile_dir = $this->_config->templateCompileDir;
     $smarty->assign('multilingual', $this->multilingual);
     $smarty->assign('locales', $this->locales);
 
@@ -152,10 +154,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    */
   public function checkVersionRelease($version, $release) {
     $versionParts = explode('.', $version);
-    if ($versionParts[2] == $release) {
-      return TRUE;
-    }
-    return FALSE;
+    return ($versionParts[2] == $release);
   }
 
   /**
@@ -350,19 +349,13 @@ SET    version = '$version'
     foreach ($sqlFiles as $file) {
       if (preg_match($sqlFilePattern, $file, $matches)) {
         if ($matches[2] == '4.0') {
-          CRM_Core_Error::fatal(ts("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731."));
+          CRM_Core_Error::fatal("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731.");
         }
         if (!in_array($matches[1], $revList)) {
           $revList[] = $matches[1];
         }
       }
     }
-
-    // sample test list
-    /*         $revList = array(
-    '2.1.0', '2.2.beta2', '2.2.beta1', '2.2.alpha1', */
-
-    /*                          '2.2.alpha3', '2.2.0', '2.2.2', '2.1.alpha1', '2.1.3'); */
 
     usort($revList, 'version_compare');
     return $revList;
@@ -453,18 +446,6 @@ SET    version = '$version'
       CRM_Core_Error::fatal(ts('Version information missing in civicrm codebase.'));
     }
 
-    // hack to make past ver compatible /w new incremental upgrade process
-    $convertVer = array(
-      '2.1' => '2.1.0',
-      '2.2' => '2.2.alpha1',
-      '2.2.alph' => '2.2.alpha3',
-      // since 3.1.1 had domain.version set as 3.1.0
-      '3.1.0' => '3.1.1',
-    );
-    if (isset($convertVer[$currentVer])) {
-      $currentVer = $convertVer[$currentVer];
-    }
-
     return array($currentVer, $latestVer);
   }
 
@@ -486,7 +467,7 @@ SET    version = '$version'
     elseif (version_compare($currentVer, $latestVer) > 0) {
       // DB version number is higher than codebase being upgraded to. This is unexpected condition-fatal error.
       $error = ts('Your database is marked with an unexpected version number: %1. The automated upgrade to version %2 can not be run - and the %2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using prior to beginning this upgrade until you resolve this problem.',
-        array(1 => $currentVer, 2 => $latestVer, 3 => $dbToolsLink)
+        array(1 => $currentVer, 2 => $latestVer)
       );
     }
     elseif (version_compare($currentVer, $latestVer) == 0) {
@@ -494,14 +475,17 @@ SET    version = '$version'
         array(1 => $latestVer)
       );
     }
+    elseif (version_compare($currentVer, self::MINIMUM_UPGRADABLE_VERSION) < 0) {
+      $error = ts('CiviCRM versions prior to %1 cannot be upgraded directly to %2. This upgrade will need to be done in stages. First download an intermediate version (the LTS may be a good choice) and upgrade to that before proceeding to this version.',
+        array(1 => self::MINIMUM_UPGRADABLE_VERSION, 2 => $latestVer)
+      );
+    }
 
-    $phpVersion = phpversion();
-    $minPhpVersion = '5.3.3';
-    if (version_compare($phpVersion, $minPhpVersion) < 0) {
+    if (version_compare(phpversion(), self::MINIMUM_PHP_VERSION) < 0) {
       $error = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
         array(
-          1 => $minPhpVersion,
-          2 => $phpVersion,
+          1 => self::MINIMUM_PHP_VERSION,
+          2 => phpversion(),
           3 => $latestVer,
         ));
     }
@@ -556,7 +540,7 @@ SET    version = '$version'
    * @param string $postUpgradeMessageFile
    *   path of a modifiable file which lists the post-upgrade messages.
    *
-   * @return CRM_Queue
+   * @return CRM_Queue_Service
    */
   public static function buildQueue($currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
@@ -656,11 +640,7 @@ SET    version = '$version'
 
     // pre-db check for major release.
     if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
-      if (!(is_callable(array(
-        $versionObject,
-        'verifyPreDBstate',
-      )))
-      ) {
+      if (!(is_callable(array($versionObject, 'verifyPreDBstate')))) {
         CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
       }
 
@@ -676,10 +656,7 @@ SET    version = '$version'
 
     $upgrade->setSchemaStructureTables($rev);
 
-    if (is_callable(array(
-      $versionObject,
-      $phpFunctionName,
-    ))) {
+    if (is_callable(array($versionObject, $phpFunctionName))) {
       $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
     }
     else {
@@ -687,17 +664,9 @@ SET    version = '$version'
     }
 
     // set post-upgrade-message if any
-    if (is_callable(array(
-      $versionObject,
-      'setPostUpgradeMessage',
-    ))) {
+    if (is_callable(array($versionObject, 'setPostUpgradeMessage'))) {
       $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
       $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
-      file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
-    }
-    else {
-      $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
-      CRM_Upgrade_Incremental_Legacy::setPostUpgradeMessage($postUpgradeMessage, $rev);
       file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
     }
 
@@ -735,15 +704,8 @@ SET    version = '$version'
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
 
-    // lets rebuild the config array in case we've made a few changes in the
-    // code base
-    // this also helps us always store the latest version of civi in the DB
-    $params = array();
-    CRM_Core_BAO_ConfigSetting::add($params);
-
-    // CRM-12804 comment-51411 : add any missing settings
-    // at the end of upgrade
-    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
+    // Clear cached metadata.
+    Civi::service('settings_manager')->flush();
 
     // cleanup caches CRM-8739
     $config = CRM_Core_Config::singleton();
@@ -768,21 +730,19 @@ SET    version = '$version'
    * @param $latestVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
-    CRM_Upgrade_Incremental_Legacy::setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+    // check for changed message templates
+    CRM_Upgrade_Incremental_General::checkMessageTemplate($preUpgradeMessage, $latestVer, $currentVer);
+    // set global messages
+    CRM_Upgrade_Incremental_General::setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
 
     // Scan through all php files and see if any file is interested in setting pre-upgrade-message
     // based on $currentVer, $latestVer.
     // Please note, at this point upgrade hasn't started executing queries.
     $revisions = $this->getRevisionSequence();
     foreach ($revisions as $rev) {
-      if (version_compare($currentVer, $rev) < 0 &&
-        version_compare($rev, '3.2.alpha1') > 0
-      ) {
+      if (version_compare($currentVer, $rev) < 0) {
         $versionObject = $this->incrementalPhpObject($rev);
-        if (is_callable(array(
-          $versionObject,
-          'setPreUpgradeMessage',
-        ))) {
+        if (is_callable(array($versionObject, 'setPreUpgradeMessage'))) {
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }
       }

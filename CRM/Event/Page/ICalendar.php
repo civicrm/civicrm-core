@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -75,9 +75,7 @@ class CRM_Event_Page_ICalendar extends CRM_Core_Page {
     }
     elseif ($html) {
       // check if we're in shopping cart mode for events
-      $enable_cart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-        'enable_cart'
-      );
+      $enable_cart = Civi::settings()->get('enable_cart');
       if ($enable_cart) {
         $this->assign('registration_links', TRUE);
       }

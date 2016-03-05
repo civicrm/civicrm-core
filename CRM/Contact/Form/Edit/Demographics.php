@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for an Demographics object
+ * Form helper class for an Demographics object.
  */
 class CRM_Contact_Form_Edit_Demographics {
 
@@ -43,25 +41,14 @@ class CRM_Contact_Form_Edit_Demographics {
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
-    // radio button for gender
-    $genderOptions = array();
-    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
-    foreach ($gender as $key => $var) {
-      $genderOptions[$key] = $form->createElement('radio', NULL,
-        ts('Gender'), $var, $key,
-        array('id' => "civicrm_gender_{$var}_{$key}")
-      );
-    }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
+    $form->addField('gender_id', array('entity' => 'contact', 'type' => 'Radio', 'allowClear' => TRUE));
 
-    $form->addDate('birth_date', ts('Date of Birth'), FALSE, array('formatType' => 'birth'));
+    $form->addField('birth_date', array('entity' => 'contact', 'formatType' => 'birth'));
 
-    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is Deceased'), array('onclick' => "showDeceasedDate()"));
-    $form->addDate('deceased_date', ts('Deceased Date'), FALSE, array('formatType' => 'birth'));
+    $form->addField('is_deceased', array('entity' => 'contact', 'label' => ts('Contact is Deceased'), 'onclick' => "showDeceasedDate()"));
+    $form->addField('deceased_date', array('entity' => 'contact', 'formatType' => 'birth'));
   }
 
   /**
@@ -70,9 +57,7 @@ class CRM_Contact_Form_Edit_Demographics {
    *
    *
    * @param CRM_Core_Form $form
-   * @param $defaults
-   *
-   * @return void
+   * @param array $defaults
    */
   public static function setDefaultValues(&$form, &$defaults) {
   }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -44,9 +44,6 @@
 
       //check if it is date element
       var isDateElement     = elementId.attr('format');
-
-      // check if it is wysiwyg element
-      var editor = elementId.attr('editor');
 
       //get the element type
       var elementType       = elementId.attr('type');
@@ -94,39 +91,11 @@
           }
         }
       }
-      else if ( editor ) {
-        var firstElementId = firstElement.attr('id');
-        switch ( editor ) {
-          case 'ckeditor':
-            //get the content of first element
-            oEditor = CKEDITOR.instances[firstElementId];
-            var htmlContent = oEditor.getData( );
-
-            // copy first element content to all the elements
-            elementId.each( function() {
-              var elemtId = $(this).attr('id');
-              oEditor = CKEDITOR.instances[elemtId];
-              oEditor.setData( htmlContent );
-            });
-            break;
-          case 'tinymce':
-            //get the content of first element
-            var htmlContent = tinyMCE.get( firstElementId ).getContent();
-
-            // copy first element content to all the elements
-            elementId.each( function() {
-              var elemtId = $(this).attr('id');
-              tinyMCE.get( elemtId ).setContent( htmlContent );
-            });
-            break;
-          case 'joomlaeditor':
-          // TO DO
-          case 'drupalwysiwyg':
-          // TO DO
-          default:
-            elementId.val( firstElementValue ).change();
-
-        }
+      else if (elementId.is('textarea')) {
+        var text = CRM.wysiwyg.getVal(firstElement);
+        elementId.each(function() {
+          CRM.wysiwyg.setVal(this, text);
+        });
       }
       else {
         if (elementId.is('select') === true && firstElement.parent().find(':input').select().index() >= 1 && firstElement.parent().find('select').select().index < 1) {

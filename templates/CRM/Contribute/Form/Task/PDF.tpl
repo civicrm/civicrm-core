@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
   <div class="icon inform-icon"></div>
       {include file="CRM/Contribute/Form/Task.tpl"}
 </div>
-<div id="help">
+<div class="help">
     {ts}You may choose to email receipts to contributors OR download a PDF file containing one receipt per page to your local computer by clicking <strong>Process Receipt(s)</strong>. Your browser may display the file for you automatically, or you may need to open it for printing using any PDF reader (such as Adobe&reg; Reader).{/ts}
 </div>
 

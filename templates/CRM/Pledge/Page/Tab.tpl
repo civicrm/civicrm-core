@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,7 @@
 {elseif $action eq 4}
     {include file="CRM/Pledge/Form/PledgeView.tpl"}
 {else}
-<div id="help">
+<div class="help">
     {ts 1=$displayName}Pledges received from %1 since inception.{/ts}
     {if $permission EQ 'edit'}
      {capture assign=newContribURL}{crmURL p="civicrm/contact/view/pledge" q="reset=1&action=add&cid=`$contactId`&context=pledge"}{/capture}
@@ -40,7 +40,7 @@
 
 {if $action eq 16 and $permission EQ 'edit'}
     <div class="action-link">
-       <a accesskey="N" href="{$newContribURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Pledge{/ts}</a></span>
+       <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Pledge{/ts}</a></span>
        <br/><br/>
     </div>
 {/if}

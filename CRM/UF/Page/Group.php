@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -57,7 +57,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    *
    * @return array
    */
-  public function &actionLinks() {
+  public static function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!self::$_actionLinks) {
       // helper variable for nicer formatting
@@ -82,17 +82,24 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'title' => ts('Edit CiviCRM Profile Group'),
         ),
         CRM_Core_Action::ADD => array(
-          'name' => ts('Use Profile-Create Mode'),
+          'name' => ts('Use - Create Mode'),
           'url' => 'civicrm/profile/create',
           'qs' => 'gid=%%id%%&reset=1',
-          'title' => ts('Use Profile-Create Mode'),
+          'title' => ts('Use - Create Mode'),
+          'fe' => TRUE,
+        ),
+        CRM_Core_Action::ADVANCED => array(
+          'name' => ts('Use - Edit Mode'),
+          'url' => 'civicrm/profile/edit',
+          'qs' => 'gid=%%id%%&reset=1',
+          'title' => ts('Use - Edit Mode'),
           'fe' => TRUE,
         ),
         CRM_Core_Action::BASIC => array(
-          'name' => ts('Use Profile-Listings Mode'),
+          'name' => ts('Use - Listings Mode'),
           'url' => 'civicrm/profile',
           'qs' => 'gid=%%id%%&reset=1',
-          'title' => ts('Use Profile-Listings Mode'),
+          'title' => ts('Use - Listings Mode'),
           'fe' => TRUE,
         ),
         CRM_Core_Action::DISABLE => array(
@@ -118,7 +125,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'title' => ts('HTML Form Snippet for this Profile'),
         ),
         CRM_Core_Action::COPY => array(
-          'name' => ts('Copy Profile'),
+          'name' => ts('Copy'),
           'url' => 'civicrm/admin/uf/group',
           'qs' => 'action=copy&gid=%%id%%',
           'title' => ts('Make a Copy of CiviCRM Profile Group'),
@@ -150,6 +157,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
 
     // assign vars to templates
     $this->assign('action', $action);
+    $this->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'String', $this));
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );
@@ -303,7 +311,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    */
   public function browse($action = NULL) {
     $ufGroup = array();
-    $allUFGroups = array();
     $allUFGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup();
     if (empty($allUFGroups)) {
       return;
@@ -324,7 +331,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id]['is_reserved'] = $value['is_reserved'];
 
       // form all action links
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
 
       // update enable/disable links depending on uf_group properties.
       if ($value['is_active']) {
@@ -342,35 +349,15 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       }
 
       $groupTypes = self::extractGroupTypes($value['group_type']);
-      $groupComponents = array('Contribution', 'Membership', 'Activity', 'Participant', 'Case');
 
-      // drop Create, Edit and View mode links if profile group_type is Contribution, Membership, Activities or Participant
+      // drop Create, Edit and View mode links if profile group_type is one of the following:
+      $groupComponents = array('Contribution', 'Membership', 'Activity', 'Participant', 'Case');
       $componentFound = array_intersect($groupComponents, array_keys($groupTypes));
       if (!empty($componentFound)) {
         $action -= CRM_Core_Action::ADD;
       }
 
-      $groupTypesString = '';
-      if (!empty($groupTypes)) {
-        $groupTypesStrings = array();
-        foreach ($groupTypes as $groupType => $typeValues) {
-          if (is_array($typeValues)) {
-            if ($groupType == 'Participant') {
-              foreach ($typeValues as $subType => $subTypeValues) {
-                $groupTypesStrings[] = $subType . '::' . implode(': ', $subTypeValues);
-              }
-            }
-            else {
-              $groupTypesStrings[] = $groupType . '::' . implode(': ', current($typeValues));
-            }
-          }
-          else {
-            $groupTypesStrings[] = $groupType;
-          }
-        }
-        $groupTypesString = implode(', ', $groupTypesStrings);
-      }
-      $ufGroup[$id]['group_type'] = $groupTypesString;
+      $ufGroup[$id]['group_type'] = self::formatGroupTypes($groupTypes);
 
       $ufGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         array('id' => $id),
@@ -393,9 +380,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param int $id
    *   Uf group id.
    *
-   * @param $action
-   *
-   * @return void
+   * @param int $action
    */
   public function preview($id, $action) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('CiviCRM Profile Group Preview'), NULL);
@@ -499,6 +484,37 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       }
     }
     return $returnGroupTypes;
+  }
+
+  /**
+   * Format 'group_type' field for display
+   *
+   * @param array $groupTypes
+   *   output from self::extractGroupTypes
+   * @return string
+   */
+  public static function formatGroupTypes($groupTypes) {
+    $groupTypesString = '';
+    if (!empty($groupTypes)) {
+      $groupTypesStrings = array();
+      foreach ($groupTypes as $groupType => $typeValues) {
+        if (is_array($typeValues)) {
+          if ($groupType == 'Participant') {
+            foreach ($typeValues as $subType => $subTypeValues) {
+              $groupTypesStrings[] = $subType . '::' . implode(': ', $subTypeValues);
+            }
+          }
+          else {
+            $groupTypesStrings[] = $groupType . '::' . implode(': ', current($typeValues));
+          }
+        }
+        else {
+          $groupTypesStrings[] = $groupType;
+        }
+      }
+      $groupTypesString = implode(', ', $groupTypesStrings);
+    }
+    return $groupTypesString;
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -235,9 +235,9 @@ class CRM_Dedupe_Finder {
 
     // handle {birth,deceased}_date
     foreach (array(
-               'birth_date',
-               'deceased_date',
-             ) as $date) {
+      'birth_date',
+      'deceased_date',
+    ) as $date) {
       if (!empty($fields[$date])) {
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {
@@ -279,7 +279,7 @@ class CRM_Dedupe_Finder {
       if (substr_count($key, '.')) {
         $last = explode('.', $key);
         $last = array_pop($last);
-        // make sure the first occurence is kept, not the last
+        // make sure the first occurrence is kept, not the last
         if (!isset($flat[$last])) {
           $flat[$last] = $value;
         }

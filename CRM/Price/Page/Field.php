@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -72,7 +72,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @return array
    *   array of action links that we need to display for the browse screen
    */
-  public function &actionLinks() {
+  public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
@@ -128,11 +128,12 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $priceFieldBAO->find();
 
     // display taxTerm for priceFields
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     while ($priceFieldBAO->fetch()) {
       $priceField[$priceFieldBAO->id] = array();
       CRM_Core_DAO::storeValues($priceFieldBAO, $priceField[$priceFieldBAO->id]);
@@ -143,8 +144,11 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         $params = array('price_field_id' => $priceFieldBAO->id);
 
         CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
-
         $financialTypeId = $optionValues['financial_type_id'];
+        if (!array_key_exists($financialTypeId, $financialTypes)) {
+          unset($priceField[$priceFieldBAO->id]);
+          continue;
+        }
         $priceField[$priceFieldBAO->id]['price'] = CRM_Utils_Array::value('amount', $optionValues);
         if ($invoicing && isset($taxRate[$financialTypeId])) {
           $priceField[$priceFieldBAO->id]['tax_rate'] = $taxRate[$financialTypeId];
@@ -156,7 +160,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         }
       }
 
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
 
       if ($this->_isSetReserved) {
         $action -= CRM_Core_Action::UPDATE + CRM_Core_Action::DELETE + CRM_Core_Action::ENABLE + CRM_Core_Action::DISABLE;

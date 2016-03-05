@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
  <div class="crm-block crm-form-block  crm-contribution-import-uploadfile-form-block id="upload-file">
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
 {include file="CRM/common/WizardHeader.tpl"}
-<div id="help">
+<div class="help">
     {ts}The Contribution Import Wizard allows you to easily upload contributions from other applications into CiviCRM.{/ts}
     {ts}Files to be imported must be in the 'comma-separated-values' format (CSV) and must contain data needed to match the contribution to an existing contact in your CiviCRM database.{/ts} {help id='upload'}
  </div>
@@ -45,6 +45,10 @@
                 {ts}Select 'Individual' if you are importing contributions made by individual persons.{/ts}
                 {ts}Select 'Organization' or 'Household' if you are importing contributions made by contacts of that type. (NOTE: Some built-in contact types may not be enabled for your site.){/ts}</span></td></tr>
         <tr><td class="label">{$form.onDuplicate.label}</td><td>{$form.onDuplicate.html} {help id="id-onDuplicate"}</td></tr>
+        <tr class="crm-import-datasource-form-block-fieldSeparator">
+          <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+          <td>{$form.fieldSeparator.html}</td>
+        </tr>
         <tr>{include file="CRM/Core/Date.tpl"}</tr>
 {if $savedMapping}
       <tr> <td class="label">{if $loadedMapping}{ts}Select a Different Field Mapping{/ts}{else}{ts}Load Saved Field Mapping{/ts}{/if}</td><td>{$form.savedMapping.html}<br /> <span class="description">{ts}Select a saved field mapping if this file format matches a previous import.{/ts}</span></tr>

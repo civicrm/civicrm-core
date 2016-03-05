@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,15 +25,15 @@
 *}
 {* Displays account creation and supporter profile form (step 1 in creating a personal campaign page as well as Update Contact info). *}
 {if $action EQ 1}
-<div id="help">
+<div class="help">
         {ts}Creating your own fundraising page is simple. Fill in some basic information below, which will allow you to manage your page and invite friends to make a contribution. Then click 'Continue' to personalize and announce your page.{/ts}
 </div>
 {/if}
 
 {if $profileDisplay}
 <div class="messages status no-popup">
-    <img src="{$config->resourceBase}i/Eyeball.gif" alt="{ts}Profile{/ts}"/>
-      <p><strong>{ts}Profile is not configured with Email address.{/ts}</strong></p>
+  <i class="crm-i fa-exclamation-triangle"></i>
+  <strong>{ts}Profile is not configured with Email address.{/ts}</strong>
 </div>
 {else}
 <div class="form-item">

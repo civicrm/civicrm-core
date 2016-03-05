@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,9 +23,9 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* this template is used for adding/editing/deleting Payment-Instrument  *}
+{* this template is used for adding/editing/deleting Payment-Method  *}
 <div class="crm-block crm-form-block crm-contribution-payment_instrument-form-block">
-<fieldset><legend>{if $action eq 1}{ts}New Payment Instrument{/ts}{elseif $action eq 2}{ts}Edit Payment Instrument{/ts}{else}{ts}Delete Payment Instrument{/ts}{/if}</legend>
+<fieldset><legend>{if $action eq 1}{ts}New Payment Method{/ts}{elseif $action eq 2}{ts}Edit Payment Method{/ts}{else}{ts}Delete Payment Method{/ts}{/if}</legend>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    {if $action eq 8}
       <div class="messages status no-popup">

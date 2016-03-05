@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
    {include file="CRM/Admin/Form/ContactType.tpl"}
 {else}
 
-  <div id="help">
+  <div class="help">
     {ts}CiviCRM comes with 3 basic (built-in) contact types: Individual, Household, and Organization. You can create additional contact types based on these types to further differentiate contacts (for example you might create Student, Parent, Staff, and /or Volunteer types from the basic Individual type...).{/ts} {help id="id-contactSubtype-intro"}
   </div>
 {if $rows}
@@ -46,7 +46,7 @@
     </tr>
     </thead>
     {foreach from=$rows item=row}
-      <tr id="contact_type-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-contactType crm-entity {if NOT $row.is_active} disabled{/if}">
+      <tr id="contact_type-{$row.id}" data-action="setvalue" class="{cycle values="odd-row,even-row"} {$row.class} crm-contactType crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crm-contactType-label crm-editable" data-field="label">{ts}{$row.label}{/ts}</td>
         <td class="crm-contactType-parent">{if $row.parent}{ts}{$row.parent_label}{/ts}{else}{ts}(built-in){/ts}{/if}</td>
         <td class="crm-contactType-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
@@ -63,7 +63,7 @@
     </div>
   {/if}
   <div class="action-link">
-    {crmButton q="action=add&reset=1" icon="circle-plus"}{ts}Add Contact Type{/ts}{/crmButton}
-    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+    {crmButton q="action=add&reset=1" icon="plus-circle"}{ts}Add Contact Type{/ts}{/crmButton}
+    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
   </div>
 {/if}

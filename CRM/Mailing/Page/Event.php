@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This implements the profile page for all contacts. It uses a selector
- * object to do the actual dispay. The fields displayd are controlled by
+ * This implements the profile page for all contacts.
+ *
+ * It uses a selector object to do the actual display. The fields displayed are controlled by
  * the admin
  */
 class CRM_Mailing_Page_Event extends CRM_Core_Page {
@@ -49,11 +48,9 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
   /**
    * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
    */
   public function run() {
-    $selector = &new CRM_Mailing_Selector_Event(
+    $selector = new CRM_Mailing_Selector_Event(
       CRM_Utils_Request::retrieve('event', 'String', $this),
       CRM_Utils_Request::retrieve('distinct', 'Boolean', $this),
       CRM_Utils_Request::retrieve('mid', 'Positive', $this),
@@ -63,7 +60,6 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
     $mailing_id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
 
-    //assign backurl
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     if ($context == 'activitySelector') {

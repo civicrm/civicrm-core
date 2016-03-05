@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
+<div class="help">
     {ts}This screen presents the list of most recent 1,000 scheduled jobs log entries.{/ts} {$docLink}
 </div>
 
@@ -32,7 +32,7 @@
 {/if}
 
 <div class="action-link">
-  <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-top" class="button"><span><div class="icon ui-icon-arrowreturnthick-1-w"></div>{ts}Back to Scheduled Jobs Listing{/ts}</span></a>
+  <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-top" class="button"><span><i class="crm-i fa-chevron-left"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
 </div>
 
 {if $rows}
@@ -73,5 +73,5 @@
 {/if}
 
 <div class="action-link">
-  <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-bottom" class="button"><span><div class="icon ui-icon-arrowreturnthick-1-w"></div>{ts}Back to Scheduled Jobs Listing{/ts}</span></a>
+  <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-bottom" class="button"><span><i class="crm-i fa-chevron-left"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
 </div>

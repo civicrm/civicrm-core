@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form to process actions on the field aspect of Custom
+ * Form to process actions on the field aspect of Custom.
  */
 class CRM_UF_Form_Field extends CRM_Core_Form {
 
@@ -46,7 +44,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_gid;
 
   /**
-   * The field id, used when editing the field
+   * The field id, used when editing the field.
    *
    * @var int
    */
@@ -185,18 +183,17 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete Profile Field'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => ts('Delete Profile Field'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
       return;
     }
 
@@ -466,24 +463,23 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     // add buttons
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-          'js' => $js,
-        ),
-        array(
-          'type' => 'next',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-          'js' => $js,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+        'js' => $js,
+      ),
+      array(
+        'type' => 'next',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+        'js' => $js,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     $this->addFormRule(array('CRM_UF_Form_Field', 'formRule'), $this);
 
@@ -504,7 +500,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    $ids = array('uf_group' => $this->_gid);
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       $fieldValues = array('uf_group_id' => $this->_gid);
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_UFField', $this->_id, $fieldValues);
@@ -523,12 +519,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
+    $params['uf_group_id'] = $this->_gid;
     if ($params['visibility'] == 'User and User Admin Only') {
       $params['is_searchable'] = $params['in_selector'] = 0;
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['uf_field'] = $this->_id;
+      $params['id'] = $this->_id;
     }
 
     $name = NULL;
@@ -543,13 +540,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     //check for duplicate fields
-    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, $ids)) {
+    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, array('uf_group' => $params['uf_group_id'], 'uf_field' => $params['id']))) {
       CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
       return;
     }
     else {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
-      $ufField = CRM_Core_BAO_UFField::add($params, $ids);
+      $ufField = CRM_Core_BAO_UFField::add($params);
 
       //reset other field is searchable and in selector settings, CRM-4363
       if ($this->_hasSearchableORInSelector &&
@@ -561,9 +558,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $config = CRM_Core_Config::singleton();
       $showBestResult = FALSE;
       if (in_array($ufField->field_name, array(
-          'country',
-          'state_province',
-        )) && count($config->countryLimit) > 1
+        'country',
+        'state_province',
+      )) && count($config->countryLimit) > 1
       ) {
         // get state or country field weight if exists
         $field = 'state_province';
@@ -789,11 +786,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     if ($in_selector && in_array($entityName, array(
-        'Contribution',
-        'Participant',
-        'Membership',
-        'Activity',
-      ))
+      'Contribution',
+      'Participant',
+      'Membership',
+      'Activity',
+    ))
     ) {
       $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $entityName));
     }
@@ -983,9 +980,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
             if ($fieldType != $profileType) {
               $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
-                  1 => $fieldType,
-                  2 => $profileType,
-                ));
+                1 => $fieldType,
+                2 => $profileType,
+              ));
             }
           }
           else {
@@ -995,9 +992,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
               $profileType != 'Contact'
             ) {
               $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
-                  1 => $fieldType,
-                  2 => $profileType,
-                ));
+                1 => $fieldType,
+                2 => $profileType,
+              ));
             }
           }
         }

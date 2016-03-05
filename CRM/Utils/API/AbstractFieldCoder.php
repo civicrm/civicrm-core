@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,26 +31,30 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'api/Wrapper.php';
 
 /**
- * Class CRM_Utils_API_AbstractFieldCoder
+ * Class CRM_Utils_API_AbstractFieldCoder.
  */
 abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
 
   /**
-   * @return array<string> list of field names
+   * Get skipped fields.
+   *
+   * @return array<string>
+   *   List of field names
    */
   public function getSkipFields() {
     return NULL;
   }
 
   /**
+   * Is field skipped.
+   *
    * @param string $fldName
+   *
    * @return bool
    *   TRUE if encoding should be skipped for this field
    */
@@ -79,15 +83,16 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
   }
 
   /**
-   * going to filter the
-   * submitted values.
+   * Going to filter the submitted values.
    *
    * @param array|string $values the field value from the API
    */
   public abstract function encodeInput(&$values);
 
   /**
-   * @param $values
+   * Decode output.
+   *
+   * @param string $values
    *
    * @return mixed
    */

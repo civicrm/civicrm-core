@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -41,7 +41,7 @@
                 {$form.value[$x][$i].html|crmAddClass:'required'}
               </span>
               {if $i gt 0 or $x gt 1}
-                &nbsp;<a href="#" class="crm-reset-builder-row crm-hover-button" title="{ts}Remove this row{/ts}"><span class="icon ui-icon-close"></span></a>
+                &nbsp;<a href="#" class="crm-reset-builder-row crm-hover-button" title="{ts}Remove this row{/ts}"><i class="crm-i fa-times"></i></a>
               {/if}
             </td>
           </tr>

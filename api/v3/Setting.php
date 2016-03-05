@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -142,6 +142,34 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
       an array or "all" are acceptable values for multiple domains',
     'title' => 'Setting Domain',
   );
+}
+
+/**
+ * Get options for settings.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ */
+function civicrm_api3_setting_getoptions($params) {
+  $specs = CRM_Core_BAO_Setting::getSettingSpecification();
+
+  if (empty($specs[$params['field']]) || empty($specs[$params['field']]['pseudoconstant'])) {
+    throw new API_Exception("The field '" . $params['field'] . "' has no associated option list.");
+  }
+
+  $pseudoconstant = $specs[$params['field']]['pseudoconstant'];
+
+  // It would be nice if we could leverage CRM_Core_PseudoConstant::get() somehow,
+  // but it's tightly coupled to DAO/field. However, if you really need to support
+  // more pseudoconstant types, then probably best to refactor it. For now, KISS.
+  if (!empty($pseudoconstant['callback'])) {
+    $values = Civi\Core\Resolver::singleton()->call($pseudoconstant['callback'], array());
+    return civicrm_api3_create_success($values, $params, 'Setting', 'getoptions');
+  }
+
+  throw new API_Exception("The field '" . $params['field'] . "' uses an unsupported option list.");
 }
 
 /**
@@ -321,10 +349,10 @@ function _civicrm_api3_setting_get_spec(&$params) {
  *   API result array.
  */
 function civicrm_api3_setting_getvalue($params) {
-  $config = CRM_Core_Config::singleton();
-  if (isset($config->$params['name'])) {
-    return $config->$params['name'];
-  }
+  //$config = CRM_Core_Config::singleton();
+  //if (isset($config->$params['name'])) {
+  //  return $config->$params['name'];
+  //}
   return CRM_Core_BAO_Setting::getItem(
     $params['group'],
     CRM_Utils_Array::value('name', $params),

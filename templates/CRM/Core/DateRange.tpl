@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,8 +25,8 @@
 *}
 {*this is included inside a table row*}
 {assign var=relativeName   value=$fieldName|cat:"_relative"}
-<td>{$form.$relativeName.html}</td>
-<td>
+<td colspan=2>
+  {$form.$relativeName.html}<br />
   <span class="crm-absolute-date-range">
     <span class="crm-absolute-date-from">
       {assign var=fromName   value=$fieldName|cat:$from}

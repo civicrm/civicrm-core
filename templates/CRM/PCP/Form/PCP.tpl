@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -38,14 +38,14 @@
   {if $form.target_entity_type}
   <table class="form-layout">
     <tr  class="crm-contribution-contributionpage-pcp-form-block-target_entity_type">
-        <td class="label">{$form.target_entity_type.label} <span class="marker"> *</span></td>
+        <td class="label">{$form.target_entity_type.label} <span class="crm-marker"> *</span></td>
         <td>{$form.target_entity_type.html} {help id="id-target_entity_type"}</td>
     </tr>
   </table>
   <div id="pcpDetailFields" {if $form.target_entity_type.value[0] == 'event'} style="display:none;"{/if}>
     <table class="form-layout">
       <tr class="crm-contribution-contributionpage-pcp-form-block-target_entity_id" id="pcpDetailFields">
-          <td class="label">{$form.target_entity_id.label} <span class="marker"> *</span></td>
+          <td class="label">{$form.target_entity_id.label} <span class="crm-marker"> *</span></td>
           <td>{$form.target_entity_id.html} {help id="id-target_entity_id"}</td>
       </tr>
     </table>

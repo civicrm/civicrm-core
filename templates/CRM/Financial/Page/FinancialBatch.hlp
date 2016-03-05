@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,14 +24,14 @@
  +--------------------------------------------------------------------+
 *}
 {htxt id="payment_instrument-title"}
-  {ts}Payment Instrument{/ts}
+  {ts}Payment Method{/ts}
 {/htxt}
 {htxt id="payment_instrument"}
 <p>
-  {ts}If you specify a payment instrument then this batch will be limited to exporting only transactions paid with that method.{/ts}
+  {ts}If you specify a payment method then this batch will be limited to exporting only transactions paid with that method.{/ts}
 </p>
 <p>
-  {ts}Note that not all transactions are necessarily associated with a payment instrument.{/ts}
+  {ts}Note that not all transactions are necessarily associated with a payment method.{/ts}
 </p>
 {/htxt}
 

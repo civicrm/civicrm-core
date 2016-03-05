@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -66,17 +66,17 @@ class CRM_Grant_Task {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Grants'),
+          'title' => ts('Delete grants'),
           'class' => 'CRM_Grant_Form_Task_Delete',
           'result' => FALSE,
         ),
         2 => array(
-          'title' => ts('Print Selected Rows'),
+          'title' => ts('Print selected rows'),
           'class' => 'CRM_Grant_Form_Task_Print',
           'result' => FALSE,
         ),
         3 => array(
-          'title' => ts('Export Grants'),
+          'title' => ts('Export grants'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
@@ -84,7 +84,7 @@ class CRM_Grant_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Update Grants'),
+          'title' => ts('Update grants'),
           'class' => 'CRM_Grant_Form_Task_Update',
           'result' => FALSE,
         ),

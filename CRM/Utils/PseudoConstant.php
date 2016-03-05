@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,12 @@
  */
 
 /**
- * Utilities for manipulating/inspecting CRM_*_PseudoConstant classes
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
+ * Utilities for manipulating/inspecting CRM_*_PseudoConstant classes.
  */
 class CRM_Utils_PseudoConstant {
   /**
@@ -40,7 +45,8 @@ class CRM_Utils_PseudoConstant {
   );
 
   /**
-   * @var array ($name => $className)
+   * @var array 
+   *   ($name => $className)
    */
   private static $constants = NULL;
 
@@ -49,10 +55,10 @@ class CRM_Utils_PseudoConstant {
    *
    * Wrapper for Pseudoconstant methods. We use this so the calling function
    * doesn't need to know which class the Pseudoconstant is on
-   * (some are on the Contribute_Pseudoconsant Class etc
+   * (some are on the Contribute_Pseudoconstant Class etc
    *
    *
-   * @param $constant
+   * @param string $constant
    *
    * @return array
    *   array reference of all relevant constant
@@ -155,10 +161,9 @@ class CRM_Utils_PseudoConstant {
   }
 
   /**
-   * Flush all caches related to pseudo-constants. This may be inefficient
-   * and should generally be avoided.
+   * Flush all caches related to pseudo-constants.
    *
-   * @return void
+   * This may be inefficient and should generally be avoided.
    */
   public static function flushAll() {
     foreach (self::findConstants() as $constant) {

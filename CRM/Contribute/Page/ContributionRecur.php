@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * Main page for viewing Recurring Contributions.
- *
  */
 class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
@@ -45,8 +42,6 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
   /**
    * View details of a recurring contribution.
-   *
-   * @return void
    */
   public function view() {
     $recur = new CRM_Contribute_DAO_ContributionRecur();
@@ -62,9 +57,14 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
           'name'
         );
       }
-      // get contribution status label
-      if (!empty($values['contribution_status_id'])) {
-        $values['contribution_status'] = CRM_Core_OptionGroup::getLabel('contribution_status', $values['contribution_status_id']);
+      $idFields = array('contribution_status_id', 'campaign_id');
+      if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($values['id'])) {
+        $idFields[] = 'financial_type_id';
+      }
+      foreach ($idFields as $idField) {
+        if (!empty($values[$idField])) {
+          $values[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $values[$idField]);
+        }
       }
 
       $this->assign('recur', $values);

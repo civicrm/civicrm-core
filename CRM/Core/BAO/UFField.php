@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains function for UFField
- *
+ * This class contains function for UFField.
  */
 class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
@@ -83,7 +80,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     //check if custom data profile field is disabled
@@ -149,7 +146,11 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Does profile consists of a multi-record custom field
+   * Does profile consists of a multi-record custom field.
+   *
+   * @param int $gId
+   *
+   * @return bool
    */
   public static function checkMultiRecordFieldExists($gId) {
     $queryString = "SELECT f.field_name
@@ -195,15 +196,13 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param array $params
    *   (reference) array containing the values submitted by the form.
-   * @param array $ids
-   *   Array containing the id.
    *
    * @return CRM_Core_BAO_UFField
-   *
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params) {
     // set values for uf field properties and save
     $ufField = new CRM_Core_DAO_UFField();
+    $ufField->copyValues($params);
     $ufField->field_type = $params['field_name'][0];
     $ufField->field_name = $params['field_name'][1];
 
@@ -224,24 +223,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     }
 
     $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
-    $ufField->listings_title = CRM_Utils_Array::value('listings_title', $params);
-    $ufField->visibility = CRM_Utils_Array::value('visibility', $params);
-    $ufField->help_pre = CRM_Utils_Array::value('help_pre', $params);
-    $ufField->help_post = CRM_Utils_Array::value('help_post', $params);
-    $ufField->label = CRM_Utils_Array::value('label', $params);
-    $ufField->is_required = CRM_Utils_Array::value('is_required', $params, FALSE);
-    $ufField->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $ufField->in_selector = CRM_Utils_Array::value('in_selector', $params, FALSE);
-    $ufField->is_view = CRM_Utils_Array::value('is_view', $params, FALSE);
-    $ufField->is_registration = CRM_Utils_Array::value('is_registration', $params, FALSE);
-    $ufField->is_match = CRM_Utils_Array::value('is_match', $params, FALSE);
-    $ufField->is_searchable = CRM_Utils_Array::value('is_searchable', $params, FALSE);
-    $ufField->is_multi_summary = CRM_Utils_Array::value('is_multi_summary', $params, FALSE);
-    $ufField->weight = CRM_Utils_Array::value('weight', $params, 0);
-
-    // need the FKEY - uf group id
-    $ufField->uf_group_id = CRM_Utils_Array::value('uf_group', $ids, FALSE);
-    $ufField->id = CRM_Utils_Array::value('uf_field', $ids, FALSE);
 
     return $ufField->save();
   }
@@ -271,8 +252,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Custom field id.
    * @param bool $is_active
    *   Set the is_active field.
-   *
-   * @return void
    */
   public static function setUFField($customFieldId, $is_active) {
     //find the profile id given custom field
@@ -294,8 +273,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   From which we need to copy.
    * @param bool $new_id
    *   In which to copy.
-   *
-   * @return void
    */
   public static function copy($old_id, $new_id) {
     $ufField = new CRM_Core_DAO_UFField();
@@ -314,9 +291,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param int $customFieldId
    *   ID of the custom field to be deleted.
-   *
-   * @return void
-   *
    */
   public static function delUFField($customFieldId) {
     //find the profile id given custom field id
@@ -337,8 +311,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Custom group id.
    * @param bool $is_active
    *   Value we want to set the is_active field.
-   *
-   * @return void
    */
   public static function setUFFieldStatus($customGroupId, $is_active) {
     //find the profile id given custom group id
@@ -386,6 +358,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Find out whether given profile group using Activity
    * Profile fields with contact fields
+   *
+   * @param int $ufGroupId
+   *
+   * @return bool
    */
   public static function checkContactActivityProfileType($ufGroupId) {
     $ufGroup = new CRM_Core_DAO_UFGroup();
@@ -752,8 +728,6 @@ SELECT  id
    * Reset In selector and is searchable values for given $profileID.
    *
    * @param int $profileID
-   *
-   * @return void
    */
   public function resetInSelectorANDSearchable($profileID) {
     if (!$profileID) {
@@ -1104,6 +1078,10 @@ SELECT  id
           'name' => 'contribution_note',
           'title' => ts('Contribution Note'),
         ),
+        'contribution_soft_credit_pcp_id' => array(
+          'name' => 'contribution_soft_credit_pcp_id',
+          'title' => ts('Personal Campaign Page'),
+        ),
       );
     }
     return self::$_contriBatchEntryFields;
@@ -1137,11 +1115,11 @@ SELECT  id
         ),
         'receive_date' => array(
           'name' => 'receive_date',
-          'title' => ts('Receive Date'),
+          'title' => ts('Date Received'),
         ),
         'payment_instrument' => array(
           'name' => 'payment_instrument',
-          'title' => ts('Payment Instrument'),
+          'title' => ts('Payment Method'),
         ),
         'contribution_status_id' => array(
           'name' => 'contribution_status_id',

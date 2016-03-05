@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="form-item crm-block crm-form-block crm-contribution-form-block">
-<div id="help">
+<div class="help">
     {ts}Use this form to record received payments for 'pay later' online contributions, membership signups and event registrations. You can use the Transaction ID field to record account+check number, bank transfer identifier, or other unique payment identifier.{/ts}
 </div>
 <fieldset>
@@ -39,7 +39,7 @@
     <th class="right">{ts}Amount{/ts}&nbsp;&nbsp;</th>
     <th>{ts}Source{/ts}</th>
     <th>{ts}Fee Amount{/ts}</th>
-    <th>{ts}Paid By{/ts}</th>
+    <th>{ts}Payment Method{/ts}</th>
     <th>{ts}Check{/ts} #</th>
     <th>{ts}Transaction ID{/ts}</th>
     <th>{ts}Transaction Date{/ts}</th>

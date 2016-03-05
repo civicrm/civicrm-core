@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -64,7 +64,7 @@ CRM.$(function($) {
       {if $paymentInfo.paid > 0}
         {$paymentInfo.paid|crmMoney}<br/>
         <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
-          <span class="icon ui-icon-zoomin"></span>
+          <i class="crm-i fa-list"></i>
           {ts}view payments{/ts}
         </a>
       {/if}
@@ -78,6 +78,6 @@ CRM.$(function($) {
   {elseif $paymentInfo.balance < 0}
      {assign var=paymentButtonName value='Record Refund'}
   {/if}
-  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}'><span class="icon ui-icon-circle-plus"></span> {ts}{$paymentButtonName}{/ts}</a>
+  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}'><i class="crm-i fa-plus-circle"></i> {ts}{$paymentButtonName}{/ts}</a>
 {/if}
 {/if}

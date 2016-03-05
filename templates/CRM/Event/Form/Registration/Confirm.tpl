@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -39,7 +39,7 @@
             {ts}Please verify the information below. Then click 'Continue' to submit your registration. <span class="bold">Once approved, you will receive an email with a link to a web page where you can complete the registration process.</span>{/ts}
         </div>
     {else}
-        <div id="help">
+        <div class="help">
         {ts}Please verify the information below. Click the <strong>Go Back</strong> button below if you need to make changes.{/ts}
         {if $contributeMode EQ 'notify' and !$is_pay_later and ! $isAmountzero }
             {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout'}
@@ -191,21 +191,6 @@
         {ts}Your registration will not be submitted until you click the <strong>Continue</strong> button. Please click the button one time only. If you need to change any details, click the Go Back button below to return to the previous screen.{/ts}
         </p>
     </div>
-    {/if}
-
-    {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout' and $paidEvent and !$is_pay_later and ! $isAmountzero and !$isOnWaitlist and !$isRequireApproval}
-        <fieldset><legend>{ts}Checkout with Google{/ts}</legend>
-            <div class="crm-section google_checkout-section">
-                <table class="form-layout-compressed">
-                  <tr>
-                    <td class="description">{ts}Click the Google Checkout button to continue.{/ts}</td>
-                  </tr>
-                  <tr>
-                    <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span></td>
-                  </tr>
-                </table>
-            </div>
-        </fieldset>
     {/if}
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">

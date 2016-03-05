@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -33,8 +33,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_State {
 
@@ -106,7 +104,9 @@ class CRM_Core_State {
   }
 
   /**
-   * Given an CRM Form, jump to the previous page
+   * Given an CRM Form, jump to the previous page.
+   *
+   * @param CRM_Core_Page $page
    *
    * @return mixed
    *   does a jump to the back state
@@ -122,10 +122,12 @@ class CRM_Core_State {
   }
 
   /**
-   * Given an CRM Form, jump to the next page
+   * Given an CRM Form, jump to the next page.
+   *
+   * @param CRM_Core_Page $page
    *
    * @return mixed
-   *   does a jump to the nextstate
+   *   Does a jump to the nextstate
    */
   public function handleNextState(&$page) {
     if ($this->_type & self::FINISH) {
@@ -138,8 +140,9 @@ class CRM_Core_State {
   }
 
   /**
-   * Determine the name of the next state. This is useful when we want
-   * to display the navigation labels or potential path
+   * Determine the name of the next state.
+   *
+   * This is useful when we want to display the navigation labels or potential path.
    *
    * @return string
    */
@@ -154,20 +157,18 @@ class CRM_Core_State {
   }
 
   /**
-   * Mark this page as valid for the QFC framework. This is needed as
-   * we build more advanced functionality into the StateMachine
+   * Mark this page as valid for the QFC framework.
    *
-   * @return void
+   * @param array $data
    */
   public function validate(&$data) {
     $data['valid'][$this->_name] = TRUE;
   }
 
   /**
-   * Mark this page as invalid for the QFC framework. This is needed as
-   * we build more advanced functionality into the StateMachine
+   * Mark this page as invalid for the QFC framework.
    *
-   * @return void
+   * @param array $data
    */
   public function invalidate(&$data) {
     $data['valid'][$this->_name] = NULL;
@@ -185,7 +186,7 @@ class CRM_Core_State {
   /**
    * Setter for name.
    *
-   * @return void
+   * @param string $name
    */
   public function setName($name) {
     $this->_name = $name;

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -33,6 +33,13 @@
  *
  */
 class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
+
+  protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Household',
+    'Organization',
+  );
 
   protected $_exposeContactID = FALSE;
 

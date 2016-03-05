@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,16 +26,12 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Event Fees
- *
+ * This class generates form components for Event Fees.
  */
 class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
@@ -61,19 +57,15 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * For edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
     $parentDefaults = parent::setDefaultValues();
@@ -238,17 +230,15 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $this->assign('inDate', $this->_inDate);
 
     if (!empty($defaults['payment_processor'])) {
-      $defaults['payment_processor'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
+      $defaults['payment_processor'] = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',',
         $defaults['payment_processor']
-      ), '1');
+      );
     }
     return $defaults;
   }
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -266,14 +256,21 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
     $this->assign('paymentProcessor', $paymentProcessor);
 
-    $this->addCheckBox('payment_processor', ts('Payment Processor'),
-      array_flip($paymentProcessor),
-      NULL, NULL, NULL, NULL,
-      array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
-    );
+    $this->addEntityRef('payment_processor', ts('Payment Processor'), array(
+      'entity' => 'PaymentProcessor',
+      'multiple' => TRUE,
+      'select' => array('minimumInputLength' => 0),
+    ));
 
     // financial type
-    $this->addSelect('financial_type_id');
+    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() ||
+        (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Core_Permission::check('administer CiviCRM Financial Types'))) {
+      $this->addSelect('financial_type_id');
+    }
+    else {
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+      $this->addSelect('financial_type_id', array('context' => 'search', 'options' => $financialTypes));
+    }
     // add pay later options
     $this->addElement('checkbox', 'is_pay_later', ts('Enable Pay Later option?'), NULL,
       array('onclick' => "return showHideByValue('is_pay_later','','payLaterOptions','block','radio',false);")
@@ -282,7 +279,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_text'),
       FALSE
     );
-    $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
+    $this->add('wysiwyg', 'pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
 
     $this->addElement('checkbox', 'is_billing_required', ts('Billing address required'));
     $this->add('text', 'fee_label', ts('Fee Label'));
@@ -393,9 +390,6 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Event_Form_ManageEvent_Fee', 'formRule'));
@@ -550,8 +544,6 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $eventTitle = '';
@@ -565,10 +557,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       return;
     }
 
-    if (array_key_exists('payment_processor', $params) &&
-      !CRM_Utils_System::isNull($params['payment_processor'])
-    ) {
-      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($params['payment_processor']));
+    if (!empty($params['payment_processor'])) {
+      $params['payment_processor'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
     }
     else {
       $params['payment_processor'] = 'null';

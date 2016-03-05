@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -53,7 +53,7 @@
         </div><br /><br />
     {/if}
 
-    <div id="help">
+    <div class="help">
         {if $isOnWaitlist}
             <p>
                 <span class="bold">{ts}You have been added to the WAIT LIST for this event.{/ts}</span>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -106,7 +106,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     // Handle relative urls that are within the CiviCRM module directory
     elseif (strpos($url, $base) === 0) {
       $internal = TRUE;
-      $url = $this->appendCoreDirectoryToResourceBase(substr(drupal_get_path('module', 'civicrm'), 0, -6)) . trim(substr($url, strlen($base)), '/');
+      $url = $this->appendCoreDirectoryToResourceBase(dirname(drupal_get_path('module', 'civicrm')) . '/') . trim(substr($url, strlen($base)), '/');
     }
     // Strip query string
     $q = strpos($url, '?');
@@ -147,7 +147,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
@@ -160,13 +159,9 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       $fragment = '#' . $fragment;
     }
 
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
-    $separator = $htmlize ? '&amp;' : '&';
+    $separator = '&';
 
     if (!$config->cleanURL) {
       if (isset($path)) {
@@ -282,6 +277,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Append Drupal js to coreResourcesList.
+   *
+   * @param array $list
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.drupal.js';
@@ -430,6 +427,29 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    global $language;
+
+    $langcode = substr($civicrm_language, 0, 2);
+    $languages = language_list();
+
+    if (isset($languages[$langcode])) {
+      $language = $languages[$langcode];
+
+      // Config must be re-initialized to reset the base URL
+      // otherwise links will have the wrong language prefix/domain.
+      $config = CRM_Core_Config::singleton();
+      $config->free();
+
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Perform any post login activities required by the UF -
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
    * calls hook_user op 'login' and generates a new session.
@@ -478,6 +498,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Fixme: Why are we overriding the parent function? Seems inconsistent.
    * This version supplies slightly different params to $this->url (not absolute and html encoded) but why?
+   *
+   * @param string $action
+   *
+   * @return string
    */
   public function postURL($action) {
     if (!empty($action)) {
@@ -515,6 +539,29 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getUserObject($userID) {
     return user_load($userID);
+  }
+
+  public function parseDrupalSiteName($civicrm_root) {
+    $siteName = NULL;
+    if (strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
+      ) === FALSE
+    ) {
+      $startPos = strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
+      );
+      $endPos = strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR
+      );
+      if ($startPos && $endPos) {
+        // if component is in sites/SITENAME/modules
+        $siteName = substr($civicrm_root,
+          $startPos + 7,
+          $endPos - $startPos - 7
+        );
+      }
+    }
+    return $siteName;
   }
 
 }

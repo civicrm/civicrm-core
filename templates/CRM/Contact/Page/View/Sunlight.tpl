@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,7 @@
 *}
 <div id="electedOfficals" class="view-content">
     <p></p>
-    <div class="bold">{ts}Elected Officals:{/ts} {$displayName}</div>
+    <div class="bold">{ts}Elected Officials:{/ts} {$displayName}</div>
     <div class="form-item">
      {if $rowCount > 0 }
        <table>

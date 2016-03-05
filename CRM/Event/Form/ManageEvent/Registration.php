@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,17 +26,12 @@
  */
 
 /**
- *
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing Event
- *
+ * This class generates form components for processing Event.
  */
 class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent {
 
@@ -52,8 +47,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_addProfileBottom = CRM_Utils_Array::value('addProfileBottom', $_GET, FALSE);
@@ -90,10 +83,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Set default values for the form.
-   * the default values are retrieved from the database
    *
-   *
-   * @return void
+   * The default values are retrieved from the database.
    */
   public function setDefaultValues() {
     if ($this->_addProfileBottom || $this->_addProfileBottomAdd) {
@@ -142,6 +133,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       }
 
       $this->assign('profilePostMultiple', CRM_Utils_Array::value('custom_post', $defaults));
+
+      // CRM-17745: Make max additional participants configurable
+      if (empty($defaults['max_additional_participants'])) {
+        $defaults['max_additional_participants'] = 9;
+      }
 
       if (!empty($defaults['is_multiple_registrations'])) {
         // CRM-4377: set additional participants’ profiles – set to ‘none’ if explicitly unset (non-active)
@@ -273,6 +269,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       ts('Register multiple participants?')
     );
 
+    // CRM-17745: Make maximum additional participants configurable
+    $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 9);
+    $this->add('select', 'max_additional_participants', ts('Maximum additional participants'), $numericOptions, FALSE, array('class' => 'required'));
+
     $this->addElement('checkbox',
       'allow_same_participant_emails',
       ts('Same email address?')
@@ -298,7 +298,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->add('text', 'expiration_time', ts('Pending participant expiration (hours)'));
     $this->addRule('expiration_time', ts('Please enter the number of hours (as an integer).'), 'integer');
-
+    $this->addField('allow_selfcancelxfer', array('label' => ts('Allow self-service cancellation or transfer?'), 'type' => 'advcheckbox'));
+    $this->add('text', 'selfcancelxfer_time', ts('Cancellation or transfer time limit (hours)'));
+    $this->addRule('selfcancelxfer_time', ts('Please enter the number of hours (as an integer).'), 'integer');
     self::buildRegistrationBlock($this);
     self::buildConfirmationBlock($this);
     self::buildMailBlock($this);
@@ -314,17 +316,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    */
   public function buildRegistrationBlock(&$form) {
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $attributes['intro_text']['click_wysiwyg'] = TRUE;
-    $form->addWysiwyg('intro_text', ts('Introductory Text'), $attributes['intro_text']);
-    // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
-    // explicit height and width.
-    $footerAttribs = array(
-      'rows' => 2,
-      'cols' => 40,
-      'click_wysiwyg' => TRUE,
-    );
-    $form->addWysiwyg('footer_text', ts('Footer Text'), $footerAttribs);
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'intro_text') + array('class' => 'collapsed');
+    $form->add('wysiwyg', 'intro_text', ts('Introductory Text'), $attributes);
+    $form->add('wysiwyg', 'footer_text', ts('Footer Text'), $attributes);
 
     extract(self::getProfileSelectorTypes());
     //CRM-15427
@@ -405,7 +399,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   public function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $attributes['confirm_text']['click_wysiwyg'] = TRUE;
     // CRM-11182 - Optional confirmation page for free events
     $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_id, 'is_monetary');
     $form->assign('is_monetary', $is_monetary);
@@ -413,15 +406,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       $form->addYesNo('is_confirm_enabled', ts('Use a confirmation screen?'), NULL, NULL, array('onclick' => "return showHideByValue('is_confirm_enabled','','confirm_screen_settings','block','radio',false);"));
     }
     $form->add('text', 'confirm_title', ts('Title'), $attributes['confirm_title']);
-    $form->addWysiwyg('confirm_text', ts('Introductory Text'), $attributes['confirm_text']);
-    // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
-    // explicit height and width.
-    $footerAttribs = array(
-      'rows' => 2,
-      'cols' => 40,
-      'click_wysiwyg' => TRUE,
-    );
-    $form->addWysiwyg('confirm_footer_text', ts('Footer Text'), $footerAttribs);
+    $form->add('wysiwyg', 'confirm_text', ts('Introductory Text'), $attributes['confirm_text'] + array('class' => 'collapsed'));
+    $form->add('wysiwyg', 'confirm_footer_text', ts('Footer Text'), $attributes['confirm_text'] + array('class' => 'collapsed'));
   }
 
   /**
@@ -449,17 +435,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   public function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $attributes['thankyou_text']['click_wysiwyg'] = TRUE;
     $form->add('text', 'thankyou_title', ts('Title'), $attributes['thankyou_title']);
-    $form->addWysiwyg('thankyou_text', ts('Introductory Text'), $attributes['thankyou_text']);
-    // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
-    // explicit height and width.
-    $footerAttribs = array(
-      'rows' => 2,
-      'cols' => 40,
-      'click_wysiwyg' => TRUE,
-    );
-    $form->addWysiwyg('thankyou_footer_text', ts('Footer Text'), $footerAttribs);
+    $form->add('wysiwyg', 'thankyou_text', ts('Introductory Text'), $attributes['thankyou_text'] + array('class' => 'collapsed'));
+    $form->add('wysiwyg', 'thankyou_footer_text', ts('Footer Text'), $attributes['thankyou_text'] + array('class' => 'collapsed'));
   }
 
   /**
@@ -804,6 +782,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Add additional profiles from the form to an array of profile ids.
+   *
+   * @param array $profileIds
+   * @param array $values
+   * @param string $field
    */
   public static function addMultipleProfiles(&$profileIds, $values, $field) {
     if ($multipleProfiles = CRM_Utils_Array::value($field, $values)) {
@@ -834,6 +816,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     // reset is_email confirm if not online reg
     if (!$params['is_online_registration']) {
       $params['is_email_confirm'] = FALSE;
+    }
+    if (!empty($params['allow_selfcancelxfer'])) {
+      $params['selfcancelxfer_time'] = !empty($params['selfcancelxfer_time']) ? $params['selfcancelxfer_time'] : 0;
     }
 
     if (!$this->_isTemplate) {

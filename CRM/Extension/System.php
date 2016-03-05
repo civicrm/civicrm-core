@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_System {
   private static $singleton;
@@ -46,11 +44,23 @@ class CRM_Extension_System {
   private $downloader = NULL;
 
   /**
+   * @var CRM_Extension_ClassLoader
+   * */
+  private $classLoader;
+
+  /**
    * The URL of the remote extensions repository.
    *
    * @var string|FALSE
    */
   private $_repoUrl = NULL;
+
+  /**
+   * @var array
+   *   Construction parameters. These are primarily retained so
+   *   that they can influence the cache name.
+   */
+  protected $parameters;
 
   /**
    * @param bool $fresh
@@ -85,22 +95,18 @@ class CRM_Extension_System {
    */
   public function __construct($parameters = array()) {
     $config = CRM_Core_Config::singleton();
-    $configKeys = array(
-      'extensionsDir',
-      'extensionsURL',
-      'resourceBase',
-      'userFrameworkBaseURL',
-    );
-    foreach ($configKeys as $key) {
-      if (!array_key_exists($key, $parameters)) {
-        $parameters[$key] = $config->{$key};
-      }
-    }
+    $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
+    $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
+    $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, $config->resourceBase);
+    $parameters['userFrameworkBaseURL'] = CRM_Utils_Array::value('userFrameworkBaseURL', $parameters, $config->userFrameworkBaseURL);
     if (!array_key_exists('civicrm_root', $parameters)) {
       $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
     }
     if (!array_key_exists('cmsRootPath', $parameters)) {
       $parameters['cmsRootPath'] = $config->userSystem->cmsRootPath();
+    }
+    if (!array_key_exists('domain_id', $parameters)) {
+      $parameters['domain_id'] = CRM_Core_Config::domainID();
     }
     ksort($parameters); // guaranteed ordering - useful for md5(serialize($parameters))
 
@@ -182,6 +188,16 @@ class CRM_Extension_System {
   }
 
   /**
+   * @return \CRM_Extension_ClassLoader
+   */
+  public function getClassLoader() {
+    if ($this->classLoader === NULL) {
+      $this->classLoader = new CRM_Extension_ClassLoader($this->getMapper(), $this->getFullContainer(), $this->getManager());
+    }
+    return $this->classLoader;
+  }
+
+  /**
    * Get the service for enabling and disabling extensions.
    *
    * @return CRM_Extension_Manager
@@ -237,16 +253,13 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      if (defined('CIVICRM_DSN')) {
-        $cacheGroup = md5(serialize(array('ext', $this->parameters)));
-        $this->cache = new CRM_Utils_Cache_SqlGroup(array(
-          'group' => $cacheGroup,
-          'prefetch' => TRUE,
-        ));
-      }
-      else {
-        $this->cache = new CRM_Utils_Cache_ArrayCache(array());
-      }
+      $cacheGroup = md5(serialize(array('ext', $this->parameters)));
+      // Extension system starts before container. Manage our own cache.
+      $this->cache = CRM_Utils_Cache::create(array(
+        'name' => $cacheGroup,
+        'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+        'prefetch' => TRUE,
+      ));
     }
     return $this->cache;
   }
@@ -258,11 +271,10 @@ class CRM_Extension_System {
    */
   public function getRepositoryUrl() {
     if (empty($this->_repoUrl) && $this->_repoUrl !== FALSE) {
-      $config = CRM_Core_Config::singleton();
-      $url = CRM_Core_BAO_Setting::getItem('Extension Preferences', 'ext_repo_url', NULL, CRM_Extension_Browser::DEFAULT_EXTENSIONS_REPOSITORY);
+      $url = Civi::settings()->get('ext_repo_url');
 
       // boolean false means don't try to check extensions
-      // http://issues.civicrm.org/jira/browse/CRM-10575
+      // CRM-10575
       if ($url === FALSE) {
         $this->_repoUrl = FALSE;
       }

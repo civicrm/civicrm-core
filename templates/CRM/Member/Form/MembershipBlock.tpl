@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,7 @@
 *}
 {* Configure Membership signup/renewal block for an Online Contribution page *}
 <div id="form" class="crm-block crm-form-block crm-member-membershipblock-form-block">
-<div id="help">
+<div class="help">
     {ts}Use this form to enable and configure a Membership Signup and Renewal section for this Online Contribution Page. If you're not using this page for membership signup, leave the <strong>Enabled</strong> box un-checked..{/ts} {docURL page="user/membership/setup"}
 </div>
   {if $form.membership_type.html}
@@ -168,14 +168,12 @@
         if ( cj('#member_price_set_id').val() ) {
             cj('#membership_type-label').hide();
             cj('#membership_type-block').hide();
-            cj('#requiredSignup').hide();
             cj('#displayFee').hide();
             cj('#separatePayment').hide();
             cj('#quickConfigConvertMessage').hide();
         } else {
             cj('#membership_type-label').show();
             cj('#membership_type-block').show();
-            cj('#requiredSignup').show();
             cj('#displayFee').show();
             cj('#separatePayment').show();
         }

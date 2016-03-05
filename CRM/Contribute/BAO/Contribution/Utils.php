@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 class CRM_Contribute_BAO_Contribution_Utils {
 
@@ -41,18 +40,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param array $paymentParams
    *   Array with payment related key.
    *   value pairs
-   * @param array $premiumParams
-   *   Array with premium related key.
-   *   value pairs
    * @param int $contactID
    *   Contact id.
    * @param int $contributionTypeId
    *   Financial type id.
    * @param int|string $component component id
-   * @param array $fieldTypes
-   *   Presumably relates to custom field types - used when building data for sendMail.
-   * @param $isTest
-   * @param $isPayLater
+   * @param bool $isTest
+   * @param bool $isRecur
    *
    * @throws CRM_Core_Exception
    * @throws Exception
@@ -63,309 +57,134 @@ class CRM_Contribute_BAO_Contribution_Utils {
   public static function processConfirm(
     &$form,
     &$paymentParams,
-    &$premiumParams,
     $contactID,
     $contributionTypeId,
     $component = 'contribution',
-    $fieldTypes = NULL,
     $isTest,
-    $isPayLater
+    $isRecur
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
     $lineItems = $form->_lineItem;
     $isPaymentTransaction = self::isPaymentTransaction($form);
 
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $contributionTypeId;
-    if (!$contributionType->find(TRUE)) {
-      //@todo - surely this check was part of the 4.3 upgrade & can go now?
-      CRM_Core_Error::fatal('Could not find a system table');
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $contributionTypeId;
+    $financialType->find(TRUE);
+    if ($financialType->is_deductible) {
+      $form->assign('is_deductible', TRUE);
+      $form->set('is_deductible', TRUE);
     }
 
     // add some financial type details to the params list
     // if folks need to use it
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
-    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
+    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
     //CRM-11456
     $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
+    $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
 
-    $payment = NULL;
-    $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
-
-    if ($isPaymentTransaction) {
-      $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
-    }
-
-    //fix for CRM-2062
     //fix for CRM-16317
-
-    $now = $form->_params['receive_date'] = date('YmdHis');
+    $form->_params['receive_date'] = date('YmdHis');
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
-    $result = NULL;
-    if ($form->_contributeMode == 'notify' ||
-      $isPayLater
-    ) {
-      // this is not going to come back, i.e. we fill in the other details
-      // when we get a callback from the payment processor
-      // also add the contact ID and contribution ID to the params list
-      $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
-      $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution(
+    if ($isPaymentTransaction) {
+
+      $contributionParams = array(
+        'contact_id' => $contactID,
+        'line_item' => $lineItems,
+        'is_test' => $isTest,
+        'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values)),
+        'contribution_page_id' => $form->_id,
+        'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+      );
+      $isMonetary = !empty($form->_values['is_monetary']);
+      if ($isMonetary) {
+        if (empty($paymentParams['is_pay_later'])) {
+          // @todo look up payment_instrument_id on payment processor table.
+          $contributionParams['payment_instrument_id'] = 1;
+        }
+      }
+      $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
         $form,
         $paymentParams,
         NULL,
-        $contactID,
-        $contributionType,
-        TRUE, TRUE,
-        $isTest,
-        $lineItems
+        $contributionParams,
+        $financialType,
+        TRUE,
+        $form->_bltID,
+        $isRecur
       );
 
-      if ($contribution) {
-        $form->_params['contributionID'] = $contribution->id;
-      }
+      $paymentParams['contributionTypeID'] = $contributionTypeId;
+      $paymentParams['item_name'] = $form->_params['description'];
 
-      $form->_params['contributionTypeID'] = $contributionTypeId;
-      $form->_params['item_name'] = $form->_params['description'];
-
-      if ($contribution && $form->_values['is_recur'] &&
-        $contribution->contribution_recur_id
+      if ($contribution && $form->_values['is_recur'] && $contribution->contribution_recur_id
       ) {
-        $form->_params['contributionRecurID'] = $contribution->contribution_recur_id;
+        $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
 
-      $form->set('params', $form->_params);
-      $form->postProcessPremium($premiumParams, $contribution);
-
-      if ($isPaymentTransaction) {
-        // add qfKey so we can send to paypal
-        $form->_params['qfKey'] = $form->controller->_key;
-        if ($component == 'membership') {
-          $membershipResult = array(1 => $contribution);
-          return $membershipResult;
-        }
-        else {
-          if (!$isPayLater) {
-            if (is_object($payment)) {
-              // call postProcess hook before leaving
-              $form->postProcessHook();
-              // this does not return
-              $result = $payment->doTransferCheckout($form->_params, 'contribute');
-            }
-            else {
-              CRM_Core_Error::fatal($paymentObjError);
-            }
-          }
-          else {
-            // follow similar flow as IPN
-            // send the receipt mail
-            $form->set('params', $form->_params);
-            if ($contributionType->is_deductible) {
-              $form->assign('is_deductible', TRUE);
-              $form->set('is_deductible', TRUE);
-            }
-            if (isset($paymentParams['contribution_source'])) {
-              $form->_params['source'] = $paymentParams['contribution_source'];
-            }
-
-            // get the price set values for receipt.
-            if ($form->_priceSetId && $form->_lineItem) {
-              $form->_values['lineItem'] = $form->_lineItem;
-              $form->_values['priceSetID'] = $form->_priceSetId;
-            }
-
-            $form->_values['contribution_id'] = $contribution->id;
-            $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
-
-            CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
-              $form->_values,
-              $contribution->is_test
-            );
-            return;
-          }
-        }
-      }
-    }
-    elseif ($form->_contributeMode == 'express') {
-      if ($form->_values['is_monetary'] && $form->_amount > 0.0) {
-        // determine if express + recurring and direct accordingly
-        if (!empty($paymentParams['is_recur']) && $paymentParams['is_recur'] == 1) {
-          if (is_object($payment)) {
-            $result = $payment->createRecurringPayments($paymentParams);
-          }
-          else {
-            CRM_Core_Error::fatal($paymentObjError);
-          }
-        }
-        else {
-          if (is_object($payment)) {
-            $result = $payment->doExpressCheckout($paymentParams);
-          }
-          else {
-            CRM_Core_Error::fatal($paymentObjError);
-          }
-        }
-      }
-    }
-    elseif ($isPaymentTransaction) {
-      if (!empty($paymentParams['is_recur']) &&
-        $form->_contributeMode == 'direct'
-      ) {
-
-        // For recurring contribution, create Contribution Record first.
-        // Contribution ID, Recurring ID and Contact ID needed
-        // When we get a callback from the payment processor
-
-        $paymentParams['contactID'] = $contactID;
-
-        // Fix for CRM-14354. If the membership is recurring, don't create a
-        // civicrm_contribution_recur record for the additional contribution
-        // (i.e., the amount NOT associated with the membership). Temporarily
-        // cache the is_recur values so we can process the additional gift as a
-        // one-off payment.
-        $pending = FALSE;
-        if (!empty($form->_values['is_recur'])) {
-          if ($form->_membershipBlock['is_separate_payment'] && !empty($form->_params['auto_renew'])) {
-            $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
-            $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
-            unset($form->_values['is_recur']);
-            unset($paymentParams['is_recur']);
-          }
-          else {
-            $pending = TRUE;
-          }
-        }
-
-        $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution(
-          $form,
-          $paymentParams,
-          NULL,
-          $contactID,
-          $contributionType,
-          $pending, TRUE,
-          $isTest,
-          $lineItems
-        );
-
-        // restore cached values (part of fix for CRM-14354)
-        if (!empty($cachedFormValue)) {
-          $form->_values['is_recur'] = $cachedFormValue;
-          $paymentParams['is_recur'] = $cachedParamValue;
-        }
-
-        $paymentParams['contributionID'] = $contribution->id;
-        //CRM-15297 deprecate contributionTypeID
-        $paymentParams['financialTypeID'] = $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
-        $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
-
-        if ($form->_values['is_recur'] && $contribution->contribution_recur_id) {
-          $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
-        }
-      }
-      if ($form->_amount > 0.0) {
-        if (is_object($payment)) {
-          $result = $payment->doDirectPayment($paymentParams);
-        }
-        else {
-          CRM_Core_Error::fatal($paymentObjError);
-        }
-      }
-    }
-
-    if ($component == 'membership') {
-      $membershipResult = array();
-    }
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      //make sure to cleanup db for recurring case.
-      //@todo this clean up has always been controversial as many orgs prefer to see failed transactions.
-      // most recent discussion has been that they should be retained and this could be altered
-      if (!empty($paymentParams['contributionID'])) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
-      }
-      if (!empty($paymentParams['contributionRecurID'])) {
-        CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+      $paymentParams['qfKey'] = $form->controller->_key;
+      if ($component == 'membership') {
+        return array('contribution' => $contribution);
       }
 
-      if ($component !== 'membership') {
-        CRM_Core_Error::displaySessionError($result);
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-          "_qf_Main_display=true&qfKey={$form->_params['qfKey']}"
-        ));
-      }
-      $membershipResult[1] = $result;
-    }
-    elseif ($result || ($form->_amount == 0.0 && !$form->_params['is_pay_later'])) {
-      if ($result) {
-        $form->_params = array_merge($form->_params, $result);
-      }
-      $form->set('params', $form->_params);
-      $form->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
-
-      // result has all the stuff we need
-      // lets archive it to a financial transaction
-      //@todo - this is done in 2 places - can't we just do it once straight after retrieving contribution type -
-      // when would this be a bad thing?
-      if ($contributionType->is_deductible) {
-        $form->assign('is_deductible', TRUE);
-        $form->set('is_deductible', TRUE);
-      }
-
+      $paymentParams['contributionID'] = $contribution->id;
+      //CRM-15297 deprecate contributionTypeID
+      $paymentParams['financialTypeID'] = $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
+      $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
       if (isset($paymentParams['contribution_source'])) {
-        $form->_params['source'] = $paymentParams['contribution_source'];
+        $paymentParams['source'] = $paymentParams['contribution_source'];
       }
 
-      // check if pending was set to true by payment processor
-      $pending = FALSE;
-      if (!empty($form->_params['contribution_status_pending'])) {
-        $pending = TRUE;
+      if ($form->_values['is_recur'] && $contribution->contribution_recur_id) {
+        $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
-      if (!(!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct')) {
-        $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
-          $form->_params, $result,
-          $contactID, $contributionType,
-          $pending, TRUE,
-          $isTest,
-          $lineItems
-        );
-      }
-      $form->postProcessPremium($premiumParams, $contribution);
-      if (is_array($result)) {
-        if (!empty($result['trxn_id'])) {
-          $contribution->trxn_id = $result['trxn_id'];
-        }
-        if (!empty($result['payment_status_id'])) {
-          $contribution->payment_status_id = $result['payment_status_id'];
-        }
-      }
-      $membershipResult[1] = $contribution;
-    }
 
-    if ($component == 'membership') {
-      return $membershipResult;
-    }
-
-    //  Email is done when the payment is completed (now or later)
-    // by completetransaction, rather than the form.
-    // We are moving towards it being done for all payment methods in completetransaction.
-    if (!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct') {
-      if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
+      if (!empty($form->_paymentProcessor)) {
         try {
-          civicrm_api3('contribution', 'completetransaction', array(
-            'id' => $contribution->id,
-            'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-            'is_transactional' => FALSE,
-          ));
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          if ($e->getErrorCode() != 'contribution_completed') {
-            throw new CRM_Core_Exception('Failed to update contribution in database');
+          $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
+          if ($form->_contributeMode == 'notify') {
+            // We want to get rid of this & make it generic - eg. by making payment processing the last thing
+            // and always calling it first.
+            $form->postProcessHook();
           }
+          $result = $payment->doPayment($paymentParams);
+          $form->_params = array_merge($form->_params, $result);
+          $form->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
+          if (!empty($result['trxn_id'])) {
+            $contribution->trxn_id = $result['trxn_id'];
+          }
+          if (!empty($result['payment_status_id'])) {
+            $contribution->payment_status_id = $result['payment_status_id'];
+          }
+          $result['contribution'] = $contribution;
+          return $result;
+        }
+        catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+          // Clean up DB as appropriate.
+          if (!empty($paymentParams['contributionID'])) {
+            CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'],
+              $paymentParams['contactID'], $e->getMessage());
+          }
+          if (!empty($paymentParams['contributionRecurID'])) {
+            CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+          }
+
+          $result['is_payment_failure'] = TRUE;
+          $result['error'] = $e;
+          return $result;
         }
       }
-      return TRUE;
+    }
+
+    // Only pay later or unpaid should reach this point. The theory is that paylater should get a receipt now &
+    // processor
+    // transaction receipts should be outcome driven.
+    $form->set('params', $form->_params);
+    if (isset($paymentParams['contribution_source'])) {
+      $form->_params['source'] = $paymentParams['contribution_source'];
     }
 
     // get the price set values for receipt.
@@ -374,14 +193,22 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_values['priceSetID'] = $form->_priceSetId;
     }
 
-    // finally send an email receipt
-    if ($contribution) {
-      $form->_values['contribution_id'] = $contribution->id;
-      CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
-        $form->_values, $contribution->is_test,
-        FALSE, $fieldTypes
+    $form->_values['contribution_id'] = $contribution->id;
+    $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
+    if ($form->_params['amount'] == 0) {
+      // This is kind of a back-up for pay-later $0 transactions.
+      // In other flows they pick up the manual processor & get dealt with above (I
+      // think that might be better...).
+      return array(
+        'payment_status_id' => 1,
+        'contribution' => $contribution,
+        'payment_processor_id' => 0,
       );
     }
+    CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
+      $form->_values,
+      $contribution->is_test
+    );
   }
 
   /**
@@ -401,15 +228,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
   }
 
   /**
-   * Get the contribution details by month
-   * of the year
+   * Get the contribution details by month of the year.
    *
    * @param int $param
    *   Year.
    *
    * @return array
    *   associated array
-   *
    */
   public static function contributionChartMonthly($param) {
     if ($param) {
@@ -449,7 +274,6 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
    *
    * @return array
    *   associated array
-   *
    */
   public static function contributionChartYearly() {
     $config = CRM_Core_Config::singleton();
@@ -575,294 +399,6 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
     else {
       $transaction['source'] = $source;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * @param array $apiParams
-   * @param $mapper
-   * @param string $type
-   * @param bool $category
-   *
-   * @return array
-   */
-  public static function formatAPIParams($apiParams, $mapper, $type = 'paypal', $category = TRUE) {
-    $type = strtolower($type);
-
-    if (!in_array($type, array(
-      'paypal',
-      'google',
-      'csv',
-    ))
-    ) {
-      // return the params as is
-      return $apiParams;
-    }
-    $params = $transaction = array();
-
-    if ($type == 'paypal') {
-      foreach ($apiParams as $detail => $val) {
-        if (isset($mapper['contact'][$detail])) {
-          $params[$mapper['contact'][$detail]] = $val;
-        }
-        elseif (isset($mapper['location'][$detail])) {
-          $params['address'][1][$mapper['location'][$detail]] = $val;
-        }
-        elseif (isset($mapper['transaction'][$detail])) {
-          switch ($detail) {
-            case 'l_period2':
-              // Sadly, PayPal seems to send two distinct data elements in a single field,
-              // so we break them out here.  This is somewhat ugly and tragic.
-              $freqUnits = array(
-                'D' => 'day',
-                'W' => 'week',
-                'M' => 'month',
-                'Y' => 'year',
-              );
-              list($frequency_interval, $frequency_unit) = explode(' ', $val);
-              $transaction['frequency_interval'] = $frequency_interval;
-              $transaction['frequency_unit'] = $freqUnits[$frequency_unit];
-              break;
-
-            case 'subscriptiondate':
-            case 'timestamp':
-              // PayPal dates are in  ISO-8601 format.  We need a format that
-              // MySQL likes
-              $unix_timestamp = strtotime($val);
-              $transaction[$mapper['transaction'][$detail]] = date('YmdHis', $unix_timestamp);
-              break;
-
-            case 'note':
-            case 'custom':
-            case 'l_number0':
-              if ($val) {
-                $val = "[PayPal_field:{$detail}] {$val}";
-                $transaction[$mapper['transaction'][$detail]] = !empty($transaction[$mapper['transaction'][$detail]]) ? $transaction[$mapper['transaction'][$detail]] . " <br/> " . $val : $val;
-              }
-              break;
-
-            default:
-              $transaction[$mapper['transaction'][$detail]] = $val;
-          }
-        }
-      }
-
-      if (!empty($transaction) && $category) {
-        $params['transaction'] = $transaction;
-      }
-      else {
-        $params += $transaction;
-      }
-
-      self::_fillCommonParams($params, $type);
-
-      return $params;
-    }
-
-    if ($type == 'csv') {
-      $header = $apiParams['header'];
-      unset($apiParams['header']);
-      foreach ($apiParams as $key => $val) {
-        if (isset($mapper['contact'][$header[$key]])) {
-          $params[$mapper['contact'][$header[$key]]] = $val;
-        }
-        elseif (isset($mapper['location'][$header[$key]])) {
-          $params['address'][1][$mapper['location'][$header[$key]]] = $val;
-        }
-        elseif (isset($mapper['transaction'][$header[$key]])) {
-          $transaction[$mapper['transaction'][$header[$key]]] = $val;
-        }
-        else {
-          $params[$header[$key]] = $val;
-        }
-      }
-
-      if (!empty($transaction) && $category) {
-        $params['transaction'] = $transaction;
-      }
-      else {
-        $params += $transaction;
-      }
-
-      self::_fillCommonParams($params, $type);
-
-      return $params;
-    }
-
-    if ($type == 'google') {
-      // return if response smell invalid
-      if (!array_key_exists('risk-information-notification', $apiParams[1][$apiParams[0]]['notifications'])) {
-        return FALSE;
-      }
-      $riskInfo = &$apiParams[1][$apiParams[0]]['notifications']['risk-information-notification'];
-
-      if (array_key_exists('new-order-notification', $apiParams[1][$apiParams[0]]['notifications'])) {
-        $newOrder = &$apiParams[1][$apiParams[0]]['notifications']['new-order-notification'];
-      }
-
-      if ($riskInfo['google-order-number']['VALUE'] == $apiParams[2]['google-order-number']['VALUE']) {
-        foreach ($riskInfo['risk-information']['billing-address'] as $field => $info) {
-          if (!empty($mapper['location'][$field])) {
-            $params['address'][1][$mapper['location'][$field]] = $info['VALUE'];
-          }
-          elseif (!empty($mapper['contact'][$field])) {
-            if ($newOrder && !empty($newOrder['buyer-billing-address']['structured-name'])) {
-              foreach ($newOrder['buyer-billing-address']['structured-name'] as $namePart => $nameValue) {
-                $params[$mapper['contact'][$namePart]] = $nameValue['VALUE'];
-              }
-            }
-            else {
-              $params[$mapper['contact'][$field]] = $info['VALUE'];
-            }
-          }
-          elseif (!empty($mapper['transaction'][$field])) {
-            $transaction[$mapper['transaction'][$field]] = $info['VALUE'];
-          }
-        }
-
-        // Response is an huge array. Lets pickup only those which we ineterested in
-        // using a local mapper, rather than traversing the entire array.
-        $localMapper = array(
-          'google-order-number' => $riskInfo['google-order-number']['VALUE'],
-          'total-charge-amount' => $apiParams[2]['total-charge-amount']['VALUE'],
-          'currency' => $apiParams[2]['total-charge-amount']['currency'],
-          'item-name' => $newOrder['shopping-cart']['items']['item']['item-name']['VALUE'],
-          'timestamp' => $apiParams[2]['timestamp']['VALUE'],
-        );
-        if (array_key_exists('latest-charge-fee', $apiParams[2])) {
-          $localMapper['latest-charge-fee'] = $apiParams[2]['latest-charge-fee']['total']['VALUE'];
-          $localMapper['net-amount'] = $localMapper['total-charge-amount'] - $localMapper['latest-charge-fee'];
-        }
-
-        // This is a subscription (recurring) donation.
-        if (array_key_exists('subscription', $newOrder['shopping-cart']['items']['item'])) {
-          $subscription = $newOrder['shopping-cart']['items']['item']['subscription'];
-          $localMapper['amount'] = $newOrder['order-total']['VALUE'];
-          $localMapper['times'] = $subscription['payments']['subscription-payment']['times'];
-          // Convert Google's period to one compatible with the CiviCRM db field.
-          $freqUnits = array(
-            'DAILY' => 'day',
-            'WEEKLY' => 'week',
-            'MONHTLY' => 'month',
-            'YEARLY' => 'year',
-          );
-          $localMapper['period'] = $freqUnits[$subscription['period']];
-          // Unlike PayPal, Google has no concept of freq. interval, it is always 1.
-          $localMapper['frequency_interval'] = '1';
-          // Google Checkout dates are in ISO-8601 format. We need a format that
-          // MySQL likes
-          $unix_timestamp = strtotime($localMapper['timestamp']);
-          $mysql_date = date('YmdHis', $unix_timestamp);
-          $localMapper['modified_date'] = $mysql_date;
-          $localMapper['start_date'] = $mysql_date;
-          // This is PayPal's nomenclature, but just use it for Google as well since
-          // we act on the value of trxn_type in processAPIContribution().
-          $localMapper['trxn_type'] = 'subscrpayment';
-        }
-
-        foreach ($localMapper as $localKey => $localVal) {
-          if (!empty($mapper['transaction'][$localKey])) {
-            $transaction[$mapper['transaction'][$localKey]] = $localVal;
-          }
-        }
-
-        if (empty($params) && empty($transaction)) {
-          continue;
-        }
-
-        if (!empty($transaction) && $category) {
-          $params['transaction'] = $transaction;
-        }
-        else {
-          $params += $transaction;
-        }
-
-        self::_fillCommonParams($params, $type);
-      }
-      return $params;
-    }
-  }
-
-  /**
-   * @param array $params
-   *
-   * @return bool
-   */
-  public static function processAPIContribution($params) {
-    if (empty($params) || array_key_exists('error', $params)) {
-      return FALSE;
-    }
-
-    // add contact using dedupe rule
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
-    $dedupeParams['check_permission'] = FALSE;
-    $dupeIds = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
-    // if we find more than one contact, use the first one
-    if (!empty($dupeIds[0])) {
-      $params['contact_id'] = $dupeIds[0];
-    }
-    $contact = CRM_Contact_BAO_Contact::create($params);
-    if (!$contact->id) {
-      return FALSE;
-    }
-
-    // only pass transaction params to contribution::create, if available
-    if (array_key_exists('transaction', $params)) {
-      $params = $params['transaction'];
-      $params['contact_id'] = $contact->id;
-    }
-
-    // handle contribution custom data
-    $customFields = CRM_Core_BAO_CustomField::getFields('Contribution',
-      FALSE,
-      FALSE,
-      CRM_Utils_Array::value('financial_type_id',
-        $params
-      )
-    );
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
-      CRM_Utils_Array::value('id', $params, NULL),
-      'Contribution'
-    );
-    // create contribution
-
-    // if this is a recurring contribution then process it first
-    if ($params['trxn_type'] == 'subscrpayment') {
-      // see if a recurring record already exists
-      $recurring = new CRM_Contribute_BAO_ContributionRecur();
-      $recurring->processor_id = $params['processor_id'];
-      if (!$recurring->find(TRUE)) {
-        $recurring = new CRM_Contribute_BAO_ContributionRecur();
-        $recurring->invoice_id = $params['invoice_id'];
-        $recurring->find(TRUE);
-      }
-
-      // This is the same thing the CiviCRM IPN handler does to handle
-      // subsequent recurring payments to avoid duplicate contribution
-      // errors due to invoice ID. See:
-      // ./CRM/Core/Payment/PayPalIPN.php:200
-      if ($recurring->id) {
-        $params['invoice_id'] = md5(uniqid(rand(), TRUE));
-      }
-
-      $recurring->copyValues($params);
-      $recurring->save();
-      if (is_a($recurring, 'CRM_Core_Error')) {
-        return FALSE;
-      }
-      else {
-        $params['contribution_recur_id'] = $recurring->id;
-      }
-    }
-
-    $contribution = &CRM_Contribute_BAO_Contribution::create($params,
-      CRM_Core_DAO::$_nullArray
-    );
-    if (!$contribution->id) {
-      return FALSE;
     }
 
     return TRUE;

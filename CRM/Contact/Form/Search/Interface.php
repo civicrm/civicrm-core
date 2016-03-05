@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 interface CRM_Contact_Form_Search_Interface {
 
@@ -50,7 +48,9 @@ interface CRM_Contact_Form_Search_Interface {
   public function buildTaskList(CRM_Core_Form_Search $form);
 
   /**
-   * Builds the quickform for this search
+   * Builds the quickform for this search.
+   *
+   * @param CRM_Core_Form $form
    */
   public function buildForm(&$form);
 

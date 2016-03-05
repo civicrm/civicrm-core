@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -129,31 +129,4 @@ function civicrm_api3_mailing_group_get($params) {
  */
 function civicrm_api3_mailing_group_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
-
-/**
- * Get metadata for mailing group functions.
- *
- * @param array $params
- *
- * @return array
- */
-function civicrm_api3_mailing_group_getfields($params) {
-  $dao = _civicrm_api3_get_DAO('Subscribe');
-  $d = new $dao();
-  $fields = $d->fields();
-  $d->free();
-
-  $dao = _civicrm_api3_get_DAO('Unsubscribe');
-  $d = new $dao();
-  $fields = $fields + $d->fields();
-  $d->free();
-
-  // CRM-13830 - prevent the api wrapper from helping out with pseudoconstants
-  // Since these fields don't belong to this entity it will fail
-  foreach ($fields as &$field) {
-    unset($field['pseudoconstant']);
-  }
-
-  return civicrm_api3_create_success($fields, $params, 'MailingGroup', 'getfields');
 }

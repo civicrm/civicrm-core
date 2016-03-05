@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
   {include file="CRM/Admin/Form/ParticipantStatusType.tpl"}
 {else}
-  <div id="help">{ts}Manage event participant statuses below. Enable selected statuses to allow event waitlisting and/or participant approval.{/ts} {help id="id-disabled_statuses"}</div>
+  <div class="help">{ts}Manage event participant statuses below. Enable selected statuses to allow event waitlisting and/or participant approval.{/ts} {help id="id-disabled_statuses"}</div>
 
 <div class="crm-section participant-status">
   {strip}
@@ -62,8 +62,8 @@
 
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      {crmButton q="action=add&reset=1" icon="circle-plus"}{ts}Add Participant Status{/ts}{/crmButton}
-      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+      {crmButton q="action=add&reset=1" icon="plus-circle"}{ts}Add Participant Status{/ts}{/crmButton}
+      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 </div>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -33,7 +33,7 @@
  *
  */
 class CRM_Upgrade_Incremental_php_FourOne {
-  // This was changed in 4.3 so we define it locally for compatability with older dbs
+  // This was changed in 4.3 so we define it locally for compatibility with older dbs
   const NAVIGATION_NAME = "Navigation Menu";
 
   /**
@@ -45,7 +45,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviCase', $config->enableComponents)) {
       if (!CRM_Core_DAO::checkTriggerViewPermission(TRUE, FALSE)) {
-        $errors[] = ts('CiviCase now requires CREATE VIEW and DROP VIEW permissions for the database user.');
+        $errors[] = 'CiviCase now requires CREATE VIEW and DROP VIEW permissions for the database user.';
         return FALSE;
       }
     }
@@ -60,8 +60,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   *
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.1.alpha1') {
@@ -70,8 +68,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
       $postUpgradeMessage .= '<br />' .
         ts('The CiviCRM Administration menu structure has been re-organized during this upgrade to make it easier to find things and reduce the number of keystrokes. If you have customized this portion of the navigation menu - you should take a few minutes to review the changes. You may need to reimplement or move your customizations.');
 
-      $postUpgradeMessage .= '<br />' .
-        ts('Yahoo recently discontinued their geocoding and mapping API service. If you previously used Yahoo, you will need to select and configure an alternate service in order to continue using geocoding/mapping tools.');
+      $postUpgradeMessage .= '<br />Yahoo recently discontinued their geocoding and mapping API service. If you previously used Yahoo, you will need to select and configure an alternate service in order to continue using geocoding/mapping tools.';
 
       $postUpgradeMessage .= '<br />' .
         ts('We have integrated KCFinder with CKEditor and TinyMCE, which enables user to upload images. Note that all the images uploaded using KCFinder will be public.');

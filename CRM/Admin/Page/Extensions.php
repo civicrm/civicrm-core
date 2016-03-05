@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -48,10 +46,10 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
    * Obtains the group name from url and sets the title.
-   *
-   * @return void
    */
   public function preProcess() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
     $destination = CRM_Utils_System::url('civicrm/admin/extensions',
       'reset=1');
@@ -117,8 +115,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -127,9 +123,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
    * Browse all options.
-   *
-   *
-   * @return void
    */
   public function browse() {
     $mapper = CRM_Extension_System::singleton()->getMapper();
@@ -212,9 +205,17 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     }
     $this->assign('localExtensionRows', $localExtensionRows);
 
-    // build list of availabe downloads
+    try {
+      $remoteExtensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
+    }
+    catch (CRM_Extension_Exception $e) {
+      $remoteExtensions = array();
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Extension download error'), 'error');
+    }
+
+    // build list of available downloads
     $remoteExtensionRows = array();
-    foreach (CRM_Extension_System::singleton()->getBrowser()->getExtensions() as $info) {
+    foreach ($remoteExtensions as $info) {
       $row = (array) $info;
       $row['id'] = $info->key;
       $action = CRM_Core_Action::UPDATE;

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
@@ -38,8 +36,6 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    * Class constructor.
    *
    * @return \CRM_SMS_DAO_Provider
-   */
-  /**
    */
   public function __construct() {
     parent::__construct();

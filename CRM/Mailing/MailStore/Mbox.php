@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,7 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
-
-require_once 'ezc/Base/src/ezc_bootstrap.php';
-require_once 'ezc/autoload/mail_autoload.php';
 
 /**
  * Class CRM_Mailing_MailStore_Mbox
@@ -70,9 +65,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Empty the mail source (if it was processed fully) and unlock the file
-   *
-   * @return void
+   * Empty the mail source (if it was processed fully) and unlock the file.
    */
   public function __destruct() {
     if ($this->_leftToProcess === 0) {
@@ -90,8 +83,6 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
    *
    * @param int $nr
    *   Number of the message to fetch.
-   *
-   * @return void
    */
   public function markIgnored($nr) {
     if ($this->_debug) {
@@ -108,8 +99,6 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
    *
    * @param int $nr
    *   Number of the message to fetch.
-   *
-   * @return void
    */
   public function markProcessed($nr) {
     if ($this->_debug) {

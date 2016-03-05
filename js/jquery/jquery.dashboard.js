@@ -1,6 +1,6 @@
 /**
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -309,14 +309,14 @@
       };
       widget.minimize = function() {
         $('.widget-content', widget.element).slideUp(opts.animationSpeed);
-        $(widget.controls.minimize.element).addClass( 'maximize-icon' );
-        $(widget.controls.minimize.element).removeClass( 'minimize-icon' );
+        $(widget.controls.minimize.element).addClass( 'fa-caret-right' );
+        $(widget.controls.minimize.element).removeClass( 'fa-caret-down' );
         widget.minimized = true;
       };
       widget.maximize = function() {
         $('.widget-content', widget.element).slideDown(opts.animationSpeed);
-        $(widget.controls.minimize.element).removeClass( 'maximize-icon' );
-        $(widget.controls.minimize.element).addClass( 'minimize-icon' );
+        $(widget.controls.minimize.element).removeClass( 'fa-caret-right' );
+        $(widget.controls.minimize.element).addClass( 'fa-caret-down' );
         widget.minimized = false;
       };
 
@@ -425,7 +425,7 @@
 
       // Adds controls to a widget.  id is for internal use and image file name in images/dashboard/ (a .gif).
       widget.addControl = function(id, control) {
-          var markup = '<a class="widget-icon ' + id + '-icon" alt="' + control.description + '" title="' + control.description + '"></a>';
+          var markup = '<a class="crm-i ' + control.icon + '" alt="' + control.description + '" title="' + control.description + '"></a>';
           control.element = $(markup).prependTo($('.widget-controls', widget.element)).click(control.callback);
       };
 
@@ -456,19 +456,23 @@
       widget.controls = {
         settings: {
           description: ts('Configure this dashlet'),
-          callback: widget.toggleSettings
+          callback: widget.toggleSettings,
+          icon: 'fa-wrench'
         },
         minimize: {
           description: ts('Collapse or expand'),
-          callback: widget.toggleMinimize
+          callback: widget.toggleMinimize,
+          icon: 'fa-caret-down',
         },
         fullscreen: {
           description: ts('View fullscreen'),
-          callback: widget.enterFullscreen
+          callback: widget.enterFullscreen,
+          icon: 'fa-expand',
         },
         close: {
           description: ts('Remove from dashboard'),
-          callback: widget.remove
+          callback: widget.remove,
+          icon: 'fa-times'
         }
       };
       // End public properties of widget.

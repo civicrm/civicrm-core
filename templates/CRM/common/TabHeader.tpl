@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,10 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-
-{* include wysiwyg related files*}
-{include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-
 {* enclose all tabs and its content in a block *}
 <div class="crm-block crm-content-block">
   {if $tabHeader and count($tabHeader)}

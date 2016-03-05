@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to delete a group of
- * contributions. This class provides functionality for the actual
- * deletion.
+ * This class provides the functionality to delete a group of contributions.
+ *
+ * This class provides functionality for the actual deletion.
  */
 class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
 
@@ -50,8 +48,6 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     //check for delete
@@ -63,19 +59,49 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
-    $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+    $count = 0;
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      foreach ($this->_contributionIds as $key => $id) {
+        $finTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'financial_type_id');
+        if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($finTypeID))) {
+          unset($this->_contributionIds[$key]);
+          $count++;
+        }
+        // Now check for lineItems
+        if ($lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id)) {
+          foreach ($lineItems as $items) {
+            if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+              unset($this->_contributionIds[$key]);
+              $count++;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if ($count && empty($this->_contributionIds)) {
+      CRM_Core_Session::setStatus(ts('1 contribution could not be deleted.', array('plural' => '%count contributions could not be deleted.', 'count' => $count)), ts('Error'), 'error');
+      $this->addButtons(array(
+        array(
+          'type' => 'back',
+          'name' => ts('Cancel'),
+        ),
+       )
+      );
+    }
+    elseif ($count && !empty($this->_contributionIds)) {
+      CRM_Core_Session::setStatus(ts('1 contribution will not be deleted.', array('plural' => '%count contributions will not be deleted.', 'count' => $count)), ts('Warning'), 'warning');
+      $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+    }
+    else {
+      $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+    }
   }
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $deleted = $failed = 0;

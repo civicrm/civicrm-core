@@ -9,15 +9,25 @@
   "include-path": ["vendor/tecnickcom"],
   "require": {
     "dompdf/dompdf" : "0.6.*",
-    "symfony/dependency-injection": "2.3.*",
-    "symfony/event-dispatcher": "2.3.*",
-    "symfony/process": "2.3.*",
+    "symfony/config": "~2.5.0",
+    "symfony/dependency-injection": "~2.5.0",
+    "symfony/event-dispatcher": "~2.5.0",
+    "symfony/filesystem": "~2.5.0",
+    "symfony/process": "~2.5.0",
     "psr/log": "1.0.0",
-    "symfony/finder": "2.3.*",
+    "symfony/finder": "~2.5.0",
     "tecnickcom/tcpdf" : "6.2.*",
     "totten/ca-config": "~13.02",
-    "civicrm/civicrm-cxn-rpc": "~0.15.12.04"
+    "civicrm/civicrm-cxn-rpc": "~0.15.12.04",
+    "zetacomponents/base": "1.7.*",
+    "zetacomponents/mail": "dev-1.7-civi"
   },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/civicrm/zetacomponents-mail.git"
+    }
+  ],
   "scripts": {
     "post-install-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",

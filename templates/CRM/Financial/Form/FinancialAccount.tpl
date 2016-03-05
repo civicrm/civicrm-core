@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -42,7 +42,7 @@
       <td class="html-adjust">{$form.description.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-organisation_name">
-      <td class="label">{$form.contact_id.label}&nbsp;{help id="id-financial-owner" file="CRM/Contact/Form/Contact.hlp"}</td>
+      <td class="label">{$form.contact_id.label}&nbsp;{help id="id-financial-owner" file="CRM/Financial/Form/FinancialAccount.hlp"}</td>
       <td class="html-adjust">{$form.contact_id.html}<br />
         <span class="description">{ts}Use this field to indicate the organization that owns this account.{/ts}</span>
       </td>
@@ -58,7 +58,7 @@
       </td>
     </tr>
     <tr class="crm-contribution-form-block-account_type_code">
-      <td class="label">{$form.account_type_code.label}</td>
+      <td class="label">{$form.account_type_code.label}&nbsp;{help id="id-account-type-code" file="CRM/Financial/Form/FinancialAccount.hlp"}</td>
       <td class="html-adjust">{$form.account_type_code.html}<br />
         <span class="description">{ts}Enter an account type code for this account. Account type codes are required for QuickBooks integration and will be included in all accounting batch exports.{/ts}</span>
       </td>

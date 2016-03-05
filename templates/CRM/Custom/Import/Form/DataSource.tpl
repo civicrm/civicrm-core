@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,7 +31,7 @@
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
 
- <div id="help">
+ <div class="help">
     {ts}The Multi-value Custom Data Import Wizard allows you to easily upload data to populate multi-value custom data records (such as employment or education history) for existing contacts.{/ts}
     {ts}Files to be imported must be in the 'comma-separated-values' format (CSV) and must contain data needed to match the incoming data to an existing contact record in your CiviCRM database.{/ts} {help id='upload'}
  </div>
@@ -75,6 +75,11 @@
                 </span>
               </td>
   </tr>
+
+   <tr class="crm-import-datasource-form-block-fieldSeparator">
+     <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+     <td>{$form.fieldSeparator.html}</td>
+   </tr>
   <tr class="crm-custom-import-uploadfile-form-block-date_format">
             {include file="CRM/Core/Date.tpl"}
   </tr>

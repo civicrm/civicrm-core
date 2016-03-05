@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -150,7 +150,7 @@ class CRM_Event_Import_Form_Preview extends CRM_Import_Form_Preview {
     // add all the necessary variables to the form
     $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
-    // check if there is any error occured
+    // check if there is any error occurred
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();

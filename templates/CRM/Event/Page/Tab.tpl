@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,7 +31,7 @@
     {if $permission EQ 'edit'}{capture assign=newEventURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant"}{/capture}
     {/if}
 
-    <div id="help">
+    <div class="help">
         <p>{ts 1=$displayName}This page lists all event registrations for %1 since inception.{/ts}
         {capture assign="link"}class="action-item" href="{$newEventURL}"{/capture}
         {if $permission EQ 'edit'}{ts 1=$link}Click <a %1>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
@@ -44,9 +44,9 @@
     </div>
     {if $action eq 16 and $permission EQ 'edit'}
        <div class="action-link">
-           <a accesskey="N" href="{$newEventURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Event Registration{/ts}</span></a>
+           <a accesskey="N" href="{$newEventURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Event Registration{/ts}</span></a>
             {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Submit Credit Card Event Registration{/ts}</a></span>
+                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Event Registration{/ts}</a></span>
             {/if}
             <br/ ><br/ >
        </div>

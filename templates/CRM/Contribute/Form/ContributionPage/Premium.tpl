@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
+<div class="help">
   {ts}Edit <strong>Premiums Settings</strong> to customize the title and introductory message (e.g ...in appreciation of your support, you will be able to select from a number of exciting thank-you gifts...). You can optionally provide a contact email address and/or phone number for inquiries.{/ts}
   {ts}Then select and review the premiums that you want to offer on this contribution page.{/ts}
 </div>
@@ -103,7 +103,7 @@
           </tr>
           <tr class="crm-contribution-contributionpage-premium-form-block-premiums_nothankyou_label">
             <td class="label">
-              {$form.premiums_nothankyou_label.label}<span class="marker"> *</span>
+              {$form.premiums_nothankyou_label.label}<span class="crm-marker"> *</span>
             </td>
             <td class="html-adjust">{$form.premiums_nothankyou_label.html}<br/>
               <span class="description">{ts}You can change the text for the 'No thank-you' radio button.{/ts}</span>

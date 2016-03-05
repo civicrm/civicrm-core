@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,32 +29,27 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class previews the uploaded file and returns summary
- * statistics
+ * This class previews the uploaded file and returns summary statistics.
  */
 class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
-    //get the data from the session
+    // Get the data from the session.
     $dataValues = $this->get('dataValues');
     $mapper = $this->get('mapper');
     $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
     $mismatchCount = $this->get('unMatchCount');
 
-    //get the mapping name displayed if the mappingId is set
+    // Get the mapping name displayed if the mappingId is set.
     $mappingId = $this->get('loadMappingId');
     if ($mappingId) {
       $mapDAO = new CRM_Core_DAO_Mapping();
@@ -107,9 +102,8 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Process the mapped fields and map it into the uploaded file.
-   * preview the file and extract some summary statistics
    *
-   * @return void
+   * Preview the file and extract some summary statistics
    */
   public function postProcess() {
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
@@ -165,7 +159,7 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
     // add all the necessary variables to the form
     $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
-    // check if there is any error occured
+    // check if there is any error occurred
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();

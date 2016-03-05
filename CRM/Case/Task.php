@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * class to represent the actions that can be performed on a group of contacts
- * used by the search forms
+ * Class to represent the actions that can be performed on a group of contacts.
  *
+ * Used by the search forms
  */
 class CRM_Case_Task {
   const DELETE_CASES = 1, PRINT_CASES = 2, EXPORT_CASES = 3, RESTORE_CASES = 4;
@@ -66,17 +64,17 @@ class CRM_Case_Task {
     if (!self::$_tasks) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Cases'),
+          'title' => ts('Delete cases'),
           'class' => 'CRM_Case_Form_Task_Delete',
           'result' => FALSE,
         ),
         2 => array(
-          'title' => ts('Print Selected Rows'),
+          'title' => ts('Print selected rows'),
           'class' => 'CRM_Case_Form_Task_Print',
           'result' => FALSE,
         ),
         3 => array(
-          'title' => ts('Export Cases'),
+          'title' => ts('Export cases'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
@@ -84,7 +82,7 @@ class CRM_Case_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Restore Cases'),
+          'title' => ts('Restore cases'),
           'class' => 'CRM_Case_Form_Task_Restore',
           'result' => FALSE,
         ),

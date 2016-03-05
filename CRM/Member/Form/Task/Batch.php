@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -92,7 +92,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     if (!$ufGroupId) {
       CRM_Core_Error::fatal('ufGroupId is missing');
     }
-    $this->_title = ts('Batch Update for Members') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
+    $this->_title = ts('Update multiple memberships') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
@@ -111,7 +111,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
       }
 
       //fix to reduce size as we are using this field in grid
-      if (is_array($field['attributes']) && $this->_fields[$name]['attributes']['size'] > 19) {
+      if (is_array($field['attributes']) && !empty($this->_fields[$name]['attributes']['size']) && $this->_fields[$name]['attributes']['size'] > 19) {
         //shrink class to "form-text-medium"
         $this->_fields[$name]['attributes']['size'] = 19;
       }
@@ -120,17 +120,16 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     $this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
     $this->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Update Members(s)'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'submit',
+        'name' => ts('Update Members(s)'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_memberIds);
@@ -176,7 +175,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_Batch_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Unsupported Field Type'), 'error');
+      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple memberships."), ts('Unsupported Field Type'), 'error');
     }
 
     $this->addDefaultButtons(ts('Update Memberships'));
@@ -254,7 +253,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
         }
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
-          $customFields,
           $key,
           'Membership',
           $membershipTypeId

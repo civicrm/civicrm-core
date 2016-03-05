@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,6 @@
 {if !$printOnly} {* NO print section starts *}
 
   {* build the print pdf buttons *}
-  {if $rows}
     <div class="crm-tasks">
       {assign var=print value="_qf_"|cat:$form.formName|cat:"_submit_print"}
       {assign var=pdf   value="_qf_"|cat:$form.formName|cat:"_submit_pdf"}
@@ -86,7 +85,6 @@
         </tr>
       </table>
     </div>
-  {/if}
 
 {literal}
   <script type="text/javascript">

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * Main page for viewing all Saved searches.
- *
  */
 class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
 
@@ -51,8 +48,6 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
    *
    * @param int $id
    *   Id of saved search.
-   *
-   * @return void
    */
   public function delete($id) {
     // first delete the group associated with this saved search
@@ -124,8 +119,6 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
 
   /**
    * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
    */
   public function run() {
     $action = CRM_Utils_Request::retrieve('action', 'String',

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,9 @@
 *}
 <style>{literal}
   .select2-results .ui-icon,
+  .select2-results .crm-i,
   .select2-container .ui-icon,
+  .select2-container .crm-i,
   .select2-results img,
   .select2-container img {
     display: inline-block;
@@ -67,11 +69,11 @@
   </div>
 
   <div class="crm-submit-buttons">
-    <span class="crm-button crm-icon-button">
-      <span class="crm-button-icon ui-icon-check"> </span> <input type="submit" value="{ts}Save{/ts}" name="save" class="crm-form-submit" accesskey="S"/>
+    <span class="crm-button crm-i-button">
+      <i class="crm-i fa-wrench"></i> <input type="submit" value="{ts}Save{/ts}" name="save" class="crm-form-submit" accesskey="S"/>
     </span>
-    <span class="crm-button crm-icon-button">
-      <span class="crm-button-icon ui-icon-cancel"> </span> <input type="submit" value="{ts}Revert to Default{/ts}" name="revert" class="crm-form-submit" onclick="return confirm('{$revertConfirm}');"/>
+    <span class="crm-button crm-i-button">
+      <i class="crm-i fa-times"></i> <input type="submit" value="{ts}Revert to Default{/ts}" name="revert" class="crm-form-submit" onclick="return confirm('{$revertConfirm}');"/>
     </span>
   </div>
 </form>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,11 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -252,11 +251,7 @@ SELECT  petition.id                         as id,
     $sql = 'UPDATE civicrm_activity_contact SET contact_id = %2 WHERE activity_id = %1 AND record_type_id = %3';
     CRM_Core_DAO::executeQuery($sql, $params);
     // remove 'Unconfirmed' tag for this contact
-    $tag_name = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'tag_unconfirmed',
-      NULL,
-      'Unconfirmed'
-    );
+    $tag_name = Civi::settings()->get('tag_unconfirmed');
 
     $sql = "
 DELETE FROM civicrm_entity_tag
@@ -544,10 +539,9 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @param $sendEmailMode
+   * @param int $sendEmailMode
    *
    * @throws Exception
-   * @return void
    */
   public static function sendEmail($params, $sendEmailMode) {
 
@@ -562,11 +556,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
      */
 
     // check if the group defined by CIVICRM_PETITION_CONTACTS exists, else create it
-    $petitionGroupName = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'petition_contacts',
-      NULL,
-      'Petition Contacts'
-    );
+    $petitionGroupName = Civi::settings()->get('petition_contacts');
 
     $dao = new CRM_Contact_DAO_Group();
     $dao->title = $petitionGroupName;

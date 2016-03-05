@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -288,7 +288,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     $this->preProcess();
 
     $this->assign('recentlyViewed', FALSE);
-    $this->assign('ufGroupName', 'unknown'); // override later (if possible)
+    // override later (if possible):
+    $this->assign('ufGroupName', 'unknown');
 
     if ($this->_gid) {
       $ufgroupDAO = new CRM_Core_DAO_UFGroup();

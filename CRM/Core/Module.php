@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -58,6 +58,11 @@ class CRM_Core_Module {
 
   /**
    * Get a list of all known modules.
+   *
+   * @param bool $fresh
+   *   Force new results?
+   *
+   * @return array
    */
   public static function getAll($fresh = FALSE) {
     static $result;

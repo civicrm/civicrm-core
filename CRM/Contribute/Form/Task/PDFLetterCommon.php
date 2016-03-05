@@ -9,10 +9,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   /**
    * Process the form after the input has been submitted and validated.
    *
-   *
    * @param CRM_Contribute_Form_Task $form
-   *
-   * @return void
    */
   public static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
@@ -337,7 +334,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       $defaults = array(
         'toName' => $contact['display_name'],
         'toEmail' => $contact['email'],
-        'subject' => ts('Thank you for your contribution/s'),
         'text' => '',
         'html' => $html,
       );
@@ -345,6 +341,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $emails = CRM_Core_BAO_Email::getFromEmail();
         $emails = array_keys($emails);
         $defaults['from'] = array_pop($emails);
+      }
+      if (!empty($params['subject'])) {
+        $defaults['subject'] = $params['subject'];
+      }
+      else {
+        $defaults['subject'] = ts('Thank you for your contribution/s');
       }
       if ($is_pdf) {
         $defaults['html'] = ts('Please see attached');

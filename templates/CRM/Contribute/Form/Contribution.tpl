@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,21 +25,13 @@
 *}
 {* this template is used for adding/editing/deleting contributions and pledge payments *}
 
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{elseif $priceSetId}
+{if $priceSetId}
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution"}
 {elseif $showAdditionalInfo and $formType }
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
-
+  {include file="CRM/Contribute/Form/AdditionalInfo/Payment.tpl"}
   <div class="crm-block crm-form-block crm-contribution-form-block">
-
-  {if $contributionMode == 'test' }
-    {assign var=contribMode value="TEST"}
-    {elseif $contributionMode == 'live'}
-    {assign var=contribMode value="LIVE"}
-  {/if}
 
   {if !$email and $action neq 8 and $context neq 'standalone'}
   <div class="messages status no-popup">
@@ -47,11 +39,12 @@
   </div>
   {/if}
   {if $contributionMode}
-  <div id="help">
+  <div class="help">
     {if $contactId}
-      {ts 1=$displayName 2=$contribMode}Use this form to submit a new contribution on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
+        %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {else}
-      {ts 1=$displayName 2=$contribMode}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {/if}
   </div>
   {/if}
@@ -85,7 +78,7 @@
       <td>{$form.contact_id.html}</td>
     {/if}
     {if $contributionMode}
-    <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
+      <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
     {/if}
     <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
       <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
@@ -211,6 +204,10 @@
               <td class="label" style="vertical-align: top;">{$form.cancel_reason.label}</td>
               <td>{$form.cancel_reason.html}</td>
             </tr>
+            <tr id="refundTrxnID">
+              <td class="label" style="vertical-align: top;">{$form.refund_trxn_id.label}</td>
+              <td>{$form.refund_trxn_id.html}</td>
+            </tr>
           </table>
         </fieldset>
         </td>
@@ -219,19 +216,7 @@
 
   </table>
 
-  <div class="accordion ui-accordion ui-widget ui-helper-reset">
-    {* Billing Pane is the only billing pane currently *}
-    {foreach from=$billingPanes key=paneName item=paneValue}
-      <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
-        <div class="crm-accordion-header" id="{$paneValue.id}">
-          {$paneName}
-        </div><!-- /.crm-accordion-header -->
-        <div class="crm-accordion-body">
-          <div class="{$paneValue.id}"></div>
-        </div>
-      </div>
-    {/foreach}
-  </div>
+  {include file='CRM/Core/BillingBlockWrapper.tpl'}
 
     <!-- start of soft credit -->
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
@@ -507,7 +492,8 @@
      });
 
      function showHideCancelInfo(obj) {
-       if (obj.find(":selected").text() == 'Refunded' || obj.find(":selected").text() == 'Cancelled') {
+       var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+       if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
          cj('#cancelInfo').show( );
          cj('#total_amount').attr('readonly', true);
        }

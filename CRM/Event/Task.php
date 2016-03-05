@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -70,17 +70,17 @@ class CRM_Event_Task {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Participants'),
+          'title' => ts('Delete participants from event'),
           'class' => 'CRM_Event_Form_Task_Delete',
           'result' => FALSE,
         ),
         2 => array(
-          'title' => ts('Print Selected Rows'),
+          'title' => ts('Print selected rows'),
           'class' => 'CRM_Event_Form_Task_Print',
           'result' => FALSE,
         ),
         3 => array(
-          'title' => ts('Export Participants'),
+          'title' => ts('Export participants'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
@@ -88,7 +88,7 @@ class CRM_Event_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Batch Update Participants Via Profile'),
+          'title' => ts('Update multiple participants'),
           'class' => array(
             'CRM_Event_Form_Task_PickProfile',
             'CRM_Event_Form_Task_Batch',
@@ -96,37 +96,42 @@ class CRM_Event_Task {
           'result' => TRUE,
         ),
         5 => array(
-          'title' => ts('Cancel Registration'),
+          'title' => ts('Cancel registration'),
           'class' => 'CRM_Event_Form_Task_Cancel',
           'result' => FALSE,
         ),
         6 => array(
-          'title' => ts('Send Email to Contacts'),
+          'title' => ts('Email - send now'),
           'class' => 'CRM_Event_Form_Task_Email',
           'result' => TRUE,
         ),
         13 => array(
-          'title' => ts('New Smart Group'),
+          'title' => ts('Group - create smart group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch',
           'result' => TRUE,
         ),
         14 => array(
-          'title' => ts('Update Smart Group'),
+          'title' => ts('Group - update smart group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch_Update',
           'result' => TRUE,
         ),
         15 => array(
-          'title' => ts('Change Participant Status'),
+          'title' => ts('Participant status - change (emails sent)'),
           'class' => 'CRM_Event_Form_Task_ParticipantStatus',
           'result' => TRUE,
         ),
         16 => array(
-          'title' => ts('Print Event Name Badges'),
+          'title' => ts('Name badges - print'),
           'class' => 'CRM_Event_Form_Task_Badge',
           'result' => FALSE,
         ),
+        17 => array(
+          'title' => ts('PDF letter - print for participants'),
+          'class' => 'CRM_Event_Form_Task_PDF',
+          'result' => TRUE,
+        ),
         20 => array(
-          'title' => ts('Add Contacts to Group'),
+          'title' => ts('Group - add contacts'),
           'class' => 'CRM_Event_Form_Task_AddToGroup',
           'result' => FALSE,
         ),
@@ -143,7 +148,7 @@ class CRM_Event_Task {
     }
 
     CRM_Utils_Hook::searchTasks('event', self::$_tasks);
-    asort(self::$_tasks);
+
     return self::$_tasks;
   }
 
@@ -224,6 +229,7 @@ class CRM_Event_Task {
       // make the print task by default
       $value = 2;
     }
+    asort(self::$_tasks);
     return array(
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],

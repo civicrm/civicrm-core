@@ -254,6 +254,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $price_set_amount = array();
       CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
       $cost = $event_price_values['amount'];
+      // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
+      // function to get correct amount level consistently. Remove setting of the amount level in
+      // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+      // to cover all variants.
       $amount_level = $event_price_values['amount_level'];
       $price_details[$price_set_id] = $price_set_amount;
     }
@@ -391,21 +395,17 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $errors = array();
 
     if ($self->payment_required && empty($self->_submitValues['is_pay_later'])) {
-      $payment = CRM_Core_Payment::singleton($self->_mode, $self->_paymentProcessor, CRM_Core_DAO::$_nullObject);
-      $error = $payment->checkConfig($self->_mode);
-      if ($error) {
-        $errors['_qf_default'] = $error;
-      }
       CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
       // validate payment instrument values (e.g. credit card number)
-      CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, $self);
+      CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, NULL);
     }
 
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
+   * @todo this should surely go! Test & remove.
    * @return bool
    */
   public function validate() {
@@ -575,21 +575,19 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
     $params['ip_address'] = CRM_Utils_System::ipAddress();
     $params['currencyID'] = $config->defaultCurrency;
-    $params['payment_action'] = 'Sale';
 
-    $payment = &CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+    $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, TRUE);
     $params['month'] = $params['credit_card_exp_date']['M'];
     $params['year'] = $params['credit_card_exp_date']['Y'];
-    $result = &$payment->doDirectPayment($params);
-    if (is_a($result, 'CRM_Core_Error')) {
+    try {
+      $result = $payment->doPayment($params);
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       CRM_Core_Error::displaySessionError($result);
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/cart_checkout', "_qf_Payment_display=1&qfKey={$this->controller->_key}", TRUE, NULL, FALSE));
-      return NULL;
     }
-    elseif (!$result['trxn_id']) {
-      CRM_Core_Error::fatal(ts("Financial institution didn't return a transaction id."));
-    }
+
     $trxnDetails = array(
       'trxn_id' => $result['trxn_id'],
       'trxn_date' => $result['now'],

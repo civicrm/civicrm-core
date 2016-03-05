@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing a contribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   protected $_crid = NULL;
@@ -57,15 +54,13 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->_crid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'info');
-      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
+      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
 
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
@@ -91,8 +86,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       $this->_mode = 'auto_renew';
     }
 
-    $this->_paymentProcessorObj = CRM_Utils_Array::value('object', $this->_paymentProcessor);
-
     if ((!$this->_crid && !$this->_coid && !$this->_mid) ||
       ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)
     ) {
@@ -113,13 +106,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     }
     $this->assign('paymentProcessor', $this->_paymentProcessor);
 
-    // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $this->_bltID = array_search('Billing', $locationTypes);
-    $this->assign('bltID', $this->_bltID);
-    if (!$this->_bltID) {
-      CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
-    }
+    $this->assignBillingType();
 
     $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
     $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
@@ -132,16 +119,10 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
+   * Set the default values of various form elements.
    *
    * @return array
-   *   reference to the array of default values
-   */
-  /**
-   * @return array
+   *   Default values
    */
   public function setDefaultValues() {
     $this->_defaults = array();
@@ -193,8 +174,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $type = 'next';
@@ -226,7 +205,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param CRM_Core_Form $self
    *
    *
    * @return bool|array
@@ -237,15 +216,13 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // validate the payment instrument values (e.g. credit card number)
-    CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, $self);
+    CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, NULL);
 
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

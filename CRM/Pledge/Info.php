@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,8 +32,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Pledge_Info extends CRM_Core_Component_Info {
 
@@ -111,9 +109,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
-  /**
-   * @return array|null
-   */
   public function getUserDashboardElement() {
     return array(
       'name' => ts('Pledges'),
@@ -133,9 +128,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
-  /**
-   * @return array|null
-   */
   public function registerTab() {
     return array(
       'title' => ts('Pledges'),
@@ -153,9 +145,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *   collection of required pane settings,
    *                    null if no element offered
    */
-  /**
-   * @return array|null
-   */
   public function registerAdvancedSearchPane() {
     return array(
       'title' => ts('Pledges'),
@@ -172,9 +161,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *
    * @return array|null
    *   collection of activity types
-   */
-  /**
-   * @return array|null
    */
   public function getActivityTypes() {
     return NULL;

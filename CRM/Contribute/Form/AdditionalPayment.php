@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This form records additional payments needed when
- * event/contribution is partially paid
- *
+ * This form records additional payments needed when event/contribution is partially paid.
  */
 class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_AbstractEditPayment {
   public $_contributeMode = 'direct';
 
   /**
-   * Related component whose financial payment is being processed
+   * Related component whose financial payment is being processed.
    *
    * @var string
    */
@@ -85,6 +81,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
     $this->assign('component', $this->_component);
     $this->assign('id', $this->_id);
+    $this->assign('suppressPaymentFormButtons', $this->isBeingCalledFromSelectorContext());
 
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, TRUE);
@@ -145,6 +142,15 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('paymentAmt', abs($paymentAmt));
 
     $this->setPageTitle($this->_refund ? ts('Refund') : ts('Payment'));
+  }
+
+  /**
+   * Is this function being called from a datatable selector.
+   *
+   * If so we don't want to show the buttons.
+   */
+  protected function isBeingCalledFromSelectorContext() {
+    return CRM_Utils_Request::retrieve('selector', 'Positive');
   }
 
   /**
@@ -273,7 +279,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     );
 
     $this->add('select', 'payment_instrument_id',
-      ts('Paid By'),
+      ts('Payment Method'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
       TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
     );
@@ -289,7 +295,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
     // add various dates
-    $dateLabel = ($this->_refund) ? ts('Refund Date') : ts('Received Date');
+    $dateLabel = ($this->_refund) ? ts('Refund Date') : ts('Date Received');
     $this->addDateTime('trxn_date', $dateLabel, FALSE, array('formatType' => 'activityDateTime'));
 
     if ($this->_contactId && $this->_id) {
@@ -333,9 +339,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         ),
       )
     );
-    $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
+    $mailingInfo = Civi::settings()->get('mailing_backend');
     $this->assign('outBound_option', $mailingInfo['outBound_option']);
 
     $this->addFormRule(array('CRM_Contribute_Form_AdditionalPayment', 'formRule'), $this);
@@ -488,12 +492,16 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->_params['total_amount'];
+    // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
+    // function to get correct amount level consistently. Remove setting of the amount level in
+    // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+    // to cover all variants.
     $this->_params['amount_level'] = 0;
     $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
       $this->_params,
       $config->defaultCurrency
     );
-    $this->_params['payment_action'] = 'Sale';
+
     if (!empty($this->_params['trxn_date'])) {
       $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['trxn_date'], $this->_params['trxn_date_time']);
     }
@@ -566,19 +574,20 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $result = NULL;
 
     if ($paymentParams['amount'] > 0.0) {
-      // force a reget of the payment processor in case the form changed it, CRM-7179
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
-      $result = $payment->doDirectPayment($paymentParams);
-    }
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      //set the contribution mode.
-      $urlParams = "action=add&cid={$this->_contactId}&id={$this->_id}&component={$this->_component}";
-      if ($this->_mode) {
-        $urlParams .= "&mode={$this->_mode}";
+      try {
+        // force a reget of the payment processor in case the form changed it, CRM-7179
+        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+        $result = $payment->doPayment($paymentParams);
       }
-      CRM_Core_Error::displaySessionError($result);
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        //set the contribution mode.
+        $urlParams = "action=add&cid={$this->_contactId}&id={$this->_id}&component={$this->_component}";
+        if ($this->_mode) {
+          $urlParams .= "&mode={$this->_mode}";
+        }
+        CRM_Core_Error::displaySessionError($result);
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
+      }
     }
 
     if ($result) {

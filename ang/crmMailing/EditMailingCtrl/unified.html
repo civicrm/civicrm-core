@@ -43,10 +43,10 @@
       <div crm-mailing-block-schedule crm-mailing="mailing"/>
     </div>
 
-    <button crm-icon="check" ng-disabled="block.check() || crmMailing.$invalid" ng-click="submit()">{{ts('Submit Mailing')}}</button>
-    <button crm-icon="disk" ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
+    <button crm-icon="fa-paper-plane" ng-disabled="block.check() || crmMailing.$invalid" ng-click="submit()">{{ts('Submit Mailing')}}</button>
+    <button crm-icon="fa-floppy-o" ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
     <button
-      crm-icon="trash"
+      crm-icon="fa-trash"
       ng-show="checkPerm('delete in CiviMail')"
       ng-disabled="block.check()"
       crm-confirm="{title:ts('Delete Draft'), message:ts('Are you sure you want to permanently delete this mailing?')}"

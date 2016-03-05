@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -48,7 +48,18 @@ function civicrm_api3_custom_field_create($params) {
 
   // Array created for passing options in params.
   if (isset($params['option_values']) && is_array($params['option_values'])) {
+    $weight = 0;
     foreach ($params['option_values'] as $key => $value) {
+      // Translate simple key/value pairs into full-blown option values
+      if (!is_array($value)) {
+        $value = array(
+          'label' => $value,
+          'value' => $key,
+          'is_active' => 1,
+          'weight' => $weight,
+        );
+        $key = $weight++;
+      }
       $params['option_label'][$key] = $value['label'];
       $params['option_value'][$key] = $value['value'];
       $params['option_status'][$key] = $value['is_active'];
@@ -80,6 +91,11 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['label']['api.required'] = 1;
   $params['custom_group_id']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
+  $params['option_values'] = array(
+    'title' => 'Option Values',
+    'description' => "Pass an array of options (value => label) to create this field's option values",
+  );
+  // TODO: Why expose this to the api at all?
   $params['option_type'] = array(
     'title' => 'Option Type',
     'description' => 'This (boolean) field tells the BAO to create an option group for the field if the field type is appropriate',

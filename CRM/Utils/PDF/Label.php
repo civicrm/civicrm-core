@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,12 +26,11 @@
  */
 
 /**
- *  Class to print labels in Avery or custom formats
+ * Class to print labels in Avery or custom formats
  * functionality and smarts to the base PDF_Label.
  *
+ * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- *
- *
  */
 
 /**
@@ -268,7 +267,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
     // Check to see if we have any additional fonts to add. You can specify more fonts in
     // civicrm.settings.php via: $config['CiviCRM Preferences']['additional_fonts']
     // CRM-13307
-    $additionalFonts = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'additional_fonts');
+    $additionalFonts = Civi::settings()->get('additional_fonts');
     if (is_array($additionalFonts)) {
       $fontLabel = array_merge($fontLabel, $additionalFonts);
     }

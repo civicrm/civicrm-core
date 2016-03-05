@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,14 +30,10 @@
 {include file="CRM/common/TrackingFields.tpl"}
 
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block">
-    <div id="help">
+    <div class="help">
         <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
             {if $contributeMode EQ 'notify' and ! $is_pay_later}
-                {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout'}
-                    {ts}Click the <strong>Google Checkout</strong> button to checkout to Google, where you will select your payment method and complete the contribution.{/ts}
-                {else}
-                    {ts 1=$paymentProcessor.name 2=$button}Click the <strong>%2</strong> button to go to %1, where you will select your payment method and complete the contribution.{/ts}
-                {/if}
+                {ts 1=$paymentProcessor.name 2=$button}Click the <strong>%2</strong> button to go to %1, where you will select your payment method and complete the contribution.{/ts}
             {elseif ! $is_monetary or $amount LE 0.0 or $is_pay_later}
                 {ts 1=$button}To complete this transaction, click the <strong>%1</strong> button below.{/ts}
             {else}
@@ -82,8 +78,8 @@
                 {if $totalTaxAmount }
                      {ts}Total Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
                 {/if}
-                {if $amount }
-                    {ts}Total Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
+		{if $amount}
+                    {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if} : <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
                 {else}
                     {$membership_name} {ts}Membership{/ts}: <strong>{$minimum_fee|crmMoney}</strong>
                 {/if}
@@ -133,7 +129,14 @@
     </div>
     {/if}
 
-    {if $honor_block_is_active}
+
+    {if $onbehalfProfile|@count && $is_for_organization}
+      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
+         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+      </div>
+    {/if}
+
+    {if $honoreeProfileFields|@count}
         <div class="crm-group honor_block-group">
             <div class="header-dark">
                 {$soft_credit_type}
@@ -141,7 +144,7 @@
             <div class="display-block">
                 <div class="label-left crm-section honoree_profile-section">
                     <strong>{$honorName}</strong></br>
-                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
+                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
                 </div>
             </div>
          </div>
@@ -177,17 +180,6 @@
             <br />
         </div>
     </div>
-    {/if}
-
-    {if $onbehalfProfile}
-      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
-         <div class="crm-section organization_email-section">
-            <div class="label">{ts}Organization Email{/ts}</div>
-            <div class="content">{$onBehalfEmail}</div>
-            <div class="clear"></div>
-         </div>
-      </div>
     {/if}
 
     {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
@@ -281,19 +273,6 @@
         {/if}
         </p>
     </div>
-    {/if}
-
-    {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout' and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) and ! $is_pay_later}
-        <fieldset class="crm-group google_checkout-group"><legend>{ts}Checkout with Google{/ts}</legend>
-        <table class="form-layout-compressed">
-            <tr>
-                <td class="description">{ts}Click the Google Checkout button to continue.{/ts}</td>
-            </tr>
-            <tr>
-                <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span></td>
-            </tr>
-        </table>
-        </fieldset>
     {/if}
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">

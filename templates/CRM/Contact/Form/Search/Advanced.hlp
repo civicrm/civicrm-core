@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,15 +27,16 @@
 {ts}Advanced Search{/ts}
 {/htxt}
 {htxt id='id-advanced-intro'}
-    <p>{ts}Use <strong>&#37;</strong> wildcard(s) for partial matches. EXAMPLE: Enter 'Volunteer&#37;' as your Activity Type to match any activity whose type is 'Volunteer' + any other words (e.g. Volunteer for Open House).{/ts}</p>
-    <p>{ts}If multiple boxes are checked for Contact Types, Groups, Tags and Location Types, the selections are combined as <strong>OR</strong> criteria (e.g. checking 'Group A' and 'Group B' will find contacts who are either in 'Group A' OR 'Group B'). All other search fields are combined as <strong>AND</strong> criteria (e.g. selecting Tag is 'Age' AND Country is 'Canada' returns only those contacts who meet both criteria).{/ts}</p>
+  <p>{ts}Use <strong>&#37;</strong> wildcard(s) for partial matches. EXAMPLE: Enter 'Volunteer&#37;' as your Activity Type to match any activity whose type is 'Volunteer' + any other words (e.g. Volunteer for Open House).{/ts}</p>
+  <p>{ts}When multiple options are selected within a search field the selections are combined using <strong>OR</strong> criteria (e.g. selecting both 'Group A' and 'Group B' will find contacts who are either in 'Group A' OR 'Group B' or in both).</p>
+  <p>By default the different search fields are combined using the <strong>AND</strong> Search Operator (e.g. selecting Tag is 'Age' AND Country is 'Canada' returns only those contacts who meet both criteria). You can override the Search Operator default for combining different fields in the Search Settings.{/ts}</p>
 {/htxt}
 
 {htxt id='id-advanced-smart-title'}
 {ts}Smart Group{/ts}
 {/htxt}
 {htxt id='id-advanced-smart'}
-    <p>{ts}If you've changed search criteria for this 'smart group' and want to save your changes, select <strong>Update Smart Group</strong> from the '- more actions -' drop-down menu, and then click Go.{/ts}</p>
+    <p>{ts}If you've changed search criteria for this 'smart group' and want to save your changes, select <strong>Group - update smart group</strong> from the '- more actions -' drop-down menu{/ts}</p>
 {/htxt}
 
 {htxt id="id-privacy-title"}
@@ -61,10 +62,10 @@
 {/htxt}
 
 {htxt id="id-search-views-title"}
-{ts}Search Views{/ts}
+{ts}Views For Display Contacts{/ts}
 {/htxt}
 {htxt id="id-search-views"}
-    <p>{ts}You can modify the columns displayed in your search results by creating a Profile containing a different set of contact fields and then selecting that Profile here. For example you may want to include columns for Gender and Date of Birth, while eliminating Country.{/ts} {docURL page="user/current/organising-your-data/profiles"}</p>
+    <p>{ts}If you are displaying the search results as contacts, you can modify the columns displayed by creating a Profile containing a different set of contact fields and then selecting that Profile here. For example you may want to include columns for Gender and Date of Birth, while eliminating Country.{/ts} {docURL page="user/current/organising-your-data/profiles"}</p>
 {/htxt}
 
 {htxt id="id-search-operator-title"}

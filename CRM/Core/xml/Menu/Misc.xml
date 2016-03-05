@@ -183,7 +183,7 @@
   <item>
     <path>civicrm/ajax/angular-modules</path>
     <page_callback>\Civi\Angular\Page\Modules</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>*always allow*</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/recurringentity/update-mode</path>
@@ -200,5 +200,11 @@
     <path>civicrm/ajax/l10n-js</path>
     <page_callback>CRM_Core_Resources::outputLocalizationJS</page_callback>
     <access_callback>1</access_callback>
+  </item>
+  <item>
+    <path>civicrm/shortcode</path>
+    <page_callback>CRM_Core_Form_ShortCode</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+    <title>Insert CiviCRM Content</title>
   </item>
 </menu>

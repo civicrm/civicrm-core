@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,12 +23,12 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
+<div class="help">
   {ts 1=$GName}The existing option choices for %1 group are listed below. You can add, edit or delete them from this screen.{/ts}
 </div>
 {if $action ne 1 and $action ne 2}
   <div class="action-link">
-    <a href="{$newReport}"  id="new"|cat:$GName class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts 1=$GName}Register New %1{/ts}</span></a>
+    <a href="{$newReport}"  id="new"|cat:$GName class="button"><span><i class="crm-i fa-plus-circle"></i> {ts 1=$GName}Register New %1{/ts}</span></a>
   </div>
   <div class="spacer"></div>
 {/if}
@@ -74,7 +74,7 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-        <a href="{$newReport}"  id="new"|cat:$GName class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts 1=$GName}Register New %1{/ts}</span></a>
+        <a href="{$newReport}"  id="new"|cat:$GName class="button"><span><i class="crm-i fa-plus-circle"></i> {ts 1=$GName}Register New %1{/ts}</span></a>
       </div>
     {/if}
   </div>

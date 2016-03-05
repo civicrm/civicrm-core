@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'Mail/mime.php';
@@ -129,7 +127,7 @@ WHERE  email = %2
    *   $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
    */
   public static function &unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE) {
-    /* First make sure there's a matching queue event */
+    // First make sure there's a matching queue event.
 
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
     $success = NULL;
@@ -173,8 +171,8 @@ WHERE  email = %2
                 AND     $group.is_hidden = 0"
     );
 
-    /* Make a list of groups and a list of prior mailings that received
-     * this mailing */
+    // Make a list of groups and a list of prior mailings that received
+    // this mailing.
 
     $groups = array();
     $base_groups = array();
@@ -194,8 +192,8 @@ WHERE  email = %2
       }
     }
 
-    /* As long as we have prior mailings, find their groups and add to the
-     * list */
+    // As long as we have prior mailings, find their groups and add to the
+    // list.
 
     while (!empty($mailings)) {
       $do->query("
@@ -222,9 +220,9 @@ WHERE  email = %2
     $base_group_ids = array_keys($base_groups);
     CRM_Utils_Hook::unsubscribeGroups('unsubscribe', $mailing_id, $contact_id, $group_ids, $base_group_ids);
 
-    /* Now we have a complete list of recipient groups.  Filter out all
-     * those except smart groups, those that the contact belongs to and
-     * base groups from search based mailings */
+    // Now we have a complete list of recipient groups.  Filter out all
+    // those except smart groups, those that the contact belongs to and
+    // base groups from search based mailings.
 
     $baseGroupClause = '';
     if (!empty($base_group_ids)) {
@@ -292,7 +290,7 @@ WHERE  email = %2
   }
 
   /**
-   * Send a reponse email informing the contact of the groups from which he.
+   * Send a response email informing the contact of the groups from which he.
    * has been unsubscribed.
    *
    * @param string $queue_id
@@ -303,8 +301,6 @@ WHERE  email = %2
    *   Is this domain-level?.
    * @param int $job
    *   The job ID.
-   *
-   * @return void
    */
   public static function send_unsub_response($queue_id, $groups, $is_domain = FALSE, $job) {
     $config = CRM_Core_Config::singleton();
@@ -406,7 +402,7 @@ WHERE  email = %2
     $b = CRM_Utils_Mail::setMimeParams($message);
     $h = $message->headers($headers);
 
-    $mailer = $config->getMailer();
+    $mailer = \Civi::service('pear_mail');
 
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
@@ -425,7 +421,9 @@ WHERE  email = %2
    * @param bool $is_distinct
    *   Group by queue ID?.
    *
-   * @param null $org_unsubscribe
+   * @param string $org_unsubscribe
+   *
+   * @param string $toDate
    *
    * @return int
    *   Number of rows in result set

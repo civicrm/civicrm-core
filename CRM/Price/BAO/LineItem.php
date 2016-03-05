@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -219,7 +219,7 @@ AND li.entity_id = {$entityId}
     );
 
     $getTaxDetails = FALSE;
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     if ($overrideWhereClause) {
       $whereClause = $overrideWhereClause;
@@ -475,6 +475,7 @@ AND li.entity_id = {$entityId}
 
   /**
    * Build line items array.
+   *
    * @param array $params
    *   Form values.
    *
@@ -484,7 +485,7 @@ AND li.entity_id = {$entityId}
    * @param string $entityTable
    *   Entity Table.
    *
-   * @return void
+   * @param bool $isRelatedID
    */
   public static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
 
@@ -518,6 +519,9 @@ AND li.entity_id = {$entityId}
     else {
       $setID = NULL;
       $totalEntityId = count($entityId);
+      if ($entityTable == 'contribution') {
+        $isRelatedID = TRUE;
+      }
       foreach ($entityId as $id) {
         $lineItems = CRM_Price_BAO_LineItem::getLineItems($id, $entityTable, NULL, TRUE, $isRelatedID);
         foreach ($lineItems as $key => $values) {

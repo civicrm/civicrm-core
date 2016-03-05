@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,11 +24,14 @@
  +--------------------------------------------------------------------+
 *}
 {*this template is used for activity accordion*}
-<div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
-  <div class="crm-accordion-header">
-    {ts}Activities{/ts}
-  </div>
-  <div id="activities" class="crm-accordion-body">
+{assign var=caseid value=$caseID}
+{if isset($isForm) and $isForm}
+  <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
+    <div class="crm-accordion-header">
+      {ts}Activities{/ts}
+    </div>
+
+    <div id="activities" class="crm-accordion-body">
     <div class="crm-accordion-wrapper crm-accordion-inner crm-search_filters-accordion collapsed">
       <div class="crm-accordion-header">
         {ts}Search Filters{/ts}
@@ -42,24 +45,17 @@
             <td class="crm-case-caseview-form-block-status_id"><label for="status_id">{$form.status_id.label}</label><br />
               {$form.status_id.html}
             </td>
-            <td style="vertical-align: bottom;">
-              {assign var=caseid value=$caseID}
-              <span class="crm-button crm-icon-button">
-                <span class="crm-button-icon ui-icon-check"></span>
-                <input class="crm-form-submit default" name="_qf_Basic_refresh" value="{ts}Search{/ts}" type="button" data-case-id="{$caseid}" />
-              </span>
-            </td>
           </tr>
           <tr>
             <td class="crm-case-caseview-form-block-activity_date_low">
-        {assign var=activitylow  value=activity_date_low_$caseID}
+              {assign var=activitylow  value=activity_date_low_$caseID}
               {$form.$activitylow.label}<br />
-            {include file="CRM/common/jcalendar.tpl" elementName=$activitylow}
+              {include file="CRM/common/jcalendar.tpl" elementName=$activitylow}
             </td>
             <td class="crm-case-caseview-form-block-activity_date_high">
-        {assign var=activityhigh  value=activity_date_high_$caseID}
+              {assign var=activityhigh  value=activity_date_high_$caseID}
               {$form.$activityhigh.label}<br />
-            {include file="CRM/common/jcalendar.tpl" elementName=$activityhigh}
+              {include file="CRM/common/jcalendar.tpl" elementName=$activityhigh}
             </td>
             <td class="crm-case-caseview-form-block-activity_type_filter_id">
               {$form.activity_type_filter_id.label}<br />
@@ -76,121 +72,47 @@
         </table>
       </div><!-- /.crm-accordion-body -->
     </div><!-- /.crm-accordion-wrapper -->
+{/if}
 
-    <table id=case_id_{$caseid}  class="nestedActivitySelector">
+    <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-order='[[0,"desc"]]' data-page-length="10">
       <thead><tr>
-        <th class='crm-case-activities-date'>{ts}Date{/ts}</th>
-        <th class='crm-case-activities-subject'>{ts}Subject{/ts}</th>
-        <th class='crm-case-activities-type'>{ts}Type{/ts}</th>
-        <th class='crm-case-activities-with'>{ts}With{/ts}</th>
-        <th class='crm-case-activities-assignee'>{ts}Reporter / Assignee{/ts}</th>
-        <th class='crm-case-activities-status'>{ts}Status{/ts}</th>
-        <th class='crm-case-activities-status' id="nosort">&nbsp;</th>
-        <th class='hiddenElement'>&nbsp;</th>
+        <th data-data="activity_date_time" class="crm-case-activities-date">{ts}Date{/ts}</th>
+        <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-case-activities-subject">{ts}Subject{/ts}</th>
+        <th data-data="type" class="crm-case-activities-type">{ts}Type{/ts}</th>
+        <th data-data="target_contact_name" class="crm-case-activities-with">{ts}With{/ts}</th>
+        <th data-data="source_contact_name" class="crm-case-activities-assignee">{ts}Reporter{/ts}</th>
+        <th data-data="assignee_contact_name" class="crm-case-activities-assignee">{ts}Assignee{/ts}</th>
+        <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-type="select" class="crm-case-activities-status">{ts}Status{/ts}</th>
+        <th data-data="links" data-orderable="false" class="crm-case-activities-status">&nbsp;</th>
       </tr></thead>
     </table>
-
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
-
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-  var CaseId = {/literal}{$caseID}{literal};
-  buildCaseActivities(false);
-  $('input.crm-form-submit[data-case-id=' + CaseId + ']').click(buildCaseActivities);
-
-  function buildCaseActivities(filterSearch) {
-    if (filterSearch) {
-      oTable.fnDestroy();
-    }
-    var count = 0;
-    var columns = '';
-    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/activity' h=0 q='snippet=4&caseID='}"{literal}+CaseId;
-    sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
-    sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
-
-    $('#case_id_'+CaseId+' th').each(function( ) {
-      if ($(this).attr('id') != 'nosort') {
-        columns += '{"sClass": "' + $(this).attr('class') +'"},';
-      }
-      else {
-        columns += '{ "bSortable": false },';
-      }
-      count++;
-    });
-
-    columns = columns.substring(0, columns.length - 1 );
-    eval('columns =[' + columns + ']');
-
-    oTable = $('#case_id_'+CaseId).dataTable({
-      "bFilter"    : false,
-      "bAutoWidth" : false,
-      "aaSorting"  : [],
-      "aoColumns"  : columns,
-      "bProcessing": true,
-      "bJQueryUI": true,
-      "asStripClasses" : [ "odd-row", "even-row" ],
-      "sPaginationType": "full_numbers",
-      "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
-      "bServerSide": true,
-      "sAjaxSource": sourceUrl,
-      "iDisplayLength": 10,
-      "bDestroy": true,
-      "fnDrawCallback": function() {
-        setSelectorClass();
-        setRowIds();
-        // FIXME: trigger crmLoad and crmEditable would happen automatically
-        $('.crm-editable', '#case_id_'+CaseId).crmEditable();
-      },
-      "fnServerData": function ( sSource, aoData, fnCallback ) {
-
-        if ( filterSearch ) {
-          var activity_deleted = 0;
-          if ( $("#activity_deleted_"+CaseId+":checked").val() == 1 ) {
-            activity_deleted = 1;
+  {literal}
+    <script type="text/javascript">
+      (function($) {
+        var caseId = {/literal}{$caseID}{literal};
+        CRM.$('table#case_id_' + caseId).data({
+          "ajax": {
+            "url": {/literal}'{crmURL p="civicrm/ajax/activity" h=0 q="snippet=4&caseID=$caseID&cid=$contactID&userID=$userID"}'{literal},
+            "data": function (d) {
+              d.status_id = $("select#status_id_" + caseId).val(),
+              d.reporter_id = $("select#reporter_id_" + caseId).val(),
+              d.activity_type_id = $("select#activity_type_filter_id_" + caseId).val(),
+              d.activity_date_low = $("#activity_date_low_" + caseId).val(),
+              d.activity_date_high = $("#activity_date_high_" + caseId).val(),
+              d.activity_deleted = ($("#activity_deleted_1").prop('checked')) ? 1 : 0; 
+            }
           }
-          aoData.push(
-            {name:'status_id', value: $("select#status_id_"+CaseId).val()},
-            {name:'reporter_id', value: $("select#reporter_id_"+CaseId).val()},
-            {name:'activity_type_id', value: $("select#activity_type_filter_id_"+CaseId).val()},
-            {name:'activity_date_low', value: $("#activity_date_low_"+CaseId).val()},
-            {name:'activity_date_high', value: $("#activity_date_high_"+CaseId).val() },
-            {name:'activity_deleted', value: activity_deleted }
-          );
-        }
-        $.ajax( {
-          "dataType": 'json',
-          "type": "POST",
-          "url": sSource,
-          "data": aoData,
-          "success": fnCallback
-        } );
-      }
-    });
-  }
+        });
+        $(function($) {
+          $('#searchOptions :input').change(function(){
+            CRM.$('table#case_id_' + caseId).DataTable().draw();
+          });
+        });
+      })(CRM.$);
+    </script>
+  {/literal}
 
-  function setRowIds() {
-    $("#case_id_"+CaseId+" tbody tr").each(function() {
-      var link, id;
-      link = $('a.action-item', this).attr('href');
-      if (link) {
-        id = link.match(/&id=(\d+)/);
-      }
-      if (id) {
-        $(this)
-          .addClass('crm-entity')
-          .data('entity', 'activity')
-          .data('id', id[1]);
-      }
-    });
-  }
-
-  function setSelectorClass() {
-    $("#case_id_"+CaseId+" td:last-child").each(function() {
-      $(this).parent().addClass($(this).text());
-    });
-  }
-});
-</script>
-{/literal}
+{if isset($isForm) and $isForm}
+    </div><!-- /.crm-accordion-body -->
+  </div><!-- /.crm-accordion-wrapper -->
+{/if}

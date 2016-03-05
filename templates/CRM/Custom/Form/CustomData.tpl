@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -40,7 +40,7 @@
   {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple > $cgCount ) ) }
     <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id} add-more-link-{$group_id}-{$cgCount}">
       <a href="#" class="crm-hover-button" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">
-        <span class="icon ui-icon-circle-plus"></span>
+        <i class="crm-i fa-plus-circle"></i>
         {ts 1=$cd_edit.title}Another %1 record{/ts}
       </a>
     </div>
@@ -93,7 +93,7 @@
       {else}
         <div id="add-more-link-{$cgCount}">
           <a href="#" class="crm-hover-button" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">
-            <span class="icon ui-icon-circle-plus"></span>
+            <i class="crm-i fa-plus-circle"></i>
             {ts 1=$cd_edit.title}Another %1 record{/ts}
           </a>
         </div>

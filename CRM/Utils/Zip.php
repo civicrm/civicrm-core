@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -43,7 +41,8 @@ class CRM_Utils_Zip {
    *
    * @param ZipArchive $zip
    *
-   * @return mixed; FALSE if #root level items !=1; otherwise, the name of base dir
+   * @return mixed
+   *   FALSE if #root level items !=1; otherwise, the name of base dir
    */
   static public function findBaseDirName(ZipArchive $zip) {
     $cnt = $zip->numFiles;
@@ -75,7 +74,8 @@ class CRM_Utils_Zip {
    *
    * @param ZipArchive $zip
    *
-   * @return array(string), no trailing /
+   * @return array(string)
+   *   no trailing /
    */
   static public function findBaseDirs(ZipArchive $zip) {
     $cnt = $zip->numFiles;
@@ -98,8 +98,8 @@ class CRM_Utils_Zip {
    * @param ZipArchive $zip
    * @param $expected
    *
-   * @return string
-   *   or FALSE
+   * @return string|bool
+   *   Return string or FALSE
    */
   static public function guessBasedir(ZipArchive $zip, $expected) {
     $candidate = FALSE;

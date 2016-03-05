@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Contribute/Form/ContributionType.tpl"}
 {else}
-    <div id="help">
+    <div class="help">
         <p>{ts}Financial types are used to categorize contributions for reporting and accounting purposes. These are also referred to as <strong>Funds</strong>. You may set up as many types as needed. Each type can carry an accounting code which can be used to map contributions to codes in your accounting system. Commonly used financial types are: Donation, Campaign Contribution, Membership Dues...{/ts}</p>
     </div>
 
@@ -71,8 +71,8 @@
 {/if}
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      {crmButton q="action=add&reset=1" id="newContributionType"  icon="circle-plus"}{ts}Add Financial Type{/ts}{/crmButton}
-      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+      {crmButton q="action=add&reset=1" id="newContributionType"  icon="plus-circle"}{ts}Add Financial Type{/ts}{/crmButton}
+      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

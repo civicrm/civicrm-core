@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -23,14 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{capture assign=aclURL}{crmURL p='civicrm/acl' q='reset=1'}{/capture}
-{capture assign=rolesURL}{crmURL p='civicrm/admin/options/acl_role' q='reset=1'}{/capture}
-{capture assign=docLink}{docURL page='user/current/initial-set-up/permissions-and-access-control/' text='Access Control Documentation'}{/capture}
-
-<div id="help" class="crm-block">
-    <p>{ts 1=$docLink}ACLs allow you control access to CiviCRM data. An ACL consists of an <strong>Operation</strong> (e.g. 'View' or 'Edit'), a <strong>set of data</strong> that the operation can be performed on (e.g. a group of contacts), and a <strong>Role</strong> that has permission to do this operation. Refer to the %1 for more info.{/ts}</p>
-    <p>{ts 1=$aclURL 2=$rolesURL}An ACL Role represents a collection ACL&rsquo;s (permissions). You can assign roles to groups of CiviCRM contacts who are users of your site below. You can add or modify ACLs <a href='%1'>here</a>. You can create additional ACL Roles <a href='%2'>here</a>.{/ts}</p>
-</div>
+{include file="CRM/ACL/Header.tpl" step=2}
 
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/ACL/Form/EntityRole.tpl"}
@@ -67,7 +60,7 @@
 
         {if $action ne 1 and $action ne 2}
       <div class="crm-submit-buttons">
-            {crmButton q="action=add&reset=1" id="newACL"  icon="circle-plus"}{ts}Add Role Assignment{/ts}{/crmButton}
+            {crmButton q="action=add&reset=1" id="newACL"  icon="plus-circle"}{ts}Add Role Assignment{/ts}{/crmButton}
         </div>
         {/if}
 </div>

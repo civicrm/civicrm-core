@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,6 @@
 /**
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
@@ -82,6 +81,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
 
   /**
    * @inheritDoc
+   *
+   * @return array
    */
   public function checkRequirements() {
     $errors = array();
@@ -93,6 +94,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
 
   /**
    * @inheritDoc
+   *
+   * @return array_keys
    */
   public function getKeys() {
     $k2c = $this->getKeysToContainer();
@@ -101,6 +104,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
 
   /**
    * @inheritDoc
+   *
+   * @param string $key
    */
   public function getPath($key) {
     return $this->getContainer($key)->getPath($key);
@@ -108,6 +113,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
 
   /**
    * @inheritDoc
+   *
+   * @param string $key
    */
   public function getResUrl($key) {
     return $this->getContainer($key)->getResUrl($key);
@@ -155,7 +162,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
     if ($this->cache) {
       $k2c = $this->cache->get($this->cacheKey);
     }
-    if (!is_array($k2c)) {
+    if (!isset($k2c) || !is_array($k2c)) {
       $k2c = array();
       $containerNames = array_reverse(array_keys($this->containers));
       foreach ($containerNames as $name) {

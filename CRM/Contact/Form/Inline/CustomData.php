@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for custom data section
+ * Form helper class for custom data section.
  */
 class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
@@ -69,8 +67,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements for custom data.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -88,15 +84,12 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     // Process / save custom data
     // Get the form values and groupTree
     $params = $this->controller->exportValues($this->_name);
     CRM_Core_BAO_CustomValueTable::postProcess($params,
-      $this->_groupTree[$this->_groupID]['fields'],
       'civicrm_contact',
       $this->_contactId,
       $this->_entityType

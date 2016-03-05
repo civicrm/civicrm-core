@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,11 +26,11 @@
 {* this template is used for web-based subscriptions to mailing list type groups  *}
 <div class="crm-block crm-mailing-subscribe-form-block">
 {if $single}
-    <div id="help">
+    <div class="help">
         {ts}Enter your email address and click <strong>Subscribe</strong>. You will receive a confirmation request via email shortly. Your subscription will be activated after you respond to that email.{/ts}
     </div>
 {else}
-    <div id="help">
+    <div class="help">
         {ts}Enter your email address and check the box next to each mailing list you want to join. Then click the <strong>Subscribe</strong> button. You will receive a confirmation request via email for each selected list. Activate your subscription to each list by responding to the corresponding confirmation email.{/ts}
     </div>
 {/if}

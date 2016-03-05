@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,11 +26,16 @@
  */
 
 /**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * A PHP cron script to format all the addresses in the database. Currently
  * it only does geocoding if the geocode values are not set. At a later
  * stage we will also handle USPS address cleanup and other formatting
  * issues
- *
  */
 class CRM_Utils_Address_BatchUpdate {
 
@@ -44,6 +49,8 @@ class CRM_Utils_Address_BatchUpdate {
   var $returnError = 0;
 
   /**
+   * Class constructor.
+   *
    * @param array $params
    */
   public function __construct($params) {
@@ -56,6 +63,8 @@ class CRM_Utils_Address_BatchUpdate {
   }
 
   /**
+   * Run batch update.
+   *
    * @return array
    */
   public function run() {
@@ -115,9 +124,11 @@ class CRM_Utils_Address_BatchUpdate {
   }
 
   /**
-   * @param $config
-   * @param $processGeocode
-   * @param $parseStreetAddress
+   * Process contacts.
+   *
+   * @param CRM_Core_Config $config
+   * @param bool $processGeocode
+   * @param bool $parseStreetAddress
    *
    * @return array
    * @throws Exception
@@ -279,6 +290,8 @@ class CRM_Utils_Address_BatchUpdate {
   }
 
   /**
+   * Return result.
+   *
    * @return array
    */
   public function returnResult() {

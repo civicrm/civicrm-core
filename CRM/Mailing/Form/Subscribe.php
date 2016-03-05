@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
   protected $_groupID = NULL;
@@ -77,8 +75,6 @@ SELECT   title, description
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // add the email address
@@ -140,9 +136,9 @@ ORDER BY title";
       $addCaptcha = FALSE;
     }
     else {
-      // if this is POST request and came from a block,
-      // lets add recaptcha only if already present
-      // gross hack for now
+      // If this is POST request and came from a block,
+      // lets add recaptcha only if already present.
+      // Gross hack for now.
       if (!empty($_POST) &&
         !array_key_exists('recaptcha_challenge_field', $_POST)
       ) {
@@ -185,10 +181,6 @@ ORDER BY title";
     return array('_qf_default' => 'Please select one or more mailing lists.');
   }
 
-  /**
-   *
-   * @return void
-   */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 

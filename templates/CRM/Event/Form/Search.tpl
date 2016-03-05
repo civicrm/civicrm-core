@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -40,6 +40,13 @@
                {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}&nbsp;&nbsp;&nbsp;{$form.buttons.html}
            </td>
         </tr>
+        {if $form.deleted_contacts}
+        <tr class="crm-event-search-form-block-deleted_contacts">
+          <td colspan="2">
+            {$form.deleted_contacts.html}&nbsp;&nbsp;{$form.deleted_contacts.label}
+          </td>
+        </tr>
+        {/if}
 
         {include file="CRM/Event/Form/Search/Common.tpl"}
 

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -66,7 +66,7 @@
   <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-is_navigation">
       <td class="report-label">{$form.is_navigation.label}</td>
-      <td>{$form.is_navigation.html}<br />
+      <td>{$form.is_navigation.html} {ts}Link to {/ts}  {$form.view_mode.html}<br />
         <span class="description">{ts}All report instances are automatically included in the Report Listing page. Check this box to also add this report to the navigation menu.{/ts}</span>
       </td>
     </tr>

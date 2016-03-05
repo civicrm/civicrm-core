@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -29,13 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -60,16 +58,14 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Core_DAO::storeValues($group, $defaults);
       return $group;
     }
-
-    return NULL;
   }
 
   /**
-   * Delete the group and all the object that connect to
-   * this group. Incredibly destructive
+   * Delete the group and all the object that connect to this group.
    *
-   * @param int $id
-   *   Group id.
+   * Incredibly destructive.
+   *
+   * @param int $id Group id.
    */
   public static function discard($id) {
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
@@ -111,10 +107,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $query = "DELETE FROM civicrm_acl_entity_role where entity_table = 'civicrm_group' AND entity_id = %1";
     CRM_Core_DAO::executeQuery($query, $params);
 
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-      'is_enabled'
-    )
-    ) {
+    if (Civi::settings()->get('is_enabled')) {
       // clear any descendant groups cache if exists
       CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
     }
@@ -138,6 +131,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * Returns an array of the contacts in the given group.
+   *
+   * @param int $id
    */
   public static function getGroupContacts($id) {
     $params = array(array('group', 'IN', array($id => 1), 0, 0));
@@ -203,7 +198,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   this array contains the list of members for this group id
    */
   public static function &getMember($groupID, $useCache = TRUE) {
-    $params = array(array('group', 'IN', array($groupID => 1), 0, 0));
+    $params = array(array('group', '=', $groupID, 0, 0));
     $returnProperties = array('contact_id');
     list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, $useCache);
 
@@ -429,9 +424,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (CRM_Utils_Array::value('no_parent', $params) !== 1) {
       if (empty($params['parents']) &&
         $domainGroupID != $group->id &&
-        CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-          'is_enabled'
-        ) &&
+        Civi::settings()->get('is_enabled') &&
         !CRM_Contact_BAO_GroupNesting::hasParentGroups($group->id)
       ) {
         // if no parent present and the group doesn't already have any parents,
@@ -506,7 +499,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * and store it for future use
    */
   public function buildClause() {
-    $params = array(array('group', 'IN', array($this->id => 1), 0, 0));
+    $params = array(array('group', 'IN', array($this->id), 0, 0));
 
     if (!empty($params)) {
       $tables = $whereTables = array();
@@ -637,7 +630,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * This function create the hidden smart group when user perform
-   * contact seach and want to send mailing to search contacts.
+   * contact search and want to send mailing to search contacts.
    *
    * @param array $params
    *   ( reference ) an assoc array of name/value pairs.
@@ -739,41 +732,61 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // format params and add links
     $groupList = array();
-    if (!empty($groups)) {
-      foreach ($groups as $id => $value) {
-        $groupList[$id]['group_id'] = $value['id'];
-        $groupList[$id]['count'] = $value['count'];
-        $groupList[$id]['group_name'] = $value['title'];
+    foreach ($groups as $id => $value) {
+      $group = array();
+      $group['group_id'] = $value['id'];
+      $group['count'] = $value['count'];
+      $group['title'] = $value['title'];
 
-        // append parent names if in search mode
-        if (empty($params['parent_id']) && !empty($value['parents'])) {
-          $groupIds = explode(',', $value['parents']);
-          $title = array();
-          foreach ($groupIds as $gId) {
-            $title[] = $allGroups[$gId];
-          }
-          $groupList[$id]['group_name'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . implode(', ', $title) . '</div>';
-          $value['class'] = array_diff($value['class'], array('crm-row-parent'));
+      // append parent names if in search mode
+      if (empty($params['parent_id']) && !empty($value['parents'])) {
+        $group['parent_id'] = $value['parents'];
+        $groupIds = explode(',', $value['parents']);
+        $title = array();
+        foreach ($groupIds as $gId) {
+          $title[] = $allGroups[$gId];
         }
-        $value['class'][] = 'crm-entity';
-        $groupList[$id]['class'] = $value['id'] . ',' . implode(' ', $value['class']);
-
-        $groupList[$id]['group_description'] = CRM_Utils_Array::value('description', $value);
-        if (!empty($value['group_type'])) {
-          $groupList[$id]['group_type'] = $value['group_type'];
-        }
-        else {
-          $groupList[$id]['group_type'] = '';
-        }
-        $groupList[$id]['visibility'] = $value['visibility'];
-        $groupList[$id]['links'] = $value['action'];
-        $groupList[$id]['org_info'] = CRM_Utils_Array::value('org_info', $value);
-        $groupList[$id]['created_by'] = CRM_Utils_Array::value('created_by', $value);
-
-        $groupList[$id]['is_parent'] = $value['is_parent'];
+        $group['title'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . implode(', ', $title) . '</div>';
+        $value['class'] = array_diff($value['class'], array('crm-row-parent'));
       }
-      return $groupList;
+      $group['DT_RowId'] = 'row_' . $value['id'];
+      if (!$params['parentsOnly']) {
+        foreach ($value['class'] as $id => $class) {
+          if ($class = 'crm-group-parent') {
+            unset($value['class'][$id]);
+          }
+        }
+      }
+      $group['DT_RowClass'] = 'crm-entity ' . implode(' ', $value['class']);
+      $group['DT_RowAttr'] = array();
+      $group['DT_RowAttr']['data-id'] = $value['id'];
+      $group['DT_RowAttr']['data-entity'] = 'group';
+
+      $group['description'] = CRM_Utils_Array::value('description', $value);
+
+      if (!empty($value['group_type'])) {
+        $group['group_type'] = $value['group_type'];
+      }
+      else {
+        $group['group_type'] = '';
+      }
+
+      $group['visibility'] = $value['visibility'];
+      $group['links'] = $value['action'];
+      $group['org_info'] = CRM_Utils_Array::value('org_info', $value);
+      $group['created_by'] = CRM_Utils_Array::value('created_by', $value);
+
+      $group['is_parent'] = $value['is_parent'];
+
+      array_push($groupList, $group);
     }
+
+    $groupsDT = array();
+    $groupsDT['data'] = $groupList;
+    $groupsDT['recordsTotal'] = $params['total'];
+    $groupsDT['recordsFiltered'] = $params['total'];
+
+    return $groupsDT;
   }
 
   /**
@@ -871,10 +884,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           'count' => '0',
         );
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
-        // Wrap with crm-editable. Not an ideal solution.
-        if (in_array(CRM_Core_Permission::EDIT, $groupPermissions)) {
-          $values[$object->id]['title'] = '<span class="crm-editable crmf-title">' . $values[$object->id]['title'] . '</span>';
-        }
 
         if ($object->saved_search_id) {
           $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';
@@ -1029,10 +1038,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // need to return id, title (w/ spacer), description, visibility
 
     // We need to build a list of tags ordered by hierarchy and sorted by
-    // name. The heirarchy will be communicated by an accumulation of
+    // name. The hierarchy will be communicated by an accumulation of
     // separators in front of the name to give it a visual offset.
     // Instead of recursively making mysql queries, we'll make one big
-    // query and build the heirarchy with the algorithm below.
+    // query and build the hierarchy with the algorithm below.
     $groups = array();
     $args = array(1 => array($groupIdString, 'String'));
     $query = "

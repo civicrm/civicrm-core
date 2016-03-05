@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  *  Access Control List
  */
 class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
+  /**
+   * @var string
+   */
   static $_entityTable = NULL;
   static $_objectTable = NULL;
   static $_operation = NULL;
@@ -44,6 +45,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   static $_fieldKeys = NULL;
 
   /**
+   * Get ACL entity table.
+   *
    * @return array|null
    */
   public static function entityTable() {
@@ -679,7 +682,7 @@ SELECT $acl.*
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     // note this also resets any ACL cache

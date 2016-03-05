@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -99,9 +99,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     }
 
     // check if we're in shopping cart mode for events
-    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
+    $enableCart = Civi::settings()->get('enable_cart');
     if (!$enableCart) {
       unset($tabs['conference']);
     }
@@ -109,19 +107,24 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $eventID = $form->getVar('_id');
     if ($eventID) {
       // disable tabs based on their configuration status
+      $eventNameMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+        'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+      )));
       $sql = "
 SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder, re.id as is_repeating_event
 FROM       civicrm_event e
 LEFT JOIN  civicrm_tell_friend taf ON ( taf.entity_table = 'civicrm_event' AND taf.entity_id = e.id )
 LEFT JOIN  civicrm_pcp_block pcp   ON ( pcp.entity_table = 'civicrm_event' AND pcp.entity_id = e.id )
-LEFT JOIN  civicrm_action_mapping  map ON ( map.entity_value = 'civicrm_event' )
-LEFT JOIN  civicrm_action_schedule sch ON ( sch.mapping_id = map.id AND sch.entity_value = %1 )
+LEFT JOIN  civicrm_action_schedule sch ON ( sch.mapping_id = %2 AND sch.entity_value = %1 )
 LEFT JOIN  civicrm_recurring_entity re ON ( e.id = re.entity_id AND re.entity_table = 'civicrm_event' )
 WHERE      e.id = %1
 ";
       //Check if repeat is configured
       $eventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
-      $params = array(1 => array($eventID, 'Integer'));
+      $params = array(
+        1 => array($eventID, 'Integer'),
+        2 => array($eventNameMapping->getId(), 'Integer'),
+      );
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if (!$dao->fetch()) {
         CRM_Core_Error::fatal();
@@ -199,9 +202,11 @@ WHERE      e.id = %1
           $action = 'browse';
         }
 
-        $tabs[$key]['link'] = CRM_Utils_System::url("civicrm/event/manage/{$key}",
-          "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}"
-        );
+        $link = "civicrm/event/manage/{$key}";
+        $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
+
+        $tabs[$key]['link'] = (isset($value['link']) ? $value['link'] :
+          CRM_Utils_System::url($link, $query));
       }
     }
 

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -49,7 +49,7 @@
     {else}
     <div class="crm-block crm-content-block">
     <div class="view-content">
-    <div id="help">
+    <div class="help">
          {ts 1=$displayName}This page lists all case records for %1.{/ts}
          {if $permission EQ 'edit' and call_user_func(array('CRM_Core_Permission','check'), 'access all cases and activities') and $allowToAddNewCase}
          {ts 1="href='$newCaseURL' class='action-item'"}Click <a %1>Add Case</a> to add a case record for this contact.{/ts}{/if}
@@ -60,7 +60,7 @@
           call_user_func(array('CRM_Core_Permission','check'), 'add cases') ) AND
         $allowToAddNewCase}
         <div class="action-link">
-        <a accesskey="N" href="{$newCaseURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts}Add Case{/ts}</span></a>
+        <a accesskey="N" href="{$newCaseURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Case{/ts}</span></a>
         </div>
     {/if}
 

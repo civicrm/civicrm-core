@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for an Email object
+ * Form helper class for an Email object.
  */
 class CRM_Contact_Form_Edit_Email {
 
@@ -47,8 +45,6 @@ class CRM_Contact_Form_Edit_Email {
    *   Block number to build.
    * @param bool $blockEdit
    *   Is it block edit.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
@@ -62,17 +58,13 @@ class CRM_Contact_Form_Edit_Email {
     $form->applyFilter('__ALL__', 'trim');
 
     //Email box
-    $form->addElement('text', "email[$blockId][email]", ts('Email'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', 'email'));
+    $form->addField("email[$blockId][email]", array('entity' => 'email'));
     $form->addRule("email[$blockId][email]", ts('Email is not valid.'), 'email');
     if (isset($form->_contactType) || $blockEdit) {
       //Block type
-      $form->addSelect("email[$blockId][location_type_id]", array(
-          'entity' => 'email',
-          'class' => 'eight',
-          'placeholder' => NULL,
-          'option_url' => NULL,
-        ));
+      $form->addField("email[$blockId][location_type_id]", array('entity' => 'email', 'placeholder' => NULL, 'class' => 'eight', 'option_url' => NULL));
 
+      //TODO: Refactor on_hold field to select.
       $multipleBulk = CRM_Core_BAO_Email::isMultipleBulkMail();
 
       //On-hold select
@@ -85,7 +77,7 @@ class CRM_Contact_Form_Edit_Email {
         $form->addElement('select', "email[$blockId][on_hold]", '', $holdOptions);
       }
       else {
-        $form->addElement('advcheckbox', "email[$blockId][on_hold]", NULL);
+        $form->addField("email[$blockId][on_hold]", array('entity' => 'email', 'type' => 'advcheckbox'));
       }
 
       //Bulkmail checkbox
@@ -116,7 +108,7 @@ class CRM_Contact_Form_Edit_Email {
           array('rows' => 2, 'cols' => 40)
         );
 
-        $form->addWysiwyg("email[$blockId][signature_html]", ts('Signature (HTML)'),
+        $form->add('wysiwyg', "email[$blockId][signature_html]", ts('Signature (HTML)'),
           array('rows' => 2, 'cols' => 40)
         );
       }

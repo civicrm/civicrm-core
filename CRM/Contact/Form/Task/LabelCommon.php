@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,27 +29,22 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the common functionality for sending email to
- * one or a group of contact ids. This class is reused by all the search
- * components in CiviCRM (since they all have send email as a task)
+ * This class provides the common functionality for sending email to one or a group of contact ids.
  */
 class CRM_Contact_Form_Task_LabelCommon {
 
   /**
-   * Create labels (pdf)
+   * Create labels (pdf).
    *
    * @param array $contactRows
-   *   Assciated array of contact data.
+   *   Associated array of contact data.
    * @param string $format
    *   Format in which labels needs to be printed.
    * @param string $fileName
    *   The name of the file to save the label in.
-   *
    */
   public static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
@@ -90,9 +85,7 @@ class CRM_Contact_Form_Task_LabelCommon {
 
     //build the return properties
     $returnProperties = array('display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1);
-    $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'mailing_format'
-    );
+    $mailingFormat = Civi::settings()->get('mailing_format');
 
     $mailingFormatProperties = array();
     if ($mailingFormat) {
@@ -169,7 +162,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     foreach ($contactIDs as $value) {
       foreach ($custom as $cfID) {
         if (isset($details[$value]["custom_{$cfID}"])) {
-          $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::getDisplayValue($details[$value]["custom_{$cfID}"], $cfID, $details[1]);
+          $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[$value]["custom_{$cfID}"], $cfID);
         }
       }
       $contact = CRM_Utils_Array::value($value, $details);
@@ -257,9 +250,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *   [street_address => 1, supplemental_address_1 => 1, supplemental_address_2 => 1]
    */
   public static function getAddressReturnProperties() {
-    $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'mailing_format'
-    );
+    $mailingFormat = Civi::settings()->get('mailing_format');
 
     $addressFields = CRM_Utils_Address::sequence($mailingFormat);
     $addressReturnProperties = array_fill_keys($addressFields, 1);
@@ -276,9 +267,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @return array
    */
   public static function getTokenData(&$contacts) {
-    $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'mailing_format'
-    );
+    $mailingFormat = Civi::settings()->get('mailing_format');
     $tokens = $tokenFields = array();
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
 

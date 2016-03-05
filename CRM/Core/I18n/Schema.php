@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,15 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_I18n_Schema {
 
   /**
    * Drop all views (for use by CRM_Core_DAO::dropAllTables() mostly).
-   *
-   * @return void
    */
   public static function dropAllViews() {
     $domain = new CRM_Core_DAO_Domain();
@@ -62,8 +58,6 @@ class CRM_Core_I18n_Schema {
    *
    * @param string $locale
    *   the first locale to create (migrate to).
-   *
-   * @return void
    */
   public static function makeMultilingual($locale) {
     $domain = new CRM_Core_DAO_Domain();
@@ -117,8 +111,6 @@ class CRM_Core_I18n_Schema {
    *
    * @param string $retain
    *   the locale to retain.
-   *
-   * @return void
    */
   public static function makeSinglelingual($retain) {
     $domain = new CRM_Core_DAO_Domain();
@@ -163,8 +155,6 @@ class CRM_Core_I18n_Schema {
    *   schema structure class to use to recreate indices.
    *
    * @param array $triggers
-   *
-   * @return void
    */
   public static function makeSinglelingualTable(
     $retain,
@@ -244,8 +234,6 @@ class CRM_Core_I18n_Schema {
    *   the new locale to add.
    * @param string $source
    *   the locale to copy from.
-   *
-   * @return void
    */
   public static function addLocale($locale, $source) {
     // get the current supported locales
@@ -303,8 +291,6 @@ class CRM_Core_I18n_Schema {
    *   locales to be rebuilt.
    * @param string $version
    *   version of schema structure to use.
-   *
-   * @return void
    */
   public static function rebuildMultilingualSchema($locales, $version = NULL) {
     if ($version) {

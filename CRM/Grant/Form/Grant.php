@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -56,19 +56,18 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_context;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Grant';
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
    */
   public function preProcess() {
-    //custom data related code
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      CRM_Custom_Form_CustomData::preProcess($this);
-      return;
-    }
 
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -104,10 +103,11 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
+      $grantTypeId = empty($_POST['grant_type_id']) ? NULL : $_POST['grant_type_id'];
       $this->set('type', 'Grant');
-      $this->set('subType', CRM_Utils_Array::value('grant_type_id', $_POST));
+      $this->set('subType', $grantTypeId);
       $this->set('entityId', $this->_id);
-      CRM_Custom_Form_CustomData::preProcess($this);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $grantTypeId, 1, 'Grant', $this->_id);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
@@ -117,9 +117,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     $defaults = parent::setDefaultValues();
 
@@ -171,9 +168,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
@@ -295,7 +289,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       CRM_Core_BAO_CustomField::getFields('Grant', FALSE, FALSE, NULL, NULL, TRUE)
     );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_id,
       'Grant'
     );

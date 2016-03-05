@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -168,6 +168,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * @return void
    */
   public function browse($action = NULL) {
+    CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
@@ -234,7 +236,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     }
 
     // get all event pages. pcp campaign start and end dates for event related pcp's use the online registration start and end dates,
-    // altho if target is contribution page this might not be correct. fixme? dgg
+    // although if target is contribution page this might not be correct. fixme? dgg
     $query = "SELECT id, title, start_date, end_date, registration_start_date, registration_end_date
                   FROM civicrm_event
                   WHERE is_template IS NULL OR is_template != 1";

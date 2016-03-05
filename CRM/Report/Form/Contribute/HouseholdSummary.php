@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -80,6 +80,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
           'household_name' => array('title' => ts('Household Name')),
         ),
         'grouping' => 'household-fields',
+      ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
       ),
       'civicrm_relationship' => array(
         'dao' => 'CRM_Contact_DAO_Relationship',
@@ -262,6 +265,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
                       {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                       {$this->_aliases['civicrm_email']}.is_primary = 1\n ";
     }
+    $this->getPermissionedFTQuery($this);
   }
 
   public function where() {
@@ -274,7 +278,6 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
             $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
           }
           else {

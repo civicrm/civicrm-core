@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -49,10 +49,11 @@
   {ts}Form Snippet{/ts}
 {/htxt}
 {htxt id='standalone'}
-    <p>{ts}The HTML Form Snippet code will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on ANY website where you want to collect contact information.{/ts}</p>
+    <p>{ts}The HTML Form Snippet code will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on your website where you want to collect contact information.{/ts}</p>
+    <p>{ts}By changing the relative URLs included in the snippet to absolute URLs (e.g. change "/sites/all/modules/civicrm/bower_components/jquery/dist/jquery.min.js?r=dXCgD" to "https://yourdomain.com/sites/all/modules/civicrm/bower_components/jquery/dist/jquery.min.js?r=dXCgD") you will be able to use the snippet on any website.{/ts}</p>
+    <p><strong>{ts}If the web page you are pasting the snippet code to is hosted in a different domain from your CiviCRM site, you may NOT be able to include Country and State fields in the form (the script which dynamically loads the states based on selected country may not be able to execute across domains).{/ts}</strong></p>
     <p>{ts}You can control the web page that someone is directed to AFTER completing the form by modifying the contents of the hidden <strong>postURL</strong> input field. Replace the default value with any valid complete URL prior to saving the form code to the desired page(s).{/ts}</p>
     <p>{ts}EXAMPLE:{/ts} <strong>&lt;input type="hidden" name="postURL" value="{ts}http://www.example.com/thank_you.html{/ts}"&gt;</strong></p>
-    <p>{ts}If the form is submitted with errors (i.e. required field not completed...) - the default behavior is to display the errors within the 'built-in' profile form. You can override this behavior - specifying your own error page - by adding a hidden <strong>errorURL</strong> input field.{/ts}</p> {docURL page="user/the-user-interface/profiles"}
+    <p>{ts}If the form is submitted with errors (i.e. required field not completed...) - the default behavior is to display the errors within the 'built-in' profile form. You can override this behavior - specifying your own error page - by adding a hidden <strong>errorURL</strong> input field.{/ts}</p> {docURL page="user/organising-your-data/profiles/"}
     <p><strong>{ts}Make sure the CAPTCHA feature is NOT enabled for this profile when you are grabbing the HTML code. CAPTCHA requires dynamic page generation. Submitting an HTML Snippet profile form with CAPTCHA included will ALWAYS result in a CAPTCHA validation error - which means that the information entered by the user can not be saved.{/ts}</strong></p>
-    <p><strong>{ts}If the web page you are pasting the snippet code to is hosted in a different domain from your CiviCRM site, you may NOT be able to include Country and State fields in the form (the script which dynamically loads the states based on selected country may not be able to execute across domains).{/ts}</strong></p>
 {/htxt}

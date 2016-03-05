@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,15 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_View_UserDashBoard {
 
   /**
-   * called when action is browse.
-   *
-   * @return void
+   * Called when action is browse.
    */
   public function browse() {
     $count = CRM_Contact_BAO_GroupContact::getContactGroup(
@@ -127,10 +123,9 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
   }
 
   /**
-   * the main function that is called when the page loads,
-   * it decides the which action has to be taken for the page.
+   * The main function that is called when the page loads.
    *
-   * @return void
+   * It decides the which action has to be taken for the page.
    */
   public function run() {
     $this->edit();

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -37,6 +37,7 @@
  * @param array $params
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_open_i_d_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -60,7 +61,7 @@ function _civicrm_api3_open_i_d_create_spec(&$params) {
  * @param array $params
  *
  * @return array
- *   API result Array
+ *   API result array
  */
 function civicrm_api3_open_i_d_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -73,7 +74,7 @@ function civicrm_api3_open_i_d_delete($params) {
  *   An associative array of name/value pairs.
  *
  * @return array
- *   details of found OpenID
+ *   API result array
  */
 function civicrm_api3_open_i_d_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

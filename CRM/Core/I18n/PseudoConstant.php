@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -76,6 +76,22 @@ class CRM_Core_I18n_PseudoConstant {
    */
   public static function shortForLong($long) {
     return substr($long, 0, 2);
+  }
+
+  /**
+   * Returns a list of ISO 639-1 "right-to-left" language codes.
+   *
+   * @return array
+   */
+  public static function getRTLlanguages() {
+    $rtl = array(
+      'ar',
+      'fa',
+      'he',
+      'ur',
+    );
+
+    return $rtl;
   }
 
 }

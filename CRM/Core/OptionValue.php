@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_OptionValue {
 
@@ -183,6 +181,7 @@ class CRM_Core_OptionValue {
    *
    */
   public static function addOptionValue(&$params, &$groupParams, &$action, &$optionValueID) {
+    $ids = array();
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     // checking if the group name with the given id or name (in $groupParams) exists
     if (!empty($groupParams)) {
@@ -291,7 +290,7 @@ class CRM_Core_OptionValue {
         $nameTitle = array(
           'payment_instrument' => array(
             'name' => 'payment_instrument',
-            'title' => ts('Payment Instrument'),
+            'title' => ts('Payment Method'),
             'headerPattern' => '/^payment|(p(ayment\s)?instrument)$/i',
           ),
         );
@@ -347,8 +346,6 @@ class CRM_Core_OptionValue {
    * Build select query in case of option-values
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {

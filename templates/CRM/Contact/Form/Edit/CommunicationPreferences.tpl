@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -107,18 +107,16 @@
             {/if}
         </tr>
         <tr>
-            {foreach key=key item=item from=$commPreference}
-                <td>
-                    <br /><span class="label">{$form.$key.label}</span> {help id="id-$key" file="CRM/Contact/Form/Contact.hlp"}
-                    {foreach key=k item=i from=$item}
-                     <br />{$form.$key.$k.html}
-                    {/foreach}
-                </td>
-            {/foreach}
-                 <td>
-                     <br /><span class="label">{$form.preferred_language.label}</span>
-                     <br />{$form.preferred_language.html}
-                </td>
+          {foreach key=key item=item from=$commPreference}
+            <td>
+              <br/><span class="label">{$form.$key.label}</span> {help id="id-$key" file="CRM/Contact/Form/Contact.hlp"}
+              <br/>{$form.$key.html}
+            </td>
+          {/foreach}
+          <td>
+            <br/><span class="label">{$form.preferred_language.label}</span>
+            <br/>{$form.preferred_language.html}
+          </td>
         </tr>
         <tr>
             <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}</td>

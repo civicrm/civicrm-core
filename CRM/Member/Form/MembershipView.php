@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -158,8 +158,17 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
 
     if ($id) {
       $params = array('id' => $id);
-
       CRM_Member_BAO_Membership::retrieve($params, $values);
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+        $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'financial_type_id');
+        $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
+        if (!CRM_Core_Permission::check('view contributions of type ' . $finType)) {
+          CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        }
+      }
+      else {
+        $this->assign('noACL', TRUE);
+      }
       $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']);
 
       // Do the action on related Membership if needed
@@ -369,7 +378,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       $memType = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $id, "membership_type_id");
 
       $groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', $this, $id, 0, $memType);
-      CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
+      CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $id);
 
       $isRecur = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $id, 'contribution_recur_id');
 
@@ -399,14 +408,13 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
    */
   public function buildQuickForm() {
     $this->addButtons(array(
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+      array(
+        'type' => 'cancel',
+        'name' => ts('Done'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to delete a group of
- * case records. This class provides functionality for the actual
- * deletion.
+ * This class provides the functionality to delete a group of case records.
  */
 class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
 
@@ -67,17 +63,13 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
-    $this->addDefaultButtons(ts('Delete Cases'), 'done');
+    $this->addDefaultButtons(ts('Delete cases'), 'done');
   }
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   * @return void
    */
   public function postProcess() {
     $deleted = $failed = 0;

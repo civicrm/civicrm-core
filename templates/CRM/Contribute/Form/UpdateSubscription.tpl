@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,9 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-recurcontrib-form-block">
-  {if $isChangeSupported}
-    <div id="help">
-      {ts}Use this form to change the amount or number of installments for this recurring contribution. Changes will be automatically sent to the payment processor. You can not change the contribution frequency.{/ts}
+  {if $changeHelpText}
+    <div class="help">
+      {$changeHelpText}
   </div>
   {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -37,19 +37,14 @@
     </tr>
     <tr><td class="label">{$form.installments.label}</td><td>{$form.installments.html}<br />
           <span class="description">{ts}Total number of payments to be made. Set this to 0 if this is an open-ended commitment i.e. no set end date.{/ts}</span></td></tr>
+    {foreach from=$editableScheduleFields item='field'}
+      <tr><td class="label">{$form.$field.label}</td><td>{$form.$field.html}</td></tr>
+    {/foreach}
     {if !$self_service}
     <tr><td class="label">{$form.is_notify.label}</td><td>{$form.is_notify.html}</td></tr>
+    <tr><td class="label">{$form.campaign_id.label}</td><td>{$form.campaign_id.html}</td></tr>
+    <tr><td class="label">{$form.financial_type_id.label}</td><td>{$form.financial_type_id.html}</td></tr>
     {/if}
-
-    {* Currently changes to interval, unit and cycle day are not supported. *}
-    {*
-      <tr><td class="label">{$form.frequency_interval.label}</td><td>{$form.frequency_interval.html}<br />
-          <span class="description">{ts}Number of time units for recurrence of payment.{/ts}</span></td></tr>
-      <tr><td class="label">{$form.frequency_unit.label}</td><td>{$form.frequency_unit.html}<br />
-        <span class="description">{ts}Time unit for recurrence of payment. For example, "month".{/ts}</span></td></tr>
-      <tr><td class="label">{$form.cycle_day.label}</td><td>{$form.cycle_day.html}<br />
-        <span class="description">{ts}Day in the period when the payment should be charged.{/ts}</span></td></tr>
-    *}
   </table>
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

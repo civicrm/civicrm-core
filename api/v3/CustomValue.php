@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -210,7 +210,7 @@ function civicrm_api3_custom_value_get($params) {
       }
       $values[$id]['entity_id'] = $getParams['entityID'];
       if (!empty($getParams['entityType'])) {
-        $values[$n]['entity_table'] = $getParams['entityType'];
+        $values[$id]['entity_table'] = $getParams['entityType'];
       }
       //set 'latest' -useful for multi fields but set for single for consistency
       $values[$id]['latest'] = $value;

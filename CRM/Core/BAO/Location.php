@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class handle creation of location block elements
+ * This class handle creation of location block elements.
  */
 class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
@@ -96,6 +94,11 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
   /**
    * Creates the entry in the civicrm_loc_block.
+   *
+   * @param string $location
+   * @param array $entityElements
+   *
+   * @return int
    */
   public static function createLocBlock(&$location, &$entityElements) {
     $locId = self::findExisting($entityElements);
@@ -134,6 +137,10 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
   /**
    * Takes an entity array and finds the existing location block.
+   *
+   * @param array $entityElements
+   *
+   * @return int
    */
   public static function findExisting($entityElements) {
     $eid = $entityElements['entity_id'];
@@ -157,8 +164,8 @@ WHERE e.id = %1";
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object
-   *   CRM_Core_BAO_locBlock object on success, null otherwise
+   * @return CRM_Core_BAO_locBlock
+   *   Object on success, null otherwise
    */
   public static function addLocBlock(&$params) {
     $locBlock = new CRM_Core_DAO_LocBlock();
@@ -173,8 +180,6 @@ WHERE e.id = %1";
    *
    * @param int $locBlockId
    *   Id of the Location Block.
-   *
-   * @return void
    */
   public static function deleteLocBlock($locBlockId) {
     if (!$locBlockId) {
@@ -232,7 +237,9 @@ WHERE e.id = %1";
   }
 
   /**
-   * @param $entityBlock
+   * Get values.
+   *
+   * @param array $entityBlock
    * @param bool $microformat
    *
    * @return array
@@ -269,8 +276,6 @@ WHERE e.id = %1";
    *   Contact id.
    * @param int $locationTypeId
    *   Id of the location to delete.
-   *
-   * @return void
    */
   public static function deleteLocationBlocks($contactId, $locationTypeId) {
     // ensure that contactId has a value
@@ -347,12 +352,10 @@ WHERE e.id = %1";
   }
 
   /**
-   * If contact has data for any location block, make sure
-   * contact should have only one primary block, CRM-5051
+   * Make sure contact should have only one primary block, CRM-5051.
    *
    * @param int $contactId
    *   Contact id.
-   *
    */
   public static function checkPrimaryBlocks($contactId) {
     if (!$contactId) {
@@ -394,6 +397,8 @@ WHERE e.id = %1";
   }
 
   /**
+   * Get chain select values (whatever that means!).
+   *
    * @param mixed $values
    * @param string $valueType
    * @param bool $flatten

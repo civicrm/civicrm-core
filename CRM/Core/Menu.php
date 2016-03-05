@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,14 +30,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'CRM/Core/I18n.php';
 
 /**
- * Class CRM_Core_Menu
+ * Class CRM_Core_Menu.
  */
 class CRM_Core_Menu {
 
@@ -69,7 +67,7 @@ class CRM_Core_Menu {
   /**
    * This function fetches the menu items from xml and xmlMenu hooks.
    *
-   * @param boolen $fetchFromXML
+   * @param bool $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
    *
    * @return array
@@ -102,8 +100,10 @@ class CRM_Core_Menu {
   }
 
   /**
+   * Read menu.
+   *
    * @param string $name
-   * @param $menu
+   * @param string $menu
    *
    * @throws Exception
    */
@@ -164,7 +164,7 @@ class CRM_Core_Menu {
   /**
    * This function defines information for various menu items.
    *
-   * @param boolen $fetchFromXML
+   * @param bool $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
    *
    * @return array
@@ -174,7 +174,9 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $values
+   * Is array true (whatever that means!).
+   *
+   * @param array $values
    *
    * @return bool
    */
@@ -188,8 +190,10 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $menu
-   * @param $path
+   * Fill menu values.
+   *
+   * @param array $menu
+   * @param string $path
    *
    * @throws Exception
    */
@@ -244,6 +248,8 @@ class CRM_Core_Menu {
    * 2. Compute local tasks value if any
    * 3. Propagate access argument, access callback, page callback to the menu item
    * 4. Build the global navigation block
+   *
+   * @param array $menu
    */
   public static function build(&$menu) {
     foreach ($menu as $path => $menuItems) {
@@ -263,6 +269,7 @@ class CRM_Core_Menu {
 
   /**
    * This function recomputes menu from xml and populates civicrm_menu.
+   *
    * @param bool $truncate
    */
   public static function store($truncate = TRUE) {
@@ -302,7 +309,9 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $menu
+   * Build admin links.
+   *
+   * @param array $menu
    */
   public static function buildAdminLinks(&$menu) {
     $values = array();
@@ -326,11 +335,12 @@ class CRM_Core_Menu {
           )
         ),
         'url' => CRM_Utils_System::url($path, $query,
-          FALSE, // absolute
-          NULL, // fragment
-          TRUE, // htmlize
-          FALSE, // frontend
-          TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+          FALSE,
+          NULL,
+          TRUE,
+          FALSE,
+          // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+          TRUE
         ),
         'icon' => CRM_Utils_Array::value('icon', $item),
         'extra' => CRM_Utils_Array::value('extra', $item),
@@ -353,6 +363,8 @@ class CRM_Core_Menu {
   }
 
   /**
+   * Get navigation.
+   *
    * @param bool $all
    *
    * @return mixed
@@ -465,6 +477,8 @@ class CRM_Core_Menu {
   }
 
   /**
+   * Get admin links.
+   *
    * @return null
    */
   public static function &getAdminLinks() {
@@ -490,7 +504,6 @@ class CRM_Core_Menu {
    *
    * @return array
    *   The breadcrumb for this path
-   *
    */
   public static function buildBreadcrumb(&$menu, $path) {
     $crumbs = array();
@@ -502,7 +515,7 @@ class CRM_Core_Menu {
     while ($newPath = array_shift($pathElements)) {
       $currentPath = $currentPath ? ($currentPath . '/' . $newPath) : $newPath;
 
-      // when we come accross breadcrumb which involves ids,
+      // when we come across breadcrumb which involves ids,
       // we should skip now and later on append dynamically.
       if (isset($menu[$currentPath]['skipBreadcrumb'])) {
         continue;

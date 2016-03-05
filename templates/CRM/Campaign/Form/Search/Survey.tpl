@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,7 +31,7 @@
     </div>
 
     <div class="action-link">
-         {crmButton p='civicrm/survey/add' q='reset=1' h=0  icon="circle-plus"}{ts}Add Survey{/ts}{/crmButton}
+         {crmButton p='civicrm/survey/add' q='reset=1' h=0  icon="plus-circle"}{ts}Add Survey{/ts}{/crmButton}
     </div>
 
 {elseif $buildSelector}
@@ -76,7 +76,7 @@
 {else}
 
    <div class="action-link">
-      {crmButton p='civicrm/survey/add' q='reset=1' h=0  icon="circle-plus"}{ts}Add Survey{/ts}{/crmButton}
+      {crmButton p='civicrm/survey/add' q='reset=1' h=0  icon="plus-circle"}{ts}Add Survey{/ts}{/crmButton}
    </div>
 
     {* build search form here *}

@@ -124,7 +124,7 @@ CRM.$(function($) {
   if (queueRunnerData.buttons.retry == 1) {
   $("#crm-queue-runner-retry").button({
     text: false,
-    icons: {primary: 'ui-icon-refresh'}
+    icons: {primary: 'fa-refresh'}
   }).click(retryNext);
   } else {
     $("#crm-queue-runner-retry").remove();
@@ -132,7 +132,7 @@ CRM.$(function($) {
   if (queueRunnerData.buttons.skip == 1) {
   $("#crm-queue-runner-skip").button({
     text: false,
-    icons: {primary: 'ui-icon-seek-next'}
+    icons: {primary: 'fa-fast-forward'}
   }).click(skipNext);
   } else {
     $("#crm-queue-runner-skip").remove();

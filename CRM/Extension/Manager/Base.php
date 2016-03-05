@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
 
@@ -51,60 +49,81 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPreInstall(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPostInstall(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPostPostInstall(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPreEnable(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPostEnable(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPreDisable(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPostDisable(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPreUninstall(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPostUninstall(CRM_Extension_Info $info) {
   }
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $oldInfo
+   * @param CRM_Extension_Info $newInfo
    */
   public function onPreReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo) {
     if ($this->autoReplace) {
@@ -115,6 +134,9 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
 
   /**
    * @inheritDoc
+   *
+   * @param CRM_Extension_Info $oldInfo
+   * @param CRM_Extension_Info $newInfo
    */
   public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo) {
     if ($this->autoReplace) {

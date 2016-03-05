@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -50,6 +50,6 @@
     </script>
     {/literal}
   {/if}
+  {include file="CRM/Form/attachmentjs.tpl"}
 {/if}
 
-{include file="CRM/Form/attachmentjs.tpl"}

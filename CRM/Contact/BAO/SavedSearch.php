@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Business object for Saved searches
- *
+ * Business object for Saved searches.
  */
 class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
 
   /**
    * Class constructor.
-   *
-   * @return \CRM_Contact_BAO_SavedSearch CRM_Contact_BAO_SavedSearch
    */
   public function __construct() {
     parent::__construct();
@@ -88,7 +83,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * Given an id, extract the formValues of the saved search
+   * Given an id, extract the formValues of the saved search.
    *
    * @param int $id
    *   The id of the saved search.
@@ -104,15 +99,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
       $result = unserialize($fv);
     }
 
-    $specialFields = array(
-      'contact_type',
-      'group',
-      'contact_tags',
-      'member_membership_type_id',
-      'member_status_id',
-      'activity_type_id',
-      'location_type',
-    );
+    $specialFields = array('contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id');
     foreach ($result as $element => $value) {
       if (CRM_Contact_BAO_Query::isAlreadyProcessedForQueryFormat($value)) {
         $id = CRM_Utils_Array::value(0, $value);
@@ -164,8 +151,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
           }
 
           $result['privacy_options'] = array();
-          foreach ($result['privacy'] as $name => $value) {
-            if ($value) {
+          foreach ($result['privacy'] as $name => $val) {
+            if ($val) {
               $result['privacy_options'][] = $name;
             }
           }
@@ -178,6 +165,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
+   * Get search parameters.
+   *
    * @param int $id
    *
    * @return array
@@ -223,6 +212,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
+   * Contact IDS Sql (whatever that means!).
+   *
    * @param int $id
    *
    * @return string
@@ -247,6 +238,8 @@ WHERE  $where";
   }
 
   /**
+   * Get from where email (whatever that means!).
+   *
    * @param int $id
    *
    * @return array
@@ -279,8 +272,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given a saved search compute the clause and the tables
-   * and store it for future use
+   * Given a saved search compute the clause and the tables and store it for future use.
    */
   public function buildClause() {
     $fv = unserialize($this->form_values);
@@ -304,15 +296,20 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     }
   }
 
-  public function save() {
+  /**
+   * Save the search.
+   *
+   * @param bool $hook
+   */
+  public function save($hook = TRUE) {
     // first build the computed fields
     $this->buildClause();
 
-    parent::save();
+    parent::save($hook);
   }
 
   /**
-   * Given an id, get the name of the saved search
+   * Given an id, get the name of the saved search.
    *
    * @param int $id
    *   The id of the saved search.
@@ -332,8 +329,11 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given a label and a set of normalized POST
-   * formValues, create a smart group with that
+   * Create a smart group from normalised values.
+   *
+   * @param array $params
+   *
+   * @return \CRM_Contact_DAO_SavedSearch
    */
   public static function create(&$params) {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();
@@ -343,7 +343,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       $savedSearch->form_values = serialize($params['formValues']);
     }
     else {
-      $savedSearch->form_values = 'null';
+      $savedSearch->form_values = NULL;
     }
 
     $savedSearch->is_active = CRM_Utils_Array::value('is_active', $params, 1);
@@ -354,6 +354,24 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     $savedSearch->save();
 
     return $savedSearch;
+  }
+
+  /**
+   * Assign test value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'form_values') {
+      // A dummy value for form_values.
+      $this->{$fieldName} = serialize(
+          array('sort_name' => "SortName{$counter}"));
+    }
+    else {
+      parent::assignTestValues($fieldName, $fieldDef, $counter);
+    }
   }
 
 }

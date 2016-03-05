@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
 
@@ -61,7 +59,9 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Create a security hash from the job, email and contact ids
+   * Create a security hash from the job, email and contact ids.
+   *
+   * @param array $params
    *
    * @return int
    *   The hash
@@ -77,7 +77,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Verify that a queue event exists with the specified id/job id/hash
+   * Verify that a queue event exists with the specified id/job id/hash.
    *
    * @param int $job_id
    *   The job ID of the event to find.

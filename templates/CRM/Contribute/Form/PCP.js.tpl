@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -47,7 +47,11 @@
     })
       // This is just a cheap trick to store the name when the form reloads
       .on('change', function() {
-        $('[name=pcp_made_through]', $form).val($(this).select2('data').text || '');
+        var fieldNameVal = $(this).select2('data');
+        if (!fieldNameVal) {
+          fieldNameVal = '';
+        }
+        $('[name=pcp_made_through]', $form).val(fieldNameVal.text);
       });
   });
 </script>

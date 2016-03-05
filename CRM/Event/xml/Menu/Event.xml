@@ -256,6 +256,24 @@
      <weight>850</weight>
   </item>
   <item>
+     <path>civicrm/event/selfsvcupdate</path>
+     <title>Self-service Registration Update</title>
+     <is_public>true</is_public>
+     <page_callback>CRM_Event_Form_SelfSvcUpdate</page_callback>
+     <access_callback>1</access_callback>
+     <page_type>1</page_type>
+     <weight>880</weight>
+  </item>
+  <item>
+     <path>civicrm/event/selfsvctransfer</path>
+     <title>Self-service Registration Transfer</title>
+     <is_public>true</is_public>
+     <page_callback>CRM_Event_Form_SelfSvcTransfer</page_callback>
+     <page_type>1</page_type>
+     <access_callback>1</access_callback>
+     <weight>890</weight>
+  </item>
+  <item>
      <path>civicrm/contact/map/event</path>
      <title>Map Event Location</title>
      <page_callback>CRM_Contact_Form_Task_Map_Event</page_callback>

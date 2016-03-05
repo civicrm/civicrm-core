@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -43,33 +43,6 @@
       </tr>
     </table>
   </div>
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      var $form = $('form.{/literal}{$form.formClass}{literal}');
-      $('input[name=file_on_case_unclosed_case_id]', $form).crmSelect2({
-        placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
-        minimumInputLength: 1,
-        formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: function(row) {
-          return row.label;
-        },
-        initSelection: function($el, callback) {
-          callback($el.data('value'));
-        },
-        ajax: {
-          url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
-          data: function(term) {
-            return {term: term, excludeCaseIds: "{/literal}{$currentCaseId}{literal}"};
-          },
-          results: function(response) {
-            return {results: response};
-          }
-        }
-      });
-    });
-  </script>
-{/literal}
 {* main form end *}
 
 {else}
@@ -90,17 +63,17 @@
     dataUrl += '&activityId=' + activityID + '&caseId=' + currentCaseId + '&cid=' + {/literal}"{$contactID}"{literal};
 
     function save() {
+      if (!$("#file_on_case_unclosed_case_id").val()) {
+        $("#file_on_case_unclosed_case_id").crmError('{/literal}{ts escape="js"}Please select a case from the list{/ts}{literal}.');
+        return false;
+      }
+
       var $context = $('div.crm-confirm-dialog'),
         selectedCaseId = $('input[name=file_on_case_unclosed_case_id]', $context).val(),
         caseTitle = $('input[name=file_on_case_unclosed_case_id]', $context).select2('data').label,
         contactId = $('input[name=file_on_case_unclosed_case_id]', $context).select2('data').extra.contact_id,
         subject = $("#file_on_case_activity_subject").val(),
         targetContactId = $("#file_on_case_target_contact_id").val();
-
-      if (!$("#file_on_case_unclosed_case_id").val()) {
-        $("#file_on_case_unclosed_case_id").crmError('{/literal}{ts escape="js"}Please select a case from the list{/ts}{literal}.');
-        return false;
-      }
 
       var postUrl = {/literal}"{crmURL p='civicrm/ajax/activity/convert' h=0 }"{literal};
       $.post( postUrl, { activityID: activityID, caseID: selectedCaseId, contactID: contactId, newSubject: subject, targetContactIds: targetContactId, mode: action, key: {/literal}"{crmKey name='civicrm/ajax/activity/convert'}"{literal} },

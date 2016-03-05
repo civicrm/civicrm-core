@@ -454,7 +454,6 @@ input.crm-form-entityref {
 }
 
 .crm-container table.form-layout,
-.crm-container table.control-panel,
 .crm-container table.no-border {
   margin: 0;
   border-collapse: collapse;
@@ -510,14 +509,6 @@ input.crm-form-entityref {
   vertical-align: text-top;
   padding: 2px 5px;
   border: none;
-}
-
-.crm-container .control-panel td {
-  padding: 3px;
-  width: 25%;
-  white-space: nowrap;
-  border: 0 none;
-  text-align: center;
 }
 
 .crm-container .form-layout td.label,
@@ -649,6 +640,12 @@ input.crm-form-entityref {
   padding: 4px;
 }
 
+.crm-container .status.crm-ok {
+  border-color: #B0D730;
+  background-color: #F1F8EB;
+  color: #3E3E3E;
+}
+
 .crm-container .crm-footer {
   font-size: 0.8em;
 }
@@ -752,14 +749,9 @@ input.crm-form-entityref {
   padding-left: 1em;
 }
 
-/* Following styles are used to remove the white bullets from the Garland Theme */
+/* Remove any weird list styles from the cms */
 .crm-container ul li {
   background-image: none;
-}
-
-/* But allow them for the help at the top of forms */
-.crm-container #help ul li {
-  background-image: url(menu-leaf.png);
 }
 
 .crm-container .crm-form-block .crm-loading-element {
@@ -1132,50 +1124,6 @@ input.crm-form-entityref {
   color: #494949;
 }
 
-/* alpha filter styles */
-#crm-recently-viewed ul,
-#crm-container #alpha-filter ul {
-  border-collapse: collapse;
-  padding: 0;
-  list-style-type: none;
-  margin: 3px;
-  height: auto;
-  width: auto;
-}
-
-.crm-container div#alpha-filter {
-  background-color: #CDE8FE;
-  margin: 4px 0 5px;
-  padding: 2px;
-  text-align: left;
-}
-
-.crm-container #alpha-filter li {
-  background-color: transparent;
-  background-image: none;
-  border: none;
-  color: #AAAAAA;
-  display: inline;
-  font-size: 15px;
-  font-weight: normal;
-  height: auto;
-  margin: 0 1px;
-  padding: 2px 5px;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.crm-container #alpha-filter a {
-  border-bottom: 1px dotted #2A71B4;
-  color: #2A71B4;
-  font-weight: normal;
-}
-
-.crm-container #lang-switch {
-  float: right;
-  z-index: 2;
-  margin: -24px 30px 0 0;
-}
-
 /* Boxes of checkbox elements (e.g. Advanced Search page) */
 .crm-container .listing-box,
 .crm-container .listing-box-tall {
@@ -1225,35 +1173,11 @@ input.crm-form-entityref {
   content: "\00BB";
 }
 
-/* editor specific classes */
-#crm-container dd.editor {
-  margin-top: 0.7em;
-  margin-left: 0;
-  float: left;
-  vertical-align: top;
-  width: 58em;
-}
-
 #crm-container.clear,
 .crm-container .crm-group-summary .clear {
   /* generic container (i.e. div) for floating buttons */
   overflow: hidden;
   width: 100%;
-}
-
-/* class for tinymce buttons display */
-#crm-container table.mceLayout td,
-#crm-container table.mceLayout table {
-  padding: 0;
-  background: #EDEDED;
-  border: 2px solid #EDEDED;
-  font-size: 0;
-  vertical-align: top;
-  width: auto;
-}
-
-#crm-container tr.mceLast {
-  border: 1px solid #EDEDED;
 }
 
 #location .form-layout table,
@@ -1295,6 +1219,7 @@ input.crm-form-entityref {
   background-color: #fafafa;
   border: 1px solid #9d9fca;
   height: 220px;
+  overflow: hidden;
 }
 
 #crm-container .thermometer-wrapper,
@@ -1462,24 +1387,6 @@ input.crm-form-entityref {
   background: transparent;
 }
 
-/* Styles for Config Task List */
-#crm-container td.tasklist a {
-  font-weight: bold;
-}
-
-#crm-container table.selector td.tasklist {
-  border-right: 1px solid #DDDDDD;
-  width: 20%;
-}
-
-#crm-container td.tasklist a:link {
-  color: #FF0105;
-}
-
-#crm-container td.tasklist a:visited {
-  color: green;
-}
-
 /* Styles for Actions Ribbon */
 #crm-container .crm-actions-ribbon {
   margin: 0 0 8px 0;
@@ -1530,7 +1437,7 @@ input.crm-form-entityref {
   text-decoration: none;
   font-size: .9em;
   color: #000;
-  padding: 1px 2px 1px 0;
+  padding: 1px 3px;
   opacity: .7;
   cursor: pointer;
 }
@@ -1547,7 +1454,8 @@ input.crm-form-entityref {
 .crm-container .crm-accordion-header .crm-hover-button {
   opacity: 1;
   position: relative;
-  top: -4px;
+  top: -2px;
+  color: inherit;
 }
 .crm-container .crm-hover-button:hover,
 .crm-container a.crm-hover-button:hover,
@@ -1633,7 +1541,6 @@ input.crm-form-entityref {
   background: url("../i/TreePlus.gif") no-repeat right 1px;
 }
 
-
 .crm-container .btn-slide-active .panel {
   z-index: 10;
 }
@@ -1661,23 +1568,6 @@ input.crm-form-entityref {
   padding: 3px;
 }
 
-/* class for text area resizer jquery plugin*/
-div.grippie {
-  background: #EEEEEE url('../i/grippie.png') no-repeat scroll center 2px;
-  border-color: #DDDDDD;
-  border-style: solid;
-  border-width: 0pt 1px 1px;
-  cursor: s-resize;
-  height: 9px;
-  overflow: hidden;
-}
-.crm-container .resizable-textarea textarea {
-  display: block;
-  margin-bottom: 0pt;
-  width: 95%;
-  height: 20%;
-}
-
 .crm-container ul li.crm-tab-button {
   border-bottom: 0 none;
   float: left;
@@ -1699,7 +1589,7 @@ div.grippie {
   font-size: 0.9em;
 }
 
-#mainTabContainer li.crm-tab-button {
+.crm-container li.crm-tab-button {
   margin: 0 2px 2px 0;
 }
 
@@ -1789,6 +1679,15 @@ div.grippie {
 
 #crm-container div.crm-case-dashboard-switch-view-buttons {
   float: right;
+}
+
+.crm-container a.crm-event-feed-link {
+  margin: 0 1ex;
+  color: #52534D;
+}
+
+.crm-container a.crm-event-feed-link:hover {
+  color: #2786c2;
 }
 
 .crm-container table.criteria-group {
@@ -1887,20 +1786,10 @@ div.grippie {
   margin-top: -4px;
 }
 
-/* This is the style for the trigger icon. The margin-bottom value causes the icon to shift down to center it. */
-.crm-container .ui-datepicker-trigger {
-  margin-top: 4px;
-  margin-bottom: -6px;
-}
-
 .crm-container .ui-datepicker {
   width: 17em;
   padding: .2em .2em 0;
   z-index: 9999 !important;
-}
-
-#crm-container .cke_editor {
-  border: 0 none;
 }
 
 /* Set/alter ICONS */
@@ -1961,9 +1850,6 @@ div.grippie {
 }
 
 .crm-container a.button,
-.crm-container a.crm-invoiceButton,
-.crm-container a.crm-invoiceButton:link,
-.crm-container a.crm-invoiceButton:visited,
 .crm-container a.button:link,
 .crm-container a.button:visited,
 .crm-container input.crm-form-submit,
@@ -2013,30 +1899,11 @@ div.grippie {
 }
 
 .crm-container a.button,
-.crm-container a.crm-invoiceButton,
-.crm-container a.crm-invoiceButton:link,
-.crm-container a.crm-invoiceButton:visited,
 .crm-container a.button:link,
 .crm-container a.button:visited {
   display: block;
   float: left;
   line-height: 135%;
-}
-
-.crm-container a.button .crm-container a.crm-invoiceButton span {
-  display: block;
-  line-height: 14px;
-  padding: 2px 0;
-}
-
-.crm-container .button .red .crm-invoiceButton{
-  background-image: url(../i/icons/jquery-ui-FFFFFF.png);
-}
-
-.crm-container a.button:active .crm-container a.crm-invoiceButton:active,{
-  color: #000;
-  outline: none;
-  /* hide dotted outline in Firefox */
 }
 
 .crm-container .crm-button:hover,
@@ -2046,8 +1913,6 @@ div.grippie {
 .crm-container .ui-dialog-buttonset .ui-button:hover,
 .crm-container .ui-dialog-buttonset .ui-button:focus,
 .crm-container a.button:hover,
-.crm-container a.crm-invoiceButton:hover,
-.crm-container a.crm-invoiceButton:focus,
 .crm-container a.button:focus {
   background-position: 0 -25px;
 }
@@ -2078,9 +1943,10 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
 
-/* No button styling for PayPal Express buttons */
-#crm-container input#_qf_Register_upload_express,
-#crm-container input#_qf_Main_upload_express {
+/* No crm-button styling for PayPal Express buttons */
+.crm-container input#_qf_Register_upload_express,
+.crm-container input#_qf_Payment_upload_express,
+.crm-container input#_qf_Main_upload_express {
   background: none;
   margin: 0;
   padding: 0;
@@ -2187,6 +2053,14 @@ div.grippie {
   padding-left: 18px;
 }
 
+.crm-container .crm-button.button-crm-i {
+  padding: 2px 0 1px 5px;
+}
+
+.crm-container .crm-button.button-crm-i input {
+  padding-left: 0;
+}
+
 .crm-container .crm-button-icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
   height: 16px;
@@ -2196,9 +2070,6 @@ div.grippie {
   pointer-events: none;
 }
 
-.crm-container .dark-icon {
-  background-image: url("../bower_components/jquery-ui/themes/smoothness/images/ui-icons_222222_256x240.png")
-}
 .crm-container .delete-icon {
   background-position: -176px -96px;
 }
@@ -2210,9 +2081,77 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
 
+/* Font Awesome */
+
+.crm-container a .crm-i,
+.crm-container a:link .crm-i,
+.crm-container a:visited .crm-i,
+.crm-container a:active .crm-i,
+.crm-container a:hover .crm-i,
+.crm-container a .ui-icon[class*=" fa-"],
+.crm-container a:link .ui-icon[class*=" fa-"],
+.crm-container a:visited .ui-icon[class*=" fa-"],
+.crm-container a:active .ui-icon[class*=" fa-"],
+.crm-container a:hover .ui-icon[class*=" fa-"] {
+  color: inherit;
+}
+
+a.crm-i:hover {
+  text-decoration: none;
+}
+
+.crm-container a:hover .crm-i.fa-trash,
+.crm-container .crm-button:hover .crm-i.fa-trash,
+.crm-container .crm-hover-button:hover .crm-i.fa-trash,
+.crm-container span:hover > .crm-i.fa-trash,
+.crm-i.crm-i-red {
+  color: #8A1F11;
+}
+
+.crm-i.crm-i-blue {
+  color: #6177D5;
+}
+
+.crm-i-button {
+  position: relative;
+}
+
+.crm-i-button>.crm-i {
+  position: absolute;
+  pointer-events: none;
+  top: .4em;
+  left: .4em;
+}
+
+.crm-container .crm-button.crm-i-button input[type="button"],
+.crm-container .crm-button.crm-i-button input.crm-form-submit {
+  padding-left: 1.6em;
+}
+
 .crm-container .inform-icon {
   background-position: -16px -144px;
   margin-right: 5px;
+}
+
+.crm-container a.helpicon {
+  opacity: .8;
+}
+
+.crm-container  a.helpicon:hover,
+.crm-container  a.helpicon:focus {
+  opacity: 1;
+}
+
+/* Same as fa-question-circle */
+.crm-container a.helpicon:before {
+  content: "\f059";
+}
+
+div.crm-accordion-header a.helpicon {
+  color: inherit;
+}
+div.crm-master-accordion-header a.helpicon {
+  color: #2786c2;
 }
 
 /* These .crm-icon classes use item_sprites.png */
@@ -2306,6 +2245,12 @@ div.grippie {
   display: none;
 }
 
+.crm-container .crm-expand-row {
+  min-width: 16px;
+  min-height: 16px;
+  display: inline-block;
+}
+
 .crm-container .crm-accordion-inner .crm-accordion-header,
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header,
 .crm-container .crm-collapsible .collapsible-title {
@@ -2378,34 +2323,8 @@ div.grippie {
   color: #0200A0;
 }
 
-/* civicrm admin menu */
-#civicrm-menu .ui-autocomplete-input,
-.crm-container .ui-autocomplete-input {
-  background: white url("../bower_components/select2/select2.png") no-repeat scroll right -23px;
-  padding-right: 16px;
-  /* so that text doesn't flow on top of icon */
-}
-
-#civicrm-menu #crm-qsearch {
-  padding: 1px 3px 1px 2px;
-  background-color: #000 !important;
-}
-
-#civicrm-menu #crm-qsearch input {
-  background-color: #eaeaea;
-  border: 1px solid black;
-  margin: 0;
-  padding: 2px 16px 3px 2px;
-  height: 16px;
-}
-#civicrm-menu #crm-qsearch input:hover,
-#civicrm-menu #crm-qsearch input:focus,
-#civicrm-menu #crm-qsearch.activetarget input {
-  background-color: #ffffff;
-}
-/* This ensures the drop-down menus appear at the right height */
-#civicrm-menu > li.menumain {
-  height: 19px !important;
+.crm-container .crm-child-row > td {
+  padding-left: 1.8em;
 }
 
 /* Status message box */
@@ -2435,32 +2354,6 @@ div.grippie {
 
 .crm-status-box-outer.status-error .crm-status-box-inner {
   background: rgba(255, 7, 0, 0.7);
-}
-
-/* Pop-up help icon - eliminate forced line break */
-.crm-container a.helpicon,
-.crm-container .crm-master-accordion-header a.helpicon {
-  background-color: #6177D5;
-  background-image: url("../i/icons/jquery-ui-F5F6F1.png");
-  background-position: -50px -146px;
-  border-radius: 6px;
-  display: inline-block;
-  height: 12px;
-  width: 12px;
-  opacity: .7;
-  position: relative;
-  top: 2px;
-  padding: 0;
-}
-
-div.crm-accordion-header a.helpicon {
-  background-color: #F5F6F1;
-  background-image: url(../i/icons/jquery-ui-2786C2.png);
-}
-
-div a.helpicon:hover,
-div a.helpicon:focus {
-  opacity: 1;
 }
 
 .crm-container .crm-summary-link {
@@ -2532,25 +2425,22 @@ div a.helpicon:focus {
 }
 
 /* crm-summary-group appears outside crm-container for contact summary icon overlay */
-#crm-container .crm-summary-group .crm-section .label,
 .crm-container .crm-summary-group .crm-section .label {
   text-align: left;
   width: 40%;
   font-size: 11px;
   color: #A7A7A7;
+  background-color: transparent;
 }
 
-#crm-container .crm-summary-group .crm-section .content,
 .crm-container .crm-summary-group .crm-section .content {
   margin-left: 41%;
 }
 
-#crm-container .crm-tooltip table .crm-summary-col-1,
 .crm-container .crm-tooltip table .crm-summary-col-1 {
   width: 350px;
 }
 
-#crm-container .crm-tooltip table .crm-summary-col-1 div,
 .crm-container .crm-tooltip table .crm-summary-col-1 div {
   width: auto;
 }
@@ -2658,18 +2548,15 @@ div.crm-container form {
 
 .crm-container .dataTables_processing {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 250px;
-  height: 30px;
-  margin-left: -125px;
-  margin-top: -15px;
-  padding: 14px 0 2px 0;
-  border: 1px solid #ddd;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-  background-color: white;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: url("../i/loading-overlay.gif") center center no-repeat white;
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .crm-container .dataTables_length {
@@ -2904,8 +2791,6 @@ tbody.scrollContent tr.alternateRow {
   border-bottom: 1px solid #FFF;
 }
 
-#crm-container div.contactCardLeft .label,
-#crm-container div.contactCardRight .label,
 .crm-container table.crm-info-panel .label {
   color: #2f2f2f;
   font-weight: normal;
@@ -2913,14 +2798,12 @@ tbody.scrollContent tr.alternateRow {
 
 .crm-container .disabled,
 .crm-container .cancelled,
-#mainTabContainer li.disabled a.ui-tabs-anchor,
-#mainTabContainer li.crm-count-0 a.ui-tabs-anchor,
-#mainTabContainer li.crm-count-0 a.ui-tabs-anchor em {
+.crm-container li.disabled a.ui-tabs-anchor,
+.crm-container li.crm-count-0 a.ui-tabs-anchor,
+.crm-container li.crm-count-0 a.ui-tabs-anchor em {
   color: #999999 !important;
 }
-#mainTabContainer li.disabled {
-  text-decoration: none;
-}
+
 #crm-container tr.crm-job {
   text-decoration: none !important;
 }
@@ -2960,18 +2843,6 @@ tbody.scrollContent tr.alternateRow {
   color: #3e3e3e;
 }
 
-.crm-container div.contact_panel td.grouplabel {
-  border-bottom: 2px solid #D7D7D0 !important;
-}
-
-#tagGroup table .label {
-  color: #FFF;
-}
-#tagGroup table {
-  color: #000;
-}
-
-
 /* search results */
 .crm-container .crm-search-tasks,
 .crm-container .crm-tasks {
@@ -3005,8 +2876,6 @@ tbody.scrollContent tr.alternateRow {
 /* rounded corners */
 .crm-container .crm-button,
 .crm-container a.button,
-.crm-container a.crm-invoiceButton,
-.crm-container a.crm-invoiceButton:link,
 .crm-container a.button:link,
 .crm-container input.crm-form-submit,
 .crm-container input[type=button] {
@@ -3168,16 +3037,6 @@ div.m ul#civicrm-menu,
 .select2-drop .crm-entityref-filters select.active {
   border: 1px solid #808080;
 }
-/* Icons used by entityRef create buttons */
-.crm-container .Individual-profile-icon {
-  background-position: -144px -96px;
-}
-.crm-container .Household-profile-icon {
-  background-position: 0 -112px;
-}
-.crm-container .Organization-profile-icon {
-  background-position: -112px -112px;
-}
 /* Style autocomplete results */
 .crm-container .select2-results {
   font-size: 12px;
@@ -3227,31 +3086,10 @@ div.m ul#civicrm-menu,
 .crm-container .crm-action-menu .select2-default span.select2-chosen {
   color: #2786C2;
 }
-.crm-container .crm-action-menu .select2-default span.select2-chosen:before {
-  background: url("../i/icons/jquery-ui-2786C2.png") no-repeat scroll -64px -112px;
-  content: "";
-  display: inline-block;
-  height: 16px;
-  width: 16px;
-  margin-right: 3px;
-  position: relative;
-  top: 3px;
+.crm-container .select2-container[class*=" fa-"]:before {
+  display: none;
 }
-.crm-container .crm-action-menu.action-icon-plus .select2-default span.select2-chosen:before {
-  background-position: 0 -192px;
-}
-.crm-container .crm-action-menu.action-icon-play .select2-default span.select2-chosen:before {
-  background-position: -48px -192px;
-}
-.crm-container .crm-action-menu.action-icon-clipboard .select2-default span.select2-chosen:before {
-  background-position: -160px -128px;
-}
-.crm-container .crm-action-menu.action-icon-token .select2-default span.select2-chosen:before {
-  background-position: -144px 0;
-}
-.crm-container .crm-action-menu.action-icon-mail-closed .select2-default span.select2-chosen:before {
-  background-position: -80px -96px;
-}
+
 /* Restore this property otherwise our css overrides it */
 .select2-search input {
   box-sizing: border-box;
@@ -3288,20 +3126,11 @@ div.m ul#civicrm-menu,
   background-color: transparent;
   background-image: none;
   border: 1px none;
-}
-.crm-container .ui-dialog-titlebar .ui-button .ui-icon {
-  background-image: url("../i/icons/jquery-ui-F5F6F1.png");
+  color: inherit;
 }
 .crm-container .ui-dialog-titlebar .ui-button:hover {
   background-color: #cdcdcd;
-}
-.crm-container .ui-dialog-titlebar .ui-button:hover .ui-icon {
-  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
-}
-
-/*Needed for jstree contextmenu */
-#vakata-contextmenu.jstree-default-context li {
-  background: none repeat scroll 0 0 transparent;
+  color: #555;
 }
 
 /* unset the styling for the li in jstree */
@@ -3311,25 +3140,15 @@ div.m ul#civicrm-menu,
   padding: 0px;
 }
 
-/* Class for successful upgrade */
-.crm-container .upgrade-success {
-  background-color: #00CC00;
-  color: white;
-}
-
-.crm-container .extension-upgradable {
-  background-color: #FFFFCC !important;
-}
-
-.crm-container .extension-installed {
-  background-color: #DDFFDD !important;
-}
-
-.crm-container .extension-missing {
-  color: #E43D2B !important;
-}
-
 /* table row highlightng */
+.crm-container .crm-row-ok {
+  background-color: #EFFFE7;
+  border-bottom: 1px solid #ccc;
+}
+.crm-container .crm-row-error {
+  background-color: #FFECEC;
+  border-bottom: 1px solid #ccc;
+}
 .crm-container table.row-highlight tr:hover,
 .crm-container .crm-row-selected {
   background-color: #FFFFCC;
@@ -3341,49 +3160,12 @@ div.m ul#civicrm-menu,
   background-color: #fffdb2;
 }
 
-#crm-container .civicrm-drupal-wysiwyg .collapsed {
-  background: transparent;
-  padding-left: 0;
-}
-
-#manageTags {
-  position: static;
-  z-index: -100;
-}
-
 #crm-container .crm-socialnetwork {
   margin-top: 1em;
 }
 
 #crm-container .crm-fb-tweet-buttons {
   width: 93%;
-}
-#crm-container div.finalconf-button {
-  float: right;
-  padding: 5px 0 0 0;
-}
-#crm-container div.finalconf-button input {
-  margin: 0;
-}
-#crm-container div.finalconf-intro {
-  padding-bottom: 12px;
-  font-style: italic;
-}
-#crm-container h4.finalconf-item {
-  border-top: 1px solid #ccc;
-  padding: 8px 0 8px 10px;
-  margin: 0;
-}
-#crm-container div.finalconf-itemdesc {
-  font-style: italic;
-  padding: 6px 12px 6px 12px;
-  color: #666;
-  float: right;
-  width: 60%;
-}
-#crm-container h4.finalconf-btm {
-  border-bottom: 1px solid #ccc;
-  margin-bottom: 20px;
 }
 
 /* classes related to batch entry operation */
@@ -3470,10 +3252,11 @@ div.m ul#civicrm-menu,
 }
 
 .crm-container .replace-plain:before {
-  content: "";
+  content: "\f040";
   position: absolute;
   top: .4em;
   right: .5em;
+  opacity: .5;
 }
 
 /* in place edit  */
@@ -3503,21 +3286,14 @@ div.m ul#civicrm-menu,
   display: inline-block !important;
 }
 
-.crm-container .crm-editable-placeholder,
-.crm-container .replace-plain:before {
-  background: url("../i/icons/jquery-ui-3E3E3E.png") -66px -114px no-repeat;
-  text-indent: -10000px;
-  display: block;
-  height: 16px;
-  width: 16px;
+.crm-container .crm-editable-enabled .crm-i {
   opacity: .5;
 }
 
 .crm-container .replace-plain a:active:before,
 .crm-container .replace-plain:focus:before,
 .crm-container .replace-plain:hover:before,
-.crm-container .crm-editable-enabled:hover .crm-editable-placeholder {
-  background-image: url("../i/icons/jquery-ui-2786C2.png");
+.crm-container .crm-editable-enabled:hover .crm-i {
   opacity: 1;
 }
 
@@ -3598,15 +3374,16 @@ div.m ul#civicrm-menu,
   padding-left: 20px;
 }
 
-#crm-container span.collapsed,
-#crm-container a.collapsed {
+.crm-container span.collapsed,
+.crm-container a.collapsed,
+.crm-container .crm-expand-row {
   background: url("../i/TreePlus.gif") no-repeat 0 0;
   padding-left: 19px;
   cursor: pointer;
 }
 
-#crm-container span.expanded,
-#crm-container a.expanded {
+.crm-container span.expanded,
+.crm-container a.expanded {
   background: url("../i/TreeMinus.gif") no-repeat 0 0;
   padding-left: 19px;
   cursor: pointer;
@@ -3683,16 +3460,23 @@ div.m ul#civicrm-menu,
   border: 0 none;
   font-size: 11px;
 }
+.crm-container div.ui-notify-message table {
+  margin: 10px 0;
+}
 .crm-container div.ui-notify-message td {
   background: rgba(255,255,255,0.1);
   border: 1px solid #111;
   font-size: 11px;
+  color: #fff;
 }
 .crm-container div.ui-notify-message th {
   background: rgba(200,200,200,0.2);
   border: 1px solid #111;
   color: #eee;
   font-size: 11px;
+}
+.crm-container div.ui-notify-message table a.action-item {
+  margin-right: 5px;
 }
 .crm-container div.ui-notify-message ul,
 .crm-container div.ui-notify-message ol {
@@ -3931,11 +3715,6 @@ span.crm-status-icon {
   font-size: 15px;
   color: #666 !important;
 }
-#crm-container .crm-extensions-upgrade {
-  background: #ffb;
-  border: 1px solid #000;
-  text-align: center;
-}
 
 /* Styles for credit card payment logos */
 .crm-container .credit_card_type-section .crm-credit_card_type-icons a {
@@ -3991,10 +3770,6 @@ span.crm-status-icon {
   color: #fff;
 }
 
-.crm-container .paper-icon {
-  background-position: -101px -222px;background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
-}
-
 .crm-container .strikethrough {
   text-decoration: line-through;
 }
@@ -4023,4 +3798,8 @@ span.crm-status-icon {
 }
 .crm-container .crm-ui-datetime.ng-dirty input.incomplete {
   border: 1px solid red;
+}
+
+.crm-container .crm-grip {
+  cursor: move;
 }

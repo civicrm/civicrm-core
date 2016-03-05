@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -60,10 +60,7 @@ class CRM_Core_CommunityMessages {
    */
   public static function create() {
     return new CRM_Core_CommunityMessages(
-      new CRM_Utils_Cache_SqlGroup(array(
-        'group' => 'community-messages',
-        'prefetch' => FALSE,
-      )),
+      Civi::cache('community_messages'),
       CRM_Utils_HttpClient::singleton()
     );
   }
@@ -77,7 +74,7 @@ class CRM_Core_CommunityMessages {
     $this->cache = $cache;
     $this->client = $client;
     if ($messagesUrl === NULL) {
-      $this->messagesUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'communityMessagesUrl', NULL, '*default*');
+      $this->messagesUrl = Civi::settings()->get('communityMessagesUrl');
     }
     else {
       $this->messagesUrl = $messagesUrl;

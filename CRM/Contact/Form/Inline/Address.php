@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for address section
+ * Form helper class for address section.
  */
 class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
@@ -64,9 +62,11 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   public $_addressId;
 
   /**
+   * Class constructor.
+   *
    * Since we are using same class / code to generate multiple instances
    * of address block, we need to generate unique form name for each,
-   * hence calling parent contructor
+   * hence calling parent constructor
    */
   public function __construct() {
     $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
@@ -121,8 +121,6 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements for an address object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -152,6 +150,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
       }
 
       $address['country_id'] = $config->defaultContactCountry;
+      $address['state_province_id'] = $config->defaultContactStateProvince;
       $defaults['address'][$this->_locBlockNo] = $address;
     }
 
@@ -160,8 +159,6 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

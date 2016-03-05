@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<tr><td><label>{ts}Contribution Dates{/ts}</label></td></tr>
+<tr><td><label>{ts}Date Received{/ts}</label></td></tr>
 <tr>
 {include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
 </tr>
@@ -126,6 +126,10 @@
     {$form.contribution_source.label} <br />
     {$form.contribution_source.html|crmAddClass:twenty}
   </td>
+  <td>
+    {$form.contribution_product_id.label} <br />
+    {$form.contribution_product_id.html|crmAddClass:twenty}
+  </td>
 </tr>
 <tr>
   <td>
@@ -156,9 +160,11 @@
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
 campaignTrClass='' campaignTdClass=''}
 
+{* contribution recurring search *}
 <tr>
   <td colspan="2">
-{include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+    {include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+  </td>
 </tr>
 
 {if $contributeGroupTree}
@@ -167,6 +173,7 @@ campaignTrClass='' campaignTdClass=''}
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributeGroupTree showHideLinks=false}</td>
 </tr>
 {/if}
+
 {literal}
 <script type="text/javascript">
   cj('#contribution_payment_instrument_id').change(function() {

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
 
@@ -90,7 +88,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       }
 
       $job = new CRM_Mailing_BAO_MailingJob();
-      $job->is_test = 0; // if set to 1 it doesn't show in the UI
+      $job->is_test = 0;  // if set to 1 it doesn't show in the UI
       $job->status = 'Complete';
       $job->scheduled_date = CRM_Utils_Date::processDate(date('Y-m-d'), date('H:i:s'));
       $job->start_date = $job->scheduled_date;

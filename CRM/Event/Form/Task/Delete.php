@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -94,6 +94,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
+    $participantLinks = NULL;
     if (CRM_Utils_Array::value('delete_participant', $params) == 2) {
       $links = array();
       foreach ($this->_participantIds as $participantId) {
@@ -104,15 +105,22 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
     $deletedParticipants = $additionalCount = 0;
     foreach ($this->_participantIds as $participantId) {
       if (CRM_Utils_Array::value('delete_participant', $params) == 1) {
+        $primaryParticipantId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant", $participantId, 'registered_by_id', 'id');
         if (CRM_Event_BAO_Participant::isPrimaryParticipant($participantId)) {
           $additionalIds = (CRM_Event_BAO_Participant::getAdditionalParticipantIds($participantId));
-          $additionalCount = count($additionalIds);
+          $additionalCount += count($additionalIds);
           foreach ($additionalIds as $value) {
             CRM_Event_BAO_Participant::deleteParticipant($value);
           }
           CRM_Event_BAO_Participant::deleteParticipant($participantId);
+          $deletedParticipants++;
         }
-        $deletedParticipants++;
+        // delete participant only if it is not an additional participant
+        // or if it is additional and its primary participant is not selected in $this->_participantIds.
+        elseif (empty($primaryParticipantId) || (!in_array($primaryParticipantId, $this->_participantIds))) {
+          CRM_Event_BAO_Participant::deleteParticipant($participantId);
+          $deletedParticipants++;
+        }
       }
       else {
         CRM_Event_BAO_Participant::deleteParticipant($participantId);

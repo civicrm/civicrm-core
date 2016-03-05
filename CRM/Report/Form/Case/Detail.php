@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -54,8 +54,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
   protected $_customGroupExtends = array('Case');
 
-  /**
-   */
   /**
    */
   public function __construct() {
@@ -119,13 +117,15 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           ),
           'status_id' => array(
             'title' => ts('Case Status'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->case_statuses,
+            'options' => CRM_Case_BAO_Case::buildOptions('status_id', 'search'),
           ),
           'case_type_id' => array(
             'title' => ts('Case Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->case_types,
+            'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
           ),
           'is_deleted' => array(
             'title' => ts('Deleted?'),
@@ -165,6 +165,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'case_role' => array(
             'name' => 'relationship_type_id',
             'title' => ts('Case Role(s)'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->rel_types,
           ),

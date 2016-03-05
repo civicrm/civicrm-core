@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class generates form components for Financial Type Account
- *
  */
 class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
@@ -69,8 +66,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_aid = CRM_Utils_Request::retrieve('aid', 'Positive', $this);
@@ -120,8 +115,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -142,10 +135,10 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->assign('aid', $this->_id);
-      //hidden field to catch the group id in profile
+      // hidden field to catch the group id in profile
       $this->add('hidden', 'financial_type_id', $this->_aid);
 
-      //hidden field to catch the field id in profile
+      // hidden field to catch the field id in profile
       $this->add('hidden', 'account_type_id', $this->_id);
     }
     $AccountTypeRelationship = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
@@ -302,8 +295,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
   /**
    * Process the form submission.
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

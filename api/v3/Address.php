@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -34,12 +34,16 @@
 /**
  * Add an Address for a contact.
  *
+ * FIXME: Should be using basic_create util
+ *
  * @param array $params
  *   Array per getfields metadata.
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_address_create(&$params) {
+  _civicrm_api3_check_edit_permissions('CRM_Core_BAO_Address', $params);
   /**
    * If street_parsing, street_address has to be parsed into
    * separate parts
@@ -66,6 +70,10 @@ function civicrm_api3_address_create(&$params) {
         }
       }
     }
+  }
+
+  if (!isset($params['check_permissions'])) {
+    $params['check_permissions'] = 0;
   }
 
   /**
@@ -96,6 +104,12 @@ function _civicrm_api3_address_create_spec(&$params) {
     'description' => 'Optional param to indicate you want the street_address field parsed into individual params',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   );
+  $params['skip_geocode'] = array(
+    'title' => 'Skip geocode',
+    'description' => 'Optional param to indicate you want to skip geocoding (useful when importing a lot of addresses
+      at once, the job \'Geocode and Parse Addresses\' can execute this task after the import)',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',
@@ -123,7 +137,7 @@ function _civicrm_api3_address_get_spec(&$params) {
  *   Array per getfields metadata.
  *
  * @return array
- *   api result array
+ *   API result array
  */
 function civicrm_api3_address_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -136,7 +150,7 @@ function civicrm_api3_address_delete($params) {
  *   Array per getfields metadata.
  *
  * @return array
- *   details of found addresses else error
+ *   API result array
  */
 function civicrm_api3_address_get(&$params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');

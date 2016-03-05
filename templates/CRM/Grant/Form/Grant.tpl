@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,10 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting grant *}
-
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 
 <div class="crm-block crm-form-block crm-grant-form-block">
   {if $action eq 8}
@@ -135,5 +131,3 @@
    {/if}
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
-{/if} {* closing of main custom data if *}

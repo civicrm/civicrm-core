@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -41,12 +41,6 @@ abstract class CRM_Core_Component_Info {
    * of the component invocation class'es name.
    */
   const COMPONENT_INVOKE_CLASS = 'Invoke';
-
-  /**
-   * Name of the class (minus component namespace path)
-   * of the component configuration class'es name.
-   */
-  const COMPONENT_CONFIG_CLASS = 'Config';
 
   /**
    * Name of the class (minus component namespace path)
@@ -241,16 +235,6 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
-   * Provides component's configuration object.
-   *
-   * @return mixed
-   *   component's configuration object
-   */
-  public function getConfigObject() {
-    return $this->_instantiate(self::COMPONENT_CONFIG_CLASS);
-  }
-
-  /**
    * Provides component's menu definition object.
    *
    * @return mixed
@@ -282,6 +266,8 @@ abstract class CRM_Core_Component_Info {
 
   /**
    * Builds advanced search form's component specific pane.
+   *
+   * @param CRM_Core_Form $form
    */
   public function buildAdvancedSearchPaneForm(&$form) {
     $bao = $this->getBAOQueryObject();

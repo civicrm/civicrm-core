@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,8 +25,8 @@
 *}
 {capture assign=docLink}{docURL page="CiviMail Mailer Settings" text="CiviMail Mailer Settings and Optimization" resource="wiki"}{/capture}
 <div class="crm-block crm-form-block crm-mail-form-block">
-<div id="help">
-    {ts 1=$docLink}These settings are used to configure mailer properties for the optional CiviMail component and may allow you to significantly optimize performance. Please read the %1 documentation, and make sure you understand it before modifying default values. (These settings are NOT used for the built-in 'Send Email to Contacts' feature).{/ts}
+<div class="help">
+    {ts 1=$docLink}These settings are used to configure mailer properties for the optional CiviMail component and may allow you to significantly optimize performance. Please read the %1 documentation, and make sure you understand it before modifying default values. (These settings are NOT used for the built-in 'Email - send now' feature).{/ts}
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">

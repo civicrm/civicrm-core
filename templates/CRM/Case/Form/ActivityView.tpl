@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -78,6 +78,6 @@
     {/if}
   {/if}
   <div class="crm-submit-buttons">
-    {crmButton p='civicrm/case' q="reset=1" class='cancel' icon='close'}{ts}Done{/ts}{/crmButton}
+    {crmButton p='civicrm/case' q="reset=1" class='cancel' icon='times'}{ts}Done{/ts}{/crmButton}
   </div>
 </div>

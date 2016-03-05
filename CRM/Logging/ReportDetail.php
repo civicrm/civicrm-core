@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -239,7 +239,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
 
     $q = "reset=1&log_conn_id={$this->log_conn_id}&log_date={$this->log_date}";
     $this->assign('revertURL', CRM_Report_Utils_Report::getNextUrl($this->detail, "$q&revert=1", FALSE, TRUE));
-    $this->assign('revertConfirm', ts('Are you sure you want to revert all these changes?'));
+    $this->assign('revertConfirm', ts('Are you sure you want to revert all changes?'));
   }
 
 }

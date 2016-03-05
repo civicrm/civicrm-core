@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to create PDF letter for a group of
- * contacts or a single contact.
+ * This class provides the functionality to create PDF letter for a group of contacts or a single contact.
  */
 class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
@@ -52,8 +49,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->skipOnHold = $this->skipDeceased = FALSE;
@@ -105,9 +100,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //enable form element
@@ -128,7 +120,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       'contribution_recur_id' => ts('Contact and Recurring'),
       'financial_type_id' => ts('Contact and Financial Type'),
       'campaign_id' => ts('Contact and Campaign'),
-      'payment_instrument_id' => 'Contact and Payment Instrument',
+      'payment_instrument_id' => ts('Contact and Payment Method'),
     );
     $this->addElement('select', 'group_by', ts('Group contributions by'), $options, array(), "<br/>", FALSE);
     // this was going to be free-text but I opted for radio options in case there was a script injection risk
@@ -162,12 +154,20 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this);
+  }
+
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
+    return $tokens;
   }
 
 }
