@@ -143,7 +143,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       }
 
       /* Queue up recipients for the child job being launched */
-
       if ($job->status != 'Running') {
         $transaction = new CRM_Core_Transaction();
 
@@ -444,6 +443,40 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
+   * Build a join and where part for a query
+   *
+   * @param $contact_id
+   * @return array - the first key is join part of the query and the second key is the where part of the query
+   */
+  public function buildAcl($contact_id) {
+    $tables = array();
+    $whereTables = array();
+    $whereClause = CRM_ACL_BAO_ACL::whereClause(CRM_Core_Permission::VIEW, $tables, $whereTables, $contact_id);
+    if (strlen($whereClause)) {
+      $whereClause = " AND (".$whereClause.")";
+    }
+
+    $join = "";
+    foreach ($whereTables as $name => $value) {
+      if (!$value) {
+        continue;
+      }
+      if ($value != 1) {
+        // if there is already a join statement in value, use value itself
+        if (strpos($value, 'JOIN')) {
+          $join .= " $value ";
+        }
+        continue;
+      }
+    }
+
+    return array (
+      $join,
+      $whereClause
+    );
+  }
+
+  /**
    * Send the mailing
    *
    * @param object $mailer        A Mail object to send the messages
@@ -465,6 +498,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $edTable      = CRM_Mailing_Event_BAO_Delivered::getTableName();
     $ebTable      = CRM_Mailing_Event_BAO_Bounce::getTableName();
 
+    list($acl_join, $acl_where) = $this->buildAcl($mailing->created_id);
+
     $query = "  SELECT      $eqTable.id,
                                 $emailTable.email as email,
                                 $eqTable.contact_id,
@@ -473,16 +508,19 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
                     FROM        $eqTable
                     INNER JOIN  $emailTable
                             ON  $eqTable.email_id = $emailTable.id
-                    INNER JOIN  $contactTable
-                            ON  $contactTable.id = $emailTable.contact_id
+                    INNER JOIN  $contactTable contact_a
+                            ON  contact_a.id = $emailTable.contact_id
                     LEFT JOIN   $edTable
                             ON  $eqTable.id = $edTable.event_queue_id
                     LEFT JOIN   $ebTable
                             ON  $eqTable.id = $ebTable.event_queue_id
+                    $acl_join
                     WHERE       $eqTable.job_id = " . $this->id . "
                         AND     $edTable.id IS null
                         AND     $ebTable.id IS null
-                        AND    $contactTable.is_opt_out = 0";
+                        AND    contact_a.is_opt_out = 0
+                        $acl_where
+                        ";
 
     if ($mailing->sms_provider_id) {
       $query = "
@@ -494,16 +532,19 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
                     FROM        $eqTable
                     INNER JOIN  $phoneTable
                             ON  $eqTable.phone_id = $phoneTable.id
-                    INNER JOIN  $contactTable
-                            ON  $contactTable.id = $phoneTable.contact_id
+                    INNER JOIN  $contactTable contact_a
+                            ON  contact_a.id = $phoneTable.contact_id
                     LEFT JOIN   $edTable
                             ON  $eqTable.id = $edTable.event_queue_id
                     LEFT JOIN   $ebTable
                             ON  $eqTable.id = $ebTable.event_queue_id
+                    $acl_join
                     WHERE       $eqTable.job_id = " . $this->id . "
                         AND     $edTable.id IS null
                         AND     $ebTable.id IS null
-                        AND    $contactTable.is_opt_out = 0";
+                        AND    contact_a.is_opt_out = 0
+                        $acl_where
+                        ";
     }
     $eq->query($query);
 
