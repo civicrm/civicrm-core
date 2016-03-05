@@ -4401,10 +4401,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
 
-      if (!empty($values['is_email_receipt'])) {
-        $contributionParams['receipt_date'] = $changeDate;
-      }
-
       if (!empty($memberships)) {
         foreach ($memberships as $membershipTypeIdKey => $membership) {
           if ($membership) {
@@ -4620,6 +4616,10 @@ LIMIT 1;";
         $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $input, $userEmail);
         $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
       }
+    }
+    // Contribution ID should really always be set. But ?
+    if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update'])) {
+      civicrm_api3('Contribution', 'create', array('receipt_date' => 'now', 'id' => $contribution->id));
     }
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
   }
