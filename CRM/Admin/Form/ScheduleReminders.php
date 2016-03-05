@@ -309,10 +309,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     if (!empty($fields['is_active']) &&
-      CRM_Utils_Array::value('mode', $fields) == 'SMS' &&
       CRM_Utils_System::isNull($fields['subject'])
     ) {
       $errors['subject'] = ts('Subject is a required field.');
+    }
+    if (!empty($fields['is_active']) &&
+      CRM_Utils_System::isNull(trim(strip_tags($fields['html_message'])))
+    ) {
+      $errors['html_message'] = ts('The HTML message is a required field.');
     }
 
     if (empty($self->_context) && CRM_Utils_System::isNull(CRM_Utils_Array::value(1, $fields['entity']))) {
