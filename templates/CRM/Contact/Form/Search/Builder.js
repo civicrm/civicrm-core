@@ -124,7 +124,8 @@
     }
     $.each(CRM.searchBuilder.fieldOptions[field], function(key, option) {
       var selected = ($.inArray(''+option.key, options) > -1) ? 'selected="selected"' : '';
-      select.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
+      var value = field === 'activity_type' ? option.value : option.key;
+      select.append('<option value="' + value + '"' + selected + '>' + option.value + '</option>');
     });
     select.change();
   }
