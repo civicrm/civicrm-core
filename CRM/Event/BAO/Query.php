@@ -684,6 +684,8 @@ class CRM_Event_BAO_Query {
   /**
    * Check if the values in the date range are in correct chronological order.
    *
+   * @todo Get this to work with CRM_Utils_Rule::validDateRange
+   *
    * @param array $fields
    * @param array $files
    * @param CRM_Core_Form $form

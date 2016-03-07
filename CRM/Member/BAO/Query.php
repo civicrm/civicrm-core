@@ -489,8 +489,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * Check if the values in the date range are in correct chronological order.
-   * @todo Find a better way to implement this validation when multiple date ranges are present.
+   * Custom form rules.
    *
    * @param array $fields
    * @param array $files
@@ -504,24 +503,10 @@ class CRM_Member_BAO_Query {
     if ((empty($fields['member_join_date_low']) || empty($fields['member_join_date_high'])) && (empty($fields['member_start_date_low']) || empty($fields['member_start_date_high'])) && (empty($fields['member_end_date_low']) || empty($fields['member_end_date_high']))) {
       return TRUE;
     }
-    $lowDate = strtotime($fields['member_join_date_low']);
-    $highDate = strtotime($fields['member_join_date_high']);
 
-    if ($lowDate > $highDate) {
-      $errors['member_join_date_range_error'] = ts('Please check that your Member Since Date Range is in correct chronological order.');
-    }
-
-    $lowDate1 = strtotime($fields['member_start_date_low']);
-    $highDate1 = strtotime($fields['member_start_date_high']);
-    if ($lowDate1 > $highDate1) {
-      $errors['member_start_date_range_error'] = ts('Please check that your Start Date Range is in correct chronological order.');
-    }
-
-    $lowDate2 = strtotime($fields['member_end_date_low']);
-    $highDate2 = strtotime($fields['member_end_date_high']);
-    if ($lowDate2 > $highDate2) {
-      $errors['member_end_date_range_error'] = ts('Please check that your End Date Range is in correct chronological order.');
-    }
+    CRM_Utils_Rule::validDateRange($fields, 'member_join_date', $errors, ts('Member Since'));
+    CRM_Utils_Rule::validDateRange($fields, 'member_start_date', $errors, ts('Start Date'));
+    CRM_Utils_Rule::validDateRange($fields, 'member_end_date', $errors, ts('End Date'));
 
     return empty($errors) ? TRUE : $errors;
   }

@@ -511,12 +511,9 @@ class CRM_Mailing_BAO_Query {
     if (empty($fields['mailing_date_high']) || empty($fields['mailing_date_low'])) {
       return TRUE;
     }
-    $lowDate = strtotime($fields['mailing_date_low']);
-    $highDate = strtotime($fields['mailing_date_high']);
 
-    if ($lowDate > $highDate) {
-      $errors['mailing_date_range_error'] = ts('Please check that your Date Range is in correct chronological order.');
-    }
+    CRM_Utils_Rule::validDateRange($fields, 'mailing_date', $errors, ts('Mailing Date'));
+
     return empty($errors) ? TRUE : $errors;
   }
 

@@ -1202,7 +1202,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * Check if the values in the date range are in correct chronological order.
+   * Custom form rules.
    *
    * @param array $fields
    * @param array $files
@@ -1216,12 +1216,9 @@ class CRM_Contribute_BAO_Query {
     if (empty($fields['contribution_date_high']) || empty($fields['contribution_date_low'])) {
       return TRUE;
     }
-    $lowDate = strtotime($fields['contribution_date_low']);
-    $highDate = strtotime($fields['contribution_date_high']);
 
-    if ($lowDate > $highDate) {
-      $errors['contribution_date_range_error'] = ts('Please check that your Date Range is in correct chronological order.');
-    }
+    CRM_Utils_Rule::validDateRange($fields, 'contribution_date', $errors, ts('Date Received'));
+
     return empty($errors) ? TRUE : $errors;
   }
 
