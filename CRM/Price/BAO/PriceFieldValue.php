@@ -319,7 +319,6 @@ WHERE cpse.id IS NOT NULL {$where}";
         1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -', 'String'),
         2 => array(CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -', 'String'),
       );
-      $participantIds = array();
       // Update contribution
       if (!empty($lineItem->contribution_id)) {
         CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution` SET `amount_level` = REPLACE(amount_level, %1, %2) WHERE id = {$lineItem->contribution_id}", $params);
