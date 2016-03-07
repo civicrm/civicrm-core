@@ -812,4 +812,25 @@ class CRM_Utils_Rule {
     return ($key) ? CRM_Core_Key::valid($key) : FALSE;
   }
 
+  /**
+   * Check if the values in the date range are in correct chronological order.
+   *
+   * @param array $fields
+   *  Fields of the form.
+   * @param $fieldName
+   *  Name of date range field.
+   * @param $errors
+   *  The error array.
+   * @param $title
+   *  Title of the date range to be displayed in the error message.
+   */
+  public static function validDateRange($fields, $fieldName, &$errors, $title) {
+    $lowDate = strtotime($fields[$fieldName . '_low']);
+    $highDate = strtotime($fields[$fieldName . '_high']);
+
+    if ($lowDate > $highDate) {
+      $errors[$fieldName . '_range_error'] = ts('%1: Please check that your date range is in correct chronological order.', array(1 => $title));
+    }
+  }
+
 }

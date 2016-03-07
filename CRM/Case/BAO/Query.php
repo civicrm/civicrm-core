@@ -688,8 +688,8 @@ case_relation_type.id = case_relationship.relationship_type_id )";
 
     CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);
-    $form->addElement('hidden', 'case_from_date_range_error');
-    $form->addElement('hidden', 'case_to_date_range_error');
+    $form->addElement('hidden', 'case_from_start_date_range_error');
+    $form->addElement('hidden', 'case_to_end_date_range_error');
     $form->addFormRule(array('CRM_Case_BAO_Query', 'formRule'), $form);
 
     $form->assign('validCiviCase', TRUE);
@@ -742,7 +742,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
-   * Check if the values in the date range are in correct chronological order.
+   * Custom form rules.
    *
    * @param array $fields
    * @param array $files
@@ -756,19 +756,10 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     if ((empty($fields['case_from_start_date_low']) || empty($fields['case_from_start_date_high'])) && (empty($fields['case_to_end_date_low']) || empty($fields['case_to_end_date_high']))) {
       return TRUE;
     }
-    $lowDate = strtotime($fields['case_from_start_date_low']);
-    $highDate = strtotime($fields['case_from_start_date_high']);
 
-    if ($lowDate > $highDate) {
-      $errors['case_from_date_range_error'] = ts('Please check that your Case Start Date Range is in correct chronological order.');
-    }
+    CRM_Utils_Rule::validDateRange($fields, 'case_from_start_date', $errors, ts('Case Start Date'));
+    CRM_Utils_Rule::validDateRange($fields, 'case_to_end_date', $errors, ts('Case End Date'));
 
-    $lowDate1 = strtotime($fields['case_to_end_date_low']);
-    $highDate1 = strtotime($fields['case_to_end_date_high']);
-
-    if ($lowDate1 > $highDate1) {
-      $errors['case_to_date_range_error'] = ts('Please check that your Case End Date Range is in correct chronological order.');
-    }
     return empty($errors) ? TRUE : $errors;
   }
 
