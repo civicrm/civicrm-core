@@ -1781,12 +1781,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_BAO_CustomValueTable::setValues($viewOnlyCustomFields);
     }
 
-    // **** Delete other contact & update prev-next caching
-    $otherParams = array(
-      'contact_id' => $otherId,
-      'id' => $otherId,
-      'version' => 3,
-    );
     if (CRM_Core_Permission::check('merge duplicate contacts') &&
       CRM_Core_Permission::check('delete contacts')
     ) {
@@ -1796,15 +1790,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         CRM_Core_DAO::executeQuery($query);
       }
 
-      civicrm_api('contact', 'delete', $otherParams);
+      civicrm_api3('contact', 'delete', array('id' => $otherId));
       CRM_Core_BAO_PrevNextCache::deleteItem($otherId);
     }
     // FIXME: else part
-    /*         else { */
-
-    /*             CRM_Core_Session::setStatus( ts('Do not have sufficient permission to delete duplicate contact.') ); */
-
-    /*         } */
+    // else {
+    //  CRM_Core_Session::setStatus( ts('Do not have sufficient permission to delete duplicate contact.') );
+    // }
 
     // CRM-15681 merge sub_types
     if ($other_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['other_details'])) {
@@ -1844,6 +1836,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     CRM_Utils_Hook::post('merge', 'Contact', $mainId, CRM_Core_DAO::$_nullObject);
+
+    // Create activity for merge.
+    $messageActivity = ts('Contact ID %1 has been merged and deleted.', array(1 => $otherId));
+    civicrm_api3('activity', 'create', array(
+      'subject' => $messageActivity,
+      'source_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
+      'target_contact_id' => $mainId,
+      'activity_type_id' => 'Contact Merged',
+      'status_id' => 'Completed',
+      'priority_id' => 'Normal',
+    ));
 
     return TRUE;
   }
