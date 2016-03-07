@@ -559,7 +559,7 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * Check if the values in the date range are in correct chronological order.
+   * Custom form rules.
    *
    * @param array $fields
    * @param array $files
@@ -573,12 +573,9 @@ class CRM_Activity_BAO_Query {
     if (empty($fields['activity_date_low']) || empty($fields['activity_date_high'])) {
       return TRUE;
     }
-    $lowDate = strtotime($fields['activity_date_low']);
-    $highDate = strtotime($fields['activity_date_high']);
 
-    if ($lowDate > $highDate) {
-      $errors['activity_date_range_error'] = ts('Please check that your Activity Date Range is in correct chronological order.');
-    }
+    CRM_Utils_Rule::validDateRange($fields, 'activity_date', $errors, ts('Activity Date'));
+
     return empty($errors) ? TRUE : $errors;
   }
 
