@@ -4469,16 +4469,14 @@ civicrm_relationship.is_permission_a_b = 0
    * @param array $formValues
    */
   public static function filterCountryFromValuesIfStateExists(&$formValues) {
-    if (!empty($formValues['country'])) {
-      if (isset($formValues['state_province'])) {
-        // The use of array map sanitises the data by ensuring we are dealing with integers.
-        $states = implode(', ', array_map('intval', $formValues['state_province']));
-        $countryList = CRM_Core_DAO::singleValueQuery(
-          "SELECT GROUP_CONCAT(country_id) FROM civicrm_state_province WHERE id IN ($states)"
-        );
-        if ($countryList == $formValues['country']) {
-          unset($formValues['country']);
-        }
+    if (!empty($formValues['country']) && !empty($formValues['state_province'])) {
+      // The use of array map sanitises the data by ensuring we are dealing with integers.
+      $states = implode(', ', array_map('intval', $formValues['state_province']));
+      $countryList = CRM_Core_DAO::singleValueQuery(
+        "SELECT GROUP_CONCAT(country_id) FROM civicrm_state_province WHERE id IN ($states)"
+      );
+      if ($countryList == $formValues['country']) {
+        unset($formValues['country']);
       }
     }
   }
@@ -5869,13 +5867,13 @@ AND   displayRelType.is_active = 1
       $pseudoOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     }
     elseif ($fieldName == 'country_id') {
-      $pseduoOptions = CRM_Core_PseudoConstant::country();
+      $pseudoOptions = CRM_Core_PseudoConstant::country();
     }
     elseif ($fieldName == 'county_id') {
-      $pseduoOptions = CRM_Core_PseudoConstant::county();
+      $pseudoOptions = CRM_Core_PseudoConstant::county();
     }
     elseif ($fieldName == 'world_region') {
-      $pseduoOptions = CRM_Core_PseudoConstant::worldRegion();
+      $pseudoOptions = CRM_Core_PseudoConstant::worldRegion();
     }
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
       $pseudoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
