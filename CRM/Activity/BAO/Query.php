@@ -215,7 +215,18 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_type':
       case 'activity_status':
+
+
+               //Fix for CiviCRMCRM-17571
+              //Cannot search for Activity type and status in Search Builder (it translates values incorrectly)
+      if (in_array($op, array('LIKE', 'NOT LIKE', 'RLIKE')))
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
+      else
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.value", $op, $value, 'Integer');
+
+
+
+
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$name]['title'], 2 => $op, 3 => $value));
         $query->_tables[$name] = $query->_whereTables[$name] = 1;
