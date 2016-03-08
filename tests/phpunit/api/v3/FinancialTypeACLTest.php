@@ -116,7 +116,8 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   }
 
   public function setACL() {
-    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
+    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = array();
+    CRM_Financial_BAO_FinancialType::$_statusACLFt = array();
     $params = array(
       'domain_id' => 1,
       'contribution_invoice_settings' => array('acl_financial_type' => 1),
@@ -315,7 +316,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPIFailure('Contribution', 'create', $params);
 
-    $config->userPermissionClass->permissions[3] = 'edit contributions of type Donation';
+    $config->userPermissionClass->permissions[] = 'edit contributions of type Donation';
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 200.00);
