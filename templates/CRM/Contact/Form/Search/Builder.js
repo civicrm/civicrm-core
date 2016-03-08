@@ -154,7 +154,7 @@
         optionKey = option.value;
       }
       var selected = ($.inArray(''+optionKey, options) > -1) ? 'selected="selected"' : '';
-      select.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
+      select.append('<option value="' + optionKey + '"' + selected + '>' + option.value + '</option>');
     });
     select.change();
   }
