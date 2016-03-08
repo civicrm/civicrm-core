@@ -52,10 +52,7 @@ function civicrm_api3_contribution_create(&$params) {
     }
     else {
       if (empty($params['financial_type_id'])) {
-        $params['financial_type_id'] = civicrm_api3('Contribution', 'getvalue', array(
-          'id' => $params['id'],
-          'return' => 'financial_type_id',
-        ));
+        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['id'], 'financial_type_id');
       }
       $op = CRM_Core_Action::UPDATE;
     }
