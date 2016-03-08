@@ -94,10 +94,15 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     // Get fields of type date
     // FIXME: This is a hack until our fields contain this meta-data
     $dateFields = array();
+    $stringFields = array();
     $searchByLabelFields = array();
     foreach ($fields as $name => $field) {
       if (strpos($name, '_date') || CRM_Utils_Array::value('data_type', $field) == 'Date') {
         $dateFields[] = $name;
+      }
+      // it's necessary to know which of the fields are from string data type
+      if (isset($field['type']) && $field['type'] === CRM_Utils_Type::T_STRING) {
+          $stringFields[] = $name;
       }
       // it's necessary to know which of the fields are searchable by label
       if (isset($field['searchByLabel']) && $field['searchByLabel']) {
@@ -113,7 +118,10 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
           'newBlock' => $this->get('newBlock'),
           'dateFields' => $dateFields,
           'fieldOptions' => self::fieldOptions(),
+          'stringFields' => $stringFields,
           'searchByLabelFields' => $searchByLabelFields,
+          'generalOperators' => array('' => ts('-operator-')) + CRM_Core_SelectValues::getSearchBuilderOperators(),
+          'stringOperators' => array('' => ts('-operator-')) + CRM_Core_SelectValues::getSearchBuilderOperators(CRM_Utils_Type::T_STRING),
         ),
       ));
     //get the saved search mapping id
