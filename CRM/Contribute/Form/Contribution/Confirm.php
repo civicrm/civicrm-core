@@ -1333,6 +1333,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isPending = $this->getIsPending();
 
     $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipType));
+    $this->_values['membership_name'] = CRM_Utils_Array::value('name', $membershipType);
 
     $isPaidMembership = FALSE;
     if ($this->_amount >= 0.0 && isset($membershipParams['amount'])) {
@@ -1499,12 +1500,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         );
         $form->set('renewal_mode', $renewalMode);
         if (!empty($dates)) {
-          $form->assign('mem_start_date',
-            CRM_Utils_Date::customFormat($dates['start_date'], '%Y%m%d')
-          );
-          $form->assign('mem_end_date',
-            CRM_Utils_Date::customFormat($dates['end_date'], '%Y%m%d')
-          );
+          $form->assign('mem_start_date', CRM_Utils_Date::customFormat($dates['start_date'], '%Y%m%d'));
+          $form->assign('mem_end_date', CRM_Utils_Date::customFormat($dates['end_date'], '%Y%m%d'));
         }
 
         if (!empty($membershipContribution)) {
@@ -1562,7 +1559,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_values['contribution_id'] = $membershipContributionID;
     }
 
-    if ($form->_paymentProcessor) {
+    if (empty($form->_params['is_pay_later']) && $form->_paymentProcessor) {
       // the is_monetary concept probably should be deprecated as it can be calculated from
       // the existence of 'amount' & seems fragile.
       if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
@@ -1585,14 +1582,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       return;
     }
 
-    $emailValues = $form->_values;
+    $emailValues = array_merge($membershipParams, $form->_values);
+    $emailValues['membership_assign'] = 1;
     // Finally send an email receipt for pay-later scenario (although it might sometimes be caught above!)
     if ($totalAmount == 0) {
       // This feels like a bizarre hack as the variable name doesn't seem to be directly connected to it's use in the template.
       $emailValues['useForMember'] = 0;
-      $emailValues['membership_assign'] = 1;
       $emailValues['amount'] = 0;
     }
+
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $emailValues,
       $isTest, FALSE,
