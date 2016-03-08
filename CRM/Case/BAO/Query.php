@@ -688,6 +688,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
 
     CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);
+    $form->addElement('hidden', 'case_from_start_date_range_error');
+    $form->addElement('hidden', 'case_to_end_date_range_error');
+    $form->addFormRule(array('CRM_Case_BAO_Query', 'formRule'), $form);
 
     $form->assign('validCiviCase', TRUE);
 
@@ -736,6 +739,28 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * @param int $id
    */
   public static function searchAction(&$row, $id) {
+  }
+
+  /**
+   * Custom form rules.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $form
+   *
+   * @return bool|array
+   */
+  public static function formRule($fields, $files, $form) {
+    $errors = array();
+
+    if ((empty($fields['case_from_start_date_low']) || empty($fields['case_from_start_date_high'])) && (empty($fields['case_to_end_date_low']) || empty($fields['case_to_end_date_high']))) {
+      return TRUE;
+    }
+
+    CRM_Utils_Rule::validDateRange($fields, 'case_from_start_date', $errors, ts('Case Start Date'));
+    CRM_Utils_Rule::validDateRange($fields, 'case_to_end_date', $errors, ts('Case End Date'));
+
+    return empty($errors) ? TRUE : $errors;
   }
 
 }
