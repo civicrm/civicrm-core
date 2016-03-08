@@ -378,6 +378,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param bool $test
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
+    if ($test) {
+      foreach (array('user_name', 'password', 'signature') as $field) {
+        $values[$field] = empty($values["test_{$field}"]) ? CRM_Utils_Array::value($field, $values) : $values["test_{$field}"];
+      }
+    }
     $params  = array_merge(array(
       'id' => $test ? $this->_testID : $this->_id,
       'domain_id' => $domainID,
