@@ -1619,14 +1619,27 @@ SELECT id
       $fName = $value['name'];
       $mimeType = $value['type'];
 
+      // If we are already passing the file id as a value then retrieve and set the file data
+      if (CRM_Utils_Rule::integer($value)) {
+        $fileDAO = new CRM_Core_DAO_File();
+        $fileDAO->id = $value;
+        $fileDAO->find(TRUE);
+        if ($fileDAO->N) {
+          $fileID = $value;
+          $fName = $fileDAO->uri;
+          $mimeType = $fileDAO->mime_type;
+        }
+      }
+
       $filename = pathinfo($fName, PATHINFO_BASENAME);
 
-      // rename this file to go into the secure directory
-      if (!rename($fName, $config->customFileUploadDir . $filename)) {
+      // rename this file to go into the secure directory only if
+      // user has uploaded new file not existing verfied on the basis of $fileID
+      if (!$fileID && !rename($fName, $config->customFileUploadDir . $filename)) {
         CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
       }
 
-      if ($customValueId) {
+      if ($customValueId && !$fileID) {
         $query = "
 SELECT $columnName
   FROM $tableName
