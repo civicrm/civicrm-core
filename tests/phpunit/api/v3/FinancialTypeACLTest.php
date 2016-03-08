@@ -115,6 +115,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->quickCleanup(array('civicrm_uf_match'));
     CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = array();
     CRM_Financial_BAO_FinancialType::$_statusACLFt = array();
+    $params = array(
+      'domain_id' => 1,
+      'contribution_invoice_settings' => array('acl_financial_type' => 0),
+    );
   }
 
   public function setACL() {
