@@ -113,6 +113,8 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(array('civicrm_uf_match'));
+    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = array();
+    CRM_Financial_BAO_FinancialType::$_statusACLFt = array();
   }
 
   public function setACL() {
