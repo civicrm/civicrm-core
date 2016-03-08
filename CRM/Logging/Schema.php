@@ -154,6 +154,7 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     }
     CRM_Utils_Hook::alterLogTables($this->logTableSpec);
     $this->tables = array_keys($this->logTableSpec);
+    $nonStandardTableNameString = $this->getNonStandardTableNameFilterString();
 
     if (defined('CIVICRM_LOGGING_DSN')) {
       $dsn = DB::parseDSN(CIVICRM_LOGGING_DSN);
@@ -170,7 +171,7 @@ SELECT TABLE_NAME
 FROM   INFORMATION_SCHEMA.TABLES
 WHERE  TABLE_SCHEMA = '{$this->db}'
 AND    TABLE_TYPE = 'BASE TABLE'
-AND    TABLE_NAME LIKE 'log_civicrm_%'
+AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
 ");
     while ($dao->fetch()) {
       $log = $dao->TABLE_NAME;
@@ -674,6 +675,27 @@ COLS;
    */
   private function tablesExist() {
     return !empty($this->logs);
+  }
+
+  /**
+   * Get an sql clause to find the names of any log tables that do not match the normal pattern.
+   *
+   * Most tables are civicrm_xxx with the log table being log_civicrm_xxx
+   * However, they don't have to match this pattern (e.g when defined by hook) so find the
+   * anomalies and return a filter string to include them.
+   *
+   * @return string
+   */
+  public function getNonStandardTableNameFilterString() {
+    $nonStandardTableNames = preg_grep('/^civicrm_/', $this->tables, PREG_GREP_INVERT);
+    if (empty($nonStandardTableNames)) {
+      return '';
+    }
+    $nonStandardTableLogs = array();
+    foreach ($nonStandardTableNames as $nonStandardTableName) {
+      $nonStandardTableLogs[] = "'log_{$nonStandardTableName}'";
+    }
+    return " OR TABLE_NAME IN (" . implode(',', $nonStandardTableLogs) . ")";
   }
 
   /**
