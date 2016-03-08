@@ -1845,7 +1845,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'target_contact_id' => $mainId,
       'activity_type_id' => 'Contact Merged',
       'status_id' => 'Completed',
-      'priority_id' => 'Normal',
     ));
 
     return TRUE;
