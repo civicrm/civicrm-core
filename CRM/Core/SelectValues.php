@@ -910,7 +910,7 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function getSearchBuilderOperators($fieldType = null) {
+  public static function getSearchBuilderOperators($fieldType = NULL) {
     $builderOperators = array(
       '=' => '=',
       '!=' => '≠',
