@@ -78,6 +78,15 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     $this->assign('action', $this->_action);
     $this->assign('surveyId', $this->_surveyId);
 
+    // when custom data is included in this page
+    if (!empty($_POST['hidden_custom'])) {
+      $this->set('type', 'Event');
+      $this->set('entityId', $this->_surveyId);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Survey', $this->_surveyId);
+      CRM_Custom_Form_CustomData::buildQuickForm($this);
+      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    }
+
     // CRM-11480, CRM-11682
     // Preload libraries required by the "Questions" tab
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
