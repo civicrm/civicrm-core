@@ -126,6 +126,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
    *   array of default values
    */
   public function setDefaultValues() {
+    if ($this->_cdType) {
+      return CRM_Custom_Form_CustomData::setDefaultValues($this);
+    }
+
     $defaults = $this->_values;
 
     $ufContactJoinParams = array(
@@ -161,6 +165,9 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
 
   public function buildQuickForm() {
+    if ($this->_cdType) {
+      return CRM_Custom_Form_CustomData::buildQuickForm($this);
+    }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(
@@ -327,6 +334,12 @@ WHERE  $whereClause
     $params['bypass_confirm'] = CRM_Utils_Array::value('bypass_confirm', $params, 0);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
+
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      $customFields,
+      $this->_surveyId,
+      'Survey'
+    );
 
     $surveyId = CRM_Campaign_BAO_Survey::create($params);
 
