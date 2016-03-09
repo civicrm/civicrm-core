@@ -2171,6 +2171,31 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Add actions menu to results form.
+   *
+   * @param $tasks
+   */
+  public function addTaskMenu($tasks) {
+    if (is_array($tasks) && !empty($tasks)) {
+      $tasks = array('' => ts('Actions')) + $tasks;
+      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu huge crm-search-result-actions'));
+      if (empty($this->_actionButtonName)) {
+        $this->_actionButtonName = $this->getButtonName('next', 'action');
+      }
+      $this->assign('actionButtonName', $this->_actionButtonName);
+      $this->add('submit', $this->_actionButtonName, ts('Go'), array('class' => 'hiddenElement crm-search-go-button'));
+
+      // Radio to choose "All items" or "Selected items only"
+      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
+      $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
+      $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
+      $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
+
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
+    }
+  }
+
+  /**
    * Set options and attributes for chain select fields based on the controlling field's value
    */
   private function preProcessChainSelectFields() {

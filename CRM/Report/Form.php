@@ -623,9 +623,6 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $this->_instanceButtonName = $this->getButtonName('submit', 'save');
     $this->_createNewButtonName = $this->getButtonName('submit', 'next');
-    $this->_printButtonName = $this->getButtonName('submit', 'print');
-    $this->_pdfButtonName = $this->getButtonName('submit', 'pdf');
-    $this->_csvButtonName = $this->getButtonName('submit', 'csv');
     $this->_groupButtonName = $this->getButtonName('submit', 'group');
     $this->_chartButtonName = $this->getButtonName('submit', 'chart');
   }
@@ -1452,30 +1449,17 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   public function buildInstanceAndButtons() {
     CRM_Report_Form_Instance::buildForm($this);
-
-    $label = $this->_id ? ts('Update Report') : ts('Create Report');
-
-    $this->addElement('submit', $this->_instanceButtonName, $label);
-    $this->addElement('submit', $this->_printButtonName, ts('Print Report'));
-    $this->addElement('submit', $this->_pdfButtonName, ts('PDF'));
+    $this->_actionButtonName = $this->getButtonName('submit');
+    $this->addTaskMenu($this->getActions($this->_id));
 
     if ($this->_id) {
       $this->addElement('submit', $this->_createNewButtonName,
         ts('Save a Copy') . '...');
     }
+    $this->addElement('submit', $this->_instanceButtonName,
+      ts('Save') . '...');
+
     $this->assign('instanceForm', $this->_instanceForm);
-
-    $label = $this->_id ? ts('Print Report') : ts('Print Preview');
-    $this->addElement('submit', $this->_printButtonName, $label);
-
-    $label = $this->_id ? ts('PDF') : ts('Preview PDF');
-    $this->addElement('submit', $this->_pdfButtonName, $label);
-
-    $label = $this->_id ? ts('Export to CSV') : ts('Preview CSV');
-
-    if ($this->_csvSupported) {
-      $this->addElement('submit', $this->_csvButtonName, $label);
-    }
 
     // CRM-16274 Determine if user has 'edit all contacts' or equivalent
     $permission = CRM_Core_Permission::getPermission();
@@ -1493,14 +1477,72 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->addElement('submit', $this->_groupButtonName, '', array('style' => 'display: none;'));
 
     $this->addChartOptions();
+    $showResultsLabel = $this->getResultsLabel();
     $this->addButtons(array(
         array(
           'type' => 'submit',
-          'name' => ts('Preview Report'),
+          'name' => $showResultsLabel,
           'isDefault' => TRUE,
         ),
       )
     );
+  }
+
+  /**
+   * Has this form been submitted already?
+   *
+   * @return bool
+   */
+  public function resultsDisplayed() {
+    $buttonName = $this->controller->getButtonName();
+    return ($buttonName || $this->_outputMode);
+  }
+
+  /**
+   * Get the actions for this report instance.
+   *
+   * @param int $instanceId
+   *
+   * @return array
+   */
+  protected function getActions($instanceId) {
+    $actions = array(
+      'html' => $this->getResultsLabel(),
+      'save' => 'Update',
+      'copy' => 'Save a Copy',
+      'print' => 'Print Report',
+      'pdf' => 'Print to PDF',
+    );
+    if (empty($instanceId)) {
+      $actions['save'] = ts('Create Report');
+    }
+
+    if ($this->_outputMode || $this->_id) {
+      $actions['html'] = 'Refresh Results';
+    }
+
+    if ($this->_csvSupported) {
+      $actions['csv'] = 'Export as CSV';
+    }
+
+    if (!empty($this->_charts)) {
+      $this->assign('charts', $this->_charts);
+      if ($this->_format != '') {
+        $actions['tabular'] = 'View as tabular data';
+      }
+      if ($this->_format != 'pieChart') {
+        $actions['pieChart'] = 'View as pie chart';
+      }
+      if ($this->_format != 'barChart') {
+        $actions['barChart'] = 'View as bar graph';
+      }
+    }
+
+    if (CRM_Core_Permission::check('administer Reports')) {
+      $actions['delete'] = 'Delete report';
+    }
+
+    return $actions;
   }
 
   /**
@@ -2520,6 +2562,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   public function processReportMode() {
     $this->setOutputMode();
 
+    $buttonName = $this->controller->getButtonName();
     $this->_sendmail
       = CRM_Utils_Request::retrieve(
         'sendmail',
@@ -2553,15 +2596,19 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       $this->_absoluteUrl = TRUE;
       $this->addPaging = FALSE;
     }
-    elseif ($this->_outputMode == 'group') {
+    elseif ($this->_groupButtonName == $buttonName || $this->_outputMode == 'group') {
       $this->assign('outputMode', 'group');
     }
     elseif ($this->_outputMode == 'create_report' && $this->_criteriaForm) {
       $this->assign('outputMode', 'create_report');
     }
+    elseif (!empty($this->_outputMode) && !empty($this->_charts[$this->_outputMode])) {
+      $this->_params['charts'] = $this->_outputMode;
+    }
     elseif ($this->_outputMode == 'copy' && $this->_criteriaForm) {
       $this->_createNew = TRUE;
     }
+    $this->assign('outputMode', $this->_outputMode);
 
     $this->assign('outputMode', $this->_outputMode);
     $this->assign('printOnly', $printOnly);
@@ -4498,8 +4545,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (empty($financialTypes)) {
       $contFTs = "0";
       $liFTs = implode(',', array_keys(CRM_Contribute_Pseudoconstant::financialType()));
-    }
-    else {
+    } else {
       $contFTs = $liFTs = implode(',', array_keys($financialTypes));
     }
     if ($alias) {
@@ -4564,25 +4610,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       CRM_Utils_Array::value('task', $this->_params)
     );
 
-    if ($buttonName) {
-      if ($buttonName == $this->_instanceButtonName) {
-        $this->_outputMode = 'save';
-      }
-      if ($buttonName == $this->_printButtonName) {
-        $this->_outputMode = 'print';
-      }
-      if ($buttonName == $this->_pdfButtonName) {
-        $this->_outputMode = 'pdf';
-      }
-      if ($this->_csvButtonName == $buttonName) {
-        $this->_outputMode = 'csv';
-      }
-      if ($this->_groupButtonName == $buttonName) {
-        $this->_outputMode = 'group';
-      }
-      if ($buttonName == $this->_createNewButtonName) {
-        $this->_outputMode = 'copy';
-      }
+    if ($buttonName && $buttonName == $this->_instanceButtonName) {
+      $this->_outputMode = 'save';
     }
   }
 
