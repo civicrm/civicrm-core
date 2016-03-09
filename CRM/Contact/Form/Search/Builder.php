@@ -102,11 +102,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       }
       // it's necessary to know which of the fields are from string data type
       if (isset($field['type']) && $field['type'] === CRM_Utils_Type::T_STRING) {
-          $stringFields[] = $name;
+        $stringFields[] = $name;
       }
       // it's necessary to know which of the fields are searchable by label
       if (isset($field['searchByLabel']) && $field['searchByLabel']) {
-          $searchByLabelFields[] = $name;
+        $searchByLabelFields[] = $name;
       }
     }
     // Add javascript
