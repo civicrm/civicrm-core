@@ -28,9 +28,14 @@
 {if $context neq 'membership'}
     <table class="form-layout-compressed">
         <tr>
+          {if $softCreditTotals.amount}
             <th class="contriTotalLeft">{ts}Total Soft Credits{/ts} - {$softCreditTotals.amount|crmMoney:$softCreditTotals.currency}</th>
             <th class="right" width="10px"> &nbsp; </th>
             <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credits{/ts} - {$softCreditTotals.avg|crmMoney:$softCreditTotals.currency}</th>
+          {/if}
+          {if $softCreditTotals.cancelAmount}
+            <th class="right contriTotalRight"> &nbsp; {ts}Total Cancelled Soft Credits{/ts} - {$softCreditTotals.cancelAmount|crmMoney:$softCreditTotals.currency}</th>
+          {/if}
         </tr>
     </table>
     <p></p>
