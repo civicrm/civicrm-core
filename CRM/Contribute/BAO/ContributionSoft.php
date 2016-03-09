@@ -243,9 +243,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @return array
    */
   public static function getSoftContributionTotals($contact_id, $isTest = 0) {
-    
+
     $whereClause = "AND cc.cancel_date IS NULL";
-    
+
     $query = "
     SELECT SUM(amount) as amount, AVG(total_amount) as average, cc.currency
     FROM civicrm_contribution_soft  ccs
@@ -271,17 +271,18 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         $currency[] = $cs->currency;
       }
     }
-    
+
     //to get cancel amount
     $cancelAmountWhereClause = "AND cc.cancel_date IS NOT NULL";
     $query = str_replace($whereClause, $cancelAmountWhereClause, $query);
     $cancelAmountSQL  = CRM_Core_DAO::executeQuery($query, $params);
     while ($cancelAmountSQL->fetch()) {
       if ($cancelAmountSQL->amount > 0) {
+        $count++;
         $cancelAmount[] = $cancelAmountSQL->amount;
       }
     }
-    
+
     if ($count > 0) {
       return array(
         implode(',&nbsp;', $amount),
