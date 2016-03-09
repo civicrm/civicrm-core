@@ -199,7 +199,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
    * @param bool $amountSection
    * @param bool $freeMembership
    */
-  public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE, $amountSection = TRUE, $freeMembership = FALSE) {
+  public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE, $amountSection = TRUE, $freeMembership = FALSE, $onBehalf = FALSE, $onBehalfParams = array()) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
     // Select membership type 1
@@ -207,10 +207,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     if ($memTypeId != 'No thank you') {
       $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//div/span/label/span[1][contains(text(),'$memTypeId')]");
     }
-
     else {
       $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label[contains(text(),'$memTypeId')]");
-
     }
     if (!$otherAmount && $amountSection) {
       $this->click("xpath=//div[@class='crm-section contribution_amount-section']/div[2]//span/label[text()='No thank you']");
@@ -224,6 +222,16 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     if ($payLater) {
       $this->waitForAjaxContent();
       $this->click("xpath=//label[text()='Pay later label {$hash}']");
+    }
+    if ($onBehalf && $onBehalfParams) {
+      $this->type("onbehalf[organization_name]", $onBehalfParams['org_name']);
+      $this->type("onbehalf[phone-3-1]", $onBehalfParams['org_phone']);
+      $this->type("onbehalf[email-3]", $onBehalfParams['org_email']);
+      $this->type("onbehalf[street_address-3]", "100 Main Street");
+      $this->type("onbehalf[city-3]", "San Francisco");
+      $this->type("onbehalf[postal_code-3]", $onBehalfParams['org_postal_code']);
+      $this->select("onbehalf[country-3]", "value=1228");
+      $this->select("onbehalf[state_province-3]", "value=1001");
     }
     $this->type("email-5", $firstName . "@example.com");
     $this->waitForElementPresent("first_name");
@@ -382,10 +390,11 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
-    $amountSection = $payLater = $allowOtherAmount = $onBehalf = $pledges = $recurring = FALSE;
+    $amountSection = $payLater = $allowOtherAmount = $pledges = $recurring = FALSE;
     $premiums = $widget = $pcp = $isSeparatePayment = $membershipsRequired = $fixedAmount = $friend = FALSE;
     $memberships = TRUE;
     $memPriceSetId = NULL;
+    $onBehalf = TRUE;
     $profilePreId = 1;
     $profilePostId = NULL;
     $contributionTitle = "Title $hash";
@@ -510,6 +519,99 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
       $this->webtestVerifyTabularData($verifyData);
     }
+  }
+
+  public function testOnlineMembershipCreateOnBehalfWithOrgDedupe() {
+    // Add unsupervised dedupe rule.
+    $this->webtestLogin();
+    $this->openCiviPage("contact/deduperules", "reset=1");
+    $this->waitForElementPresent("xpath=//div[@id='option13_wrapper']/table/tbody/tr[2]/td[3]/span/a[2][text()='Edit Rule']");
+    $this->click("xpath=//div[@id='option13_wrapper']/table/tbody/tr[2]/td[3]/span/a[2][text()='Edit Rule']");
+    $this->waitForElementPresent('_qf_DedupeRules_next');
+    
+    $this->type('title', "Postal Code unsupervised dedupe rule");
+    $this->click('CIVICRM_QFID_Unsupervised_used');
+    $this->select('where_0', "Organization Name");
+    $this->type('weight_0', 10);
+    $this->select('where_1', "Postal Code");
+    $this->type('length_1', 3);
+    $this->type('weight_1', 10);
+    $this->type('threshold', 20);
+    $this->click('_qf_DedupeRules_next');
+    $this->webtestLogout();
+
+    //login with admin credentials & make sure we do have required permissions.
+    $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
+    $this->changePermissions($permissions);
+
+    $hash = substr(sha1(rand()), 0, 7);
+    $rand = 2 * rand(2, 50);
+    $amountSection = $payLater = $allowOtherAmount = $pledges = $recurring = $membershipsRequired = FALSE;
+    $premiums = $widget = $pcp = $isSeparatePayment = $fixedAmount = $friend = FALSE;
+    $memberships = FALSE;
+    $memPriceSetId = NULL;
+    $profilePreId = 1;
+    $profilePostId = NULL; 
+    $onBehalf = TRUE;
+    $contributionTitle = "Title $hash";
+    $pageId = $this->webtestAddContributionPage(
+      $hash,
+      $rand,
+      $contributionTitle,
+      NULL,
+      $amountSection,
+      $payLater,
+      $onBehalf,
+      $pledges,
+      $recurring,
+      $memberships,
+      $memPriceSetId,
+      $friend,
+      $profilePreId,
+      $profilePostId,
+      $premiums,
+      $widget,
+      $pcp,
+      FALSE,
+      FALSE,
+      $isSeparatePayment,
+      FALSE,
+      $allowOtherAmount,
+      TRUE,
+      'Member Dues',
+      $fixedAmount,
+      $membershipsRequired
+    );
+    $memTypeParams = $this->webtestAddMembershipType('rolling', 1, 'year', 'no', 0);
+    $memTypeTitle = $memTypeParams['membership_type'];
+    $memTypeId = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$memTypeTitle}']/../../td[12]/span/a[3]@href"));
+    $memTypeId = $memTypeId[1];
+
+    // edit contribution page amounts tab to uncheck real time monetary transaction
+    $this->openCiviPage("admin/contribute/membership", "reset=1&action=update&id={$pageId}", '_qf_MembershipBlock_submit_savenext');
+    $this->click('member_is_active');
+    $this->waitForElementPresent('displayFee');
+    $this->type('new_title', "Title - New Membership $hash");
+    $this->type('renewal_title', "Title - Renewals $hash");
+    $this->click("membership_type_$memTypeId");
+    $this->clickLink('_qf_MembershipBlock_submit_savenext');
+
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    
+    $onBehalfParams = array(
+      'org_name' => 'Test Org',
+      'org_phone' => '123-456-789',
+      'org_email' => 'testorg@test.com',
+      'org_postal_code' => 'ABC 123',
+    );
+    
+    $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection, TRUE, TRUE, $onBehalfParams);
+    $onBehalfParams['org_postal_code'] = 'XYZ 123';
+    $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection, TRUE, TRUE, $onBehalfParams);
+    
+    // Log in using webtestLogin() method
+    $this->webtestLogin();
   }
 
 }
