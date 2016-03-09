@@ -214,8 +214,8 @@
                   appendHTML += '<td class="crm-group-name crmf-title crm-editable ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.title + '</td>';
                 }
                 else {
-                  appendHTML += '<td class="crm-group-name  crmf-title crm-editable ' + levelClass + '"><span class="crm-no-children"></span>' + val.title + '</td>';
-                }
+                 appendHTML += '<td class="' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><span class="crm-group-name crmf\
+-title crm-editable">{literal}' + val.title + '</span></td>';                 }
                 appendHTML += '<td class="right">' + val.count + "</td>";
                 appendHTML += "<td>" + val.created_by + "</td>";
                 appendHTML += '<td class="crm-editable crmf-description">' + (val.description || '') + "</td>";
