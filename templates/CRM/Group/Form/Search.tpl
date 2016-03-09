@@ -43,8 +43,8 @@
       </span>
     </td>
     <td id="group_type-block">
-      {$form.group_type.label}<br />
-      {$form.group_type.html}<br />
+      {$form.group_type_search.label}<br />
+      {$form.group_type_search.html}<br />
       <span class="description font-italic">
           {ts}Filter search by group type(s).{/ts}
       </span>
@@ -100,11 +100,11 @@
         "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
         "data": function (d) {
 
-          var groupTypes = ($('.crm-group-search-form-block #group_type_1').prop('checked')) ? '1' : '';
+          var groupTypes = ($('.crm-group-search-form-block #group_type_search_1').prop('checked')) ? '1' : '';
           if (groupTypes) {
-            groupTypes = ($('.crm-group-search-form-block #group_type_2').prop('checked')) ? groupTypes + ',2' : groupTypes;
+            groupTypes = ($('.crm-group-search-form-block #group_type_search_2').prop('checked')) ? groupTypes + ',2' : groupTypes;
           } else {
-            groupTypes = ($('.crm-group-search-form-block #group_type_2').prop('checked')) ? '2' : '';
+            groupTypes = ($('.crm-group-search-form-block #group_type_search_2').prop('checked')) ? '2' : '';
           }
 
           var groupStatus = ($('.crm-group-search-form-block #group_status_1').prop('checked')) ? 1 : '';
