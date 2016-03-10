@@ -86,14 +86,15 @@ abstract class SelectQuery {
   /**
    * @var string|bool
    */
-  public $checkPermissions;
+  protected $checkPermissions;
 
   protected $apiVersion;
 
   /**
    * @param string $entity
+   * @param bool $checkPermissions
    */
-  public function __construct($entity) {
+  public function __construct($entity, $checkPermissions) {
     $this->entity = $entity;
     require_once 'api/v3/utils.php';
     $baoName = _civicrm_api3_get_BAO($entity);
@@ -106,6 +107,7 @@ abstract class SelectQuery {
     $bao->free();
 
     // Add ACLs first to avoid redundant subclauses
+    $this->checkPermissions = $checkPermissions;
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
   }
 

@@ -1339,7 +1339,7 @@ function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $e
   $entity = CRM_Core_DAO_AllCoreTables::getBriefName(str_replace('_BAO_', '_DAO_', $bao_name));
   $options = _civicrm_api3_get_options_from_params($params);
 
-  $query = new \Civi\API\Api3SelectQuery($entity);
+  $query = new \Civi\API\Api3SelectQuery($entity, CRM_Utils_Array::value('check_permissions', $params, FALSE));
   $query->where = $params;
   if ($options['is_count']) {
     $query->select = array('count');
@@ -1351,7 +1351,6 @@ function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $e
   }
   $query->limit = $options['limit'];
   $query->offset = $options['offset'];
-  $query->checkPermissions = CRM_Utils_Array::value('check_permissions', $params, FALSE);
   $query->merge($sql);
   $result = $query->run();
 
