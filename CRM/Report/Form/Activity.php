@@ -283,8 +283,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     ) + $this->addressFields(TRUE);
 
     if ($caseEnabled && CRM_Core_Permission::check('access all cases and activities')) {
-      $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
-      $this->_columns['civicrm_activity']['filters']['activity_type_id']['options'] = $this->activityTypes;
       $this->_columns['civicrm_activity']['filters']['include_case_activities'] = array(
         'name' => 'include_case_activities',
         'title' => ts('Include Case Activities'),
