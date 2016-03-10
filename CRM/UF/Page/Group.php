@@ -357,6 +357,9 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $componentFound = array_diff(array_keys($groupTypes), $contactTypes);
       if (!empty($componentFound)) {
         $action -= CRM_Core_Action::ADD;
+        $action -= CRM_Core_Action::ADVANCED;
+        $action -= CRM_Core_Action::BASIC;
+        $action -= CRM_Core_Action::PROFILE;
       }
 
       $ufGroup[$id]['group_type'] = self::formatGroupTypes($groupTypes);
