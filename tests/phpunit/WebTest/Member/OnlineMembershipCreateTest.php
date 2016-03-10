@@ -528,7 +528,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@id='option13_wrapper']/table/tbody/tr[2]/td[3]/span/a[2][text()='Edit Rule']");
     $this->click("xpath=//div[@id='option13_wrapper']/table/tbody/tr[2]/td[3]/span/a[2][text()='Edit Rule']");
     $this->waitForElementPresent('_qf_DedupeRules_next');
-    
+
     $this->type('title', "Postal Code unsupervised dedupe rule");
     $this->click('CIVICRM_QFID_Unsupervised_used');
     $this->select('where_0', "Organization Name");
@@ -551,7 +551,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $memberships = FALSE;
     $memPriceSetId = NULL;
     $profilePreId = 1;
-    $profilePostId = NULL; 
+    $profilePostId = NULL;
     $onBehalf = TRUE;
     $contributionTitle = "Title $hash";
     $pageId = $this->webtestAddContributionPage(
@@ -598,18 +598,18 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
-    
+
     $onBehalfParams = array(
       'org_name' => 'Test Org',
       'org_phone' => '123-456-789',
       'org_email' => 'testorg@test.com',
       'org_postal_code' => 'ABC 123',
     );
-    
+
     $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection, TRUE, TRUE, $onBehalfParams);
     $onBehalfParams['org_postal_code'] = 'XYZ 123';
     $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection, TRUE, TRUE, $onBehalfParams);
-    
+
     // Log in using webtestLogin() method
     $this->webtestLogin();
   }
