@@ -433,7 +433,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           strstr($clause, 'civicrm_email_contact_target_email') ||
           strstr($clause, 'civicrm_phone_contact_target_phone')
         ) {
-          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR '; ') as $clause";
+          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR ';') as $clause";
         }
       }
     }
