@@ -59,7 +59,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
     $components = CRM_Core_Component::getEnabledComponents();
     foreach ($components as $componentName => $componentInfo) {
-      if (CRM_Core_Permission::check("access $componentName")) {
+      $permission = sprintf("access %s", $componentName == 'CiviCase' ? "all cases and activities" : $componentName);
+      if (CRM_Core_Permission::check($permission)) {
         $accessAllowed[] = $componentInfo->componentID;
       }
     }
