@@ -368,7 +368,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
     }
     else {
-      $params['group_type'] = '';
+      $params['group_type'] = NULL;
     }
 
     $session = CRM_Core_Session::singleton();
