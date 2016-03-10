@@ -126,7 +126,9 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     $this->assign('isGroupReserved', $isGroupReserved);
 
     $profileType = CRM_Core_BAO_UFField::getProfileType($this->_gid);
-    if ($profileType == 'Contribution' || $profileType == 'Membership' || $profileType == 'Activity' || $profileType == 'Participant') {
+    $contactTypes = CRM_Contact_BAO_ContactType::contactTypes();
+    $contactTypes[] = 'Contact';
+    if (!in_array($profileType, $contactTypes)) {
       $this->assign('skipCreate', TRUE);
     }
 
