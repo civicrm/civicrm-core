@@ -125,8 +125,8 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     $isGroupReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'is_reserved');
     $this->assign('isGroupReserved', $isGroupReserved);
 
-    $profileType = CRM_Core_BAO_UFField::getProfileType($this->_gid);
-    if ($profileType == 'Contribution' || $profileType == 'Membership' || $profileType == 'Activity' || $profileType == 'Participant') {
+    $isMixedProfile = CRM_Core_BAO_UFField::checkProfileType($this->_gid);
+    if ($isMixedProfile) {
       $this->assign('skipCreate', TRUE);
     }
 
