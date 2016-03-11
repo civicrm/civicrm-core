@@ -98,6 +98,7 @@ class CRM_Export_BAO_Export {
    */
   public static function defaultReturnProperty($exportMode) {
     // hack to add default return property based on export mode
+    $property = NULL;
     if ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT) {
       $property = 'contribution_id';
     }
@@ -118,9 +119,6 @@ class CRM_Export_BAO_Export {
     }
     elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
       $property = 'activity_id';
-    }
-    elseif ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
-      $property = 'contact_id';
     }
     return $property;
   }
@@ -434,7 +432,9 @@ class CRM_Export_BAO_Export {
           }
         }
       }
-      $returnProperties[self::defaultReturnProperty($exportMode)] = 1;
+      if (!empty(self::defaultReturnProperty($exportMode))) {
+        $returnProperties[self::defaultReturnProperty($exportMode)] = 1;
+      }
     }
     else {
       $primary = TRUE;
@@ -560,7 +560,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     list($select, $from, $where, $having) = $query->query();
 
     if ($mergeSameHousehold == 1) {
-      if (!$returnProperties['id']) {
+      if (empty($returnProperties['id'])) {
         $returnProperties['id'] = 1;
       }
 
