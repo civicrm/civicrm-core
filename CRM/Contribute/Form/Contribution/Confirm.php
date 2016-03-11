@@ -1577,10 +1577,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // Do not send an email if Recurring transaction is done via Direct Mode
       // Email will we sent when the IPN is received.
       foreach ($paymentResults as $result) {
-	      //CRM-18211: Fix situation where second contribution doesn't exist because it is optional.
-	      if($result['contribution_id']) {
-	        $this->completeTransaction($result['result'], $result['contribution_id']);
-	      }
+        //CRM-18211: Fix situation where second contribution doesn't exist because it is optional.
+        if ($result['contribution_id']) {
+          $this->completeTransaction($result['result'], $result['contribution_id']);
+        }
       }
       return;
     }
