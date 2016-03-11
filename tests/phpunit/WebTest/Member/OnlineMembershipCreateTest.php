@@ -224,6 +224,9 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       $this->click("xpath=//label[text()='Pay later label {$hash}']");
     }
     if ($onBehalf && $onBehalfParams) {
+      if ($onBehalfParams['mode'] == 'optional') {
+        $this->click("is_for_organization");
+      }
       $this->type("onbehalf[organization_name]", $onBehalfParams['org_name']);
       $this->type("onbehalf[phone-3-1]", $onBehalfParams['org_phone']);
       $this->type("onbehalf[email-3]", $onBehalfParams['org_email']);
@@ -521,6 +524,10 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * CRM-18163 - To check whether multiple organizations with same name
+   * are created based on dedupe rule other than org name.
+   */
   public function testOnlineMembershipCreateOnBehalfWithOrgDedupe() {
     // Add unsupervised dedupe rule.
     $this->webtestLogin();
@@ -552,7 +559,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $memPriceSetId = NULL;
     $profilePreId = 1;
     $profilePostId = NULL;
-    $onBehalf = TRUE;
+    $onBehalf = 'optional';
     $contributionTitle = "Title $hash";
     $pageId = $this->webtestAddContributionPage(
       $hash,
@@ -587,7 +594,6 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $memTypeId = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$memTypeTitle}']/../../td[12]/span/a[3]@href"));
     $memTypeId = $memTypeId[1];
 
-    // edit contribution page amounts tab to uncheck real time monetary transaction
     $this->openCiviPage("admin/contribute/membership", "reset=1&action=update&id={$pageId}", '_qf_MembershipBlock_submit_savenext');
     $this->click('member_is_active');
     $this->waitForElementPresent('displayFee');
@@ -600,18 +606,24 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
 
     $onBehalfParams = array(
-      'org_name' => 'Test Org',
+      'org_name' => 'Test Org Dedupe', // Same Org Name.
       'org_phone' => '123-456-789',
-      'org_email' => 'testorg@test.com',
+      'org_email' => 'testorgdedupe@test.com', // Same Email address.
       'org_postal_code' => 'ABC 123',
+      'mode' => 'optional',
     );
 
     $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection, TRUE, TRUE, $onBehalfParams);
     $onBehalfParams['org_postal_code'] = 'XYZ 123';
     $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection, TRUE, TRUE, $onBehalfParams);
 
-    // Log in using webtestLogin() method
     $this->webtestLogin();
+    $this->openCiviPage("contact/search", "reset=1");
+    $this->waitForElementPresent("_qf_Basic_refresh");
+    $this->type('sort_name', $onBehalfParams['org_email']);
+    $this->click("_qf_Basic_refresh");
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[2]/td[2]/label[1]", "All 2 records");
   }
 
 }
