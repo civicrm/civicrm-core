@@ -155,14 +155,13 @@ class CRM_Utils_Mail {
    *   TRUE if a mail was sent, else FALSE.
    */
   public static function send(&$params) {
-    $returnPath = CRM_Core_BAO_MailSettings::defaultReturnPath();
+    $defaultReturnPath = CRM_Core_BAO_MailSettings::defaultReturnPath();
     $includeMessageId = CRM_Core_BAO_MailSettings::includeMessageId();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
     $from = CRM_Utils_Array::value('from', $params);
-    if (!$returnPath) {
-      $returnPath = self::pluckEmailFromHeader($from);
+    if (!$defaultReturnPath) {
+      $defaultReturnPath = self::pluckEmailFromHeader($from);
     }
-    $params['returnPath'] = $returnPath;
 
     // first call the mail alter hook
     CRM_Utils_Hook::alterMailParams($params);
@@ -198,7 +197,7 @@ class CRM_Utils_Mail {
     $headers['Content-Type'] = $htmlMessage ? 'multipart/mixed; charset=utf-8' : 'text/plain; charset=utf-8';
     $headers['Content-Disposition'] = 'inline';
     $headers['Content-Transfer-Encoding'] = '8bit';
-    $headers['Return-Path'] = CRM_Utils_Array::value('returnPath', $params);
+    $headers['Return-Path'] = CRM_Utils_Array::value('returnPath', $params, $defaultReturnPath);
 
     // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
     $replyTo = CRM_Utils_Array::value('replyTo', $params, CRM_Utils_Array::value('from', $params));
