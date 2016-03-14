@@ -1013,11 +1013,13 @@ SELECT  pledge.contact_id              as contact_id,
 
         if (empty($details['reminder_date'])) {
           $nextReminderDate = new DateTime($details['scheduled_date']);
+          $details['initial_reminder_day'] = empty($details['initial_reminder_day']) ? 0 : $details['initial_reminder_day'];
           $nextReminderDate->modify("-" . $details['initial_reminder_day'] . "day");
           $nextReminderDate = $nextReminderDate->format("Ymd");
         }
         else {
           $nextReminderDate = new DateTime($details['reminder_date']);
+          $details['additional_reminder_day'] = empty($details['additional_reminder_day']) ? 0 : $details['additional_reminder_day'];
           $nextReminderDate->modify("+" . $details['additional_reminder_day'] . "day");
           $nextReminderDate = $nextReminderDate->format("Ymd");
         }
