@@ -1186,6 +1186,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testContactModifiedAnniversary() {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $modifiedDate = $this->callAPISuccess('Contact', 'getvalue', array('id' => $contact['id'], 'return' => 'modified_date'));
     $actionSchedule = $this->fixtures['sched_contact_mod_anniv'];
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
@@ -1197,7 +1198,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ),
       array(
         // On the eve of 3 years after they were modified, send an email.
-        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . ' +3 years -23 hours')),
+        'time' => date('Y-m-d H:i:s', strtotime($modifiedDate . ' +3 years -1 day')),
         'recipients' => array(array('test-bday@example.com')),
       ),
     ));
