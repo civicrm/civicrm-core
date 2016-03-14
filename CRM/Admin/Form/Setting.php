@@ -68,6 +68,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       $this->_defaults['contact_reference_options'] = self::getAutocompleteContactReference();
       $this->_defaults['enableSSL'] = Civi::settings()->get('enableSSL');
       $this->_defaults['verifySSL'] = Civi::settings()->get('verifySSL');
+      $this->_defaults['environment'] = CRM_Core_Config::environment();
       $this->_defaults['enableComponents'] = Civi::settings()->get('enable_components');
     }
 
@@ -97,9 +98,23 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     foreach ($settingMetaData as $setting => $props) {
       if (isset($props['quick_form_type'])) {
         if (isset($props['pseudoconstant'])) {
-          $options = civicrm_api3('Setting', 'getoptions', array(
-            'field' => $setting,
-          ));
+          if (array_key_exists('optionGroupName', $props['pseudoconstant'])) {
+            $optionValues = civicrm_api3('OptionValue', 'get', array(
+              'return' => array("label", "value"),
+              'option_group_id' => $setting,
+            ));
+            if ($optionValues['count'] > 0) {
+              foreach ($optionValues['values'] as $key => $values) {
+                $vals[$values['value']] = $values['label'];
+              }
+              $options['values'] = $vals;
+            }
+          }
+          else {
+            $options = civicrm_api3('Setting', 'getoptions', array(
+              'field' => $setting,
+            ));
+          }
         }
         else {
           $options = NULL;
@@ -116,7 +131,11 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
           );
         }
         elseif ($add == 'addSelect') {
-          $this->addElement('select', $setting, ts($props['title']), $options['values'], CRM_Utils_Array::value('html_attributes', $props));
+          $element = $this->addElement('select', $setting, ts($props['title']), $options['values'], CRM_Utils_Array::value('html_attributes', $props));
+          if (defined('CIVICRM_ENVIRONMENT')) {
+            $element->freeze();
+            CRM_Core_Session::setStatus(ts('The environment settings have been disabled because it has been overridden in the settings file.'), ts('Environment settings'), 'info');
+          }
         }
         elseif ($add == 'addCheckBox') {
           $this->addCheckBox($setting, ts($props['title']), $options['values'], NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, array('&nbsp;&nbsp;'));

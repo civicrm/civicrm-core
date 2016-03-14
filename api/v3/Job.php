@@ -494,6 +494,7 @@ function civicrm_api3_job_process_batch_merge($params) {
       'options' => array('limit' => 1),
     ));
   }
+  $rgid = CRM_Utils_Array::value('rgid', $params);
   $gid = CRM_Utils_Array::value('gid', $params);
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
 

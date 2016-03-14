@@ -490,4 +490,28 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return FALSE;
   }
 
+  /**
+   * Check if environment is explicitly set.
+   *
+   * @return bool
+   */
+  public static function isEnvironmentSet($setting, $value = NULL) {
+    $environment = CRM_Core_Config::environment();
+    if ($setting == 'environment' && $environment) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Check if job is able to be executed by API.
+   *
+   * @throws API_Exception
+   */
+  public static function isAPIJobAllowedToRun($params) {
+    if (CRM_Core_Config::environment() != 'Production' && !CRM_Utils_Array::value('runInNonProductionEnvironment', $params)) {
+      throw new Exception("Job has not been executed as it is a non-production environment.");
+    }
+  }
+
 }
