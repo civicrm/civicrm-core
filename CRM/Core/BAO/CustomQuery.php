@@ -349,7 +349,7 @@ SELECT f.id, f.label, f.data_type,
               }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
-              if ($isSerialized && !empty($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
+              if ($isSerialized && !CRM_Utils_System::isNull($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
                 $sp = CRM_Core_DAO::VALUE_SEPARATOR;
                 if (strstr($op, 'IN')) {
                   $value = str_replace(",", "$sp|$sp", $value);
