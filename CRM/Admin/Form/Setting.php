@@ -133,7 +133,13 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
           $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
         }
         else {
-          $this->$add($setting, ts($props['title']));
+          global $civicrm_setting;
+          if ($setting == 'civicrmEnvironment' && array_key_exists($setting, $civicrm_setting['Developer Preferences'])) {
+            $this->$add($setting, ts($props['title']), FALSE, NULL, array('disabled' => TRUE));
+          }
+          else {
+            $this->$add($setting, ts($props['title']));
+          }
         }
         $this->assign("{$setting}_description", ts($props['description']));
         if ($setting == 'max_attachments') {
