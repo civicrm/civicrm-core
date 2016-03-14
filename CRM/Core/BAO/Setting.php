@@ -178,6 +178,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     /** @var \Civi\Core\SettingsManager $manager */
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
+    global $civicrm_setting;
+    if ($name == 'civicrmEnvironment' && isset($civicrm_setting['Developer Preferences'][$name]) && array_key_exists($name, $civicrm_setting['Developer Preferences'])) {
+      throw new api_Exception('CiviCRM Environment already set in civicrm.settings.php!');
+    }
     $settings->set($name, $value);
   }
 
