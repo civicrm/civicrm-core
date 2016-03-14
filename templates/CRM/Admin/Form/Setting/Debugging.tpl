@@ -46,6 +46,11 @@
                 <td>{$form.backtrace.html}<br />
                 <span class="description">{ts}<strong>This feature should NOT be enabled for production sites.</strong><br />Set this value to <strong>Yes</strong> if you want to display a backtrace listing when a fatal error is encountered.{/ts}</span></td>
             </tr>
+            <tr class="crm-debugging-form-block-civicrmEnvironment">
+                <td class="label">{$form.civicrmEnvironment.label}</td>
+                <td>{$form.civicrmEnvironment.html}<br />
+                <span class="description">{ts}<strong>This feature should NOT be enabled for development sites.</strong><br />Set this value to <strong>No</strong> to prevent cron jobs & mailings from being executed.{/ts}</span></td>
+            </tr>
             <tr class="crm-debugging-form-block-fatalErrorHandler">
                 <td class="label">{$form.fatalErrorHandler.label}</td>
                 <td>{$form.fatalErrorHandler.html}<br />
