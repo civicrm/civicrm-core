@@ -211,6 +211,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $fieldsToSet = self::validateSettingsInput($params, $fields);
 
     foreach ($fieldsToSet as $settingField => &$settingValue) {
+      if (self::isEnvironmentSet($settingField)) {
+        throw new api_Exception('CiviCRM Environment already set in civicrm.settings.php!');
+      }
       self::validateSetting($settingValue, $fields['values'][$settingField]);
     }
 
