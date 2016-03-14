@@ -1289,6 +1289,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => array(array('member@example.com')),
       ),
     ));
+    $this->assertCronRuns(array(
+      array(
+        // It should not re-send on the same day
+        'time' => '2012-04-12 01:00:00',
+        'recipients' => array(array()),
+      ),
+    ));
   }
 
   public function testMembershipOnMultipleReminder() {
