@@ -178,8 +178,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     /** @var \Civi\Core\SettingsManager $manager */
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
-    global $civicrm_setting;
-    if ($name == 'civicrmEnvironment' && isset($civicrm_setting['Developer Preferences'][$name]) && array_key_exists($name, $civicrm_setting['Developer Preferences'])) {
+    if (self::isEnvironmentSet($name)) {
       throw new api_Exception('CiviCRM Environment already set in civicrm.settings.php!');
     }
     $settings->set($name, $value);
@@ -489,6 +488,19 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       if (version_compare($currentVer, '4.1.alpha1') < 0) {
         return TRUE;
       }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Check if civicrmEnvironment is explicitly set.
+   *
+   * @return bool
+   */
+  public static function isEnvironmentSet($setting) {
+    global $civicrm_setting;
+    if ($setting == 'civicrmEnvironment' && isset($civicrm_setting['Developer Preferences'][$setting]) && array_key_exists($setting, $civicrm_setting['Developer Preferences'])) {
+      return TRUE;
     }
     return FALSE;
   }
