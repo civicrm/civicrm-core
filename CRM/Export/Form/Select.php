@@ -444,7 +444,7 @@ FROM   {$this->_componentTable}
    * @return string
    */
   public function getTitle() {
-    return ts('Export All or Selected Fields');
+    return ts('Export Options');
   }
 
   /**
