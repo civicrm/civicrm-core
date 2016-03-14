@@ -48,12 +48,12 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
 
     $cs[] = array(
       '2015-02-01 00:00:00',
-      'addAliceDues addBobDonation scheduleForDues startOnTime useHelloFirstName',
+      'addAliceDues addBobDonation scheduleForDues startOnTime useHelloFirstNameStatus',
       array(
         array(
           'time' => '2015-02-01 00:00:00',
           'to' => array('alice@example.org'),
-          'subject' => '/Hello, Alice.*via subject/',
+          'subject' => '/Hello, Alice. @Completed.*via subject/',
         ),
       ),
     );
@@ -181,6 +181,12 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->limit_to = 1;
     $this->schedule->recipient = 'soft_credit_type';
     $this->schedule->recipient_listing = CRM_Utils_Array::implodePadded(array(3));
+  }
+
+  public function useHelloFirstNameStatus() {
+    $this->schedule->subject = 'Hello, {contact.first_name}. @{contribution.status}. (via subject)';
+    $this->schedule->body_html = '<p>Hello, {contact.first_name}. @{contribution.status}. (via body_html)</p>';
+    $this->schedule->body_text = 'Hello, {contact.first_name}. @{contribution.status}. (via body_text)';
   }
 
 }
