@@ -134,7 +134,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
         }
         else {
           global $civicrm_setting;
-          if ($setting == 'civicrmEnvironment' && array_key_exists($setting, $civicrm_setting['Developer Preferences'])) {
+          if ($setting == 'civicrmEnvironment' && isset($civicrm_setting['Developer Preferences'][$setting]) && array_key_exists($setting, $civicrm_setting['Developer Preferences'])) {
             $this->$add($setting, ts($props['title']), FALSE, NULL, array('disabled' => TRUE));
           }
           else {
