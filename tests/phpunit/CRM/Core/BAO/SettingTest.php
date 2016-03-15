@@ -181,29 +181,29 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test to set civicrmEnvironment
+   * Test to set isProductionEnvironment
    *
    */
   public function testSetCivicrmEnvironment() {
-    CRM_Core_BAO_Setting::setItem(TRUE, CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'civicrmEnvironment');
-    $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'civicrmEnvironment');
+    CRM_Core_BAO_Setting::setItem(TRUE, CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
+    $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
     $this->assertEquals(TRUE, $values);
 
     global $civicrm_setting;
-    $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['civicrmEnvironment'] = FALSE;
+    $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['isProductionEnvironment'] = FALSE;
     Civi::service('settings_manager')->useMandatory();
-    $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'civicrmEnvironment');
+    $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
     $this->assertEquals(FALSE, $values);
 
     // check for fatal error
     try {
-      CRM_Core_BAO_Setting::setItem(TRUE, CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'civicrmEnvironment');
+      CRM_Core_BAO_Setting::setItem(TRUE, CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
       $this->fail("Missed expected exception");
     }
     catch (Exception $e) {
       $this->assertEquals(ts('CiviCRM Environment already set in civicrm.settings.php!'), $e->getMessage());
     }
-    unset($civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['civicrmEnvironment']);
+    unset($civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['isProductionEnvironment']);
   }
 
 }

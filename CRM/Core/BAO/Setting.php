@@ -496,13 +496,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Check if civicrmEnvironment is explicitly set.
+   * Check if isProductionEnvironment is explicitly set.
    *
    * @return bool
    */
   public static function isEnvironmentSet($setting) {
     global $civicrm_setting;
-    if ($setting == 'civicrmEnvironment' && isset($civicrm_setting['Developer Preferences'][$setting]) && array_key_exists($setting, $civicrm_setting['Developer Preferences'])) {
+    if ($setting == 'isProductionEnvironment' && isset($civicrm_setting['Developer Preferences'][$setting]) && array_key_exists($setting, $civicrm_setting['Developer Preferences'])) {
       return TRUE;
     }
     return FALSE;

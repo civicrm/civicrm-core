@@ -38,7 +38,7 @@ class WebTest_Admin_Form_Setting_DebuggingTest extends CiviSeleniumTestCase {
   public function testSetCivicrmEnvironment() {
     $this->webtestLogin();
     $this->openCiviPage('admin/setting/debug', 'reset=1');
-    $this->click('xpath=//tr[@class="crm-debugging-form-block-civicrmEnvironment"]/td[2]/label[contains(text(), "No")]');
+    $this->click('xpath=//tr[@class="crm-debugging-form-block-isProductionEnvironment"]/td[2]/label[contains(text(), "No")]');
     $this->click('_qf_Debugging_next-top');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -49,9 +49,9 @@ class WebTest_Admin_Form_Setting_DebuggingTest extends CiviSeleniumTestCase {
       array_push($this->verificationErrors, $e->toString());
     }
     global $civicrm_setting;
-    $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['civicrmEnvironment'] = TRUE;
+    $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['isProductionEnvironment'] = TRUE;
     $this->openCiviPage('admin/setting/debug', 'reset=1');
-    $disabled = $this->getAttribute("xpath=//tr[@class='crm-debugging-form-block-civicrmEnvironment']/td[2]/input[1]@disabled");
+    $disabled = $this->getAttribute("xpath=//tr[@class='crm-debugging-form-block-isProductionEnvironment']/td[2]/input[1]@disabled");
     $this->assertEquals(1, $disabled);
   }
 

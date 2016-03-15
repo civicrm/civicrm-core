@@ -79,10 +79,10 @@ return array(
     'is_contact' => 0,
     'description' => "Set this value to Yes if you want to display a backtrace listing when a fatal error is encountered. This feature should NOT be enabled for production sites",
   ),
-  'civicrmEnvironment' => array(
+  'isProductionEnvironment' => array(
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
-    'name' => 'civicrmEnvironment',
+    'name' => 'isProductionEnvironment',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => '1',
