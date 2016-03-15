@@ -738,7 +738,7 @@ GROUP BY  currency
    * @return array
    *   array of exportable Fields
    */
-  public static function &exportableFields($checkPermission) {
+  public static function exportableFields($checkPermission) {
     if (!self::$_exportableFields) {
       if (!self::$_exportableFields) {
         self::$_exportableFields = array();
