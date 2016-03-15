@@ -67,18 +67,15 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   public function preProcess() {
 
-    // set the button names
-     
     $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
     $this->defaults = array();
 
-    
     // we allow the controller to set force/reset externally, useful when we are being
     // driven by the wizard framework
-    
+
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
@@ -302,6 +299,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    *
    * @param array $fields
    *   Posted values of the form.
+   *
+   * @return array|bool
    */
   public static function formRule($fields) {
     $errors = array();

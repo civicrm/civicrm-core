@@ -51,7 +51,7 @@ class CRM_Contribute_BAO_Query {
    * @return array
    *   Associative array of contribution fields
    */
-  public static function &getFields($checkPermission = TRUE) {
+  public static function getFields($checkPermission = TRUE) {
     if (!self::$_contributionFields) {
       self::$_contributionFields = array();
 
