@@ -1732,6 +1732,7 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called to alter the list of allowable entityTables.
    *
+   * @param sting|CRM_Core_DAO $entity
    * @param array $tables array of allowable entityTables
    * @return mixed
    */
