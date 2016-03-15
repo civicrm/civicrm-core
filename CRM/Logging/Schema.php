@@ -597,7 +597,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     $cols = <<<COLS
             ,
             log_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            log_conn_id INTEGER,
+            log_conn_id VARCHAR(17),
             log_user_id INTEGER,
             log_action  ENUM('Initialization', 'Insert', 'Update', 'Delete')
 COLS;
@@ -631,9 +631,13 @@ COLS;
     CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
 
     $columns = implode(', ', $this->columnsOf($table));
-    CRM_Core_DAO::executeQuery("INSERT INTO `{$this->db}`.log_$table ($columns, log_conn_id, log_user_id, log_action) SELECT $columns, CONNECTION_ID(), @civicrm_user_id, 'Initialization' FROM {$table}", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery("INSERT INTO `{$this->db}`.log_$table ($columns, log_conn_id, log_user_id, log_action) SELECT $columns, @uniqueID, @civicrm_user_id, 'Initialization' FROM {$table}", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
 
     $this->tables[] = $table;
+    if(empty($this->logs)) {
+      civicrm_api3('Setting', 'create', array('logging_uniqueid_date' => 'now'));
+      civicrm_api3('Setting', 'create', array('logging_all_tables_uniquid' => 1));
+    }
     $this->logs[$table] = "log_$table";
   }
 
@@ -776,8 +780,16 @@ COLS;
         $sqlStmt .= "NEW.$column, ";
         $deleteSQL .= "OLD.$column, ";
       }
-      $sqlStmt .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
-      $deleteSQL .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
+      if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_uniqueid_date', 'group' => 'core'))) {
+        $sqlStmt .= "@uniqueID, @civicrm_user_id, '{eventName}');";
+        $deleteSQL .= "@uniqueID, @civicrm_user_id, '{eventName}');";
+      }
+      else {
+        // The log tables have not yet been converted to have varchar(17) fields for log_conn_id.
+        // Continue to use the less reliable connection_id for al tables for now.
+        $sqlStmt .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
+        $deleteSQL .= "@uniqueID, @civicrm_user_id, '{eventName}');";
+      }
 
       $sqlStmt .= "END IF;";
       $deleteSQL .= "END IF;";
