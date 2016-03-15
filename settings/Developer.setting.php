@@ -90,7 +90,7 @@ return array(
     'title' => 'Production Instance?',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => "Set this value to No if you want to disable all cron jobs & mailings. This feature will write all mails to disk unless specified otherwise in civicrm.settings.php.",
+    'description' => "Set this value to Yes if this instance is a Production, and to No if is a Staging, Development, Test or other non-production instance. A value of No disables certain functionality dangerous on non-production sites, such as emailing or posting recurrent payment requests to payment processors that would duplicate production ones.",
   ),
   'fatalErrorHandler' => array(
     'group_name' => 'Developer Preferences',
