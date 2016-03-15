@@ -39,7 +39,9 @@ class CRM_Logging_Differ {
   private $interval;
 
   /**
-   * @param int $log_conn_id
+   * Class constructor.
+   *
+   * @param string $log_conn_id
    * @param $log_date
    * @param string $interval
    */
@@ -77,7 +79,7 @@ class CRM_Logging_Differ {
     $diffs = array();
 
     $params = array(
-      1 => array($this->log_conn_id, 'Integer'),
+      1 => array($this->log_conn_id, 'String'),
       2 => array($this->log_date, 'String'),
     );
 
@@ -166,7 +168,7 @@ WHERE lt.log_conn_id = %1 AND
     $diffs = array();
 
     $params = array(
-      1 => array($this->log_conn_id, 'Integer'),
+      1 => array($this->log_conn_id, 'String'),
       2 => array($this->log_date, 'String'),
       3 => array($id, 'Integer'),
     );
@@ -336,7 +338,7 @@ WHERE lt.log_conn_id = %1 AND
     $values = array();
 
     $params = array(
-      1 => array($this->log_conn_id, 'Integer'),
+      1 => array($this->log_conn_id, 'String'),
       2 => array($this->log_date, 'String'),
       3 => array($table, 'String'),
     );

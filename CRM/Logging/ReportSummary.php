@@ -224,7 +224,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     if (!empty($this->_params['fields']['altered_contact'])) {
       $tempColumns .= ", altered_contact varchar(128)";
     }
-    $tempColumns .= ", altered_contact_id int(10), log_conn_id int(11), is_deleted tinyint(4)";
+    $tempColumns .= ", altered_contact_id int(10), log_conn_id varchar(17), is_deleted tinyint(4)";
     if (!empty($this->_params['fields']['display_name'])) {
       $tempColumns .= ", display_name varchar(128)";
     }
@@ -401,7 +401,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
       $sql = "select {$this->_logTables[$entity]['action_column']} from `{$this->loggingDB}`.{$entity} where id = %1 AND log_conn_id = %2";
       $newAction = CRM_Core_DAO::singleValueQuery($sql, array(
         1 => array($id, 'Integer'),
-        2 => array($connId, 'Integer'),
+        2 => array($connId, 'String'),
       ));
 
       switch ($entity) {
