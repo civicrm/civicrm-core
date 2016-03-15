@@ -111,6 +111,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->assertEquals('log_civicrm_contact', $dao->Table);
     $tableField = 'Create_Table';
     $this->assertContains('`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,', $dao->$tableField);
+    $this->assertContains('`log_conn_id` varchar(17) COLLATE utf8_unicode_ci DEFAULT NULL,', $dao->$tableField);
     return $dao->$tableField;
   }
 
