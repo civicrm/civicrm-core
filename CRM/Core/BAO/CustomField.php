@@ -1635,11 +1635,11 @@ SELECT id
 
       // rename this file to go into the secure directory only if
       // user has uploaded new file not existing verfied on the basis of $fileID
-      if (!$fileID && !rename($fName, $config->customFileUploadDir . $filename)) {
+      if (empty($fileID) && !rename($fName, $config->customFileUploadDir . $filename)) {
         CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
       }
 
-      if ($customValueId && !$fileID) {
+      if ($customValueId && empty($fileID)) {
         $query = "
 SELECT $columnName
   FROM $tableName
