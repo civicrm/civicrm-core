@@ -223,6 +223,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     // if onbehalf-of-organization
     if (!empty($this->_values['onbehalf_profile_id']) && !empty($this->_params['onbehalf']['organization_name'])) {
+      $this->_params['organization_id'] = CRM_Utils_Array::value('onbehalfof_id', $this->_params);
       $this->_params['organization_name'] = $this->_params['onbehalf']['organization_name'];
       $addressBlocks = array(
         'street_address',
