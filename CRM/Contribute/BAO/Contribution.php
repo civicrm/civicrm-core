@@ -2823,7 +2823,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $template->assign('trxn_id', $this->trxn_id);
     $template->assign('receive_date',
-      CRM_Utils_Date::mysqlToIso($this->receive_date)
+      CRM_Utils_Date::processDate($this->receive_date)
     );
     $template->assign('contributeMode', 'notify');
     $template->assign('action', $this->is_test ? 1024 : 1);
