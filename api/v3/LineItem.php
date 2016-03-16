@@ -75,6 +75,9 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  *   Array of matching line_items
  */
 function civicrm_api3_line_item_get($params) {
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Utils_Array::value('check_permissions', $params)) {
+    CRM_Price_BAO_LineItem::getAPILineItemParams($params);
+  }
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -90,5 +93,14 @@ function civicrm_api3_line_item_get($params) {
  *   API result array
  */
 function civicrm_api3_line_item_delete($params) {
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Utils_Array::value('check_permissions', $params)) {
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::DELETE);
+    if (empty($params['financial_type_id'])) {
+      $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
+    }
+    if (!in_array($params['financial_type_id'], array_keys($types))) {
+      throw new API_Exception('You do not have permission to delete this line item');
+    }
+  }
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

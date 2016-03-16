@@ -57,15 +57,26 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $id = CRM_Utils_Array::value('id', $params);
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
+      $op = CRM_Core_Action::UPDATE;
     }
     else {
       CRM_Utils_Hook::pre('create', 'LineItem', $params['entity_id'], $params);
+      $op = CRM_Core_Action::ADD;
     }
 
     // unset entity table and entity id in $params
     // we never update the entity table and entity id during update mode
     if ($id) {
       unset($params['entity_id'], $params['entity_table']);
+    }
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Utils_Array::value('check_permissions', $params)) {
+      if (empty($params['financial_type_id'])) {
+        throw new Exception('Mandatory key(s) missing from params array: financial_type_id');
+      }
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
+      if (!in_array($params['financial_type_id'], array_keys($types))) {
+        throw new Exception('You do not have permission to create this line item');
+      }
     }
 
     $lineItemBAO = new CRM_Price_BAO_LineItem();
@@ -103,6 +114,34 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       return $lineItem;
     }
     return NULL;
+  }
+
+  /**
+   * Modifies $params array for filtering financial types.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   *
+   */
+  public static function getAPILineItemParams(&$params) {
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+    if ($types && empty($params['financial_type_id'])) {
+      $params['financial_type_id'] = array('IN' => array_keys($types));
+    }
+    elseif ($types) {
+      if (is_array($params['financial_type_id'])) {
+        $invalidFts = array_diff($params['financial_type_id'], array_keys($types));
+      }
+      elseif (!in_array($params['financial_type_id'], array_keys($types))) {
+        $invalidFts = $params['financial_type_id'];
+      }
+      if ($invalidFts) {
+        $params['financial_type_id'] = array('NOT IN' => $invalidFts);
+      }
+    }
+    else {
+      $params['financial_type_id'] = 0;
+    }
   }
 
   /**
