@@ -151,7 +151,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
           $this->assign('skipTitle', 1);
         }
-        CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId);
+        CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId, $this->_contactId);
       }
     }
     else {
