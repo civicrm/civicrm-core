@@ -195,7 +195,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
     $this->assertEquals(FALSE, $values);
 
-    // check for fatal error
+    // check that attempt to override value set in civicrm.settings.php raises error
     try {
       CRM_Core_BAO_Setting::setItem(TRUE, CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
       $this->fail("Missed expected exception");

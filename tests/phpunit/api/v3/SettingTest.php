@@ -568,7 +568,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Setting', 'getvalue', $params);
     $this->assertEquals(FALSE, $result);
 
-    // check for failure
+    // check that attempt to override value set in civicrm.settings.php raises error
     $params = array(
       'isProductionEnvironment' => TRUE,
     );
