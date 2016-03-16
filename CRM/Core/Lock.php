@@ -124,6 +124,9 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     else {
       $this->_name = $database . '.' . $domainID . '.' . $name;
     }
+    if (strlen($this->_name) > 64) {
+      $this->_name = sha1( $this->_name );
+    }
     if (defined('CIVICRM_LOCK_DEBUG')) {
       CRM_Core_Error::debug_log_message('trying to construct lock for ' . $this->_name);
     }
