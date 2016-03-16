@@ -1034,6 +1034,9 @@ class CRM_Utils_Array {
    * @return void
    */
   public static function formatArrayKeys(&$array) {
+    if (!is_array($array)) {
+      return null;
+    }
     $keys = array_keys($array, 1);
     if (count($keys) > 1 ||
       (count($keys) == 1 &&
