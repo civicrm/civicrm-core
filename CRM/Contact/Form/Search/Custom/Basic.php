@@ -44,7 +44,6 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->normalize();
     $this->_columns = array(
       '' => 'contact_type',
       ts('Name') => 'sort_name',
