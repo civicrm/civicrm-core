@@ -63,10 +63,15 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
     $this->assertLoggingEnabled(TRUE);
     $this->checkLogTableCreated();
-    $this->checkTriggersCreated();
+    $this->checkTriggersCreated(TRUE);
     // Create a contact to make sure they aren't borked.
     $this->individualCreate();
     $this->assertTrue($this->callAPISuccessGetValue('Setting', array('name' => 'logging', 'group' => 'core')));
+    $this->assertEquals(1, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid', 'group' => 'core')));
+    $this->assertEquals(
+      date('Y-m-d'),
+      date('Y-m-d', strtotime($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date', 'group' => 'core'))))
+    );
 
     $this->callAPISuccess('Setting', 'create', array('logging' => FALSE));
     $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging', 'group' => 'core')));
@@ -80,10 +85,64 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_alterLogTables', array($this, 'innodbLogTableSpec'));
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
     $this->checkINNODBLogTableCreated();
-    $this->checkTriggersCreated();
+    $this->checkTriggersCreated(TRUE);
     // Create a contact to make sure they aren't borked.
     $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', array('logging' => FALSE));
+  }
+
+  /**
+   * Check responsible creation when old structure log table exists.
+   *
+   * When an existing table exists NEW tables will have the varchar type for log_conn_id.
+   *
+   * Existing tables will be unchanged, and the trigger will use log_conn_id
+   * rather than uniqueId to be consistent across the tables.
+   *
+   * The settings for unique id will not be set.
+   */
+  public function testEnableLoggingLegacyLogTableExists() {
+    $this->createLegacyStyleContactLogTable();
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    $this->checkTriggersCreated(FALSE);
+    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid', 'group' => 'core')));
+    $this->assertEmpty($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date', 'group' => 'core')));
+  }
+
+  /**
+   * Check we can update legacy log tables using the api function.
+   */
+  public function testUpdateLegacyLogTable() {
+    $this->createLegacyStyleContactLogTable();
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    $this->callAPISuccess('System', 'updatelogtables', array());
+    $this->checkLogTableCreated();
+    $this->checkTriggersCreated(TRUE);
+    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid', 'group' => 'core')));
+    $this->assertEquals(
+      date('Y-m-d'),
+      date('Y-m-d', strtotime($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date', 'group' => 'core'))))
+    );
+  }
+
+  /**
+   * Check we can update legacy log tables using the api function.
+   */
+  public function testUpdateLogTableHookINNODB() {
+    $this->createLegacyStyleContactLogTable();
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    $this->hookClass->setHook('civicrm_alterLogTables', array($this, 'innodbLogTableSpec'));
+    $this->callAPISuccess('System', 'updatelogtables', array());
+    $this->checkINNODBLogTableCreated();
+    $this->checkTriggersCreated(TRUE);
+    // Make sure that the absence of a hook specifying INNODB does not cause revert to archive.
+    // Only a positive action, like specifying ARCHIVE in a hook should trigger a change back to archive.
+    $this->hookClass->setHook('civicrm_alterLogTables', array());
+    $schema = new CRM_Logging_Schema();
+    $spec = $schema->getLogTableSpec();
+    $this->assertEquals(array(), $spec['civicrm_contact']);
+    $this->callAPISuccess('System', 'updatelogtables', array());
+    $this->checkINNODBLogTableCreated();
   }
 
   /**
@@ -93,7 +152,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    */
   public function innodbLogTableSpec(&$logTableSpec) {
     $logTableSpec['civicrm_contact'] = array(
-      'engine' => 'INNODB',
+      'engine' => 'InnoDB',
+      'engine_config' => 'ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4',
       'indexes' => array(
         'index_id' => 'id',
         'index_log_conn_id' => 'log_conn_id',
@@ -111,7 +171,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->assertEquals('log_civicrm_contact', $dao->Table);
     $tableField = 'Create_Table';
     $this->assertContains('`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,', $dao->$tableField);
-    $this->assertContains('`log_conn_id` varchar(17) COLLATE utf8_unicode_ci DEFAULT NULL,', $dao->$tableField);
+    $this->assertContains('`log_conn_id` varchar(17)', $dao->$tableField);
     return $dao->$tableField;
   }
 
@@ -121,17 +181,23 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   protected function checkINNODBLogTableCreated() {
     $createTableString = $this->checkLogTableCreated();
     $this->assertContains('ENGINE=InnoDB', $createTableString);
+    $this->assertContains('ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4', $createTableString);
     $this->assertContains('KEY `index_id` (`id`),', $createTableString);
   }
 
   /**
    * Check the triggers were created and look OK.
    */
-  protected function checkTriggersCreated() {
+  protected function checkTriggersCreated($unique) {
     $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS LIKE 'civicrm_contact'");
     while ($dao->fetch()) {
       if ($dao->Timing == 'After') {
-        $this->assertContains('@uniqueID', $dao->Statement);
+        if ($unique) {
+          $this->assertContains('@uniqueID', $dao->Statement);
+        }
+        else {
+          $this->assertContains('CONNECTION_ID()', $dao->Statement);
+        }
       }
     }
   }
@@ -145,6 +211,19 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   protected function assertLoggingEnabled($expected) {
     $schema = new CRM_Logging_Schema();
     $this->assertTrue($schema->isEnabled() === $expected);
+  }
+
+  /**
+   * Create the contact log table with log_conn_id as an integer.
+   */
+  protected function createLegacyStyleContactLogTable() {
+    CRM_Core_DAO::executeQuery("
+      CREATE TABLE log_civicrm_contact
+      (log_conn_id INT NULL, log_user_id INT NULL, log_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP)
+      ENGINE=ARCHIVE
+      (SELECT c.*, CURRENT_TIMESTAMP as log_date, 'Initialize' as 'log_action'
+      FROM civicrm_contact c)
+    ");
   }
 
 }
