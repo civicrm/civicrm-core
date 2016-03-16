@@ -265,7 +265,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       $groupTree = &CRM_Core_BAO_CustomGroup::getTree($this->_contactType, $this, $this->_tableID,
         $this->_groupID, $this->_contactSubType
       );
-      $customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, $this->_groupID);
+      $customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, $this->_groupID, NULL, NULL, $this->_tableID);
     }
     else {
       $customValueCount = $_POST['hidden_custom_group_count'][$this->_groupID];
@@ -282,7 +282,8 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   public function postProcess() {
     // Get the form values and groupTree
-    $params = CRM_Utils_Request::exportValues();
+    //CRM-18183
+    $params = $this->controller->exportValues($this->_name);
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
