@@ -190,6 +190,8 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
       'civicrm_event',
       'civicrm_contribution_page',
     );
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(str_replace("BAO", "DAO", get_called_class()));
+    CRM_Utils_Hook::entityTables($entity, $tables);
     // Identical keys & values
     return array_combine($tables, $tables);
   }
