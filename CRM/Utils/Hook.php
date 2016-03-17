@@ -1732,14 +1732,14 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called to alter the list of allowable entityTables.
    *
-   * @param sting|CRM_Core_DAO $entity
+   * @param string|CRM_Core_DAO $entity
    * @param array $tables array of allowable entityTables
    * @return mixed
    */
   public static function entityTables($entity, &$tables) {
     $entityName = is_object($entity) ? _civicrm_api_get_entity_name_from_dao($entity) : $entity;
-    return self::singleton()->invoke(2, $entityName, $clauses,
-      self::$_nullobject, self::$_nullobject, self::$_nullobject, self::$_nullobject,
+    return self::singleton()->invoke(2, $entityName, $tables,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_entityTables'
     );
   }
