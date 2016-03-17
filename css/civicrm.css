@@ -3457,6 +3457,7 @@ div.m ul#civicrm-menu,
 .crm-container div.ui-notify-message table,
 .crm-container div.ui-notify-message tbody,
 .crm-container div.ui-notify-message tr {
+  background: rgba(50,50,50,0.1);
   border: 0 none;
   font-size: 11px;
 }
@@ -3464,7 +3465,7 @@ div.m ul#civicrm-menu,
   margin: 10px 0;
 }
 .crm-container div.ui-notify-message td {
-  background: rgba(255,255,255,0.1);
+  
   border: 1px solid #111;
   font-size: 11px;
   color: #fff;
