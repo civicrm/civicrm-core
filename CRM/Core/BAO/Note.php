@@ -585,7 +585,8 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
       'civicrm_participant',
       'civicrm_contribution',
     );
-    CRM_Utils_Hook::entityTables($this, $tables);
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(str_replace("BAO", "DAO", get_called_class()));
+    CRM_Utils_Hook::entityTables($entity, $tables);
     // Identical keys & values
     return array_combine($tables, $tables);
   }
