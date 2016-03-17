@@ -64,6 +64,12 @@ class CRM_Core_JobManager {
    */
   public function execute($auth = TRUE) {
 
+    // check if non-production environment.
+    if (Civi::settings()->get('isProductionEnvironment') == 1) {
+      $this->logEntry($job->name . ' has not been executed as it is a non-production environment.');
+      return;
+    }
+
     $this->logEntry('Starting scheduled jobs execution');
 
     if ($auth && !CRM_Utils_System::authenticateKey(TRUE)) {
@@ -118,6 +124,13 @@ class CRM_Core_JobManager {
    */
   public function executeJob($job) {
     $this->currentJob = $job;
+
+    // check if non-production environment.
+    if (Civi::settings()->get('isProductionEnvironment') == 0) {
+      $this->logEntry($job->name . ' has not been executed as it is a non-production environment.');
+      return;
+    }
+
     $this->logEntry('Starting execution of ' . $job->name);
     $job->saveLastRun();
 
