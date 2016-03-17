@@ -585,6 +585,7 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
       'civicrm_participant',
       'civicrm_contribution',
     );
+    CRM_Utils_Hook::entityTables($this, $tables);
     // Identical keys & values
     return array_combine($tables, $tables);
   }
