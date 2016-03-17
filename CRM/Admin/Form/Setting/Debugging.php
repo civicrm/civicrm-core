@@ -55,4 +55,18 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
     parent::buildQuickForm();
   }
 
+  /**
+   * Process the form submission.
+   */
+  public function postProcess() {
+    $params = $this->controller->exportValues($this->_name);
+
+    if ($params['isProductionEnvironment'] == 0) {
+      Civi::settings()->set('mailing_backend', array('outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED));
+      CRM_Core_Session::setStatus(ts('Outbound emails have been disabled. Scheduled jobs have been prevented from being executed.'), ts("Non-production environment set"), "success");
+    }
+    parent::postProcess();
+  }
+  
+
 }
