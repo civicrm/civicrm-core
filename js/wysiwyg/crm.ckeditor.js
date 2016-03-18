@@ -68,10 +68,7 @@
 
       $(item).addClass('crm-wysiwyg-enabled');
 
-      var isFullPage = false;
-      if ($(item).hasClass('crm-wysiwyg-fullpage')) {
-        isFullPage = true;
-      }
+      var isFullPage = $(item).hasClass('crm-wysiwyg-fullpage');
 
       CKEDITOR.replace($(item)[0], {
         filebrowserBrowseUrl: browseUrl + '&type=files',
