@@ -1223,7 +1223,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($memPriceSetId || (($membershipTypes === TRUE) || (is_array($membershipTypes) && !empty($membershipTypes)))) {
       // go to step 3 (memberships)
       $this->click('link=Memberships');
-      $this->waitForElementPresent('_qf_MembershipBlock_next-bottom');
+      $this->waitForElementPresent('_qf_MembershipBlock_submit_savenext');
 
       // fill in step 3 (Memberships)
       $this->click('member_is_active');
