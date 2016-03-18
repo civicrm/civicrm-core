@@ -425,12 +425,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
                     ON fitem.financial_account_id = {$this->_aliases['civicrm_financial_account']}_credit_2.id
               LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
                     ON  fitem.entity_id = {$this->_aliases['civicrm_line_item']}.id AND fitem.entity_table = 'civicrm_line_item' ";
-              if ($this->isTableSelected('civicrm_batch')) {
-                    $this->_from .= "LEFT JOIN civicrm_entity_batch ent_batch
-                          ON  {$this->_aliases['civicrm_financial_trxn']}.id = ent_batch.entity_id AND ent_batch.entity_table = 'civicrm_financial_trxn' 
-                    LEFT JOIN civicrm_batch batch
-                          ON  ent_batch.batch_id = batch.id";
-              }
+    if ($this->isTableSelected('civicrm_batch')) {
+              $this->_from .= "LEFT JOIN civicrm_entity_batch ent_batch
+                    ON  {$this->_aliases['civicrm_financial_trxn']}.id = ent_batch.entity_id AND ent_batch.entity_table = 'civicrm_financial_trxn' 
+              LEFT JOIN civicrm_batch batch
+                    ON  ent_batch.batch_id = batch.id";
+    }
   }
 
   public function orderBy() {
