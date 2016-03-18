@@ -455,7 +455,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
 
-    if (!empty($this->_values['onbehalf_profile_id']) && !empty($params['onbehalf'])) {
+    if (!empty($this->_values['onbehalf_profile_id']) &&
+      !empty($params['onbehalf']) &&
+      ($this->_values['is_for_organization'] == 2 ||
+        !empty($params['is_for_organization'])
+      )
+    ) {
       $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
       $fieldTypes = array_merge($fieldTypes, $contactSubType);
@@ -2083,7 +2088,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // If onbehalf-of-organization contribution / signup, add organization
     // and it's location.
-    if (isset($this->_values['onbehalf_profile_id']) && isset($behalfOrganization['organization_name']) && !empty($this->_params['is_for_organization'])) {
+    if (isset($this->_values['onbehalf_profile_id']) &&
+      isset($behalfOrganization['organization_name']) &&
+      ($this->_values['is_for_organization'] == 2 ||
+        !empty($this->_params['is_for_organization'])
+      )
+    ) {
       $ufFields = array();
       foreach ($this->_fields['onbehalf'] as $name => $value) {
         $ufFields[$name] = 1;
