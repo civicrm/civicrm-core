@@ -445,6 +445,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     // format activity custom data
     if (!empty($params['hidden_custom'])) {
       if ($this->_activityId) {
+        // retrieve and include the custom data of old Activity
+        $oldActivity = civicrm_api3('Activity', 'getsingle', array('id' => $this->_activityId));
+        $params = array_merge($params, $oldActivity);
+
         // unset custom fields-id from params since we want custom
         // fields to be saved for new activity.
         foreach ($params as $key => $value) {
