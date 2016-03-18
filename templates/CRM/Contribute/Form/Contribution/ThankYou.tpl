@@ -188,7 +188,7 @@
     </div>
   {/if}
 
-  {if $onbehalfProfile|@count && $is_for_organization}
+  {if $onbehalfProfile|@count}
     <div class="crm-group onBehalf_display-group label-left crm-profile-view">
       {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
      </div>
