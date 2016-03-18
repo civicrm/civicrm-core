@@ -467,16 +467,22 @@ ORDER BY start_date desc
     $eventsByDates = $this->get('eventsByDates');
     if ($this->_searchResult) {
       if ($eventsByDates) {
-
         $from = $this->get('start_date');
+        $to = $this->get('end_date');
+        $start = $end = '';
         if (!CRM_Utils_System::isNull($from)) {
-          $clauses[] = '( start_date >= %3 OR start_date IS NULL )';
+          $start = 'end_date >= %3 AND';
+          if (!CRM_Utils_System::isNull($to)) {
+            $end = ' AND start_date <= %4 ';
+          }
+          // CRM-18250 - search end_date greater than $from or start_date should be
+          // greater than $from in case end_date is NULL to get proper event result.
+          $clauses[] = "( (end_date >= %3 $end ) OR (start_date >= %3 AND end_date IS NULL) )";
           $params[3] = array($from, 'String');
         }
 
-        $to = $this->get('end_date');
         if (!CRM_Utils_System::isNull($to)) {
-          $clauses[] = '( end_date <= %4 OR end_date IS NULL )';
+          $clauses[] = "(($start start_date <= %4))";
           $params[4] = array($to, 'String');
         }
       }
