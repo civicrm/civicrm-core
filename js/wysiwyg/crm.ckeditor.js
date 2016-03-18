@@ -68,6 +68,8 @@
 
       $(item).addClass('crm-wysiwyg-enabled');
 
+      var isFullPage = $(item).hasClass('crm-wysiwyg-fullpage');
+
       CKEDITOR.replace($(item)[0], {
         filebrowserBrowseUrl: browseUrl + '&type=files',
         filebrowserImageBrowseUrl: browseUrl + '&type=images',
@@ -76,6 +78,7 @@
         filebrowserImageUploadUrl: uploadUrl + '&type=images',
         filebrowserFlashUploadUrl: uploadUrl + '&type=flash',
         allowedContent: true, // For CiviMail!
+        fullPage: isFullPage,
         customConfig: CRM.config.CKEditorCustomConfig,
         on: {
           instanceReady: onReady
