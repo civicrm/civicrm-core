@@ -178,7 +178,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     /** @var \Civi\Core\SettingsManager $manager */
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
-    if (self::isEnvironmentSet($name)) {
+    if (self::isEnvironmentSet($name, $value)) {
       throw new api_Exception('CiviCRM Environment already set in civicrm.settings.php!');
     }
     $settings->set($name, $value);
@@ -211,7 +211,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $fieldsToSet = self::validateSettingsInput($params, $fields);
 
     foreach ($fieldsToSet as $settingField => &$settingValue) {
-      if (self::isEnvironmentSet($settingField)) {
+      if (self::isEnvironmentSet($settingField, $settingValue)) {
         throw new api_Exception('CiviCRM Environment already set in civicrm.settings.php!');
       }
       self::validateSetting($settingValue, $fields['values'][$settingField]);
@@ -500,9 +500,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return bool
    */
-  public static function isEnvironmentSet($setting) {
+  public static function isEnvironmentSet($setting, $value = NULL) {
     global $civicrm_setting;
-    if ($setting == 'isProductionEnvironment' && isset($civicrm_setting['Developer Preferences'][$setting]) && array_key_exists($setting, $civicrm_setting['Developer Preferences'])) {
+    if (($setting == 'isProductionEnvironment' && array_key_exists($setting, $civicrm_setting['Developer Preferences'])
+         && isset($civicrm_setting['Developer Preferences'][$setting])) && (isset($value) && $value != $civicrm_setting['Developer Preferences'][$setting])) {
       return TRUE;
     }
     return FALSE;
