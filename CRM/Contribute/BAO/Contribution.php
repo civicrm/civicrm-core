@@ -4763,7 +4763,7 @@ LIMIT 1;";
    * @throws \CiviCRM_API3_Exception
    */
   protected static function getRecurringContributionDescription($contribution, $event) {
-    if (! empty($contribution->source)) {
+    if (!empty($contribution->source)) {
       return $contribution->source;
     }
     elseif (!empty($contribution->contribution_page_id)) {
