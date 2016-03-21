@@ -101,5 +101,3 @@ function generateRandomDate() {
   return $date;
 
 }
-
-
