@@ -122,6 +122,7 @@ class CRM_Core_JobManager {
     // check if non-production environment.
     if (Civi::settings()->get('isProductionEnvironment') == 0) {
       $this->logEntry($job->name . ' has not been executed as it is a non-production environment.');
+      $this->currentJob = FALSE;
       return;
     }
 
