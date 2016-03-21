@@ -2702,7 +2702,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return \CRM_Core_DAO
    */
   public static function copy($id) {
-    $fieldsFix = array('prefix' => array('title' => ts('Copy of ')));
+    $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_uf_group");
+
+    $title = ts('[Copy id %1]', array(1 => $maxId + 1));
+    $fieldsFix = array(
+      'suffix' => array(
+        'title' => ' ' . $title,
+        'name' => '__Copy_id_' . ($maxId + 1) . '_',
+      ),
+    );
+
     $copy = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFGroup',
       array('id' => $id),
       NULL,
