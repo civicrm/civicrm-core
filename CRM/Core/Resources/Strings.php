@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Manage translatable strings on behalf of resource files.
@@ -107,4 +107,5 @@ class CRM_Core_Resources_Strings {
         throw new Exception("Cannot extract strings: Unrecognized file type.");
     }
   }
+
 }
