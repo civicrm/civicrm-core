@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -66,5 +66,6 @@ for ($i = 1; $i <= $numGroups; $i++) {
   $group->group_type = $groupType[$t];
 
   $group->save();
+
 }
 

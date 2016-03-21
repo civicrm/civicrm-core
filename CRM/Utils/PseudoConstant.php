@@ -45,7 +45,7 @@ class CRM_Utils_PseudoConstant {
   );
 
   /**
-   * @var array 
+   * @var array
    *   ($name => $className)
    */
   private static $constants = NULL;

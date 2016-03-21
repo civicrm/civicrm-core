@@ -68,9 +68,7 @@ class CRM_Pledge_Form_Task_Print extends CRM_Pledge_Form_Task {
    *    - displaying elements for saving the search.
    */
   public function buildQuickForm() {
-    
     // just need to add a javacript to popup the window for printing
-    
     $this->addButtons(array(
         array(
           'type' => 'next',

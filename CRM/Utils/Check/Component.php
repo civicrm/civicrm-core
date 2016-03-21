@@ -56,4 +56,5 @@ abstract class CRM_Utils_Check_Component {
     }
     return $messages;
   }
+
 }

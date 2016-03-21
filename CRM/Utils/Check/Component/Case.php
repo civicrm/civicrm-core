@@ -43,8 +43,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   protected $caseTypeNames;
 
   /**
-   * @param CRM_Case_XMLRepository $xmlRepo
-   * @param array <string> $caseTypeNames
+   * Class constructor.
    */
   public function __construct() {
     $this->caseTypeNames = CRM_Case_PseudoConstant::caseType('name');

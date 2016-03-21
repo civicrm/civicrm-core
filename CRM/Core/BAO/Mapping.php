@@ -597,7 +597,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
               $relationshipType->id = $id;
               if ($relationshipType->find(TRUE)) {
                 $direction = "contact_sub_type_$second";
-		 $target_type = 'contact_type_' . $second;
+                $target_type = 'contact_type_' . $second;
                 if (isset($relationshipType->$direction)) {
                   $relatedFields = array_merge((array) $relatedMapperFields[$relationshipType->$direction], (array) $relationshipCustomFields);
                 }
