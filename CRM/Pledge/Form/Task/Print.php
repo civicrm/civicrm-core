@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -68,9 +68,7 @@ class CRM_Pledge_Form_Task_Print extends CRM_Pledge_Form_Task {
    *    - displaying elements for saving the search.
    */
   public function buildQuickForm() {
-    
     // just need to add a javacript to popup the window for printing
-    
     $this->addButtons(array(
         array(
           'type' => 'next',
