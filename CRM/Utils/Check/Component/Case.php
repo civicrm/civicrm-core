@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
 
@@ -43,8 +43,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   protected $caseTypeNames;
 
   /**
-   * @param CRM_Case_XMLRepository $xmlRepo
-   * @param array <string> $caseTypeNames
+   * Class constructor.
    */
   public function __construct() {
     $this->caseTypeNames = CRM_Case_PseudoConstant::caseType('name');
