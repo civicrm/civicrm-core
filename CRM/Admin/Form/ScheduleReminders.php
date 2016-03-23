@@ -110,7 +110,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'text',
       'title',
       ts('Title'),
-      array('size' => 45, 'maxlength' => 128),
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_ActionSchedule', 'title'),
       TRUE
     );
 
