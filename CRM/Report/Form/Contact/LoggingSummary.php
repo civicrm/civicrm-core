@@ -247,14 +247,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
 
   /**
    * Generate From Clause.
-   *
-   * @param string $logTable
    */
-  public function from($logTable = NULL) {
-    static $entity = NULL;
-    if ($logTable) {
-      $entity = $logTable;
-    }
+  public function from() {
+    $entity = $this->currentLogTable;
 
     $detail = $this->_logTables[$entity];
     $tableName = CRM_Utils_Array::value('table_name', $detail, $entity);
