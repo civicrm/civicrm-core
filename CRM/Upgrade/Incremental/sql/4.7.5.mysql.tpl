@@ -1,4 +1,6 @@
 {* file to handle db changes in 4.7.5 during upgrade *}
+{include file='../CRM/Upgrade/4.7.5.msg_template/civicrm_msg_template.tpl'}
+
 -- Minor fix for CRM-16173, CRM-16831 - change labels, add separator, etc.
 SELECT @parent_id := id from `civicrm_navigation` where name = 'System Settings' AND domain_id = {$domainID};
 UPDATE `civicrm_navigation` SET `label` = 'Components' where `name` = 'Enable Components' and `parent_id` = @parent_id;
