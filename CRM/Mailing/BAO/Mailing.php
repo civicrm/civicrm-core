@@ -615,7 +615,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
 
     $patterns = array();
 
-    $protos = '(https?|ftp)';
+    $protos = '(https?|ftp|mailto)';
     $letters = '\w';
     $gunk = '\{\}/#~:.?+=&;%@!\,\-\|\(\)\*';
     $punc = '.:?\-';

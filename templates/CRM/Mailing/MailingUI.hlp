@@ -97,7 +97,7 @@
   <p>
     {ts}Track the number of times recipients click each link in this mailing.{/ts}
   </p><p>
-    {ts}NOTE: When this feature is enabled, all links in the message body will be automatically re-written to route through your CiviCRM server prior to redirecting to the target page.{/ts}
+    {ts}NOTE: When this feature is enabled, all links in the message body (including mailtos) will be automatically re-written to route through your CiviCRM website prior to redirecting to the target page.{/ts}
   </p>
 {/htxt}
 
