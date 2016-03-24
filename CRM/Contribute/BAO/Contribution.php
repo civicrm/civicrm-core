@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
@@ -4763,7 +4763,10 @@ LIMIT 1;";
    * @throws \CiviCRM_API3_Exception
    */
   protected static function getRecurringContributionDescription($contribution, $event) {
-    if (!empty($contribution->contribution_page_id)) {
+    if (!empty($contribution->source)) {
+      return $contribution->source;
+    }
+    elseif (!empty($contribution->contribution_page_id)) {
       $contributionPageTitle = civicrm_api3('ContributionPage', 'getvalue', array(
         'id' => $contribution->contribution_page_id,
         'return' => 'title',
