@@ -227,7 +227,7 @@
     // If the location was changed, lookup the type if it exists
     if (type == 'locTypeId') {
       locTypeId = element.value;
-      typeTypeId = CRM.$( 'select#type_' + blockname + '_' + blockId + '_typeTypeId' ).val();
+      typeTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_typeTypeId' ).val();
     }
 
     // Otherwise the type was changed, lookup the location if it exists
