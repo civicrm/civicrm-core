@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
             <tr><td class="label">{ts}Subject{/ts}</td><td>{$note.subject}</td></tr>
             <tr><td class="label">{ts}Date:{/ts}</td><td>{$note.modified_date|crmDate}</td></tr>
             <tr><td class="label">{ts}Privacy:{/ts}</td><td>{$note.privacy}</td></tr>
-            <tr><td class="label"></td><td>{$note.note|nl2br}</td></tr>
+            <tr><td class="label">{ts}Note:{/ts}</td><td>{$note.note|nl2br}</td></tr>
 
             {if $currentAttachmentInfo}
                {include file="CRM/Form/attachment.tpl"}
