@@ -121,6 +121,7 @@ function _civicrm_api3_job_execute_spec(&$params) {
  *   API Result Array
  */
 function civicrm_api3_job_geocode($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $gc = new CRM_Utils_Address_BatchUpdate($params);
 
   $result = $gc->run();
@@ -173,6 +174,7 @@ function _civicrm_api3_job_geocode_spec(&$params) {
  * @return array
  */
 function civicrm_api3_job_send_reminder($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   //note that $params['rowCount' can be overridden by one of the preferred syntaxes ($options['limit'] = x
   //It's not clear whether than syntax can be passed in via the UI config - but this keeps the pre 4.4.4 behaviour
   // in that case (ie. makes it non-configurable via the UI). Another approach would be to set a default of 0
@@ -221,6 +223,7 @@ function _civicrm_api3_job_send_reminder(&$params) {
  * @return array
  */
 function civicrm_api3_job_mail_report($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $result = CRM_Report_Utils_Report::processReport($params);
 
   if ($result['is_error'] == 0) {
@@ -245,6 +248,7 @@ function civicrm_api3_job_mail_report($params) {
  * @return array
  */
 function civicrm_api3_job_update_greeting($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   if (isset($params['ct']) && isset($params['gt'])) {
     $ct = explode(',', $params['ct']);
     $gt = explode(',', $params['gt']);
@@ -291,6 +295,7 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
  * @return array
  */
 function civicrm_api3_job_process_pledge($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   // *** Uncomment the next line if you want automated reminders to be sent
   // $params['send_reminders'] = true;
   $result = CRM_Pledge_BAO_Pledge::updatePledgeStatus($params);
@@ -312,6 +317,7 @@ function civicrm_api3_job_process_pledge($params) {
  * @return array
  */
 function civicrm_api3_job_process_mailing($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $mailsProcessedOrig = CRM_Mailing_BAO_MailingJob::$mailsProcessed;
 
   if (!CRM_Mailing_BAO_Mailing::processQueue()) {
@@ -333,6 +339,7 @@ function civicrm_api3_job_process_mailing($params) {
  * @return array
  */
 function civicrm_api3_job_process_sms($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $mailsProcessedOrig = CRM_Mailing_BAO_MailingJob::$mailsProcessed;
 
   if (!CRM_Mailing_BAO_Mailing::processQueue('sms')) {
@@ -354,6 +361,7 @@ function civicrm_api3_job_process_sms($params) {
  * @return array
  */
 function civicrm_api3_job_fetch_bounces($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $lock = Civi::lockManager()->acquire('worker.mailing.EmailProcessor');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
@@ -377,6 +385,7 @@ function civicrm_api3_job_fetch_bounces($params) {
  * @return array
  */
 function civicrm_api3_job_fetch_activities($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $lock = Civi::lockManager()->acquire('worker.mailing.EmailProcessor');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
@@ -404,6 +413,7 @@ function civicrm_api3_job_fetch_activities($params) {
  *   array of properties, if error an array with an error id and error message
  */
 function civicrm_api3_job_process_participant($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $result = CRM_Event_BAO_ParticipantStatusType::process($params);
 
   if (!$result['is_error']) {
@@ -430,6 +440,7 @@ function civicrm_api3_job_process_participant($params) {
  *   true if success, else false
  */
 function civicrm_api3_job_process_membership($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $lock = Civi::lockManager()->acquire('worker.member.UpdateMembership');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
@@ -456,6 +467,7 @@ function civicrm_api3_job_process_membership($params) {
  *   true if success, else false
  */
 function civicrm_api3_job_process_respondent($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $result = CRM_Campaign_BAO_Survey::releaseRespondent($params);
 
   if ($result['is_error'] == 0) {
@@ -476,6 +488,7 @@ function civicrm_api3_job_process_respondent($params) {
  *   API Result Array
  */
 function civicrm_api3_job_process_batch_merge($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $rgid = CRM_Utils_Array::value('rgid', $params);
   $gid = CRM_Utils_Array::value('gid', $params);
 
@@ -529,6 +542,7 @@ function _civicrm_api3_job_process_batch_merge_spec(&$params) {
  * {string  'processor_name' - the name of the payment processor, eg: Sagepay}
  */
 function civicrm_api3_job_run_payment_cron($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
 
   // live mode
   CRM_Core_Payment::handlePaymentMethod(
@@ -562,6 +576,7 @@ function civicrm_api3_job_run_payment_cron($params) {
  *   Sends in various config parameters to decide what needs to be cleaned.
  */
 function civicrm_api3_job_cleanup($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $session   = CRM_Utils_Array::value('session', $params, TRUE);
   $tempTable = CRM_Utils_Array::value('tempTables', $params, TRUE);
   $jobLog    = CRM_Utils_Array::value('jobLog', $params, TRUE);
@@ -606,6 +621,7 @@ function civicrm_api3_job_cleanup($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_job_disable_expired_relationships($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $result = CRM_Contact_BAO_Relationship::disableExpiredRelationships();
   if (!$result) {
     throw new API_Exception('Failed to disable all expired relationships.');
@@ -627,6 +643,7 @@ function civicrm_api3_job_disable_expired_relationships($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_job_group_rebuild($params) {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $lock = Civi::lockManager()->acquire('worker.core.GroupRebuild');
   if (!$lock->isAcquired()) {
     throw new API_Exception('Could not acquire lock, another EmailProcessor process is running');
@@ -646,6 +663,7 @@ function civicrm_api3_job_group_rebuild($params) {
  * Anonymous site statistics are sent back to civicrm.org during this check.
  */
 function civicrm_api3_job_version_check() {
+  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $vc = new CRM_Utils_VersionCheck();
   $vc->fetch();
   return civicrm_api3_create_success();
