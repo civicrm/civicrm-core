@@ -37,7 +37,7 @@
  */
 
 //@todo - why doesn't class loader find these (I tried renaming)
-require_once 'CiviTest/CiviMailUtils.php';
+//require_once 'CiviTest/CiviMailUtils.php';
 
 /**
  * Class api_v3_JobTest
@@ -114,6 +114,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    *
    */
   public function testMailNonProductionRun() {
+    // Test in non-production mode.
     $params = array(
       'isProductionEnvironment' => FALSE,
     );
@@ -125,6 +126,12 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->callAPISuccess('mailing', 'create', $this->_params);
     $this->_mut->assertRecipients(array());
     $this->callAPIFailure('job', 'process_mailing', "Failure in api call for job process_mailing:  Job has not been executed as it is a non-production environment.");
+
+    // Test with runInNonProductionEnvironment param.
+    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+
+    // Test in production mode.
     $params = array(
       'isProductionEnvironment' => TRUE,
     );
