@@ -97,6 +97,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   private $limit = NULL;
   private $offset = NULL;
   private $params = array();
+  private $distinct = NULL;
 
   // Public to work-around PHP 5.3 limit.
   public $strict = NULL;
@@ -222,6 +223,19 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
       $this->selects[$expr] = $this->interpolate($expr, $args);
+    }
+    return $this;
+  }
+
+  /**
+   * Return only distinct values
+   *
+   * @param bool $isDistinct allow DISTINCT select or not
+   * @return CRM_Utils_SQL_Select
+   */
+  public function distinct($isDistinct = TRUE) {
+    if ($isDistinct) {
+      $this->distinct = 'DISTINCT ';
     }
     return $this;
   }
@@ -502,7 +516,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
       $sql .= ")\n";
     }
     if ($this->selects) {
-      $sql .= 'SELECT ' . implode(', ', $this->selects) . "\n";
+      $sql .= 'SELECT ' . $this->distinct . implode(', ', $this->selects) . "\n";
     }
     else {
       $sql .= 'SELECT *' . "\n";
