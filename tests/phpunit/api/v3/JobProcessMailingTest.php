@@ -37,7 +37,7 @@
  */
 
 //@todo - why doesn't class loader find these (I tried renaming)
-require_once 'CiviTest/CiviMailUtils.php';
+//require_once 'CiviTest/CiviMailUtils.php';
 
 /**
  * Class api_v3_JobTest
@@ -105,6 +105,30 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     ));
     $this->callAPISuccess('mailing', 'create', $this->_params);
     $this->_mut->assertRecipients(array());
+    $this->callAPISuccess('job', 'process_mailing', array());
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+  }
+
+  /**
+   * Test mail when in non-production environment.
+   *
+   */
+  public function testMailNonProductionRun() {
+    $params = array(
+      'isProductionEnvironment' => FALSE,
+    );
+    $this->callAPISuccess('Setting', 'create', $params);
+    $this->createContactsInGroup(10, $this->_groupID);
+    Civi::settings()->add(array(
+      'mailerBatchLimit' => 2,
+    ));
+    $this->callAPISuccess('mailing', 'create', $this->_params);
+    $this->_mut->assertRecipients(array());
+    $this->callAPIFailure('job', 'process_mailing', "Failure in api call for job process_mailing:  Job has not been executed as it is a non-production environment.");
+    $params = array(
+      'isProductionEnvironment' => TRUE,
+    );
+    $this->callAPISuccess('Setting', 'create', $params);
     $this->callAPISuccess('job', 'process_mailing', array());
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
   }
