@@ -230,6 +230,8 @@ class SelectQuery {
         $table_name = self::MAIN_TABLE_ALIAS;
         $column_name = $key;
       }
+      //CRM-18295: This checks the entity definition to lookup/match
+      //the column name to the entity field name.
       elseif (array_key_exists($key, $this->entityFieldNames)) {
         $table_name = self::MAIN_TABLE_ALIAS;
         $column_name = $this->entityFieldNames[$key];
