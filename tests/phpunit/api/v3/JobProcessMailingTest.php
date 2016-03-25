@@ -37,7 +37,7 @@
  */
 
 //@todo - why doesn't class loader find these (I tried renaming)
-//require_once 'CiviTest/CiviMailUtils.php';
+require_once 'CiviTest/CiviMailUtils.php';
 
 /**
  * Class api_v3_JobTest
