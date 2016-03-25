@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "189ae04cf5b1ca1ee00d56a629a273c3",
-    "content-hash": "c2aba74bbb5b474831736b3e3bcbcb20",
+    "hash": "eb62072cf1f9ecf0cf4c6ff177e39c25",
+    "content-hash": "674fa02010c992f3299495324b4f0a99",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -107,6 +107,46 @@
             "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
             "homepage": "https://github.com/dompdf/dompdf",
             "time": "2016-05-11 00:36:29"
+        },
+        {
+            "name": "marcj/topsort",
+            "version": "dev-1.0-php53",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/totten/topsort.php.git",
+                "reference": "2765723d36f0e536d987e42cbc60de52209212bd"
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "dev-master",
+                "phpunit/phpunit": "~4.0",
+                "symfony/console": "~2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MJS\\TopSort\\": "src/",
+                    "MJS\\TopSort\\Tests\\": "tests/Tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marc J. Schmidt",
+                    "email": "marc@marcjschmidt.de"
+                }
+            ],
+            "description": "High-Performance TopSort/Dependency resolving algorithm",
+            "keywords": [
+                "dependency resolving",
+                "topological sort",
+                "topsort"
+            ],
+            "time": "2016-03-25 21:38:05"
         },
         {
             "name": "pclzip/pclzip",
@@ -610,12 +650,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4"
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
-                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
+                "url": "https://api.github.com/repos/symfony/config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e",
                 "shasum": ""
             },
             "require": {
@@ -1299,6 +1339,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "zetacomponents/mail": 20,
+        "marcj/topsort": 20,
         "pear/validate_finance_creditcard": 20
     },
     "prefer-stable": false,
