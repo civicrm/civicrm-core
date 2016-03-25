@@ -53,7 +53,8 @@ function civicrm_api3_extension_install($params) {
   }
 
   try {
-    CRM_Extension_System::singleton()->getManager()->install($keys);
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $manager->install($manager->findInstallRequirements($keys));
   }
   catch (CRM_Extension_Exception $e) {
     return civicrm_api3_create_error($e->getMessage());
@@ -124,7 +125,8 @@ function civicrm_api3_extension_enable($params) {
     return civicrm_api3_create_success();
   }
 
-  CRM_Extension_System::singleton()->getManager()->enable($keys);
+  $manager = CRM_Extension_System::singleton()->getManager();
+  $manager->enable($manager->findInstallRequirements($keys));
   return civicrm_api3_create_success();
 }
 
