@@ -222,6 +222,11 @@ class CRM_Extension_Manager {
           $typeManager->onPreEnable($info);
           $this->_setExtensionActive($info, 1);
           $typeManager->onPostEnable($info);
+
+          // A full refresh would be preferrable but very slow. This at least allows
+          // later extensions to access classes from earlier extensions.
+          $this->statuses = NULL;
+          $this->mapper->refresh();
           break;
 
         case self::STATUS_UNINSTALLED:
@@ -229,6 +234,11 @@ class CRM_Extension_Manager {
           $typeManager->onPreInstall($info);
           $this->_createExtensionEntry($info);
           $typeManager->onPostInstall($info);
+
+          // A full refresh would be preferrable but very slow. This at least allows
+          // later extensions to access classes from earlier extensions.
+          $this->statuses = NULL;
+          $this->mapper->refresh();
           break;
 
         case self::STATUS_UNKNOWN:
