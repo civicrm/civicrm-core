@@ -341,6 +341,19 @@ class CRM_Extension_Mapper {
   }
 
   /**
+   * @return array
+   *   Ex: $result['org.civicrm.foobar'] = new CRM_Extension_Info(...).
+   * @throws \CRM_Extension_Exception
+   * @throws \Exception
+   */
+  public function getAllInfos() {
+    foreach ($this->container->getKeys() as $key) {
+      $this->keyToInfo($key);
+    }
+    return $this->infos;
+  }
+
+  /**
    * @param string $name
    *
    * @return bool
