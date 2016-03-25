@@ -49,6 +49,22 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals('test.foo', $info->key);
     $this->assertEquals('foo', $info->file);
     $this->assertEquals('zamboni', $info->typeInfo['extra']);
+    $this->assertEquals(array(), $info->requires);
+  }
+
+  public function testGood_string_extras() {
+    $data = "<extension key='test.bar' type='module'><file>testbar</file>
+      <classloader><psr4 prefix=\"Civi\\\" path=\"Civi\"/></classloader>
+      <requires><ext>org.civicrm.a</ext><ext>org.civicrm.b</ext></requires>
+    </extension>
+    ";
+
+    $info = CRM_Extension_Info::loadFromString($data);
+    $this->assertEquals('test.bar', $info->key);
+    $this->assertEquals('testbar', $info->file);
+    $this->assertEquals('Civi\\', $info->classloader[0]['prefix']);
+    $this->assertEquals('Civi', $info->classloader[0]['path']);
+    $this->assertEquals(array('org.civicrm.a', 'org.civicrm.b'), $info->requires);
   }
 
   public function testBad_string() {
