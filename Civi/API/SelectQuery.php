@@ -230,6 +230,10 @@ class SelectQuery {
         $table_name = self::MAIN_TABLE_ALIAS;
         $column_name = $key;
       }
+      elseif (array_key_exists($key, $this->entityFieldNames)) {
+        $table_name = self::MAIN_TABLE_ALIAS;
+        $column_name = $this->entityFieldNames[$key];
+      }
       elseif (($cf_id = \CRM_Core_BAO_CustomField::getKeyID($key)) != FALSE) {
         list($table_name, $column_name) = $this->addCustomField($custom_fields[$cf_id], 'INNER');
       }
