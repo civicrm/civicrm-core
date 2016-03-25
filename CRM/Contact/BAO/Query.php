@@ -2064,11 +2064,17 @@ class CRM_Contact_BAO_Query {
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    if (isset($locType[1]) && is_numeric($locType[1])) {
+      $lType = $locationType[$locType[1]];
+    }
+    if ($lType) {
+      $field['title'] .= " ($lType)";
+    }
 
     if (substr($name, 0, 14) === 'state_province') {
       if (isset($locType[1]) && is_numeric($locType[1])) {
         $setTables = FALSE;
-        $aName = "{$locationType[$locType[1]]}-address";
+        $aName = "{$lType}-address";
         $where = "`$aName`.state_province_id";
       }
       else {
@@ -2077,7 +2083,7 @@ class CRM_Contact_BAO_Query {
 
       $this->_where[$grouping][] = self::buildClause($where, $op, $value);
       list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_Address', "state_province_id", $value, $op);
-      $this->_qill[$grouping][] = ts("State %1 %2", array(1 => $qillop, 2 => $qillVal));
+      $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
     }
     elseif (!empty($field['pseudoconstant'])) {
       $this->optionValueQuery(
@@ -2096,7 +2102,7 @@ class CRM_Contact_BAO_Query {
       $name = (substr($name, 0, 7) === 'country') ? "country_id" : "county_id";
       if (isset($locType[1]) && is_numeric($locType[1])) {
         $setTables = FALSE;
-        $aName = "{$locationType[$locType[1]]}-address";
+        $aName = "{$lType}-address";
         $where = "`$aName`.$name";
       }
       else {
@@ -2105,9 +2111,6 @@ class CRM_Contact_BAO_Query {
 
       $this->_where[$grouping][] = self::buildClause($where, $op, $value, 'Positive');
 
-      if ($lType) {
-        $field['title'] .= " ($lType)";
-      }
       list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
       $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
     }
@@ -5883,9 +5886,6 @@ AND   displayRelType.is_active = 1
     }
     elseif ($daoName == 'CRM_Contact_DAO_Group' && $fieldName == 'id') {
       $pseudoOptions = CRM_Core_PseudoConstant::group();
-    }
-    elseif ($fieldName == 'country_id') {
-      $pseudoOptions = CRM_Core_PseudoConstant::country();
     }
     elseif ($daoName) {
       $pseudoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseudoExtraParam);
