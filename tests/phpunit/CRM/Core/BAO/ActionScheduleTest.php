@@ -1056,7 +1056,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       array(
         // It should not re-send on the same day
         'time' => '2012-04-12 01:00:00',
-        'recipients' => array(array()),
+        'recipients' => array(),
       ),
     ));
   }
