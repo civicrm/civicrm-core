@@ -52,6 +52,12 @@ class CRM_Extension_Info {
   public $classloader = array();
 
   /**
+   * @var array
+   *   Each item is they key-name of an extension required by this extension.
+   */
+  public $requires = array();
+
+  /**
    * Load extension info an XML file.
    *
    * @param $file
@@ -88,6 +94,27 @@ class CRM_Extension_Info {
     $instance = new CRM_Extension_Info();
     $instance->parse($xml);
     return $instance;
+  }
+
+  /**
+   * Build a reverse-dependency map.
+   *
+   * @param array $infos
+   *   The universe of available extensions.
+   *   Ex: $infos['org.civicrm.foobar'] = new CRM_Extension_Info().
+   * @return array
+   *   If "org.civicrm.api" is required by "org.civicrm.foo", then return
+   *   array('org.civicrm.api' => array(CRM_Extension_Info[org.civicrm.foo])).
+   *   Array(string $key => array $requiredBys).
+   */
+  public static function buildReverseMap($infos) {
+    $revMap = array();
+    foreach ($infos as $info) {
+      foreach ($info->requires as $key) {
+        $revMap[$key][] = $info;
+      }
+    }
+    return $revMap;
   }
 
   /**
@@ -139,6 +166,12 @@ class CRM_Extension_Info {
             'prefix' => (string) $psr4->attributes()->prefix,
             'path' => (string) $psr4->attributes()->path,
           );
+        }
+      }
+      elseif ($attr === 'requires') {
+        $this->requires = array();
+        foreach ($val->ext as $ext) {
+          $this->requires[] = (string) $ext;
         }
       }
       else {
