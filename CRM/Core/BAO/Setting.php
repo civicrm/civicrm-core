@@ -500,10 +500,26 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return bool
    */
-  public static function isEnvironmentSet($setting, $value = NULL) {
+  public static function isEnvironmentSet($setting, $value = NULL, $checkValue = FALSE) {
     global $civicrm_setting;
     if ($setting == 'isProductionEnvironment' && (isset($civicrm_setting[self::DEVELOPER_PREFERENCES_NAME][$setting])
-         && array_key_exists($setting, $civicrm_setting[self::DEVELOPER_PREFERENCES_NAME])) && (isset($value) && $value != $civicrm_setting[self::DEVELOPER_PREFERENCES_NAME][$setting])) {
+      && array_key_exists($setting, $civicrm_setting[self::DEVELOPER_PREFERENCES_NAME])) &&
+      ($checkValue || (isset($value) && $value != $civicrm_setting[self::DEVELOPER_PREFERENCES_NAME][$setting]))) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Check if job is able to be executed.
+   *
+   * @return bool
+   */
+  public static function isJobRun($job) {
+    $currentJob = $job->currentJob;
+    if (Civi::settings()->get('isProductionEnvironment') == 0 && !CRM_Utils_Array::value('runInNonProductionEnvironment', $currentJob->apiParams)) {
+      $job->logEntry($currentJob->name . ' has not been executed as it is a non-production environment.');
+      $job->currentJob = FALSE;
       return TRUE;
     }
     return FALSE;
