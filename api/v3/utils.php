@@ -472,7 +472,7 @@ function _civicrm_api3_field_names($fields) {
   $result = array();
   foreach ($fields as $key => $value) {
     if (!empty($value['name'])) {
-      $result[] = $value['name'];
+      $result[$key] = $value['name'];
     }
   }
   return $result;
