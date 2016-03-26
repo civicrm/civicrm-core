@@ -2098,12 +2098,13 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when a geocoder's format method is called.
    *
+   * @param string $geoProvider
    * @param array $values
    * @param SimpleXMLElement $xml
    */
-  public static function geocoderFormat(&$values, $xml) {
-    return self::singleton()->invoke(2, $values, $xml,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function geocoderFormat($geoProvider, &$values, $xml) {
+    return self::singleton()->invoke(3, $geoProvider, $values, $xml,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_geocoderFormat'
     );
   }
