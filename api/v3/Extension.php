@@ -41,6 +41,7 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
  *    - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
+ *    - path: string, e.g. "/var/www/extensions/*"
  *
  * Using 'keys' should be more performant than making multiple API calls with 'key'
  *
@@ -70,10 +71,14 @@ function civicrm_api3_extension_install($params) {
 function _civicrm_api3_extension_install_spec(&$fields) {
   $fields['keys'] = array(
     'title' => 'Extension Key(s)',
-    'api.required' => 1,
     'api.aliases' => array('key'),
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Fully qualified name of one or more extensions',
+  );
+  $fields['path'] = array(
+    'title' => 'Extension Path',
+    'type' => CRM_Utils_Type::T_STRING,
+    'description' => 'The path to the extension. May use wildcard ("*").',
   );
 }
 
@@ -114,6 +119,7 @@ function civicrm_api3_extension_upgrade() {
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
  *    - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
+ *    - path: string, e.g. "/var/www/vendor/foo/myext" or "/var/www/vendor/*"
  *
  * Using 'keys' should be more performant than making multiple API calls with 'key'
  *
@@ -145,6 +151,7 @@ function _civicrm_api3_extension_enable_spec(&$fields) {
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
  *    - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
+ *    - path: string, e.g. "/var/www/vendor/foo/myext" or "/var/www/vendor/*"
  *
  * Using 'keys' should be more performant than making multiple API calls with 'key'
  *
@@ -175,6 +182,7 @@ function _civicrm_api3_extension_disable_spec(&$fields) {
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
  *    - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
+ *    - path: string, e.g. "/var/www/vendor/foo/myext" or "/var/www/vendor/*"
  *
  * Using 'keys' should be more performant than making multiple API calls with 'key'
  *
@@ -394,11 +402,16 @@ function civicrm_api3_extension_getremote($params) {
  *
  * @param array $params
  * @param string $key
- *   API request params with 'keys'.
+ *   API request params with 'keys' or 'path'.
+ *   - keys: A comma-delimited list of extension names
+ *   - path: An absolute directory path. May append '*' to match all sub-directories.
  *
  * @return array
  */
 function _civicrm_api3_getKeys($params, $key = 'keys') {
+  if ($key == 'path') {
+    return CRM_Extension_System::singleton()->getMapper()->getKeysByPath($params['path']);
+  }
   if (isset($params[$key])) {
     if (is_array($params[$key])) {
       return $params[$key];
@@ -408,7 +421,5 @@ function _civicrm_api3_getKeys($params, $key = 'keys') {
     }
     return explode(API_V3_EXTENSION_DELIMITER, $params[$key]);
   }
-  else {
-    return array();
-  }
+  throw new API_Exception("Missing required parameter: key, keys, or path");
 }
