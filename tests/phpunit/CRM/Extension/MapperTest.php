@@ -5,6 +5,22 @@
  * @group headless
  */
 class CRM_Extension_MapperTest extends CiviUnitTestCase {
+
+  /**
+   * @var string
+   */
+  protected $basedir, $basedir2;
+
+  /**
+   * @var CRM_Extension_Container_Interface
+   */
+  protected $container, $containerWithSlash;
+
+  /**
+   * @var CRM_Extension_Mapper
+   */
+  protected $mapper, $mapperWithSlash;
+
   public function setUp() {
     parent::setUp();
     list ($this->basedir, $this->container) = $this->_createContainer();
@@ -70,6 +86,27 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $this->assertEquals(rtrim($config->resourceBase, '/'), $this->mapper->keyToUrl('civicrm'));
     $this->assertEquals(rtrim($config->resourceBase, '/'), $this->mapperWithSlash->keyToUrl('civicrm'));
+  }
+
+  public function testGetKeysByPath() {
+    $mappers = array(
+      $this->basedir => $this->mapper,
+      $this->basedir2 => $this->mapperWithSlash,
+    );
+    foreach ($mappers as $basedir => $mapper) {
+      /** @var CRM_Extension_Mapper $mapper */
+      $this->assertEquals(array(), $mapper->getKeysByPath($basedir));
+      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird'));
+      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird/'));
+      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird//'));
+      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/*'));
+      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '//*'));
+      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/*'));
+      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar'));
+      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar/'));
+      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar//'));
+      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar/*'));
+    }
   }
 
   /**
