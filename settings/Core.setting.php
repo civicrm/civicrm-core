@@ -699,6 +699,17 @@ return array(
     'description' => 'When enabled, "empowered by CiviCRM" is displayed at the bottom of public forms.',
     'help_text' => NULL,
   ),
+  'logging_no_trigger_permission' => array(
+    'add' => '4.7',
+    'help_text' => ts('If the mysql user does not have trigger permissions then you must create the triggers outside CiviCRM'),
+    'name' => 'logging_no_trigger_permission',
+    'type' => 'Bool',
+    'quick_form_type' => 'YesNo',
+    'html_type' => '',
+    'default' => 0,
+    'title' => 'MYSQL user does not have trigger permissions',
+    'description' => 'Set this when you intend to manage trigger creation outside of CiviCRM',
+  ),
   'logging' => array(
     'add' => '4.7',
     'help_text' => NULL,

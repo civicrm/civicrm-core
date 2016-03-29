@@ -1282,6 +1282,92 @@ FROM   civicrm_domain
   }
 
   /**
+   * Execute a query altering triggers.
+   *
+   * As this requires a high permission level we funnel the queries through here to
+   * facilitate them being taken 'offline'.
+   *
+   * @param string $triggerSQL
+   *   The sql to run to create or drop the triggers.
+   * @param array $params
+   *   Optional parameters to interpolate into the string.
+   */
+  public static function executeTriggerQuery($triggerSQL, $params = array()) {
+    if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_no_trigger_permission', 'group' => 'CiviCRM Preferences'))) {
+      $prefix = 'trigger' . CRM_Utils_Request::id();
+      CRM_Core_DAO::logQuery("DELIMITER //", $params, TRUE, FALSE, $prefix, TRUE);
+      CRM_Core_DAO::logQuery($triggerSQL . '//', $params, TRUE, FALSE, $prefix, TRUE);
+      CRM_Core_Session::setStatus(ts('The mysql commands you need to run are stored in %1', array(
+        1 => CRM_Core_Error::getDebugLoggerFileName($prefix)))
+      );
+      CRM_Core_DAO::logQuery("DELIMITER ;", $params, TRUE, FALSE, $prefix, TRUE);
+    }
+    else {
+      // Multilingual needs to be false.
+      CRM_Core_DAO::executeQuery($triggerSQL, $params, TRUE, NULL, FALSE, FALSE);
+    }
+  }
+
+  /**
+   * Get the query that would be generated.
+   *
+   * This could be used in tests or where it is desirable to log the query rather than run it.
+   *
+   * @param string $query
+   *   Query to be executed.
+   *
+   * @param array $params
+   * @param bool $abort
+   * @param bool $i18nRewrite
+   *
+   * @return string
+   *   The resolved mysql query.
+   */
+  public static function getQuery(
+    $query,
+    $params = array(),
+    $abort = TRUE,
+    $i18nRewrite = TRUE
+  ) {
+    $queryStr = self::composeQuery($query, $params, $abort);
+    global $dbLocale;
+    if ($i18nRewrite and $dbLocale) {
+      $queryStr = CRM_Core_I18n_Schema::rewriteQuery($query);
+    }
+    return $queryStr;
+  }
+
+  /**
+   * Log the query that would be generated.
+   *
+   * @param string $query
+   *   Query to be executed.
+   *
+   * @param array $params
+   * @param bool $abort
+   * @param bool $i18nRewrite
+   * @param string $outputFilePrefix
+   * @param bool $raw
+   *   Should we omit data like timestamp and debug level?
+   */
+  public static function logQuery(
+    $query,
+    $params = array(),
+    $abort = TRUE,
+    $i18nRewrite = TRUE,
+    $outputFilePrefix = '',
+    $raw = FALSE
+  ) {
+    $queryStr = self::getQuery($query, $params, $abort, $i18nRewrite);
+    if ($raw) {
+      CRM_Core_Error::debug_raw_message($queryStr, FALSE, $outputFilePrefix);
+    }
+    else {
+      CRM_Core_Error::debug_log_message($queryStr, FALSE, $outputFilePrefix);
+    }
+  }
+
+  /**
    * Execute a query and get the single result.
    *
    * @param string $query
@@ -1884,7 +1970,7 @@ SELECT contact_id
     // test for create view and trigger permissions and if allowed, add the option to go multilingual
     // and logging
     // I'm not sure why we use the getStaticProperty for an error, rather than checking for DB_Error
-    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+    CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
     if ($view) {
       $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
@@ -2096,15 +2182,8 @@ SELECT contact_id
           $triggerName = "{$validName}_{$whenName}_{$eventName}";
           $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN $varString $sqlString END";
 
-          CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS $triggerName");
-          CRM_Core_DAO::executeQuery(
-            $triggerSQL,
-            array(),
-            TRUE,
-            NULL,
-            FALSE,
-            FALSE
-          );
+          CRM_Core_DAO::executeTriggerQuery("DROP TRIGGER IF EXISTS $triggerName");
+          CRM_Core_DAO::executeTriggerQuery($triggerSQL);
         }
       }
     }
