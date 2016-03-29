@@ -1936,13 +1936,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'activity_type_id' => 'Contact Merged',
       'status_id' => 'Completed',
     ));
-    civicrm_api3('activity', 'create', array(
-      'subject' => ts('Contact ID %1 has been merged into Contact ID %2 and deleted.', $params),
-      'target_contact_id' => $otherId,
-      'activity_type_id' => 'Contact Deleted by Merge',
-      'parent_id' => $activity['id'],
-      'status_id' => 'Completed',
-    ));
+    if (civicrm_api3('Setting', 'getvalue', array('name' => 'contact_undelete', 'group' => 'CiviCRM Preferences'))) {
+      civicrm_api3('activity', 'create', array(
+        'subject' => ts('Contact ID %1 has been merged into Contact ID %2 and deleted.', $params),
+        'target_contact_id' => $otherId,
+        'activity_type_id' => 'Contact Deleted by Merge',
+        'parent_id' => $activity['id'],
+        'status_id' => 'Completed',
+      ));
+    }
   }
 
 }
