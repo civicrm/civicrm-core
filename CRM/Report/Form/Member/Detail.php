@@ -247,6 +247,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
       $this->_columns['civicrm_membership']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
 
