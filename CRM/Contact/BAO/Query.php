@@ -4610,18 +4610,21 @@ civicrm_relationship.is_permission_a_b = 0
           switch ($field) {
             case 'city':
             case 'postal_code':
-              $this->_whereTables["civicrm_address"] = 1;
+              $this->_tables["civicrm_address"] = $this->_whereTables["civicrm_address"] = 1;
               $order = str_replace($field, "civicrm_address.{$field}", $order);
               break;
 
             case 'country':
             case 'state_province':
-              $this->_whereTables["civicrm_{$field}"] = 1;
+              $this->_tables["civicrm_{$field}"] = $this->_whereTables["civicrm_{$field}"] = 1;
+              if (is_array($this->_returnProperties) && empty($this->_returnProperties)) {
+                $additionalFromClause .= " LEFT JOIN civicrm_{$field} ON civicrm_{$field}.id = civicrm_address.{$field}_id";
+              }
               $order = str_replace($field, "civicrm_{$field}.name", $order);
               break;
 
             case 'email':
-              $this->_whereTables["civicrm_email"] = 1;
+              $this->_tables["civicrm_email"] = $this->_whereTables["civicrm_email"] = 1;
               $order = str_replace($field, "civicrm_email.{$field}", $order);
               break;
 

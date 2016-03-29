@@ -1212,11 +1212,6 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $sortOrder = &$this->getSortOrder($this->_action);
     $sort = new CRM_Utils_Sort($sortOrder, $sortID);
-    $includeOrderByClause = Civi::settings()->get('includeOrderByClause');
-    $returnProperties = CRM_Contact_BAO_Query::NO_RETURN_PROPERTIES;
-    if ($includeOrderByClause) {
-      $returnProperties = $this->_returnProperties;
-    }
 
     // rectify params to what proximity search expects if there is a value for prox_distance
     // CRM-7021 CRM-7905
@@ -1226,7 +1221,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
 
     if (!$displayRelationshipType) {
       $query = new CRM_Contact_BAO_Query($params,
-        $returnProperties,
+        CRM_Contact_BAO_Query::NO_RETURN_PROPERTIES,
         NULL, FALSE, FALSE, 1,
         FALSE, TRUE, TRUE, NULL,
         $queryOperator
@@ -1234,7 +1229,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
     }
     else {
       $query = new CRM_Contact_BAO_Query($params,
-        $returnProperties,
+        CRM_Contact_BAO_Query::NO_RETURN_PROPERTIES,
         NULL, FALSE, FALSE, 1,
         FALSE, TRUE, TRUE, $displayRelationshipType,
         $queryOperator
