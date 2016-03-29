@@ -570,7 +570,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Display the error message on terminal.
+   * Display the error message on terminal and append it to the log file.
+   *
+   * Provided the user has the 'view debug output' the output should be displayed. In all
+   * cases it should be logged.
    *
    * @param string $message
    * @param bool $out
@@ -634,19 +637,29 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Obtain a reference to the error log.
    *
-   * @param string $comp
+   * @param string $prefix
    *
    * @return Log
    */
-  public static function createDebugLogger($comp = '') {
-    if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $comp])) {
+  public static function createDebugLogger($prefix = '') {
+    self::generateLogFileName($prefix);
+    return Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '');
+  }
+
+  /**
+   * Generate the name of the logfile to use and store it as a static.
+   *
+   * This function includes poor man's log file management and a check as to whether the file exists.
+   *
+   * @param string $prefix
+   */
+  protected static function generateLogFileName($prefix) {
+    if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $prefix])) {
       $config = CRM_Core_Config::singleton();
 
-      if ($comp) {
-        $comp = $comp . '.';
-      }
+      $prefixString = $prefix ? ($prefix . '.') : '';
 
-      $fileName = "{$config->configAndLogDir}CiviCRM." . $comp . md5($config->dsn) . '.log';
+      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . md5($config->dsn) . '.log';
 
       // Roll log file monthly or if greater than 256M
       // note that PHP file functions have a limit of 2G and hence
@@ -663,9 +676,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
           );
         }
       }
-      \Civi::$statics[__CLASS__]['logger_file' . $comp] = $fileName;
+      \Civi::$statics[__CLASS__]['logger_file' . $prefix] = $fileName;
     }
-    return Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $comp]);
   }
 
   /**
