@@ -794,6 +794,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     $notifyURL = $config->userFrameworkResourceURL . "extern/ipn.php?reset=1&contactID={$params['contactID']}" . "&contributionID={$params['contributionID']}" . "&module={$component}";
+    // CRM-18302: pass payment processor ID to IPN handler
+    $notifyURL .= "&paymentProcessorID={$this->_paymentProcessor['id']}";
 
     if ($component == 'event') {
       $notifyURL .= "&eventID={$params['eventID']}&participantID={$params['participantID']}";
