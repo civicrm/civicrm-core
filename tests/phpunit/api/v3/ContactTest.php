@@ -2885,4 +2885,25 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Test merging 2 contacts with delete to trash off.
+   *
+   * We are checking that there is no error due to attempting to add an activity for the
+   * deleted contact.
+   *
+   * CRM-18307
+   */
+  public function testMergeNoTrash() {
+    $this->createLoggedInUser();
+    $this->callAPISuccess('Setting', 'create', array('contact_undelete' => FALSE));
+    $otherContact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $retainedContact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $this->callAPISuccess('contact', 'merge', array(
+      'to_keep_id' => $retainedContact['id'],
+      'to_remove_id' => $otherContact['id'],
+      'auto_flip' => FALSE,
+    ));
+    $this->callAPISuccess('Setting', 'create', array('contact_undelete' => TRUE));
+  }
+
 }
