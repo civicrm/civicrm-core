@@ -432,8 +432,9 @@ class CRM_Export_BAO_Export {
           }
         }
       }
-      if (!empty(self::defaultReturnProperty($exportMode))) {
-        $returnProperties[self::defaultReturnProperty($exportMode)] = 1;
+      $defaultExportMode = self::defaultReturnProperty($exportMode);
+      if (!empty($defaultExportMode)) {
+        $returnProperties[$defaultExportMode] = 1;
       }
     }
     else {
