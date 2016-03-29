@@ -102,7 +102,7 @@
                 </div>
 
             {/if}
-              {if !empty($extends) && $extends eq "Membership" && $element.html_type != 'Text'}
+              {if !empty($extends) && $extends eq "Membership" && $element.name == 'membership_amount'}
                 <div id="allow_auto_renew">
                   <div class='crm-section auto-renew'>
                     <div class='label'></div>
