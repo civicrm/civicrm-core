@@ -634,7 +634,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
 
-    $this->callAPIFailure('contribution', 'create', $params, 'contact_id is not valid : 999');
+    $this->callAPIFailure('contribution', 'create', $params);
   }
 
   /**

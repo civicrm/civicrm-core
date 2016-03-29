@@ -176,8 +176,13 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
         $values[$key]['id'] = $item[$lowercase_entity . "_id"];
       }
       if (!empty($item['financial_type_id'])) {
-        //4.3 legacy handling
-        $values[$key]['contribution_type_id'] = $item['financial_type_id'];
+        // 4.3 legacy handling - translate financial_type to contribution_type unless financial_type is explicitly specified.
+        if (!is_array($params) || empty($params['return']) || !is_array($params['return']) ||
+          (empty($params['return']['financial_type_id']) && !in_array('financial_type_id', $params['return'])) ||
+          (!empty($params['return']['contribution_type_id']) || in_array('contribution_type_id', $params['return']))
+        ) {
+          $values[$key]['contribution_type_id'] = $item['financial_type_id'];
+        }
       }
       if (!empty($item['next_sched_contribution_date'])) {
         // 4.4 legacy handling
