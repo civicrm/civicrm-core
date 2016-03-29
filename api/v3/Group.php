@@ -24,6 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
+require_once 'api/v3/utils.php';
 
 /**
  * This api exposes CiviCRM Groups.
