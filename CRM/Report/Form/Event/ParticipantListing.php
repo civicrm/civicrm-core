@@ -411,6 +411,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
       $this->_columns['civicrm_participant']['order_bys']['campaign_id'] = array(
         'title' => ts('Campaign'),
