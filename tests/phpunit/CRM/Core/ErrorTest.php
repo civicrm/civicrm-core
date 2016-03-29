@@ -93,4 +93,50 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     }
   }
 
+
+  /**
+   * Check that a debugger is created and there is no error when passing in a prefix.
+   *
+   * Do some basic content checks.
+   */
+  public function testDebugLoggerFormat() {
+    $log = CRM_Core_Error::createDebugLogger('my-test');
+    $log->log('Mary had a little lamb');
+    $log->log('Little lamb');
+    $config = CRM_Core_Config::singleton();
+    $fileContents = file_get_contents($log->_filename);
+    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . 'my-test.' . md5($config->dsn) . '.log', $log->_filename);
+    // The 5 here is a bit arbitrary - on my local the date part is 15 chars (Mar 29 05:29:16) - but we are just checking that
+    // there are chars for the date at the start.
+    $this->assertTrue(strpos($fileContents, '[info] Mary had a little lamb') > 10);
+    $this->assertContains('[info] Little lamb', $fileContents);
+  }
+
+  /**
+   * Check that a debugger is created and there is no error when passing in a prefix.
+   *
+   * Do some basic content checks.
+   */
+  public function testDebugSetFormat() {
+    $log = CRM_Core_Error::createDebugLogger('my-test', array('lineFormat' => '%4$s'));
+    $log->log('Mary had a little lamb');
+    $config = CRM_Core_Config::singleton();
+    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . 'my-test.' . md5($config->dsn) . '.log', $log->_filename);
+    $this->assertEquals("Mary had a little lamb\n", file_get_contents($log->_filename));
+  }
+
+  /**
+   * Same as the previous test using a wrapper function.
+   */
+  public function testDebugRaw() {
+    $config = CRM_Core_Config::singleton();
+    CRM_Core_Error::debug_raw_message('Mary had a little lamb', FALSE, 'my-test');
+    CRM_Core_Error::debug_raw_message('Little lamb, little lamb', FALSE, 'my-test');
+    CRM_Core_Error::debug_raw_message('Mary had a little lamb', FALSE, 'my-test');
+
+    $fileContents = file_get_contents($config->configAndLogDir . 'CiviCRM.' . 'my-test.' . md5($config->dsn) . '.log');
+    $this->assertNotEmpty($fileContents);
+    $this->assertEquals("Mary had a little lamb\n\nLittle lamb, little lamb\n\nMary had a little lamb\n\n", $fileContents);
+  }
+
 }
