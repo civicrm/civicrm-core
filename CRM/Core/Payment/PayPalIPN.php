@@ -324,7 +324,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     // CRM-18302: get payment processor ID passed from CRM_Core_Payment_PayPalImpl::doTransferCheckout()
     $paymentProcessorID = self::retrieve('paymentProcessorID', 'Integer', 'GET', TRUE);
 
-    if (!$this->validateData($input, $ids, $objects, TRUE, $processorInfo['id'])) {
+    if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       return FALSE;
     }
 
