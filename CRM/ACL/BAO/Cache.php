@@ -135,7 +135,7 @@ WHERE contact_id = %1
     self::build($id);
 
     // rebuilds civicrm_acl_contact_cache
-    CRM_Contact_BAO_Contact_Permission::cache($id, CRM_Core_Permission::VIEW, TRUE);
+    CRM_Contact_BAO_Contact_Permission::cache($id, TRUE);
   }
 
   /**
