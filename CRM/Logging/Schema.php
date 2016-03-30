@@ -868,7 +868,7 @@ COLS;
         $sqlStmt .= "NEW.$column, ";
         $deleteSQL .= "OLD.$column, ";
       }
-      if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_uniqueid_date', 'group' => 'core'))) {
+      if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_uniqueid_date'))) {
         $sqlStmt .= "@uniqueID, @civicrm_user_id, '{eventName}');";
         $deleteSQL .= "@uniqueID, @civicrm_user_id, '{eventName}');";
       }
