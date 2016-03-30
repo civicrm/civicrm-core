@@ -23,57 +23,62 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="help">
-{ts}This screen shows all the Personal Campaign Pages created in the system and allows administrator to review them and change their status.{/ts} {help id="id-pcp-intro"}
-</div>
-{if $action ne 8}
-{include file="CRM/PCP/Form/PCP/PCP.tpl"}
-{else}
+{if $action ne 2 AND $action ne 8}
+{include file="CRM/PCP/Form/Search.tpl"}
+{/if}
+{if $action eq 8}
 {include file="CRM/PCP/Form/PCP/Delete.tpl"}
 {/if}
+{*approve/reject Personal Campaign Page*}
+{literal}
+<script type="text/javascript">
+CRM.$(function($) {
+  $('#crm-container')
+    .on('click', 'a.button, a.action-item[title*="Reject Personal Campaign Page"]', function(e) {
+       e.preventDefault();
+    var $el = $(this).closest('tr');
+    CRM.confirm({
+      title: ts('{/literal}{ts escape="js"}Reject Campaign Page{/ts}{literal}'),
+      message: ts('{/literal}{ts escape="js"}Are you sure you want to revert the Campaign Page?{/ts}{literal}'),
+      options: {{/literal}yes: '{ts escape="js"}Yes{/ts}', no: '{ts escape="js"}No{/ts}'{literal}},
+      width: 300,
+      height: 'auto'
+    }).on('crmConfirm:yes', function() {
+      CRM.status({/literal}"{ts escape='js'}Saving...{/ts}"{literal}, request);
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_PCP_Page_AJAX&fnName=reject'}"{literal};
+      var request = $.post(postUrl, {id : $el.attr('data-id'), action : $el.attr('action'), dataType: 'json',});
+      request.done(function(data) {
+	if (data.status = "Reverted") {
+	  CRM.status({/literal}"{ts escape='js'}Record Reverted{/ts}"{literal}, request);
+	  CRM.refreshParent($el);
+	} 
+      });
+    });
+  });
+  
+  $('#crm-container')
+    .on('click', 'a.button, a.action-item[title*="Approve Personal Campaign Page"]', function(e) {
+       e.preventDefault();
+    var $el = $(this).closest('tr');
+    CRM.confirm({
+      title: ts('{/literal}{ts escape="js"}Approve Campaign Page{/ts}{literal}'),
+      message: ts('{/literal}{ts escape="js"}Are you sure you want to approve the Campaign Page?{/ts}{literal}'),
+      options: {{/literal}yes: '{ts escape="js"}Yes{/ts}', no: '{ts escape="js"}No{/ts}'{literal}},
+      width: 300,
+      height: 'auto'
+    }).on('crmConfirm:yes', function() {
+      CRM.status({/literal}"{ts escape='js'}Saving...{/ts}"{literal}, request);
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_PCP_Page_AJAX&fnName=approve'}"{literal};
+      var request = $.post(postUrl, {id : $el.attr('data-id'), action : $el.attr('action'), dataType: 'json',});
+      request.done(function(data) {
+	if (data.status = "Approved") {
+	  CRM.status({/literal}"{ts escape='js'}Record Approved{/ts}"{literal}, request);
+	  CRM.refreshParent($el);
+	} 
+      });
+    });
+  });
 
-{if $rows}
-<div id="ltype">
-<p></p>
-{include file="CRM/common/pager.tpl" location="top"}
-{include file="CRM/common/pagerAToZ.tpl"}
-{include file="CRM/common/jsortable.tpl"}
-{strip}
-<table id="options" class="display">
-  <thead>
-    <tr>
-    <th>{ts}Page Title{/ts}</th>
-    <th>{ts}Supporter{/ts}</th>
-    <th>{ts}Contribution Page / Event{/ts}</th>
-    <th>{ts}Starts{/ts}</th>
-    <th>{ts}Ends{/ts}</th>
-    <th>{ts}Status{/ts}</th>
-    <th></th>
-    </tr>
-  </thead>
-  <tbody>
-  {foreach from=$rows item=row}
-  <tr id="row_{$row.id}" class="{$row.class}">
-    <td><a href="{crmURL p='civicrm/pcp/info' q="reset=1&id=`$row.id`" fe='true'}" title="{ts}View Personal Campaign Page{/ts}" target="_blank">{$row.title}</a></td>
-    <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.supporter_id`"}" title="{ts}View contact record{/ts}">{$row.supporter}</a></td>
-    <td><a href="{$row.page_url}" title="{ts}View page{/ts}" target="_blank">{$row.page_title}</td>
-    <td>{$row.start_date|crmDate}</td>
-    <td>{if $row.end_date}{$row.end_date|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
-    <td>{$row.status_id}</td>
-    <td id={$row.id}>{$row.action|replace:'xx':$row.id}</td>
-  </tr>
-  {/foreach}
-  </tbody>
-</table>
-{/strip}
-</div>
-{else}
-<div class="messages status no-popup">
-<div class="icon inform-icon"></div>
-    {if $isSearch}
-        {ts}There are no Personal Campaign Pages which match your search criteria.{/ts}
-    {else}
-        {ts}There are currently no Personal Campaign Pages.{/ts}
-    {/if}
-</div>
-{/if}
+});
+</script>
+{/literal}

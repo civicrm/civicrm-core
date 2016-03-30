@@ -235,6 +235,10 @@ class CRM_Admin_Page_AJAX {
             $ret['content'] .= '<br /><br /><strong>' . ts('This recurring contribution is linked to an auto-renew membership. If you cancel it, the associated membership will no longer renew automatically. However, the current membership status will not be affected.') . '</strong>';
           }
           break;
+					
+				case 'CRM_PCP_BAO_PCP':
+					$ret['content'] = ts('Are you sure you want to disable this Personal Campaign Page?');
+					break;
 
         default:
           $ret['content'] = ts('Are you sure you want to disable this record?');
