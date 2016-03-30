@@ -142,7 +142,7 @@ AND ac.id IS NULL
     if (CRM_ACL_API::isAccessingSelf($userID, $type)){
       CRM_Core_DAO::executeQuery("
 REPLACE INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
-$userID as user_id, $userID as contact_id, 'View' as operation
+  VALUES($userID, $userID, 'View')
 ");
     }
 
