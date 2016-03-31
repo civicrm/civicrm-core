@@ -16,3 +16,9 @@ SET
   nav2.weight = nav1.weight,
   nav2.has_separator = 1,
   nav2.label = 'Extensions';
+
+--CRM-18327 filter value missed on the contact deleted by merge activity --
+UPDATE civicrm_option_value ov
+LEFT JOIN civicrm_option_group og ON og.id = ov.option_group_id
+SET filter = 1
+WHERE ov.name = 'Contact Deleted by Merge' AND og.name = 'activity_type'
