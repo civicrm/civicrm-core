@@ -91,6 +91,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'System',
       'Setting',
       'Payment',
+      'Logging',
     );
     $this->toBeImplemented['create'] = array(
       'Cxn',
@@ -108,6 +109,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Payment',
       'Order',
       'SavedSearch', //work fine in local
+      'Logging',
     );
     $this->toBeImplemented['delete'] = array(
       'Cxn',
@@ -343,6 +345,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomValue',
       'Setting',
       'User',
+      'Logging',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -391,6 +394,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Extension',
       'ReportTemplate',
       'System',
+      'Logging',
     );
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -464,6 +468,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingContact',
       'SystemLog',
       //skip this because it doesn't make sense to update logs,
+      'Logging',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;

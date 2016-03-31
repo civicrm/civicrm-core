@@ -226,4 +226,23 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     ");
   }
 
+  /**
+   * Test changes can be reverted.
+   */
+  public function testRevert() {
+    $contactId = $this->individualCreate();
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    CRM_Core_DAO::executeQuery("SET @uniqueID = 'woot'");
+    $timeStamp = date('Y-m-d H:i:s');
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $contactId,
+      'first_name' => 'Dopey',
+      'api.email.create' => array('email' => 'dopey@mail.com'))
+    );
+    $email = $this->callAPISuccessGetSingle('email', array('email' => 'dopey@mail.com'));
+    $this->callAPIAndDocument('Logging', 'revert', array('log_conn_id' => 'woot', 'log_date' => $timeStamp), __FILE__, 'Revert');
+    $this->assertEquals('Anthony', $this->callAPISuccessGetValue('contact', array('id' => $contactId, 'return' => 'first_name')));
+    $this->callAPISuccessGetCount('Email', array('id' => $email['id']), 0);
+  }
+
 }
