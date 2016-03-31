@@ -70,8 +70,6 @@ class CiviCRM_For_WordPress_Shortcodes {
     // store reference to Civi object
     $this->civi = civi_wp();
 
-    return $this;
-
   }
 
 
