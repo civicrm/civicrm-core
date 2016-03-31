@@ -2268,12 +2268,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $smarty->assign('result', $result);
     $smarty->assign('action', $action);
 
-    if (file_exists('../tests/templates/documentFunction.tpl')) {
-      if (!is_dir("../api/v3/examples/$entity")) {
-        mkdir("../api/v3/examples/$entity");
+    global $civicrm_root;
+    if (file_exists($civicrm_root . '/tests/templates/documentFunction.tpl')) {
+      if (!is_dir($civicrm_root . '/api/v3/examples/$entity')) {
+        mkdir($civicrm_root . '/api/v3/examples/$entity');
       }
-      $f = fopen("../api/v3/examples/$entity/$exampleName.php", "w+b");
-      fwrite($f, $smarty->fetch('../tests/templates/documentFunction.tpl'));
+      $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.php", "w+b");
+      fwrite($f, $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl'));
       fclose($f);
     }
   }

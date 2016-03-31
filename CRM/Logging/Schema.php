@@ -921,4 +921,15 @@ COLS;
     }
   }
 
+  /**
+   * Get all the log tables that reference civicrm_contact.
+   *
+   * Note that it might make sense to wrap this in a getLogTablesForEntity
+   * but this is the only entity currently available...
+   */
+  public function getLogTablesForContact() {
+    $tables = array_keys(CRM_Dedupe_Merger::cidRefs());
+    return array_intersect($tables, $this->tables);
+  }
+
 }

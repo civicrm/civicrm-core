@@ -238,7 +238,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    */
   protected function revert() {
     $reverter = new CRM_Logging_Reverter($this->log_conn_id, $this->log_date);
-    $reverter->revert($this->tables);
+    $reverter->calculateDiffsFromLogConnAndDate($this->tables);
+    $reverter->revert();
     CRM_Core_Session::setStatus(ts('The changes have been reverted.'), ts('Reverted'), 'success');
     if ($this->cid) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view', "reset=1&selectedChild=log&cid={$this->cid}", FALSE, NULL, FALSE));

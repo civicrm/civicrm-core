@@ -388,4 +388,33 @@ ORDER BY log_date
     return array($titles, $values);
   }
 
+  /**
+   * Get all changes made in the connection.
+   *
+   * @param array $tables
+   *   Array of tables to inspect.
+   *
+   * @return array
+   */
+  public function getAllChangesForConnection($tables) {
+    $params = array(1 => array($this->log_conn_id, 'String'));
+    foreach ($tables as $table) {
+      if (empty($sql)) {
+        $sql = " SELECT '{$table}' as table_name, id FROM {$this->db}.log_{$table} WHERE log_conn_id = %1";
+      }
+      else {
+        $sql .= " UNION SELECT '{$table}' as table_name, id FROM {$this->db}.log_{$table} WHERE log_conn_id = %1";
+      }
+    }
+    $diffs = array();
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    while ($dao->fetch()) {
+      if (empty($this->log_date)) {
+        $this->log_date = CRM_Core_DAO::singleValueQuery("SELECT log_date FROM {$this->db}.log_{$table} WHERE log_conn_id = %1 LIMIT 1", $params);
+      }
+      $diffs = array_merge($diffs, $this->diffsInTableForId($dao->table_name, $dao->id));
+    }
+    return $diffs;
+  }
+
 }

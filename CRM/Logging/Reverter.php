@@ -36,6 +36,13 @@ class CRM_Logging_Reverter {
   private $log_date;
 
   /**
+   * The diffs to be reverted.
+   *
+   * @var array
+   */
+  private $diffs = array();
+
+  /**
    * Class constructor.
    *
    * @param string $log_conn_id
@@ -49,11 +56,24 @@ class CRM_Logging_Reverter {
   }
 
   /**
-   * Revert changes in the array of diffs in $this->diffs.
    *
-   * @param $tables
+   * Calculate a set of diffs based on the connection_id and changes at a close time.
+   *
+   * @param array $tables
    */
-  public function revert($tables) {
+  public function calculateDiffsFromLogConnAndDate($tables) {
+    $differ = new CRM_Logging_Differ($this->log_conn_id, $this->log_date);
+    $this->diffs = $differ->diffsInTables($tables);
+  }
+
+  public function setDiffs($diffs) {
+    $this->diffs = $diffs;
+  }
+
+  /**
+   * Revert changes in the array of diffs in $this->diffs.
+   */
+  public function revert() {
 
     // get custom data tables, columns and types
     $ctypes = array();
@@ -65,9 +85,7 @@ class CRM_Logging_Reverter {
       $ctypes[$dao->table_name][$dao->column_name] = $dao->data_type;
     }
 
-    $differ = new CRM_Logging_Differ($this->log_conn_id, $this->log_date);
-    $diffs = $differ->diffsInTables($tables);
-
+    $diffs = $this->diffs;
     $deletes = array();
     $reverts = array();
     foreach ($diffs as $table => $changes) {
