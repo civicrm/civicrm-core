@@ -151,6 +151,10 @@ class CRM_Custom_Form_CustomData {
    * @return array
    */
   public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = FALSE) {
+    // CRM-17902
+    if ($form->_subName == 'null') {
+      $form->_subName = NULL;
+    }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
       $form,
