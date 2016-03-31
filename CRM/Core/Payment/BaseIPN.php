@@ -519,14 +519,17 @@ LIMIT 1;";
             else {
               $receiveDate = CRM_Utils_Date::processDate($changeToday, NULL, FALSE, 'Y-m-d');
               $startDate = CRM_Utils_Date::processDate($membership->start_date, NULL, FALSE, 'Y-m-d');
+              $endDate = CRM_Utils_Date::processDate($membership->end_date, NULL, FALSE, 'Y-m-d');
               if ($receiveDate > $startDate) {
                 $startDate = NULL;
+                $endDate = NULL;
               }
               else {
                 $startDate = $membership->start_date;
+                $endDate = $membership->end_date;
               }
               $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id,
-                $changeToday, $startDate, $membership->end_date, $numterms
+                $changeToday, $startDate, $endDate, $numterms
               );
             }
 
