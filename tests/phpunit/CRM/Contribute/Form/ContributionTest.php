@@ -222,7 +222,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'receipt_date_time' => '',
         'payment_processor_id' => $paymentProcessorID,
         'currency' => 'USD',
-        'source' => '',
+        'source' => 'bob sled race',
       ), CRM_Core_Action::ADD);
     }
     catch (Civi\Payment\Exception\PaymentProcessorException $e) {
@@ -233,6 +233,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 'Pending',
     ), 1);
+    $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
+    $this->assertEmpty($contact['source']);
   }
 
   /**
