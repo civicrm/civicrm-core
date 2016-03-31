@@ -511,7 +511,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         $params['frequency_interval'] . " " .
         $params['frequency_unit'];
       $args['amt'] = $params['amount'];
-      $args['totalbillingcycles'] = $params['installments'];
+      $args['totalbillingcycles'] = CRM_Utils_Array::value('installments', $params);
       $args['version'] = 56.0;
       $args['PROFILEREFERENCE'] = "" .
         "i=" . $params['invoiceID'] . "&m=" . $component .
@@ -562,7 +562,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doQuery($params) {
-    if (empty($params['trxn_id'])) {
+    //CRM-18140 - trxn_id not returned for recurring paypal transaction
+    if (!empty($params['is_recur'])) {
+      return array();
+    }
+    elseif (empty($params['trxn_id'])) {
       throw new \Civi\Payment\Exception\PaymentProcessorException('transaction id not set');
     }
     $args = array(

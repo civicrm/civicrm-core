@@ -414,7 +414,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * @return string
    */
   public function whereGroupClause($field, $value, $op) {
-    if (empty($this->contactTempTable)) {
+    if ($op == 'notin') {
+      // We do not have an optimisation for this scenario at this stage. Use
+      // parent.
+      return parent::whereGroupClause($field, $value, $op);
+    }
+
+    if (empty($this->groupTempTable)) {
       $group = new CRM_Contact_DAO_Group();
       $group->is_active = 1;
       $group->find();
@@ -656,10 +662,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * @return string
    */
   public function buildQuery($applyLimit = TRUE) {
+
+    // Calling where & select before FROM allows us to build temp tables to use in from.
+    $this->where();
     $this->select();
     $this->from();
     $this->customDataFrom(empty($this->contactTempTable));
-    $this->where();
+
     $this->groupBy();
     $this->orderBy();
     $this->getPermissionedFTQuery($this);

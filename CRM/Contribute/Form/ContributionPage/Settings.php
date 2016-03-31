@@ -57,6 +57,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $ufJoinDAO = new CRM_Core_DAO_UFJoin();
         $ufJoinDAO->module = $module;
         $ufJoinDAO->entity_id = $this->_id;
+        $ufJoinDAO->entity_table = 'civicrm_contribution_page';
         if ($ufJoinDAO->find(TRUE)) {
           $jsonData = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoinDAO->module_data, TRUE, $module);
           if ($module == 'soft_credit') {

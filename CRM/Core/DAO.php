@@ -112,6 +112,7 @@ class CRM_Core_DAO extends DB_DataObject {
       CRM_Core_DAO::executeQuery('SET SESSION sql_mode = STRICT_TRANS_TABLES');
     }
     CRM_Core_DAO::executeQuery('SET NAMES utf8');
+    CRM_Core_DAO::executeQuery('SET @uniqueID = %1', array(1 => array(CRM_Utils_Request::id(), 'String')));
   }
 
   /**

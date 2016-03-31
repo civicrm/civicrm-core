@@ -351,10 +351,13 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $groupTypes = self::extractGroupTypes($value['group_type']);
 
       // drop Create, Edit and View mode links if profile group_type is one of the following:
-      $groupComponents = array('Contribution', 'Membership', 'Activity', 'Participant', 'Case');
-      $componentFound = array_intersect($groupComponents, array_keys($groupTypes));
-      if (!empty($componentFound)) {
+      // Contribution, Membership, Activity, Participant, Case, Grant
+      $isMixedProfile = CRM_Core_BAO_UFField::checkProfileType($id);
+      if ($isMixedProfile) {
         $action -= CRM_Core_Action::ADD;
+        $action -= CRM_Core_Action::ADVANCED;
+        $action -= CRM_Core_Action::BASIC;
+        $action -= CRM_Core_Action::PROFILE;
       }
 
       $ufGroup[$id]['group_type'] = self::formatGroupTypes($groupTypes);

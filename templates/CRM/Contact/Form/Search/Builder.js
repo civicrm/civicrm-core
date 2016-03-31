@@ -12,7 +12,19 @@
   function handleUserInputField() {
     var row = $(this).closest('tr');
     var field = $('select[id^=mapper][id$="_1"]', row).val();
-    var op = $('select[id^=operator]', row).val();
+    var operator = $('select[id^=operator]', row);
+    var op = operator.val();
+    
+    var patt = /_1$/; // pattern to check if the change event came from field name
+    if (field !== null && patt.test(this.id)) {
+      if ($.inArray(field, CRM.searchBuilder.stringFields) >= 0) {
+        // string operators
+        buildOperator(operator, CRM.searchBuilder.stringOperators);
+      } else {
+        // general operators
+        buildOperator(operator, CRM.searchBuilder.generalOperators);
+      }
+    }
 
     // These Ops don't get any input field.
     var noFieldOps = ['', 'IS EMPTY', 'IS NOT EMPTY', 'IS NULL', 'IS NOT NULL'];
@@ -37,6 +49,20 @@
     else {
       buildDate(row, op);
     }
+  }
+
+  /**
+   * Add appropriate operator to selected field
+   * @param operator: jQuery object
+   * @param options: array
+   */
+  function buildOperator(operator, options) {
+    var selected = operator.val();
+    operator.html('');
+    $.each(options, function(value, label) {
+      operator.append('<option value="' + value + '">' + label + '</option>');
+    });
+    operator.val(selected);
   }
 
   /**
@@ -123,8 +149,12 @@
       }
     }
     $.each(CRM.searchBuilder.fieldOptions[field], function(key, option) {
-      var selected = ($.inArray(''+option.key, options) > -1) ? 'selected="selected"' : '';
-      select.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
+      var optionKey = option.key;
+      if ($.inArray(field, CRM.searchBuilder.searchByLabelFields) >= 0) {
+        optionKey = option.value;
+      }
+      var selected = ($.inArray(''+optionKey, options) > -1) ? 'selected="selected"' : '';
+      select.append('<option value="' + optionKey + '"' + selected + '>' + option.value + '</option>');
     });
     select.change();
   }

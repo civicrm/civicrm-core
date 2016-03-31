@@ -415,6 +415,9 @@ class CRM_Activity_BAO_Query {
     );
 
     CRM_Core_Form_Date::buildDateRange($form, 'activity_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
+    $form->addElement('hidden', 'activity_date_range_error');
+    $form->addFormRule(array('CRM_Activity_BAO_Query', 'formRule'), $form);
+
     $followUpActivity = array(
       1 => ts('Yes'),
       2 => ts('No'),
@@ -553,6 +556,27 @@ class CRM_Activity_BAO_Query {
     }
 
     return $properties;
+  }
+
+  /**
+   * Custom form rules.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $form
+   *
+   * @return bool|array
+   */
+  public static function formRule($fields, $files, $form) {
+    $errors = array();
+
+    if (empty($fields['activity_date_low']) || empty($fields['activity_date_high'])) {
+      return TRUE;
+    }
+
+    CRM_Utils_Rule::validDateRange($fields, 'activity_date', $errors, ts('Activity Date'));
+
+    return empty($errors) ? TRUE : $errors;
   }
 
 }

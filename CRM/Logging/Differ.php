@@ -257,25 +257,8 @@ WHERE lt.log_conn_id = %1 AND
     static $titles = array();
     static $values = array();
 
-    // FIXME: split off the table → DAO mapping to a GenCode-generated class
-    static $daos = array(
-      'civicrm_address' => 'CRM_Core_DAO_Address',
-      'civicrm_contact' => 'CRM_Contact_DAO_Contact',
-      'civicrm_email' => 'CRM_Core_DAO_Email',
-      'civicrm_im' => 'CRM_Core_DAO_IM',
-      'civicrm_openid' => 'CRM_Core_DAO_OpenID',
-      'civicrm_phone' => 'CRM_Core_DAO_Phone',
-      'civicrm_website' => 'CRM_Core_DAO_Website',
-      'civicrm_contribution' => 'CRM_Contribute_DAO_Contribution',
-      'civicrm_note' => 'CRM_Core_DAO_Note',
-      'civicrm_relationship' => 'CRM_Contact_DAO_Relationship',
-      'civicrm_activity' => 'CRM_Activity_DAO_Activity',
-      'civicrm_case' => 'CRM_Case_DAO_Case',
-    );
-
     if (!isset($titles[$table]) or !isset($values[$table])) {
-
-      if (in_array($table, array_keys($daos))) {
+      if (($tableDAO = CRM_Core_DAO_AllCoreTables::getClassForTable($table)) != FALSE) {
         // FIXME: these should be populated with pseudo constants as they
         // were at the time of logging rather than their current values
         // FIXME: Use *_BAO:buildOptions() method rather than pseudoconstants & fetch programmatically
@@ -311,7 +294,7 @@ WHERE lt.log_conn_id = %1 AND
             break;
         }
 
-        $dao = new $daos[$table]();
+        $dao = new $tableDAO();
         foreach ($dao->fields() as $field) {
           $titles[$table][$field['name']] = CRM_Utils_Array::value('title', $field);
 

@@ -381,11 +381,29 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     if (!is_array($defaults)) {
       $defaults = array();
     }
-
+    $this->loadDefaultCountryBasedOnState($defaults);
     if ($this->_ssID && empty($_POST)) {
       $defaults = array_merge($defaults, CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID));
     }
     return $defaults;
+  }
+
+  /**
+   * Set the default country for the form.
+   *
+   * For performance reasons country might be removed from the form CRM-18125
+   * but we need to include it in our defaults or the state will not be visible.
+   *
+   * @param array $defaults
+   */
+  public function loadDefaultCountryBasedOnState(&$defaults) {
+    if (!empty($defaults['state_province'])) {
+      $defaults['country'] = CRM_Core_DAO::singleValueQuery(
+        "SELECT country_id FROM civicrm_state_province
+         WHERE id = %1",
+        array(1 => array($defaults['state_province'][0], 'Integer'))
+      );
+    }
   }
 
 }

@@ -34,6 +34,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
   /**
    * Product information.
+   *
    * @var array
    */
   private static $productInfo;
@@ -53,7 +54,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ManagePremium
+   * @return CRM_Contribute_DAO_Product
    */
   public static function retrieve(&$params, &$defaults) {
     $premium = new CRM_Contribute_DAO_Product();
@@ -84,12 +85,8 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * Delete financial Types.
    *
    * @param int $premiumID
-   *
    */
   public static function del($premiumID) {
-    //check dependencies
-
-    //delete from financial Type table
     $premium = new CRM_Contribute_DAO_Premium();
     $premium->id = $premiumID;
     $premium->delete();
@@ -102,8 +99,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param int $pageID
    * @param bool $formItems
    * @param int $selectedProductID
-   * @param null $selectedOption
-   *
+   * @param string $selectedOption
    */
   public static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
     $form->add('hidden', "selectProduct", $selectedProductID, array('id' => 'selectProduct'));
@@ -175,7 +171,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param CRM_Core_Form $form
    * @param int $productID
    * @param int $premiumProductID
-   *
    */
   public function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
     if ($premiumProductID) {
@@ -213,7 +208,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * Delete premium associated w/ contribution page.
    *
    * @param int $contributionPageID
-   *
    */
   public static function deletePremium($contributionPageID) {
     if (!$contributionPageID) {

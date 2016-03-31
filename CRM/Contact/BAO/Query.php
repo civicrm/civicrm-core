@@ -1507,6 +1507,8 @@ class CRM_Contact_BAO_Query {
       return $params;
     }
 
+    self::filterCountryFromValuesIfStateExists($formValues);
+
     foreach ($formValues as $id => $values) {
 
       if (self::isAlreadyProcessedForQueryFormat($values)) {
@@ -4457,6 +4459,29 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
+   * If the state and country are passed remove state.
+   *
+   * Country is implicit from the state, but including both results in
+   * a poor query as there is no combined index on state AND country.
+   *
+   * CRM-18125
+   *
+   * @param array $formValues
+   */
+  public static function filterCountryFromValuesIfStateExists(&$formValues) {
+    if (!empty($formValues['country']) && !empty($formValues['state_province'])) {
+      // The use of array map sanitises the data by ensuring we are dealing with integers.
+      $states = implode(', ', array_map('intval', $formValues['state_province']));
+      $countryList = CRM_Core_DAO::singleValueQuery(
+        "SELECT GROUP_CONCAT(country_id) FROM civicrm_state_province WHERE id IN ($states)"
+      );
+      if ($countryList == $formValues['country']) {
+        unset($formValues['country']);
+      }
+    }
+  }
+
+  /**
    * Create and query the db for an contact search.
    *
    * @param int $offset
@@ -5842,13 +5867,13 @@ AND   displayRelType.is_active = 1
       $pseudoOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     }
     elseif ($fieldName == 'country_id') {
-      $pseduoOptions = CRM_Core_PseudoConstant::country();
+      $pseudoOptions = CRM_Core_PseudoConstant::country();
     }
     elseif ($fieldName == 'county_id') {
-      $pseduoOptions = CRM_Core_PseudoConstant::county();
+      $pseudoOptions = CRM_Core_PseudoConstant::county();
     }
     elseif ($fieldName == 'world_region') {
-      $pseduoOptions = CRM_Core_PseudoConstant::worldRegion();
+      $pseudoOptions = CRM_Core_PseudoConstant::worldRegion();
     }
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
       $pseudoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);

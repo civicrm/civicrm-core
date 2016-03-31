@@ -883,7 +883,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     // CRM-5081 - formatting the dates to omit seconds.
     // Note the 00 in the date format string is needed otherwise later on it thinks scheduled ones are overdue.
     $select = "
-           SELECT COUNT(ca.id) AS ismultiple,
+           SELECT SQL_CALC_FOUND_ROWS COUNT(ca.id) AS ismultiple,
                   ca.id AS id,
                   ca.activity_type_id AS type,
                   ca.activity_type_id AS activity_type_id,
@@ -1015,6 +1015,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $queryParams = array(1 => array($caseID, 'Integer'));
 
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    $caseCount = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
 
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
     $activityStatuses = CRM_Core_PseudoConstant::activityStatus();
@@ -1074,10 +1075,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     }
 
     $caseActivities = array();
-    $caseCount = 0;
 
     while ($dao->fetch()) {
-      $caseCount++;
       $caseActivity = array();
       $caseActivityId = $dao->id;
 

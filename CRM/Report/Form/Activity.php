@@ -59,7 +59,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
     $components = CRM_Core_Component::getEnabledComponents();
     foreach ($components as $componentName => $componentInfo) {
-      if (CRM_Core_Permission::check("access $componentName")) {
+      $permission = sprintf("access %s", $componentName == 'CiviCase' ? "all cases and activities" : $componentName);
+      if (CRM_Core_Permission::check($permission)) {
         $accessAllowed[] = $componentInfo->componentID;
       }
     }
@@ -282,8 +283,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     ) + $this->addressFields(TRUE);
 
     if ($caseEnabled && CRM_Core_Permission::check('access all cases and activities')) {
-      $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
-      $this->_columns['civicrm_activity']['filters']['activity_type_id']['options'] = $this->activityTypes;
       $this->_columns['civicrm_activity']['filters']['include_case_activities'] = array(
         'name' => 'include_case_activities',
         'title' => ts('Include Case Activities'),
@@ -433,7 +432,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           strstr($clause, 'civicrm_email_contact_target_email') ||
           strstr($clause, 'civicrm_phone_contact_target_phone')
         ) {
-          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR '; ') as $clause";
+          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR ';') as $clause";
         }
       }
     }

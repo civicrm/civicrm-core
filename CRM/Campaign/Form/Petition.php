@@ -66,8 +66,11 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this);
+      $this->set('type', 'Event');
+      $this->set('entityId', $this->_surveyId);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Survey', $this->_surveyId);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
+      CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
     $session = CRM_Core_Session::singleton();
@@ -317,6 +320,12 @@ WHERE  $whereClause
     $params['bypass_confirm'] = CRM_Utils_Array::value('bypass_confirm', $params, 0);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
+
+    $customFields = CRM_Core_BAO_CustomField::getFields('Survey');
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      $this->_surveyId,
+      'Survey'
+    );
 
     $surveyId = CRM_Campaign_BAO_Survey::create($params);
 

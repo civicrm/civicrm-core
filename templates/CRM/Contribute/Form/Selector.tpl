@@ -59,9 +59,11 @@
           <td>{$row.contact_type} &nbsp; <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
         {/if}
         <td class="crm-contribution-amount">
-          <a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$row.contact_id`&id=`$row.contribution_id`&selector=1"}">
-            &nbsp; {if !$row.contribution_soft_credit_amount}{$row.total_amount|crmMoney:$row.currency}{/if}
-          </a>
+          {if !$row.contribution_soft_credit_amount}
+             <a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$row.contact_id`&id=`$row.contribution_id`&selector=1"}">
+               &nbsp; {$row.total_amount|crmMoney:$row.currency}
+            </a>
+          {/if}
           {if $row.amount_level }<br/>({$row.amount_level}){/if}
           {if $row.contribution_recur_id}<br/>{ts}(Recurring Contribution){/ts}{/if}
         </td>
@@ -104,4 +106,3 @@
 
 {include file="CRM/common/pager.tpl" location="bottom"}
 {crmScript file='js/crm.expandRow.js'}
-

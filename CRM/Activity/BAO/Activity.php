@@ -2173,11 +2173,13 @@ AND cl.modified_id  = c.id
             'title' => ts('Activity Type'),
             'name' => 'activity_type',
             'type' => CRM_Utils_Type::T_STRING,
+            'searchByLabel' => TRUE,
           ),
           'activity_status' => array(
             'title' => ts('Activity Status'),
             'name' => 'activity_status',
             'type' => CRM_Utils_Type::T_STRING,
+            'searchByLabel' => TRUE,
           ),
         );
         $fields = array_merge($Activityfields, $exportableFields);
@@ -2604,7 +2606,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         );
 
         if ($values['is_recurring_activity']) {
-          $contactActivities[$activityId]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getPositionAndCount($values['activity_id'], 'civicrm_activity');
+          $activity['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getPositionAndCount($values['activity_id'], 'civicrm_activity');
         }
 
         array_push($contactActivities, $activity);
