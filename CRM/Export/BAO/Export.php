@@ -433,7 +433,7 @@ class CRM_Export_BAO_Export {
         }
       }
       $defaultExportMode = self::defaultReturnProperty($exportMode);
-      if (!empty($defaultExportMode)) {
+      if ($defaultExportMode) {
         $returnProperties[$defaultExportMode] = 1;
       }
     }
