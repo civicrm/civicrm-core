@@ -4353,6 +4353,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $participant = CRM_Utils_Array::value('participant', $objects);
     $memberships = CRM_Utils_Array::value('membership', $objects);
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
+    $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
     $event = CRM_Utils_Array::value('event', $objects);
 
     $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
@@ -4363,8 +4364,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
 
-    if (!empty($recurContrib->id)) {
-      $contributionParams['contribution_recur_id'] = $recurContrib->id;
+    if ($recurringContributionID) {
+      $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
     $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
 
@@ -4389,7 +4390,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         // Figure out what we gain from this.
         CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
       }
-      elseif ($recurContrib && $recurContrib->id) {
+      elseif ($recurContrib && $recurringContributionID) {
         $values['amount'] = $recurContrib->amount;
         $values['financial_type_id'] = $objects['contributionType']->id;
         $values['title'] = $source = ts('Offline Recurring Contribution');
@@ -4398,7 +4399,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $values['receipt_from_email'] = $domainValues[1];
       }
 
-      if ($recurContrib && $recurContrib->id && !isset($input['is_email_receipt'])) {
+      if ($recurContrib && $recurringContributionID && !isset($input['is_email_receipt'])) {
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
         // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
@@ -4551,7 +4552,8 @@ LIMIT 1;";
     CRM_Core_Error::debug_log_message("Contribution record updated successfully");
     $transaction->commit();
 
-    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution);
+    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution->id, $recurringContributionID,
+      $input['contribution_status_id'], $input['total_amount']);
 
     // create an activity record
     if ($input['component'] == 'contribute') {
