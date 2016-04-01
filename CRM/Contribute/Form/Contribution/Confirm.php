@@ -1404,7 +1404,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isProcessSeparateMembershipTransaction, $financialTypeID, $membershipLineItems, $isPayLater, $isPending) {
     $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
-    $errors = $createdMemberships = $paymentResults = array();
+    $errors = $paymentResults = array();
     $form->_values['isMembership'] = TRUE;
     $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_values, CRM_Utils_Array::value('is_recur', $membershipParams));
     $totalAmount = $membershipParams['amount'];
@@ -1515,10 +1515,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
         foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
-          if (!empty($priceFieldOp['membership_type_id']) &&
-            isset($createdMemberships[$priceFieldOp['membership_type_id']])
-          ) {
-            $membershipOb = $createdMemberships[$priceFieldOp['membership_type_id']];
+          if (!empty($priceFieldOp['membership_type_id']) && $membership->membership_type_id == $priceFieldOp['membership_type_id']) {
+            $membershipOb = $membership;
             $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::customFormat($membershipOb->start_date, '%B %E%f, %Y') : '-';
             $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::customFormat($membershipOb->end_date, '%B %E%f, %Y') : '-';
           }
@@ -1539,23 +1537,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // CRM-7851 - Moved after processing Payment Errors
     //@todo - the reasoning for this being here seems a little outdated
-    foreach ($createdMemberships as $createdMembership) {
-      CRM_Core_BAO_CustomValueTable::postProcess(
-        $form->_params,
-        'civicrm_membership',
-        $createdMembership->id,
-        'Membership'
-      );
-      $form->_params['createdMembershipIDs'][] = $createdMembership->id;
-    }
-    if (count($createdMemberships) == 1) {
+    CRM_Core_BAO_CustomValueTable::postProcess($form->_params, 'civicrm_membership', $membership->id, 'Membership');
+    $form->_params['createdMembershipIDs'][] = $membership->id;
+
+    if ($membership) {
       //presumably this is only relevant for exactly 1 membership
-      $form->_params['membershipID'] = $createdMembership->id;
+      $form->_params['membershipID'] = $membership->id;
     }
 
     //CRM-15232: Check if membership is created and on the basis of it use
     //membership receipt template to send payment receipt
-    if (count($createdMemberships)) {
+    if ($membership) {
       $form->_values['isMembership'] = TRUE;
     }
     if (isset($membershipContributionID)) {
