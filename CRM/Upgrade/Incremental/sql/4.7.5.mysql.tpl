@@ -17,8 +17,11 @@ SET
   nav2.has_separator = 1,
   nav2.label = 'Extensions';
 
---CRM-18327 filter value missed on the contact deleted by merge activity --
+-- CRM-18327 filter value missed on the contact deleted by merge activity --
 UPDATE civicrm_option_value ov
 LEFT JOIN civicrm_option_group og ON og.id = ov.option_group_id
 SET filter = 1
-WHERE ov.name = 'Contact Deleted by Merge' AND og.name = 'activity_type'
+WHERE ov.name = 'Contact Deleted by Merge' AND og.name = 'activity_type';
+
+-- CRM-18241 Change field length of civicrm_option_value.label from 255 to 512 --
+ALTER TABLE civicrm_option_value CHANGE label label varchar( 512 ) DEFAULT NULL ;
