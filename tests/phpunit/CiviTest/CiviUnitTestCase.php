@@ -2498,6 +2498,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_participant',
       'civicrm_participant_payment',
       'civicrm_pledge',
+      'civicrm_pledge_payment',
       'civicrm_price_set_entity',
       'civicrm_price_field_value',
       'civicrm_price_field',
