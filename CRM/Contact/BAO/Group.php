@@ -750,7 +750,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $value['class'] = array_diff($value['class'], array('crm-row-parent'));
       }
       $group['DT_RowId'] = 'row_' . $value['id'];
-      if (!$params['parentsOnly']) {
+      if (!empty($params['parentsOnly'])) {
         foreach ($value['class'] as $id => $class) {
           if ($class == 'crm-group-parent') {
             unset($value['class'][$id]);
@@ -778,7 +778,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       $group['is_parent'] = $value['is_parent'];
 
-      array_push($groupList, $group);
+      $groupList[$id] = $group;
     }
 
     $groupsDT = array();
@@ -801,7 +801,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $config = CRM_Core_Config::singleton();
 
     $whereClause = self::whereClause($params, FALSE);
-
     //$this->pagerAToZ( $whereClause, $params );
 
     if (!empty($params['rowCount']) &&
