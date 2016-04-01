@@ -1515,10 +1515,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
         foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
-          if (!empty($priceFieldOp['membership_type_id']) &&
-            isset($membership[$priceFieldOp['membership_type_id']])
-          ) {
-            $membershipOb = $membership[$priceFieldOp['membership_type_id']];
+          if (!empty($priceFieldOp['membership_type_id']) && $membership->membership_type_id == $priceFieldOp['membership_type_id']) {
+            $membershipOb = $membership;
             $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::customFormat($membershipOb->start_date, '%B %E%f, %Y') : '-';
             $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::customFormat($membershipOb->end_date, '%B %E%f, %Y') : '-';
           }
@@ -1542,14 +1540,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     CRM_Core_BAO_CustomValueTable::postProcess($form->_params, 'civicrm_membership', $membership->id, 'Membership');
     $form->_params['createdMembershipIDs'][] = $membership->id;
 
-    if (count($membership) == 1) {
+    if ($membership) {
       //presumably this is only relevant for exactly 1 membership
       $form->_params['membershipID'] = $membership->id;
     }
 
     //CRM-15232: Check if membership is created and on the basis of it use
     //membership receipt template to send payment receipt
-    if (count($membership)) {
+    if ($membership) {
       $form->_values['isMembership'] = TRUE;
     }
     if (isset($membershipContributionID)) {
