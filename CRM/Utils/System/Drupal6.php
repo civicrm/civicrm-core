@@ -756,6 +756,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function setHttpHeader($name, $value) {
+    // CRM-17965: allow extern/widget.php to boot Drupal
+    defined('DRUPAL_ROOT') or self::loadBootStrap(NULL, FALSE);
     drupal_set_header("$name: $value");
   }
 
