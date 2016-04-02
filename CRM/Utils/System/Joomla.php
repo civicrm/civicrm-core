@@ -726,4 +726,23 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $list[] = 'js/crm.joomla.js';
   }
 
+  /**
+   * Get timezone from CMS.
+   * @return string
+   */
+  public function getTimeZoneString() {
+    $user = JFactory::getUser();
+    $timezone = $user->getParam('timezone');
+    if (defined('_JEXEC') && !$timezone) {
+      $conf = JFactory::getConfig();
+      $timezone = $conf->get('offset');
+    }
+
+    if (!$timezone) {
+      $timezone = parent::getTimeZoneString();
+    }
+    date_default_timezone_set($timezone);
+    return $timezone;
+  }
+
 }
