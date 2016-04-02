@@ -786,6 +786,8 @@ AND    u.status = 1
    * @inheritDoc
    */
   public function setHttpHeader($name, $value) {
+    // CRM-17965: allow extern/widget.php to boot Drupal
+    defined('DRUPAL_ROOT') or self::loadBootStrap(NULL, FALSE);
     drupal_add_http_header($name, $value);
   }
 
