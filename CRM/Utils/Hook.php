@@ -2095,4 +2095,15 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook is called for bypass a few civicrm urls from IDS check
+   * @param array $skip list of civicrm url;
+   */
+  public static function idsException(&$skip) {
+    return self::singleton()->invoke(1, $skip, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_idsException'
+    );
+  }
+
 }
