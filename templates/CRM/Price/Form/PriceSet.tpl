@@ -102,17 +102,19 @@
                 </div>
 
             {/if}
-              {if !empty($extends) && $extends eq "Membership" && $element.name == 'membership_amount'}
-                <div id="allow_auto_renew">
-                  <div class='crm-section auto-renew'>
-                    <div class='label'></div>
-                    <div class ='content'>
-                      {if isset($form.auto_renew) }
-                        {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
-                      {/if}
+              {if !empty($extends) && $extends eq "Membership"}
+                {if (!empty($priceSet) && $element.id == $priceSet.auto_renew_membership_field) || (empty($priceSet) && $element.name == 'membership_amount')}
+                  <div id="allow_auto_renew">
+                    <div class='crm-section auto-renew'>
+                      <div class='label'></div>
+                      <div class ='content'>
+                        {if isset($form.auto_renew) }
+                          {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
+                        {/if}
+                      </div>
                     </div>
                   </div>
-                </div>
+                {/if}
               {/if}
               <div class="clear"></div>
           </div>
