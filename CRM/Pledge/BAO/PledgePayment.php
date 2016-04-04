@@ -566,7 +566,8 @@ WHERE  civicrm_pledge.id = %2
       CRM_Utils_Date::intervalAdd(
         $params['frequency_unit'],
         $paymentNo * ($params['frequency_interval']),
-        $basePaymentDate
+        // CRM-18316
+        $params['scheduled_date']
       )
     );
   }
