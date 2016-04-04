@@ -445,6 +445,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       'contribution_recur_id' => $id,
       'options' => array('limit' => 1, 'sort' => array('id DESC')),
       'sequential' => 1,
+      'contribution_test' => '',
     ));
     if ($templateContribution['count']) {
       return $templateContribution['values'][0];

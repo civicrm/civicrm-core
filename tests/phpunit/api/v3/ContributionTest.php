@@ -1370,22 +1370,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test repeat contribution successfully creates line items.
    */
   public function testRepeatTransaction() {
-    $paymentProcessorID = $this->paymentProcessorCreate();
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
-      'contact_id' => $this->_individualId,
-      'installments' => '12',
-      'frequency_interval' => '1',
-      'amount' => '500',
-      'contribution_status_id' => 1,
-      'start_date' => '2012-01-01 00:00:00',
-      'currency' => 'USD',
-      'frequency_unit' => 'month',
-      'payment_processor_id' => $paymentProcessorID,
-    ));
-    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
-      $this->_params,
-      array('contribution_recur_id' => $contributionRecur['id']))
-    );
+    $originalContribution = $this->setUpRepeatTransaction();
 
     $this->callAPISuccess('contribution', 'repeattransaction', array(
       'original_contribution_id' => $originalContribution['id'],
@@ -1418,6 +1403,21 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
 
     $this->quickCleanUpFinancialEntities();
+  }
+
+  /**
+   * Test repeat contribution successfully creates line items.
+   */
+  public function testRepeatTransactionIsTest() {
+    $this->_params['is_test'] = 1;
+    $originalContribution = $this->setUpRepeatTransaction(array('is_test' => 1));
+
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+    $this->callAPISuccessGetCount('Contribution', array('contribution_test' => 1), 2);
   }
 
   /**
@@ -2339,6 +2339,33 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       array(
         'contribution_recur_id' => $contributionRecur['id'],
       ), $generalParams)
+    );
+    return $originalContribution;
+  }
+
+  /**
+   * Set up a repeat transaction.
+   *
+   * @param array $recurParams
+   *
+   * @return array
+   */
+  protected function setUpRepeatTransaction($recurParams = array()) {
+    $paymentProcessorID = $this->paymentProcessorCreate();
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '500',
+      'contribution_status_id' => 1,
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $paymentProcessorID,
+    ), $recurParams));
+    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+      $this->_params,
+      array('contribution_recur_id' => $contributionRecur['id']))
     );
     return $originalContribution;
   }
