@@ -1283,13 +1283,13 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
 
     // CRM-18354 relationship custom field
-    if (strpos($field,'_a_b-custom') !== false) {
+    if (strpos($field, '_a_b-custom') !== FALSE) {
       $customField = explode('a_b-', $field);
       if (!empty($customField) && !empty($customField['1'])) {
         $field = $customField['1'];
       }
     }
-    elseif (strpos($field,'_b_a-custom') !== false) {
+    elseif (strpos($field, '_b_a-custom') !== FALSE) {
       $customField = explode('b_a-', $field);
       if (!empty($customField) && !empty($customField['1'])) {
         $field = $customField['1'];
