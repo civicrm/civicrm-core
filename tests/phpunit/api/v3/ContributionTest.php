@@ -1579,11 +1579,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
     ));
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id']));
+    $this->assertEquals('SSF', $contribution['contribution_source']);
     $this->assertEquals('Completed', $contribution['contribution_status']);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receipt_date'])));
     $mut->checkMailLog(array(
       'Receipt - Contribution',
       'Please print this confirmation for your records.',
+      'May 11th, 2012',
     ));
     $mut->stop();
   }
@@ -1662,6 +1664,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => uniqid(),
     ));
     $this->callAPISuccessGetCount('Contribution', array('contribution_test' => 1), 2);
+  }
+
+  /**
+   * Test repeat contribution passed in status.
+   */
+  public function testRepeatTransactionPassedInStatus() {
+    $originalContribution = $this->setUpRepeatTransaction();
+
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Pending',
+      'trxn_id' => uniqid(),
+    ));
+    $this->callAPISuccessGetCount('Contribution', array('contribution_status_id' => 2), 1);
   }
 
   /**

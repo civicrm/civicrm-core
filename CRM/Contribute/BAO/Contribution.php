@@ -134,9 +134,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
     }
 
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
-      $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       // @todo - should we include Chargeback? If so use self::isContributionStatusNegative($params['contribution_status_id'])
       if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
         || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
@@ -4344,6 +4344,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'campaign_id',
       'receive_date',
       'receipt_date',
+      'contribution_status_id',
     );
     if (self::isSingleLineItem($primaryContributionID)) {
       $inputContributionWhiteList[] = 'financial_type_id';
@@ -4531,7 +4532,7 @@ LIMIT 1;";
       $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $input);
       $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     }
-    $input['contribution_status_id'] = $completedContributionStatusID;
+    $input['contribution_status_id'] = $contributionParams['contribution_status_id'];
     $input['total_amount'] = $input['amount'];
     $input['contribution'] = $contribution;
     $input['financial_type_id'] = $contribution->financial_type_id;
