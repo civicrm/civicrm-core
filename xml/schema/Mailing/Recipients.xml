@@ -53,7 +53,7 @@
     <name>email_id</name>
     <table>civicrm_email</table>
     <key>id</key>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
     <name>phone_id</name>
@@ -66,6 +66,6 @@
     <name>phone_id</name>
     <table>civicrm_phone</table>
     <key>id</key>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
 </table>
