@@ -174,10 +174,10 @@
           // do not set defaults to file type fields
           if ($('#' + ele).attr('type') != 'file') {
             if (ele.split("_").pop() == 'display') {
-              cj("[id^='"+ele+"']").val(data[ele].value).change();
+              $("[id^='"+ele+"']").val(data[ele].value).change();
             }
             else {
-              cj('#' + ele ).val(data[ele].value).change();
+              $('#' + ele ).val(data[ele].value).change();
             }
           }
         }
