@@ -304,7 +304,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
         }
         $entryFound = TRUE;
       }
-      
+
       // make count columns point to detail report
       // convert display name to links
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
