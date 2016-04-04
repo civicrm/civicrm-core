@@ -58,7 +58,8 @@ class CRM_Core_IDS {
    */
   public function check(&$args) {
     // lets bypass a few civicrm urls from this check
-    static $skip = array('civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates');
+    $skip = array('civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates');
+    CRM_Utils_Hook::idsException($skip);
     $path = implode('/', $args);
     if (in_array($path, $skip)) {
       return NULL;
