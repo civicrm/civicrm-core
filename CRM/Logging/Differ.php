@@ -242,6 +242,9 @@ WHERE lt.log_conn_id = %1 AND
           'field' => $diff,
           'from' => CRM_Utils_Array::value($diff, $original),
           'to' => CRM_Utils_Array::value($diff, $changed),
+          'table' => $table,
+          'log_date' => $changed['log_date'],
+          'log_conn_id' => $changed['log_conn_id'],
         );
       }
     }

@@ -46,6 +46,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    * Clean up log tables.
    */
   protected function tearDown() {
+    $this->quickCleanup(array('civicrm_email'));
     parent::tearDown();
     $this->callAPISuccess('Setting', 'create', array('logging' => FALSE));
     $schema = new CRM_Logging_Schema();
@@ -243,6 +244,48 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('Logging', 'revert', array('log_conn_id' => 'woot', 'log_date' => $timeStamp), __FILE__, 'Revert');
     $this->assertEquals('Anthony', $this->callAPISuccessGetValue('contact', array('id' => $contactId, 'return' => 'first_name')));
     $this->callAPISuccessGetCount('Email', array('id' => $email['id']), 0);
+  }
+
+  /**
+   * Test changes can be retrieved.
+   */
+  public function testGet() {
+    $contactId = $this->individualCreate();
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty woot'");
+    $timeStamp = date('Y-m-d H:i:s');
+    $this->callAPISuccess('Contact', 'create', array(
+        'id' => $contactId,
+        'first_name' => 'Dopey',
+        'last_name' => 'Dwarf',
+        'api.email.create' => array('email' => 'dopey@mail.com'))
+    );
+    $this->callAPISuccessGetSingle('email', array('email' => 'dopey@mail.com'));
+    $diffs = $this->callAPIAndDocument('Logging', 'get', array('log_conn_id' => 'wooty woot', 'log_date' => $timeStamp), __FUNCTION__, __FILE__);
+    $this->assertLoggingIncludes($diffs['values'], array('to' => 'Dwarf, Dopey'));
+    $this->assertLoggingIncludes($diffs['values'], array('to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name'));
+    $this->assertLoggingIncludes($diffs['values'], array('to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email'));
+  }
+
+  /**
+   * Assert the values in the $expect array in included in the logging diff.
+   *
+   * @param array $diffs
+   * @param array $expect
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function assertLoggingIncludes($diffs, $expect) {
+    foreach ($diffs as $diff) {
+      foreach ($expect as $expectKey => $expectValue) {
+        if ($diff[$expectKey] != $expectValue) {
+          continue;
+        }
+        return TRUE;
+      }
+    }
+    throw new CRM_Core_Exception("No match found for key : $expectKey with value : $expectValue");
   }
 
 }
