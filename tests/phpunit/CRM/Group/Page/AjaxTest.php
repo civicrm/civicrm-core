@@ -287,6 +287,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   public function testTraditionalACLNotFoundTitle() {
     $this->_params['title'] = 'n';
     $this->setupACL();
+    $this->setPermissionAndRequest('edit groups');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $total, 'Total needs to be set correctly');
@@ -328,6 +329,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->_params['status'] = 2;
     $this->_params['title'] = 'n';
     $this->setupACL();
+    $this->setPermissionAndRequest('edit groups');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $total, 'Total needs to be set correctly');
