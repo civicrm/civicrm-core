@@ -80,7 +80,6 @@ class CRM_Logging_Differ {
 
     $params = array(
       1 => array($this->log_conn_id, 'String'),
-      2 => array($this->log_date, 'String'),
     );
 
     $logging = new CRM_Logging_Schema();
@@ -142,14 +141,21 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
       }
     }
 
+    $logDateClause = '';
+    if ($this->log_date) {
+      $params[2] = array($this->log_date, 'String');
+      $logDateClause = "
+        AND lt.log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval})
+      ";
+    }
+
     // find ids in this table that were affected in the given connection (based on connection id and a ±10 s time period around the date)
     $sql = "
 SELECT DISTINCT lt.id FROM `{$this->db}`.`log_$table` lt
 {$join}
-WHERE lt.log_conn_id = %1 AND
-      lt.log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval})
-      {$contactIdClause}";
-
+WHERE lt.log_conn_id = %1
+    $logDateClause
+    {$contactIdClause}";
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
       $diffs = array_merge($diffs, $this->diffsInTableForId($table, $dao->id));
@@ -169,15 +175,23 @@ WHERE lt.log_conn_id = %1 AND
 
     $params = array(
       1 => array($this->log_conn_id, 'String'),
-      2 => array($this->log_date, 'String'),
       3 => array($id, 'Integer'),
     );
 
     // look for all the changes in the given connection that happened less than {$this->interval} s later than log_date to the given id to catch multi-query changes
-    $changedSQL = "SELECT * FROM `{$this->db}`.`log_$table` WHERE log_conn_id = %1 AND log_date >= %2 AND log_date < DATE_ADD(%2, INTERVAL {$this->interval}) AND id = %3 ORDER BY log_date DESC LIMIT 1";
+    $logDateClause = "";
+    if ($this->log_date && $this->interval) {
+      $logDateClause = " AND log_date >= %2 AND log_date < DATE_ADD(%2, INTERVAL {$this->interval})";
+      $params[2] = array($this->log_date, 'String');
+    }
+
+    $changedSQL = "SELECT * FROM `{$this->db}`.`log_$table` WHERE log_conn_id = %1 $logDateClause AND id = %3 ORDER BY log_date DESC LIMIT 1";
 
     $changedDAO = CRM_Core_DAO::executeQuery($changedSQL, $params);
     while ($changedDAO->fetch()) {
+      if (empty($this->log_date) && !$this->checkLogCanBeUsedWithNoLogDate($changedDAO->log_date)) {
+        throw new CRM_Core_Exception('The connection date must be passed in to disambiguate this logging entry per CRM-18193');
+      }
       $changed = $changedDAO->toArray();
 
       // return early if nothing found
@@ -201,6 +215,7 @@ WHERE lt.log_conn_id = %1 AND
           break;
 
         case 'Update':
+          $params[2] = array($changedDAO->log_date, 'String');
           // look for the previous state (different log_conn_id) of the given id
           $originalSQL = "SELECT * FROM `{$this->db}`.`log_$table` WHERE log_conn_id != %1 AND log_date < %2 AND id = %3 ORDER BY log_date DESC LIMIT 1";
           $original = $this->sqlToArray($originalSQL, $params);
@@ -418,6 +433,38 @@ ORDER BY log_date
       $diffs = array_merge($diffs, $this->diffsInTableForId($dao->table_name, $dao->id));
     }
     return $diffs;
+  }
+
+  /**
+   * Check that the log record relates to a unique log id.
+   *
+   * If the record was recorded using the old non-unique style then the
+   * log_date
+   * MUST be set to get the (fairly accurate) list of changes. In this case the
+   * nasty 10 second interval rule is applied.
+   *
+   * See  CRM-18193 for a discussion of unique log id.
+   *
+   * @param string $change_date
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function checkLogCanBeUsedWithNoLogDate($change_date) {
+    if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_all_tables_uniquid', 'group' => 'CiviCRM Preferences'))) {
+      return TRUE;
+    };
+    $uniqueDate = civicrm_api3('Setting', 'getvalue', array(
+      'name' => 'logging_uniqueid_date',
+      'group' => 'CiviCRM Preferences',
+    ));
+    if (strtotime($uniqueDate) <= strtotime($change_date)) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+
   }
 
 }

@@ -247,6 +247,46 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test changes can be reverted.
+   */
+  public function testRevertNoDate() {
+    $contactId = $this->individualCreate();
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    CRM_Core_DAO::executeQuery("SET @uniqueID = 'Wot woot'");
+    $this->callAPISuccess('Contact', 'create', array(
+        'id' => $contactId,
+        'first_name' => 'Dopey',
+        'api.email.create' => array('email' => 'dopey@mail.com'))
+    );
+    $email = $this->callAPISuccessGetSingle('email', array('email' => 'dopey@mail.com'));
+    $this->callAPISuccess('Logging', 'revert', array('log_conn_id' => 'Wot woot'));
+    $this->assertEquals('Anthony', $this->callAPISuccessGetValue('contact', array('id' => $contactId, 'return' => 'first_name')));
+    $this->callAPISuccessGetCount('Email', array('id' => $email['id']), 0);
+  }
+
+  /**
+   * Test changes can be reverted.
+   */
+  public function testRevertNoDateNotUnique() {
+    $contactId = $this->individualCreate();
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    CRM_Core_DAO::executeQuery("SET @uniqueID = 'Wopity woot'");
+    $this->callAPISuccess('Contact', 'create', array(
+        'id' => $contactId,
+        'first_name' => 'Dopey',
+        'api.email.create' => array('email' => 'dopey@mail.com'))
+    );
+    $this->callAPISuccess('Setting', 'create', array('logging_all_tables_uniquid' => FALSE));
+    $this->callAPISuccess('Setting', 'create', array('logging_uniqueid_date' => date('Y-m-d H:i:s')));
+    $this->callAPIFailure(
+      'Logging',
+      'revert',
+      array('log_conn_id' => 'Wopity woot'),
+      'Failure in api call for Logging revert:  The connection date must be passed in to disambiguate this logging entry per CRM-18193'
+    );
+  }
+
+  /**
    * Test changes can be retrieved.
    */
   public function testGet() {
@@ -261,7 +301,27 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
         'api.email.create' => array('email' => 'dopey@mail.com'))
     );
     $this->callAPISuccessGetSingle('email', array('email' => 'dopey@mail.com'));
-    $diffs = $this->callAPIAndDocument('Logging', 'get', array('log_conn_id' => 'wooty woot', 'log_date' => $timeStamp), __FUNCTION__, __FILE__);
+    $diffs = $this->callAPISuccess('Logging', 'get', array('log_conn_id' => 'wooty woot', 'log_date' => $timeStamp), __FUNCTION__, __FILE__);
+    $this->assertLoggingIncludes($diffs['values'], array('to' => 'Dwarf, Dopey'));
+    $this->assertLoggingIncludes($diffs['values'], array('to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name'));
+    $this->assertLoggingIncludes($diffs['values'], array('to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email'));
+  }
+
+  /**
+   * Test changes can be retrieved without log_date being required.
+   */
+  public function testGetNoDate() {
+    $contactId = $this->individualCreate();
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty wop wop'");
+    $this->callAPISuccess('Contact', 'create', array(
+        'id' => $contactId,
+        'first_name' => 'Dopey',
+        'last_name' => 'Dwarf',
+        'api.email.create' => array('email' => 'dopey@mail.com'))
+    );
+    $this->callAPISuccessGetSingle('email', array('email' => 'dopey@mail.com'));
+    $diffs = $this->callAPIAndDocument('Logging', 'get', array('log_conn_id' => 'wooty wop wop'), __FUNCTION__, __FILE__);
     $this->assertLoggingIncludes($diffs['values'], array('to' => 'Dwarf, Dopey'));
     $this->assertLoggingIncludes($diffs['values'], array('to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name'));
     $this->assertLoggingIncludes($diffs['values'], array('to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email'));
