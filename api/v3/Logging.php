@@ -43,7 +43,7 @@
  */
 function civicrm_api3_logging_revert($params) {
   $schema = new CRM_Logging_Schema();
-  $reverter = new CRM_Logging_Reverter($params['log_conn_id'], $params['log_date']);
+  $reverter = new CRM_Logging_Reverter($params['log_conn_id'], CRM_Utils_Array::value('log_date', $params));
   $reverter->calculateDiffsFromLogConnAndDate($schema->getLogTablesForContact());
   $reverter->revert();
   return civicrm_api3_create_success(1);
