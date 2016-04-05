@@ -562,7 +562,6 @@ function civicrm_api3_job_run_payment_cron($params) {
  *   Sends in various config parameters to decide what needs to be cleaned.
  */
 function civicrm_api3_job_cleanup($params) {
-  CRM_Core_BAO_Setting::isAPIJobRun($params);
   $session   = CRM_Utils_Array::value('session', $params, TRUE);
   $tempTable = CRM_Utils_Array::value('tempTables', $params, TRUE);
   $jobLog    = CRM_Utils_Array::value('jobLog', $params, TRUE);
