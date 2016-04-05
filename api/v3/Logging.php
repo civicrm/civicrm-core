@@ -48,3 +48,46 @@ function civicrm_api3_logging_revert($params) {
   $reverter->revert();
   return civicrm_api3_create_success(1);
 }
+
+/**
+ * Get a log change.
+ *
+ * @param array $params
+ *
+ * @return array
+ *    API Success Array
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
+ */
+function civicrm_api3_logging_get($params) {
+  $schema = new CRM_Logging_Schema();
+  $interval = (empty($params['log_date'])) ? NULL : $params['interval'];
+  $differ = new CRM_Logging_Differ($params['log_conn_id'], CRM_Utils_Array::value('log_date', $params), $interval);
+  return civicrm_api3_create_success($differ->getAllChangesForConnection($schema->getLogTablesForContact()));
+}
+
+/**
+ * Get a log change.
+ *
+ * @param array $params
+ *
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
+ */
+function _civicrm_api3_logging_get_spec(&$params) {
+  $params['log_conn_id'] = array(
+    'title' => 'Logging Connection ID',
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.required' => TRUE,
+  );
+  $params['log_date'] = array(
+    'title' => 'Logging Timestamp',
+    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+  );
+  $params['interval'] = array(
+    'title' => ts('Interval (required if date is included)'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => '10 SECOND',
+    'description' => ts('Used when log_date is passed in'),
+  );
+}
