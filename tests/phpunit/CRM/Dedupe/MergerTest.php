@@ -9,6 +9,14 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   protected $_groupId;
   protected $_contactIds = array();
 
+  public function setUp() {
+    // Connect to the database
+    parent::setUp();
+
+    // create a logged in USER since the code references it for source_contact_id
+    $this->createLoggedInUser();
+  }
+
   public function createDupeContacts() {
     // create a group to hold contacts, so that dupe checks don't consider any other contacts in the DB
     $params = array(

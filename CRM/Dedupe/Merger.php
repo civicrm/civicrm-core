@@ -1485,15 +1485,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // Ignore operation for websites
         // @todo Tidy this up
         $operation = 0;
-        if ($fieldName != 'website') {
-          $operation = CRM_Utils_Array::value('operation', $migrationInfo['location'][$fieldName][$fieldCount]);
-        }
         // default operation is overwrite.
-        if (!$operation) {
+        if (!isset($migrationInfo['location'])) {
           $operation = 2;
         }
-        $locBlocks[$fieldName][$fieldCount]['operation'] = $operation;
+        elseif ($fieldName != 'website') {
+          $operation = CRM_Utils_Array::value('operation', $migrationInfo['location'][$fieldName][$fieldCount], 2);
+        }
 
+        $locBlocks[$fieldName][$fieldCount]['operation'] = $operation;
       }
 
       elseif (substr($key, 0, 15) == 'move_rel_table_' and $value == '1') {
@@ -1539,7 +1539,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $otherBlockDAO->id = $otherBlockId;
 
           // Add/update location and type information from the form, if applicable
-          if ($locationBlocks[$name]['hasLocation']) {
+          if ($locationBlocks[$name]['hasLocation'] && isset($migrationInfo['location'])) {
             $locTypeId = CRM_Utils_Array::value('locTypeId', $migrationInfo['location'][$name][$blkCount]);
             $otherBlockDAO->location_type_id = $locTypeId;
           }
@@ -1549,7 +1549,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
 
           // Get main block ID
-          $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location'][$name][$blkCount], 0);
+          if (isset($migrationInfo['location'])) {
+            $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location'][$name][$blkCount], 0);
+          }
 
           // if main contact already has primary & billing, set the flags to 0.
           if ($primaryDAOId) {
@@ -1930,6 +1932,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       1 => $otherId,
       2 => $mainId,
     );
+
     $activity = civicrm_api3('activity', 'create', array(
       'subject' => ts('Contact ID %1 has been merged and deleted.', $params),
       'target_contact_id' => $mainId,
