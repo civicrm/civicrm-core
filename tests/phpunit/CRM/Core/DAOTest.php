@@ -248,7 +248,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     );
     $testDetails = array();
     foreach ($databases as $database => $val) {
-      $this->assertEquals(CRM_Core_DAO::requireValidDBName($database, $testDetails), $val);
+      $this->assertEquals(CRM_Core_DAO::requireValidDBName($database), $val);
     }
   }
 

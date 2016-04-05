@@ -2392,14 +2392,13 @@ SELECT contact_id
   }
 
   /**
-   * function to check valid db name
+   * function to check valid db name containing only characters in [0-9,a-z,A-Z_]
    *
    * @param $database
-   * @param $testDetails
    *
    * @return bool
    */
-  public static function requireValidDBName($database, $testDetails, $object = NULL) {
+  public static function requireValidDBName($database) {
     $matches = array();
     preg_match(
       "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
@@ -2407,13 +2406,7 @@ SELECT contact_id
       $matches
     );
     if (empty($matches)) {
-      if ($object) {
-        $object->error($testDetails);
-      }
       return FALSE;
-    }
-    if ($object) {
-      $object->testing($testDetails);
     }
     return TRUE;
   }
