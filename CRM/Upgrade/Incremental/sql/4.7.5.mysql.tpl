@@ -24,4 +24,10 @@ SET filter = 1
 WHERE ov.name = 'Contact Deleted by Merge' AND og.name = 'activity_type';
 
 -- CRM-18241 Change field length of civicrm_option_value.label from 255 to 512 --
-ALTER TABLE civicrm_option_value CHANGE label label varchar( 512 ) DEFAULT NULL ;
+{if $multilingual}
+  {foreach from=$locales item=loc}
+    ALTER TABLE civicrm_option_value CHANGE label_{$loc} label_{$loc} varchar( 512 ) DEFAULT NULL ;
+  {/foreach}
+{else}
+  ALTER TABLE civicrm_option_value CHANGE label label varchar( 512 ) DEFAULT NULL ;
+{/if}
