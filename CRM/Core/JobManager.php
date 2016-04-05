@@ -121,7 +121,7 @@ class CRM_Core_JobManager {
 
      // CRM-18231 check if non-production environment.
      try {
-       CRM_Core_BAO_Setting::isAPIJobRun($job->apiParams);
+       CRM_Core_BAO_Setting::isAPIJobAllowedToRun($job->apiParams);
      }
      catch (Exception $e) {
        $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
