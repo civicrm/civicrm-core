@@ -143,7 +143,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
    */
   public function browse($action = NULL) {
     // check if non-prod mode is enabled.
-    if (Civi::settings()->get('isProductionEnvironment') == 0) {
+    if (Civi::settings()->get('isProductionEnvironment') === FALSE) {
       CRM_Core_Session::setStatus(ts('Execution of scheduled jobs have been turned off.'), ts("Non-production Environment"), "warning", array('expires' => 0));
     }
 
