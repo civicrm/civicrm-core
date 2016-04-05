@@ -119,10 +119,14 @@ class CRM_Core_JobManager {
   public function executeJob($job) {
     $this->currentJob = $job;
 
-    // check if non-production environment.
-    if (Civi::settings()->get('isProductionEnvironment') == 0 && !CRM_Utils_Array::value('runInNonProductionEnvironment', $job->apiParams)) {
-      $this->logEntry($job->name . ' has not been executed as it is a non-production environment.');
-      $this->currentJob = FALSE;
+     // CRM-18231 check if non-production environment.
+     try {
+       CRM_Core_BAO_Setting::isAPIJobRun($job->apiParams);
+     }
+     catch (Exception $e) {
+       $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
+       $this->currentJob = FALSE;
+       return FALSE;
     }
 
     $this->logEntry('Starting execution of ' . $job->name);
