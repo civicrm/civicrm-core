@@ -90,15 +90,6 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
       $this->revert();
     }
 
-    // make sure the report works even without the params
-    if (!$this->log_conn_id or !$this->log_date) {
-      $dao = new CRM_Core_DAO();
-      $dao->query("SELECT log_conn_id, log_date FROM `{$this->db}`.log_{$this->tables[0]} WHERE log_action = 'Update' ORDER BY log_date DESC LIMIT 1");
-      $dao->fetch();
-      $this->log_conn_id = $dao->log_conn_id;
-      $this->log_date = $dao->log_date;
-    }
-
     $this->_columnHeaders = array(
       'field' => array('title' => ts('Field')),
       'from' => array('title' => ts('Changed From')),
