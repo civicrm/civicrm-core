@@ -445,8 +445,11 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
- *   Api result array.
+ * @return array
+ *   API result array
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
+ * @throws \Exception
  */
 function civicrm_api3_contribution_completetransaction(&$params) {
 
@@ -471,7 +474,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   if (!empty($params['fee_amount'])) {
     $input['fee_amount'] = $params['fee_amount'];
   }
-  $params = _ipn_process_transaction($params, $contribution, $input, $ids);
+  return _ipn_process_transaction($params, $contribution, $input, $ids);
 
 }
 
@@ -571,7 +574,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     );
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
-    $params = _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
+    return _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
   }
   catch(Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -621,9 +624,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
     $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
   }
   $transaction = new CRM_Core_Transaction();
-  CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, !empty($contribution->contribution_recur_id), $contribution,
+  return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, !empty
+  ($contribution->contribution_recur_id), $contribution,
     FALSE, FALSE);
-  return $params;
 }
 
 /**
