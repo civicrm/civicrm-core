@@ -48,6 +48,20 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $summary;
 
   /**
+   * Instance of Differ.
+   *
+   * @var CRM_Logging_Differ
+   */
+  protected $differ;
+
+  /**
+   * Array of changes made.
+   *
+   * @var array
+   */
+  protected $diffs = array();
+
+  /**
    * Don't display the Add these contacts to Group button.
    *
    * @var bool
@@ -98,6 +112,10 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   }
 
   /**
+   * Build query for report.
+   *
+   * We override this to be empty & calculate the rows in the buildRows function.
+   *
    * @param bool $applyLimit
    */
   public function buildQuery($applyLimit = TRUE) {
@@ -112,16 +130,25 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     if (!$this->log_conn_id or !$this->log_date) {
       return;
     }
+    $this->getDiffs();
+    $rows = $this->convertDiffsToRows();
+  }
 
-    if (empty($rows)) {
-
-      $rows = array();
-
+  /**
+   * Get the diffs for the report, calculating them if not already done.
+   *
+   * Note that contact details report now uses a more comprehensive method but
+   * the contribution logging details report still uses this.
+   *
+   * @return array
+   */
+  protected function getDiffs() {
+    if (empty($this->diffs)) {
+      foreach ($this->tables as $table) {
+        $this->diffs = array_merge($this->diffs, $this->diffsInTable($table));
+      }
     }
-
-    foreach ($this->tables as $table) {
-      $rows = array_merge($rows, $this->diffsInTable($table));
-    }
+    return $this->diffs;
   }
 
   /**
@@ -130,21 +157,30 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    * @return array
    */
   protected function diffsInTable($table) {
-    $rows = array();
+    $this->setDiffer();
+    return $this->differ->diffsInTable($table, $this->cid);
+  }
 
-    $differ = new CRM_Logging_Differ($this->log_conn_id, $this->log_date, $this->interval);
-    $diffs = $differ->diffsInTable($table, $this->cid);
-
+  /**
+   * Convert the diffs to row format.
+   *
+   * @return array
+   */
+  protected function convertDiffsToRows() {
     // return early if nothing found
-    if (empty($diffs)) {
-      return $rows;
+    if (empty($this->diffs)) {
+      return array();
     }
 
-    list($titles, $values) = $differ->titlesAndValuesForTable($table);
-
     // populate $rows with only the differences between $changed and $original (skipping certain columns and NULL ↔ empty changes unless raw requested)
-    $skipped = array('contact_id', 'entity_id', 'id');
-    foreach ($diffs as $diff) {
+    $skipped = array('id');
+    foreach ($this->diffs as $diff) {
+      $table = $diff['table'];
+      if (empty($metadata[$table])) {
+        list($metadata[$table]['titles'], $metadata[$table]['values']) = $this->differ->titlesAndValuesForTable($table);
+      }
+      $values = CRM_Utils_Array::value('values', $metadata[$diff['table']], array());
+      $titles = $metadata[$diff['table']]['titles'];
       $field = $diff['field'];
       $from = $diff['from'];
       $to = $diff['to'];
@@ -222,6 +258,55 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected function storeDB() {
     $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
     $this->db = $dsn['database'];
+  }
+
+  /**
+   * Calculate all the contact related diffs for the change.
+   *
+   * @return array
+   */
+  protected function calculateContactDiffs(){
+    $this->diffs = $this->getAllContactChangesForConnection();
+  }
+
+
+  /**
+   * Get an array of changes made in the mysql connection.
+   *
+   * @return mixed
+   */
+  public function getAllContactChangesForConnection() {
+    if (empty($this->log_conn_id)) {
+      return array();
+    }
+    $this->setDiffer();
+    try {
+      return $this->differ->getAllChangesForConnection($this->tables);
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::statusBounce(ts($e->getMessage()));
+    }
+  }
+
+  /**
+   * Make sure the differ is defined.
+   */
+  protected function setDiffer() {
+    if (empty($this->differ)) {
+      $this->differ = new CRM_Logging_Differ($this->log_conn_id, $this->log_date, $this->interval);
+    }
+  }
+
+  /**
+   * Set this tables to reflect tables changed in a merge.
+   */
+  protected function setTablesToContactRelatedTables() {
+    $schema = new CRM_Logging_Schema();
+    $this->tables = $schema->getLogTablesForContact();
+    // allow tables to be extended by report hook query objects.
+    // This is a report specific hook. It's unclear how it interacts to / overlaps the main one.
+    // It probably precedes the main one and was never reconciled with it....
+    CRM_Report_BAO_Hook::singleton()->alterLogTables($this, $this->tables);
   }
 
   /**

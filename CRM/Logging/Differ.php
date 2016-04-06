@@ -169,6 +169,7 @@ WHERE lt.log_conn_id = %1
    * @param int $id
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   private function diffsInTableForId($table, $id) {
     $diffs = array();
