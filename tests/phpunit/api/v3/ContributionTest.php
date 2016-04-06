@@ -1579,11 +1579,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
     ));
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id']));
+    $this->assertEquals('SSF', $contribution['contribution_source']);
     $this->assertEquals('Completed', $contribution['contribution_status']);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receipt_date'])));
     $mut->checkMailLog(array(
       'Receipt - Contribution',
       'Please print this confirmation for your records.',
+      'May 11th, 2012',
     ));
     $mut->stop();
   }
@@ -1662,6 +1664,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => uniqid(),
     ));
     $this->callAPISuccessGetCount('Contribution', array('contribution_test' => 1), 2);
+  }
+
+  /**
+   * Test repeat contribution passed in status.
+   */
+  public function testRepeatTransactionPassedInStatus() {
+    $originalContribution = $this->setUpRepeatTransaction();
+
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Pending',
+      'trxn_id' => uniqid(),
+    ));
+    $this->callAPISuccessGetCount('Contribution', array('contribution_status_id' => 2), 1);
   }
 
   /**
@@ -2012,6 +2028,38 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test completing a pledge with the completeTransaction api..
+   *
+   * Note that we are creating a logged in user because email goes out from
+   * that person.
+   */
+  public function testCompleteTransactionUpdatePledgePayment() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $mut->clearMessages();
+    $this->createLoggedInUser();
+    $contributionID = $this->createPendingPledgeContribution();
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contributionID,
+      'trxn_date' => '1 Feb 2013',
+    ));
+    $pledge = $this->callAPISuccessGetSingle('Pledge', array(
+      'id' => $this->_ids['pledge'],
+    ));
+    $this->assertEquals('Completed', $pledge['pledge_status']);
+
+    $status = $this->callAPISuccessGetValue('PledgePayment', array(
+      'pledge_id' => $this->_ids['pledge'],
+      'return' => 'status_id',
+    ));
+    $this->assertEquals(1, $status);
+    $mut->checkMailLog(array(
+      '$ 500.00',
+      'May 11th, 2012 12:00 AM',
+    ));
+    $mut->stop();
+  }
+
+  /**
    * Test completing a transaction with an event via the API.
    *
    * Note that we are creating a logged in user because email goes out from
@@ -2289,6 +2337,33 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     foreach ($params as $key => $value) {
       $this->assertEquals($value, $values[$key], $key . " value: $value doesn't match " . print_r($values, TRUE));
     }
+  }
+
+  /**
+   * Create a pending contribution & linked pending pledge record.
+   */
+  public function createPendingPledgeContribution() {
+
+    $pledgeID = $this->pledgeCreate(array('contact_id' => $this->_individualId, 'installments' => 1, 'amount' => 500));
+    $this->_ids['pledge'] = $pledgeID;
+    $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_params, array(
+      'contribution_status_id' => 'Pending',
+       'total_amount' => 500,
+      ))
+    );
+    $paymentID = $this->callAPISuccessGetValue('PledgePayment', array(
+      'options' => array('limit' => 1),
+      'return' => 'id',
+    ));
+    $this->callAPISuccess('PledgePayment', 'create', array(
+      'id' => $paymentID,
+      'contribution_id' =>
+      $contribution['id'],
+      'status_id' => 'Pending',
+      'scheduled_amount' => 500,
+    ));
+
+    return $contribution['id'];
   }
 
   /**
