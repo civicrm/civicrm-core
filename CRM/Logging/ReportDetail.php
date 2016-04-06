@@ -127,7 +127,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    */
   public function buildRows($sql, &$rows) {
     // safeguard for when there aren’t any log entries yet
-    if (!$this->log_conn_id or !$this->log_date) {
+    if (!$this->log_conn_id && !$this->log_date) {
       return;
     }
     $this->getDiffs();
@@ -177,7 +177,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     foreach ($this->diffs as $diff) {
       $table = $diff['table'];
       if (empty($metadata[$table])) {
-        list($metadata[$table]['titles'], $metadata[$table]['values']) = $this->differ->titlesAndValuesForTable($table);
+        list($metadata[$table]['titles'], $metadata[$table]['values']) = $this->differ->titlesAndValuesForTable($table, $diff['log_date']);
       }
       $values = CRM_Utils_Array::value('values', $metadata[$diff['table']], array());
       $titles = $metadata[$diff['table']]['titles'];
