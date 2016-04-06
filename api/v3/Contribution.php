@@ -559,10 +559,16 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     }
 
     unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
-    $contribution->contribution_status_id = $params['contribution_status_id'];
     $contribution->receive_date = $params['receive_date'];
 
-    $passThroughParams = array('trxn_id', 'total_amount', 'campaign_id', 'fee_amount', 'financial_type_id');
+    $passThroughParams = array(
+      'trxn_id',
+      'total_amount',
+      'campaign_id',
+      'fee_amount',
+      'financial_type_id',
+      'contribution_status_id',
+    );
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
     $params = _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
