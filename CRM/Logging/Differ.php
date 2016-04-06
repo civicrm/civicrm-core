@@ -269,11 +269,16 @@ WHERE lt.log_conn_id = %1
   }
 
   /**
-   * @param $table
+   * Get the titles & metadata option values for the table.
+   *
+   * For custom fields the titles may change so we use the ones as at the reference date.
+   *
+   * @param string $table
+   * @param string $referenceDate
    *
    * @return array
    */
-  public function titlesAndValuesForTable($table) {
+  public function titlesAndValuesForTable($table, $referenceDate) {
     // static caches for subsequent calls with the same $table
     static $titles = array();
     static $values = array();
@@ -325,7 +330,7 @@ WHERE lt.log_conn_id = %1
         }
       }
       elseif (substr($table, 0, 14) == 'civicrm_value_') {
-        list($titles[$table], $values[$table]) = $this->titlesAndValuesForCustomDataTable($table);
+        list($titles[$table], $values[$table]) = $this->titlesAndValuesForCustomDataTable($table, $referenceDate);
       }
       else {
         $titles[$table] = $values[$table] = array();
@@ -348,17 +353,20 @@ WHERE lt.log_conn_id = %1
   }
 
   /**
-   * @param $table
+   * Get the field titles & option group values for the custom table as at the reference date.
+   *
+   * @param string $table
+   * @param string $referenceDate
    *
    * @return array
    */
-  private function titlesAndValuesForCustomDataTable($table) {
+  private function titlesAndValuesForCustomDataTable($table, $referenceDate) {
     $titles = array();
     $values = array();
 
     $params = array(
       1 => array($this->log_conn_id, 'String'),
-      2 => array($this->log_date, 'String'),
+      2 => array($referenceDate, 'String'),
       3 => array($table, 'String'),
     );
 
