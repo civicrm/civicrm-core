@@ -4495,7 +4495,7 @@ LIMIT 1;";
 
     $contributionParams['id'] = $contribution->id;
 
-    civicrm_api3('Contribution', 'create', $contributionParams);
+    $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
     // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
@@ -4584,6 +4584,7 @@ LIMIT 1;";
       CRM_Contribute_BAO_ContributionRecur::sendRecurringStartOrEndNotification($ids, $recur,
         $isFirstOrLastRecurringPayment);
     }
+    return $contributionResult;
   }
 
   /**
