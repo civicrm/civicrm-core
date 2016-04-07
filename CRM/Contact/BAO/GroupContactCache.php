@@ -333,10 +333,7 @@ SET    cache_date = null,
 ";
       }
       else {
-        $groupsQuery = "SELECT id
-          FROM civicrm_group
-          WHERE cache_date <= %1 
-        ";
+        $groupsQuery = self::groupRefreshedClause();
         $cacheTime = date('Y-m-d H-i-s', strtotime("- $smartGroupCacheTimeout minutes"));
         $params = array(1 => array($cacheTime, 'String'));
         $dao = CRM_Core_DAO::executeQuery($groupsQuery, $params);
@@ -355,7 +352,7 @@ SET    cache_date = null,
           $groups = implode(',', $groupsIDs);
           $update = "
             UPDATE civicrm_group
-            SET cache_date = $now,
+            SET cache_date = null,
             refresh_date = null
             WHERE id IN ( $groups )";
           $refresh = "
@@ -377,7 +374,7 @@ WHERE      g.group_id IN ( $groupIDs )
 
       $update = "
 UPDATE civicrm_group g
-SET    cache_date = $now,
+SET    cache_date = null,
        refresh_date = null
 WHERE  id IN ( $groupIDs )
 ";
@@ -392,7 +389,7 @@ WHERE      g.group_id = %1
 
       $update = "
 UPDATE civicrm_group g
-SET    cache_date = $now,
+SET    cache_date = null,
        refresh_date = null
 WHERE  id = %1
 ";
