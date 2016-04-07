@@ -1798,6 +1798,9 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
     }
   }
   $fields += _civicrm_api_get_custom_fields($entity, $params);
+  if ($entity == 'Contact') {
+    $fields += _civicrm_api_get_fields('Address');
+  }
   return $fields;
 }
 
