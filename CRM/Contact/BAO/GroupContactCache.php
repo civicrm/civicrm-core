@@ -334,24 +334,27 @@ SET    cache_date = null,
 ";
       }
       else {
+
         $query = "
 DELETE     gc
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
-WHERE      TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout
+WHERE      g.cache_date <= %1
 ";
         $update = "
 UPDATE civicrm_group g
 SET    cache_date = null,
        refresh_date = null
-WHERE  TIMESTAMPDIFF(MINUTE, cache_date, $now) >= $smartGroupCacheTimeout
+WHERE  g.cache_date <= %1
 ";
         $refresh = "
 UPDATE civicrm_group g
 SET    refresh_date = $refreshTime
-WHERE  TIMESTAMPDIFF(MINUTE, cache_date, $now) < $smartGroupCacheTimeout
+WHERE  g.cache_date > %1
 AND    refresh_date IS NULL
 ";
+        $cacheTime = date('Y-m-d H-i-s', strtotime("- $smartGroupCacheTimeout minutes"));
+        $params = array(1 => array($cacheTime, 'String'));
       }
     }
     elseif (is_array($groupID)) {
