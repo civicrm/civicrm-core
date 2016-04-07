@@ -136,8 +136,6 @@ ORDER BY page_type, page_id";
     $approved = CRM_Utils_Array::key('Approved', $pcpStatus);
 
     while ($pcpInfoDao->fetch()) {
-//crm_core_error::Debug($pcpInfoDao);
-
       $mask = $hide;
       if ($links) {
         $replace = array(
