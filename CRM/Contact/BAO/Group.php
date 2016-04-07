@@ -778,7 +778,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       $group['is_parent'] = $value['is_parent'];
 
-      $groupList[$id] = $group;
+      array_push($groupList, $group);
     }
 
     $groupsDT = array();
