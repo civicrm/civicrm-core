@@ -229,30 +229,51 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['state_province_id'] = array(
     'title' => 'Primary Address State Province ID',
     'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_state_province',
+    ),
   );
   $params['state_province_name'] = array(
     'title' => 'Primary Address State Province Name',
     'type' => CRM_Utils_Type::T_STRING,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_state_province',
+    ),
   );
   $params['state_province'] = array(
     'title' => 'Primary Address State Province',
     'type' => CRM_Utils_Type::T_STRING,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_state_province',
+    ),
   );
   $params['country_id'] = array(
     'title' => 'Primary Address Country ID',
     'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_country',
+    ),
   );
   $params['country'] = array(
     'title' => 'Primary Address country',
     'type' => CRM_Utils_Type::T_STRING,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_country',
+    ),
   );
   $params['worldregion_id'] = array(
     'title' => 'Primary Address World Region ID',
     'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_world_region',
+    ),
   );
   $params['worldregion'] = array(
     'title' => 'Primary Address World Region',
     'type' => CRM_Utils_Type::T_STRING,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_world_region',
+    ),
   );
   $params['phone_id'] = array(
     'title' => 'Primary Phone ID',
