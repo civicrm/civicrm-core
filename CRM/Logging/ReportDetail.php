@@ -32,6 +32,15 @@
  */
 class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $cid;
+
+  /**
+   * Other contact ID.
+   *
+   * This would be set if we are viewing a merge of 2 contacts.
+   *
+   * @var int
+   */
+  protected $oid;
   protected $db;
   protected $log_conn_id;
   protected $log_date;
@@ -122,8 +131,10 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   }
 
   /**
-   * @param $sql
-   * @param $rows
+   * Build rows from query.
+   *
+   * @param string $sql
+   * @param array $rows
    */
   public function buildRows($sql, &$rows) {
     // safeguard for when there aren’t any log entries yet
@@ -248,6 +259,9 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->assign('log_date', CRM_Utils_Date::mysqlToIso($this->log_date));
 
     $q = "reset=1&log_conn_id={$this->log_conn_id}&log_date={$this->log_date}";
+    if ($this->oid) {
+      $q .= '&oid=' . $this->oid;
+    }
     $this->assign('revertURL', CRM_Report_Utils_Report::getNextUrl($this->detail, "$q&revert=1", FALSE, TRUE));
     $this->assign('revertConfirm', ts('Are you sure you want to revert all changes?'));
   }
@@ -262,10 +276,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
 
   /**
    * Calculate all the contact related diffs for the change.
-   *
-   * @return array
    */
-  protected function calculateContactDiffs(){
+  protected function calculateContactDiffs() {
     $this->diffs = $this->getAllContactChangesForConnection();
   }
 
@@ -318,7 +330,18 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $reverter->revert();
     CRM_Core_Session::setStatus(ts('The changes have been reverted.'), ts('Reverted'), 'success');
     if ($this->cid) {
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view', "reset=1&selectedChild=log&cid={$this->cid}", FALSE, NULL, FALSE));
+      if ($this->oid) {
+        CRM_Utils_System::redirect(CRM_Utils_System::url(
+          'civicrm/contact/merge',
+          "reset=1&cid={$this->cid}&oid={$this->oid}",
+          FALSE,
+          NULL,
+          FALSE)
+        );
+      }
+      else {
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view', "reset=1&selectedChild=log&cid={$this->cid}", FALSE, NULL, FALSE));
+      }
     }
     else {
       CRM_Utils_System::redirect(CRM_Report_Utils_Report::getNextUrl($this->summary, 'reset=1', FALSE, TRUE));
