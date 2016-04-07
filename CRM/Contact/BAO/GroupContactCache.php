@@ -392,7 +392,7 @@ WHERE      g.group_id = %1
 
       $update = "
 UPDATE civicrm_group g
-SET    cache_date = null,
+SET    cache_date = $now,
        refresh_date = null
 WHERE  id = %1
 ";
