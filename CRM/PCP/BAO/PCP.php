@@ -118,6 +118,7 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
 
     $query = "
 SELECT * FROM civicrm_pcp pcp
+LEFT JOIN civicrm_pcp_block block ON block.id = pcp.pcp_block_id
 WHERE pcp.is_active = 1
   AND pcp.contact_id = %1
 ORDER BY page_type, page_id";
@@ -135,6 +136,8 @@ ORDER BY page_type, page_id";
     $approved = CRM_Utils_Array::key('Approved', $pcpStatus);
 
     while ($pcpInfoDao->fetch()) {
+//crm_core_error::Debug($pcpInfoDao);
+
       $mask = $hide;
       if ($links) {
         $replace = array(
@@ -149,7 +152,7 @@ ORDER BY page_type, page_id";
 
       if ($pcpInfoDao->status_id != $approved || $pcpInfoDao->is_active != 1) {
         $class = 'disabled';
-        if (!$pcpInfoDao->tellfriend) {
+        if (!$pcpInfoDao->is_tellfriend_enabled) {
           $mask -= CRM_Core_Action::DETACH;
         }
       }
