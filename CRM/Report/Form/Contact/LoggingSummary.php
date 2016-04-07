@@ -174,6 +174,13 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
     $newRows = array();
 
     foreach ($rows as $key => &$row) {
+      $baseQueryCriteria = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}";
+      if (!CRM_Logging_Differ::checkLogCanBeUsedWithNoLogDate($row['log_civicrm_entity_log_date'])) {
+        $baseQueryCriteria .= '&log_date=' . CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
+      }
+      if ($this->cid) {
+        $baseQueryCriteria .= '&cid=' . $this->cid;
+      }
       if (!isset($isDeleted[$row['log_civicrm_entity_altered_contact_id']])) {
         $isDeleted[$row['log_civicrm_entity_altered_contact_id']] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
           $row['log_civicrm_entity_altered_contact_id'], 'is_deleted') !== '0';
@@ -198,7 +205,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       }
 
       if ('Contact' == CRM_Utils_Array::value('log_type', $this->_logTables[$row['log_civicrm_entity_log_type']]) &&
-        CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == 'Insert'
+        CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == ts('Insert')
       ) {
         $row['log_civicrm_entity_log_action'] = ts('Update');
       }
@@ -216,18 +223,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       $date = CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
 
       if ('Update' == CRM_Utils_Array::value('log_civicrm_entity_log_action', $row)) {
-        $q = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}&log_date=" . $date;
-        if ($this->cid) {
-          $q .= '&cid=' . $this->cid;
-        }
-        $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ? '&alteredName=' . $row['log_civicrm_entity_altered_contact'] : '';
-        $q .= (!empty($row['altered_by_contact_display_name'])) ? '&alteredBy=' . $row['altered_by_contact_display_name'] : '';
-        $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ? '&alteredById=' . $row['log_civicrm_entity_log_user_id'] : '';
-
-        $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
-        $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
-        $hoverTitle = ts('View details for this update');
-        $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><i class=\"crm-i fa-list-alt\"></i></a>&nbsp;<a title='{$hoverTitle}' href='{$url2}'>" . ts('Update') . '</a>';
+        $row = $this->addDetailReportLinksToRow($baseQueryCriteria, $row);
       }
 
       $key = $date . '_' .
@@ -274,6 +270,27 @@ FROM `{$this->loggingDB}`.$tableName entity_log_civireport
 {$joinClause}
 LEFT  JOIN civicrm_contact altered_by_contact_civireport
         ON (entity_log_civireport.log_user_id = altered_by_contact_civireport.id)";
+  }
+
+  /**
+   * Add links & hovers to the detailed report.
+   *
+   * @param $baseQueryCriteria
+   * @param $row
+   *
+   * @return mixed
+   */
+  protected function addDetailReportLinksToRow($baseQueryCriteria, $row) {
+    $q = $baseQueryCriteria;
+    $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ? '&alteredName=' . $row['log_civicrm_entity_altered_contact'] : '';
+    $q .= (!empty($row['altered_by_contact_display_name'])) ? '&alteredBy=' . $row['altered_by_contact_display_name'] : '';
+    $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ? '&alteredById=' . $row['log_civicrm_entity_log_user_id'] : '';
+
+    $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
+    $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
+    $hoverTitle = ts('View details for this update');
+    $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><i class=\"crm-i fa-list-alt\"></i></a>&nbsp;<a title='{$hoverTitle}' href='{$url2}'>" . $row['log_civicrm_entity_log_action'] . '</a>';
+    return $row;
   }
 
 }
