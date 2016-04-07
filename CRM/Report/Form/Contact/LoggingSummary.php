@@ -53,6 +53,11 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'log_grouping' => array(
+            'required' => TRUE,
+            'title' => ts('Extra information to control grouping'),
+            'no_display' => TRUE,
+          ),
           'log_action' => array(
             'default' => TRUE,
             'title' => ts('Action'),
@@ -174,6 +179,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
     $newRows = array();
 
     foreach ($rows as $key => &$row) {
+      $isMerge = 0;
       $baseQueryCriteria = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}";
       if (!CRM_Logging_Differ::checkLogCanBeUsedWithNoLogDate($row['log_civicrm_entity_log_date'])) {
         $baseQueryCriteria .= '&log_date=' . CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
@@ -196,6 +202,10 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         if ($entity) {
           $row['log_civicrm_entity_altered_contact'] = $row['log_civicrm_entity_altered_contact'] . " [{$entity}]";
         }
+        if ($entity == 'Contact Merged') {
+          $isMerge = 1;
+        }
+
       }
       $row['altered_by_contact_display_name_link'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $row['log_civicrm_entity_log_user_id']);
       $row['altered_by_contact_display_name_hover'] = ts("Go to contact summary");
@@ -228,6 +238,11 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
 
       $key = $date . '_' .
         $row['log_civicrm_entity_log_type'] . '_' .
+        // This ensures merge activities are not 'lost' by aggregation.
+        // I would prefer not to lose other entities either but it's a balancing act as
+        // described in https://issues.civicrm.org/jira/browse/CRM-12867 so adding this criteria
+        // while hackish saves us from figuring out if the original decision is still good.
+        $isMerge .
         $row['log_civicrm_entity_log_conn_id'] . '_' .
         $row['log_civicrm_entity_log_user_id'] . '_' .
         $row['log_civicrm_entity_altered_contact_id'];
@@ -263,6 +278,11 @@ INNER JOIN civicrm_contact modified_contact_civireport
 INNER JOIN `{$this->loggingDB}`.{$detail['joins']['table']} fk_table ON {$detail['joins']['join']}
 INNER JOIN civicrm_contact modified_contact_civireport
         ON (fk_table.{$detail['fk']} = modified_contact_civireport.id {$clause})";
+    }
+
+    if (!empty($detail['extra_joins'])) {
+      $joinClause .= "
+INNER JOIN `{$this->loggingDB}`.{$detail['extra_joins']['table']} extra_table ON {$detail['extra_joins']['join']}";
     }
 
     $this->_from = "
