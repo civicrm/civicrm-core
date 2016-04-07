@@ -190,7 +190,7 @@ WHERE lt.log_conn_id = %1
 
     $changedDAO = CRM_Core_DAO::executeQuery($changedSQL, $params);
     while ($changedDAO->fetch()) {
-      if (empty($this->log_date) && !$this->checkLogCanBeUsedWithNoLogDate($changedDAO->log_date)) {
+      if (empty($this->log_date) && !self::checkLogCanBeUsedWithNoLogDate($changedDAO->log_date)) {
         throw new CRM_Core_Exception('The connection date must be passed in to disambiguate this logging entry per CRM-18193');
       }
       $changed = $changedDAO->toArray();
@@ -459,7 +459,8 @@ ORDER BY log_date
    * @return bool
    * @throws \CiviCRM_API3_Exception
    */
-  protected function checkLogCanBeUsedWithNoLogDate($change_date) {
+  public static function checkLogCanBeUsedWithNoLogDate($change_date) {
+
     if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_all_tables_uniquid', 'group' => 'CiviCRM Preferences'))) {
       return TRUE;
     };
