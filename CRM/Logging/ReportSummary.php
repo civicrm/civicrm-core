@@ -127,6 +127,10 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         'table_name' => 'log_civicrm_activity_contact',
         'log_type' => 'Activity',
         'field' => 'activity_id',
+        'extra_joins' => array(
+          'table' => 'log_civicrm_activity',
+          'join' => 'extra_table.id = entity_log_civireport.activity_id',
+        ),
 
         'bracket_info' => array(
           'entity_column' => 'activity_type_id',
@@ -202,6 +206,13 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       $this->_selectAliases[] = $alias;
       return "activity_id";
     }
+    if ($fieldName == 'log_grouping') {
+      if ($this->currentLogTable != 'log_civicrm_activity_contact') {
+        return 1;
+      }
+      $mergeActivityID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contact Merged');
+      return " IF (entity_log_civireport.log_action = 'Insert' AND extra_table.activity_type_id = $mergeActivityID , GROUP_CONCAT(entity_log_civireport.contact_id), 1) ";
+    }
   }
 
   public function where() {
@@ -216,7 +227,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $this->beginPostProcess();
     $rows = array();
 
-    $tempColumns = "id int(10)";
+    $tempColumns = "id int(10),  log_civicrm_entity_log_grouping varchar(32)";
     if (!empty($this->_params['fields']['log_action'])) {
       $tempColumns .= ", log_action varchar(64)";
     }
@@ -295,7 +306,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $sql = "{$this->_select}
 FROM civicrm_temp_civireport_logsummary entity_log_civireport
 WHERE {$logTypeTableClause}
-GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civicrm_entity_log_conn_id, log_civicrm_entity_log_user_id, log_civicrm_entity_altered_contact_id
+GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civicrm_entity_log_conn_id, log_civicrm_entity_log_user_id, log_civicrm_entity_altered_contact_id, log_civicrm_entity_log_grouping
 ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
     $sql = str_replace('modified_contact_civireport.display_name', 'entity_log_civireport.altered_contact', $sql);
     $sql = str_replace('modified_contact_civireport.id', 'entity_log_civireport.altered_contact_id', $sql);
