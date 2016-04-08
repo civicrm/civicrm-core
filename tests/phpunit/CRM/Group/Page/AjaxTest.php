@@ -65,8 +65,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   public function setPermissionAndRequest($permission) {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = (array) $permission;
     CRM_Contact_BAO_Group::getPermissionClause(TRUE);
-    global $_GET;
-    $_GET = $this->_params;
+    global $_REQUEST;
+    $_REQUEST = $this->_params;
   }
 
   /**
@@ -77,8 +77,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = (array) $permission;
     $this->hookClass->setHook('civicrm_aclGroup', array($this, $hook));
     CRM_Contact_BAO_Group::getPermissionClause(TRUE);
-    global $_GET;
-    $_GET = $this->_params;
+    global $_REQUEST;
+    $_REQUEST = $this->_params;
   }
 
   /**
@@ -88,8 +88,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('not-me-active', $groups[4]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-active</span>', $groups[4]['group_name']);
   }
 
   /**
@@ -99,15 +99,15 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('not-me-active', $groups[4]['title']);
+    $this->assertEquals('pick-me-active', $groups[2]['group_name']);
+    $this->assertEquals('not-me-active', $groups[4]['group_name']);
 
     // as per changes made in PR-6822
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('not-me-active', $groups[4]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-active</span>', $groups[4]['group_name']);
   }
 
   /**
@@ -120,8 +120,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   /**
@@ -141,8 +141,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest(array('edit all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('not-me-active', $groups[4]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-active</span>', $groups[4]['group_name']);
   }
 
   /**
@@ -153,8 +153,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('not-me-active', $groups[4]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-active</span>', $groups[4]['group_name']);
   }
 
   /**
@@ -165,8 +165,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
-    $this->assertEquals('not-me-disabled', $groups[3]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-disabled</span>', $groups[3]['group_name']);
   }
 
   /**
@@ -178,7 +178,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, $total);
-    $this->assertEquals('not-me-disabled', $groups[3]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-disabled</span>', $groups[3]['group_name']);
   }
 
   /**
@@ -190,7 +190,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, $total);
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   /**
@@ -201,10 +201,10 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(4, $total);
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
-    $this->assertEquals('not-me-disabled', $groups[3]['title']);
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('not-me-active', $groups[4]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-disabled</span>', $groups[3]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">not-me-active</span>', $groups[4]['group_name']);
   }
 
 
@@ -281,7 +281,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
   }
 
   public function testTraditionalACLNotFoundTitle() {
@@ -300,8 +300,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   public function testTraditionalACLDisabled() {
@@ -311,7 +311,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   public function testTraditionalACLDisabledFoundTitle() {
@@ -322,7 +322,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   public function testTraditionalACLDisabledNotFoundTitle() {
@@ -342,7 +342,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
   }
 
   public function testTraditionalACLAll() {
@@ -352,8 +352,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   /**
@@ -365,7 +365,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   /**
@@ -378,7 +378,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   /**
@@ -402,7 +402,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
   }
 
   /**
@@ -425,8 +425,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   /**
@@ -438,8 +438,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
-    $this->assertEquals('pick-me-disabled', $groups[1]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-disabled</span>', $groups[1]['group_name']);
   }
 
   /**
@@ -451,7 +451,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups[2]['title']);
+    $this->assertEquals('<span class="crm-editable crmf-title">pick-me-active</span>', $groups[2]['group_name']);
   }
 
   /**
