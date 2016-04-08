@@ -180,8 +180,8 @@ class CRM_Core_Page_AJAX_Location {
           }
           elseif ($htmlType == 'Select Date') {
             $elements["onbehalf_{$key}"]['type'] = $htmlType;
-            $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
-            $elements["onbehalf_{$key}_display"]['value'] = $defaults[$key];
+            //CRM-18349, date value must be ISO formatted before being set as a default value for crmDatepicker custom field
+            $elements["onbehalf_{$key}"]['value'] = CRM_Utils_Date::processDate($defaults[$key], NULL, FALSE, 'Y-m-d G:i:s');
           }
           else {
             $elements["onbehalf_{$key}"]['type'] = $htmlType;
