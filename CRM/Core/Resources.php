@@ -603,7 +603,7 @@ class CRM_Core_Resources {
         }
       }
 
-      global $tsLocale;
+      $tsLocale = CRM_Core_I18n::getLocale();
       // Dynamic localization script
       $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $tsLocale, array('r' => $this->getCacheCode())), $jsWeight++, $region);
 
@@ -753,7 +753,7 @@ class CRM_Core_Resources {
       $items[] = "js/crm.optionEdit.js";
     }
 
-    global $tsLocale;
+    $tsLocale = CRM_Core_I18n::getLocale();
     // Add localized jQuery UI files
     if ($tsLocale && $tsLocale != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)

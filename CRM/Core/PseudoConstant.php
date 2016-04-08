@@ -706,7 +706,7 @@ class CRM_Core_PseudoConstant {
       self::populate(self::$stateProvince, 'CRM_Core_DAO_StateProvince', TRUE, 'name', 'is_active', $whereClause);
 
       // localise the province names if in an non-en_US locale
-      global $tsLocale;
+      $tsLocale = CRM_Core_I18n::getLocale();
       if ($tsLocale != '' and $tsLocale != 'en_US') {
         $i18n = CRM_Core_I18n::singleton();
         $i18n->localizeArray(self::$stateProvince, array(
@@ -837,7 +837,7 @@ WHERE  id = %1";
       }
 
       // localise the country names if in an non-en_US locale
-      global $tsLocale;
+      $tsLocale = CRM_Core_I18n::getLocale();
       if ($tsLocale != '' and $tsLocale != 'en_US') {
         $i18n = CRM_Core_I18n::singleton();
         $i18n->localizeArray(self::$country, array(
@@ -1565,7 +1565,7 @@ ORDER BY name";
 
     // localise the stateProvince names if in an non-en_US locale
     $config = CRM_Core_Config::singleton();
-    global $tsLocale;
+    $tsLocale = CRM_Core_I18n::getLocale();
     if ($tsLocale != '' and $tsLocale != 'en_US') {
       $i18n = CRM_Core_I18n::singleton();
       $i18n->localizeArray($result, array(
