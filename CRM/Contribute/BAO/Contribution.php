@@ -4354,8 +4354,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
     $event = CRM_Utils_Array::value('event', $objects);
 
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
     $contributionParams = array_merge(array(
-      'contribution_status_id' => 'Completed',
+      'contribution_status_id' => $contributionStatuses['Completed'],
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
@@ -4493,6 +4497,14 @@ LIMIT 1;";
 
     civicrm_api3('Contribution', 'create', $contributionParams);
 
+    // CRM-18303: Reload contribution object with updated information
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $contributionParams['id'];
+    $contribution->find(TRUE);
+    $contribution->loadRelatedObjects($input, $ids);
+    $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
+    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
+
     // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
@@ -4508,10 +4520,6 @@ LIMIT 1;";
       }
     }
 
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
-      'labelColumn' => 'name',
-      'flip' => 1,
-    ));
     if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
       $input['payment_processor'] = $paymentProcessorId;
     }
@@ -4524,9 +4532,6 @@ LIMIT 1;";
     elseif (!empty($contribution->_relatedObjects['membership'])) {
       $input['skipLineItem'] = TRUE;
       $input['contribution_mode'] = 'membership';
-      $contribution->contribution_status_id = $contributionStatuses['Completed'];
-      $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $input);
-      $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     }
     $input['contribution_status_id'] = $contributionStatuses['Completed'];
     $input['total_amount'] = $input['amount'];
@@ -4570,7 +4575,7 @@ LIMIT 1;";
     if (!array_key_exists('is_email_receipt', $values) ||
       $values['is_email_receipt'] == 1
     ) {
-      self::sendMail($input, $ids, $objects['contribution'], $values, $recur, FALSE);
+      self::sendMail($input, $ids, $contribution, $values, $recur, FALSE);
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
 
