@@ -134,9 +134,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
     }
 
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
-      $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       // @todo - should we include Chargeback? If so use self::isContributionStatusNegative($params['contribution_status_id'])
       if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
         || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
@@ -4344,6 +4344,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'campaign_id',
       'receive_date',
       'receipt_date',
+      'contribution_status_id',
     );
     if (self::isSingleLineItem($primaryContributionID)) {
       $inputContributionWhiteList[] = 'financial_type_id';
@@ -4354,8 +4355,10 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
     $event = CRM_Utils_Array::value('event', $objects);
 
+    $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+
     $contributionParams = array_merge(array(
-      'contribution_status_id' => 'Completed',
+      'contribution_status_id' => $completedContributionStatusID,
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
@@ -4524,11 +4527,11 @@ LIMIT 1;";
     elseif (!empty($contribution->_relatedObjects['membership'])) {
       $input['skipLineItem'] = TRUE;
       $input['contribution_mode'] = 'membership';
-      $contribution->contribution_status_id = $contributionStatuses['Completed'];
+      $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
       $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $input);
       $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     }
-    $input['contribution_status_id'] = $contributionStatuses['Completed'];
+    $input['contribution_status_id'] = $contributionParams['contribution_status_id'];
     $input['total_amount'] = $input['amount'];
     $input['contribution'] = $contribution;
     $input['financial_type_id'] = $contribution->financial_type_id;
