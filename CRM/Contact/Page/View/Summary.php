@@ -395,13 +395,20 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'weight' => $weight,
         'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
         'hideCount' => !$group['is_multiple'],
-        'class' => 'livePage'
+        'class' => 'livePage',
       );
       $weight += 10;
     }
 
     // see if any other modules want to add any tabs
     CRM_Utils_Hook::tabs($allTabs, $this->_contactId);
+
+    $allTabs[] = array(
+      'id' => 'summary',
+      'url' => '#contact-summary',
+      'title' => ts('Summary'),
+      'weight' => 0,
+    );
 
     // now sort the tabs based on weight
     usort($allTabs, array('CRM_Utils_Sort', 'cmpFunc'));
