@@ -73,7 +73,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   /**
    * The actual redis object
    *
-   * @var resource
+   * @var Redis
    */
   protected $_cache;
 
@@ -147,7 +147,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    * @return mixed
    */
   public function flush() {
-    return $this->_cache->flush();
+    return $this->_cache->flushDB();
   }
 
 }
