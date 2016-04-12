@@ -455,6 +455,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $params['overrideFKConstraint'] = 0;
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
+      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      $params['collapse_display'] = CRM_Utils_Array::value('collapse_display', $params, FALSE);
+      $params['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $params, FALSE);
       if ($this->_defaults['extends'][0] != $params['extends'][0]) {
         $params['overrideFKConstraint'] = 1;
       }
