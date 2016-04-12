@@ -51,6 +51,9 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $this->_contactID = $this->individualCreate();
+    $session = CRM_Core_Session::singleton();
+    $session->set('userID', $this->_contactID);
+
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', array(
         'title' => "Test Contribution Page",
         'financial_type_id' => $this->_financialTypeID,

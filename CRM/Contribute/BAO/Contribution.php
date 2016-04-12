@@ -4552,8 +4552,11 @@ LIMIT 1;";
     CRM_Core_Error::debug_log_message("Contribution record updated successfully");
     $transaction->commit();
 
-    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution->id, $recurringContributionID,
-      $input['contribution_status_id'], $input['total_amount']);
+    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution->id,
+      $recurringContributionID,
+      $input['contribution_status_id'],
+      $input['total_amount']
+    );
 
     // create an activity record
     if ($input['component'] == 'contribute') {
@@ -4611,23 +4614,21 @@ LIMIT 1;";
    * @return array
    */
   public static function sendMail(&$input, &$ids, $contribution, &$values, $recur = FALSE, $returnMessageText = FALSE) {
-    $input['is_recur'] = $recur;
-    $input['receipt_date'] = $contribution->receipt_date;
-    // set receipt from e-mail and name in value
-    if (!$returnMessageText) {
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
-      if (!empty($userID)) {
-        list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
-        $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $input, $userEmail);
-        $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
-      }
-    }
+    $params = array(
+      'id' => $contribution->id,
+      'return_text' => $returnMessageText,
+      'is_recur' => $recur,
+      'receipt_date' => $contribution->receipt_date,
+      'payment_processor_id' => CRM_Utils_Array::value('payment_processor_id', $input,
+        CRM_Utils_Array::value('paymentProcessor', $ids)
+      ),
+    );
+
     // Contribution ID should really always be set. But ?
     if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update'])) {
       civicrm_api3('Contribution', 'create', array('receipt_date' => 'now', 'id' => $contribution->id));
     }
-    return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
+    return civicrm_api3('Contribution', 'sendconfirmation', $params);
   }
 
   /**
