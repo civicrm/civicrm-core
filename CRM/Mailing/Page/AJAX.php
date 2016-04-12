@@ -65,7 +65,7 @@ class CRM_Mailing_Page_AJAX {
 
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
+      $sortMapper[$key] = CRM_Utils_Type::escape(CRM_Utils_Array::value('data', $value), 'String');
     };
 
     $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
@@ -73,7 +73,7 @@ class CRM_Mailing_Page_AJAX {
     $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
 
-    $params = $_GET;
+    $params = array();
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
     }

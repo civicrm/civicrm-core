@@ -117,19 +117,19 @@ class CRM_Custom_Page_AJAX {
     $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 10;
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
+      $sortMapper[$key] = CRM_Utils_Type::escape(CRM_Utils_Array::value('data', $value), 'String');
     };
     $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
 
     $params['page'] = ($offset / $rowCount) + 1;
     $params['rp'] = $rowCount;
-    $contactType = CRM_Contact_BAO_Contact::getContactType($params['cid']);
+    $contactType = CRM_Contact_BAO_Contact::getContactType(CRM_Utils_Type::escape(CRM_Utils_Array::value('cid', $params), 'Interger'));
 
     $obj = new CRM_Profile_Page_MultipleRecordFieldsListing();
     $obj->_pageViewType = 'customDataView';
-    $obj->_contactId = $params['cid'];
-    $obj->_customGroupId = $params['cgid'];
+    $obj->_contactId = CRM_Utils_Type::escape(CRM_Utils_Array::value('cid', $params), 'Integer');
+    $obj->_customGroupId = CRM_Utils_Type::escape(CRM_Utils_Array::value('cgid', $params), 'Integer');
     $obj->_contactType = $contactType;
     $obj->_DTparams['offset'] = ($params['page'] - 1) * $params['rp'];
     $obj->_DTparams['rowCount'] = $params['rp'];
