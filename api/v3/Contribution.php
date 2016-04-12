@@ -384,6 +384,8 @@ function civicrm_api3_contribution_transact($params) {
  *   Input parameters.
  *
  * @throws Exception
+ *
+ * @return array
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
@@ -391,9 +393,27 @@ function civicrm_api3_contribution_sendconfirmation($params) {
   if (!$contribution->find(TRUE)) {
     throw new Exception('Contribution does not exist');
   }
-  $input = $ids = $cvalues = array('receipt_from_email' => $params['receipt_from_email']);
+
+  unset($params['version']);
+  foreach (array('is_recur', 'return_text') as $key) {
+    if (empty($params[$key])){
+      $params[$key] = FALSE;
+    }
+  }
+
+  $input = $cvalues = $ids = array();
+  $input = $params;
+
+  $userID = CRM_Core_Session::getLoggedInContactID();
+  if (empty($params['return_text']) && is_numeric($userID)) {
+    // set receipt from e-mail and name in value
+    list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+    $cvalues['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $input, $userEmail);
+    $cvalues['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
+  }
+
   $contribution->loadRelatedObjects($input, $ids, TRUE);
-  $contribution->composeMessageArray($input, $ids, $cvalues, FALSE, FALSE);
+  return $contribution->composeMessageArray($input, $ids, $cvalues, $params['is_recur'], $params['return_text']);
 }
 
 /**
@@ -410,8 +430,15 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
     'title' => 'Contribution ID',
     'type' => CRM_Utils_Type::T_INT,
   );
+  $params['is_recur'] = array(
+    'title' => 'Is Recurring Contribution?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+  $params['return_text'] = array(
+    'title' => 'Should text be returned instead of sent',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
   $params['receipt_from_email'] = array(
-    'api.required' => 1,
     'title' => 'From Email address (string) required until someone provides a patch :-)',
     'type' => CRM_Utils_Type::T_STRING,
   );
