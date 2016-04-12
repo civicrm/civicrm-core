@@ -34,7 +34,7 @@
  */
 class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   const DEFAULT_HOST    = 'localhost';
-  const DEFAULT_PORT    = 11211;
+  const DEFAULT_PORT    = 6379;
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX  = '';
 
