@@ -505,25 +505,32 @@ WHERE  civicrm_pledge.id = %2
    * will be the 15th of the relevant month. Then to calculate the payments you can use intervalAdd ie.
    * CRM_Utils_Date::intervalAdd( $params['frequency_unit'], $i * ($params['frequency_interval']) , calculateBaseScheduledDate( &$params )))
    *
-   *
    * @param array $params
+   * @param int $paymentNo
    *
    * @return array
    *   Next scheduled date as an array
    */
-  public static function calculateBaseScheduleDate(&$params) {
+  public static function calculateBaseScheduleDate(&$params, $paymentNo = NULL) {
     $date = array();
     $scheduled_date = CRM_Utils_Date::processDate($params['scheduled_date']);
     $date['year'] = (int) substr($scheduled_date, 0, 4);
     $date['month'] = (int) substr($scheduled_date, 4, 2);
     $date['day'] = (int) substr($scheduled_date, 6, 2);
+    $date['hour'] = (int) substr($scheduled_date, 7, 2);
+    $date['minute'] = (int) substr($scheduled_date, 9, 2);
+    $date['seconds'] = (int) substr($scheduled_date, 11, 2);
     // calculation of schedule date according to frequency day of period
     // frequency day is not applicable for daily installments
     if ($params['frequency_unit'] != 'day' && $params['frequency_unit'] != 'year') {
       if ($params['frequency_unit'] != 'week') {
-
-        // for month use day of next month as next payment date
+        // CRM-18316: To calculate pledge scheduled dates at the end of a month.
         $date['day'] = $params['frequency_day'];
+        $interval = $paymentNo * ($params['frequency_interval']);
+        $lastDayOfMonth = date('t', mktime($date['hour'], $date['minute'], $date['seconds'], $date['month'] + $interval, 1, $date['year']));
+        if ($lastDayOfMonth < $date['day']) {
+          $date['day'] = $lastDayOfMonth;
+        }
       }
       elseif ($params['frequency_unit'] == 'week') {
 
@@ -560,7 +567,7 @@ WHERE  civicrm_pledge.id = %2
    */
   public static function calculateNextScheduledDate(&$params, $paymentNo, $basePaymentDate = NULL) {
     if (!$basePaymentDate) {
-      $basePaymentDate = self::calculateBaseScheduleDate($params);
+      $basePaymentDate = self::calculateBaseScheduleDate($params, $paymentNo);
     }
     return CRM_Utils_Date::format(
       CRM_Utils_Date::intervalAdd(
