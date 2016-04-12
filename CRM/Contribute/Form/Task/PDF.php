@@ -187,7 +187,7 @@ AND    {$this->_componentClause}";
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
       $values = array();
-      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution'], $values, FALSE,
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values, FALSE,
         $elements['createPdf']);
 
       if ($mail['html']) {

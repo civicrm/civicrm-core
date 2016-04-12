@@ -4393,9 +4393,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $values['amount'] = $recurContrib->amount;
         $values['financial_type_id'] = $objects['contributionType']->id;
         $values['title'] = $source = ts('Offline Recurring Contribution');
-        $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-        $values['receipt_from_name'] = $domainValues[0];
-        $values['receipt_from_email'] = $domainValues[1];
       }
 
       if ($recurContrib && $recurContrib->id && !isset($input['is_email_receipt'])) {
@@ -4573,7 +4570,10 @@ LIMIT 1;";
     if (!array_key_exists('is_email_receipt', $values) ||
       $values['is_email_receipt'] == 1
     ) {
-      self::sendMail($input, $ids, $objects['contribution'], $values, $recur, FALSE);
+      civicrm_api3('Contribution', 'sendconfirmation', array(
+        'id' => $contribution->id,
+        'payment_processor_id' => $paymentProcessorId,
+      ));
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
 
@@ -4596,7 +4596,7 @@ LIMIT 1;";
    *   Incoming data from Payment processor.
    * @param array $ids
    *   Related object IDs.
-   * @param CRM_Contribute_BAO_Contribution $contribution
+   * @param int $contributionID
    * @param array $values
    *   Values related to objects that have already been loaded.
    * @param bool $recur
@@ -4606,10 +4606,19 @@ LIMIT 1;";
    *   is because the function is also used to generate pdfs
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function sendMail(&$input, &$ids, $contribution, &$values, $recur = FALSE, $returnMessageText = FALSE) {
+  public static function sendMail(&$input, &$ids, $contributionID, &$values, $recur = FALSE,
+                                  $returnMessageText = FALSE) {
     $input['is_recur'] = $recur;
-    $input['receipt_date'] = $contribution->receipt_date;
+
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $contributionID;
+    if (!$contribution->find(TRUE)) {
+      throw new CRM_Core_Exception('Contribution does not exist');
+    }
+    $contribution->loadRelatedObjects($input, $ids, TRUE);
     // set receipt from e-mail and name in value
     if (!$returnMessageText) {
       $session = CRM_Core_Session::singleton();
@@ -4623,6 +4632,7 @@ LIMIT 1;";
     // Contribution ID should really always be set. But ?
     if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update'])) {
       civicrm_api3('Contribution', 'create', array('receipt_date' => 'now', 'id' => $contribution->id));
+      $values['receipt_date'] = date('Y-m-d H:i:s');
     }
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
   }

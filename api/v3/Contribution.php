@@ -386,14 +386,22 @@ function civicrm_api3_contribution_transact($params) {
  * @throws Exception
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
-  $contribution = new CRM_Contribute_BAO_Contribution();
-  $contribution->id = $params['id'];
-  if (!$contribution->find(TRUE)) {
-    throw new Exception('Contribution does not exist');
+  $input = $ids = $values = array();
+  $passThroughParams = array(
+    'receipt_from_email',
+    'receipt_from_name',
+    'receipt_update',
+    'cc_receipt',
+    'bcc_receipt',
+    'receipt_text',
+    'payment_processor_id',
+  );
+  foreach ($passThroughParams as $key) {
+    if (isset($params[$key])) {
+      $input[$key] = $params[$key];
+    }
   }
-  $input = $ids = $cvalues = array('receipt_from_email' => $params['receipt_from_email']);
-  $contribution->loadRelatedObjects($input, $ids, TRUE);
-  $contribution->composeMessageArray($input, $ids, $cvalues, FALSE, FALSE);
+  CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
 }
 
 /**
@@ -407,29 +415,37 @@ function civicrm_api3_contribution_sendconfirmation($params) {
 function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
   $params['id'] = array(
     'api.required' => 1,
-    'title' => 'Contribution ID',
+    'title' => ts('Contribution ID'),
     'type' => CRM_Utils_Type::T_INT,
   );
   $params['receipt_from_email'] = array(
-    'api.required' => 1,
-    'title' => 'From Email address (string) required until someone provides a patch :-)',
+    'title' => ts('From Email address (string)'),
     'type' => CRM_Utils_Type::T_STRING,
   );
   $params['receipt_from_name'] = array(
-    'title' => 'From Name (string)',
+    'title' => ts('From Name (string)'),
     'type' => CRM_Utils_Type::T_STRING,
   );
   $params['cc_receipt'] = array(
-    'title' => 'CC Email address (string)',
+    'title' => ts('CC Email address (string)'),
     'type' => CRM_Utils_Type::T_STRING,
   );
   $params['bcc_receipt'] = array(
-    'title' => 'BCC Email address (string)',
+    'title' => ts('BCC Email address (string)'),
     'type' => CRM_Utils_Type::T_STRING,
   );
   $params['receipt_text'] = array(
-    'title' => 'Message (string)',
+    'title' => ts('Message (string)'),
     'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['receipt_update'] = array(
+    'title' => ts('Update the Receipt Date'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => TRUE,
+  );
+  $params['payment_processor_id'] = array(
+    'title' => ts('Payment processor Id (avoids mis-guesses)'),
+    'type' => CRM_Utils_Type::T_INT,
   );
 }
 
