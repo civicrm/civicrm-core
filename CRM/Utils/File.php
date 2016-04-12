@@ -287,16 +287,23 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param $dsn
+   * @param string|NULL $dsn
+   *   Use NULL to load the default/active connection from CRM_Core_DAO.
+   *   Otherwise, give a full DSN string.
    * @param string $fileName
    * @param null $prefix
    * @param bool $isQueryString
    * @param bool $dieOnErrors
    */
   public static function sourceSQLFile($dsn, $fileName, $prefix = NULL, $isQueryString = FALSE, $dieOnErrors = TRUE) {
-    require_once 'DB.php';
+    if ($dsn === NULL) {
+      $db = CRM_Core_DAO::getConnection();
+    }
+    else {
+      require_once 'DB.php';
+      $db = DB::connect($dsn);
+    }
 
-    $db = DB::connect($dsn);
     if (PEAR::isError($db)) {
       die("Cannot open $dsn: " . $db->getMessage());
     }

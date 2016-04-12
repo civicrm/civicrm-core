@@ -116,6 +116,15 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * @return DB_common
+   */
+  public static function getConnection() {
+    global $_DB_DATAOBJECT;
+    $dao = new CRM_Core_DAO();
+    return $_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5];
+  }
+
+  /**
    * @param string $fieldName
    * @param $fieldDef
    * @param array $params
