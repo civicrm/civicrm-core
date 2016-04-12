@@ -111,9 +111,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Load saved search sql files into the DB.
    */
   public function loadSavedSearches() {
-    $dsn = CRM_Core_Config::singleton()->dsn;
     foreach (glob(dirname(__FILE__) . "/SavedSearchDataSets/*.sql") as $file) {
-      CRM_Utils_File::sourceSQLFile($dsn, $file);
+      CRM_Utils_File::sourceSQLFile(NULL, $file);
     }
   }
 
