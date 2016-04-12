@@ -82,6 +82,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   protected $paymentInstruments = array();
 
   /**
+   * @var CiviMailUtils
+   */
+  protected $mut;
+
+  /**
    * Test setup for every test.
    *
    * Connect to the database, truncate the tables that will be used
@@ -426,6 +431,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $form = $this->getForm();
+    $this->mut = new CiviMailUtils($this, TRUE);
     $form->_mode = 'test';
     $this->createLoggedInUser();
     $params = array(
@@ -444,7 +450,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'soft_credit_type_id' => '',
       'soft_credit_contact_id' => '',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
-      'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->_paymentProcessorID,
       'credit_card_number' => '4111111111111111',
       'cvv2' => '123',
@@ -460,6 +465,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'billing_state_province_id-5' => '1003',
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
+      'send_receipt' => TRUE,
+      'receipt_text' => 'Receipt text',
     );
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params);
@@ -475,6 +482,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
     ), 1);
+    $this->mut->checkMailLog(array(
+      '50',
+      'Receipt text',
+    ));
+    $this->mut->stop();
   }
 
   /**
