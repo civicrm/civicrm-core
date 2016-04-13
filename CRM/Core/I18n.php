@@ -565,7 +565,7 @@ class CRM_Core_I18n {
    *   Language (for example 'en_US', or 'fr_CA').
    *   True if the domain was changed for an extension.
    */
-  public function setLocale($language) {
+  public static function setLocale($language) {
 
     $config = CRM_Core_Config::singleton();
 
@@ -602,8 +602,9 @@ class CRM_Core_I18n {
     }
 
     // for sql queries
-    global $dbLocale;
+    global $dbLocale, $tsLocale;
     $dbLocale = "_{$language}";
+    $tsLocale = $language;
 
   }
 
@@ -677,15 +678,6 @@ class CRM_Core_I18n {
   public static function getLocale() {
     global $tsLocale;
     return $tsLocale;
-  }
-
-  /**
-   * Set the current locale
-   * @param $locale
-   */
-  public static function setLocale($locale) {
-    global $tsLocale;
-    $tsLocale = $locale;
   }
 
 }
