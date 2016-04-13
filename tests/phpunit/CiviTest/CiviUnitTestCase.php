@@ -3403,4 +3403,40 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     return $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $priceField->id));
   }
 
+  /**
+   * Replace the template with a test-oriented template designed to show all the variables.
+   *
+   * @param string $templateName
+   */
+  protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt') {
+    $testTemplate = file_get_contents(__DIR__ . '/../../templates/message_templates/' . $templateName . '_html.tpl');
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_option_group og
+      LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
+      LEFT JOIN civicrm_msg_template m ON m.workflow_id = ov.id
+      SET m.msg_html = '{$testTemplate}'
+      WHERE og.name = 'msg_tpl_workflow_contribution'
+      AND ov.name = '{$templateName}'
+      AND m.is_default = 1"
+    );
+  }
+
+  /**
+   * Reinstate the default template.
+   *
+   * @param string $templateName
+   */
+  protected function revertTemplateToReservedTemplate($templateName = 'contribution_online_receipt') {
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_option_group og
+      LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
+      LEFT JOIN civicrm_msg_template m ON m.workflow_id = ov.id
+      LEFT JOIN civicrm_msg_template m2 ON m2.workflow_id = ov.id AND m2.is_reserved = 1
+      SET m.msg_html = m2.msg_html
+      WHERE og.name = 'msg_tpl_workflow_contribution'
+      AND ov.name = '{$templateName}'
+      AND m.is_default = 1"
+    );
+  }
+
 }
