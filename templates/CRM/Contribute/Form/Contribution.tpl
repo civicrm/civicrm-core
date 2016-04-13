@@ -609,10 +609,8 @@ function showStartDate( ) {
 
 {/literal}{/if}{literal}
 cj('#fee_amount').change( function() {
-  var totalAmount = cj('#total_amount').val();
-  var feeAmount = cj('#fee_amount').val();
-  var netAmount = totalAmount.replace(/,/g, '') - feeAmount.replace(/,/g, '');
-  if (!cj('#net_amount').val() && totalAmount) {
+  var netAmount = CRM.unformatMoney(cj('#total_amount').val()) - CRM.unformatMoney(cj('#fee_amount').val());
+  if (!cj('#net_amount').val() && cj('#total_amount').val()) {
     cj('#net_amount').val(CRM.formatMoney(netAmount, true));
   }
 });
