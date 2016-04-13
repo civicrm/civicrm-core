@@ -2552,17 +2552,18 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $addressParams = array('id' => $this->address_id);
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams, FALSE, 'id');
       $addressDetails = array_values($addressDetails);
-      $values['address'] = $addressDetails[0]['display'];
     }
     // Else we assign the billing address of the contribution contact.
     else {
       $addressParams = array('contact_id' => $this->contact_id, 'is_billing' => 1);
-      $addressDetails = CRM_Core_BAO_Address::getValues($addressParams);
-      if (!is_null($addressDetails)) {
-        $addressDetails = array_values($addressDetails);
-        $values['address'] = $addressDetails[0]['display'];
-      }
+      $addressDetails = (array) CRM_Core_BAO_Address::getValues($addressParams);
+      $addressDetails = array_values($addressDetails);
     }
+
+    if (!empty($addressDetails[0]['display'])) {
+      $values['address'] = $addressDetails[0]['display'];
+    }
+
     if ($this->_component == 'contribute') {
       //get soft contributions
       $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);

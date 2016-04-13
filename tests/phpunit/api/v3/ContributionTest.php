@@ -1604,6 +1604,61 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test to check whether contact billing address is used when no contribution address
+   */
+  public function testBillingAddress() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->swapMessageTemplateForTestTemplate();
+    $this->createLoggedInUser();
+
+    //Scenario 1: When Contact don't have any address
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+    $mut->checkMailLog(array(
+      'address:::',
+    ));
+
+    // Scenario 2: Contribution using address
+    $address = $this->callAPISuccess('address', 'create', array(
+      'street_address' => 'contribution billing st',
+      'location_type_id' => 2,
+      'contact_id' => $this->_params['contact_id'],
+    ));
+    $params = array_merge($this->_params, array('contribution_status_id' => 2,
+      'address_id' => $address['id'],
+      )
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+    $mut->checkMailLog(array(
+      'address:::contribution billing st',
+    ));
+
+    // Scenario 3: Contribution wtth no address but contact has a billing address
+    $this->callAPISuccess('address', 'create', array(
+      'id' => $address['id'],
+      'street_address' => 'is billing st',
+      'contact_id' => $this->_params['contact_id'],
+    ));
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+    $mut->checkMailLog(array(
+      'address:::is billing st',
+    ));
+
+    $mut->stop();
+    $this->revertTemplateToReservedTemplate();
+  }
+
+  /**
    * Test completing a transaction via the API.
    *
    * Note that we are creating a logged in user because email goes out from
