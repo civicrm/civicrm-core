@@ -511,4 +511,15 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return FALSE;
   }
 
+  /**
+   * Check if job is able to be executed by API.
+   *
+   * @throws API_Exception
+   */
+  public static function isAPIJobAllowedToRun($params) {
+    if (Civi::settings()->get('isProductionEnvironment') === FALSE && !CRM_Utils_Array::value('runInNonProductionEnvironment', $params)) {
+      throw new Exception("Job has not been executed as it is a non-production environment.");
+    }
+  }
+
 }
