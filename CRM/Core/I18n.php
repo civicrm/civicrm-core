@@ -602,9 +602,8 @@ class CRM_Core_I18n {
     }
 
     // for sql queries
-    global $dbLocale, $tsLocale;
+    global $dbLocale;
     $dbLocale = "_{$language}";
-    $tsLocale = $language;
 
   }
 

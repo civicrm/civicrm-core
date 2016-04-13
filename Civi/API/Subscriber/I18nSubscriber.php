@@ -102,7 +102,8 @@ class I18nSubscriber implements EventSubscriberInterface {
         $dbLocale = $multiLang && $lcMessages ? "_{$lcMessages}" : '';
 
         // FIXME: an ugly hack to fix CRM-4041
-        \CRM_Core_I18n::setLocale($lcMessages);
+        global $tsLocale;
+        $tsLocale = $lcMessages;
       }
     }
   }

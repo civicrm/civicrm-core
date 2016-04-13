@@ -212,7 +212,8 @@ class CRM_Core_BAO_ConfigSetting {
     $dbLocale = $multiLang ? "_{$chosenLocale}" : '';
 
     // FIXME: an ugly hack to fix CRM-4041
-    CRM_Core_I18n::setLocale($chosenLocale);
+    global $tsLocale;
+    $tsLocale = $chosenLocale;
 
     // FIXME: as bad aplace as any to fix CRM-5428
     // (to be moved to a sane location along with the above)
