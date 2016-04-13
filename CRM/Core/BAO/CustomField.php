@@ -1230,8 +1230,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
           else {
             // In other contexts show a paperclip icon
-            $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
-            $display = $icons[$value];
+            if (CRM_Utils_Rule::integer($value)) {
+              $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
+              $display = $icons[$value];
+            }
+            else {
+              //CRM-18396, if filename is passed instead
+              $display = $value;
+            }
           }
         }
         break;
