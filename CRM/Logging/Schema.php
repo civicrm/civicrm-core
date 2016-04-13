@@ -556,9 +556,11 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * @return array
    */
   private function columnSpecsOf($table) {
-    static $columnSpecs = array(), $civiDB = NULL;
-
-    if (empty($columnSpecs) || !isset($columnSpecs[$table])) {
+    static $civiDB = NULL;
+    if (empty(\Civi::$statics[__CLASS__]['columnSpecs'])) {
+      \Civi::$statics[__CLASS__]['columnSpecs'] = array();
+    }
+    if (empty(\Civi::$statics[__CLASS__]['columnSpecs']) || !isset(\Civi::$statics[__CLASS__]['columnSpecs'][$table])) {
       if (!$civiDB) {
         $dao = new CRM_Contact_DAO_Contact();
         $civiDB = $dao->_database;
@@ -575,21 +577,23 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         return array();
       }
       while ($dao->fetch()) {
-        if (!array_key_exists($dao->TABLE_NAME, $columnSpecs)) {
-          $columnSpecs[$dao->TABLE_NAME] = array();
+        if (!array_key_exists($dao->TABLE_NAME, \Civi::$statics[__CLASS__]['columnSpecs'])) {
+          \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME] = array();
         }
-        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] = array(
+        \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME] = array(
           'COLUMN_NAME' => $dao->COLUMN_NAME,
           'DATA_TYPE' => $dao->DATA_TYPE,
           'IS_NULLABLE' => $dao->IS_NULLABLE,
           'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT,
         );
         if (($first = strpos($dao->COLUMN_TYPE, '(')) != 0) {
-          $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = substr($dao->COLUMN_TYPE, $first, strpos($dao->COLUMN_TYPE, ')'));
+          \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = substr(
+            $dao->COLUMN_TYPE, $first, strpos($dao->COLUMN_TYPE, ')')
+          );
         }
       }
     }
-    return $columnSpecs[$table];
+    return \Civi::$statics[__CLASS__]['columnSpecs'][$table];
   }
 
   /**
