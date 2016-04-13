@@ -302,7 +302,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
         'api.email.create' => array('email' => 'dopey@mail.com'))
     );
     $this->callAPISuccess('Setting', 'create', array('logging_all_tables_uniquid' => FALSE));
-    $this->callAPISuccess('Setting', 'create', array('logging_uniqueid_date' => date('Y-m-d H:i:s')));
+    $this->callAPISuccess('Setting', 'create', array('logging_uniqueid_date' => date('Y-m-d H:i:s', strtotime('+ 1 hour'))));
     $this->callAPIFailure(
       'Logging',
       'revert',
