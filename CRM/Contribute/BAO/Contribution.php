@@ -548,8 +548,24 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
     }
     else {
-      // CRM-13237 : if activity record found, update it with campaign id of contribution
-      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
+     $new_activity_subject = $contribution->total_amount . ' - ' . $contribution->source;
+
+      //If the activity subject is different to the the result from the contribution total and the source we should update it
+      if (strpos($activity->subject, $new_activity_subject) !== 0 ) {
+        //Append the previous subject to keep a track of changes to the contribution
+        $activity->subject = $new_activity_subject . ' [was ' . $activity->subject . ']';
+      }
+
+      $activityFieldsToUpdate = array(
+          'subject'            => $activity->subject,
+          'activity_date_time' =>  $contribution->receive_date,
+          'campaign_id'        => $contribution->campaign_id
+      );
+
+      //Loop through the activity fields and update them
+      foreach ($activityFieldsToUpdate as $key => $value) {
+          CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, $key, $value);
+      }
     }
 
     // do not add to recent items for import, CRM-4399
