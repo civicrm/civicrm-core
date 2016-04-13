@@ -230,8 +230,8 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     if (defined('CIVICRM_LOCK_DEBUG')) {
       CRM_Core_Error::debug_log_message('(CRM-12856) faking lock for ' . $this->_name . '(' . $this->_id . ')');
     }
-    $this->_hasLock = FALSE;
-    return FALSE;
+    $this->_hasLock = TRUE;
+    return TRUE;
   }
 
 }
