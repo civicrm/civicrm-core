@@ -552,6 +552,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'label' => ts('Contact Deleted by Merge'),
       'description' => ts('Contact was merged into another contact'),
       'is_active' => TRUE,
+      'filter' => 1,
     ));
     return TRUE;
   }

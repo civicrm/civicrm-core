@@ -116,6 +116,15 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * @return DB_common
+   */
+  public static function getConnection() {
+    global $_DB_DATAOBJECT;
+    $dao = new CRM_Core_DAO();
+    return $_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5];
+  }
+
+  /**
    * @param string $fieldName
    * @param $fieldDef
    * @param array $params
@@ -2558,6 +2567,26 @@ SELECT contact_id
       }
     }
     return $clauses;
+  }
+
+  /**
+   * function to check valid db name containing only characters in [0-9,a-z,A-Z_]
+   *
+   * @param $database
+   *
+   * @return bool
+   */
+  public static function requireValidDBName($database) {
+    $matches = array();
+    preg_match(
+      "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
+      $database,
+      $matches
+    );
+    if (empty($matches)) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
 }

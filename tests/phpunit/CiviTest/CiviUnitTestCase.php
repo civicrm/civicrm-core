@@ -1463,17 +1463,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create contribution.
+   * Create pledge.
    *
-   * @param int $cID
-   *   Contact_id.
+   * @param array $params
+   *  Parameters.
    *
    * @return int
-   *   id of created contribution
+   *   id of created pledge
    */
-  public function pledgeCreate($cID) {
-    $params = array(
-      'contact_id' => $cID,
+  public function pledgeCreate($params) {
+    $params = array_merge(array(
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
       'scheduled_date' => date('Ymd'),
@@ -1485,7 +1484,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'frequency_unit' => 'year',
       'frequency_day' => 15,
       'installments' => 5,
-    );
+    ),
+    $params);
 
     $result = $this->callAPISuccess('Pledge', 'create', $params);
     return $result['id'];
@@ -2498,6 +2498,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_participant',
       'civicrm_participant_payment',
       'civicrm_pledge',
+      'civicrm_pledge_payment',
       'civicrm_price_set_entity',
       'civicrm_price_field_value',
       'civicrm_price_field',

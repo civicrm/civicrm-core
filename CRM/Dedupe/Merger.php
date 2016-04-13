@@ -122,7 +122,7 @@ class CRM_Dedupe_Merger {
         'rel_table_mailings' => array(
           'title' => ts('Mailings'),
           'tables' => array('civicrm_mailing', 'civicrm_mailing_event_queue', 'civicrm_mailing_event_subscribe'),
-          'url' => CRM_Utils_System::url('civicrm/mailing', 'reset=1&force=1&cid=$cid'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=mailing'),
         ),
         'rel_table_cases' => array(
           'title' => ts('Cases'),
@@ -1486,7 +1486,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // @todo Tidy this up
         $operation = 0;
         if ($fieldName != 'website') {
-          $operation = CRM_Utils_Array::value('operation', $migrationInfo['location_blocks'][$fieldName][$fieldCount]);
+          $operation = CRM_Utils_Array::value('operation', $migrationInfo['location'][$fieldName][$fieldCount]);
         }
         // default operation is overwrite.
         if (!$operation) {
@@ -1540,16 +1540,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // Add/update location and type information from the form, if applicable
           if ($locationBlocks[$name]['hasLocation']) {
-            $locTypeId = CRM_Utils_Array::value('locTypeId', $migrationInfo['location_blocks'][$name][$blkCount]);
+            $locTypeId = CRM_Utils_Array::value('locTypeId', $migrationInfo['location'][$name][$blkCount]);
             $otherBlockDAO->location_type_id = $locTypeId;
           }
           if ($locationBlocks[$name]['hasType']) {
-            $typeTypeId = CRM_Utils_Array::value('typeTypeId', $migrationInfo['location_blocks'][$name][$blkCount]);
+            $typeTypeId = CRM_Utils_Array::value('typeTypeId', $migrationInfo['location'][$name][$blkCount]);
             $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
           }
 
           // Get main block ID
-          $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location_blocks'][$name][$blkCount], 0);
+          $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location'][$name][$blkCount], 0);
 
           // if main contact already has primary & billing, set the flags to 0.
           if ($primaryDAOId) {
@@ -1936,13 +1936,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'activity_type_id' => 'Contact Merged',
       'status_id' => 'Completed',
     ));
-    civicrm_api3('activity', 'create', array(
-      'subject' => ts('Contact ID %1 has been merged into Contact ID %2 and deleted.', $params),
-      'target_contact_id' => $otherId,
-      'activity_type_id' => 'Contact Deleted by Merge',
-      'parent_id' => $activity['id'],
-      'status_id' => 'Completed',
-    ));
+    if (civicrm_api3('Setting', 'getvalue', array('name' => 'contact_undelete', 'group' => 'CiviCRM Preferences'))) {
+      civicrm_api3('activity', 'create', array(
+        'subject' => ts('Contact ID %1 has been merged into Contact ID %2 and deleted.', $params),
+        'target_contact_id' => $otherId,
+        'activity_type_id' => 'Contact Deleted by Merge',
+        'parent_id' => $activity['id'],
+        'status_id' => 'Completed',
+      ));
+    }
   }
 
 }

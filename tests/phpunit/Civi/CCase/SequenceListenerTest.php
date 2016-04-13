@@ -23,11 +23,11 @@ class SequenceListenerTest extends \CiviCaseTestCase {
   public function testSequence() {
     $actStatuses = array_flip(\CRM_Core_PseudoConstant::activityStatus('name'));
     $caseStatuses = array_flip(\CRM_Case_PseudoConstant::caseStatus('name'));
+    $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create'));
 
     // Create case; schedule first activity
     \CRM_Utils_Time::setTime('2013-11-30 01:00:00');
     $case = $this->callAPISuccess('case', 'create', $this->_params);
-
     $analyzer = new \Civi\CCase\Analyzer($case['id']);
     $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
     $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
@@ -41,7 +41,6 @@ class SequenceListenerTest extends \CiviCaseTestCase {
       'id' => self::ag($analyzer->getSingleActivity('Medical evaluation'), 'id'),
       'subject' => 'This is the new subject',
     ));
-
     $analyzer = new \Civi\CCase\Analyzer($case['id']);
     $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
     $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
@@ -78,7 +77,26 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
 
-    // Complete third activity; close case
+    //Add an Activity before the case is closed
+    \CRM_Utils_Time::setTime('2013-11-30 04:00:00');
+    $this->callApiSuccess('Activity', 'create', array(
+        'activity_name' => 'Follow up',
+        'activity_type_id' => $actTypes['Follow up'],
+        'status_id' => $actStatuses['Scheduled'],
+        'case_id' => $case['id'],
+        'activity_date_time' => \CRM_Utils_Time::getTime(),
+    ));
+    $analyzer->flush();
+    $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 04:00:00', self::ag($analyzer->getSingleActivity('Follow up'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Follow up'), 'status_id'));
+
+    // Complete third activity; Case should remain open because of the Follow up activity
     \CRM_Utils_Time::setTime('2013-11-30 04:00:00');
     $this->callApiSuccess('Activity', 'create', array(
       'id' => self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'id'),
@@ -91,8 +109,26 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 04:00:00', self::ag($analyzer->getSingleActivity('Follow up'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Follow up'), 'status_id'));
+    $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
+
+    // Complete the additional Activity; Case closed
+    \CRM_Utils_Time::setTime('2013-11-30 04:00:00');
+    $this->callApiSuccess('Activity', 'create', array(
+        'id' => self::ag($analyzer->getSingleActivity('Follow up'), 'id'),
+        'status_id' => $actStatuses['Completed'],
+    ));
+    $analyzer->flush();
+    $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 04:00:00', self::ag($analyzer->getSingleActivity('Follow up'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Follow up'), 'status_id'));
     $this->assertEquals($caseStatuses['Closed'], self::ag($analyzer->getCase(), 'status_id'));
-    // */
   }
 
   /**

@@ -18,7 +18,8 @@
         crm-entityref="{entity: 'Campaign', select: {allowClear: true, placeholder: ts('Select Campaign')}}"
         crm-ui-id="setupForm.campaign"
         name="campaign"
-        ng-model="mailing.campaign_id"
+        ng-model="abtest.mailings.a.campaign_id"
+        ng-change="abtest.mailings.b.campaign_id=abtest.mailings.a.campaign_id"
       />
     </div>
     <div crm-ui-field="{title: ts('Test Type')}" ng-if="fields.testing_criteria">

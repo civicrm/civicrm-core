@@ -115,7 +115,7 @@ AND    {$this->_componentClause}";
       array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE)
     );
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
-    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do no email / Do not mail)'), FALSE);
+    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
     $this->addButtons(array(
         array(
@@ -181,6 +181,7 @@ AND    {$this->_componentClause}";
       $input['trxn_id'] = $contribution->trxn_id;
       $input['trxn_date'] = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
       $input['receipt_update'] = $params['receipt_update'];
+      $input['contribution_status_id'] = $contribution->contribution_status_id;
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);

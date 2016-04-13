@@ -644,7 +644,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    * Set up participant requirements for test.
    */
   public function _setUpPledgeObjects() {
-    $this->_pledgeId = $this->pledgeCreate($this->_contactId);
+    $this->_pledgeId = $this->pledgeCreate(array('contact_id' => $this->_contactId));
     //we'll create membership payment here because to make setup more re-usable
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'create', array(
       'version' => 3,

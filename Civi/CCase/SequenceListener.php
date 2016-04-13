@@ -64,7 +64,15 @@ class SequenceListener implements CaseChangeListener {
       }
     }
 
-    // OK, the activity has completed every step in the sequence!
+    //CRM-17452 - Close the case only if all the activities are complete
+    $activities = $analyzer->getActivities();
+    foreach ($activities as $activity) {
+      if ($activity['status_id'] != $actStatuses['Completed']) {
+        return;
+      }
+    }
+
+    // OK, the all activities have completed
     civicrm_api3('Case', 'create', array(
       'id' => $analyzer->getCaseId(),
       'status_id' => 'Closed',

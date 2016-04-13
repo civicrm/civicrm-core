@@ -424,7 +424,7 @@
         }
 
         {/literal}
-        CRM.buildCustomData( '{$customDataType}', 'null', 'null' );
+        CRM.buildCustomData( '{$customDataType}', null, null );
         {if $eventID}
           CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
         {/if}
