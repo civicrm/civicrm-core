@@ -68,6 +68,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   protected $_eventID;
 
   /**
+   * @var CiviMailUtils
+   */
+  protected $mut;
+
+  /**
    * Setup function.
    */
   public function setUp() {
@@ -1572,6 +1577,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCompleteTransaction() {
     $mut = new CiviMailUtils($this, TRUE);
+    $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
@@ -1583,11 +1589,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('Completed', $contribution['contribution_status']);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receipt_date'])));
     $mut->checkMailLog(array(
-      'Receipt - Contribution',
-      'Please print this confirmation for your records.',
-      'May 11th, 2012',
+      'email:::anthony_anderson@civicrm.org',
+      'is_monetary:::1',
+      'amount:::100.00',
+      'currency:::USD',
+      'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
+      'receipt_date:::' . date('Ymd'),
+      'contributeMode:::notify',
+      'title:::Contribution',
+      'displayName:::Mr. Anthony Anderson II',
     ));
     $mut->stop();
+    $this->revertTemplateToReservedTemplate();
   }
 
   /**
@@ -1991,6 +2004,64 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'Please print this confirmation for your records.',
     ));
     $mut->stop();
+  }
+
+
+  /**
+   * Complete the transaction using the template with all the possible.
+   */
+  public function testCompleteTransactionWithTestTemplate() {
+    $this->swapMessageTemplateForTestTemplate();
+    $contribution = $this->setUpForCompleteTransaction();
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+      'trxn_date' => date('2011-04-09'),
+      'trxn_id' => 'kazam',
+    ));
+    $receive_date = $this->callAPISuccess('Contribution', 'getvalue', array('id' => $contribution['id'], 'return' => 'receive_date'));
+    $this->mut->checkMailLog(array(
+      'email:::anthony_anderson@civicrm.org',
+      'is_monetary:::1',
+      'amount:::100.00',
+      'currency:::USD',
+      'receive_date:::' . date('Ymd', strtotime($receive_date)),
+      'receipt_date:::' . date('Ymd'),
+      'contributeMode:::notify',
+      'title:::Contribution',
+      'displayName:::Mr. Anthony Anderson II',
+      'trxn_id:::kazam',
+      'contactID:::' . $this->_params['contact_id'],
+      'contributionID:::' . $contribution['id'],
+      'financialTypeId:::1',
+      'financialTypeName:::Donation',
+    ));
+    $this->mut->stop();
+    $this->revertTemplateToReservedTemplate();
+  }
+
+  /**
+   * Complete the transaction using the template with all the possible.
+   */
+  public function testCompleteTransactionContributionPageFromAddress() {
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', array(
+      'receipt_from_name' => 'Mickey Mouse',
+      'receipt_from_email' => 'mickey@mouse.com',
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'NZD',
+      'goal_amount' => 50,
+      'is_pay_later' => 1,
+      'is_monetary' => TRUE,
+      'is_email_receipt' => TRUE,
+    ));
+    $this->_params['contribution_page_id'] = $contributionPage['id'];
+    $contribution = $this->setUpForCompleteTransaction();
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id']));
+    $this->mut->checkMailLog(array(
+      'mickey@mouse.com',
+      'Mickey Mouse <',
+    ));
+    $this->mut->stop();
   }
 
   /**
@@ -2751,6 +2822,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       array('contribution_recur_id' => $contributionRecur['id']))
     );
     return $originalContribution;
+  }
+
+  /**
+   * Common set up routine.
+   *
+   * @return array
+   */
+  protected function setUpForCompleteTransaction() {
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 2, 'receipt_date' => 'now'));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    return $contribution;
   }
 
 }
