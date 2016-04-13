@@ -39,6 +39,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    * This method is called before a test is executed.
    */
   protected function setUp() {
+    $this->ensureTempColIsCleanedUp();
     parent::setUp();
   }
 
@@ -58,7 +59,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    * Test that logging is successfully enabled and disabled.
    */
   public function testEnableDisableLogging() {
-    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging', 'group' => 'core')));
+    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging')));
     $this->assertLoggingEnabled(FALSE);
 
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
@@ -67,15 +68,15 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->checkTriggersCreated(TRUE);
     // Create a contact to make sure they aren't borked.
     $this->individualCreate();
-    $this->assertTrue($this->callAPISuccessGetValue('Setting', array('name' => 'logging', 'group' => 'core')));
-    $this->assertEquals(1, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid', 'group' => 'core')));
+    $this->assertTrue($this->callAPISuccessGetValue('Setting', array('name' => 'logging')));
+    $this->assertEquals(1, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid')));
     $this->assertEquals(
       date('Y-m-d'),
-      date('Y-m-d', strtotime($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date', 'group' => 'core'))))
+      date('Y-m-d', strtotime($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date'))))
     );
 
     $this->callAPISuccess('Setting', 'create', array('logging' => FALSE));
-    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging', 'group' => 'core')));
+    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging')));
     $this->assertLoggingEnabled(FALSE);
   }
 
@@ -106,8 +107,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
     $this->checkTriggersCreated(FALSE);
-    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid', 'group' => 'core')));
-    $this->assertEmpty($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date', 'group' => 'core')));
+    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid')));
+    $this->assertEmpty($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date')));
   }
 
   /**
@@ -119,10 +120,10 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->callAPISuccess('System', 'updatelogtables', array());
     $this->checkLogTableCreated();
     $this->checkTriggersCreated(TRUE);
-    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid', 'group' => 'core')));
+    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid')));
     $this->assertEquals(
       date('Y-m-d'),
-      date('Y-m-d', strtotime($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date', 'group' => 'core'))))
+      date('Y-m-d', strtotime($this->callAPISuccessGetValue('Setting', array('name' => 'logging_uniqueid_date'))))
     );
   }
 
@@ -160,9 +161,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $schema->fixSchemaDifferencesForAll(TRUE);
 
     foreach ($tables as $table) {
-      $dao = CRM_Core_DAO::executeQuery("SHOW columns FROM log_{$table} WHERE Field = 'temp_col'");
-      $dao->fetch(TRUE);
-      $this->assertEquals(1, $dao->N, "Column temp_col not in $table");
+      $this->assertTrue($this->checkColumnExistsInTable('log_' . $table, 'temp_col'), 'log_' . $table . ' has temp_col');
       $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS LIKE '{$table}'");
       while ($dao->fetch()) {
         $this->assertContains('temp_col', $dao->Statement);
@@ -372,6 +371,30 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       }
     }
     throw new CRM_Core_Exception("No match found for key : $expectKey with value : $expectValue");
+  }
+
+  /**
+   * Check if the column exists in the table.
+   *
+   * @param string $table
+   * @param string $column
+   *
+   * @return \CRM_Core_DAO|object
+   */
+  protected function checkColumnExistsInTable($table, $column) {
+    $dao = CRM_Core_DAO::executeQuery("SHOW columns FROM {$table} WHERE Field = '{$column}'");
+    $dao->fetch(TRUE);
+    return ($dao->N == 1);
+  }
+
+  /**
+   * Helper for when it crashes and clean up needs to be done.
+   */
+  protected function ensureTempColIsCleanedUp() {
+    if ($this->checkColumnExistsInTable('civicrm_acl', 'temp_col')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl DROP Column temp_col");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_website DROP Column temp_col");
+    }
   }
 
 }
