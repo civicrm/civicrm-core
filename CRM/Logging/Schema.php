@@ -467,10 +467,9 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     foreach ($diffs as $table => $cols) {
       $this->fixSchemaDifferencesFor($table, $cols, FALSE);
     }
-
     if ($rebuildTrigger) {
       // invoke the meta trigger creation call
-      CRM_Core_DAO::triggerRebuild($table);
+      CRM_Core_DAO::triggerRebuild(NULL, TRUE);
     }
   }
 
@@ -534,23 +533,19 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * @return array
    */
   private function columnsOf($table, $force = FALSE) {
-    static $columnsOf = array();
-
-    $from = (substr($table, 0, 4) == 'log_') ? "`{$this->db}`.$table" : $table;
-
-    if (!isset($columnsOf[$table]) || $force) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+    if ($force || !isset(\Civi::$statics[__CLASS__]['columnsOf'][$table])) {
+      $from = (substr($table, 0, 4) == 'log_') ? "`{$this->db}`.$table" : $table;
+      CRM_Core_TemporaryErrorScope::ignoreException();
       $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
       if (is_a($dao, 'DB_Error')) {
         return array();
       }
-      $columnsOf[$table] = array();
+      \Civi::$statics[__CLASS__]['columnsOf'][$table] = array();
       while ($dao->fetch()) {
-        $columnsOf[$table][] = $dao->Field;
+        \Civi::$statics[__CLASS__]['columnsOf'][$table][] = $dao->Field;
       }
     }
-
-    return $columnsOf[$table];
+    return \Civi::$statics[__CLASS__]['columnsOf'][$table];
   }
 
   /**

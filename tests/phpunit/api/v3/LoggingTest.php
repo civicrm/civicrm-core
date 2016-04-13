@@ -147,6 +147,32 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that if a field is added then the trigger is updated on refresh.
+   */
+  public function testRebuildTriggerAfterSchemaChange() {
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    $tables = array('civicrm_acl', 'civicrm_website');
+    foreach ($tables as $table) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE $table ADD column temp_col INT(10)");
+    }
+
+    $schema = new CRM_Logging_Schema();
+    $schema->fixSchemaDifferencesForAll(TRUE);
+
+    foreach ($tables as $table) {
+      $dao = CRM_Core_DAO::executeQuery("SHOW columns FROM log_{$table} WHERE Field = 'temp_col'");
+      $dao->fetch(TRUE);
+      $this->assertEquals(1, $dao->N, "Column temp_col not in $table");
+      $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS LIKE '{$table}'");
+      while ($dao->fetch()) {
+        $this->assertContains('temp_col', $dao->Statement);
+      }
+    }
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl DROP column temp_col");
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_website DROP column temp_col");
+  }
+
+  /**
    * Use a hook to declare an INNODB engine for the contact log table.
    *
    * @param array $logTableSpec
