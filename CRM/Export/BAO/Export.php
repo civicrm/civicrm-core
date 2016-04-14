@@ -764,7 +764,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $limitReached = FALSE;
     while (!$limitReached) {
       $limitQuery = "{$queryString} LIMIT {$offset}, {$rowCount}";
-      $dao = CRM_Core_DAO::executeUnbufferedQuery($limitQuery);
+      $dao = CRM_Core_DAO::executeQuery($limitQuery);
       // If this is less than our limit by the end of the iteration we do not need to run the query again to
       // check if some remain.
       $rowsThisIteration = 0;
