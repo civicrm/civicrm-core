@@ -146,14 +146,22 @@ class CRM_Utils_Request {
    *    The value of the variable
    */
   public static function getValue($name, $method) {
+    if (isset($method[$name])) {
+      return $method[$name];
+    }
     // CRM-18384 - decode incorrect keys generated when &amp; is present in url
     foreach ($method as $key => $value) {
-      if (strpos($key, 'amp;') !== false) {
+      if (strpos($key, 'amp;') !== FALSE) {
         $method[str_replace('amp;', '', $key)] = $method[$key];
-        unset($method[$key]);
+        if (isset($method[$name])) {
+          return $method[$name];
+        }
+        else {
+          continue;
+        }
       }
     }
-    return CRM_Utils_Array::value($name, $method);
+    return NULL;
   }
 
   /**
