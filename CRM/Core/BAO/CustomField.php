@@ -898,11 +898,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Select Date':
         $attr = array('data-crm-custom' => $dataCrmCustomVal);
+        //CRM-18379: Fix for date range of 'Select Date' custom field when include in profile.
+        $minYear = isset($field->start_date_years) ? (date('Y') - $field->start_date_years) : NULL;
+        $maxYear = isset($field->end_date_years) ? (date('Y') + $field->end_date_years) : NULL;
+
         $params = array(
           'date' => $field->date_format,
-          'minDate' => isset($field->start_date_years) ? (date('Y') - $field->start_date_years) . '-01-01' : NULL,
-          'maxDate' => isset($field->end_date_years) ? (date('Y') + $field->end_date_years) . '-01-01' : NULL,
+          'minDate' => isset($minYear) ? $minYear . '-01-01' : NULL,
+          'maxDate' => isset($maxYear) ? $maxYear . '-01-01' : NULL,
           'time' => $field->time_format ? $field->time_format * 12 : FALSE,
+          'yearRange' => "{$minYear}:{$maxYear}",
         );
         if ($field->is_search_range && $search) {
           $qf->add('datepicker', $elementName . '_from', $label, $attr + array('placeholder' => ts('From')), FALSE, $params);
