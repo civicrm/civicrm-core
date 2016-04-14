@@ -1,3 +1,5 @@
+DO NOT MERGE THIS CHANGE!
+
 *************************
 README file for CiviCRM
 *************************
