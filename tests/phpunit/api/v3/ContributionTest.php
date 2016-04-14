@@ -2105,6 +2105,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * that person.
    */
   public function testCompleteTransactionUpdatePledgePayment() {
+    $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $this->createLoggedInUser();
@@ -2124,10 +2125,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(1, $status);
     $mut->checkMailLog(array(
-      '$ 500.00',
-      'May 11th, 2012 12:00 AM',
+      'amount:::500.00',
+      'receive_date:::20130201000000',
+      'receipt_date:::201',
     ));
     $mut->stop();
+    $this->revertTemplateToReservedTemplate();
   }
 
   /**
