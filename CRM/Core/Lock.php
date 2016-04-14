@@ -145,7 +145,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    */
   public function acquire($timeout = NULL) {
     if (!$this->_hasLock) {
-      if (self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . $this->_id . "')")) {
+      if (self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
         return $this->hackyHandleBrokenCode(self::$jobLog);
       }
 
@@ -161,7 +161,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
         }
         $this->_hasLock = TRUE;
         if (stristr($this->_name, 'data.mailing.job.')) {
-          self::$jobLog = $this->_name;
+          self::$jobLog = $this->_id;
         }
       }
       else {
@@ -183,7 +183,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
       }
       $this->_hasLock = FALSE;
 
-      if (self::$jobLog == $this->_name) {
+      if (self::$jobLog == $this->_id) {
         self::$jobLog = FALSE;
       }
 
