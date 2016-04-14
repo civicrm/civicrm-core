@@ -167,6 +167,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'membership_assign',
       'amount',
       'receipt_date',
+      'is_pay_later',
     );
 
     foreach ($valuesRequiredForTemplate as $valueRequiredForTemplate) {
@@ -381,6 +382,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'useForMember' => $values['useForMember'],
         'membership_assign' => $values['membership_assign'],
         'amount' => $values['amount'],
+        'is_pay_later' => $values['is_pay_later'],
         'receipt_date' => !$values['receipt_date'] ?: date('YmdHis', strtotime($values['receipt_date'])),
       );
 
