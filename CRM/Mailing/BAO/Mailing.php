@@ -902,14 +902,14 @@ SELECT     civicrm_email.id AS email_id,
            civicrm_email.is_primary as is_primary,
            civicrm_email.is_bulkmail as is_bulkmail
 FROM       civicrm_email
-INNER JOIN civicrm_contact ON civicrm_email.contact_id = civicrm_contact.id
+INNER JOIN civicrm_contact contact_a ON civicrm_email.contact_id = contact_a.id
 {$acl_join}
 WHERE      (civicrm_email.is_bulkmail = 1 OR civicrm_email.is_primary = 1)
-AND        civicrm_contact.id = {$groupContact}
-AND        civicrm_contact.do_not_email = 0
-AND        civicrm_contact.is_deceased = 0
+AND        contact_a.id = {$groupContact}
+AND        contact_a.do_not_email = 0
+AND        contact_a.is_deceased = 0
 AND        civicrm_email.on_hold = 0
-AND        civicrm_contact.is_opt_out = 0
+AND        contact_a.is_opt_out = 0
 {$acl_where}
 GROUP BY   civicrm_email.id
 ORDER BY   civicrm_email.is_bulkmail DESC
