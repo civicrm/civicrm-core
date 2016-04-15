@@ -252,6 +252,60 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   *  CRM-18316: To calculate pledge scheduled dates with end of a month.
+   *  Test culateNextScheduledDateMonth for months.
+   */
+  public function testcalculateNextScheduledDateMonth() {
+    $params = array(
+      'scheduled_date' => '20110510',
+      'frequency_unit' => 'month',
+      'frequency_day' => 31,
+      'frequency_interval' => 1,
+    );
+    $scheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 2);
+    $this->assertEquals('20110731000000', $scheduleDate);
+    // assert pledge scheduled date for month february.
+    $scheduleDateForFeb = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 9);
+    $this->assertEquals('20120229000000', $scheduleDateForFeb);
+
+    //Case: Frequency day = 31 and scheduled date = 31st of any month
+    $params['scheduled_date'] = '20110131';
+    $params['frequency_day'] = 31;
+    $scheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 1);
+    $this->assertEquals('20110228000000', $scheduleDate);
+
+    //Case: Frequency day = 30 and scheduled date = 30th of any month
+    $params['scheduled_date'] = '20110130';
+    $params['frequency_day'] = 30;
+    $scheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 3);
+    $this->assertEquals('20110430000000', $scheduleDate);
+
+    //Case: Frequency day = 30 and scheduled date = any day of month
+    $params['scheduled_date'] = '20110110';
+    $params['frequency_day'] = 30;
+    $scheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 4);
+    $this->assertEquals('20110530000000', $scheduleDate);
+
+    //Case: Frequency day = any and scheduled date = 31st of any month
+    $params['scheduled_date'] = '20110131';
+    $params['frequency_day'] = 5;
+    $scheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 5);
+    $this->assertEquals('20110605000000', $scheduleDate);
+
+    //Case: Frequency day = any AND Satrt date = 30th of any month
+    $params['scheduled_date'] = '20110130';
+    $params['frequency_day'] = 10;
+    $scheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 6);
+    $this->assertEquals('20110710000000', $scheduleDate);
+
+    //Case: Frequency day = any AND Satrt date = any day month
+    $params['scheduled_date'] = '20110124';
+    $params['frequency_day'] = 6;
+    $scheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 7);
+    $this->assertEquals('20110806000000', $scheduleDate);
+  }
+
+  /**
    *  Test calculateNextScheduledDate - no date provided
    */
   public function testcalculateNextScheduledDateYearDateProvided() {
