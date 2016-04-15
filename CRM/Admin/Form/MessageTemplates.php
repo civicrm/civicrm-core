@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -171,6 +171,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
           'cols' => '80',
           'rows' => '8',
           'onkeyup' => "return verify(this)",
+          'class' => 'crm-wysiwyg-fullpage',
         )
       );
     }

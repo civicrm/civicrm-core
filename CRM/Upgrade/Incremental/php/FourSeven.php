@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -297,7 +297,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       // Add default position for Getting Started Dashlet ( left column)
       $sql = "INSERT INTO `civicrm_dashboard_contact` (dashboard_id, contact_id, column_no, is_active)
 SELECT (SELECT MAX(id) FROM `civicrm_dashboard`), contact_id, 0, IF (SUM(is_active) > 0, 1, 0)
-FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
+FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_contact.contact_id = civicrm_contact.id GROUP BY contact_id";
       CRM_Core_DAO::executeQuery($sql);
     }
     return TRUE;
@@ -552,6 +552,7 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
       'label' => ts('Contact Deleted by Merge'),
       'description' => ts('Contact was merged into another contact'),
       'is_active' => TRUE,
+      'filter' => 1,
     ));
     return TRUE;
   }

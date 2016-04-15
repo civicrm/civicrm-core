@@ -14,6 +14,7 @@ Required vars: mailing
         crm-ui-insert-rx="insert:body_html"
         ng-model="mailing.body_html"
         ng-blur="checkTokens(mailing, 'body_html', 'insert:body_html')"
+        class="crm-wysiwyg-fullpage"
         ></textarea>
       <span ng-model="body_html_tokens" crm-ui-validate="hasAllTokens(mailing, 'body_html')"></span>
       <div ng-show="htmlForm.$error.crmUiValidate" class="crmMailing-error-link">

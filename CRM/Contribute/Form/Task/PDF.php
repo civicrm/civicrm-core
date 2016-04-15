@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -115,7 +115,7 @@ AND    {$this->_componentClause}";
       array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE)
     );
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
-    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do no email / Do not mail)'), FALSE);
+    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
     $this->addButtons(array(
         array(

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -375,6 +375,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
       $this->_columns['civicrm_contribution']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
     }
@@ -517,7 +518,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                SUM( {$this->_aliases['civicrm_contribution']}.total_amount ) as amount,
                ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,
                {$this->_aliases['civicrm_contribution']}.currency as currency,
-	       SUM( {$this->_aliases['civicrm_contribution']}.fee_amount ) as fees,
+               SUM( {$this->_aliases['civicrm_contribution']}.fee_amount ) as fees,
                SUM( {$this->_aliases['civicrm_contribution']}.net_amount ) as net
         ";
 
@@ -604,6 +605,12 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
     $this->beginPostProcess();
+    // CRM-18312 - display soft_credits and soft_credits_for column
+    // when 'Contribution or Soft Credit?' column is not selected
+    if (empty($this->_params['fields']['contribution_or_soft'])) {
+      $this->_params['fields']['contribution_or_soft'] = 1;
+      $this->noDisplayContributionOrSoftColumn = TRUE;
+    }
 
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'contributions_only' &&
@@ -870,6 +877,12 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
             "\n<a href='{$url}'>{$dao->civicrm_contact_sort_name}</a>";
         }
         $rows[$rowNum]['civicrm_contribution_soft_credit_for'] = $string;
+      }
+
+      // CRM-18312 - hide 'contribution_or_soft' column if unchecked.
+      if (!empty($this->noDisplayContributionOrSoftColumn)) {
+        unset($rows[$rowNum]['civicrm_contribution_contribution_or_soft']);
+        unset($this->_columnHeaders['civicrm_contribution_contribution_or_soft']);
       }
 
       //convert soft_credit_type_id into label

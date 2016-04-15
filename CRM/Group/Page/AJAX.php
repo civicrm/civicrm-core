@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  *
  */
 
@@ -43,7 +43,6 @@ class CRM_Group_Page_AJAX {
    */
   public static function getGroupList() {
     $params = $_GET;
-
     if (isset($params['parent_id'])) {
       // requesting child groups for a given parent
       $params['page'] = 1;
@@ -55,7 +54,8 @@ class CRM_Group_Page_AJAX {
     else {
 
       $sortMapper = array();
-      foreach ($_GET['columns'] as $key => $value) {
+      $columns = CRM_Utils_Array::value('columns', $params, array());
+      foreach ($columns as $key => $value) {
         $sortMapper[$key] = $value['data'];
       };
 
@@ -90,7 +90,7 @@ class CRM_Group_Page_AJAX {
       //@todo - ideally the portion of this that retrieves the groups should be extracted into a function separate
       // from the one which deals with web inputs & outputs so we have a properly testable & re-usable function
       if (!empty($params['is_unit_test'])) {
-        return array($groups, $iFilteredTotal);
+        return array($groups['data'], $params['total']);
       }
       CRM_Utils_JSON::output($groups);
     }

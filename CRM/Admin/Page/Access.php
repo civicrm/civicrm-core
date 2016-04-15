@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -45,11 +45,11 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
 
     switch ($config->userFramework) {
       case 'Drupal':
-        $this->assign('ufAccessURL', CRM_Utils_System::url('admin/people/permissions'));
+        $this->assign('ufAccessURL', url('admin/people/permissions'));
         break;
 
       case 'Drupal6':
-        $this->assign('ufAccessURL', CRM_Utils_System::url('admin/user/permissions'));
+        $this->assign('ufAccessURL', url('admin/user/permissions'));
         break;
 
       case 'Joomla':

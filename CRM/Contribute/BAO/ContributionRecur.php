@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
@@ -459,6 +459,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       'contribution_recur_id' => $id,
       'options' => array('limit' => 1, 'sort' => array('id DESC')),
       'sequential' => 1,
+      'contribution_test' => '',
     ));
     if ($templateContribution['count']) {
       return $templateContribution['values'][0];

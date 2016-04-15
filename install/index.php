@@ -394,6 +394,18 @@ class InstallRequirements {
             ts("An auto_increment_increment value greater than 1 is not currently supported. Please see issue CRM-7923 for further details and potential workaround."),
           )
         );
+        $testDetails = array(
+          ts("MySQL %1 Configuration", array(1 => $dbName)),
+          ts("Is the provided database name valid?"),
+          ts("The database name provided is not valid. Please use only 0-9, a-z, A-Z and _ as characters in the name."),
+        );
+        if (!CRM_Core_DAO::requireValidDBName($databaseConfig['database'])) {
+          $this->error($testDetails);
+          return FALSE;
+        }
+        else {
+          $this->testing($testDetails);
+        }
         $this->requireMySQLThreadStack($databaseConfig['server'],
           $databaseConfig['username'],
           $databaseConfig['password'],
@@ -1159,7 +1171,8 @@ class InstallRequirements {
       return;
     }
     else {
-      if (@mysql_query("CREATE DATABASE $database")) {
+      $query = sprintf("CREATE DATABASE %s", mysql_real_escape_string($database));
+      if (@mysql_query($query)) {
         $okay = ts("Able to create a new database.");
       }
       else {
@@ -1291,8 +1304,8 @@ class Installer extends InstallRequirements {
       // skip if database already present
       return;
     }
-
-    if (@mysql_query("CREATE DATABASE $database")) {
+    $query = sprintf("CREATE DATABASE %s", mysql_real_escape_string($database));
+    if (@mysql_query($query)) {
     }
     else {
       $errorTitle = ts("Oops! Could not create database %1", array(1 => $database));

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * PEAR_ErrorStack and use that framework
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 require_once 'PEAR/ErrorStack.php';
@@ -183,15 +183,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     // create the error array
-    $error = array();
-    $error['callback'] = $pearError->getCallback();
-    $error['code'] = $pearError->getCode();
-    $error['message'] = $pearError->getMessage();
-    $error['mode'] = $pearError->getMode();
-    $error['debug_info'] = $pearError->getDebugInfo();
-    $error['type'] = $pearError->getType();
-    $error['user_info'] = $pearError->getUserInfo();
-    $error['to_string'] = $pearError->toString();
+    $error = self::getErrorDetails($pearError);
 
     // We access connection info via _DB_DATAOBJECT instead
     // of, e.g., calling getDatabaseConnection(), so that we
@@ -259,6 +251,26 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function simpleHandler($pearError) {
 
+    $error = self::getErrorDetails($pearError);
+
+    // ensure that debug does not check permissions since we are in bootstrap
+    // mode and need to print a decent message to help the user
+    CRM_Core_Error::debug('Initialization Error', $error, TRUE, TRUE, FALSE);
+
+    // always log the backtrace to a file
+    self::backtrace('backTrace', TRUE);
+
+    exit(0);
+  }
+
+  /**
+   * this function is used to return error details
+   *
+   * @param $pearError
+   *
+   * @return array $error
+   */
+  public static function getErrorDetails($pearError) {
     // create the error array
     $error = array();
     $error['callback'] = $pearError->getCallback();
@@ -270,14 +282,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $error['user_info'] = $pearError->getUserInfo();
     $error['to_string'] = $pearError->toString();
 
-    // ensure that debug does not check permissions since we are in bootstrap
-    // mode and need to print a decent message to help the user
-    CRM_Core_Error::debug('Initialization Error', $error, TRUE, TRUE, FALSE);
-
-    // always log the backtrace to a file
-    self::backtrace('backTrace', TRUE);
-
-    exit(0);
+    return $error;
   }
 
   /**
@@ -891,6 +896,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
+    CRM_Core_Error::debug_var('Fatal Error Details', self::getErrorDetails($pearError));
     CRM_Core_Error::backtrace('backTrace', TRUE);
     throw new PEAR_Exception($pearError->getMessage(), $pearError);
   }

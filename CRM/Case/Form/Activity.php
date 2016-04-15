@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -415,7 +415,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       if ($this->_activityId) {
         // retrieve and include the custom data of old Activity
         $oldActivity = civicrm_api3('Activity', 'getsingle', array('id' => $this->_activityId));
-        $params = array_merge($params, $oldActivity);
+        $params = array_merge($oldActivity, $params);
 
         // unset custom fields-id from params since we want custom
         // fields to be saved for new activity.

@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -600,6 +600,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public static function formRule($fields, $files, $self) {
     $errors = array();
     $amount = self::computeAmount($fields, $self->_values);
+    if (CRM_Utils_Array::value('auto_renew', $fields) &&
+      CRM_Utils_Array::value('payment_processor_id', $fields) == 0
+    ) {
+      $errors['auto_renew'] = ts('You cannot have auto-renewal on if you are paying later.');
+    }
 
     if ((!empty($fields['selectMembership']) &&
         $fields['selectMembership'] != 'no_thanks'

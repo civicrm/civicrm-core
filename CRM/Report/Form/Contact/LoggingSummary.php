@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   /**
@@ -247,14 +247,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
 
   /**
    * Generate From Clause.
-   *
-   * @param string $logTable
    */
-  public function from($logTable = NULL) {
-    static $entity = NULL;
-    if ($logTable) {
-      $entity = $logTable;
-    }
+  public function from() {
+    $entity = $this->currentLogTable;
 
     $detail = $this->_logTables[$entity];
     $tableName = CRM_Utils_Array::value('table_name', $detail, $entity);

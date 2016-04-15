@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Core_PseudoConstant {
 
@@ -252,7 +252,10 @@ class CRM_Core_PseudoConstant {
 
       // if callback is specified..
       if (!empty($pseudoconstant['callback'])) {
-        return call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']));
+        $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']));
+        //CRM-18223: Allow additions to field options via hook.
+        CRM_Utils_Hook::fieldOptions($entity, $fieldName, $fieldOptions, $params);
+        return $fieldOptions;
       }
 
       // Merge params with schema defaults

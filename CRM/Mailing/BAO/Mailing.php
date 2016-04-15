@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 require_once 'Mail/mime.php';
 
@@ -615,7 +615,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
 
     $patterns = array();
 
-    $protos = '(https?|ftp)';
+    $protos = '(https?|ftp|mailto)';
     $letters = '\w';
     $gunk = '\{\}/#~:.?+=&;%@!\,\-\|\(\)\*';
     $punc = '.:?\-';
@@ -2453,6 +2453,19 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $mailingIDs = array();
       while ($dao->fetch()) {
         $mailingIDs[] = $dao->id;
+      }
+      //CRM-18181 Get all mailings that use the mailings found earlier as receipients
+      if (!empty($mailingIDs)) {
+        $mailings = implode(',', $mailingIDs);
+        $mailingQuery = "
+           SELECT DISTINCT ( m.id ) as id
+           FROM civicrm_mailing m 
+           LEFT JOIN civicrm_mailing_group g ON g.mailing_id = m.id
+           WHERE g.entity_table like 'civicrm_mailing%' AND g.entity_id IN ($mailings)";
+        $mailingDao = CRM_Core_DAO::executeQuery($mailingQuery);
+        while ($mailingDao->fetch()) {
+          $mailingIDs[] = $mailingDao->id;
+        }
       }
     }
 

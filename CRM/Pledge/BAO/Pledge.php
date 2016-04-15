@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
@@ -1108,10 +1108,11 @@ SELECT  pledge.contact_id              as contact_id,
    * @param int $pledgeID
    */
   public static function cancel($pledgeID) {
-    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus());
     $paymentIDs = self::findCancelablePayments($pledgeID);
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $cancelled = array_search('Cancelled', $status);
     CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $paymentIDs, NULL,
-      $statuses['Cancelled'], 0, FALSE, TRUE
+      $cancelled, 0, FALSE, TRUE
     );
   }
 

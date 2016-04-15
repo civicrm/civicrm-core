@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -102,17 +102,19 @@
                 </div>
 
             {/if}
-              {if !empty($extends) && $extends eq "Membership" && $element.html_type != 'Text'}
-                <div id="allow_auto_renew">
-                  <div class='crm-section auto-renew'>
-                    <div class='label'></div>
-                    <div class ='content'>
-                      {if isset($form.auto_renew) }
-                        {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
-                      {/if}
+              {if !empty($extends) && $extends eq "Membership"}
+                {if (!empty($priceSet) && $element.id == $priceSet.auto_renew_membership_field) || (empty($priceSet) && $element.name == 'membership_amount')}
+                  <div id="allow_auto_renew">
+                    <div class='crm-section auto-renew'>
+                      <div class='label'></div>
+                      <div class ='content'>
+                        {if isset($form.auto_renew) }
+                          {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
+                        {/if}
+                      </div>
                     </div>
                   </div>
-                </div>
+                {/if}
               {/if}
               <div class="clear"></div>
           </div>

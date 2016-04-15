@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -186,7 +186,12 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
-    if (!empty($params['onbehalf'])) {
+    if (!empty($this->_values['onbehalf_profile_id']) &&
+      !empty($params['onbehalf']) &&
+      ($this->_values['is_for_organization'] == 2 ||
+        !empty($params['is_for_organization'])
+      )
+    ) {
       $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
       $fieldTypes = array_merge($fieldTypes, $contactSubType);

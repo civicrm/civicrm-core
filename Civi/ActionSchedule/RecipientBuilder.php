@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -178,31 +178,57 @@ class RecipientBuilder {
 
     $startDateClauses = $this->prepareStartDateClauses();
 
-    $firstQuery = $query->copy()
-      ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
-      ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
-      ->where("reminder.id IS NULL")
-      ->where($startDateClauses)
-      ->strict()
-      ->toSQL();
-    \CRM_Core_DAO::executeQuery($firstQuery);
-
     // In some cases reference_date got outdated due to many reason e.g. In Membership renewal end_date got extended
     // which means reference date mismatches with the end_date where end_date may be used as the start_action_date
     // criteria  for some schedule reminder so in order to send new reminder we INSERT new reminder with new reference_date
     // value via UNION operation
+    $referenceReminderIDs = array();
+    $referenceDate = NULL;
     if (!empty($query['casUseReferenceDate'])) {
+      // First retrieve all the action log's ids which are outdated or in other words reference_date now don't match with entity date.
+      // And the retrieve the updated entity date which will later used below to update all other outdated action log records
+      $sql = $query->copy()
+        ->select('reminder.id as id')
+        ->select($query['casDateField'] . ' as reference_date')
+        ->merge($this->joinReminder('INNER JOIN', 'rel', $query))
+        ->where("reminder.id IS NOT NULL AND reminder.reference_date IS NOT NULL AND reminder.reference_date <> !casDateField")
+        ->where($startDateClauses)
+        ->orderBy("reminder.id desc")
+        ->strict()
+        ->toSQL();
+      $dao = \CRM_Core_DAO::executeQuery($sql);
+
+      while ($dao->fetch()) {
+        $referenceReminderIDs[] = $dao->id;
+        $referenceDate = $dao->reference_date;
+      }
+    }
+
+    if (empty($referenceReminderIDs)) {
+      $firstQuery = $query->copy()
+        ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
+        ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
+        ->where("reminder.id IS NULL")
+        ->where($startDateClauses)
+        ->strict()
+        ->toSQL();
+      \CRM_Core_DAO::executeQuery($firstQuery);
+    }
+    else {
+      // INSERT new log to send reminder as desired entity date got updated
       $referenceQuery = $query->copy()
         ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
         ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
-        ->where("reminder.id IS NOT NULL")
+        ->where("reminder.id = !reminderID")
         ->where($startDateClauses)
-        ->where("reminder.action_date_time IS NOT NULL AND reminder.reference_date IS NOT NULL")
-        ->groupBy("reminder.id, reminder.reference_date")
-        ->having("reminder.id = MAX(reminder.id) AND reminder.reference_date <> !casDateField")
+        ->param('reminderID', $referenceReminderIDs[0])
         ->strict()
         ->toSQL();
       \CRM_Core_DAO::executeQuery($referenceQuery);
+
+      // Update all the previous outdated reference date valued, action_log rows to the latest changed entity date
+      $updateQuery = "UPDATE civicrm_action_log SET reference_date = '" . $referenceDate . "' WHERE id IN (" . implode(', ', $referenceReminderIDs) . ")";
+      \CRM_Core_DAO::executeQuery($updateQuery);
     }
   }
 

@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -1635,11 +1635,11 @@ SELECT id
 
       // rename this file to go into the secure directory only if
       // user has uploaded new file not existing verfied on the basis of $fileID
-      if (!$fileID && !rename($fName, $config->customFileUploadDir . $filename)) {
+      if (empty($fileID) && !rename($fName, $config->customFileUploadDir . $filename)) {
         CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
       }
 
-      if ($customValueId && !$fileID) {
+      if ($customValueId && empty($fileID)) {
         $query = "
 SELECT $columnName
   FROM $tableName

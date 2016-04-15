@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  */
 
@@ -52,6 +52,9 @@ else {
   // @todo upgrade standard per Pro
 }
 try {
+  //CRM-18245
+  CRM_Utils_System::loadBootStrap();
+
   $paypalIPN->main();
 }
 catch (CRM_Core_Exception $e) {

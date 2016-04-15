@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
@@ -750,7 +750,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $value['class'] = array_diff($value['class'], array('crm-row-parent'));
       }
       $group['DT_RowId'] = 'row_' . $value['id'];
-      if (!$params['parentsOnly']) {
+      if (!empty($params['parentsOnly'])) {
         foreach ($value['class'] as $id => $class) {
           if ($class == 'crm-group-parent') {
             unset($value['class'][$id]);
@@ -801,7 +801,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $config = CRM_Core_Config::singleton();
 
     $whereClause = self::whereClause($params, FALSE);
-
     //$this->pagerAToZ( $whereClause, $params );
 
     if (!empty($params['rowCount']) &&

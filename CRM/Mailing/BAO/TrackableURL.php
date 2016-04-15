@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
@@ -121,35 +121,6 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
     }
 
     return NULL;
-  }
-
-  /**
-   * @param $msg
-   * @param int $mailing_id
-   * @param int $queue_id
-   * @param bool $onlyHrefs
-   */
-  public static function scan_and_replace(&$msg, $mailing_id, $queue_id, $onlyHrefs = FALSE) {
-    if (!$mailing_id) {
-      return;
-    }
-
-    $protos = '(https?|ftp)';
-    $letters = '\w';
-    $gunk = '/#~:.?+=&%@!\-';
-    $punc = '.:?\-';
-    $any = "{$letters}{$gunk}{$punc}";
-    if ($onlyHrefs) {
-      $pattern = "{\\b(href=([\"'])?($protos:[$any]+?(?=[$punc]*[^$any]|$))([\"'])?)}im";
-    }
-    else {
-      $pattern = "{\\b($protos:[$any]+?(?=[$punc]*[^$any]|$))}eim";
-    }
-
-    $trackURL = CRM_Mailing_BAO_TrackableURL::getTrackerURL('\\1', $mailing_id, $queue_id);
-    $replacement = $onlyHrefs ? ("href=\"{$trackURL}\"") : ("\"{$trackURL}\"");
-
-    $msg = preg_replace($pattern, $replacement, $msg);
   }
 
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -194,7 +194,7 @@ return array(
       'multiple' => 1,
       'class' => 'crm-select2',
     ),
-    'default' => array('1228'),
+    'default' => array(),
     'add' => '4.3',
     'title' => 'Available Countries',
     'is_domain' => 1,
@@ -216,7 +216,7 @@ return array(
       'multiple' => 1,
       'class' => 'crm-select2',
     ),
-    'default' => array('1228'),
+    'default' => array(),
     'add' => '4.3',
     'title' => 'Available States and Provinces',
     'is_domain' => 1,

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -424,7 +424,7 @@
         }
 
         {/literal}
-        CRM.buildCustomData( '{$customDataType}', 'null', 'null' );
+        CRM.buildCustomData( '{$customDataType}', null, null );
         {if $eventID}
           CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
         {/if}

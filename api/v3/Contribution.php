@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -48,16 +48,13 @@ function civicrm_api3_contribution_create(&$params) {
 
   if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
     if (empty($params['id'])) {
-      $op = 'add';
+      $op = CRM_Core_Action::ADD;
     }
     else {
       if (empty($params['financial_type_id'])) {
-        $params['financial_type_id'] = civicrm_api3('Contribution', 'getvalue', array(
-          'id' => $params['id'],
-          'return' => 'financial_type_id',
-        ));
+        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['id'], 'financial_type_id');
       }
-      $op = 'edit';
+      $op = CRM_Core_Action::UPDATE;
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
     if (!in_array($params['financial_type_id'], array_keys($types))) {

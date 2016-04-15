@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 abstract class CRM_Utils_Hook {
 
@@ -2092,6 +2092,17 @@ abstract class CRM_Utils_Hook {
     self::singleton()->invoke(2, $list, $region,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_coreResourceList'
+    );
+  }
+
+  /**
+   * This hook is called for bypass a few civicrm urls from IDS check
+   * @param array $skip list of civicrm url;
+   */
+  public static function idsException(&$skip) {
+    return self::singleton()->invoke(1, $skip, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_idsException'
     );
   }
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -134,7 +134,6 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
         'email' => array(
           'title' => ts('Email'),
           'no_repeat' => TRUE,
-          'required' => TRUE,
         ),
       ),
       'order_bys' => array(
@@ -211,7 +210,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
     $this->_from .= "
         INNER JOIN civicrm_mailing_event_queue
           ON civicrm_mailing_event_queue.contact_id = {$this->_aliases['civicrm_contact']}.id
-        INNER JOIN civicrm_email {$this->_aliases['civicrm_email']}
+        LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
           ON civicrm_mailing_event_queue.email_id = {$this->_aliases['civicrm_email']}.id
         INNER JOIN civicrm_mailing_event_opened
           ON civicrm_mailing_event_opened.event_queue_id = civicrm_mailing_event_queue.id
@@ -297,6 +296,15 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
+
+      // If the email address has been deleted
+      if (array_key_exists('civicrm_email_email', $row)) {
+        if (empty($rows[$rowNum]['civicrm_email_email'])) {
+          $rows[$rowNum]['civicrm_email_email'] = '<del>Email address deleted</del>';
+        }
+        $entryFound = TRUE;
+      }
+
       // make count columns point to detail report
       // convert display name to links
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
