@@ -506,28 +506,23 @@ WHERE  civicrm_pledge.id = %2
    * CRM_Utils_Date::intervalAdd( $params['frequency_unit'], $i * ($params['frequency_interval']) , calculateBaseScheduledDate( &$params )))
    *
    * @param array $params
-   * @param int $paymentNo
    *
    * @return array
    *   Next scheduled date as an array
    */
-  public static function calculateBaseScheduleDate(&$params, $paymentNo = NULL) {
+  public static function calculateBaseScheduleDate(&$params) {
     $date = array();
     $scheduled_date = CRM_Utils_Date::processDate($params['scheduled_date']);
     $date['year'] = (int) substr($scheduled_date, 0, 4);
     $date['month'] = (int) substr($scheduled_date, 4, 2);
     $date['day'] = (int) substr($scheduled_date, 6, 2);
-    $date['hour'] = (int) substr($scheduled_date, 7, 2);
-    $date['minute'] = (int) substr($scheduled_date, 9, 2);
-    $date['seconds'] = (int) substr($scheduled_date, 11, 2);
     // calculation of schedule date according to frequency day of period
     // frequency day is not applicable for daily installments
     if ($params['frequency_unit'] != 'day' && $params['frequency_unit'] != 'year') {
       if ($params['frequency_unit'] != 'week') {
         // CRM-18316: To calculate pledge scheduled dates at the end of a month.
         $date['day'] = $params['frequency_day'];
-        $interval = $paymentNo * ($params['frequency_interval']);
-        $lastDayOfMonth = date('t', mktime($date['hour'], $date['minute'], $date['seconds'], $date['month'] + $interval, 1, $date['year']));
+        $lastDayOfMonth = date('t', mktime(0, 0, 0, $date['month'], 1, $date['year']));
         if ($lastDayOfMonth < $date['day']) {
           $date['day'] = $lastDayOfMonth;
         }
@@ -566,13 +561,32 @@ WHERE  civicrm_pledge.id = %2
    *   formatted date
    */
   public static function calculateNextScheduledDate(&$params, $paymentNo, $basePaymentDate = NULL) {
+    $interval = $paymentNo * ($params['frequency_interval']);
     if (!$basePaymentDate) {
-      $basePaymentDate = self::calculateBaseScheduleDate($params, $paymentNo);
+      $basePaymentDate = self::calculateBaseScheduleDate($params);
     }
+
+    //CRM-18316 - change $basePaymentDate for the end dates of the month eg: 29, 30 or 31.
+    if ($params['frequency_unit'] == 'month' && in_array($params['frequency_day'], array(29, 30, 31))) {
+      $frequency = $params['frequency_day'];
+      extract(date_parse($basePaymentDate));
+      $lastDayOfMonth = date('t', mktime($hour, $minute, $second, $month + $interval, 1, $year));
+      // Take the last day in case the current month is Feb or frequency_day is set to 31.
+      if (in_array($lastDayOfMonth, array(28, 29)) || $frequency == 31) {
+        $frequency = 0;
+        $interval++;
+      }
+      $basePaymentDate = array(
+        'M' => $month,
+        'd' => $frequency,
+        'Y' => $year,
+      );
+    }
+
     return CRM_Utils_Date::format(
       CRM_Utils_Date::intervalAdd(
         $params['frequency_unit'],
-        $paymentNo * ($params['frequency_interval']),
+        $interval,
         $basePaymentDate
       )
     );
