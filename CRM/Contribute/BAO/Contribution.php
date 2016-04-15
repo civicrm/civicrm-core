@@ -2547,6 +2547,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return array
    */
   public function _gatherMessageValues($input, &$values, $ids = array()) {
+
+    // CRM-18335: Assign transaction ID too
+    if (!empty($this->trxn_id)) {
+      $values['trxn_id'] = $this->trxn_id;
+    }
+
     // set display address of contributor
     if ($this->address_id) {
       $addressParams = array('id' => $this->address_id);
