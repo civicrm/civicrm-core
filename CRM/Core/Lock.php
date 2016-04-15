@@ -246,4 +246,5 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     $this->_hasLock = TRUE;
     return TRUE;
   }
+
 }
