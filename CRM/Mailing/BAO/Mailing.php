@@ -784,7 +784,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         $this->templates['text'] = implode("\n", $template);
       }
 
-      if ($this->body_html) {
+      // To check for an html part strip tags
+      if (trim(strip_tags($this->body_html))) {
 
         $template = array();
         if ($this->header) {
