@@ -841,6 +841,40 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   }
 
   /**
+   * Build a join and where part for a query
+   *
+   * @param $contact_id
+   * @return array - the first key is join part of the query and the second key is the where part of the query
+   */
+  public function buildAcl($contact_id) {
+    $tables = array();
+    $whereTables = array();
+    $whereClause = CRM_ACL_BAO_ACL::whereClause(CRM_Core_Permission::VIEW, $tables, $whereTables, $contact_id);
+    if (strlen($whereClause)) {
+      $whereClause = " AND (".$whereClause.")";
+    }
+
+    $join = "";
+    foreach ($whereTables as $name => $value) {
+      if (!$value) {
+        continue;
+      }
+      if ($value != 1) {
+        // if there is already a join statement in value, use value itself
+        if (strpos($value, 'JOIN')) {
+          $join .= " $value ";
+        }
+        continue;
+      }
+    }
+
+    return array (
+      $join,
+      $whereClause
+    );
+  }
+
+  /**
    * Generate an event queue for a test job
    *
    * @params array $params contains form values
@@ -849,6 +883,10 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @access public
    */
   public function getTestRecipients($testParams) {
+    $session = CRM_Core_Session::singleton();
+    $sender_id = $session->get('userID');
+    list($acl_join, $acl_where) = $this->buildAcl($sender_id);
+    
     if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact','get', array(
         'version' =>3,
@@ -865,12 +903,14 @@ SELECT     civicrm_email.id AS email_id,
            civicrm_email.is_bulkmail as is_bulkmail
 FROM       civicrm_email
 INNER JOIN civicrm_contact ON civicrm_email.contact_id = civicrm_contact.id
+{$acl_join}
 WHERE      (civicrm_email.is_bulkmail = 1 OR civicrm_email.is_primary = 1)
 AND        civicrm_contact.id = {$groupContact}
 AND        civicrm_contact.do_not_email = 0
 AND        civicrm_contact.is_deceased = 0
 AND        civicrm_email.on_hold = 0
 AND        civicrm_contact.is_opt_out = 0
+{$acl_where}
 GROUP BY   civicrm_email.id
 ORDER BY   civicrm_email.is_bulkmail DESC
 ";
