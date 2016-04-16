@@ -2502,7 +2502,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
             $template->assign('mem_status', $membership_status);
             if ($membership_status == 'Pending' && $membership->is_pay_later == 1) {
-              $template->assign('is_pay_later', 1);
+              $values['is_pay_later'] = 1;
             }
 
             // if separate payment there are two contributions recorded and the
