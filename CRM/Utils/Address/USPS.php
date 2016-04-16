@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,36 +26,19 @@
  */
 
 /**
- *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Address utilties
+ * Address utilities.
  */
 class CRM_Utils_Address_USPS {
 
   /**
-   * Whether USPS validation should be disabled during import.
+   * Check address.
    *
-   * @var bool
-   */
-  protected static $_disabled = FALSE;
-
-  /**
-   * @param $disabled
-   *
-   * @return void
-   */
-  public static function disable($disable = TRUE) {
-    self::$_disabled = $disable;
-  }
-
-  /**
-   * @param $values
+   * @param array $values
    *
    * @return bool
    */
@@ -72,12 +55,8 @@ class CRM_Utils_Address_USPS {
       return FALSE;
     }
 
-    $userID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME,
-      'address_standardization_userid'
-    );
-    $url = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME,
-      'address_standardization_url'
-    );
+    $userID = Civi::settings()->get('address_standardization_userid');
+    $url = Civi::settings()->get('address_standardization_url');
 
     if (empty($userID) ||
       empty($url)

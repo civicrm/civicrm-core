@@ -601,8 +601,6 @@ class Net_SMTP
          * (SSL) socket connection. */
         if ($tls && version_compare(PHP_VERSION, '5.1.0', '>=') &&
             extension_loaded('openssl') && isset($this->_esmtp['STARTTLS']) &&
-            // CiviCRM: CRM-8744
-            ($this->_esmtp['STARTTLS'] == true) &&
             strncasecmp($this->host, 'ssl://', 6) !== 0) {
             /* Start the TLS connection attempt. */
             if (PEAR::isError($result = $this->_put('STARTTLS'))) {

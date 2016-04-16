@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,21 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This class generates form components generic to Contribution admin
- *
+ * This class generates form components generic to Contribution admin.
  */
 class CRM_Contribute_Form extends CRM_Admin_Form {
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
-   *
+   * Set default values for the form.
    *
    * @return array
    */

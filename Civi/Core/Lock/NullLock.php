@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,16 +29,17 @@ namespace Civi\Core\Lock;
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class NullLock implements LockInterface {
 
   private $hasLock = FALSE;
 
   /**
+   * Create lock.
+   *
    * @param string $name
+   *
    * @return static
    */
   public static function create($name) {
@@ -46,9 +47,12 @@ class NullLock implements LockInterface {
   }
 
   /**
+   * Acquire lock.
+   *
    * @param int|NULL $timeout
    *   The number of seconds to wait to get the lock.
    *   For a default value, use NULL.
+   *
    * @return bool
    */
   public function acquire($timeout = NULL) {
@@ -57,6 +61,8 @@ class NullLock implements LockInterface {
   }
 
   /**
+   * Release lock.
+   *
    * @return bool|null|string
    *   Trueish/falsish.
    */

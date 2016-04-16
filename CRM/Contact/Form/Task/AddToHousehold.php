@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -93,7 +93,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task_AddToPa
 
     $this->set('searchDone', 0);
     if (!empty($_POST['_qf_AddToHousehold_refresh'])) {
-      $searchParams['contact_type'] = array('Household' => 'Household');
+      $searchParams['contact_type'] = 'Household';
       $searchParams['rel_contact'] = $this->params['name'];
       $this->search($this, $searchParams);
       $this->set('searchDone', 1);

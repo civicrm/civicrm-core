@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * form helper class for an IM object
+ * Form helper class for an IM object.
  */
 class CRM_Contact_Form_Edit_IM {
 
@@ -47,8 +45,6 @@ class CRM_Contact_Form_Edit_IM {
    *   Block number to build.
    * @param bool $blockEdit
    *   Is it block edit.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     if (!$blockCount) {
@@ -60,21 +56,12 @@ class CRM_Contact_Form_Edit_IM {
     $form->applyFilter('__ALL__', 'trim');
 
     //IM provider select
-    $form->addSelect("im[$blockId][provider_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
-
+    $form->addField("im[$blockId][provider_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
     //Block type select
-    $form->addSelect("im[$blockId][location_type_id]", array(
-        'entity' => 'im',
-        'class' => 'eight',
-        'placeholder' => NULL,
-        'option_url' => NULL,
-      ));
+    $form->addField("im[$blockId][location_type_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'option_url' => NULL));
 
     //IM box
-    $form->addElement('text', "im[$blockId][name]", ts('Instant Messenger'),
-      CRM_Core_DAO::getAttribute('CRM_Core_DAO_IM', 'name')
-    );
-
+    $form->addField("im[$blockId][name]", array('entity' => 'im'));
     //is_Primary radio
     $js = array('id' => 'IM_' . $blockId . '_IsPrimary');
     if (!$blockEdit) {

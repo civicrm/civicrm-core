@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * Main page for viewing Notes.
- *
  */
 class CRM_Contact_Page_View_Note extends CRM_Core_Page {
 
@@ -55,16 +52,15 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
 
   /**
    * View details of a note.
-   *
-   * @return void
    */
   public function view() {
     $note = new CRM_Core_DAO_Note();
     $note->id = $this->_id;
     if ($note->find(TRUE)) {
       $values = array();
+
       CRM_Core_DAO::storeValues($note, $values);
-      $values['privacy'] = CRM_Core_OptionGroup::optionLabel('note_privacy', $values['privacy']);
+      $values['privacy'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Note', 'privacy', $values['privacy']);
       $this->assign('note', $values);
     }
 
@@ -233,8 +229,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
 
   /**
    * Delete the note object from the db.
-   *
-   * @return void
    */
   public function delete() {
     CRM_Core_BAO_Note::del($this->_id);

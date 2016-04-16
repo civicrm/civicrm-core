@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -141,6 +141,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
     $dao->entity_table = CRM_Utils_Array::value('entity_table', $params);
     $dao->entity_id = CRM_Utils_Array::value('entity_id', $params);
     $dao->weight = CRM_Utils_Array::value('weight', $params);
+    $dao->module = CRM_Utils_Array::value('module', $params);
     if ($dao->find(TRUE)) {
       return $dao->uf_group_id;
     }
@@ -178,6 +179,19 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
       }
     }
     return array($first, $second, $firstActive, $secondActive);
+  }
+
+  /**
+   * Whitelist of possible values for the entity_table field
+   * @return array
+   */
+  public static function entityTables() {
+    $tables = array(
+      'civicrm_event',
+      'civicrm_contribution_page',
+    );
+    // Identical keys & values
+    return array_combine($tables, $tables);
   }
 
 }

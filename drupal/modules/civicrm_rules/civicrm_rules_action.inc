@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -83,6 +83,28 @@ The content of the email is:
   );
 
   $defaults = array(
+    'parameter' => array('contact' => array('type' => 'contact',
+        'label' => t('Contact'),
+        'save' => TRUE,
+      ),
+      'civicrm_tags' => array(
+        'type' => 'list<integer>',
+        'label' => t('CiviCRM Tags'),
+        'options list' => 'civicrm_rules_options_list',
+      ),
+    ),
+    'group' => t('CiviCRM Contact'),
+    'access callback' => 'civicrm_rules_rules_admin_access',
+  );
+
+  $items['add_tag'] = $defaults + array('label' => t('Add CiviCRM Tag to Contact'),
+    'base' => 'civicrm_rules_rules_action_add_tag',
+  );
+  $items['remove_tag'] = $defaults + array('label' => t('Remove CiviCRM Tag from Contact'),
+    'base' => 'civicrm_rules_rules_action_remove_tag',
+  );
+
+$defaults = array(
     'parameter' => array('to' => array('type' => 'text',
         'label' => t('To'),
         'description' => t('The e-mail address or addresses where the message will be sent to. The formatting of this string must comply with RFC 2822.'),

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -49,8 +49,12 @@
  *   API Result Array
  */
 function civicrm_api3_contact_create($params) {
-
   $contactID = CRM_Utils_Array::value('contact_id', $params, CRM_Utils_Array::value('id', $params));
+
+  if ($contactID && !empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
+    throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+  }
+
   $dupeCheck = CRM_Utils_Array::value('dupe_check', $params, FALSE);
   $values = _civicrm_api3_contact_check_params($params, $dupeCheck);
   if ($values) {
@@ -370,8 +374,6 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
       $groups = explode(',', $params['filter.group_id']);
     }
     unset($params['filter.group_id']);
-    $groups = array_flip($groups);
-    $groups[key($groups)] = 1;
     $options['input_params']['group'] = $groups;
   }
 }
@@ -382,12 +384,16 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
  * @param array $params
  *   input parameters per getfields
  *
+ * @throws \Civi\API\Exception\UnauthorizedException
  * @return array
  *   API Result Array
  */
 function civicrm_api3_contact_delete($params) {
-
   $contactID = CRM_Utils_Array::value('id', $params);
+
+  if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::DELETE)) {
+    throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+  }
 
   $session = CRM_Core_Session::singleton();
   if ($contactID == $session->get('userID')) {
@@ -791,7 +797,7 @@ function civicrm_api3_contact_getquick($params) {
   }
   $from = implode(' ', $from);
   $limit = (int) CRM_Utils_Array::value('limit', $params);
-  $limit = $limit > 0 ? $limit : CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
+  $limit = $limit > 0 ? $limit : Civi::settings()->get('search_autocomplete_count');
 
   // add acl clause here
   list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
@@ -808,9 +814,9 @@ function civicrm_api3_contact_getquick($params) {
     $currEmpDetails = array();
     if (!empty($params['employee_id'])) {
       if ($currentEmployer = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        (int) $params['employee_id'],
-        'employer_id'
-      )) {
+          (int) $params['employee_id'],
+          'employer_id'
+        )) {
         if ($config->includeWildCardInName) {
           $strSearch = "%$name%";
         }
@@ -915,7 +921,7 @@ function civicrm_api3_contact_getquick($params) {
 
   //CRM-5954
   $query = "
-        SELECT DISTINCT(id), data, sort_name {$selectAliases}
+        SELECT DISTINCT(id), data, sort_name {$selectAliases}, exactFirst
         FROM   (
             ( SELECT IF($table_name.$field_name = '{$name}', 0, 1) as exactFirst, cc.id as id, CONCAT_WS( ' :: ',
             {$actualSelectElements} )
@@ -1024,23 +1030,49 @@ function _civicrm_api3_contact_deprecation() {
  *
  * @return array
  *   API Result Array
+ * @throws CiviCRM_API3_Exception
  */
 function civicrm_api3_contact_merge($params) {
-  $mode = CRM_Utils_Array::value('mode', $params, 'safe');
-  $autoFlip = CRM_Utils_Array::value('auto_flip', $params, TRUE);
-
-  $dupePairs = array(array(
-  'srcID' => CRM_Utils_Array::value('main_id', $params),
-      'dstID' => CRM_Utils_Array::value('other_id', $params),
-    ));
-  $result = CRM_Dedupe_Merger::merge($dupePairs, array(), $mode, $autoFlip);
-
-  if ($result['is_error'] == 0) {
-    return civicrm_api3_create_success();
+  if (($result = CRM_Dedupe_Merger::merge(array(
+      array(
+        'srcID' => $params['to_remove_id'],
+        'dstID' => $params['to_keep_id'],
+      ),
+    ), array(), $params['mode'], $params['auto_flip'])) != FALSE) {
+    return civicrm_api3_create_success($result, $params);
   }
-  else {
-    return civicrm_api3_create_error($result['messages']);
-  }
+  throw new CiviCRM_API3_Exception('Merge failed');
+}
+
+/**
+ * Adjust metadata for contact_merge api function.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_contact_merge_spec(&$params) {
+  $params['to_remove_id'] = array(
+    'title' => 'ID of the contact to merge & remove',
+    'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+    'api.aliases' => array('main_id'),
+  );
+  $params['to_keep_id'] = array(
+    'title' => 'ID of the contact to keep',
+    'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+    'api.aliases' => array('other_id'),
+  );
+  $params['auto_flip'] = array(
+    'title' => 'Swap destination and source to retain lowest id?',
+    'api.default' => TRUE,
+  );
+  $params['mode'] = array(
+    // @todo need more detail on what this means.
+    'title' => 'Dedupe mode',
+    'api.default' => 'safe',
+  );
 }
 
 /**

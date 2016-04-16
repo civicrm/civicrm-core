@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.6                                                |
+-- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2015                                |
+-- | Copyright CiviCRM LLC (c) 2004-2016                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -114,11 +114,11 @@ VALUES
 INSERT INTO `civicrm_contact_type`
   ( `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
  VALUES
-  ( 'Student'     , 'Student'     , NULL, 1, 1, 0),
-  ( 'Parent'      , 'Parent'      , NULL, 1, 1, 0),
-  ( 'Staff'       , 'Staff'       , NULL, 1, 1, 0),
-  ( 'Team'        , 'Team'        , NULL, 3, 1, 0),
-  ( 'Sponsor'     , 'Sponsor'     , NULL, 3, 1, 0);
+  ( 'Student'     , ''     , NULL, 1, 1, 0),
+  ( 'Parent'      , ''      , NULL, 1, 1, 0),
+  ( 'Staff'       , ''       , NULL, 1, 1, 0),
+  ( 'Team'        , ''        , NULL, 3, 1, 0),
+  ( 'Sponsor'     , ''     , NULL, 3, 1, 0);
 
     SELECT @domain_id   := min(id) FROM civicrm_domain;
     SELECT @nav_indi    := id FROM civicrm_navigation WHERE name = 'New Individual';
@@ -137,10 +137,10 @@ INSERT INTO `civicrm_contact_type`
 INSERT INTO `civicrm_dashboard`
     ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `is_fullscreen`, `fullscreen_url`)
     VALUES
-    ( @domain_id, 'report/6', 'Donor Summary'       , 'civicrm/report/instance/6?reset=1&section=1&snippet=5&charts=barChart',  'access CiviContribute', 'AND', 0, 0,'1', 4, '1', 'civicrm/report/instance/6?reset=1&section=1&snippet=5&charts=barChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/13', 'Top Donors'            , 'civicrm/report/instance/13?reset=1&section=2&snippet=5',                 'access CiviContribute', 'AND', 0, 0,'1', 5, '1', 'civicrm/report/instance/13?reset=1&section=2&snippet=5&context=dashletFullscreen'),
-    ( @domain_id, 'report/26', 'Event Income Summary', 'civicrm/report/instance/26?reset=1&section=1&snippet=5&charts=pieChart', 'access CiviEvent'     , 'AND', 0, 0,'1', 6, '1', 'civicrm/report/instance/26?reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/21', 'Membership Summary'  , 'civicrm/report/instance/21?reset=1&section=2&snippet=5',                 'access CiviMember'    , 'AND', 0, 0,'1', 7, '1', 'civicrm/report/instance/21?reset=1&section=2&snippet=5&context=dashletFullscreen');
+    ( @domain_id, 'report/7', ''       , 'civicrm/report/instance/7?reset=1&section=1&snippet=5&charts=barChart',  'access CiviContribute', 'AND', 0, 0,'1', 4, '1', 'civicrm/report/instance/7?reset=1&section=1&snippet=5&charts=barChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/14', ''            , 'civicrm/report/instance/14?reset=1&section=2&snippet=5',                 'access CiviContribute', 'AND', 0, 0,'1', 5, '1', 'civicrm/report/instance/14?reset=1&section=2&snippet=5&context=dashletFullscreen'),
+    ( @domain_id, 'report/27', '', 'civicrm/report/instance/27?reset=1&section=1&snippet=5&charts=pieChart', 'access CiviEvent'     , 'AND', 0, 0,'1', 6, '1', 'civicrm/report/instance/27?reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/22', ''  , 'civicrm/report/instance/22?reset=1&section=2&snippet=5',                 'access CiviMember'    , 'AND', 0, 0,'1', 7, '1', 'civicrm/report/instance/22?reset=1&section=2&snippet=5&context=dashletFullscreen');
 
 -- INSERT sample data for membership
 
@@ -253,9 +253,9 @@ VALUES
     (@priceFieldID,'soprano','Soprano','50',3,1,0,2);
 
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.6                                                |
+-- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2015                                |
+-- | Copyright CiviCRM LLC (c) 2004-2016                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -351,7 +351,7 @@ VALUES
 ('Core ACL', 0, 'civicrm_acl_role', 2, 'All', 'view event info', NULL, NULL, NULL, 1);
 
 -- Create default Groups for User Permissioning
-INSERT INTO civicrm_group (`id`, `name`, `title`, `description`, `source`, `saved_search_id`, `is_active`, `visibility`, `group_type`) VALUES (1, 'Administrators', 'Administrators', 'Contacts in this group are assigned Administrator role permissions.', NULL, NULL, 1, 'User and User Admin Only', '1');
+INSERT INTO civicrm_group (`id`, `name`, `title`, `description`, `source`, `saved_search_id`, `is_active`, `visibility`, `group_type`) VALUES (1, 'Administrators', '', '', NULL, NULL, 1, 'User and User Admin Only', '1');
 
 -- Assign above Group (entity) to the Administrator Role
 INSERT INTO civicrm_acl_entity_role

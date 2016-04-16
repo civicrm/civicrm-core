@@ -1,0 +1,58 @@
+General:
+[WILL NOT FIX]- I prefer to have getXXX() method when the main purpose is to return a value:
+  ezcMailTools::generateContentID. 
+[DONE] - Default variables when not set: $aap = '', $aap = null, or $aap = false.
+
+
+Tests:
+[WHAT DO YOU MEAN?]- Set the timezone somewhere that the test run separately.
+
+ezcMail.php:41
+[DONE, lacks impl] "Use setSubject if you require a special encoding.": Method setSubject does not exist.
+
+ezcMail::generateHeaders
+[DONE] Add doc, only for extension.
+
+composer.php
+[DONE, used null] Initialize $this->htmlText and $this->plainText as false in the constructor. Easier to check in other
+functions.
+
+tools.php
+[IS OK]- uniqueID is not thread safe?
+[SINCE IT IS STATIC]- lineBreak -> getLineBreak(). And why not a property?
+[NO STRUCT ANYMORE THEN]- Tools work upon the mailAddress struct, but why not implement the methods
+  there?
+
+mail_address.php
+[DONE]- __set_state() not documented ;-).
+
+transport_smtp_exception.php
+- The consts are not documented.
+
+file_part.php
+- Constructor contains:  /*,$encoding = ezcMail::BASE64*/ ..
+- Can encoding be removed from the __get(), and __set() ?
+[I'm letting it stay in the case we implement it..]
+
+transport_smtp.php
+[DONE]- consts are not documented.
+[DONE]- You can link to the consts, if you want to.. e.g. in $status.
+[DONE]- login(), throws also an Exceptions if the auth fails. Is not documented.
+[WILL NOT FIX]- composeSmtpMailAddress .. or getComposedSmtpMailAddress ?  
+
+Review Derick
+=============
+ezcMail.php:
+misses a "setFrom", "setSubject", and "setBody" function
+[added setSubject because of charset encoding, the others are properties]
+
+[DONE] ezcMail::__get doesn't check whether the properties have all been set (I get
+        undefined index notices with the new test case that I just added)
+[now initialized to null]
+
+Bugs:
+[DONE] http://ez.no/bugs/view/7577
+http://ez.no/bugs/view/7512
+[DONE] http://ez.no/bugs/view/7578
+[DONE] http://ez.no/bugs/view/7576
+http://ez.no/bugs/view/7582

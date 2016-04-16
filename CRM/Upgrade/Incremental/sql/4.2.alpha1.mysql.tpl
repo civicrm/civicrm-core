@@ -109,7 +109,7 @@ INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
     ( {$domainID}, 'civicrm/batch&reset=1', '{ts escape="sql" skip="true"}Batches{/ts}', 'Batches', 'access CiviContribute,access CiviMember', '', @navContributionsID, '1', NULL, 4 ),
-    ( {$domainID}, 'civicrm/batch&reset=1', '{ts escape="sql" skip="true"}Batches{/ts}', 'Batches', 'access CiviMember,acess CiviContribute',  '', @navMembershipsID, '1', NULL, 4 );
+    ( {$domainID}, 'civicrm/batch&reset=1', '{ts escape="sql" skip="true"}Batches{/ts}', 'Batches', 'access CiviMember,access CiviContribute',  '', @navMembershipsID, '1', NULL, 4 );
 
 -- CRM-9686
 INSERT INTO `civicrm_state_province`(`country_id`, `abbreviation`, `name`) VALUES(1097, "LP", "La Paz");

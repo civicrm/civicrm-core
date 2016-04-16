@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Page to display / edit the header / footer of a mailing
- *
+ * Page to display / edit the header / footer of a mailing.
  */
 class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
   public $_mailing_id;
@@ -107,10 +104,10 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
 
     $report = CRM_Mailing_BAO_Mailing::report($this->_mailing_id);
 
-    //get contents of mailing
+    // get contents of mailing
     CRM_Mailing_BAO_Mailing::getMailingContent($report, $this);
 
-    //assign backurl
+    // assign backurl
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 

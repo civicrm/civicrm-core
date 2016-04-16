@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,15 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * This class generates form components for Message templates
  * used by membership, contributions, event registrations, etc.
- *
  */
 class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   // which (and whether) mailing workflow this template belongs to
@@ -56,10 +53,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
   /**
    * Set default values for the form.
+   *
    * The default values are retrieved from the database.
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -110,8 +105,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -173,11 +166,12 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       );
     }
     else {
-      $this->addWysiwyg('msg_html', ts('HTML Message'),
+      $this->add('wysiwyg', 'msg_html', ts('HTML Message'),
         array(
           'cols' => '80',
           'rows' => '8',
           'onkeyup' => "return verify(this)",
+          'class' => 'crm-wysiwyg-fullpage',
         )
       );
     }
@@ -202,9 +196,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

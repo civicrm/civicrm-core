@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -135,7 +135,12 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
   }
 
   if (empty($tagIDs)) {
-    return civicrm_api3_create_error('tag_id is a required field');
+    if ($op == 'remove') {
+      $tagIDs = array_keys(CRM_Core_BAO_EntityTag::getContactTags($entityIDs[0]));
+    }
+    else {
+      return civicrm_api3_create_error('tag_id is a required field');
+    }
   }
 
   $values = array('is_error' => 0);

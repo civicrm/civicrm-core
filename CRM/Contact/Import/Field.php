@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -164,14 +164,20 @@ class CRM_Contact_Import_Field {
   }
 
   /**
-   * The value is in string format. convert the value to the type of this field
+   * The value is in string format.
+   *
+   * Convert the value to the type of this field
    * and set the field value with the appropriate type
+   *
+   * @param mixed $value
    */
   public function setValue($value) {
     $this->_value = $value;
   }
 
   /**
+   * Validate something we didn't document.
+   *
    * @return bool
    */
   public function validate() {

@@ -1,0 +1,121 @@
+eZ publish Enterprise Component: Mail, Design
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Introduction
+============
+
+Purpose of Mail package
+-----------------------
+The purpose of the Mail package is to create and send mail. It must
+support the at least the most common mail functions.
+
+Current implementation
+----------------------
+
+Currrently Mail functionality is implemented in the class
+eZMail and the transportclasses eZSMTPTransport and eZSsendmailTransport.
+
+Requirements
+=============
+It must support sending mail using
+
+- the default PHP MTA.
+- SMTP
+
+The composer must support the following
+- Plain text mail sending
+- HTML mail sending (with images)
+- Alternative mails (text and HTML parts)
+- Attachments (images/video and other binary data)
+
+The implementation must conform to the following specifications:
+
+Mime
+http://www.faqs.org/rfcs/rfc2045.html
+http://www.faqs.org/rfcs/rfc2046.html
+http://www.faqs.org/rfcs/rfc2047.html
+http://www.faqs.org/rfcs/rfc2048.html
+http://www.faqs.org/rfcs/rfc2049.html
+
+Mime multipart
+http://www.faqs.org/rfcs/rfc2387.html
+
+Mime encapsulation (HTML mail)
+http://www.faqs.org/rfcs/rfc2557.html
+
+Content-Disposition field
+http://www.faqs.org/rfcs/rfc2183.html
+
+Mail
+http://www.faqs.org/rfcs/rfc822.html
+http://www.faqs.org/rfcs/rfc2822.html
+
+It must be possible to later extend the model so it can also parse
+and read mail.
+
+Design
+======
+
+The design is split into two parts.
+
+1. The design of the mail itself
+2. The design of the mail transport
+
+
+Mail Class design
+----------------------
+
+The design of the mail itself is built around the MIME
+specifications. This is to allow easy parsing of mail later. It also
+allows the building of advanced MIME mail structures if needed.
+
+ezcMailPart
+   ezcMailPart is an abstract base class for all mail structures. It
+   holds one MIME part and is responsible for storing the headers for
+   a MIME part. The generate method uses the generateHeaders and
+   generateBody methods to build up the entire (sub) message.
+
+ezcMultipart
+   Base class for all multipart MIME types.
+
+ezcMailMultipartMixed
+   Handles multiparts of the type mixed. This is the most common
+   multipart which is used e.g for attachments.
+
+ezcMailMultipartAlternative
+   Handles multiparts of the type alternative. This is used for HTML
+   messages where you also want to support plain text mail clients.
+
+ezcMailMultipartRelated
+   Handles multiparts of the type related. This is used to connect
+   related parts to a main part e.g images in an HTML message.
+
+ezcMailTextPart
+   Handles text parts of a message. This class is not only used for
+   plain text but also for e.g HTML messages.
+
+ezcMailFilePart
+   Handles all file attachments.
+
+ezcMail
+   Base class for mail creation. This base class contains the basic
+   functionality needed to build e-mail.
+
+ezcMailComposer
+   Convinience class that can be used to create the most common e-mail
+   messages. This class handles the creation of the internal parts
+   internally.
+
+
+Transport Class design
+----------------------
+
+ezcMailTransport
+   Abstract interface for sending e-mail.
+
+ezcMailTransportMta
+   Implementation of the mail transport interface using the mail
+   function found in PHP.
+
+ezcMailTransportSmtp
+   Implementation of mail transport interface using SMTP to send mail.

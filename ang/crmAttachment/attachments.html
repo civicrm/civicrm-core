@@ -11,7 +11,7 @@
       </td>
       <td>
         <a
-          crm-icon="trash"
+          crm-icon="fa-trash"
           crm-confirm="{message: ts('Deleting an attachment will completely remove it from server.')}" on-yes="att.deleteFile(file)"
           title="{{ts('Delete attachment')}}"
           class="crm-hover-button">
@@ -27,7 +27,7 @@
         <!-- item.isReady item.isUploading item.isUploaded item.isSuccess item.isCancel item.isError -->
       </td>
       <td>
-        <a crm-icon="close" ng-click="item.remove()" class="crm-hover-button" title="{{ts('Remove unsaved attachment')}}"></a>
+        <a crm-icon="fa-times" ng-click="item.remove()" class="crm-hover-button" title="{{ts('Remove unsaved attachment')}}"></a>
       </td>
     </tr>
     </tbody>

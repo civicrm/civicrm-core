@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * This class generates form components for relationship
- *
  */
 class CRM_Mailing_Form_Task extends CRM_Core_Form {
 
@@ -62,10 +59,6 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @param
-   *
-   * @return void
    */
   public function preProcess() {
     self::preProcessCommon($this);
@@ -113,7 +106,7 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
       $form->_componentClause = ' civicrm_mailing_recipients.id IN ( ' . implode(',', $ids) . ' ) ';
     }
 
-    //set the context for redirection for any task actions
+    // set the context for redirection for any task actions
     $session = CRM_Core_Session::singleton();
 
     $fragment = 'search';
@@ -141,9 +134,6 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
    * @param string $nextType
    * @param string $backType
    * @param bool $submitOnce
-   *
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(

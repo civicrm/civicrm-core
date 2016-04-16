@@ -48,8 +48,8 @@ class ProcessUtils
             }
 
             $escapedArgument = '';
-            $quote = false;
-            foreach (preg_split('/(")/', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
+            $quote =  false;
+            foreach (preg_split('/(")/i', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
                 if ('"' === $part) {
                     $escapedArgument .= '\\"';
                 } elseif (self::isSurroundedBy($part, '%')) {
@@ -75,7 +75,7 @@ class ProcessUtils
     }
 
     /**
-     * Validates and normalized a Process input.
+     * Validates and normalizes a Process input.
      *
      * @param string $caller The name of method call that validates the input
      * @param mixed  $input  The input to validate
@@ -87,7 +87,11 @@ class ProcessUtils
     public static function validateInput($caller, $input)
     {
         if (null !== $input) {
-            if (is_scalar($input) || (is_object($input) && method_exists($input, '__toString'))) {
+            if (is_scalar($input)) {
+                return (string) $input;
+            }
+            // deprecated as of Symfony 2.5, to be removed in 3.0
+            if (is_object($input) && method_exists($input, '__toString')) {
                 return (string) $input;
             }
 

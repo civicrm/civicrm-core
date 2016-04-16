@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -52,7 +52,8 @@ class civicrm_handler_filter_state_multi extends views_handler_filter_in_operato
      */
 
     // get the country filter
-    foreach ($this->view->filter as $name => $handler) {
+    $filters = is_array($this->view->filter) ? $this->view->filter : array();
+    foreach ($filters as $name => $handler) {
       if ($handler->definition['handler'] == 'civicrm_handler_filter_country_multi') {
         $country_field = $handler->field;
         $selected_countries = $loaded_list = array();
@@ -69,7 +70,11 @@ class civicrm_handler_filter_state_multi extends views_handler_filter_in_operato
           array(':countries' => $allowedCountries))
         ->fetchAllAssoc('id');
 
+        $state_html = array();
         foreach ($result as $state_id => $state) {
+          if (empty($state_html[$state->country_id])) {
+            $state_html[$state->country_id] = '';
+          }
           $state_html[$state->country_id] .= '<option value="' . $state_id . '">' . $state->name . '</option>';
           if(in_array($state->country_id, $selected_countries)) {
             $loaded_list[$state_id] = $state->name;

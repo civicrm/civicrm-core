@@ -72,11 +72,11 @@ class Resolver {
       switch ($url['scheme']) {
         case 'obj':
           // Object: Lookup in container.
-          return Container::singleton()->get($url['host']);
+          return \Civi::service($url['host']);
 
         case 'call':
           // Callback: Object/method in container.
-          $obj = Container::singleton()->get($url['host']);
+          $obj = \Civi::service($url['host']);
           return array($obj, ltrim($url['path'], '/'));
 
         case 'api3':
@@ -266,6 +266,8 @@ class ResolverGlobalCallback {
 
   /**
    * Invoke function.
+   *
+   * @param mixed $arg1
    *
    * @return mixed
    */

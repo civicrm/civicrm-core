@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,10 +27,13 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  */
 
+if (defined('PANTHEON_ENVIRONMENT')) {
+  ini_set('session.save_handler', 'files');
+}
 session_start();
 
 require_once '../civicrm.config.php';
@@ -40,13 +43,7 @@ $log->alert('payment_notification processor_name=AuthNet', $_REQUEST);
 
 $authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN($_REQUEST);
 try {
-  // We allow the possibility of the site opting out of real-(Authorize.net)-time
-  // processing in favour of using the nz.co.fuzion.notificationlog for greater
-  // reliability.
-  if (!defined('CIVICRM_ANET_SKIP_IPN_PROCESSING')) {
-    $authorizeNetIPN->main();
-  }
-  echo "processing intentionally delayed";
+  $authorizeNetIPN->main();
 }
 catch (CRM_Core_Exception $e) {
   CRM_Core_Error::debug_log_message($e->getMessage());

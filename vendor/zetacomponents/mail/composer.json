@@ -1,0 +1,53 @@
+{
+    "authors": [
+        {
+            "name": "Sergey Alexeev"
+        },
+        {
+            "name": "Sebastian Bergmann"
+        },
+        {
+            "name": "Jan Borsodi"
+        },
+        {
+            "name": "Raymond Bosman"
+        },
+        {
+            "name": "Frederik Holljen"
+        },
+        {
+            "name": "Kore Nordmann"
+        },
+        {
+            "name": "Derick Rethans"
+        },
+        {
+            "name": "Vadym Savchuk"
+        },
+        {
+            "name": "Tobias Schlitt"
+        },
+        {
+            "name": "Alexandru Stanoi"
+        },
+        {
+            "name": "Sinisa Dukaric"
+        },
+        {
+            "name": "Mikko Koppanen"
+        },
+        {
+            "name": "Christian Michel"
+        }
+    ],
+    "autoload": {
+        "classmap": [
+            "src"
+        ]
+    },
+    "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
+    "homepage": "https://github.com/zetacomponents",
+    "license": "apache2",
+    "name": "zetacomponents/mail",
+    "type": "library"
+}

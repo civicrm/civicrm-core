@@ -149,7 +149,7 @@ function civicrm_page_build($page) {
  */
 function civicrm_initialize() {
   // Check for php version and ensure its greater than minPhpVersion
-  $minPhpVersion = '5.3.3';
+  $minPhpVersion = '5.3.4';
   if (version_compare(PHP_VERSION, $minPhpVersion) < 0) {
     echo "CiviCRM requires PHP Version $minPhpVersion or greater. You are running PHP Version " . PHP_VERSION . "<p>";
     exit();
@@ -225,37 +225,6 @@ function civicrm_initialize() {
       drupal_add_html_head($header);
     }
 
-    $args = explode('/', $_GET['q']);
-    if (
-      (!isset($args[1]) || $args[1] != 'upgrade') &&
-      // drupal wysiwyg
-      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id') == 4
-    ) {
-      // CRM-12164
-      if (!function_exists('wysiwyg_get_profile')) {
-        // reset the editor choice so the warning is not displayed all the time
-        CRM_Core_BAO_Setting::setItem(NULL, CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
-
-        // display warning and url to fix
-        $url = CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1');
-        $msg = ts(
-          'You had configured CiviCRM to use Drupal default editor but the WYSIWYG module is disabled. Please goto <a href="%1">display preferences</a> and choose another editor',
-          array(1 => $url)
-        );
-        CRM_Core_Session::setStatus($msg);
-      }
-      else {
-        //we have to ensure that wysiwyg is loaded since
-        //pages load only with ajax callbacks
-        $formats = filter_formats();
-        foreach ($formats as $id => $format) {
-          wysiwyg_get_profile($id);
-        }
-        $path = drupal_get_path('module', 'filter');
-        drupal_add_js($path . '/filter.js');
-        drupal_add_css($path . '/filter.css');
-      }
-    }
     CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
   }
 
@@ -302,6 +271,9 @@ function _civicrm_get_url_parameters_as_url_string() {
  *  Context.
  */
 function civicrm_metatag_metatags_view_alter(&$output, $instance) {
+  if (arg(0) != 'civicrm') {
+    return;
+  }
   $linkUrls = array('og:url', 'canonical', 'shortlink');
   foreach ($linkUrls as $url) {
     if (isset($output[$url]['#attached']['drupal_add_html_head'][0][0]['#value'])) {
@@ -884,7 +856,7 @@ function civicrm_add_jquery(&$html) {
   return $html;
 }
 
-function civicrm_form_alter(&$form, $formValues, $formID) {
+function civicrm_form_alter(&$form, &$formValues, $formID) {
   switch ($formID) {
     case 'user_admin_permissions':
       $form['#submit'][] = 'civicrm_user_admin_permissions_submit';
@@ -906,6 +878,7 @@ function civicrm_form_alter(&$form, $formValues, $formID) {
         NULL, TRUE, FALSE
       );
       $form = array_merge($form, $output);
+      $formValues['no_cache'] = TRUE;
       break;
 
     case 'user_profile_form':
@@ -935,6 +908,7 @@ function civicrm_form_alter(&$form, $formValues, $formID) {
           $form = array_merge($form, $output);
         }
       }
+      $formValues['no_cache'] = TRUE;
       break;
 
     default:
@@ -1043,95 +1017,6 @@ function civicrm_preprocess_page(&$variables) {
 }
 
 /**
- * Get drupal WYSIWIG html.
- *
- * Supporting functions to allow using drupal input formats and WYSIWYG API
- * as a CiviCRM rich text editor. This code is in the Drupal module because it's
- * Drupal-version dependent.
- *
- * @param $attributes
- * @param string $value
- * @param null $format
- *
- * @return string
- */
-function civicrm_drupal_get_wysiwyg_html($attributes, $value = '', $format = NULL) {
-  $form = drupal_get_form('civicrm_drupal_wysiwyg_form', $attributes, $value, $format);
-  unset($form['#theme_wrappers']);
-
-  //fix the elements to work with civi/QuickForm
-  $id = $attributes['id'];
-  $name = $attributes['name'];
-  $form[$id]['value']['#name'] = $name . '[value]';
-  $form[$id]['format']['format']['#name'] = $name . '[format]';
-  $html = drupal_render($form);
-
-  //adds settings information. Required for instances loaded via ajax
-  $embed_prefix = "\n<!--//--><![CDATA[//><!--\n";
-  $embed_suffix = "\n//--><!]]>\n";
-  $element      = array(
-    '#tag' => 'script',
-    '#value' => '',
-    '#attributes' => array(
-      'type' => 'text/javascript',
-    ),
-  );
-  $script = drupal_add_js();
-
-  $js_element = $element;
-  $js_element['#value_prefix'] = $embed_prefix;
-  $js_element['#value'] = 'jQuery.extend(Drupal.settings, ' . drupal_json_encode(drupal_array_merge_deep_array($script['settings']['data'])) . ");";
-  $js_element['#value_suffix'] = $embed_suffix;
-  $html .= theme('html_tag', array('element' => $js_element));
-  return $html;
-}
-
-function civicrm_drupal_wysiwyg_form($form, $form_state, $attributes, $value = '', $format = NULL) {
-  $id        = $attributes['id'];
-  $form      = array();
-  $form[$id] = array(
-    '#type' => 'text_format',
-    '#base_type' => 'textarea',
-    // title comes from quickform output
-    //$attributes['label'],
-    '#title' => '',
-    '#default_value' => $value,
-    '#rows' => $attributes['rows'],
-    '#cols' => $attributes['cols'],
-    '#id' => $attributes['id'],
-    '#format' => $format,
-  );
-
-  return $form;
-}
-
-function civicrm_drupal_wysiwyg_update_value($element, $caller) {
-  // constant values override both default and submitted ones
-  // default values are overriden by submitted
-  $value = $element->_findValue($caller->_constantValues);
-  if (NULL === $value) {
-    $value = $element->_findValue($caller->_submitValues);
-    if (NULL === $value) {
-      $value = $element->_findValue($caller->_defaultValues);
-    }
-    else {
-      if (is_array($value)) {
-        $element->format = $value['format'];
-        $value = $value['value'];
-      }
-    }
-  }
-  if (NULL !== $value) {
-    if (isset($element->format)) {
-      $element->setValue(check_markup($value, $element->format));
-    }
-    else {
-      $element->setValue($value);
-    }
-  }
-}
-
-/**
  * Implements hook_filter_tips().
  */
 function civicrm_filter_info() {
@@ -1213,17 +1098,6 @@ function civicrm_civicrm_postProcess($formName, $form) {
     if (module_exists('views')) {
       views_invalidate_cache();
     }
-  }
-}
-
-/**
- * Implements hook_civicrm_merge().
- */
-function civicrm_civicrm_merge($type, &$data, $mainId, $otherId, $tables) {
-  if ($mainId == 2311 && $otherId == 5686 && $type == 'batch') {
-    $conflicts = &$data['fields_in_conflict'];
-    $conflicts['move_custom_1'] = 'end_user';
-    unset($conflicts['move_custom_8']);
   }
 }
 
@@ -1401,7 +1275,7 @@ function civicrm_modules_enabled($modules) {
 }
 
 /**
- * Implementation of hook_modules_disabled().
+ * Implements hook_modules_disabled().
  */
 function civicrm_modules_disabled($modules) {
   civicrm_initialize();
@@ -1417,12 +1291,12 @@ function civicrm_modules_uninstalled($modules) {
 }
 
 /**
- * Implements hook__metatag_page_cache_cid_parts_alter().
+ * Implements hook_metatag_page_cache_cid_parts_alter().
  *
- * Append the query string to the key under which the page title is cached to prevent cross-contamination
- * from urls such as civicrm/contribute/transact.
+ * Append the query string to the key under which the page title is cached to
+ * prevent cross-contamination from URLs such as civicrm/contribute/transact.
  *
- * If metadata module is not installed this function will not fire.
+ * If the metatag module is not installed this function will not fire.
  *
  * @param array $cid_parts
  */

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -151,6 +151,16 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       'fields' => array(
         'url' => array(
           'title' => ts('Click through URL'),
+        ),
+      ),
+      // To do this filter should really be like mailing id filter a multi select, However
+      // Not clear on how to make filter dependant on selected mailings at this stage so have set a
+      // text filter which works for now
+      'filters' => array(
+        'url' => array(
+          'title' => ts('URL'),
+          'type' => CRM_Utils_Type::T_STRING,
+          'operator' => 'like',
         ),
       ),
       'order_bys' => array(

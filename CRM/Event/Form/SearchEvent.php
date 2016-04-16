@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,18 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
 class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Event';
+  }
 
   /**
    * @return array
@@ -62,7 +69,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
     );
 
     $this->addSelect('event_type_id', array('multiple' => TRUE, 'context' => 'search'));
-    
+
     $eventsByDates = array();
     $searchOption = array(ts('Show Current and Upcoming Events'), ts('Search All or by Date Range'));
     $this->addRadio('eventsByDates', ts('Events by Dates'), $searchOption, array('onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','radio',true);"), "<br />");

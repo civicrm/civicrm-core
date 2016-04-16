@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This class generates form components for name badge layout
- *
+ * This class generates form components for name badge layout.
  */
 class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
@@ -43,8 +40,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -154,11 +149,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * Set default values for the form. MobileProvider that in edit/view mode
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
+   * Set default values for the form.
    */
   public function setDefaultValues() {
     if (isset($this->_id)) {
@@ -183,9 +174,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

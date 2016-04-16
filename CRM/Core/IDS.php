@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Core_IDS {
 
@@ -49,6 +47,8 @@ class CRM_Core_IDS {
   private $init = NULL;
 
   /**
+   * Check function.
+   *
    * This function includes the IDS vendor parts and runs the
    * detection routines on the request array.
    *
@@ -65,7 +65,7 @@ class CRM_Core_IDS {
       return NULL;
     }
 
-    #add request url and user agent
+    // Add request url and user agent.
     $_REQUEST['IDS_request_uri'] = $_SERVER['REQUEST_URI'];
     if (isset($_SERVER['HTTP_USER_AGENT'])) {
       $_REQUEST['IDS_user_agent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -172,8 +172,7 @@ class CRM_Core_IDS {
   }
 
   /**
-   * This function rects on the values in
-   * the incoming results array.
+   * This function reacts on the values in the incoming results array.
    *
    * Depending on the impact value certain actions are
    * performed.
@@ -205,8 +204,7 @@ class CRM_Core_IDS {
   }
 
   /**
-   * This function writes an entry about the intrusion
-   * to the intrusion database
+   * This function writes an entry about the intrusion to the database.
    *
    * @param array $result
    * @param int $reaction
@@ -239,14 +237,22 @@ class CRM_Core_IDS {
   }
 
   /**
-   * //todo
+   * Warn about IDS.
+   *
+   * @param array $result
+   *
+   * @return array
    */
   private function warn($result) {
     return $result;
   }
 
   /**
-   *  //todo
+   * Kick (whatever that means!).
+   *
+   * @param array $result
+   *
+   * @throws \Exception
    */
   private function kick($result) {
     $session = CRM_Core_Session::singleton();

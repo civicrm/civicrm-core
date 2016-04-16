@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -77,42 +77,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public function setExpressCheckOut(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-   * @param $token
-   *
-   * @throws Exception
-   */
-  public function getExpressCheckoutDetails($token) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public function doExpressCheckout(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public function doTransferCheckout(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
    * Submit a payment using Advanced Integration Method.
    *
    * @param array $params
@@ -136,7 +100,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     /**********************************************************
      * Check to see if we have a duplicate before we send
      **********************************************************/
-    if ($this->_checkDupe($this->_getParam('order_id'))) {
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::error(9004, ts('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.'));
     }
 
@@ -186,7 +150,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     curl_setopt($submit, CURLOPT_HTTPHEADER, array('SOAPAction: ""'));
     curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($submit, CURLOPT_TIMEOUT, 60);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
+    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
     curl_setopt($submit, CURLOPT_HEADER, 0);
 
     // take caching out of the picture
@@ -205,7 +169,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
 
     curl_close($submit);
 
-    // Tidy up the responce xml
+    // Tidy up the response xml
     $response_xml = preg_replace("/[\s\t]/", " ", $response_xml);
     $response_xml = preg_replace("/[\n\r]/", "", $response_xml);
 
@@ -332,7 +296,13 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   *  Format the params from the form ready for sending to Realex.  Also perform some validation
+   * Format the params from the form ready for sending to Realex.
+   *
+   * Also perform some validation
+   *
+   * @param array $params
+   *
+   * @return bool
    */
   public function setRealexFields(&$params) {
     if ((int) $params['amount'] <= 0) {
@@ -425,21 +395,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $this->_setParam('timestamp', $timestamp);
 
     return TRUE;
-  }
-
-  /**
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
   }
 
   /**

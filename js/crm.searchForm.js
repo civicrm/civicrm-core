@@ -3,7 +3,7 @@
   "use strict";
   var selected = 0,
     form = 'form.crm-search-form',
-    active = 'a.button, a.action-item:not(.crm-enable-disable), a.crm-popup';
+    active = 'a.action-item:not(.crm-enable-disable), a.crm-popup';
 
   function clearTaskMenu() {
     $('select#task', form).val('').select2('val', '').prop('disabled', true).select2('disable');

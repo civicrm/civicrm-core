@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Generate ical invites for activities
- *
+ * Generate ical invites for activities.
  */
 class CRM_Activity_BAO_ICalendar {
 
@@ -69,7 +66,7 @@ class CRM_Activity_BAO_ICalendar {
    */
   public function addAttachment(&$attachments, $contacts) {
     // Check preferences setting
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'activity_assignee_notification_ics')) {
+    if (Civi::settings()->get('activity_assignee_notification_ics')) {
       $config = &CRM_Core_Config::singleton();
       $this->icsfile = tempnam($config->customFileUploadDir, 'ics');
       if ($this->icsfile !== FALSE) {
@@ -114,7 +111,7 @@ class CRM_Activity_BAO_ICalendar {
   }
 
   /**
-   * TODO: Is there a better way to do this?
+   * @todo Is there a better way to do this?
    * @return string
    */
   private function getPrimaryEmail() {

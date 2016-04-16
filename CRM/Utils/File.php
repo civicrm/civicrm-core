@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -104,12 +102,14 @@ class CRM_Utils_File {
    *   The path name.
    * @param bool $abort
    *   Should we abort or just return an invalid code.
-   *
-   * @return void
+   * @return bool|NULL
+   *   NULL: Folder already exists or was not specified.
+   *   TRUE: Creation succeeded.
+   *   FALSE: Creation failed.
    */
   public static function createDir($path, $abort = TRUE) {
     if (is_dir($path) || empty($path)) {
-      return;
+      return NULL;
     }
 
     CRM_Utils_File::createDir(dirname($path), $abort);
@@ -137,7 +137,6 @@ class CRM_Utils_File {
    * @param bool $verbose
    *
    * @throws Exception
-   * @return void
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
     static $exceptions = array('.', '..');
@@ -276,7 +275,8 @@ class CRM_Utils_File {
    */
   public static function addTrailingSlash($path, $slash = NULL) {
     if (!$slash) {
-      // FIXME: Defaulting to backslash on windows systems can produce unexpected results, esp for URL strings which should always use forward-slashes.
+      // FIXME: Defaulting to backslash on windows systems can produce
+      // unexpected results, esp for URL strings which should always use forward-slashes.
       // I think this fn should default to forward-slash instead.
       $slash = DIRECTORY_SEPARATOR;
     }
@@ -313,7 +313,7 @@ class CRM_Utils_File {
       $string = $prefix . $fileName;
     }
 
-    //get rid of comments starting with # and --
+    // get rid of comments starting with # and --
 
     $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
     $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
@@ -346,7 +346,7 @@ class CRM_Utils_File {
     if (!$extensions) {
       $extensions = CRM_Core_OptionGroup::values('safe_file_extension', TRUE);
 
-      //make extensions to lowercase
+      // make extensions to lowercase
       $extensions = array_change_key_case($extensions, CASE_LOWER);
       // allow html/htm extension ONLY if the user is admin
       // and/or has access CiviMail
@@ -361,7 +361,7 @@ class CRM_Utils_File {
         unset($extensions['htm']);
       }
     }
-    //support lower and uppercase file extensions
+    // support lower and uppercase file extensions
     return isset($extensions[strtolower($ext)]) ? TRUE : FALSE;
   }
 
@@ -386,8 +386,11 @@ class CRM_Utils_File {
   }
 
   /**
-   * Remove the 32 bit md5 we add to the fileName
-   * also remove the unknown tag if we added it
+   * Remove the 32 bit md5 we add to the fileName also remove the unknown tag if we added it.
+   *
+   * @param $name
+   *
+   * @return mixed
    */
   public static function cleanFileName($name) {
     // replace the last 33 character before the '.' with null
@@ -497,13 +500,14 @@ HTACCESS;
    * Create the base file path from which all our internal directories are
    * offset. This is derived from the template compile directory set
    */
-  public static function baseFilePath($templateCompileDir = NULL) {
+  public static function baseFilePath() {
     static $_path = NULL;
     if (!$_path) {
-      if ($templateCompileDir == NULL) {
-        $config = CRM_Core_Config::singleton();
-        $templateCompileDir = $config->templateCompileDir;
+      // Note: Don't rely on $config; that creates a dependency loop.
+      if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
+        throw new RuntimeException("Undefined constant: CIVICRM_TEMPLATE_COMPILEDIR");
       }
+      $templateCompileDir = CIVICRM_TEMPLATE_COMPILEDIR;
 
       $path = dirname($templateCompileDir);
 
@@ -523,6 +527,8 @@ HTACCESS;
 
   /**
    * Determine if a path is absolute.
+   *
+   * @param string $path
    *
    * @return bool
    *   TRUE if absolute. FALSE if relative.
@@ -569,10 +575,12 @@ HTACCESS;
 
   /**
    * @param $directory
+   * @param string|NULL $basePath
+   *   The base path when evaluating relative paths. Should include trailing slash.
    *
    * @return string
    */
-  public static function absoluteDirectory($directory) {
+  public static function absoluteDirectory($directory, $basePath = NULL) {
     // check if directory is already absolute, if so return immediately
     // Note: Windows PHP accepts any mix of "/" or "\", so "C:\htdocs" or "C:/htdocs" would be a valid absolute path
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && preg_match(';^[a-zA-Z]:[/\\\\];', $directory)) {
@@ -585,7 +593,7 @@ HTACCESS;
     }
 
     // make everything absolute from the baseFilePath
-    $basePath = self::baseFilePath();
+    $basePath = ($basePath === NULL) ? self::baseFilePath() : $basePath;
 
     return $basePath . $directory;
   }
@@ -614,7 +622,7 @@ HTACCESS;
   /**
    * Create a path to a temporary file which can endure for multiple requests.
    *
-   * TODO: Automatic file cleanup using, eg, TTL policy
+   * @todo Automatic file cleanup using, eg, TTL policy
    *
    * @param string $prefix
    *
@@ -622,9 +630,9 @@ HTACCESS;
    * @see tempnam
    */
   public static function tempnam($prefix = 'tmp-') {
-    //$config = CRM_Core_Config::singleton();
-    //$nonce = md5(uniqid() . $config->dsn . $config->userFrameworkResourceURL);
-    //$fileName = "{$config->configAndLogDir}" . $prefix . $nonce . $suffix;
+    // $config = CRM_Core_Config::singleton();
+    // $nonce = md5(uniqid() . $config->dsn . $config->userFrameworkResourceURL);
+    // $fileName = "{$config->configAndLogDir}" . $prefix . $nonce . $suffix;
     $fileName = tempnam(sys_get_temp_dir(), $prefix);
     return $fileName;
   }
@@ -632,7 +640,7 @@ HTACCESS;
   /**
    * Create a path to a temporary directory which can endure for multiple requests.
    *
-   * TODO: Automatic file cleanup using, eg, TTL policy
+   * @todo Automatic file cleanup using, eg, TTL policy
    *
    * @param string $prefix
    *
@@ -660,6 +668,9 @@ HTACCESS;
    * @return array(string)
    */
   public static function findFiles($dir, $pattern, $relative = FALSE) {
+    if (!is_dir($dir)) {
+      return array();
+    }
     $dir = rtrim($dir, '/');
     $todos = array($dir);
     $result = array();
@@ -739,7 +750,7 @@ HTACCESS;
       }
     }
 
-    // return rename($fromDir, $toDir); // CRM-11987, https://bugs.php.net/bug.php?id=54097
+    // return rename($fromDir, $toDir); CRM-11987, https://bugs.php.net/bug.php?id=54097
 
     CRM_Utils_File::copyDir($fromDir, $toDir);
     if (!CRM_Utils_File::cleanDir($fromDir, TRUE, FALSE)) {

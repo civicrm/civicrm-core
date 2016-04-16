@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * form helper class for an Website object
+ * Form helper class for an Website object.
  */
 class CRM_Contact_Form_Edit_Website {
 
@@ -45,8 +43,6 @@ class CRM_Contact_Form_Edit_Website {
    *   Reference to the form object.
    * @param int $blockCount
    *   Block number to build.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, $blockCount = NULL) {
     if (!$blockCount) {
@@ -59,20 +55,12 @@ class CRM_Contact_Form_Edit_Website {
     $form->applyFilter('__ALL__', 'trim');
 
     //Website type select
-    $form->addSelect("website[$blockId][website_type_id]", array('entity' => 'website', 'class' => 'eight'));
+    $form->addField("website[$blockId][website_type_id]", array('entity' => 'website', 'class' => 'eight'));
 
     //Website box
-    $form->addElement('text', "website[$blockId][url]", ts('Website'),
-      array_merge(
-        CRM_Core_DAO::getAttribute('CRM_Core_DAO_Website', 'url'),
-        array(
-          'onfocus' => "if (!this.value) {  this.value='http://';} else return false",
-          'onblur' => "if ( this.value == 'http://') {  this.value='';} else return false",
-        )
-      )
-    );
+    $form->addField("website[$blockId][url]", array('entity' => 'website'));
+    $form->addRule("website[$blockId][url]", ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
 
-    $form->addRule("website[$blockId][url]", ts('Enter a valid web location beginning with \'http://\' or \'https://\'. EXAMPLE: http://www.mysite.org/'), 'url');
   }
 
 }

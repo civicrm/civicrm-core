@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -295,7 +295,7 @@ function _civicrm_og_sync_node_action($node) {
   }
 
 function _civicrm_og_sync_group_action($membership, $op = 'add') {
-  if ($membership->entity_type != 'user' || !civicrm_initialize() || _civicrm_og_sync_skip_process_request()) {
+  if ($membership->entity_type != 'user' || !civicrm_initialize() || _civicrm_og_sync_skip_process_request() || $membership->type == "trusted_contacts") {
     return;
   }
 

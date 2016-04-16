@@ -516,11 +516,11 @@ function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL) {
     //Get all memberships of contact
     $memParams = array(
       'contact_id' => $cid,
-      'version' => 3,
+      'options' => array('limit' => 0),
     );
     //CRM-16000 added try/catch to api call
     try {
-      $memberships = civicrm_api('membership', 'get', $memParams);
+      $memberships = civicrm_api3('membership', 'get', $memParams);
     } catch (CiviCRM_API3_Exception $e) {
       $error = $e->getMessage();
       return $error;

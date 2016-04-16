@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
 
@@ -99,8 +97,6 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the type
    * of action and executes that action. Finally it calls the parent's run
    * method.
-   *
-   * @return void
    */
   public function run() {
     // get the requested action, default to 'browse'
@@ -136,8 +132,6 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
 
   /**
    * Browse all rule groups.
-   *
-   * @return void
    */
   public function browse() {
     // get all rule groups

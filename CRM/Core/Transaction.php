@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
  * $Id$
  *
@@ -176,7 +176,7 @@ class CRM_Core_Transaction {
    * use it again.
    *
    * @param string $callable
-   *   Should exception one paramter (CRM_Core_Transaction $tx).
+   *   Should exception one parameter (CRM_Core_Transaction $tx).
    * @return CRM_Core_Transaction
    * @throws Exception
    */

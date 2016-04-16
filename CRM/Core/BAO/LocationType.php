@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -77,7 +77,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    *
    */
   public static function setIsActive($id, $is_active) {
@@ -160,12 +160,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
       $baoString = 'CRM_Core_BAO_' . $name;
       $object = new $baoString();
       $object->location_type_id = $locationTypeId;
-      if ($object->find()) {
-        throw new CRM_Core_Exception('Deleting this will delete address, phone, email or im data.'
-        . 'You are using the Fuzion CiviCRM repo and we have blocked you from doing this due to the catastrophic nature of a mistake here'
-        . 'If you really want to do this log a Redmine ticket to us (assuming you are a customer)
-        ');
-      }
+      $object->delete();
     }
 
     $locationType = new CRM_Core_DAO_LocationType();

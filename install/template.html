@@ -1,15 +1,19 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $short_lang_code; ?>" lang="<?php echo $short_lang_code; ?>" dir="<?php echo $text_direction; ?>">
 <head>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-<title><?php echo ts('CiviCRM Installer'); ?></title>
-<link rel="stylesheet" type="text/css" href=<?php echo $installURLPath . "template.css"?> />
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <title><?php echo ts('CiviCRM Installer'); ?></title>
+  <link rel="stylesheet" type="text/css" href=<?php echo $installURLPath . "template.css"?> />
+<?php
+if ($text_direction == 'rtl') {
+  echo "  <link rel='stylesheet' type='text/css' href='{$installURLPath}template-rtl.css' />\n";
+}
+?>
 </head>
-
 <body>
 
 <div id="All">
-  <div style="float: right"><strong><?php echo ts('Version %1', array(1 => "{$civicrm_version['version']} {$civicrm_version['cms']}")); ?></strong><br/>
+  <div class="civicrm-logo"><strong><?php echo ts('Version %1', array(1 => "{$civicrm_version['version']} {$civicrm_version['cms']}")); ?></strong><br/>
     <span><img src=<?php echo $installURLPath . "block_small.png"?> /></span>
   </div>
 

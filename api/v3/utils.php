@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -131,9 +131,10 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
 function civicrm_api3_create_error($msg, $data = array()) {
   $data['is_error'] = 1;
   $data['error_message'] = $msg;
+
   // we will show sql to privileged user only (not sure of a specific
   // security hole here but seems sensible - perhaps should apply to the trace as well?)
-  if (isset($data['sql']) && CRM_Core_Permission::check('Administer CiviCRM')) {
+  if (isset($data['sql']) && (CRM_Core_Permission::check('Administer CiviCRM') || CIVICRM_UF == 'UnitTests')) {
     // Isn't this redundant?
     $data['debug_information'] = $data['sql'];
   }
@@ -265,8 +266,8 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   }
   // Report deprecations.
   $deprecated = _civicrm_api3_deprecation_check($entity, $result);
-  // The "setvalue" action is deprecated but still in use, so report it only on "getactions".
-  if (!is_string($deprecated) && $action == 'getactions') {
+  // Always report "setvalue" action as deprecated.
+  if (!is_string($deprecated) && ($action == 'getactions' || $action == 'setvalue')) {
     $deprecated = ((array) $deprecated) + array('setvalue' => 'The "setvalue" action is deprecated. Use "create" with an id instead.');
   }
   // Always report "update" action as deprecated.
@@ -627,10 +628,6 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $skipPermissions,
     $mode
   );
-  if ($getCount) {
-    // only return the count of contacts
-    return $entities;
-  }
 
   return $entities;
 }
@@ -1052,7 +1049,7 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
     $result[$dao->id] = $tmp;
 
     if (_civicrm_api3_custom_fields_are_required($entity, $params)) {
-      _civicrm_api3_custom_data_get($result[$dao->id], $entity, $dao->id);
+      _civicrm_api3_custom_data_get($result[$dao->id], $params['check_permissions'], $entity, $dao->id);
     }
   }
 
@@ -1374,9 +1371,11 @@ function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $e
  *   Entity - pass in if entity is non-standard & required $ids array.
  *
  * @throws API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  * @return array
  */
 function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
+  _civicrm_api3_check_edit_permissions($bao_name, $params);
   _civicrm_api3_format_params_for_create($params, $entity);
   $args = array(&$params);
   if ($entity) {
@@ -1466,10 +1465,11 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
  * @return array
  *   API result array
  * @throws API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function _civicrm_api3_basic_delete($bao_name, &$params) {
-
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
+  _civicrm_api3_check_edit_permissions($bao_name, array('id' => $params['id']));
   $args = array(&$params['id']);
   if (method_exists($bao_name, 'del')) {
     $bao = call_user_func_array(array($bao_name, 'del'), $args);
@@ -1514,13 +1514,17 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  * @param string $subName
  *   Subtype of entity.
  */
-function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
+function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
   $groupTree = CRM_Core_BAO_CustomGroup::getTree($entity,
     NULL,
     $entity_id,
     $groupID,
-    $subType,
-    $subName
+    NULL,
+    $subName,
+    TRUE,
+    NULL,
+    TRUE,
+    $checkPermission
   );
   $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, CRM_Core_DAO::$_nullObject);
   $customValues = array();
@@ -1631,7 +1635,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
           _civicrm_api3_validate_constraint($params, $fieldName, $fieldInfo);
         }
         elseif (!empty($fieldInfo['required'])) {
-          throw new Exception("DB Constraint Violation - possibly $fieldName should possibly be marked as mandatory for this API. If so, please raise a bug report");
+          throw new Exception("DB Constraint Violation - possibly $fieldName should possibly be marked as mandatory for this API. If so, please raise a bug report.");
         }
       }
       if (!empty($fieldInfo['api.unique'])) {
@@ -1877,6 +1881,14 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
   }
   $d = new $dao();
   $fields = $d->fields();
+
+  // Set html attributes for text fields
+  foreach ($fields as $name => &$field) {
+    if (isset($field['html'])) {
+      $field['html'] += (array) $d::makeAttribute($field);
+    }
+  }
+
   // replace uniqueNames by the normal names as the key
   if (empty($unique)) {
     foreach ($fields as $name => &$field) {
@@ -2160,7 +2172,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
  * @throws Exception
  */
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
-  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName, 'String');
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE || CRM_Utils_System::isNull($fieldValue)) {
     return;
   }
@@ -2295,8 +2307,10 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  * @param $fieldName
  *   any variation of a field's name (name, unique_name, api.alias).
  *
+ * @param string $action
+ *
  * @return bool|string
- *   fieldName or FALSE if the field does not exist
+ *   FieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create') {
   if (!$fieldName) {
@@ -2360,18 +2374,22 @@ function _civicrm_api3_deprecation_check($entity, $result = array()) {
  * Get the actual field value.
  *
  * In some case $params[$fieldName] holds Array value in this format Array([operator] => [value])
- * So this function returns the actual field value
+ * So this function returns the actual field value.
  *
  * @param array $params
  * @param string $fieldName
+ * @param string $type
  *
  * @return mixed
  */
-function _civicrm_api3_field_value_check(&$params, $fieldName) {
+function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
   $fieldValue = CRM_Utils_Array::value($fieldName, $params);
   $op = NULL;
 
-  if (!empty($fieldValue) && is_array($fieldValue) && array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
+  if (!empty($fieldValue) && is_array($fieldValue) &&
+    (array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators()) ||
+      $type == 'String' && strstr(key($fieldValue), 'EMPTY'))
+  ) {
     $op = key($fieldValue);
     $fieldValue = CRM_Utils_Array::value($op, $fieldValue);
   }
@@ -2437,4 +2455,28 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fiel
   }
 
   return civicrm_api3_create_success($matches, $params);
+}
+
+/**
+ * @param string $bao_name
+ * @param array $params
+ * @throws \Civi\API\Exception\UnauthorizedException
+ */
+function _civicrm_api3_check_edit_permissions($bao_name, $params) {
+  // For lack of something more clever, here's a whitelist of entities whos permissions
+  // are inherited from a contact record.
+  // Note, when adding here, also remember to modify _civicrm_api3_permissions()
+  $contactEntities = array(
+    'CRM_Core_BAO_Email',
+    'CRM_Core_BAO_Phone',
+    'CRM_Core_BAO_Address',
+    'CRM_Core_BAO_IM',
+    'CRM_Core_BAO_Website',
+  );
+  if (!empty($params['check_permissions']) && in_array($bao_name, $contactEntities)) {
+    $cid = !empty($params['contact_id']) ? $params['contact_id'] : CRM_Core_DAO::getFieldValue($bao_name, $params['id'], 'contact_id');
+    if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
+      throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+    }
+  }
 }

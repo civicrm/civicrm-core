@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
 <dt>{ts}Message{/ts}</dt><dd>{$message}</dd>
 <dt>&nbsp;</dt>
   <dd class="crm-submit-buttons">
-   {crmButton class="cancel" icon="close" p='civicrm/contact/view/activity' q="history=1&show=1"}">{ts}Done{/ts}{/crmButton}
+   {crmButton class="cancel" icon="times" p='civicrm/contact/view/activity' q="history=1&show=1"}">{ts}Done{/ts}{/crmButton}
   </dd>
 </dl>
 </fieldset>

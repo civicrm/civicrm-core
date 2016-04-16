@@ -103,7 +103,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * {@inheritdoc}
+     * @see EventDispatcherInterface::hasListeners()
      */
     public function hasListeners($eventName = null)
     {
@@ -119,7 +119,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * {@inheritdoc}
+     * @see EventDispatcherInterface::getListeners()
      */
     public function getListeners($eventName = null)
     {

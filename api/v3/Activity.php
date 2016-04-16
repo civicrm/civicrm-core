@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,7 @@
  *
  * @throws API_Exception
  * @return array
- *   Array containing 'is_error' to denote success or failure and details of the created activity.
+ *   API result array
  */
 function civicrm_api3_activity_create($params) {
 
@@ -230,6 +230,7 @@ function _civicrm_api3_activity_create_spec(&$params) {
  *   Array per getfields documentation.
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_activity_get($params) {
   if (!empty($params['contact_id'])) {
@@ -302,6 +303,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
       $returns[$returnkey] = $v;
     }
   }
+
   $returns['source_contact_id'] = 1;
   foreach ($returns as $n => $v) {
     switch ($n) {
@@ -332,7 +334,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
   if (!empty($activities) && (!empty($returnProperties) || !empty($params['contact_id']))) {
     foreach ($activities as $activityId => $values) {
       //@todo - should possibly load activity type id if not loaded (update with id)
-      _civicrm_api3_custom_data_get($activities[$activityId], 'Activity', $activityId, NULL, CRM_Utils_Array::value('activity_type_id', $values));
+      _civicrm_api3_custom_data_get($activities[$activityId], CRM_Utils_Array::value('check_permissions', $params), 'Activity', $activityId, NULL, CRM_Utils_Array::value('activity_type_id', $values));
     }
   }
   return $activities;
@@ -348,6 +350,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
  * @throws API_Exception
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_activity_delete($params) {
 

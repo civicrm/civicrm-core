@@ -54,10 +54,6 @@ $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES'] =
             'hiddenselect'  =>array('HTML/QuickForm/hiddenselect.php','HTML_QuickForm_hiddenselect'),
             'text'          =>array('HTML/QuickForm/text.php','HTML_QuickForm_text'),
             'textarea'      =>array('HTML/QuickForm/textarea.php','HTML_QuickForm_textarea'),
-            'ckeditor'      =>array('HTML/QuickForm/ckeditor.php','HTML_QuickForm_CKEditor'),
-            'tinymce'       =>array('HTML/QuickForm/tinymce.php','HTML_QuickForm_TinyMCE'),
-            'joomlaeditor'  =>array('HTML/QuickForm/joomlaeditor.php','HTML_QuickForm_JoomlaEditor'),
-            'drupalwysiwyg' =>array('HTML/QuickForm/drupalwysiwyg.php', 'HTML_QuickForm_DrupalWysiwyg'),
             'link'          =>array('HTML/QuickForm/link.php','HTML_QuickForm_link'),
             'advcheckbox'   =>array('HTML/QuickForm/advcheckbox.php','HTML_QuickForm_advcheckbox'),
             'date'          =>array('HTML/QuickForm/date.php','HTML_QuickForm_date'),
@@ -1947,6 +1943,8 @@ class HTML_QuickForm extends HTML_Common
                     !in_array($this->_elements[$key]->_type, array('text', 'textarea'))
                     // …or should be skipped…
                     or CRM_Core_HTMLInputCoder::isSkippedField($fldName)
+                    //CRM-17962 - do not encode if element is a wysiwyg editor
+                    or CRM_Utils_Array::value('class', $this->_elements[$key]->_attributes) == 'crm-form-wysiwyg'
                 ) {
                     // …don’t filter, otherwise filter (else clause below)
                 } else {

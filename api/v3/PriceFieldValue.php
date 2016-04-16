@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -71,6 +71,7 @@ function _civicrm_api3_price_field_value_create_spec(&$params) {
   $params['label']['api.required'] = TRUE;
   $params['amount']['api.required'] = TRUE;
   $params['is_active']['api.default'] = TRUE;
+  $params['financial_type_id']['api.default'] = TRUE;
 }
 
 /**

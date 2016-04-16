@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,21 +28,29 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * This class generates form components for Financial Type
- *
  */
 class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    // Check permission for Financial Type when ACL-FT is enabled
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
+    ) {
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    }
+    parent::preProcess();
+  }
+
+  /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -77,8 +85,6 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
    * Process the form submission.
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

@@ -25,9 +25,11 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
     echo "Generating CRM_Core_I18n_SchemaStructure...\n";
     $columns = array();
     $indices = array();
+    $widgets = array();
     foreach ($this->tables as $table) {
       if ($table['localizable']) {
         $columns[$table['name']] = array();
+        $widgets[$table['name']] = array();
       }
       else {
         continue;
@@ -35,6 +37,7 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
       foreach ($table['fields'] as $field) {
         if ($field['localizable']) {
           $columns[$table['name']][$field['name']] = $field['sqlType'];
+          $widgets[$table['name']][$field['name']] = $field['widget'];
         }
       }
       if (isset($table['index'])) {
@@ -50,6 +53,7 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
 
     $template->assign('columns', $columns);
     $template->assign('indices', $indices);
+    $template->assign('widgets', $widgets);
 
     $template->run('schema_structure.tpl', $this->config->phpCodePath . "/CRM/Core/I18n/SchemaStructure.php");
   }

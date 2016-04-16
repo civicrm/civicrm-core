@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,21 +28,17 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This form records additional payments needed when
- * event/contribution is partially paid
- *
+ * This form records additional payments needed when event/contribution is partially paid.
  */
 class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_AbstractEditPayment {
   public $_contributeMode = 'direct';
 
   /**
-   * Related component whose financial payment is being processed
+   * Related component whose financial payment is being processed.
    *
    * @var string
    */
@@ -343,9 +339,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         ),
       )
     );
-    $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
+    $mailingInfo = Civi::settings()->get('mailing_backend');
     $this->assign('outBound_option', $mailingInfo['outBound_option']);
 
     $this->addFormRule(array('CRM_Contribute_Form_AdditionalPayment', 'formRule'), $this);
@@ -388,7 +382,15 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->processCreditCard($submittedValues);
     }
     else {
+      $defaults = array();
       $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
+      // Fetch the contribution & do proportional line item assignment
+      $params = array('id' => $this->_contributionId);
+      $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
+      $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_contributionId);
+      if (!empty($lineItems)) {
+        CRM_Contribute_BAO_Contribution::addPayments($lineItems, array($contribution));
+      }
 
       // email sending
       if (!empty($result) && !empty($submittedValues['is_email_receipt'])) {
@@ -498,12 +500,16 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->_params['total_amount'];
+    // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
+    // function to get correct amount level consistently. Remove setting of the amount level in
+    // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+    // to cover all variants.
     $this->_params['amount_level'] = 0;
     $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
       $this->_params,
       $config->defaultCurrency
     );
-    $this->_params['payment_action'] = 'Sale';
+
     if (!empty($this->_params['trxn_date'])) {
       $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['trxn_date'], $this->_params['trxn_date_time']);
     }
@@ -576,19 +582,20 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $result = NULL;
 
     if ($paymentParams['amount'] > 0.0) {
-      // force a reget of the payment processor in case the form changed it, CRM-7179
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
-      $result = $payment->doDirectPayment($paymentParams);
-    }
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      //set the contribution mode.
-      $urlParams = "action=add&cid={$this->_contactId}&id={$this->_id}&component={$this->_component}";
-      if ($this->_mode) {
-        $urlParams .= "&mode={$this->_mode}";
+      try {
+        // force a reget of the payment processor in case the form changed it, CRM-7179
+        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+        $result = $payment->doPayment($paymentParams);
       }
-      CRM_Core_Error::displaySessionError($result);
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        //set the contribution mode.
+        $urlParams = "action=add&cid={$this->_contactId}&id={$this->_id}&component={$this->_component}";
+        if ($this->_mode) {
+          $urlParams .= "&mode={$this->_mode}";
+        }
+        CRM_Core_Error::displaySessionError($result);
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
+      }
     }
 
     if ($result) {

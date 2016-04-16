@@ -18,3 +18,40 @@
 .adv-search-top-submit span.crm-button {
   float: right !important;
 }
+
+/* alpha filter styles */
+#crm-container #alpha-filter ul {
+  border-collapse: collapse;
+  padding: 0;
+  list-style-type: none;
+  margin: 3px;
+  height: auto;
+  width: auto;
+}
+
+.crm-container div#alpha-filter {
+  background-color: #CDE8FE;
+  margin: 4px 0 5px;
+  padding: 2px;
+  text-align: left;
+}
+
+.crm-container #alpha-filter li {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  color: #AAAAAA;
+  display: inline;
+  font-size: 15px;
+  font-weight: normal;
+  height: auto;
+  margin: 0 1px;
+  padding: 2px 5px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.crm-container #alpha-filter a {
+  border-bottom: 1px dotted #2A71B4;
+  color: #2A71B4;
+  font-weight: normal;
+}

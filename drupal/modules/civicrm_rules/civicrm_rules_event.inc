@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -116,6 +116,7 @@ function civicrm_rules_get_event() {
 
   if (is_array($validObjects)) {
     foreach ($validObjects as $entity => $enabled) {
+      $entity = strtolower($entity);
       if (!$enabled == 0) {
         //todo consider building the entity name into the argument rather than calling the same argument for each
         $events['civicrm_' . $entity . '_create'] = $defaults + array(

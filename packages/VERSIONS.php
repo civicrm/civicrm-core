@@ -7,7 +7,6 @@
  * =================
  *  + Introduction
  *  + License Abbreviations
- *  + How-To: PEAR install instructions
  *  + How-To: Manual upgrade of a forked package
  *  + Package List: PEAR
  *  + Package List: Manually installed
@@ -24,6 +23,13 @@
  * file provides all the notes about how/where to download/upgrade third-party
  * library.
  *
+ * Note that the packages directory is generally deprecated for
+ * managing dependencies. Instead, one should update a config file
+ * in the main civicrm-core project:
+ *
+ *  - For PHP dependencies, use composer.json
+ *  - For client-side CSS/JS resources, use bower.json
+ *  - For CLI JS tools, use package.json
  *
  * License Abbreviations
  * =====================
@@ -42,23 +48,6 @@
  *   PHP 2     PHP License 2.*
  *   PHP 3     PHP License 3.*
  *   X11       X11 (a.k.a. MIT) license
- *
- *
- * How-To: PEAR install instructions
- * =================================
- *
- * pear config-set download_dir /tmp
- * pear config-set bin_dir   packages/bin
- * pear config-set doc_dir   packages/doc
- * pear config-set ext_dir   packages/ext
- * pear config-set php_dir   packages
- * pear config-set cache_dir packages/cache
- * pear config-set cfg_dir   packages/cfg
- * pear config-set data_dir  packages/data
- * pear config-set temp_dir  packages/temp
- * pear config-set test_dir  packages/test
- * pear config-set www_dir   packages/www
- * pear install Archive_Tar  # etc., in the main CiviCRM dir
  *
  *
  * How-To: Manual upgrade of a forked package
@@ -145,5 +134,4 @@
  * ============================
  * Facebook      BSD 2-cl.
  * Google        Apache 2/GPL 2+
- * TinyMCE       LGPL 2.1
  */

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -52,23 +52,26 @@ abstract class CRM_Import_DataSource {
 
   /**
    * Set variables up before form is built.
+   *
+   * @param CRM_Core_Form $form
    */
   abstract public function preProcess(&$form);
 
   /**
-   * This is function is called by the form object to get the DataSource's
-   * form snippet. It should add all fields necesarry to get the data
-   * uploaded to the temporary table in the DB.
+   * This is function is called by the form object to get the DataSource's form snippet.
+   *
+   * It should add all fields necessary to get the data uploaded to the temporary table in the DB.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
-   *   (operates directly on form argument)
    */
   abstract public function buildQuickForm(&$form);
 
   /**
    * Process the form submission.
+   *
+   * @param array $params
+   * @param string $db
+   * @param CRM_Core_Form $form
    */
   abstract public function postProcess(&$params, &$db, &$form);
 

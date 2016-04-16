@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -121,7 +121,6 @@ function civicrm_engage_civicrm_postProcess($class, &$form) {
         require_once 'CRM/Core/BAO/CustomValueTable.php';
         $params = $form->controller->exportValues($form->getVar('_name'));
         CRM_Core_BAO_CustomValueTable::postProcess($params,
-          $groupTree[$cgID]['fields'],
           'civicrm_contact',
           $form->getVar('_contactId'),
           'Individual'

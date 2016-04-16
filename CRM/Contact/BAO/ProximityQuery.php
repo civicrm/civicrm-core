@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contact_BAO_ProximityQuery {
 
@@ -97,7 +95,7 @@ class CRM_Contact_BAO_ProximityQuery {
    *
    * @param float $longitude
    * @param float $latitude
-   * @param float $height
+   * @param float|int $height
    *
    * @return array
    */
@@ -254,11 +252,13 @@ ACOS(
   }
 
   /**
-   * @param $query
+   * Process form.
+   *
+   * @param CRM_Contact_BAO_Query $query
    * @param array $values
    *
+   * @return null
    * @throws Exception
-   * @return void
    */
   public static function process(&$query, &$values) {
     list($name, $op, $distance, $grouping, $wildcard) = $values;

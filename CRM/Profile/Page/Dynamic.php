@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -206,7 +206,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $this->_isPermissionedChecksum = $allowPermission = FALSE;
       $permissionType = CRM_Core_Permission::VIEW;
       if (CRM_Core_Permission::check('administer users') || CRM_Core_Permission::check('view all contacts') || CRM_Contact_BAO_Contact_Permission::allow($this->_id)) {
-        $allowPermission =  TRUE;
+        $allowPermission = TRUE;
       }
       if ($this->_id != $userID) {
         // do not allow edit for anon users in joomla frontend, CRM-4668, unless u have checksum CRM-5228

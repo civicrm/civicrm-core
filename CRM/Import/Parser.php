@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 abstract class CRM_Import_Parser {
   /**
@@ -208,14 +206,18 @@ abstract class CRM_Import_Parser {
   abstract protected function fini();
 
   /**
-   * @param $values
+   * Map field.
+   *
+   * @param array $values
    *
    * @return mixed
    */
   abstract protected function mapField(&$values);
 
   /**
-   * @param $values
+   * Preview.
+   *
+   * @param array $values
    *
    * @return mixed
    */
@@ -339,7 +341,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Remove single-quote enclosures from a value array (row)
+   * Remove single-quote enclosures from a value array (row).
    *
    * @param array $values
    * @param string $enclosure

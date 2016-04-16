@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,25 +28,17 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * Build the form object for disable mail feature
- *
- * @param
- *
- * @return void
  */
 class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
   /**
    * Heart of the viewing process. The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
@@ -68,8 +60,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -86,10 +76,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
     );
   }
 
-  /**
-   *
-   * @return void
-   */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Mailing_BAO_Mailing::del($this->_mailingId);

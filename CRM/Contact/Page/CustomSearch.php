@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * Main page for viewing all Saved searches.
- *
  */
 class CRM_Contact_Page_CustomSearch extends CRM_Core_Page {
 
@@ -89,8 +86,6 @@ ORDER By  v.weight
 
   /**
    * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
    */
   public function run() {
     $action = CRM_Utils_Request::retrieve('action',

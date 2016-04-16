@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,9 +30,7 @@
  * by every scheduled job (cron task) in CiviCRM.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Core_JobManager {
 
@@ -53,8 +51,6 @@ class CRM_Core_JobManager {
 
   /**
    * Class constructor.
-   *
-   * @return void
    */
   public function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -85,6 +81,13 @@ class CRM_Core_JobManager {
       }
     }
     $this->logEntry('Finishing scheduled jobs execution.');
+
+    // Set last cron date for the status check
+    $statusPref = array(
+      'name' => 'checkLastCron',
+      'check_info' => gmdate('U'),
+    );
+    CRM_Core_BAO_StatusPreference::create($statusPref);
   }
 
   /**
@@ -200,9 +203,6 @@ class CRM_Core_JobManager {
 
   /**
    * @param string $message
-   *
-   * @return void
-   *   collection of permissions, null if none
    */
   public function logEntry($message) {
     $domainID = CRM_Core_Config::domainID();

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This class acts like a psuedo-BAO for transient import job tables
+ * This class acts like a psuedo-BAO for transient import job tables.
  */
 class CRM_Contact_Import_ImportJob {
 
@@ -416,7 +414,6 @@ class CRM_Contact_Import_ImportJob {
 
       $tagParams = array(
         'name' => $newTagName,
-        'title' => $newTagName,
         'description' => $newTagDesc,
         'is_selectable' => TRUE,
         'used_for' => 'civicrm_contact',

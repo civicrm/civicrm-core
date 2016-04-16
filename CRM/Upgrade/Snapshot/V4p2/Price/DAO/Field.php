@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2015                                |
+| Copyright CiviCRM LLC (c) 2004-2016                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -27,7 +27,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -340,6 +340,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   /**
    * returns the list of fields that can be imported.
    *
+   * @param bool $prefix
+   *
    * @return array
    */
   static function &import($prefix = FALSE) {
@@ -361,7 +363,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   }
 
   /**
-   * returns the list of fields that can be exported.
+   * Returns the list of fields that can be exported.
+   *
+   * @param bool $prefix
    *
    * @return array
    */
@@ -427,7 +431,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
    *
    * @param array $values
    *   (reference) the array up for enhancing.
-   * @return void
    */
   public static function addDisplayEnums(&$values) {
     $enumFields = &Snapshot_v4p2_Price_DAO_Field::getEnums();

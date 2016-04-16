@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
 function _civicrm_case_data(&$data, $enabled) {
 
   /**
-   *CiviCRM Campaign Base Table
+   *CiviCRM Case Base Table
    */
 
   $data['civicrm_case']['table']['group'] = t('CiviCRM Cases');
@@ -62,7 +62,7 @@ function _civicrm_case_data(&$data, $enabled) {
     ),
   );
 
-  // Campaign ID
+  // Case ID
   $data['civicrm_case']['id'] = array(
     'title' => t('Case ID'),
     'help' => t('The numeric ID of the case'),
@@ -434,6 +434,44 @@ function _civicrm_case_data(&$data, $enabled) {
       'label' => t('CiviCRM Contact, with custom fields'),
     ),
   );
+  //----------------------------------------------------------------
+  // CIVICRM Case Type Names are here, base tabling it up.
+  //----------------------------------------------------------------
 
+  $data['civicrm_case_type']['table']['group'] = t('CiviCRM Case Type Names');
+
+  $data['civicrm_case_type']['table']['base'] = array(
+    // Governs the whole mozilla
+    'field' => 'id',
+    'title' => t('CiviCRM Case Type Names'),
+    'help' => t("View displays CiviCRM Case Type Names"),
+  );
+
+  // Explain how this table joins to others.
+  $data['civicrm_case_type']['table']['join'] = array(
+    // Directly links to case table.
+    'civicrm_case' => array(
+      'left_field' => 'case_type_id',
+      'field' => 'id',
+    ),
+  );
+
+  //CiviCRM Case Type - FIELDS
+
+  //Case Type Title
+  $data['civicrm_case_type']['title'] = array(
+    'title' => t('Case Type Name'),
+    'real field' => 'title',
+    'help' => t('The Name of the Case Type'),
+    'field' => array(
+    'handler' => 'views_handler_field',
+    'click sortable' => TRUE,
+    ),
+    'argument' => array(
+     'handler' => 'views_handler_argument',
+    ),
+    'sort' => array(
+    'handler' => 'views_handler_sort',
+    ),
+  );
 }
-

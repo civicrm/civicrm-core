@@ -419,7 +419,7 @@
      <path>civicrm/admin/synchUser</path>
      <title>Synchronize Users to Contacts</title>
      <desc>Automatically create a CiviCRM contact record for each CMS user record.</desc>
-     <page_callback>CRM_Admin_Page_CMSUser</page_callback>
+     <page_callback>CRM_Admin_Form_CMSUser</page_callback>
      <adminGroup>Users and Permissions</adminGroup>
      <icon>admin/small/Synch_user.png</icon>
      <weight>20</weight>
@@ -723,8 +723,8 @@
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/mapping1</path>
-     <page_callback>CRM_Admin_Page_AJAX::mappingList1</page_callback>
+     <path>civicrm/ajax/recipientListing</path>
+     <page_callback>CRM_Admin_Page_AJAX::recipientListing</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
@@ -759,6 +759,12 @@
   <item>
     <path>civicrm/admin/badgelayout/add</path>
     <page_callback>CRM_Badge_Form_Layout</page_callback>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/ckeditor</path>
+    <title>Configure CKEditor</title>
+    <page_callback>CRM_Admin_Page_CKEditorConfig</page_callback>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>

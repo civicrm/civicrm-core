@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,7 +54,7 @@ function smarty_function_crmAPI($params, &$smarty) {
   $result = civicrm_api($entity, $action, $params);
   unset($errorScope);
   if ($result === FALSE) {
-    $smarty->trigger_error("Unkown error");
+    $smarty->trigger_error("Unknown error");
     return;
   }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Page for displaying list of Reminders
+ * Page for displaying list of Reminders.
  */
 class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
 
@@ -131,8 +129,6 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    * Browse all Scheduled Reminders settings.
    *
    * @param null $action
-   *
-   * @return void
    */
   public function browse($action = NULL) {
     //CRM-16777: Do not permit access to user, for page 'Administer->Communication->Schedule Reminder',

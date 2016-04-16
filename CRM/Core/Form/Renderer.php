@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -120,7 +120,18 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
-      $el['html'] = '<span class="crm-frozen-field">' . $el['html'] . '</span>';
+      elseif ($element->getAttribute('type') == 'text' && $element->getAttribute('formatType')) {
+        list($date, $time) = CRM_Utils_Date::setDateDefaults($element->getValue(), $element->getAttribute('formatType'), $element->getAttribute('format'), $element->getAttribute('timeformat'));
+        $date .= ($element->getAttribute('timeformat')) ? " $time" : '';
+        $el['html'] = $date . '<input type="hidden" value="' . $element->getValue() . '" name="' . $element->getAttribute('name') . '">';
+      }
+      if ($el['name'] == 'details') {
+        $el['html'] = str_replace('<br />', '', $el['html']);
+        $el['html'] = '<span class="crm-frozen-field">' . html_entity_decode($el['html']) . '</span>';
+      }
+      else {
+        $el['html'] = '<span class="crm-frozen-field">' . $el['html'] . '</span>';
+      }
     }
     // Active form elements
     else {
@@ -186,6 +197,17 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     elseif (strpos($class, 'crm-form-contact-reference') !== FALSE) {
       self::preprocessContactReference($element);
     }
+    // Hack to support html5 fields (number, url, etc)
+    else {
+      foreach (CRM_Core_Form::$html5Types as $type) {
+        if (strpos($class, "crm-form-$type") !== FALSE) {
+          $element->setAttribute('type', $type);
+          // Also add the "base" class for consistent styling
+          $class .= ' crm-form-text';
+          break;
+        }
+      }
+    }
 
     if ($required) {
       $class .= ' required';
@@ -239,7 +261,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * @param HTML_QuickForm_element $field
    */
   public function renderFrozenEntityRef(&$el, $field) {
-    $entity = $field->getAttribute('data-api-entity');
+    $entity = strtolower($field->getAttribute('data-api-entity'));
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
     $display = array();
 
@@ -305,7 +327,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       $path = $field->getAttribute('data-option-edit-path');
       // NOTE: If we ever needed to support arguments in this link other than reset=1 we could split $path here if it contains a ?
       $url = CRM_Utils_System::url($path, 'reset=1');
-      $el['html'] .= ' <a href="' . $url . '" class="crm-option-edit-link medium-popup crm-hover-button" target="_blank" title="' . ts('Edit Options') . '" data-option-edit-path="' . $path . '"><span class="icon ui-icon-wrench"></span></a>';
+      $el['html'] .= ' <a href="' . $url . '" class="crm-option-edit-link medium-popup crm-hover-button" target="_blank" title="' . ts('Edit Options') . '" data-option-edit-path="' . $path . '"><i class="crm-i fa-wrench"></i></a>';
     }
   }
 
@@ -317,7 +339,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     // Initially hide if not needed
     // Note: visibility:hidden prevents layout jumping around unlike display:none
     $display = $field->getValue() !== NULL ? '' : ' style="visibility:hidden;"';
-    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear') . '"><span class="icon ui-icon-close"></span></a>';
+    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear') . '"><i class="crm-i fa-times"></i></a>';
   }
 
 }

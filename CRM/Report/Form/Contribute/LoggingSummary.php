@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -212,7 +212,7 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
         $url = CRM_Report_Utils_Report::getNextUrl('logging/contribute/detail', $q, FALSE, TRUE);
         $row['log_civicrm_contribution_log_action_link'] = $url;
         $row['log_civicrm_contribution_log_action_hover'] = ts('View details for this update');
-        $row['log_civicrm_contribution_log_action'] = '<div class="icon ui-icon-zoomin"></div> ' . ts('Update');
+        $row['log_civicrm_contribution_log_action'] = '<i class="crm-i fa-list-alt"></i> ' . ts('Update');
       }
 
       unset($row['log_civicrm_contribute_log_user_id']);

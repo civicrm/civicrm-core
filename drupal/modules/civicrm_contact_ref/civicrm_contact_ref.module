@@ -351,8 +351,9 @@ function _civicrm_contact_ref_potential_references_standard($field, $string = ''
   }
 
   if (!empty($contactSubTypes)) {
-    $contactSubTypes = implode("','", $contactSubTypes);
-    $whereClause[] = "contact_sub_type IN ( '{$contactSubTypes}' )";
+    foreach ($contactSubTypes as $subType) {
+      $whereClause[] = "contact_sub_type LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . $subType . CRM_Core_DAO::VALUE_SEPARATOR . "%'";
+    }
   }
 
   $whereClause = empty($whereClause) ? '' : '(' . implode(' OR ', $whereClause) . ') AND';

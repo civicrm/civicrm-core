@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Delegate query functions based on hook system
+ * Delegate query functions based on hook system.
  */
 class CRM_Contact_BAO_Query_Hook {
 
@@ -57,7 +55,7 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
-   * Get or build the list of search objects (via hook)
+   * Get or build the list of search objects (via hook).
    *
    * @return array
    *   Array of CRM_Contact_BAO_Query_Interface objects
@@ -93,7 +91,9 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
-   * @param $query
+   * Alter search query.
+   *
+   * @param string $query
    * @param string $fnName
    */
   public function alterSearchQuery(&$query, $fnName) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -563,27 +563,6 @@ DELETE g, v
     $params = array(1 => array($groupName, 'String'));
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
-  }
-
-  /**
-   * @param string $groupName
-   * @param $value
-   *
-   * @return null|string
-   */
-  public static function optionLabel($groupName, $value) {
-    $query = "
-SELECT v.label
-  FROM civicrm_option_group g,
-       civicrm_option_value v
- WHERE g.id = v.option_group_id
-   AND g.name  = %1
-   AND v.value = %2";
-    $params = array(
-      1 => array($groupName, 'String'),
-      2 => array($value, 'String'),
-    );
-    return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
   /**

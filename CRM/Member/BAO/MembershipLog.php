@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -38,17 +38,13 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
    * Add the membership log record.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
+   *   Properties of the log item.
    *
-   *
-   * @return object
+   * @return CRM_Member_DAO_MembershipLog|CRM_Core_Error
    */
-  public static function add(&$params, &$ids) {
+  public static function add($params) {
     $membershipLog = new CRM_Member_DAO_MembershipLog();
     $membershipLog->copyValues($params);
-
     $membershipLog->save();
     $membershipLog->free();
 
@@ -69,6 +65,8 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   }
 
   /**
+   * Reset the modified ID to NULL for log items by the given contact ID.
+   *
    * @param int $contactID
    */
   public static function resetModifiedID($contactID) {

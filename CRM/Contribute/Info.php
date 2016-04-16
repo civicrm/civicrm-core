@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,9 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contribute_Info extends CRM_Core_Component_Info {
 
@@ -80,11 +78,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    *
    * @return array|null
    *   collection of permissions, null if none
-   */
-  /**
-   * @param bool $getAllUnconditionally
-   *
-   * @return array|null
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
     $permissions = array(

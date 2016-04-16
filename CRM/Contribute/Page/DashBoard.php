@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,21 +28,18 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Page for displaying list of Payment-Instrument
+ * Page for displaying list of Payment-Instrument.
  */
 class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviContribute'));

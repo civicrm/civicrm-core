@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: PaymentProcessorType.php 9702 2007-05-29 23:57:16Z lobo $
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This class generates form components for Location Type
- *
+ * This class generates form components for Location Type.
  */
 class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   protected $_id = NULL;
@@ -149,8 +146,6 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
    * Build the form object.
    *
    * @param bool $check
-   *
-   * @return void
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -206,9 +201,6 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     CRM_Utils_System::flushCache('CRM_Financial_DAO_PaymentProcessorType');

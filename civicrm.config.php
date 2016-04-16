@@ -81,6 +81,13 @@ function civicrm_conf_init() {
         exit( );
     }
 
+    // since drupal 7, alias could be defined in sites/sites.php
+    if ( file_exists( $confdir . "/sites.php" ) ) {
+      include $confdir . "/sites.php";
+    } else {
+      $sites = array();
+    }
+
     $phpSelf  = array_key_exists( 'PHP_SELF' , $_SERVER ) ? $_SERVER['PHP_SELF' ] : '';
     $httpHost = array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : '';
 
@@ -92,6 +99,11 @@ function civicrm_conf_init() {
             if (file_exists("$confdir/$dir/civicrm.settings.php")) {
                 $conf = "$confdir/$dir";
                 return $conf;
+            }
+            // check for alias
+            if (isset($sites[$dir]) && file_exists("$confdir/{$sites[$dir]}/civicrm.settings.php")) {
+              $conf = "$confdir/{$sites[$dir]}";
+              return $conf;
             }
         }
     }

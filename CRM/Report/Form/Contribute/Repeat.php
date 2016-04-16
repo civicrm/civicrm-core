@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   protected $_amountClauseWithAND = NULL;
@@ -258,8 +258,9 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
@@ -398,7 +399,14 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
    * @return mixed|string
    */
   public function fromContribution($replaceAliasWith = 'contribution1') {
-    return 'FROM civicrm_contribution ' . $replaceAliasWith;
+    $from = " FROM civicrm_contribution {$replaceAliasWith} ";
+    $temp = $this->_aliases['civicrm_contribution'];
+    $this->_aliases['civicrm_contribution'] = $replaceAliasWith;
+    $this->_from = $from;
+    $from .= (string) $this->getPermissionedFTQuery($this, 'civicrm_line_item_report', TRUE);
+    $this->_aliases['civicrm_contribution'] = $temp;
+    $this->_where = '';
+    return $from;
   }
 
   /**
@@ -972,7 +980,7 @@ GROUP BY    currency
   }
 
   /**
-   * @return string
+   * Build the temp tables for comparison.
    */
   protected function buildTempTables() {
     $this->setGroupByInformation();

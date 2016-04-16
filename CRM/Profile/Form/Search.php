@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -39,16 +37,11 @@
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Profile_Form_Search extends CRM_Profile_Form {
 
   /**
    * Pre processing work done here.
-   *
-   * @param
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_SEARCH;
@@ -57,7 +50,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
 
   /**
    * Set the default form values.
-   *
    *
    * @return array
    *   the default array reference
@@ -101,8 +93,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // Is proximity search enabled for this profile?
@@ -126,10 +116,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   }
 
   /**
-   *
-   *
-   *
-   * @return void
+   * Post process function.
    */
   public function postProcess() {
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -58,13 +58,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @var array
    */
   protected $_subtypes = array();
-
-  /**
-   * Array of default params.
-   *
-   * @var array
-   */
-  protected $_defaults = array();
 
   /**
    * Set variables up before form is built.
@@ -335,8 +328,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->assign('defaultSubtypes', json_encode($this->_subtypes));
 
     // help text
-    $this->addWysiwyg('help_pre', ts('Pre-form Help'), $attributes['help_pre']);
-    $this->addWysiwyg('help_post', ts('Post-form Help'), $attributes['help_post']);
+    $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), $attributes['help_pre']);
+    $this->add('wysiwyg', 'help_post', ts('Post-form Help'), $attributes['help_post']);
 
     // weight
     $this->add('text', 'weight', ts('Order'), $attributes['weight'], TRUE);

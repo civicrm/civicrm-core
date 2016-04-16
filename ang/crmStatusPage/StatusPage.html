@@ -1,0 +1,36 @@
+<div crm-ui-debug="statuses"></div>
+
+<h1 crm-page-title crm-document-title="ts('CiviCRM System Status') + ' (' + countVisible(1) + ')'">
+  {{ts('CiviCRM System Status')}}
+</h1>
+
+<div id="crm-status-list" crm-ui-tab-set>
+  <div crm-ui-tab
+    ng-repeat="tab in [{is_visible: 1, icon: 'fa-bell'}, {is_visible: 0, icon: 'fa-bell-slash-o'}]"
+    id="tab-status-visible-{{tab.is_visible}}"
+    count="{{countVisible(tab.is_visible)}}"
+    crm-title="tab.is_visible ? ts('Active') : ts('Hidden')"
+    crm-icon="{{tab.icon}}"
+    >
+    <div class="crm-status-item" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
+      <h3 class="crm-severity-{{status.severity}}">
+        <i ng-if="status.icon" class="crm-i {{status.icon}}"></i>
+        {{status.title}}
+        <div statuspage-popup-menu class="hush-menu css_right"></div>
+        <div ng-if="!status.is_visible" class="hidden-until css_right">
+          ({{status.hidden_until ? ts('Hidden until %1', {1: formatDate(status.hidden_until)}) : ts('Hidden permanently')}})
+        </div>
+      </h3>
+      <div class="crm-block crm-status-message-body">
+        <span ng-bind-html="status.message | trusted"></span>
+        <a
+          ng-if="status.help"
+          class="helpicon"
+          ng-click="help(status.title, status.help);"
+          href="javascript:void(0)"
+          >
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

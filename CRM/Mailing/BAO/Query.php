@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Mailing_BAO_Query {
 
@@ -55,8 +53,6 @@ class CRM_Mailing_BAO_Query {
    * If mailings are involved, add the specific Mailing fields
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     // if Mailing mode add mailing id
@@ -122,6 +118,12 @@ class CRM_Mailing_BAO_Query {
         $query->_select['mailing_recipients_id'] = " civicrm_mailing_recipients.id as mailing_recipients_id";
         $query->_element['mailing_recipients_id'] = 1;
       }
+    }
+
+    if (CRM_Utils_Array::value('mailing_campaign_id', $query->_returnProperties)) {
+      $query->_select['mailing_campaign_id'] = 'civicrm_mailing.campaign_id as mailing_campaign_id';
+      $query->_element['mailing_campaign_id'] = 1;
+      $query->_tables['civicrm_campaign'] = 1;
     }
   }
 
@@ -207,6 +209,7 @@ class CRM_Mailing_BAO_Query {
     if ($mode & CRM_Contact_BAO_Query::MODE_MAILING) {
       $properties = array(
         'mailing_id' => 1,
+        'mailing_campaign_id' => 1,
         'mailing_name' => 1,
         'sort_name' => 1,
         'email' => 1,
@@ -375,6 +378,15 @@ class CRM_Mailing_BAO_Query {
           $query->_qill[$grouping][] = "Mailing Job Status IS \"$value\"";
         }
         return;
+
+      case 'mailing_campaign_id':
+        $name = 'campaign_id';
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_mailing.$name", $op, $value, 'Integer');
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Mailing_DAO_Mailing', $name, $value, $op);
+        $query->_qill[$grouping][] = ts('Campaign %1 %2', array(1 => $op, 2 => $value));
+        $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
+        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
+        return;
     }
   }
 
@@ -383,7 +395,6 @@ class CRM_Mailing_BAO_Query {
    *
    *
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function buildSearchForm(&$form) {
     // mailing selectors
@@ -396,6 +407,8 @@ class CRM_Mailing_BAO_Query {
     }
 
     CRM_Core_Form_Date::buildDateRange($form, 'mailing_date', 1, '_low', '_high', ts('From'), FALSE);
+    $form->addElement('hidden', 'mailing_date_range_error');
+    $form->addFormRule(array('CRM_Mailing_BAO_Query', 'formRule'), $form);
 
     $mailingJobStatuses = array(
       '' => ts('- select -'),
@@ -423,6 +436,8 @@ class CRM_Mailing_BAO_Query {
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));
     $form->add('checkbox', 'mailing_forward', ts('Forwards'));
+    // Campaign select field
+    CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'mailing_campaign_id');
 
     $form->assign('validCiviMailing', TRUE);
   }
@@ -450,8 +465,6 @@ class CRM_Mailing_BAO_Query {
    * @param $fieldTitle
    *
    * @param $valueTitles
-   *
-   * @return void
    */
   public static function mailingEventQueryBuilder(&$query, &$values, $tableName, $fieldName, $fieldTitle, &$valueTitles) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -481,6 +494,27 @@ class CRM_Mailing_BAO_Query {
     $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
     $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
     $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
+  }
+
+  /**
+   * Check if the values in the date range are in correct chronological order.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $form
+   *
+   * @return bool|array
+   */
+  public static function formRule($fields, $files, $form) {
+    $errors = array();
+
+    if (empty($fields['mailing_date_high']) || empty($fields['mailing_date_low'])) {
+      return TRUE;
+    }
+
+    CRM_Utils_Rule::validDateRange($fields, 'mailing_date', $errors, ts('Mailing Date'));
+
+    return empty($errors) ? TRUE : $errors;
   }
 
 }

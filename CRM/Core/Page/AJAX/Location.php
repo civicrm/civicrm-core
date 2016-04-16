@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  *
  */
 
@@ -58,8 +58,8 @@ class CRM_Core_Page_AJAX_Location {
     }
 
     // Verify user permission on related contact
-    $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($user);
-    if (!isset($employers[$cid])) {
+    $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($user, NULL, NULL, 'Organization');
+    if (!isset($organizations[$cid])) {
       CRM_Utils_System::civiExit();
     }
 
@@ -145,7 +145,8 @@ class CRM_Core_Page_AJAX_Location {
         }
         $elements["onbehalf_{$field}-{$locTypeId}"] = array(
           'type' => $type,
-          'value' => isset($location['address'][1]) ? $location['address'][1][$addField] : NULL,
+          'value' => isset($location['address'][1]) ? CRM_Utils_Array::value($addField,
+            $location['address'][1]) : NULL,
         );
         unset($profileFields["{$field}-{$locTypeId}"]);
       }

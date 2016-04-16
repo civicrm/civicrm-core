@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
- */
-
-/**
- * Files required
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -156,7 +150,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  protected $entityReferenceFields = array('membership_type_id');
+  protected $entityReferenceFields = array('event_id', 'membership_type_id');
 
   /**
    * Name of the selector to use.
@@ -166,6 +160,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_customSearchClass = NULL;
 
   protected $_openedPanes = array();
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Contact';
+  }
 
   /**
    * Define the set of valid contexts that the search form operates on.
@@ -332,9 +333,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $this->_taskList += CRM_Contact_Task::permissionedTaskTitles($permission,
           CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
         );
-      } else {
+      }
+      else {
         $className = $this->_modeValue['taskClassName'];
-        $this->_taskList += $className::permissionedTaskTitles($permission, false);
+        $this->_taskList += $className::permissionedTaskTitles($permission, FALSE);
       }
 
       // Only offer the "Update Smart Group" task if a smart group/saved search is already in play
@@ -343,13 +345,12 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
+    asort($this->_taskList);
     return $this->_taskList;
   }
 
   /**
    * Build the common elements between the search/advanced form.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -493,8 +494,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     // set the various class variables
@@ -569,6 +568,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->normalizeFormValues();
       $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
       $this->_returnProperties = &$this->returnProperties();
+
       // also get the uf group id directly from the post value
       $this->_ufGroupID = CRM_Utils_Array::value('uf_group_id', $_POST, $this->_ufGroupID);
       $this->_formValues['uf_group_id'] = $this->_ufGroupID;
@@ -602,10 +602,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       // fix for CRM-1907
       if (isset($this->_ssID) && $this->_context != 'smog') {
         // we only retrieve the saved search values if out current values are null
-        $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
-        $this->tempFixFormValues($this->_ssID, $formValues);
-        $this->_formValues = $formValues;
-        $this->set('formValues', $formValues);
+        $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
+
         //fix for CRM-1505
         if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'mapping_id')) {
           $this->_params = CRM_Contact_BAO_SavedSearch::getSearchParams($this->_ssID);
@@ -626,6 +624,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         if (isset($this->_operator)) {
           $this->_formValues['operator'] = $this->_operator;
         }
+
         // FIXME: we should generalise in a way that components could inject url-filters
         // just like they build their own form elements
         foreach (array(
@@ -679,7 +678,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     if (!isset($this->_componentMode)) {
       $this->_componentMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
-    $modeValues = self::getModeValue($this->_componentMode);
+    self::setModeValues();
 
     self::$_selectorName = $this->_modeValue['selectorName'];
 
@@ -746,12 +745,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Function to deal with groups that may have been mis-saved during a glitch.
-   */
-  function tempFixFormValues($id, $formValues) {
-  }
-
-  /**
    * @return array
    */
   public function &getFormValues() {
@@ -760,8 +753,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Common post processing.
-   *
-   * @return void
    */
   public function postProcess() {
     /*

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,11 +43,11 @@ class civicrm_handler_field_money extends views_handler_field {
 
   function render($values) {
     $value = $this->get_value($values);
-    $currency = $this->get_value($values, 'currency');
+    $currency_code = $this->get_value($values, 'currency_code');
 
     switch ($this->options ['display_format']) {
       case 'formatted':
-        return CRM_Utils_Money::format($value, $currency);
+        return CRM_Utils_Money::format($value);
 
       case 'raw':
         return $value;

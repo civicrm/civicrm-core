@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -49,11 +49,10 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     parent::preProcess();
     $setTab = CRM_Utils_Request::retrieve('setTab', 'Int', $this, FALSE, 0);
 
-    $field = 'civicrm_event';
-    if ($this->_isTemplate) {
-      $field = 'event_template';
-    }
-    $reminderList = CRM_Core_BAO_ActionSchedule::getList(FALSE, $field, $this->_id);
+    $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+      'id' => ($this->_isTemplate ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID),
+    )));
+    $reminderList = CRM_Core_BAO_ActionSchedule::getList(FALSE, $mapping, $this->_id);
     if ($reminderList && is_array($reminderList)) {
       // Add action links to each of the reminders
       foreach ($reminderList as & $format) {

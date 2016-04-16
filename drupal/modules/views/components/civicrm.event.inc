@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -57,6 +57,32 @@ function _civicrm_event_data(&$data, $enabled) {
   $data['civicrm_event']['id'] = array(
     'title' => t('Event ID'),
     'help' => t('The numeric ID of the Event'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'base' => 'civicrm_participant',
+      'base field' => 'event_id',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Event -> Participant'),
+    ),
+  );
+
+  // Event Max-Partipicants
+  $data['civicrm_event']['max_participants'] = array(
+    'title' => t('Event Max-Participants'),
+    'help' => t('The maximal number of participants of the Event'),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
@@ -447,6 +473,7 @@ function _civicrm_event_data(&$data, $enabled) {
       'click sortable' => TRUE,
       'pseudo class' => 'CRM_Event_PseudoConstant',
       'pseudo method' => 'participantStatus',
+      'pseudo args' => array(NULL, NULL, 'label'),
     ),
     'argument' => array(
       'handler' => 'views_handler_argument',
@@ -456,6 +483,7 @@ function _civicrm_event_data(&$data, $enabled) {
       'allow empty' => TRUE,
       'pseudo class' => 'CRM_Event_PseudoConstant',
       'pseudo method' => 'participantStatus',
+      'pseudo args' => array(NULL, NULL, 'label'),
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',

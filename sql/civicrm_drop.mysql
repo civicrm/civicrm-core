@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.6                                                |
+-- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2015                                |
+-- | Copyright CiviCRM LLC (c) 2004-2016                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -104,6 +104,7 @@ DROP TABLE IF EXISTS `civicrm_group_contact_cache`;
 DROP TABLE IF EXISTS `civicrm_subscription_history`;
 DROP TABLE IF EXISTS `civicrm_group`;
 DROP TABLE IF EXISTS `civicrm_acl_cache`;
+DROP TABLE IF EXISTS `civicrm_status_pref`;
 DROP TABLE IF EXISTS `civicrm_word_replacement`;
 DROP TABLE IF EXISTS `civicrm_print_label`;
 DROP TABLE IF EXISTS `civicrm_setting`;

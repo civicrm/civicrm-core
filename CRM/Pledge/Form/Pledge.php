@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -396,9 +396,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       array('' => ts('- select -')) + $pledgePages
     );
 
-    $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
+    $mailingInfo = Civi::settings()->get('mailing_backend');
     $this->assign('outBound_option', $mailingInfo['outBound_option']);
 
     // build custom data
@@ -488,6 +486,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
 
+    // get All Payments status types.
+    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
     $fields = array(
       'frequency_unit',
       'frequency_interval',
@@ -553,7 +554,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
       $customFields = CRM_Core_BAO_CustomField::getFields('Pledge');
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
-        $customFields,
         $this->_id,
         'Pledge'
       );

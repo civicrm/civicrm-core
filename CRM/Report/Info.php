@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -98,6 +98,10 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
       'administer Reports' => array(
         ts('administer Reports'),
         ts('Manage report templates'),
+      ),
+      'view report sql' => array(
+        ts('view report sql'),
+        ts('View sql used in CiviReports'),
       ),
     );
 

@@ -2,16 +2,17 @@
 Controller: CaseTypeCtrl
 Required vars: caseType
 -->
+<h1 crm-page-title>{{caseType.title || ts('New Case Type')}}</h1>
 <form name="editCaseTypeForm" unsaved-warning-form>
 <div class="crm-block crm-form-block crmCaseType">
   <div class="help">
     {{ts('Use this screen to define or update the Case Roles, Activity Types, and Timelines for a case type.')}} <a href="http://book.civicrm.org/user/current/case-management/setup/" target="_blank">{{ts('Learn more...')}}</a>
   </div>
   <div class="crm-submit-buttons">
-    <button crm-icon="check" ng-click="editCaseTypeForm.$setPristine(); save()" ng-disabled="editCaseTypeForm.$invalid">
+    <button crm-icon="fa-check" ng-click="editCaseTypeForm.$setPristine(); save()" ng-disabled="editCaseTypeForm.$invalid">
       {{ts('Save')}}
     </button>
-    <button crm-icon="close" ng-click="editCaseTypeForm.$setPristine(); goto('caseType')">
+    <button crm-icon="fa-times" ng-click="editCaseTypeForm.$setPristine(); goto('caseType')">
       {{ts('Cancel')}}
     </button>
   </div>
@@ -29,12 +30,12 @@ Required vars: caseType
       <li><a href="#acttab-actType">{{ts('Activity Types')}}</a></li>
       <li ng-repeat="activitySet in caseType.definition.activitySets">
         <a href="#acttab-{{$index}}">{{ activitySet.label }}</a>
-        <span class="ui-icon ui-icon-trash" title="{{ts('Remove')}}"
+        <span class="crm-i fa-trash" title="{{ts('Remove')}}"
           ng-hide="activitySet.name == 'standard_timeline'"
           ng-click="removeItem(caseType.definition.activitySets, activitySet)">{{ts('Remove')}}</span>
         <!-- Weird spacing:
         <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activitySets, activitySet)">
-          <span class="ui-icon delete-icon" title="Remove">Remove</span>
+          <span class="crm-i fa-trash" title="Remove">Remove</span>
         </a>
         -->
       </li>
@@ -60,10 +61,10 @@ Required vars: caseType
   </div>
 
   <div class="crm-submit-buttons">
-    <button crm-icon="check" ng-click="editCaseTypeForm.$setPristine(); save()" ng-disabled="editCaseTypeForm.$invalid">
+    <button crm-icon="fa-check" ng-click="editCaseTypeForm.$setPristine(); save()" ng-disabled="editCaseTypeForm.$invalid">
       {{ts('Save')}}
     </button>
-    <button crm-icon="close" ng-click="editCaseTypeForm.$setPristine(); goto('caseType')">
+    <button crm-icon="fa-times" ng-click="editCaseTypeForm.$setPristine(); goto('caseType')">
       {{ts('Cancel')}}
     </button>
   </div>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -126,12 +126,13 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
           'case_type_id' => array(
             'title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->case_types,
+            'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
           ),
           'status_id' => array(
             'title' => ts('Status'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->case_statuses,
+            'options' => CRM_Case_BAO_Case::buildOptions('status_id', 'search'),
           ),
           'is_deleted' => array(
             'title' => ts('Deleted?'),
@@ -161,6 +162,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
         'filters' => array(
           'relationship_type_id' => array(
             'title' => ts('Staff Relationship'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->rel_types,
           ),

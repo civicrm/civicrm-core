@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -71,8 +71,7 @@ class civicrm_handler_field_custom extends views_handler_field {
           // get the field id from the db
           if (!empty($this->definition['title'])) {
             $customFieldID = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_CustomField', $this->definition['title'], 'id', 'label');
-            require_once 'CRM/Core/BAO/CustomOption.php';
-            return CRM_Core_BAO_CustomOption::getOptionLabel($customFieldID, $value);
+            return CRM_Core_BAO_CustomField::displayValue($value, $customFieldID);
           }
           // could not get custom id, lets just return what we have
           return $value;

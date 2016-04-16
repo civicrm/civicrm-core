@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,15 +26,13 @@
  */
 
 /**
- *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This class gets the name of the file to upload
+ * This class gets the name of the file to upload.
+ *
  * TODO: CRM-11254 - There's still a lot of duplicate code in the 5 child classes that should be moved here
  */
 abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
@@ -83,7 +81,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   protected $_fieldUsed;
 
   /**
-   * Return a descriptive name for the page, used in wizard header
+   * Return a descriptive name for the page, used in wizard header.
    *
    * @return string
    */

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -252,6 +252,8 @@ class CRM_Core_Permission_Base {
   /**
    * Get the permissions defined in the hook_civicrm_permission implementation
    * in all enabled CiviCRM module extensions.
+   *
+   * @param bool $descriptions
    *
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().

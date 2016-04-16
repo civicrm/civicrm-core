@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2015                                |
+| Copyright CiviCRM LLC (c) 2004-2016                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -89,8 +87,6 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
   public function run() {
     CRM_Utils_System::setTitle(ts('DB Template Strings'));
@@ -100,9 +96,6 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
 
   /**
    * Browse all options.
-   *
-   *
-   * @return void
    */
   public function browse() {
     $permission = FALSE;

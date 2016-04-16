@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -69,8 +69,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -95,11 +93,9 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -126,9 +122,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Event_Form_ManageEvent_Location', 'formRule'));
@@ -151,9 +144,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   *  function to build location block.
-   *
-   * @return void
+   * Function to build location block.
    */
   public function buildQuickForm() {
     //load form for child blocks
@@ -214,9 +205,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

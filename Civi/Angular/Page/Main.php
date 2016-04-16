@@ -33,6 +33,13 @@ class Main extends \CRM_Core_Page {
   public $angular;
 
   /**
+   * The region of the page into which JavaScript will be loaded.
+   *
+   * @var String
+   */
+  public $region;
+
+  /**
    * @param string $title
    *   Title of the page.
    * @param int $mode
@@ -43,7 +50,8 @@ class Main extends \CRM_Core_Page {
   public function __construct($title = NULL, $mode = NULL, $res = NULL) {
     parent::__construct($title, $mode);
     $this->res = \CRM_Core_Resources::singleton();
-    $this->angular = \Civi\Core\Container::singleton()->get('angular');
+    $this->angular = \Civi::service('angular');
+    $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
   }
 
   /**
@@ -77,20 +85,17 @@ class Main extends \CRM_Core_Page {
       ));
     });
 
-    $this->res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, 'html-header', FALSE);
-
-    // FIXME: crmUi depends on loading ckeditor, but ckeditor doesn't work with this aggregation.
-    $this->res->addScriptFile('civicrm', 'packages/ckeditor/ckeditor.js', 100, 'page-header', FALSE);
+    $this->res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, $this->region, FALSE);
 
     $headOffset = 0;
     $config = \CRM_Core_Config::singleton();
     if ($config->debug) {
       foreach ($modules as $moduleName => $module) {
         foreach ($this->angular->getResources($moduleName, 'css', 'cacheUrl') as $url) {
-          $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
+          $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->region);
         }
         foreach ($this->angular->getResources($moduleName, 'js', 'cacheUrl') as $url) {
-          $this->res->addScriptUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
+          $this->res->addScriptUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->region);
           // addScriptUrl() bypasses the normal string-localization of addScriptFile(),
           // but that's OK because all Angular strings (JS+HTML) will load via crmResource.
         }
@@ -100,16 +105,23 @@ class Main extends \CRM_Core_Page {
       // Note: addScriptUrl() bypasses the normal string-localization of addScriptFile(),
       // but that's OK because all Angular strings (JS+HTML) will load via crmResource.
       $aggScriptUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=js&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
-      $this->res->addScriptUrl($aggScriptUrl, 120, 'html-header');
+      $this->res->addScriptUrl($aggScriptUrl, 120, $this->region);
 
       // FIXME: The following CSS aggregator doesn't currently handle path-adjustments - which can break icons.
       //$aggStyleUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=css&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
-      //$this->res->addStyleUrl($aggStyleUrl, 120, 'html-header');
+      //$this->res->addStyleUrl($aggStyleUrl, 120, $this->region);
 
       foreach ($this->angular->getResources(array_keys($modules), 'css', 'cacheUrl') as $url) {
-        $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
+        $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->region);
       }
     }
+
+    // If trying to load an Angular page via AJAX, the route must be passed as a
+    // URL parameter, since the server doesn't receive information about
+    // URL fragments (i.e, what comes after the #).
+    \CRM_Core_Resources::singleton()->addSetting(array(
+      'angularRoute' => \CRM_Utils_Request::retrieve('route', 'String'),
+    ));
   }
 
 }

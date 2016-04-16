@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -45,7 +45,7 @@ class CRM_Event_Import_Form_Summary extends CRM_Import_Form_Summary {
    */
   public function preProcess() {
     // set the error message path to display
-    $errorFile = $this->assign('errorFile', $this->get('errorFile'));
+    $this->assign('errorFile', $this->get('errorFile'));
 
     $totalRowCount = $this->get('totalRowCount');
     $relatedCount = $this->get('relatedCount');

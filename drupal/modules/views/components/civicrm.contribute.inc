@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -164,7 +164,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
 
   //Payment Instrument Used
   $data['civicrm_contribution']['payment_instrument'] = array(
-    'title' => t('Payment Instrument'),
+    'title' => t('Payment Method'),
     'real field' => 'payment_instrument_id',
     'help' => t('The Payment Instrument Used for the Contribution'),
     'field' => array(
@@ -191,7 +191,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
 
   //Contribution Receive Date
   $data['civicrm_contribution']['receive_date'] = array(
-    'title' => t('Receive Date'),
+    'title' => t('Date Received'),
     'help' => t('The Date the Contribution was received / paid'),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
@@ -207,7 +207,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
   );
 
   civicrm_views_add_date_arguments($data['civicrm_contribution'], array(
-    'title' => 'Receive Date',
+    'title' => t('Date Received'),
       'name' => 'receive_date',
     ));
   //Non Deductible Amount of Contribution
@@ -551,12 +551,35 @@ function _civicrm_contribute_data(&$data, $enabled) {
       ),
     );
   }
-
-
+  // Link to Membership table
+  if (isset($enabled['CiviMember'])) {
+    $data['civicrm_contribution']['membership_id'] = array(
+      'title' => t('Memberships Records'),
+      'help' => 'Bring memberships records',
+      'relationship' => array(
+        'base' => 'civicrm_membership',
+        'base field' => 'id',
+        'handler' => 'civicrm_handler_relationship_memberships_contributions',
+        'label' => t('Contribution -> Membership'),
+      ),
+    );
+  }
+  //link to line-items
+  $data['civicrm_contribution']['line_item_id'] = array(
+    'title' => t('Line-items Records'),
+    'help' => 'Bring line-items records',
+    'relationship' => array(
+      'base' => 'civicrm_line_item',
+      'base field' => 'contribution_id',
+      'field' => 'id',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Contribution -> line-item'),
+    ),
+  );
+  
   /*
-     * Soft Credits
-     */
-
+   * Soft Credits
+   */
 
   $data['civicrm_contribution_soft']['table']['group'] = t('CiviCRM  Soft Credits');
 

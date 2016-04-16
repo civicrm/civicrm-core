@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -180,10 +180,7 @@ WHERE     %2.id = %1";
    *                          to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
-   *   this is
-   *                          lineItem array)
-   *
-   * @return void
+   *   this is lineItem array)
    */
   public static function format($fid, &$params, &$fields, &$values) {
     if (empty($params["price_{$fid}"])) {

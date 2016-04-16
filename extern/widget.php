@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  */
 require_once '../civicrm.config.php';
@@ -41,6 +41,7 @@ require_once 'CRM/Utils/Request.php';
 $cpageId = CRM_Utils_Request::retrieve('cpageId', 'Positive', CRM_Core_DAO::$_nullObject);
 $widgetId = CRM_Utils_Request::retrieve('widgetId', 'Positive', CRM_Core_DAO::$_nullObject);
 $format = CRM_Utils_Request::retrieve('format', 'Positive', CRM_Core_DAO::$_nullObject);
+$includePending = CRM_Utils_Request::retrieve('includePending', 'Boolean', CRM_Core_DAO::$_nullObject);
 
 require_once 'CRM/Contribute/BAO/Widget.php';
 
@@ -49,7 +50,7 @@ if (isset($format)) {
   $jsonvar .= $cpageId;
 }
 
-$data = CRM_Contribute_BAO_Widget::getContributionPageData($cpageId, $widgetId);
+$data = CRM_Contribute_BAO_Widget::getContributionPageData($cpageId, $widgetId, $includePending);
 
 $output = '
     var ' . $jsonvar . ' = ' . json_encode($data) . ';

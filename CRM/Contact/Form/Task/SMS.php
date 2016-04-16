@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This class provides the functionality to sms a group of
- * contacts.
+ * This class provides the functionality to sms a group of contacts.
  */
 class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
 
@@ -74,9 +71,6 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //enable form element
@@ -87,12 +81,19 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     CRM_Contact_Form_Task_SMSCommon::postProcess($this);
+  }
+
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
   }
 
 }

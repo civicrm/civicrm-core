@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,6 +33,9 @@ if (phpversion() == "5.2.2" &&
   $GLOBALS['HTTP_RAW_POST_DATA'] = file_get_contents('php://input');
 }
 
+if (defined('PANTHEON_ENVIRONMENT')) {
+  ini_set('session.save_handler', 'files');
+}
 session_start();
 
 require_once '../civicrm.config.php';

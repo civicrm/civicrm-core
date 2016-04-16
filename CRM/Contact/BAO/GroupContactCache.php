@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,28 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
   static $_alreadyLoaded = array();
-
-  /**
-   * Get a list of caching modes.
-   *
-   * @return array
-   */
-  public static function getModes() {
-    return array(
-      // Flush expired caches in response to user actions.
-      'opportunistic' => ts('Opportunistic Flush'),
-
-      // Flush expired caches via background cron jobs.
-      'deterministic' => ts('Cron Flush'),
-    );
-  }
 
   /**
    * Check to see if we have cache entries for this group.
@@ -155,7 +138,7 @@ AND (
         $groupIDs = array($groupIDs);
       }
 
-      // note escapeString is a must here and we can't send the imploded value as second arguement to
+      // note escapeString is a must here and we can't send the imploded value as second argument to
       // the executeQuery(), since that would put single quote around the string and such a string
       // of comma separated integers would not work.
       $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
@@ -226,7 +209,7 @@ AND    g.refresh_date IS NULL
 
     $returnProperties = array('contact_id');
     foreach ($groupID as $gid) {
-      $params = array(array('group', 'IN', array($gid => 1), 0, 0));
+      $params = array(array('group', 'IN', array($gid), 0, 0));
       // the below call updates the cache table as a byproduct of the query
       CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, FALSE);
     }
@@ -306,8 +289,6 @@ WHERE  id IN ( $groupIDs )
    *   the groupID to delete cache entries, NULL for all groups.
    * @param bool $onceOnly
    *   run the function exactly once for all groups.
-   *
-   * @return void
    */
   public static function remove($groupID = NULL, $onceOnly = TRUE) {
     static $invoked = FALSE;
@@ -567,8 +548,8 @@ WHERE  id = %1
       return;
     }
 
-    // grab a lock so other processes don't compete and do the same query
-    $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.core.group.{$groupID}");
+    // grab a lock so other processes dont compete and do the same query
+    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
     if (!$lock->isAcquired()) {
       // this can cause inconsistent results since we don't know if the other process
       // will fill up the cache before our calling routine needs it.
@@ -579,7 +560,7 @@ WHERE  id = %1
 
     self::$_alreadyLoaded[$groupID] = 1;
 
-    // we now have the lock, but some other proces could have actually done the work
+    // we now have the lock, but some other process could have actually done the work
     // before we got here, so before we do any work, lets ensure that work needs to be
     // done
     // we allow hidden groups here since we dont know if the caller wants to evaluate an

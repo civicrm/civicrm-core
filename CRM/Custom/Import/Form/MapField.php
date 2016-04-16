@@ -25,7 +25,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $this->assign('columnCount', $this->_columnCount);
     $this->_dataValues = $this->get('dataValues');
 
-    //Seperate column names from actual values.
+    //Separate column names from actual values.
     $columnNames = $this->_dataValues[0];
     //actual values need to be in 2d array ($array[$i][$j]) format to be parsed by the template.
     $dataValues[] = $this->_dataValues[1];

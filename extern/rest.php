@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,6 +28,9 @@
 require_once '../civicrm.config.php';
 $config = CRM_Core_Config::singleton();
 
+if (defined('PANTHEON_ENVIRONMENT')) {
+  ini_set('session.save_handler', 'files');
+}
 session_start();
 $rest = new CRM_Utils_REST();
 

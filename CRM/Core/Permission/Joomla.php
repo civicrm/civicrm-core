@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -61,12 +61,32 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     // we've not yet figured out how to bootstrap joomla, so we should
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
-      $permission = JFactory::getUser()->authorise($translated[0], $translated[1]);
-      return $permission;
+      $user = JFactory::getUser();
+      $api_key    = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+
+      // If we are coming from REST we don't have a user but we do have the api_key for a user.
+      if ($user->id === 0 && !is_null($api_key)) {
+        // This is a codeblock copied from /Civicrm/Utils/REST
+        $uid = NULL;
+        if (!$uid) {
+          $store      = NULL;
+
+          $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
+
+          if ($contact_id) {
+            $uid = CRM_Core_BAO_UFMatch::getUFId($contact_id);
+          }
+          $user = JFactory::getUser($uid);
+
+        }
+      }
+
+      return $user->authorise($translated[0], $translated[1]);
+
     }
     else {
-      // This function is supposed to return a boolean. What does '(1)' mean?
-      return '(1)';
+
+      return FALSE;
     }
   }
 

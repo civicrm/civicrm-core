@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,9 +29,7 @@
  * Redefine the back action.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Core_QuickForm_Action_Back extends CRM_Core_QuickForm_Action {
 
@@ -54,8 +52,6 @@ class CRM_Core_QuickForm_Action_Back extends CRM_Core_QuickForm_Action {
    *   The current form-page.
    * @param string $actionName
    *   Current action name, as one Action object can serve multiple actions.
-   *
-   * @return void
    */
   public function perform(&$page, $actionName) {
     $this->_stateMachine->perform($page, $actionName, 'Back');

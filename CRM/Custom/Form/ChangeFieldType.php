@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -59,7 +59,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    * Set up variables to build the form.
    *
    * @return void
-   * @acess protected
+   * @access protected
    */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
@@ -267,6 +267,9 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   /**
    * Take a single-value column (eg: a Radio or Select etc ) and convert
    * value to the multi listed value (eg:"^Foo^")
+   *
+   * @param string $table
+   * @param string $column
    */
   public function firstValueToFlatten($table, $column) {
     $selectSql = "SELECT id, $column FROM $table WHERE $column IS NOT NULL";
@@ -288,6 +291,9 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   /**
    * Take a multi-value column (e.g. a Multi-Select or CheckBox column), and convert
    * all values (of the form "^^" or "^Foo^" or "^Foo^Bar^") to the first listed value ("Foo")
+   *
+   * @param string $table
+   * @param string $column
    */
   public function flattenToFirstValue($table, $column) {
     $selectSql = "SELECT id, $column FROM $table WHERE $column IS NOT NULL";

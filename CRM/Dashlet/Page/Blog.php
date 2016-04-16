@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -50,7 +50,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
   public function getBlogUrl() {
     // Note: We use "*default*" as the default (rather than self::BLOG_URL) so that future
     // developers can change BLOG_URL without needing to update {civicrm_setting}.
-    $url = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'blogUrl', NULL, '*default*');
+    $url = Civi::settings()->get('blogUrl');
     if ($url === '*default*') {
       $url = self::BLOG_URL;
     }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,6 +66,7 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['duration_unit']['api.required'] = 1;
   $params['duration_interval']['api.required'] = 1;
+  $params['is_active']['api.default'] = 1;
 }
 
 /**

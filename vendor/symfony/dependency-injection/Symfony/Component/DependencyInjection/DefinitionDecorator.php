@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 class DefinitionDecorator extends Definition
 {
     private $parent;
-    private $changes;
+    private $changes = array();
 
     /**
      * @param string $parent The id of Definition instance to decorate.
@@ -32,7 +32,6 @@ class DefinitionDecorator extends Definition
         parent::__construct();
 
         $this->parent = $parent;
-        $this->changes = array();
     }
 
     /**

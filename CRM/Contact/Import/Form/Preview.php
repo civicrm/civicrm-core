@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This class previews the uploaded file and returns summary
- * statistics
+ * This class previews the uploaded file and returns summary statistics.
  */
 class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
@@ -48,8 +45,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     //get the data from the session
@@ -145,11 +140,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
-    $this->addElement('text', 'newGroupName', ts('Name for new group'));
+    $this->addElement('text', 'newGroupName', ts('Name for new group'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'));
     $this->addElement('text', 'newGroupDesc', ts('Description of new group'));
     $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
     if (!empty($groupTypes)) {
@@ -170,8 +163,8 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     //display new tag
-    $this->addElement('text', 'newTagName', ts('Tag'));
-    $this->addElement('text', 'newTagDesc', ts('Description'));
+    $this->addElement('text', 'newTagName', ts('Tag'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'name'));
+    $this->addElement('text', 'newTagDesc', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description'));
 
     $tag = $this->get('tag');
     if (!empty($tag)) {
@@ -266,10 +259,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
+   * Process the mapped fields and map it into the uploaded file.
    */
   public function postProcess() {
 
@@ -321,7 +311,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     // add all the necessary variables to the form
     $importJob->setFormVariables($this);
 
-    // check if there is any error occured
+    // check if there is any error occurred
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
     $errorMessage = array();
@@ -358,10 +348,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
+   * Process the mapped fields and map it into the uploaded file.
    */
   public function postProcessOld() {
 
@@ -588,7 +575,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     // add all the necessary variables to the form
     $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
-    // check if there is any error occured
+    // check if there is any error occurred
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();

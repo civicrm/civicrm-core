@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -62,7 +62,7 @@
        {if $action ne 1 and $action ne 2}
   <br/>
        <div class="action-link">
-       {crmButton q="action=add&reset=1" icon="circle-plus"}{ts}Add Mailing Component{/ts}{/crmButton}
+       {crmButton q="action=add&reset=1" icon="plus-circle"}{ts}Add Mailing Component{/ts}{/crmButton}
        </div>
        {/if}
     </div>

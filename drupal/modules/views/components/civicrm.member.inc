@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -107,6 +107,26 @@ function _civicrm_member_data(&$data, $enabled) {
     ),
   );
 
+  //Membership Type ID
+  $data['civicrm_membership']['membership_type_id'] = array(
+    'title' => t('Membership Type ID'),
+    'help' => t('The numeric ID of the Membership Type'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  
   //Membership Join date
   $data['civicrm_membership']['join_date'] = array(
     'title' => t('Join Date'),
@@ -328,6 +348,19 @@ function _civicrm_member_data(&$data, $enabled) {
         'base field' => 'id',
         'handler' => 'views_handler_relationship',
         'label' => t('Membership -> Campaign'),
+      ),
+    );
+  }
+  // Link to Contribution table
+  if (isset($enabled['CiviContribute'])) {
+    $data['civicrm_membership']['contribution_id'] = array(
+      'title' => t('Contribution Records'),
+      'help' => 'Bring contributions records',
+      'relationship' => array(
+        'base' => 'civicrm_contribution',
+        'base field' => 'id',
+        'handler' => 'civicrm_handler_relationship_memberships_contributions',
+        'label' => t('Membership -> Contribution'),
       ),
     );
   }

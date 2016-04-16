@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * and similar across all objects (thus providing both reuse and standards)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -171,7 +171,7 @@ class CRM_Core_Action {
    *   the corresponding action description
    */
   public static function description($mask) {
-    if (!isset($_description)) {
+    if (!isset(self::$_description)) {
       self::$_description = array_flip(self::$_names);
     }
 
@@ -321,8 +321,10 @@ class CRM_Core_Action {
   /**
    * Get the mask for a permission (view, edit or null)
    *
+   * @param array $permissions
+   *
    * @return int
-   *   the mask for the above permission
+   *   The mask for the above permission
    */
   public static function mask($permissions) {
     $mask = NULL;

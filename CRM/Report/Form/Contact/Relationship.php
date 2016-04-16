@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -44,6 +44,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   );
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
+  /**
+   * This will be a_b or b_a.
+   *
+   * @var string
+   */
+  protected $relationType;
+
+  /**
+   * Class constructor.
+   */
   public function __construct() {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
@@ -259,11 +269,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'filters' => array(
           'country_id' => array(
             'title' => ts('Country'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::country(),
           ),
           'state_province_id' => array(
             'title' => ts('State/Province'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::stateProvince(),
           ),
@@ -562,7 +574,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function postProcess() {
     $this->beginPostProcess();
 
-    $this->relationType = NULL;
     $originalRelationshipTypeIdValue = $this->_params['relationship_type_id_value'];
     if (!empty($this->_params['relationship_type_id_value'])) {
       $relationshipTypes = array();

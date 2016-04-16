@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -610,6 +610,19 @@ function _civicrm_price_set_data(&$data, $enabled) {
     ),
   );
 
+  // Price set
+  $data['civicrm_price_field']['price_set'] = array(
+    'title' => t('Price Set'),
+    'help' => t('Price Set related to this Price Field'),
+    'real field' => 'price_set_id',
+    'relationship' => array(
+      'base' => 'civicrm_price_set',
+      'base field' => 'id',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Price Set'),
+    ),
+  );
+  
   //----------------------------------------------------------------
   // CIVICRM Price Field Value - BASE TABLE
   //----------------------------------------------------------------

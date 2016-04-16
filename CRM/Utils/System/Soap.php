@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Soap specific stuff goes here
+ * Soap specific stuff goes here.
  */
 class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
 
@@ -84,8 +82,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @param object $user
    *   Handle to the user object.
-   *
-   * @return void
    */
   public function setEmail(&$user) {
   }

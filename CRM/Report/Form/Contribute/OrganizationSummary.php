@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -92,6 +92,9 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
           'organization_name' => array('title' => ts('Organization Name')),
         ),
         'grouping' => 'organization-fields',
+      ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
       ),
       'civicrm_relationship' => array(
         'dao' => 'CRM_Contact_DAO_Relationship',
@@ -201,6 +204,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
     }
 
@@ -257,7 +261,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
                       ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.$this->otherContact )
             {$this->_aclFrom}
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} ON
-                      ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
+                      ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0  ";
 
     if ($this->_addressField) {
       $this->_from .= "
@@ -271,6 +275,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
                       {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                       {$this->_aliases['civicrm_email']}.is_primary = 1\n ";
     }
+    $this->getPermissionedFTQuery($this);
   }
 
   public function where() {

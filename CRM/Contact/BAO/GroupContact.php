@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
@@ -328,9 +326,10 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param bool $excludeHidden
    *
-   * @return array (reference)|int $values
-   *   the relevant data object values for the contact or
-   *   the total count when $count is TRUE
+   * @param int $groupId
+   *
+   * @return array|int $values
+   *   the relevant data object values for the contact or the total count when $count is TRUE
    */
   public static function &getContactGroup(
     $contactId,
@@ -454,7 +453,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param int $contactId
    *   Id of the contact.
    * @param int $groupID
-   *   Id of a perticuler group.
+   *   Id of a particular group.
    * @param string $method
    *   If we want the subscription history details for a specific method.
    *
@@ -496,7 +495,7 @@ SELECT    *
    * Method to get Group Id.
    *
    * @param int $groupContactID
-   *   Id of a perticuler group.
+   *   Id of a particular group.
    *
    *
    * @return groupID
@@ -520,8 +519,6 @@ SELECT    *
    *
    * @param bool $visibility
    * @param string $method
-   *
-   * @return void
    */
   public static function create(&$params, $contactId, $visibility = FALSE, $method = 'Admin') {
     $contactIds = array();
@@ -585,7 +582,7 @@ SELECT    *
     }
 
     $params = array(
-      array('group', 'IN', array($groupID => 1), 0, 0),
+      array('group', 'IN', array($groupID), 0, 0),
       array('contact_id', '=', $contactID, 0, 0),
     );
     list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, array('contact_id'));
@@ -608,9 +605,6 @@ SELECT    *
    * @see CRM_Dedupe_Merger::cpTables()
    *
    * TODO: use the 3rd $sqls param to append sql statements rather than executing them here
-   *
-   * @return void
-   *
    */
   public static function mergeGroupContact($mainContactId, $otherContactId) {
     $params = array(

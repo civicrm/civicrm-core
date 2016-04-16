@@ -4,7 +4,7 @@
 {else}
 {if $rows}
 <div class="action-link">
-  <a href="{$addSurveyType}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$GName}Add %1{/ts}</span></a>
+  {crmButton p=$addSurveyType.0 q=$addSurveyType.1 icon="crm-i fa-plus-circle"}{ts 1=$GName}Add %1{/ts}{/crmButton}
 </div>
 
 <div id={$gName}>
@@ -41,14 +41,14 @@
         </table>
         {/strip}
         <div class="action-link">
-          <a href="{$addSurveyType}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$GName}Add %1{/ts}</span></a>
+          {crmButton p=$addSurveyType.0 q=$addSurveyType.1 icon="crm-i fa-plus-circle"}{ts 1=$GName}Add %1{/ts}{/crmButton}
         </div>
 
 </div>
 {else}
     <div class="messages status no-popup">
          <div class="icon inform-icon"> &nbsp;
-         {ts 1=$addSurveyType}There are no survey type entered. You can <a href='%1'>add one</a>.{/ts}</div>
+         {ts p=$addSurveyType.0 q=$addSurveyType.1}There are no survey types entered. You can <a href='%1'>add one</a>.{/ts}</div>
     </div>
 {/if}
 {/if}

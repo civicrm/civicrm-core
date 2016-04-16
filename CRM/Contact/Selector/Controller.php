@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,20 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contact_Selector_Controller extends CRM_Core_Selector_Controller {
   /**
-   * Default function for qill, if needed to be implemented, we
-   * expect the subclass to do it
+   * Default function for qill.
+   *
+   * If needed to be implemented, we expect the subclass to do it
    *
    * @return string
    *   the status message
-   */
-  /**
-   * @return string
    */
   public function getQill() {
     return $this->_object->getQILL();

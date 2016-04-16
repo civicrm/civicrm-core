@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -103,6 +103,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
           ),
           'subject' => array(
             'title' => ts('Activity Subject'),
+            'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
           ),
           'activity_type_id' => array(
@@ -112,6 +113,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
           ),
           'status_id' => array(
             'title' => ts('Activity Status'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->activityStatuses,
           ),

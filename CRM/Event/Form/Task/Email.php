@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id: Email.php 45499 2013-02-08 12:31:05Z kurund $
  */
 
@@ -89,6 +89,16 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
    */
   public function postProcess() {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
+  }
+
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
   }
 
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * Business objects for managing custom data values.
- *
  */
 class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
@@ -189,9 +186,9 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
           $formValues[$key] = array('IN' => $formValues[$key]);
         }
       }
-      elseif (stristr($formValues[$key], '%') && ($htmlType == 'TextArea' ||
+      elseif (($htmlType == 'TextArea' ||
           ($htmlType == 'Text' && $dataType == 'String')
-        )
+        ) && strstr($formValues[$key], '%')
       ) {
         $formValues[$key] = array('LIKE' => $formValues[$key]);
       }
@@ -205,8 +202,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    *   Custom value ID.
    * @param int $customGroupID
    *   Custom group ID.
-   *
-   * @return void
    */
   public static function deleteCustomValue($customValueID, $customGroupID) {
     // first we need to find custom value table, from custom group ID

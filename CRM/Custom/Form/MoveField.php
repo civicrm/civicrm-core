@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -77,7 +77,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
    * Set up variables to build the form.
    *
    * @return void
-   * @acess protected
+   * @access protected
    */
   public function preProcess() {
     $this->_srcFID = CRM_Utils_Request::retrieve('fid', 'Positive',

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,19 +28,20 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Page for displaying list of site configuration tasks with links to each setting form
+ * Page for displaying list of site configuration tasks with links to each setting form.
  */
 class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
   /**
+   * Run page.
+   *
    * @return string
    */
   public function run() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 
     CRM_Utils_System::setTitle(ts("Configuration Checklist"));
     $this->assign('recentlyViewed', FALSE);

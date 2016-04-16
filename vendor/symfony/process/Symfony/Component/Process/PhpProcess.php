@@ -24,6 +24,8 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 class PhpProcess extends Process
 {
+    private $executableFinder;
+
     /**
      * Constructor.
      *
@@ -35,25 +37,9 @@ class PhpProcess extends Process
      */
     public function __construct($script, $cwd = null, array $env = null, $timeout = 60, array $options = array())
     {
-        $executableFinder = new PhpExecutableFinder();
-        if (false === $php = $executableFinder->find()) {
-            $php = null;
-        }
-        if ('phpdbg' === PHP_SAPI) {
-            $file = tempnam(sys_get_temp_dir(), 'dbg');
-            file_put_contents($file, $script);
-            register_shutdown_function('unlink', $file);
-            $php .= ' '.ProcessUtils::escapeArgument($file);
-            $script = null;
-        }
-        if ('\\' !== DIRECTORY_SEPARATOR && null !== $php) {
-            // exec is mandatory to deal with sending a signal to the process
-            // see https://github.com/symfony/symfony/issues/5030 about prepending
-            // command with exec
-            $php = 'exec '.$php;
-        }
+        parent::__construct(null, $cwd, $env, $script, $timeout, $options);
 
-        parent::__construct($php, $cwd, $env, $script, $timeout, $options);
+        $this->executableFinder = new PhpExecutableFinder();
     }
 
     /**
@@ -70,7 +56,10 @@ class PhpProcess extends Process
     public function start($callback = null)
     {
         if (null === $this->getCommandLine()) {
-            throw new RuntimeException('Unable to find the PHP executable.');
+            if (false === $php = $this->executableFinder->find()) {
+                throw new RuntimeException('Unable to find the PHP executable.');
+            }
+            $this->setCommandLine($php);
         }
 
         parent::start($callback);

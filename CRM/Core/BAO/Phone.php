@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Class contains functions for phone
+ * Class contains functions for phone.
  */
 class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
 
@@ -234,8 +232,6 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    *
    * @param $optionId
    *   Value of option to be deleted.
-   *
-   * @return void
    */
   public static function setOptionToNull($optionId) {
     if (!$optionId) {
@@ -264,6 +260,10 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
 
   /**
    * Call common delete function.
+   *
+   * @param int $id
+   *
+   * @return bool
    */
   public static function del($id) {
     // Ensure mysql phone function exists

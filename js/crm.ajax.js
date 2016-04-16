@@ -37,14 +37,6 @@
     return url;
   };
 
-  // @deprecated
-  $.extend ({'crmURL':
-    function (p, params) {
-      CRM.console('warn', 'Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
-      return CRM.url(p, params);
-    }
-  });
-
   $.fn.crmURL = function () {
     return this.each(function() {
       if (this.href) {
@@ -55,6 +47,7 @@
 
   /**
    * AJAX api
+   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3
    */
   CRM.api3 = function(entity, action, params, status) {
     if (typeof(entity) === 'string') {
@@ -150,15 +143,6 @@
         }
       });
     })($.extend({}, settings, options));
-  };
-
-  /**
-   * Backwards compatible with jQuery fn
-   * @deprecated
-   */
-  $.fn.crmAPI = function(entity, action, params, options) {
-    CRM.console('warn', 'Calling crmAPI from jQuery is deprecated. Please use CRM.api3() instead.');
-    return CRM.api.call(this, entity, action, params, options);
   };
 
   $.widget('civi.crmSnippet', {
@@ -296,13 +280,6 @@
         $('.blockUI', this.element).remove();
         this._originalContent = this.element.contents().detach();
       }
-      if (window.tinyMCE && tinyMCE.editors) {
-        $.each(tinyMCE.editors, function(k) {
-          if ($.contains(that.element[0], this.getElement())) {
-            this.remove();
-          }
-        });
-      }
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
     },
     _destroy: function() {
@@ -331,7 +308,7 @@
         .dialog(settings.dialog)
         .parent().find('.ui-dialog-titlebar')
         .append($('<a class="crm-dialog-titlebar-print ui-dialog-titlebar-close" title="'+ts('Print window')+'" target="_blank" style="right:3.8em;"/>')
-          .button({icons: {primary: 'ui-icon-print'}, text: false}));
+          .button({icons: {primary: 'fa-print'}, text: false}));
     }
     // Add handlers to new or existing dialog
     if ($(settings.target).data('uiDialog')) {
@@ -385,7 +362,7 @@
         var id = widget.attr('id') + '-unsaved-alert',
           title = widget.dialog('option', 'title'),
           alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), 'alert unsaved-dialog', {expires: 60000});
-        $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
+        $('#' + id).button({icons: {primary: 'fa-undo'}}).click(function(e) {
           widget.attr('data-unsaved-changes', 'false').dialog('open');
           e.preventDefault();
         });
@@ -452,18 +429,6 @@
             }
           }
         },
-        beforeSerialize: function(form, options) {
-          if (window.CKEDITOR && window.CKEDITOR.instances) {
-            $.each(CKEDITOR.instances, function() {
-              if (this.updateElement) this.updateElement();
-            });
-          }
-          if (window.tinyMCE && tinyMCE.editors) {
-            $.each(tinyMCE.editors, function() {
-              this.save();
-            });
-          }
-        },
         beforeSubmit: function(submission) {
           $.each(formErrors, function() {
             if (this && this.close) this.close();
@@ -496,15 +461,15 @@
             label = $el.is('input') ? $el.attr('value') : $el.text(),
             identifier = $el.attr('name') || $el.attr('href');
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
-            var $icon = $el.find('.icon'),
+            var $icon = $el.find('.icon, .crm-i'),
               button = {'data-identifier': identifier, text: label, click: function() {
                 $el[0].click();
               }};
             if ($icon.length) {
               button.icons = {primary: $icon.attr('class')};
             } else {
-              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'close' : 'check');
-              button.icons = {primary: 'ui-icon-' + action};
+              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'fa-times' : 'fa-check');
+              button.icons = {primary: action};
             }
             buttons.push(button);
             added.push(identifier);
@@ -513,15 +478,6 @@
           $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
         });
         $el.dialog('option', 'buttons', buttons);
-
-        // Show done button for non-ajax dialogs (e.g. file downloads)
-        $(this).on('submit', "form[data-no-ajax-submit=true]", function() {
-          $el.dialog('option', 'buttons', [{
-            text: ts('Done'),
-            icons: {primary: 'ui-icon-close'},
-            click: function() {$(this).dialog('close');}
-          }]);
-        });
       }
       // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
@@ -599,6 +555,12 @@
       // Destroy old unsaved dialog
       .on('dialogcreate', function(e) {
         $('.ui-dialog-content.crm-ajax-container:hidden[data-unsaved-changes=true]').crmSnippet('destroy').dialog('destroy').remove();
+      })
+      // Ensure wysiwyg content is updated prior to ajax submit
+      .on('form-pre-serialize', function(e) {
+        $('.crm-wysiwyg-enabled', e.target).each(function() {
+          CRM.wysiwyg.updateElement(this);
+        });
       })
       // Auto-resize dialogs when loading content
       .on('crmLoad dialogopen', 'div.ui-dialog.ui-resizable.crm-container', function(e) {

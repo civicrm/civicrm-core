@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,8 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
-
-require_once 'ezc/Base/src/ezc_bootstrap.php';
-require_once 'ezc/autoload/mail_autoload.php';
 
 /**
  * Class CRM_Mailing_MailStore_Pop3
@@ -83,8 +78,6 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
    *
    * @param int $nr
    *   Number of the message to fetch.
-   *
-   * @return void
    */
   public function markIgnored($nr) {
     if ($this->_debug) {
@@ -101,8 +94,6 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
    *
    * @param int $nr
    *   Number of the message to fetch.
-   *
-   * @return void
    */
   public function markProcessed($nr) {
     if ($this->_debug) {

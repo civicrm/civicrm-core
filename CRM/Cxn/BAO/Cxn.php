@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,9 +31,7 @@ use Civi\Cxn\Rpc\DefaultCertificateValidator;
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -58,7 +56,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
 
     // In practice, this may not be necessary, but we want to prevent
     // edge-cases that downgrade security-level below system policy.
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL')) {
+    if (Civi::settings()->get('enableSSL')) {
       $civiUrl = preg_replace('/^http:/', 'https:', $civiUrl);
     }
 

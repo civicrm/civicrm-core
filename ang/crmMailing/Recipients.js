@@ -98,12 +98,12 @@
             return item.text;
           }
           var option = convertValueToObj(item.id);
-          var icon = (option.entity_type === 'civicrm_mailing') ? 'EnvelopeIn.gif' : 'group.png';
+          var icon = (option.entity_type === 'civicrm_mailing') ? 'fa-envelope' : 'fa-users';
           var spanClass = (option.mode == 'exclude') ? 'crmMailing-exclude' : 'crmMailing-include';
           if (option.entity_type != 'civicrm_mailing' && isMandatory(option.entity_id)) {
             spanClass = 'crmMailing-mandatory';
           }
-          return '<img src="' + CRM.config.resourceBase + 'i/' + icon + '" height="12" width="12" /> <span class="' + spanClass + '">' + item.text + '</span>';
+          return '<i class="crm-i '+icon+'"></i> <span class="' + spanClass + '">' + item.text + '</span>';
         }
 
         function validate() {

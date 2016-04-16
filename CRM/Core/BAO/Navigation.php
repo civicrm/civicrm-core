@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
 
@@ -88,9 +88,10 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    */
   public static function add(&$params) {
     $navigation = new CRM_Core_DAO_Navigation();
-
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['has_separator'] = CRM_Utils_Array::value('has_separator', $params, FALSE);
+    if (empty($params['id'])) {
+      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      $params['has_separator'] = CRM_Utils_Array::value('has_separator', $params, FALSE);
+    }
 
     if (!isset($params['id']) ||
       (CRM_Utils_Array::value('parent_id', $params) != CRM_Utils_Array::value('current_parent_id', $params))
@@ -336,6 +337,7 @@ ORDER BY parent_id, weight";
 
     // run the Navigation  through a hook so users can modify it
     CRM_Utils_Hook::navigationMenu($navigations);
+    self::fixNavigationMenu($navigations);
 
     $i18n = CRM_Core_I18n::singleton();
 
@@ -460,6 +462,51 @@ ORDER BY parent_id, weight";
       }
     }
     return $navigationString;
+  }
+
+  /**
+   * Given a navigation menu, generate navIDs for any items which are
+   * missing them.
+   *
+   * @param array $nodes
+   *   Each key is a numeral; each value is a node in
+   *   the menu tree (with keys "child" and "attributes").
+   */
+  public static function fixNavigationMenu(&$nodes) {
+    $maxNavID = 1;
+    array_walk_recursive($nodes, function($item, $key) use (&$maxNavID) {
+      if ($key === 'navID') {
+        $maxNavID = max($maxNavID, $item);
+      }
+    });
+    self::_fixNavigationMenu($nodes, $maxNavID, NULL);
+  }
+
+  /**
+   * @param array $nodes
+   *   Each key is a numeral; each value is a node in
+   *   the menu tree (with keys "child" and "attributes").
+   * @param int $maxNavID
+   * @param int $parentID
+   */
+  private static function _fixNavigationMenu(&$nodes, &$maxNavID, $parentID) {
+    $origKeys = array_keys($nodes);
+    foreach ($origKeys as $origKey) {
+      if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
+        $nodes[$origKey]['attributes']['parentID'] = $parentID;
+      }
+      // If no navID, then assign navID and fix key.
+      if (!isset($nodes[$origKey]['attributes']['navID'])) {
+        $newKey = ++$maxNavID;
+        $nodes[$origKey]['attributes']['navID'] = $newKey;
+        $nodes[$newKey] = $nodes[$origKey];
+        unset($nodes[$origKey]);
+        $origKey = $newKey;
+      }
+      if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
+        self::_fixNavigationMenu($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
+      }
+    }
   }
 
   /**
@@ -619,20 +666,7 @@ ORDER BY parent_id, weight";
         $homeLabel = ts('CiviCRM Home');
       }
       // Link to hide the menubar
-      if (
-        ($config->userSystem->is_drupal) &&
-        ((module_exists('toolbar') && user_access('access toolbar')) ||
-          module_exists('admin_menu') && user_access('access administration menu')
-        )
-      ) {
-        $hideLabel = ts('Drupal Menu');
-      }
-      elseif ($config->userSystem->is_wordpress) {
-        $hideLabel = ts('WordPress Menu');
-      }
-      else {
-        $hideLabel = ts('Hide Menu');
-      }
+      $hideLabel = ts('Hide Menu');
 
       $prepandString = "
         <li class='menumain crm-link-home'>$homeIcon
@@ -882,7 +916,7 @@ ORDER BY parent_id, weight";
         "compid={$component_id}&reset=1", $reports_nav->id, $permission, $domain_id, TRUE);
       foreach ($component['reports'] as $report_id => $report) {
         // Create or update the report instance links.
-        $report_nav = self::createOrUpdateReportNavItem($report['title'], $report['url'], 'reset=1', $component_nav->id, $report['permission'], $domain_id);
+        $report_nav = self::createOrUpdateReportNavItem($report['title'], $report['url'], 'reset=1', $component_nav->id, $report['permission'], $domain_id, FALSE, TRUE);
         // Update the report instance to include the navigation id.
         $query = "UPDATE civicrm_report_instance SET navigation_id = %1 WHERE id = %2";
         $params = array(
@@ -894,7 +928,7 @@ ORDER BY parent_id, weight";
     }
 
     // Create or update the All Reports link.
-    self::createOrUpdateReportNavItem('All Reports', 'civicrm/report/list', 'reset=1', $reports_nav->id, 'access CiviReport', $domain_id);
+    self::createOrUpdateReportNavItem('All Reports', 'civicrm/report/list', 'reset=1', $reports_nav->id, 'access CiviReport', $domain_id, TRUE);
   }
 
   /**
@@ -924,6 +958,9 @@ ORDER BY parent_id, weight";
   /**
    * Retrieve a navigation item using it's url.
    *
+   * Note that we use LIKE to permit a wildcard as the calling code likely doesn't
+   * care about output params appended.
+   *
    * @param string $url
    * @param array $url_params
    *
@@ -934,8 +971,9 @@ ORDER BY parent_id, weight";
    */
   public static function getNavItemByUrl($url, $url_params, $parent_id = NULL) {
     $nav = new CRM_Core_BAO_Navigation();
-    $nav->url = "{$url}?{$url_params}";
     $nav->parent_id = $parent_id;
+    $nav->whereAdd("url LIKE '{$url}?{$url_params}'");
+
     if ($nav->find(TRUE)) {
       return $nav;
     }
@@ -1004,9 +1042,10 @@ ORDER BY parent_id, weight";
    * @return \CRM_Core_DAO_Navigation
    */
   protected static function createOrUpdateReportNavItem($name, $url, $url_params, $parent_id, $permission,
-                                                        $domain_id, $onlyMatchParentID = FALSE) {
+                                                        $domain_id, $onlyMatchParentID = FALSE, $useWildcard = TRUE) {
     $id = NULL;
-    $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params, ($onlyMatchParentID ? $parent_id : NULL));
+    $existing_url_params = $useWildcard ? $url_params . '%' : $url_params;
+    $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $existing_url_params, ($onlyMatchParentID ? $parent_id : NULL));
     if ($existing_nav) {
       $id = $existing_nav->id;
     }
@@ -1058,13 +1097,9 @@ ORDER BY parent_id, weight";
    * @return object|string
    */
   public static function getCacheKey($cid) {
-    $key = CRM_Core_BAO_Setting::getItem(
-      CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-      'navigation',
-      NULL,
-      '',
-      $cid
-    );
+    $key = Civi::service('settings_manager')
+      ->getBagByContact(NULL, $cid)
+      ->get('navigation');
     if (strlen($key) !== self::CACHE_KEY_STRLEN) {
       $key = self::resetNavigation($cid);
     }

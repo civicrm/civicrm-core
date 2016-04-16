@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -39,13 +37,15 @@
 class CRM_Report_Page_Instance extends CRM_Core_Page {
   /**
    * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
    */
   public function run() {
     $instanceId = CRM_Report_Utils_Report::getInstanceID();
     if (!$instanceId) {
       $instanceId = CRM_Report_Utils_Report::getInstanceIDForPath();
+    }
+    if (is_numeric($instanceId)) {
+      $instanceURL = CRM_Utils_System::url("civicrm/report/instance/{$instanceId}", 'reset=1');
+      CRM_Core_Session::singleton()->replaceUserContext($instanceURL);
     }
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $optionVal = CRM_Report_Utils_Report::getValueFromUrl($instanceId);

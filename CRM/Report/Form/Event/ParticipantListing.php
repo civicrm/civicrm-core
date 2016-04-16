@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -37,7 +37,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   protected $_summary = NULL;
 
   protected $_contribField = FALSE;
-  protected $_lineitemField = FALSE;
   protected $_groupFilter = TRUE;
   protected $_tagFilter = TRUE;
   protected $_balance = FALSE;
@@ -185,8 +184,14 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'required' => TRUE,
             'no_display' => TRUE,
           ),
+          'registered_by_id' => array(
+            'title' => ts('Registered by Participant ID'),
+          ),
+          'source' => array(
+            'title' => ts('Source'),
+          ),
           'participant_fee_level' => NULL,
-          'participant_fee_amount' => NULL,
+          'participant_fee_amount' => array('title' => ts('Participant Fee')),
           'participant_register_date' => array('title' => ts('Registration Date')),
           'total_paid' => array(
             'title' => ts('Total Paid'),
@@ -214,6 +219,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'sid' => array(
             'name' => 'status_id',
             'title' => ts('Participant Status'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label'),
           ),
@@ -234,7 +240,16 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
-
+          'registered_by_id' => array(
+            'title' => ts('Registered by Participant ID'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operator' => 'like',
+          ),
+          'source' => array(
+            'title' => ts('Source'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operator' => 'like',
+          ),
         ),
         'order_bys' => array(
           'participant_register_date' => array(
@@ -271,6 +286,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'eid' => array(
             'name' => 'event_type_id',
             'title' => ts('Event Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('event_type'),
           ),
@@ -324,6 +340,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
@@ -336,6 +353,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
           'payment_instrument_id' => array(
             'title' => ts('Payment Type'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           ),
@@ -354,6 +372,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'price_field_value_id' => array(
             'name' => 'price_field_value_id',
             'title' => ts('Fee Level'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->getPriceLevels(),
           ),
@@ -392,6 +411,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
       $this->_columns['civicrm_participant']['order_bys']['campaign_id'] = array(
         'title' => ts('Campaign'),
@@ -409,7 +429,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
    */
   public function getPriceLevels() {
     $query = "
-SELECT CONCAT(cv.label, ' (', ps.title, ')') label, cv.id
+SELECT CONCAT(cv.label, ' (', ps.title, ' - ', cf.label , ')') label, cv.id
 FROM civicrm_price_field_value cv
 LEFT JOIN civicrm_price_field cf
   ON cv.price_field_id = cf.id
@@ -445,9 +465,6 @@ ORDER BY  cv.label
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
     }
     foreach ($this->_columns as $tableName => $table) {
-      if ($tableName == 'civicrm_line_item') {
-        $this->_lineitemField = TRUE;
-      }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) ||
@@ -458,6 +475,11 @@ ORDER BY  cv.label
             }
             if ($fieldName == 'total_paid' || $fieldName == 'balance') {
               $this->_balance = TRUE;
+              // modify the select if filtered by fee_level as the from clause
+              // already selects the total_amount from civicrm_contribution table
+              if (!empty($this->_params['price_field_value_id_value'])) {
+                $field['dbAlias'] = str_replace('SUM(ft.total_amount)', 'ft.total_amount', $field['dbAlias']);
+              }
             }
             $alias = "{$tableName}_{$fieldName}";
             $select[] = "{$field['dbAlias']} as $alias";
@@ -520,7 +542,7 @@ ORDER BY  cv.label
                     ON (pp.contribution_id  = {$this->_aliases['civicrm_contribution']}.id)
       ";
     }
-    if ($this->_lineitemField) {
+    if (!empty($this->_params['price_field_value_id_value'])) {
       $this->_from .= "
             LEFT JOIN civicrm_line_item line_item_civireport
                   ON line_item_civireport.entity_table = 'civicrm_participant' AND
@@ -534,9 +556,12 @@ ORDER BY  cv.label
                   ON (eft.entity_id = {$this->_aliases['civicrm_contribution']}.id)
             LEFT JOIN civicrm_financial_account fa
                   ON (fa.account_type_code = 'AR')
+            LEFT JOIN civicrm_financial_account fae
+                  ON (fae.account_type_code = 'EXP')
             LEFT JOIN civicrm_financial_trxn ft
                   ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND
-                     (ft.to_financial_account_id != fa.id)
+                     (ft.to_financial_account_id != fa.id) AND
+                     (ft.to_financial_account_id != fae.id)
       ";
     }
   }

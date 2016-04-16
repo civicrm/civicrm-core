@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -41,6 +41,14 @@ class CRM_Core_ClassLoader {
    * @var object
    */
   private static $_singleton = NULL;
+
+  /**
+   * The classes in CiviTest have ucky, non-standard naming.
+   *
+   * @var array
+   *   Array(string $className => string $filePath).
+   */
+  private $civiTestClasses;
 
   /**
    * @param bool $force
@@ -63,6 +71,22 @@ class CRM_Core_ClassLoader {
    */
   protected function __construct() {
     $this->_registered = FALSE;
+    $this->civiTestClasses = array(
+      'CiviCaseTestCase',
+      'CiviDBAssert',
+      'CiviMailUtils',
+      'CiviReportTestCase',
+      'CiviSeleniumTestCase',
+      'CiviTestSuite',
+      'CiviUnitTestCase',
+      'Contact',
+      'ContributionPage',
+      'Custom',
+      'Event',
+      'Membership',
+      'Participant',
+      'PaypalPro',
+    );
   }
 
   /**
@@ -168,6 +192,20 @@ class CRM_Core_ClassLoader {
       // intelligible errors.
       if (FALSE != stream_resolve_include_path($file)) {
         require_once $file;
+      }
+    }
+    elseif (in_array($class, $this->civiTestClasses)) {
+      $file = "tests/phpunit/CiviTest/{$class}.php";
+      if (FALSE != stream_resolve_include_path($file)) {
+        require_once $file;
+      }
+    }
+    elseif ($class === 'CiviSeleniumSettings') {
+      if (!empty($GLOBALS['_CV'])) {
+        require_once 'tests/phpunit/CiviTest/CiviSeleniumSettings.auto.php';
+      }
+      elseif (CRM_Utils_File::isIncludable('tests/phpunit/CiviTest/CiviSeleniumSettings.php')) {
+        require_once 'tests/phpunit/CiviTest/CiviSeleniumSettings.php';
       }
     }
   }

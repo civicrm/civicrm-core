@@ -9,7 +9,7 @@
       },
       template: '<input type="text" class="crmMailingToken" />',
       link: function(scope, element, attrs, crmUiIdCtrl) {
-        $(element).addClass('crm-action-menu action-icon-token').select2({
+        $(element).addClass('crm-action-menu fa-code').crmSelect2({
           width: "12em",
           dropdownAutoWidth: true,
           data: CRM.crmMailing.mailTokens,

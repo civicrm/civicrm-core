@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
@@ -252,14 +253,19 @@ class YamlFileLoader extends FileLoader
                 $name = $tag['name'];
                 unset($tag['name']);
 
-                foreach ($tag as $value) {
-                    if (!is_scalar($value)) {
-                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s" in %s. Check your YAML syntax.', $id, $name, $file));
+                foreach ($tag as $attribute => $value) {
+                    if (!is_scalar($value) && null !== $value) {
+                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in %s. Check your YAML syntax.', $id, $name, $attribute, $file));
                     }
                 }
 
                 $definition->addTag($name, $tag);
             }
+        }
+
+        if (isset($service['decorates'])) {
+            $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
+            $definition->setDecoratedService($service['decorates'], $renameId);
         }
 
         $this->container->setDefinition($id, $definition);
@@ -352,6 +358,8 @@ class YamlFileLoader extends FileLoader
     {
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
+        } elseif (is_string($value) &&  0 === strpos($value, '@=')) {
+            return new Expression(substr($value, 2));
         } elseif (is_string($value) &&  0 === strpos($value, '@')) {
             if (0 === strpos($value, '@@')) {
                 $value = substr($value, 1);

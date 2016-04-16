@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Auxilary class to provide support for locking (and ignoring locks on)
- * contact records.
+ * Auxiliary class to provide support for locking (and ignoring locks on) contact records.
  */
 class CRM_Contact_Form_Inline_Lock {
 
@@ -45,8 +42,6 @@ class CRM_Contact_Form_Inline_Lock {
    * @param CRM_Core_Form $form
    *   Form object.
    * @param int $contactID
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, $contactID) {
     // We provide a value for oplock_ts to client, but JS uses it carefully
@@ -63,7 +58,7 @@ class CRM_Contact_Form_Inline_Lock {
   }
 
   /**
-   * Ensure that oplock_ts hasn't changed in the underlying DB
+   * Ensure that oplock_ts hasn't changed in the underlying DB.
    *
    * @param array $fields
    *   The input form values.
@@ -89,7 +84,7 @@ class CRM_Contact_Form_Inline_Lock {
   }
 
   /**
-   * Return any post-save data
+   * Return any post-save data.
    *
    * @param int $contactID
    *

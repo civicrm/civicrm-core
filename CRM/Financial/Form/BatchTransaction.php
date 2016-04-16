@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * This class generates form components for Financial Type
- *
  */
 class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   static $_links = NULL;
@@ -64,7 +61,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
         'created_by' => ts('Created By'),
         'status' => ts('Status'),
         'description' => ts('Description'),
-        'payment_instrument' => ts('Payment Instrument'),
+        'payment_instrument' => ts('Payment Method'),
         'item_count' => ts('Entered Transactions'),
         'assigned_item_count' => ts('Assigned Transactions'),
         'total' => ts('Entered Total'),
@@ -77,8 +74,6 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_batchStatusId == 2) {

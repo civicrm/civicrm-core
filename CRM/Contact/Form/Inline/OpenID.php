@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * form helper class for an OpenID object
+ * Form helper class for an OpenID object.
  */
 class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
 
@@ -63,8 +61,6 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements for openID object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -155,8 +151,6 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -164,6 +158,12 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
     // Process / save openID
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['openid']['isIdSet'] = TRUE;
+    foreach ($this->_openids as $count => $value) {
+      if (!empty($value['id']) && isset($params['openid'][$count])) {
+        $params['openid'][$count]['id'] = $value['id'];
+      }
+    }
     CRM_Core_BAO_Block::create('openid', $params);
 
     $this->log();

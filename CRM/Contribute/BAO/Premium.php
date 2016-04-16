@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
   /**
    * Product information.
+   *
    * @var array
    */
   private static $productInfo;
@@ -55,7 +54,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ManagePremium
+   * @return CRM_Contribute_DAO_Product
    */
   public static function retrieve(&$params, &$defaults) {
     $premium = new CRM_Contribute_DAO_Product();
@@ -76,7 +75,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Premium', $id, 'premiums_active ', $is_active);
@@ -86,12 +85,8 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * Delete financial Types.
    *
    * @param int $premiumID
-   *
    */
   public static function del($premiumID) {
-    //check dependencies
-
-    //delete from financial Type table
     $premium = new CRM_Contribute_DAO_Premium();
     $premium->id = $premiumID;
     $premium->delete();
@@ -104,8 +99,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param int $pageID
    * @param bool $formItems
    * @param int $selectedProductID
-   * @param null $selectedOption
-   *
+   * @param string $selectedOption
    */
   public static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
     $form->add('hidden', "selectProduct", $selectedProductID, array('id' => 'selectProduct'));
@@ -114,6 +108,11 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
     $dao->entity_table = 'civicrm_contribution_page';
     $dao->entity_id = $pageID;
     $dao->premiums_active = 1;
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+    $addWhere = "financial_type_id IN (0)";
+    if (!empty($financialTypes)) {
+      $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+    }
 
     if ($dao->find(TRUE)) {
       $premiumID = $dao->id;
@@ -122,6 +121,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->premiums_id = $premiumID;
+      $dao->whereAdd($addWhere);
       $dao->orderBy('weight');
       $dao->find();
 
@@ -171,7 +171,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param CRM_Core_Form $form
    * @param int $productID
    * @param int $premiumProductID
-   *
    */
   public function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
     if ($premiumProductID) {
@@ -209,7 +208,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * Delete premium associated w/ contribution page.
    *
    * @param int $contributionPageID
-   *
    */
   public static function deletePremium($contributionPageID) {
     if (!$contributionPageID) {

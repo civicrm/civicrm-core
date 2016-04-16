@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -55,13 +55,12 @@ class CRM_Member_Form_Task_Result extends CRM_Member_Form_Task {
    */
   public function buildQuickForm() {
     $this->addButtons(array(
-        array(
-          'type' => 'done',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+      array(
+        'type' => 'done',
+        'name' => ts('Done'),
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
 }

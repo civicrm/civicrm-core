@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -46,8 +46,6 @@ class CRM_Custom_Form_CustomData {
    * @param string $type
    * @param null|int $entityID
    * @param null $onlySubType
-   *
-   * @return void
    */
   public static function preProcess(
     &$form, $subName = NULL, $subType = NULL,
@@ -125,31 +123,7 @@ class CRM_Custom_Form_CustomData {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
-      $form,
-      $form->_entityId,
-      $gid,
-      $subType,
-      $form->_subName,
-      $getCachedTree,
-      $onlySubType
-    );
-
-    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
-      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL);
-    }
-    // we should use simplified formatted groupTree
-    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
-
-    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
-      $keys = array_keys($groupTree);
-      foreach ($keys as $key) {
-        $form->_groupTree[$key] = $groupTree[$key];
-      }
-    }
-    else {
-      $form->_groupTree = $groupTree;
-    }
+    self::setGroupTree($form, $subType, $gid, $onlySubType, $getCachedTree);
   }
 
   /**
@@ -165,12 +139,51 @@ class CRM_Custom_Form_CustomData {
 
   /**
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     $form->addElement('hidden', 'hidden_custom', 1);
     $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
     CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
+  }
+
+  /**
+   * @param $form
+   * @param $subType
+   * @param $gid
+   * @param $onlySubType
+   * @param $getCachedTree
+   *
+   * @return array
+   */
+  public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = FALSE) {
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
+      $form,
+      $form->_entityId,
+      $gid,
+      $subType,
+      $form->_subName,
+      $getCachedTree,
+      $onlySubType
+    );
+
+    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
+      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
+    }
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+
+    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
+      $keys = array_keys($groupTree);
+      foreach ($keys as $key) {
+        $form->_groupTree[$key] = $groupTree[$key];
+      }
+      return array($form, $groupTree);
+    }
+    else {
+      $form->_groupTree = $groupTree;
+      return array($form, $groupTree);
+    }
   }
 
 }

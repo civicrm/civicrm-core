@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,14 +60,14 @@ function _civicrm_api3_navigation_reset_spec(&$params) {
  */
 function civicrm_api3_navigation_reset($params) {
   if ($params['for'] == 'report') {
-    CRM_Core_BAO_Navigation::resetNavigation();
+    CRM_Core_BAO_Navigation::rebuildReportsNavigation($params['domain_id']);
   }
-  CRM_Core_BAO_Navigation::rebuildReportsNavigation($params['domain_id']);
+  CRM_Core_BAO_Navigation::resetNavigation();
   return civicrm_api3_create_success(1, $params, 'navigation', 'reset');
 }
 
 /**
- * Adjust metadata for navigation reset action.
+ * Adjust metadata for navigation get action.
  *
  * @param array $params
  */
@@ -85,4 +85,46 @@ function _civicrm_api3_navigation_get_spec(&$params) {
  */
 function civicrm_api3_navigation_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Adjust metadata for navigation create action.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_navigation_create_spec(&$params) {
+}
+
+/**
+ * Create navigation item.
+ *
+ * @param array $params
+ *   Array of name/value pairs.
+ *
+ * @return array
+ *   API result array.
+ */
+function civicrm_api3_navigation_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Adjust metadata for navigation create action.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_navigation_delete_spec(&$params) {
+}
+
+/**
+ * Delete navigation item.
+ *
+ * @param array $params
+ *   Array of name/value pairs.
+ *
+ * @return array
+ *   API result array.
+ */
+function civicrm_api3_navigation_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

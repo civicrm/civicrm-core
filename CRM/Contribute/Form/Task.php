@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * This class generates form components for relationship
- *
+ * This class generates form components for relationship.
  */
 class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
@@ -90,10 +87,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @param
-   *
-   * @return void
    */
   public function preProcess() {
     self::preProcessCommon($this);
@@ -131,6 +124,8 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
       $query = new CRM_Contact_BAO_Query($queryParams, array('contribution_id'), NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_CONTRIBUTE
       );
+      // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
+      // can we remove? if not why not?
       if ($form->_includesSoftCredits) {
         $contactIds = $contributionContactIds = array();
         $query->_rowCountClause = " count(civicrm_contribution.id)";
@@ -207,8 +202,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
    *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(

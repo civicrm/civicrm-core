@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -345,6 +345,10 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * default is to always check permissioning but public pages for example might not want
    * permission to be checked for anonymous users. Refer CRM-6211. We might be beaking
    * Multi-Site dedupe for public pages.
+   *
+   * @param bool $checkPermission
+   *
+   * @return string
    */
   public function thresholdQuery($checkPermission = TRUE) {
     $this->_aclFrom = '';
@@ -413,6 +417,11 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
   /**
    * Get all of the combinations of fields that would work with a rule.
+   *
+   * @param array $rgFields
+   * @param int $threshold
+   * @param array $combos
+   * @param array $running
    */
   public static function combos($rgFields, $threshold, &$combos, $running = array()) {
     foreach ($rgFields as $rgField => $weight) {

@@ -59,7 +59,7 @@
       var buttons = [
         {
           text: ts('Save'),
-          icons: {primary: 'ui-icon-check'},
+          icons: {primary: 'fa-check'},
           click: function () {
             $scope.save().then(function (item) {
               dialogService.close('saveTemplateDialog', item);
@@ -68,7 +68,7 @@
         },
         {
           text: ts('Cancel'),
-          icons: {primary: 'ui-icon-close'},
+          icons: {primary: 'fa-times'},
           click: function () {
             dialogService.cancel('saveTemplateDialog');
           }

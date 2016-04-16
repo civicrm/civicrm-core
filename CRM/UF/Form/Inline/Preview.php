@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,15 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
  * This class generates form components
  * for previewing Civicrm Profile Group
- *
  */
 class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
 
@@ -44,10 +41,6 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
    * Pre processing work done here.
    *
    * gets session variables for group or field id
-   *
-   * @param
-   *
-   * @return void
    */
   public function preProcess() {
     if ($_SERVER['REQUEST_METHOD'] != 'POST') {

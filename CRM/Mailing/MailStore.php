@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Mailing_MailStore {
   // flag to decide whether to print debug messages
   var $_debug = FALSE;
 
   /**
-   * Return the proper mail store implementation, based on config settings
+   * Return the proper mail store implementation, based on config settings.
    *
    * @param string $name
    *   Name of the settings set from civimail_mail_settings to use (null for default).
@@ -94,7 +92,7 @@ class CRM_Mailing_MailStore {
   }
 
   /**
-   * Expunge the messages marked for deletion; stub function to be redefined by IMAP store
+   * Expunge the messages marked for deletion; stub function to be redefined by IMAP store.
    */
   public function expunge() {
   }

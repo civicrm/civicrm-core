@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -49,22 +49,11 @@ class CRM_Logging_Reverter {
   }
 
   /**
+   * Revert changes in the array of diffs in $this->diffs.
+   *
    * @param $tables
    */
   public function revert($tables) {
-    // FIXME: split off the table → DAO mapping to a GenCode-generated class
-    $daos = array(
-      'civicrm_address' => 'CRM_Core_DAO_Address',
-      'civicrm_contact' => 'CRM_Contact_DAO_Contact',
-      'civicrm_email' => 'CRM_Core_DAO_Email',
-      'civicrm_im' => 'CRM_Core_DAO_IM',
-      'civicrm_openid' => 'CRM_Core_DAO_OpenID',
-      'civicrm_phone' => 'CRM_Core_DAO_Phone',
-      'civicrm_website' => 'CRM_Core_DAO_Website',
-      'civicrm_contribution' => 'CRM_Contribute_DAO_Contribution',
-      'civicrm_note' => 'CRM_Core_DAO_Note',
-      'civicrm_relationship' => 'CRM_Contact_DAO_Relationship',
-    );
 
     // get custom data tables, columns and types
     $ctypes = array();
@@ -109,14 +98,13 @@ class CRM_Logging_Reverter {
     foreach ($deletes as $table => $ids) {
       CRM_Core_DAO::executeQuery("DELETE FROM `$table` WHERE id IN (" . implode(', ', array_unique($ids)) . ')');
     }
-
     // revert updates by updating to previous values
     foreach ($reverts as $table => $row) {
       switch (TRUE) {
         // DAO-based tables
 
-        case in_array($table, array_keys($daos)):
-          $dao = new $daos[$table]();
+        case (($tableDAO = CRM_Core_DAO_AllCoreTables::getClassForTable($table)) != FALSE):
+          $dao = new $tableDAO ();
           foreach ($row as $id => $changes) {
             $dao->id = $id;
             foreach ($changes as $field => $value) {
@@ -146,6 +134,7 @@ class CRM_Logging_Reverter {
               if (!isset($ctypes[$table][$field])) {
                 continue;
               }
+              $fldVal = "%{$counter}";
               switch ($ctypes[$table][$field]) {
                 case 'Date':
                   $value = substr(CRM_Utils_Date::isoToMysql($value), 0, 8);
@@ -154,10 +143,17 @@ class CRM_Logging_Reverter {
                 case 'Timestamp':
                   $value = CRM_Utils_Date::isoToMysql($value);
                   break;
+
+                case 'Boolean':
+                  if ($value === '') {
+                    $fldVal = 'DEFAULT';
+                  }
               }
               $inserts[$field] = "%$counter";
-              $updates[] = "$field = %$counter";
-              $params[$counter] = array($value, $ctypes[$table][$field]);
+              $updates[] = "{$field} = {$fldVal}";
+              if ($fldVal != 'DEFAULT') {
+                $params[$counter] = array($value, $ctypes[$table][$field]);
+              }
               $counter++;
             }
             if ($changes['log_action'] == 'Delete') {

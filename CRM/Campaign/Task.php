@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * class to represent the actions that can be performed on a
- * group of voters.
- * used by the search forms
+ * class to represent the actions that can be performed on a group of voters.
  *
+ * Used by the search forms.
  */
 class CRM_Campaign_Task {
   const INTERVIEW = 1, RESERVE = 2, RELEASE = 3, PRINT_VOTERS = 4;

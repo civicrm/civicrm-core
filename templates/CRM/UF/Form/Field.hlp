@@ -57,10 +57,10 @@
 {/htxt}
 {htxt id='visibility'}
   <p>
-    {ts}Is this field hidden from other users ('User and User Admin Only'), or is it visible to others and potentially searchable in the Profile Search form ('Public Pages' or 'Public Pages and Listings')?{/ts}
+    {ts}Is this field hidden from public search ('User and User Admin Only'), or is it visible to the public and potentially searchable in the Profile Search form ('Expose Publicly' or 'Expose Publicly and for Listings')?  ('User and User Admin Only') fields can still be used for Edit and Create mode.{/ts}
   </p>
   <p>
-    {ts}When visibility is 'Public Pages and Listings', users can also click the field value when viewing a contact in order to locate other contacts with the same value(s) (i.e. other contacts who live in Poland).{/ts}
+    {ts}When visibility is 'Expose Publicly and for Listings', users can also click the field value when viewing a contact in order to locate other contacts with the same value(s) (i.e. other contacts who live in Poland).{/ts}
   </p>
 {/htxt}
 

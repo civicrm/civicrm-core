@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fd3f59bfad9a391951d4e773230a4752",
-    "content-hash": "5ac26ca66347ff4485584db892ed4341",
+    "hash": "6d663f79b264d072ee699147bc572115",
+    "content-hash": "9d0da097291dbad481650b039869f719",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -313,18 +313,79 @@
             "time": "2012-12-21 11:40:51"
         },
         {
+            "name": "symfony/config",
+            "version": "v2.5.12",
+            "target-dir": "Symfony/Component/Config",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/config.git",
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "symfony/filesystem": "~2.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Config\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Symfony Config Component",
+            "homepage": "http://symfony.com",
+            "time": "2015-01-03 08:01:13"
+        },
+        {
             "name": "symfony/dependency-injection",
+<<<<<<< HEAD
             "version": "v2.3.42",
+=======
+            "version": "v2.5.12",
+>>>>>>> d59aa28... New files for 4.7
             "target-dir": "Symfony/Component/DependencyInjection",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
+<<<<<<< HEAD
                 "reference": "06265ee128644eb70356bd72ab28c9ded6618d19"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/06265ee128644eb70356bd72ab28c9ded6618d19",
                 "reference": "06265ee128644eb70356bd72ab28c9ded6618d19",
+=======
+                "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/c42aee05b466cc9c66b87ddf7d263402befb6962",
+                "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962",
+>>>>>>> d59aa28... New files for 4.7
                 "shasum": ""
             },
             "require": {
@@ -332,6 +393,10 @@
             },
             "require-dev": {
                 "symfony/config": "~2.2",
+<<<<<<< HEAD
+=======
+                "symfony/expression-language": "~2.4,>=2.4.10",
+>>>>>>> d59aa28... New files for 4.7
                 "symfony/yaml": "~2.1"
             },
             "suggest": {
@@ -342,7 +407,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -368,29 +433,54 @@
                 }
             ],
             "description": "Symfony DependencyInjection Component",
+<<<<<<< HEAD
             "homepage": "https://symfony.com",
             "time": "2016-05-30 08:31:06"
         },
         {
             "name": "symfony/event-dispatcher",
             "version": "v2.3.42",
+=======
+            "homepage": "http://symfony.com",
+            "time": "2015-01-25 04:37:39"
+        },
+        {
+            "name": "symfony/event-dispatcher",
+            "version": "v2.5.12",
+>>>>>>> d59aa28... New files for 4.7
             "target-dir": "Symfony/Component/EventDispatcher",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
+<<<<<<< HEAD
                 "reference": "fd6d162d97bf3e6060622e5c015af39ca72e33bc"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/fd6d162d97bf3e6060622e5c015af39ca72e33bc",
                 "reference": "fd6d162d97bf3e6060622e5c015af39ca72e33bc",
+=======
+                "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
+                "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
+>>>>>>> d59aa28... New files for 4.7
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
+<<<<<<< HEAD
                 "symfony/dependency-injection": "~2.0,>=2.0.5"
+=======
+                "psr/log": "~1.0",
+                "symfony/config": "~2.0,>=2.0.5",
+                "symfony/dependency-injection": "~2.0,>=2.0.5,<2.6.0",
+                "symfony/stopwatch": "~2.3"
+>>>>>>> d59aa28... New files for 4.7
             },
             "suggest": {
                 "symfony/dependency-injection": "",
@@ -399,7 +489,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -425,6 +515,7 @@
                 }
             ],
             "description": "Symfony EventDispatcher Component",
+<<<<<<< HEAD
             "homepage": "https://symfony.com",
             "time": "2016-04-04 09:22:54"
         },
@@ -441,6 +532,23 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/finder/zipball/dce4b58434fc1cbd66e3006e539bb53074dfea82",
                 "reference": "dce4b58434fc1cbd66e3006e539bb53074dfea82",
+=======
+            "homepage": "http://symfony.com",
+            "time": "2015-01-29 18:20:43"
+        },
+        {
+            "name": "symfony/filesystem",
+            "version": "v2.5.12",
+            "target-dir": "Symfony/Component/Filesystem",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/filesystem.git",
+                "reference": "d3c24d7d6e9c342008d8421b2fade460311647ea"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/d3c24d7d6e9c342008d8421b2fade460311647ea",
+                "reference": "d3c24d7d6e9c342008d8421b2fade460311647ea",
                 "shasum": ""
             },
             "require": {
@@ -449,7 +557,55 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Filesystem\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Symfony Filesystem Component",
+            "homepage": "http://symfony.com",
+            "time": "2015-01-03 21:04:44"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "v2.5.12",
+            "target-dir": "Symfony/Component/Finder",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Finder.git",
+                "reference": "e527ebf47ff912a45e148b7d0b107b80ec0b3cc2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Finder/zipball/e527ebf47ff912a45e148b7d0b107b80ec0b3cc2",
+                "reference": "e527ebf47ff912a45e148b7d0b107b80ec0b3cc2",
+>>>>>>> d59aa28... New files for 4.7
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -475,6 +631,7 @@
                 }
             ],
             "description": "Symfony Finder Component",
+<<<<<<< HEAD
             "homepage": "https://symfony.com",
             "time": "2016-05-13 14:58:35"
         },
@@ -491,6 +648,24 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/process/zipball/89aced1438655ad81fc828c2e2e555e9b88fef3b",
                 "reference": "89aced1438655ad81fc828c2e2e555e9b88fef3b",
+=======
+            "homepage": "http://symfony.com",
+            "time": "2015-01-03 08:01:13"
+        },
+        {
+            "name": "symfony/process",
+            "version": "v2.5.12",
+            "target-dir": "Symfony/Component/Process",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Process.git",
+                "reference": "00a1308e8b5aec5eba7c8f1708426a78f929be8c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Process/zipball/00a1308e8b5aec5eba7c8f1708426a78f929be8c",
+                "reference": "00a1308e8b5aec5eba7c8f1708426a78f929be8c",
+>>>>>>> d59aa28... New files for 4.7
                 "shasum": ""
             },
             "require": {
@@ -499,7 +674,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -516,17 +691,85 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
                 },
                 {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 }
             ],
             "description": "Symfony Process Component",
+<<<<<<< HEAD
             "homepage": "https://symfony.com",
             "time": "2016-03-31 08:39:43"
+=======
+            "homepage": "http://symfony.com",
+            "time": "2015-02-08 07:07:45"
+        },
+        {
+            "name": "tecnickcom/tcpdf",
+            "version": "6.2.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tecnickcom/TCPDF.git",
+                "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/2f732eaa91b5665274689b1d40b285a7bacdc37f",
+                "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "fonts",
+                    "config",
+                    "include",
+                    "tcpdf.php",
+                    "tcpdf_parser.php",
+                    "tcpdf_import.php",
+                    "tcpdf_barcodes_1d.php",
+                    "tcpdf_barcodes_2d.php",
+                    "include/tcpdf_colors.php",
+                    "include/tcpdf_filters.php",
+                    "include/tcpdf_font_data.php",
+                    "include/tcpdf_fonts.php",
+                    "include/tcpdf_images.php",
+                    "include/tcpdf_static.php",
+                    "include/barcodes/datamatrix.php",
+                    "include/barcodes/pdf417.php",
+                    "include/barcodes/qrcode.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPLv3"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "homepage": "http://nicolaasuni.tecnick.com"
+                }
+            ],
+            "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
+            "homepage": "http://www.tcpdf.org/",
+            "keywords": [
+                "PDFD32000-2008",
+                "TCPDF",
+                "barcodes",
+                "datamatrix",
+                "pdf",
+                "pdf417",
+                "qrcode"
+            ],
+            "time": "2015-09-12 10:08:34"
+>>>>>>> d59aa28... New files for 4.7
         },
         {
             "name": "tecnickcom/tcpdf",
@@ -627,12 +870,136 @@
             "description": "Default configuration for certificate authorities",
             "homepage": "https://github.com/totten/ca_config",
             "time": "2013-02-13 03:40:18"
+        },
+        {
+            "name": "zetacomponents/base",
+            "version": "1.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zetacomponents/Base.git",
+                "reference": "2612ee3ce88902632d45b93e379277e9d46b70a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/2612ee3ce88902632d45b93e379277e9d46b70a7",
+                "reference": "2612ee3ce88902632d45b93e379277e9d46b70a7",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "apache2"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Alexeev"
+                },
+                {
+                    "name": "Sebastian Bergmann"
+                },
+                {
+                    "name": "Jan Borsodi"
+                },
+                {
+                    "name": "Raymond Bosman"
+                },
+                {
+                    "name": "Frederik Holljen"
+                },
+                {
+                    "name": "Kore Nordmann"
+                },
+                {
+                    "name": "Derick Rethans"
+                },
+                {
+                    "name": "Vadym Savchuk"
+                },
+                {
+                    "name": "Tobias Schlitt"
+                },
+                {
+                    "name": "Alexandru Stanoi"
+                }
+            ],
+            "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
+            "homepage": "https://github.com/zetacomponents",
+            "time": "2009-06-29 10:47:39"
+        },
+        {
+            "name": "zetacomponents/mail",
+            "version": "dev-1.7-civi",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/civicrm/zetacomponents-mail.git",
+                "reference": "19f5af66cdde19bc20f41671fe453b37f4121eb1"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src"
+                ]
+            },
+            "license": [
+                "apache2"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Alexeev"
+                },
+                {
+                    "name": "Sebastian Bergmann"
+                },
+                {
+                    "name": "Jan Borsodi"
+                },
+                {
+                    "name": "Raymond Bosman"
+                },
+                {
+                    "name": "Frederik Holljen"
+                },
+                {
+                    "name": "Kore Nordmann"
+                },
+                {
+                    "name": "Derick Rethans"
+                },
+                {
+                    "name": "Vadym Savchuk"
+                },
+                {
+                    "name": "Tobias Schlitt"
+                },
+                {
+                    "name": "Alexandru Stanoi"
+                },
+                {
+                    "name": "Sinisa Dukaric"
+                },
+                {
+                    "name": "Mikko Koppanen"
+                },
+                {
+                    "name": "Christian Michel"
+                }
+            ],
+            "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
+            "homepage": "https://github.com/zetacomponents",
+            "time": "2016-01-08 01:15:38"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "zetacomponents/mail": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

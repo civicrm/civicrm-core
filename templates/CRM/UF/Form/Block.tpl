@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,7 +66,7 @@
       {elseif $n}
         {* Show explanatory text for field if not in 'view' or 'preview' modes *}
         {if $field.help_pre && $action neq 4 && $action neq 1028}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-pre" id="helprow-{$n}">
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
@@ -124,7 +124,7 @@
                 {include file="CRM/Profile/Form/GreetingType.tpl"}
               {elseif ($n eq 'group' && $form.group) || ($n eq 'tag' && $form.tag)}
                 {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n title=null context="profile"}
-              {elseif ( ( $field.data_type eq 'Date' ) or
+              {elseif ((( $field.data_type eq 'Date' ) AND !$prefix) or
                 ( $n|substr:-5:5 eq '_date' ) ) AND
               ( $form.formName neq 'Confirm' )  AND
               ( $form.formName neq 'ThankYou' ) }
@@ -143,10 +143,13 @@
                 {/if}
               {else}
                 {if $prefix}
+                  {if $n eq 'organization_name' && !empty($form.onbehalfof_id)}
+                    {$form.onbehalfof_id.html}
+                  {/if}
                   {$form.$prefix.$n.html}
-                {else}
-                  {$form.$n.html}
-                {/if}
+		{else}
+		  {$form.$n.html}
+		{/if}
               {/if}
 
             {*CRM-4564*}
@@ -161,7 +164,7 @@
         {/if}
         {* Show explanatory text for field if not in 'view' or 'preview' modes *}
         {if $field.help_post && $action neq 4 && $action neq 1028}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-post" id="helprow-{$n}">
             <div class="content description">{$field.help_post}</div>
           </div>
         {/if}

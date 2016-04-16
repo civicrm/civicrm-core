@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -104,8 +102,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @return void
    */
   public function run() {
     // get the requested action
@@ -126,11 +122,14 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
 
   /**
    * Browse all financial types.
-   *
-   *
-   * @return void
    */
   public function browse() {
+    // Check permission for Financial Type when ACL-FT is enabled
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
+    ) {
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    }
     // get all financial types sorted by weight
     $financialType = array();
     $dao = new CRM_Financial_DAO_FinancialType();
@@ -167,7 +166,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
         $action -= CRM_Core_Action::ENABLE;
         $action -= CRM_Core_Action::DISABLE;
         $action -= CRM_Core_Action::DELETE;
-        //continue;
       }
       else {
         if ($dao->is_active) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -51,14 +51,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * @var boolean
    */
   public $_single;
-
-  /**
-   * The default values for the form.
-   *
-   * @var array
-   */
-  protected $_defaults;
-
 
   public function preProcess() {
     $session = CRM_Core_Session::singleton();

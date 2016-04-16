@@ -50,8 +50,6 @@ class SplFileInfo extends \SplFileInfo
     /**
      * Returns the relative path name.
      *
-     * This path contains the file name.
-     *
      * @return string the relative path name
      */
     public function getRelativePathname()
