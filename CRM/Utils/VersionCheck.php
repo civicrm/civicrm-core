@@ -179,8 +179,6 @@ class CRM_Utils_VersionCheck {
   public function isSecurityUpdateAvailable() {
     $thisVersion = $this->getReleaseInfo($this->localVersion);
     $localVersionDate = CRM_Utils_Array::value('date', $thisVersion, 0);
-    // If not defined we will get an e-notice. That seems OK....
-    $isLTS = $this->versionInfo[$this->localMajorVersion]['status'] === 'lts' ? TRUE : FALSE;
 
     foreach ($this->versionInfo as $majorVersionNumber => $majorVersion) {
       foreach ($majorVersion['releases'] as $release) {
@@ -188,13 +186,32 @@ class CRM_Utils_VersionCheck {
           && version_compare($this->localVersion, $release['version']) < 0
         ) {
           if ((!$this->ignoreDate || $this->ignoreDate < $release['date'])
-            && (!$isLTS || $majorVersionNumber === $this->localMajorVersion)
+            && (!$this->isThisReleaseTheLTS() || $majorVersionNumber === $this->localMajorVersion)
           ) {
             return TRUE;
           }
         }
       }
     }
+  }
+
+  /**
+   * Is this the LTS release.
+   *
+   * This function is only really being used in 4.6 & is a bit heavy on the enotice
+   * handling for test reasons
+   */
+  public function isThisReleaseTheLTS() {
+    if (empty($this->versionInfo)) {
+      return FALSE;
+    }
+    if (empty($this->versionInfo[$this->localMajorVersion])) {
+      return FALSE;
+    }
+    if ($this->versionInfo[$this->localMajorVersion]['status'] === 'lts') {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
