@@ -2835,6 +2835,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('receive_date',
       CRM_Utils_Date::processDate($this->receive_date)
     );
+    $values['receipt_date'] = (empty($this->receipt_date) ? NULL : $this->receipt_date);
     $template->assign('contributeMode', 'notify');
     $template->assign('action', $this->is_test ? 1024 : 1);
     $template->assign('receipt_text',
@@ -4642,12 +4643,13 @@ LIMIT 1;";
         $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
       }
     }
+
+    $return = $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
     // Contribution ID should really always be set. But ?
-    if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update'])) {
+    if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update']) && empty($contribution->receipt_date)) {
       civicrm_api3('Contribution', 'create', array('receipt_date' => 'now', 'id' => $contribution->id));
-      $values['receipt_date'] = date('Y-m-d H:i:s');
     }
-    return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
+    return $return;
   }
 
   /**

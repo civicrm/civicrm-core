@@ -1594,7 +1594,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'amount:::100.00',
       'currency:::USD',
       'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
-      'receipt_date:::' . date('Ymd'),
+      "receipt_date:::\n",
       'contributeMode:::notify',
       'title:::Contribution',
       'displayName:::Mr. Anthony Anderson II',
@@ -1627,7 +1627,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'location_type_id' => 2,
       'contact_id' => $this->_params['contact_id'],
     ));
-    $params = array_merge($this->_params, array('contribution_status_id' => 2,
+    $params = array_merge($this->_params, array(
+      'contribution_status_id' => 2,
       'address_id' => $address['id'],
       )
     );
@@ -2046,6 +2047,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-14151 - Test completing a transaction via the API.
    */
   public function testCompleteTransactionWithReceiptDateSet() {
+    $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'receipt_date' => 'now'));
@@ -2056,9 +2058,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
     $mut->checkMailLog(array(
       'Receipt - Contribution',
-      'Please print this confirmation for your records.',
+      'receipt_date:::' . date('Ymd'),
     ));
     $mut->stop();
+    $this->revertTemplateToReservedTemplate();
   }
 
 
@@ -2182,7 +2185,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog(array(
       'amount:::500.00',
       'receive_date:::20130201000000',
-      'receipt_date:::201',
+      "receipt_date:::\n",
     ));
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
