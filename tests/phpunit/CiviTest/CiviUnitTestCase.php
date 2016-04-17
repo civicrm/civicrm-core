@@ -3458,6 +3458,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   protected function setPermissions($permissions) {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     $this->flushFinancialTypeStatics();
+    CRM_Contact_BAO_Group::getPermissionClause(TRUE);
   }
 
 }
