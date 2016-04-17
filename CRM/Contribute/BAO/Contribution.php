@@ -2504,6 +2504,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             if ($membership_status == 'Pending' && $membership->is_pay_later == 1) {
               $values['is_pay_later'] = 1;
             }
+            // @todo move the assigning from here to sendMail - that is preferred as it prevents leakage
+            // but moving params across is more risky.
+            $template->assign('is_pay_later', CRM_Utils_Array::value('is_pay_later', $values));
 
             // if separate payment there are two contributions recorded and the
             // admin will need to send a receipt for each of them separately.
