@@ -131,6 +131,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Check method testGetAvailableFinancialTypes()
+   * @group ornery
    */
   public function testGetAvailableFinancialTypes() {
     $this->setACL();
@@ -156,6 +157,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Check method testgetAvailableMembershipTypes()
+   * @group ornery
    */
   public function testgetAvailableMembershipTypes() {
     // Create Membership types
@@ -201,6 +203,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Check method testPermissionedFinancialTypes()
+   * @group ornery
    */
   public function testPermissionedFinancialTypes() {
     // First get all core permissions
