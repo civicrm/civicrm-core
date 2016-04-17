@@ -3439,4 +3439,25 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     );
   }
 
+  /**
+   * Flush statics relating to financial type.
+   */
+  protected function flushFinancialTypeStatics() {
+    if (isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'])) {
+      unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);
+    }
+    CRM_Contribute_PseudoConstant::flush('financialType');
+    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
+  }
+
+  /**
+   * Set the permissions to the supplied array.
+   *
+   * @param array $permissions
+   */
+  protected function setPermissions($permissions) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
+    $this->flushFinancialTypeStatics();
+  }
+
 }
