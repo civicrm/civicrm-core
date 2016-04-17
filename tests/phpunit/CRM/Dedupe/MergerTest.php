@@ -120,6 +120,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     civicrm_api('group', 'delete', $params);
   }
 
+  /**
+   * @group ornery
+   */
   public function testBatchMergeSelectedDuplicates() {
     $this->createDupeContacts();
 
@@ -179,6 +182,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->deleteDupeContacts();
   }
 
+  /**
+   * @group ornery
+   */
   public function testBatchMergeAllDuplicates() {
     $this->createDupeContacts();
 
