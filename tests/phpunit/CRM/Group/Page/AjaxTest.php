@@ -3,6 +3,7 @@
 /**
  * Class CRM_Group_Page_AjaxTest
  * @group headless
+ * @group ornery
  */
 class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   /**
