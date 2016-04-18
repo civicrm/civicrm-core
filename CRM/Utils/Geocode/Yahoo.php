@@ -128,6 +128,7 @@ class CRM_Utils_Geocode_Yahoo {
     $string = $request->getResponseBody();
     // see CRM-11359 for why we suppress errors with @
     $xml = @simplexml_load_string($string);
+    CRM_Utils_Hook::geocoderFormat('Yahoo', $values, $xml);
 
     if ($xml === FALSE) {
       // account blocked maybe?
