@@ -62,7 +62,7 @@
                 "shasum": ""
             },
             "require": {
-                "phenx/php-font-lib": "0.2.*"
+                "phenx/php-font-lib": "0.4.*"
             },
             "type": "library",
             "autoload": {
@@ -90,7 +90,7 @@
         },
         {
             "name": "phenx/php-font-lib",
-            "version": "0.2.2",
+            "version": "0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PhenX/php-font-lib.git",
