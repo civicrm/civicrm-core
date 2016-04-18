@@ -548,7 +548,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
     }
     else {
-     self::updateContributionActivity($activity, $contribution);
+      self::updateContributionActivity($activity, $contribution);
     }
 
     // do not add to recent items for import, CRM-4399
@@ -4946,12 +4946,12 @@ LIMIT 1;";
     $activityFieldsToUpdate = array(
         'id'                 => $activity->id,
         'subject'            => $activity->subject,
-        'activity_date_time' =>  $contribution->receive_date,
-        'campaign_id'        => $contribution->campaign_id
-    );
+        'activity_date_time' => $contribution->receive_date,
+        'campaign_id'        => $contribution->campaign_id,);
 
     $activity = civicrm_api3('Activity', 'create', $activityFieldsToUpdate);
 
     return $activity;
   }
+  
 }
