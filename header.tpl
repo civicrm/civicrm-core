@@ -22,4 +22,5 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
+ Added only for the purpose of a Dummy PR - @anuditverma (potential GSoC'16 student for project "Open Supporter Data Interface (OSDI) API Implementation (beta)")
 *}
