@@ -4944,10 +4944,10 @@ LIMIT 1;";
     }
 
     $activityFieldsToUpdate = array(
-        'id'                 => $activity->id,
-        'subject'            => $activity->subject,
-        'activity_date_time' => $contribution->receive_date,
-        'campaign_id'        => $contribution->campaign_id,);
+      'id'                 => $activity->id,
+      'subject'            => $activity->subject,
+      'activity_date_time' => $contribution->receive_date,
+      'campaign_id'        => $contribution->campaign_id,);
 
     $activity = civicrm_api3('Activity', 'create', $activityFieldsToUpdate);
 
