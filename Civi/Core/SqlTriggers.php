@@ -36,6 +36,13 @@ namespace Civi\Core;
 class SqlTriggers {
 
   /**
+   * The name of the output file.
+   *
+   * @var string|NULL
+   */
+  private $file = NULL;
+
+  /**
    * Build a list of triggers via hook and add them to (err, reconcile them
    * with) the database.
    *
@@ -188,6 +195,54 @@ class SqlTriggers {
 
     // drop all existing triggers on all tables
     $logging->dropTriggers($tableName);
+  }
+
+  /**
+   * Enqueue a query which alters triggers.
+   *
+   * As this requires a high permission level we funnel the queries through here to
+   * facilitate them being taken 'offline'.
+   *
+   * @param string $triggerSQL
+   *   The sql to run to create or drop the triggers.
+   * @param array $params
+   *   Optional parameters to interpolate into the string.
+   */
+  public function enqueueQuery($triggerSQL, $params = array()) {
+    if (\Civi::settings()->get('logging_no_trigger_permission')) {
+
+      if (!file_exists($this->getFile())) {
+        // Ugh. Need to let user know somehow. This is the first change.
+        \CRM_Core_Session::setStatus(ts('The mysql commands you need to run are stored in %1', array(
+            1 => $this->getFile(),
+          )),
+          '',
+          'alert',
+          array('expires' => 0)
+        );
+      }
+
+      $buf = "\n";
+      $buf .= "DELIMITER //\n";
+      $buf .= \CRM_Core_DAO::composeQuery($triggerSQL, $params) . " //\n";
+      $buf .= "DELIMITER ;\n";
+      file_put_contents($this->getFile(), $buf, FILE_APPEND);
+    }
+    else {
+      \CRM_Core_DAO::executeQuery($triggerSQL, $params, TRUE, NULL, FALSE, FALSE);
+    }
+  }
+
+  /**
+   * @return NULL|string
+   */
+  public function getFile() {
+    if ($this->file === NULL) {
+      $prefix = 'trigger' . \CRM_Utils_Request::id();
+      $config = \CRM_Core_Config::singleton();
+      $this->file = "{$config->configAndLogDir}CiviCRM." . $prefix . md5($config->dsn) . '.sql';
+    }
+    return $this->file;
   }
 
 }
