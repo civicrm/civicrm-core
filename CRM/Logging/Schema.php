@@ -218,14 +218,14 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $validName = CRM_Core_DAO::shortenSQLName($table, 48, TRUE);
 
       // before triggers
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_insert");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
+      $dao->executeTriggerQuery("DROP TRIGGER IF EXISTS {$validName}_before_insert");
+      $dao->executeTriggerQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
+      $dao->executeTriggerQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
 
       // after triggers
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
+      $dao->executeTriggerQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
+      $dao->executeTriggerQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
+      $dao->executeTriggerQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
     }
 
     // now lets also be safe and drop all triggers that start with
@@ -238,7 +238,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       while ($triggers->fetch()) {
         // note that drop trigger has a weird syntax and hence we do not
         // send the trigger name as a string (i.e. its not quoted
-        $dao->executeQuery("DROP TRIGGER IF EXISTS {$triggers->Trigger}");
+        $dao->executeTriggerQuery("DROP TRIGGER IF EXISTS {$triggers->Trigger}");
       }
     }
   }
@@ -652,6 +652,11 @@ COLS;
    * Predicate whether the logging triggers are in place.
    */
   private function triggersExist() {
+    if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_no_trigger_permission', 'group' => 'core'))) {
+      // The mysql user does not have permission to check but since they have gone to the effort
+      // of setting this setting we assume they do.
+      return TRUE;
+    }
     // FIXME: probably should be a bit more thorough…
     // note that the LIKE parameter is TABLE NAME
     return (bool) CRM_Core_DAO::singleValueQuery("SHOW TRIGGERS LIKE 'civicrm_contact'");

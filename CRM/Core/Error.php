@@ -570,7 +570,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Display the error message on terminal.
+   * Display the error message on terminal and append it to the log file.
+   *
+   * Provided the user has the 'view debug output' the output should be displayed. In all
+   * cases it should be logged.
    *
    * @param string $message
    * @param bool $out
@@ -579,14 +582,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string $comp
    *   Message to be output.
    * @param string $priority
+   * @param array $logFileOptions
+   *   Options to pass to the log file.
    *
    * @return string
    *   Format of the backtrace
    */
-  public static function debug_log_message($message, $out = FALSE, $comp = '', $priority = NULL) {
+  public static function debug_log_message($message, $out = FALSE, $comp = '', $priority = NULL, $logFileOptions = array()) {
     $config = CRM_Core_Config::singleton();
 
-    $file_log = self::createDebugLogger($comp);
+    $file_log = self::createDebugLogger($comp, $logFileOptions);
     $file_log->log("$message\n", $priority);
 
     $str = '<p/><code>' . htmlspecialchars($message) . '</code>';
@@ -603,6 +608,20 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     return $str;
+  }
+
+  /**
+   * Log message without appending timestamp or error level.
+   *
+   * @param string $message
+   *   Message to output.
+   * @param bool $out
+   *   Should we print the output.
+   * @param string $prefix
+   *   String to append to the log file
+   */
+  public static function debug_raw_message($message, $out = FALSE, $prefix = '') {
+    self::debug_log_message($message, $out, $prefix, NULL, array('lineFormat' => '%4$s'));
   }
 
   /**
@@ -634,19 +653,42 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Obtain a reference to the error log.
    *
-   * @param string $comp
+   * @param string $prefix
+   * @param array $logConfig
+   *   Configuration options to pass to the logging class.
    *
    * @return Log
    */
-  public static function createDebugLogger($comp = '') {
-    if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $comp])) {
+  public static function createDebugLogger($prefix = '', $logConfig = array()) {
+    return Log::singleton('file', self::getDebugLoggerFileName($prefix), '', $logConfig);
+  }
+
+  /**
+   * Get the log filename for the supplied prefix.
+   *
+   * @param $prefix
+   *
+   * @return string
+   */
+  public static function getDebugLoggerFileName($prefix) {
+    self::generateLogFileName($prefix);
+    return \Civi::$statics[__CLASS__]['logger_file' . $prefix];
+  }
+
+  /**
+   * Generate the name of the logfile to use and store it as a static.
+   *
+   * This function includes poor man's log file management and a check as to whether the file exists.
+   *
+   * @param string $prefix
+   */
+  protected static function generateLogFileName($prefix) {
+    if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $prefix])) {
       $config = CRM_Core_Config::singleton();
 
-      if ($comp) {
-        $comp = $comp . '.';
-      }
+      $prefixString = $prefix ? ($prefix . '.') : '';
 
-      $fileName = "{$config->configAndLogDir}CiviCRM." . $comp . md5($config->dsn) . '.log';
+      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . md5($config->dsn) . '.log';
 
       // Roll log file monthly or if greater than 256M
       // note that PHP file functions have a limit of 2G and hence
@@ -663,9 +705,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
           );
         }
       }
-      \Civi::$statics[__CLASS__]['logger_file' . $comp] = $fileName;
+      \Civi::$statics[__CLASS__]['logger_file' . $prefix] = $fileName;
     }
-    return Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $comp]);
   }
 
   /**
