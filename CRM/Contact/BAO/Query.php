@@ -417,7 +417,6 @@ class CRM_Contact_BAO_Query {
     $operator = 'AND',
     $apiEntity = NULL
   ) {
-
     $this->_params = &$params;
     if ($this->_params == NULL) {
       $this->_params = array();
@@ -499,7 +498,7 @@ class CRM_Contact_BAO_Query {
     $this->_whereTables = $this->_tables;
 
     $this->selectClause($apiEntity);
-    $this->_whereClause = $this->whereClause();
+    $this->_whereClause = $this->whereClause($apiEntity);
     if (array_key_exists('civicrm_contribution', $this->_whereTables)) {
       $component = 'contribution';
     }
@@ -1662,9 +1661,11 @@ class CRM_Contact_BAO_Query {
     static $skipWhere = NULL;
     static $likeNames = NULL;
     $result = NULL;
+
     // Change camelCase EntityName to lowercase with underscores
     $apiEntity = _civicrm_api_get_entity_name_from_camel($apiEntity);
 
+    // check if $value is in OK (Operator as Key) format as used by Get API
     if (CRM_Utils_System::isNull($values)) {
       return $result;
     }
@@ -1728,8 +1729,9 @@ class CRM_Contact_BAO_Query {
    * Get the where clause for a single field.
    *
    * @param array $values
+   * @param string $apiEntity
    */
-  public function whereClauseSingle(&$values) {
+  public function whereClauseSingle(&$values, $apiEntity) {
     // do not process custom fields or prefixed contact ids or component params
     if (CRM_Core_BAO_CustomField::getKeyID($values[0]) ||
       (substr($values[0], 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) ||
@@ -1810,7 +1812,8 @@ class CRM_Contact_BAO_Query {
         return;
 
       case 'email':
-        $this->email($values);
+      case 'email_id':
+        $this->email($values, $apiEntity);
         return;
 
       case 'phone_numeric':
@@ -1970,9 +1973,11 @@ class CRM_Contact_BAO_Query {
   /**
    * Given a list of conditions in params generate the required where clause.
    *
+   * @param string $apiEntity
+   *
    * @return string
    */
-  public function whereClause() {
+  public function whereClause($apiEntity) {
     $this->_where[0] = array();
     $this->_qill[0] = array();
 
@@ -1987,7 +1992,7 @@ class CRM_Contact_BAO_Query {
           $this->_where[0][] = self::buildClause("contact_a.id", $this->_params[$id][1], $this->_params[$id][2]);
         }
         else {
-          $this->whereClauseSingle($this->_params[$id]);
+          $this->whereClauseSingle($this->_params[$id], $apiEntity);
         }
       }
 
@@ -3373,9 +3378,24 @@ WHERE  $smartGroupClause
    * Where / qill clause for email
    *
    * @param array $values
+   * @param string $apiEntity
    */
-  protected function email(&$values) {
+  protected function email(&$values, $apiEntity) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
+
+    // CRM-18147: for Contact's GET API, email fieldname got appended with its entity as in {$apiEntiy}_{$name}
+    // so following code is use build whereClause for contact's primart email id
+    if (!empty($apiEntity)) {
+      $dataType = 'String';
+      if ($name == 'email_id') {
+        $dataType = 'Integer';
+        $name = 'id';
+      }
+
+      $this->_where[$grouping][] = self::buildClause('civicrm_email.is_primary', '=', 1, 'Integer');
+      $this->_where[$grouping][] = self::buildClause("civicrm_email.$name", $op, $value, $dataType);
+      return;
+    }
 
     $n = strtolower(trim($value));
     if ($n) {
