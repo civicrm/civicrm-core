@@ -131,7 +131,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Check method testGetAvailableFinancialTypes()
-   * @group ornery
    */
   public function testGetAvailableFinancialTypes() {
     $this->setACL();
@@ -139,7 +138,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       'view contributions of type Donation',
       'view contributions of type Member Dues',
     ));
-
+    $types = array();
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
     $expectedResult = array(
       1 => "Donation",
@@ -157,7 +156,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Check method testgetAvailableMembershipTypes()
-   * @group ornery
    */
   public function testgetAvailableMembershipTypes() {
     // Create Membership types
@@ -203,7 +201,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Check method testPermissionedFinancialTypes()
-   * @group ornery
    */
   public function testPermissionedFinancialTypes() {
     // First get all core permissions
