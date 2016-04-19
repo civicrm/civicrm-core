@@ -493,6 +493,28 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
+      // CRM-18397: Display billing address on contact summary page when values for all billing fields.
+      $addressFields = array(
+        "billing_street_address-{$this->_bltID}",
+        "billing_city-{$this->_bltID}",
+        "billing_state_province-{$this->_bltID}",
+        "billing_state_province_id-{$this->_bltID}",
+        "billing_postal_code-{$this->_bltID}",
+        "billing_country-{$this->_bltID}",
+      );
+
+      $billingAddressFields = array_intersect_key($value, array_flip($addressFields));
+      if (empty(array_filter($billingAddressFields))) {
+        foreach ($addressFields as $key) {
+          unset($value[$key]);
+        }
+        unset($value['billing_first_name']);
+        unset($value['billing_middle_name']);
+        unset($value['billing_last_name']);
+        unset($value["billing_country_id-{$this->_bltID}"]);
+        unset($value["address_name-{$this->_bltID}"]);
+      }
+
       //Unset ContactID for additional participants and set RegisterBy Id.
       if (empty($value['is_primary'])) {
         $contactID = CRM_Utils_Array::value('contact_id', $value);
@@ -710,7 +732,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if ($invoicing) {
           foreach ($value as $line) {
             if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
-              $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
+              $totalTaxAmount = CRM_Utils_Array::value('tax_amount', $line) + $totalTaxAmount;
               if (isset($dataArray[$line['tax_rate']])) {
                 $dataArray[$line['tax_rate']] = $dataArray[$line['tax_rate']] + CRM_Utils_Array::value('tax_amount', $line);
               }
