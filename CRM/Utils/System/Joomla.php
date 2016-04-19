@@ -695,7 +695,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function getDefaultSiteSettings($dir) {
+  public function getDefaultSiteSettings($dir = NULL) {
     $config = CRM_Core_Config::singleton();
     $url = preg_replace(
       '|/administrator|',
