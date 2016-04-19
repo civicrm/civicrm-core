@@ -167,15 +167,8 @@ class SqlTriggers {
           $triggerName = "{$validName}_{$whenName}_{$eventName}";
           $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN $varString $sqlString END";
 
-          \CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS $triggerName");
-          \CRM_Core_DAO::executeQuery(
-            $triggerSQL,
-            array(),
-            TRUE,
-            NULL,
-            FALSE,
-            FALSE
-          );
+          $this->enqueueQuery("DROP TRIGGER IF EXISTS $triggerName");
+          $this->enqueueQuery($triggerSQL);
         }
       }
     }
