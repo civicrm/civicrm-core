@@ -1007,7 +1007,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($field->text_length) {
           $attributes['maxlength'] = $field->text_length;
         }
-        $element = $qf->add('wysiwyg', $elementName, $label, $attributes, $search);
+        $element = $qf->add('wysiwyg', $elementName, $label, $attributes, $useRequired && !$search);
         break;
 
       case 'Autocomplete-Select':
