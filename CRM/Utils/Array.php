@@ -973,7 +973,8 @@ class CRM_Utils_Array {
    */
   public static function formatArrayKeys(&$array) {
     $keys = array_keys($array, 1);
-    if (count($keys) == count($array)) {
+    if ((count($keys) == count($array)) && // All values are 1
+      !((count($keys) == 1) && (current($keys) == 0))) { // handle array(1);
       $array = $keys;
     }
   }
