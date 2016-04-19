@@ -3446,7 +3446,14 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if (isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'])) {
       unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);
     }
+    if (isset(\Civi::$statics['CRM_Contribute_PseudoConstant'])) {
+      unset(\Civi::$statics['CRM_Contribute_PseudoConstant']);
+    }
     CRM_Contribute_PseudoConstant::flush('financialType');
+    CRM_Contribute_PseudoConstant::flush('membershipType');
+    // Pseudoconstants may be saved to the cache table.
+    CRM_Core_DAO::executeQuery("TRUNCATE civicrm_cache");
+    CRM_Financial_BAO_FinancialType::$_statusACLFt = array();
     CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
   }
 
