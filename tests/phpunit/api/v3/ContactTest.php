@@ -379,6 +379,63 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-14232 test preferred language set to site default if not passed.
+   */
+  public function testCreatePreferredLanguageUnset() {
+    $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'Snoop',
+      'last_name' => 'Dog',
+      'contact_type' => 'Individual')
+    );
+    $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Dog'));
+    $this->assertEquals('en_US', $result['preferred_language']);
+  }
+
+  /**
+   * CRM-14232 test preferred language returns setting if not passed.
+   */
+  public function testCreatePreferredLanguageSet() {
+    $this->callAPISuccess('Setting', 'create', array('contact_default_language' => 'fr_FR'));
+    $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'Snoop',
+      'last_name' => 'Dog',
+      'contact_type' => 'Individual',
+    ));
+    $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Dog'));
+    $this->assertEquals('fr_FR', $result['preferred_language']);
+  }
+
+  /**
+   * CRM-14232 test preferred language returns setting if not passed where setting is NULL.
+   */
+  public function testCreatePreferredLanguageNull() {
+    $this->callAPISuccess('Setting', 'create', array('contact_default_language' => 'null'));
+    $this->callAPISuccess('Contact', 'create', array(
+        'first_name' => 'Snoop',
+        'last_name' => 'Dog',
+        'contact_type' => 'Individual',
+        )
+    );
+    $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Dog'));
+    $this->assertEquals(NULL, $result['preferred_language']);
+  }
+
+  /**
+   * CRM-14232 test preferred language returns setting if not passed where setting is NULL.
+   */
+  public function testCreatePreferredLanguagePassed() {
+    $this->callAPISuccess('Setting', 'create', array('contact_default_language' => 'null'));
+    $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'Snoop',
+      'last_name' => 'Dog',
+      'contact_type' => 'Individual',
+      'preferred_language' => 'en_AU',
+    ));
+    $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Dog'));
+    $this->assertEquals('en_AU', $result['preferred_language']);
+  }
+
+  /**
    * CRM-15792 - create/update datetime field for contact.
    */
   public function testCreateContactCustomFldDateTime() {

@@ -1,0 +1,62 @@
+<?php
+// $Id: civicrm_member_roles.install,v 1.2.4.2 2008/08/17 21:44:19 posco Exp $
+
+
+/**
+ * Copyright (C) 2010 Neil Goodman
+ * @license GNU General Public License version 2 or later
+ *
+ * @file
+ * Install CiviMember Role Sync database table and provide hook_uninstall.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function civicrm_member_roles_install() {}
+
+/*
+ * Implemenation of hook_enable()
+ */
+function civicrm_member_roles_enable() {
+  db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_member_roles'");
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function civicrm_member_roles_schema() {
+  $schema['civicrm_member_roles_rules'] = array(
+    'fields' => array(
+      'rule_id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'rid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'type_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'status_codes' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('rule_id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function civicrm_member_roles_uninstall() {
+  variable_del('civicrm_member_roles_sync_method');
+}
+

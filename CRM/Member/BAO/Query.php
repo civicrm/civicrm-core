@@ -204,11 +204,26 @@ class CRM_Member_BAO_Query {
           $op = 'IN';
           $value = array_keys($value);
         }
+
+      case 'membership_type_id':
+        // CRM-17075 we are specifically handling the possibility we are dealing with the entity reference field
+        // for membership_type_id here (although status would be handled if converted). The unhandled pathway at the moment
+        // is from groupContactCache::load and this is a small fix to get the entity reference field to work.
+        // However, it would seem the larger fix would be to NOT invoke the form formValues for
+        // the load function. The where clause and the whereTables are saved so they should suffice to generate the query
+        // to get a contact list. But, better to deal with in 4.8 now...
+        if (is_string($value) && strpos($value, ',') && $op == '=') {
+          $value = array('IN' => explode(',', $value));
+        }
+
+
       case 'membership_status':
       case 'membership_status_id':
       case 'membership_type':
-      case 'membership_type_id':
       case 'member_id':
+        if (strstr($name, 'status') && is_string($value) && !is_numeric($value)) {
+          $value = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $value);
+        }
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
           $qillName = ts('Membership Status');
@@ -288,6 +303,12 @@ class CRM_Member_BAO_Query {
           $query->_where[$grouping][] = " civicrm_membership.owner_membership_id IS NOT NULL";
           $query->_qill[$grouping][] = ts("Related Members Only");
         }
+        $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
+        return;
+
+      case 'member_is_override':
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.is_override", $op, $value, "Boolean");
+        $query->_qill[$grouping][] = $value ? ts("Is Membership Status overriden? Yes") : ts("Is Membership Status overriden? No");
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
@@ -376,6 +397,7 @@ class CRM_Member_BAO_Query {
         'max_related' => 1,
         'membership_recur_id' => 1,
         'member_campaign_id' => 1,
+        'member_is_override' => 1,
       );
 
       if ($includeCustomFields) {
@@ -393,17 +415,24 @@ class CRM_Member_BAO_Query {
   }
 
   /**
+   * Build the search form.
+   *
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
     $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label', FALSE, FALSE);
-    $form->add('select', 'membership_status_id', ts('Membership Status'), $membershipStatus, FALSE,
-      array('id' => 'membership_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
-    );
+    $form->add('select', 'membership_status_id', ts('Membership Status(s)'), $membershipStatus, FALSE, array(
+      'id' => 'membership_status_id',
+      'multiple' => 'multiple',
+      'class' => 'crm-select2',
+    ));
 
-    $form->addSelect('membership_type_id',
-      array('entity' => 'membership', 'multiple' => 'multiple', 'label' => ts('Membership Type(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
-    );
+    $form->addEntityRef('membership_type_id', ts('Membership Type(s)'), array(
+      'entity' => 'MembershipType',
+      'multiple' => TRUE,
+      'placeholder' => ts('- any -'),
+      'select' => array('minimumInputLength' => 0),
+    ));
 
     $form->addElement('text', 'member_source', ts('Source'));
 
@@ -417,6 +446,7 @@ class CRM_Member_BAO_Query {
     $form->addYesNo('member_pay_later', ts('Pay Later?'), TRUE);
     $form->addYesNo('member_auto_renew', ts('Auto-Renew?'), TRUE);
     $form->addYesNo('member_test', ts('Membership is a Test?'), TRUE);
+    $form->addYesNo('member_is_override', ts('Membership Status Is Override?'), TRUE);
 
     // add all the custom  searchable fields
     $extends = array('Membership');

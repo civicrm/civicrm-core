@@ -293,13 +293,6 @@ contact_a.sort_name    as sort_name,
   }
 
   /**
-   * @return array
-   */
-  public function setDefaultValues() {
-    return array();
-  }
-
-  /**
    * @param $row
    */
   public function alterRow(&$row) {

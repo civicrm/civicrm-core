@@ -128,7 +128,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
       }
 
       $form->_includesSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
-      $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
+      $query = new CRM_Contact_BAO_Query($queryParams, array('contribution_id'), NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_CONTRIBUTE
       );
       if ($form->_includesSoftCredits) {
@@ -148,6 +148,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
           $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
         }
       }
+      $result->free();
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
     }
 

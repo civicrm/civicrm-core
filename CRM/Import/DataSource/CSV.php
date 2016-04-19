@@ -130,6 +130,9 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     if (!$fd) {
       CRM_Core_Error::fatal("Could not read $file");
     }
+    if (filesize($file) == 0) {
+      CRM_Core_Error::fatal("$file is empty. Please upload a valid file.");
+    }
 
     $config = CRM_Core_Config::singleton();
     // support tab separated

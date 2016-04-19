@@ -325,7 +325,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
-    $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
     $this->_returnProperties = &$this->returnProperties();
     parent::postProcess();
   }
@@ -370,7 +370,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contribution_status',
       'contribution_status_id',
       'contribution_source',
-      'membership_type_id',
       'membership_status_id',
       'participant_status_id',
       'contribution_trxn_id',
@@ -424,27 +423,36 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     }
 
     if ($this->_ssID && empty($_POST)) {
-      $specialFields = array('contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id');
+      $defaults = array_merge($defaults, CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID));
+    }
+    return $defaults;
+  }
 
-      foreach ($defaults as $element => $value) {
-        if (!empty($value) && is_array($value)) {
-          if (in_array($element, $specialFields)) {
-            $element = str_replace('member_membership_type_id', 'membership_type_id', $element);
-            $element = str_replace('member_status_id', 'membership_status_id', $element);
-            $defaults[$element] = array_keys($value);
+  /**
+   * Function to deal with groups that may have been mis-saved during a glitch.
+   *
+   * This deals with groups that may have been saved with differing mapping parameters than
+   * the latest supported ones.
+   *
+   * @param int $id
+   * @param array $formValues
+   */
+  public function tempFixFormValues($id, $formValues) {
+    foreach ($formValues as $index => $formValue) {
+      if (is_array($formValue) && isset($formValue[1])) {
+        if ($formValue[1] == 'IN') {
+          $formValues[$formValue[0]] = $formValue[2];
+          unset($formValues[$index]);
+        }
+        if ($formValue[1] == '=') {
+          $formValues[$formValue[0]] = $formValue[2];
+          if (substr($formValue[0], -4, 4) == '_low' || substr($formValue[0], -5, 5) == '_high') {
+            $formValues[str_replace('_low', '', str_replace('_high','', $formValue[0])). '_relative'] = 0;
           }
-          // As per the OK (Operator as Key) value format, value array may contain key
-          // as an operator so to ensure the default is always set actual value
-          elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-            $defaults[$element] = CRM_Utils_Array::value(key($value), $value);
-            if (is_string($defaults[$element])) {
-              $defaults[$element] = str_replace("%", '', $defaults[$element]);
-            }
-          }
+          unset($formValues[$index]);
         }
       }
     }
-    return $defaults;
   }
 
 }

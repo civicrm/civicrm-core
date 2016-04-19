@@ -289,7 +289,40 @@ class CRM_Utils_Mail_EmailProcessor {
                 $text = $mail->body->text;
               }
               elseif ($mail->body instanceof ezcMailMultipart) {
-                if ($mail->body instanceof ezcMailMultipartRelated) {
+                if ($mail->body instanceof ezcMailMultipartReport) {
+                  $part = $mail->body->getMachinePart();
+                  if ($part instanceof ezcMailDeliveryStatus) {
+                    foreach ($part->recipients as $rec) {
+                      if (isset($rec["Diagnostic-Code"])) {
+                        $text = $rec["Diagnostic-Code"];
+                        break;
+                      }
+                      elseif (isset($rec["Description"])) {
+                        $text = $rec["Description"];
+                        break;
+                      }
+                      // no diagnostic info present - try getting the human readable part
+                      elseif (isset($rec["Status"])) {
+                        $text = $rec["Status"];
+                        $textpart = $mail->body->getReadablePart();
+                        if ($textpart != NULL and isset($textpart->text)) {
+                          $text .= " " . $textpart->text;
+                        }
+                        else {
+                          $text .= " Delivery failed but no diagnostic code or description.";
+                        }
+                        break;
+                      }
+                    }
+                  }
+                  elseif ($part != NULL and isset($part->text)) {
+                    $text = $part->text;
+                  }
+                  elseif (($part = $mail->body->getReadablePart()) != NULL) {
+                    $text = $part->text;
+                  }
+                }
+                elseif ($mail->body instanceof ezcMailMultipartRelated) {
                   foreach ($mail->body->getRelatedParts() as $part) {
                     if (isset($part->subType) and $part->subType == 'plain') {
                       $text = $part->text;
@@ -308,7 +341,7 @@ class CRM_Utils_Mail_EmailProcessor {
               }
 
               if (
-                $text == NULL &&
+                empty($text) &&
                 $mail->subject == "Delivery Status Notification (Failure)"
               ) {
                 // Exchange error - CRM-9361
@@ -316,7 +349,12 @@ class CRM_Utils_Mail_EmailProcessor {
                   if ($part instanceof ezcMailDeliveryStatus) {
                     foreach ($part->recipients as $rec) {
                       if ($rec["Status"] == "5.1.1") {
-                        $text = "Delivery to the following recipients failed";
+                        if (isset($rec["Description"])) {
+                          $text = $rec["Description"];
+                        }
+                        else {
+                          $text = $rec["Status"] . " Delivery to the following recipients failed";
+                        }
                         break;
                       }
                     }

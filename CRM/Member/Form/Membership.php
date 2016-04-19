@@ -704,7 +704,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $this->addElement('checkbox',
       'send_receipt',
       ts('Send Confirmation and Receipt?'), NULL,
-      array('onclick' => "showHideByValue( 'send_receipt', '', 'notice', 'table-row', 'radio', false); showHideByValue( 'send_receipt', '', 'fromEmail', 'table-row', 'radio', false);")
+      array('onclick' => "showEmailOptions()")
     );
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
@@ -746,6 +746,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       'mailing_backend'
     );
     $this->assign('outBound_option', $mailingInfo['outBound_option']);
+    $this->assign('isEmailEnabledForSite', ($mailingInfo['outBound_option'] != 2));
 
     parent::buildQuickForm();
   }

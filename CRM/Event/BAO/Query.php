@@ -405,6 +405,8 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'participant_register_date':
+      case 'participant_register_date_high':
+      case 'participant_register_date_low':
         $query->dateQueryBuilder($values,
           'civicrm_participant', 'participant_register_date', 'register_date', 'Register Date'
         );
@@ -589,6 +591,8 @@ class CRM_Event_BAO_Query {
     $form->add('text', 'participant_fee_id', ts('Fee Level'), array('class' => 'big crm-ajax-select'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
+
+    CRM_Core_Form_Date::buildDateRange($form, 'participant', 1, '_register_date_low', '_register_date_high', ts('From'), FALSE);
 
     $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', array(1 => '<em>%1</em>')));
 

@@ -116,15 +116,15 @@ function dm_install_drupal() {
   local to="$2"
   dm_install_dir "$repo" "$to"
 
-  # set full version in .info files
+  # Set full version in .info files. See CRM-15768.
   local MODULE_DIRS=`find "$to" -type f -name "*.info"`
   for INFO in $MODULE_DIRS; do
     if [ $(uname) = "Darwin" ]; then
       ## BSD sed
-      sed -i '' "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
+      sed -i '' "s/version = \([0-9]*\.x-\)[1-9.]*/version = \1$DM_VERSION/g" $INFO
     else
       ## GNU sed
-      sed -i'' "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
+      sed -i'' "s/version = \([0-9]*\.x-\)[1-9.]*/version = \1$DM_VERSION/g" $INFO
     fi
   done
 

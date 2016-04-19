@@ -964,4 +964,25 @@ class CRM_Utils_Array {
     $r[$last] = $value;
   }
 
+  /**
+   * Convert array where key(s) holds the actual value and value(s) as 1 into array of actual values
+   *  Ex: array('foobar' => 1, 4 => 1) formatted into array('foobar', 4)
+   *
+   * @param array $array
+   * @return void
+   */
+  public static function formatArrayKeys(&$array) {
+    $keys = array_keys($array, 1);
+    if (count($keys) > 1 ||
+      (count($keys) == 1 &&
+        (current($keys) > 1 ||
+          is_string(current($keys)) ||
+          (current($keys) == 1 && $array[1] == 1) // handle (0 => 4), (1 => 1)
+        )
+       )
+    ) {
+      $array = $keys;
+    }
+  }
+
 }

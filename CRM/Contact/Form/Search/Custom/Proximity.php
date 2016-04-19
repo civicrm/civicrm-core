@@ -271,6 +271,9 @@ AND cgc.group_id = {$this->_group}
    * @return array|null
    */
   public function setDefaultValues() {
+    if (!empty($this->_formValues)) {
+      return $this->_formValues;
+    }
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
     $stateprovinceDefault = $config->defaultContactStateProvince;

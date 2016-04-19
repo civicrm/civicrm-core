@@ -151,26 +151,6 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   }
 
   /**
-   * Set search form field defaults here.
-   * @return array
-   */
-  public function setDefaultValues() {
-    $defaults = array('andOr' => '1');
-
-    if (!empty($this->_formValues)) {
-      $defaults['andOr'] = CRM_Utils_Array::value('andOr', $this->_formValues, '1');
-
-      $defaults['includeGroups'] = CRM_Utils_Array::value('includeGroups', $this->_formValues);
-      $defaults['excludeGroups'] = CRM_Utils_Array::value('excludeGroups', $this->_formValues);
-
-      $defaults['includeTags'] = CRM_Utils_Array::value('includeTags', $this->_formValues);
-      $defaults['excludeTags'] = CRM_Utils_Array::value('excludeTags', $this->_formValues);
-    }
-
-    return $defaults;
-  }
-
-  /**
    * @param int $offset
    * @param int $rowcount
    * @param NULL $sort

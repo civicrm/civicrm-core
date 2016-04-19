@@ -38,11 +38,11 @@ class CRM_Contact_BAO_Contact_Permission {
    * Check if the logged in user has permissions for the operation type.
    *
    * @param int $id
-   *   Contact id.
+   *   Contact id they are trying to access.
    * @param int|string $type the type of operation (view|edit)
    *
    * @return bool
-   *   true if the user has permission, false otherwise
+   *   true if the user has permission to do the given operation on this contact.
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
     $tables = array();
@@ -62,6 +62,10 @@ class CRM_Contact_BAO_Contact_Permission {
       return TRUE;
     }
 
+    if (CRM_ACL_API::isAccessingSelf($id, $type)) {
+      return TRUE;
+    }
+
     //check permission based on relationship, CRM-2963
     if (self::relationship($id)) {
       return TRUE;
@@ -72,7 +76,7 @@ class CRM_Contact_BAO_Contact_Permission {
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
     $query = "
-SELECT count(DISTINCT contact_a.id)
+SELECT count(contact_a.id)
        $from
 WHERE contact_a.id = %1 AND $permission";
     $params = array(1 => array($id, 'Integer'));
@@ -92,7 +96,6 @@ WHERE contact_a.id = %1 AND $permission";
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     static $_processed = array();
-
     if ($type = CRM_Core_Permission::VIEW) {
       $operationClause = " operation IN ( 'Edit', 'View' ) ";
       $operation = 'View';
@@ -128,20 +131,21 @@ AND    $operationClause
     $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID);
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
-
     CRM_Core_DAO::executeQuery("
 INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
-SELECT      $userID as user_id, contact_a.id as contact_id, '$operation' as operation
+SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, 'View' as operation
          $from
+         LEFT JOIN civicrm_acl_contact_cache ac ON ac.user_id = $userID AND contact_a.id = ac.contact_id AND ac.operation = 'View'
 WHERE    $permission
-GROUP BY contact_a.id
-ON DUPLICATE KEY UPDATE
-         user_id=VALUES(user_id),
-         contact_id=VALUES(contact_id),
-         operation=VALUES(operation)"
-    );
+AND ac.id IS NULL
+");
+    if (CRM_ACL_API::isAccessingSelf($userID, $type)){
+      CRM_Core_DAO::executeQuery("
+REPLACE INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
+  VALUES($userID, $userID, 'View')
+");
+    }
 
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_acl_contact_cache WHERE contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)');
     $_processed[$userID] = 1;
   }
 
@@ -173,7 +177,7 @@ ON DUPLICATE KEY UPDATE
     }
 
     // fill cache
-    self::cache($contactID);
+    self::cache($contactID, $operation);
 
     $sql = "
 SELECT id

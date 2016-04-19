@@ -542,6 +542,34 @@ class CRM_Core_I18n {
     return $locales[$tsLocale];
   }
 
+  /**
+   * Get the default language for contacts where no language is provided.
+   *
+   * Note that NULL is a valid option so be careful with checking for empty etc.
+   *
+   * NULL would mean 'we don't know & we don't want to hazard a guess'.
+   *
+   * @return string
+   */
+  public static  function getContactDefaultLanguage() {
+    $language = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'contact_default_language');
+    if ($language == 'undefined') {
+      return NULL;
+    }
+    if (empty($language) || $language === '*default*') {
+      $language = civicrm_api3('setting', 'getvalue', array(
+        'name' => 'lcMessages',
+        'group' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+      ));
+    }
+    elseif ($language == 'current_site_language') {
+      global $tsLocale;
+      return $tsLocale;
+    }
+
+    return $language;
+  }
+
 }
 
 /**

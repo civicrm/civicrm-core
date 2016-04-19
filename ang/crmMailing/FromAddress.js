@@ -18,6 +18,7 @@
           var addr = crmFromAddresses.getByLabel(newValue);
           mailing.from_name = addr.author;
           mailing.from_email = addr.email;
+          mailing.replyto_email = addr.email;
         });
         // FIXME: Shouldn't we also be watching mailing.from_name and mailing.from_email?
       }

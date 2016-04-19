@@ -563,6 +563,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         reset($variable);
       }
     }
+    // FIXME: $log unused.
+    // FIXME: do we ever use the return value?
     return self::debug_log_message($out, FALSE, $comp);
   }
 
@@ -607,7 +609,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function debug_query($string) {
     if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
-      if (CIVICRM_DEBUG_LOG_QUERY == 'backtrace') {
+      if (CIVICRM_DEBUG_LOG_QUERY === 'backtrace') {
         CRM_Core_Error::backtrace($string, TRUE);
       }
       elseif (CIVICRM_DEBUG_LOG_QUERY) {
@@ -638,6 +640,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @return Log
    */
   public static function createDebugLogger($comp = '') {
+    static $cachedLogger = null;
+
+    if ($cachedLogger) {
+      return $cachedLogger;
+    }
+
     $config = CRM_Core_Config::singleton();
 
     if ($comp) {
@@ -662,7 +670,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
     }
 
-    return Log::singleton('file', $fileName);
+    $cachedLogger = Log::singleton('file', $fileName);
+    return $cachedLogger;
   }
 
   /**

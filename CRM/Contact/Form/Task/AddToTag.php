@@ -142,7 +142,8 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
-      list($total, $added, $notAdded) = CRM_Core_BAO_EntityTag::addEntitiesToTag($this->_contactIds, $key);
+      list($total, $added, $notAdded) = CRM_Core_BAO_EntityTag::addEntitiesToTag($this->_contactIds, $key,
+        'civicrm_contact', FALSE);
 
       $status = array(ts('%count contact tagged', array('count' => $added, 'plural' => '%count contacts tagged')));
       if ($notAdded) {

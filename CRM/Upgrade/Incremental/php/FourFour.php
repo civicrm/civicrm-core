@@ -436,7 +436,10 @@ ALTER TABLE civicrm_dashboard
     $dao = new CRM_Contact_DAO_SavedSearch();
     $dao->find();
     while ($dao->fetch()) {
-      $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($dao->id);
+      $formValues = NULL;
+      if (!empty($dao->form_values)) {
+        $formValues = unserialize($dao->form_values);
+      }
       if (!empty($formValues['mapper'])) {
         foreach ($formValues['mapper'] as $key => $value) {
           foreach ($value as $k => $v) {

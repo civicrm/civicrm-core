@@ -34,6 +34,7 @@
      {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="previewPremium"}
   {else}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+  {crmRegion name="contribute-form-managepremiums-standard-fields"}
   <table class="form-layout-compressed">
      <tr class="crm-contribution-form-block-name">
   <td class="label">{$form.name.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_product' field='name' id=$productId}{/if}
@@ -118,6 +119,8 @@
        <td class="html-adjust">{$form.is_active.html}</td>
     </tr>
   </table>
+  {/crmRegion}
+  {crmRegion name="contribute-form-managepremiums-other-fields"}
   <fieldset id="time-delimited" class="crm-collapsible {if empty($showSubscriptions)}collapsed{/if}">
     <legend class="collapsible-title">{ts}Subscription or Service Settings{/ts}</legend>
     <div>
@@ -149,6 +152,7 @@
       </table>
     </div>
   </fieldset>
+  {/crmRegion}
  {/if}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
