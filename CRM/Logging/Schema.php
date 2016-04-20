@@ -205,6 +205,8 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    * @param string $tableName
    */
   public function dropTriggers($tableName = NULL) {
+    /** @var \Civi\Core\SqlTriggers $sqlTriggers */
+    $sqlTriggers = Civi::service('sql_triggers');
     $dao = new CRM_Core_DAO();
 
     if ($tableName) {
@@ -218,14 +220,14 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $validName = CRM_Core_DAO::shortenSQLName($table, 48, TRUE);
 
       // before triggers
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_insert");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
+      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_insert");
+      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
+      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
 
       // after triggers
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
+      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
+      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
+      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
     }
 
     // now lets also be safe and drop all triggers that start with
@@ -236,9 +238,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $triggers = $dao->executeQuery("SHOW TRIGGERS LIKE 'civicrm_%'");
 
       while ($triggers->fetch()) {
-        // note that drop trigger has a weird syntax and hence we do not
-        // send the trigger name as a string (i.e. its not quoted
-        $dao->executeQuery("DROP TRIGGER IF EXISTS {$triggers->Trigger}");
+        $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$triggers->Trigger}");
       }
     }
   }

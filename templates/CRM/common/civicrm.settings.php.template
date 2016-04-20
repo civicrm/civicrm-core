@@ -247,6 +247,9 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  // Disable automatic download / installation of extensions
  // $civicrm_setting['Extension Preferences']['ext_repo_url'] = false;
 
+ // set triggers to be managed offline per CRM-18212
+ // $civicrm_setting['CiviCRM Preferences']['logging_no_trigger_permission'] = 1;
+
  // Override the CMS root path defined by cmsRootPath.
  // define('CIVICRM_CMSDIR', '/path/to/install/root/');
 
