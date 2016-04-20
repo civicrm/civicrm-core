@@ -85,7 +85,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
     $this->addElement('checkbox', 'amount_block_is_active', ts('Contribution Amounts section enabled'), NULL, array('onclick' => "showHideAmountBlock( this, 'amount_block_is_active' );"));
 
-
     $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
     $recurringPaymentProcessor = array();
 
