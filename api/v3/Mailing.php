@@ -662,6 +662,7 @@ function _civicrm_api3_mailing_stats_spec(&$params) {
   $params['date']['api.default'] = 'now';
   $params['date']['title'] = 'Date';
   $params['is_distinct']['api.default'] = FALSE;
+  $params['is_distinct']['title'] = 'Is Distinct';
 }
 
 /**
