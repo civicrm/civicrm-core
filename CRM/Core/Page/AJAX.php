@@ -214,4 +214,28 @@ class CRM_Core_Page_AJAX {
     CRM_Utils_System::setHttpHeader('Cache-Control', "max-age=$ttl, public");
   }
 
+  public static function defaultSortAndPagerParams($defaultOffset = 0, $defaultRowCount = 25, $defaultSort = NULL, $defaultsortOrder = 'asc') {
+    $params = array();
+
+    $sortMapper = array();
+    foreach ($_GET['columns'] as $key => $value) {
+      $sortMapper[$key] = CRM_Utils_Type::escape($value['data'], 'MysqlColumnName');
+    };
+
+    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : $defaultOffset;
+    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : $defaultRowCount;
+    // Why is the number of order by columns limited to 1?
+    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : $defaultSort;
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : $defaultsortOrder;
+
+    if ($sort) {
+      $params['sortBy'] = "`{$sort}` {$sortOrder}";
+    }
+
+    $params['page'] = ($offset / $rowCount) + 1;
+    $params['rp'] = $rowCount;
+
+    return $params;
+  }
+
 }
