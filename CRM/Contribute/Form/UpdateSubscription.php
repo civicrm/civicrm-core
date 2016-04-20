@@ -164,6 +164,14 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       $this->add('checkbox', 'is_notify', ts('Notify Contributor?'));
     }
 
+    if (CRM_Core_Permission::check('edit contributions')) {
+      CRM_Campaign_BAO_Campaign::addCampaign($this, $this->_subscriptionDetails->campaign_id);
+    }
+
+    if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->_crid)) {
+      $this->addEntityRef('financial_type_id', ts('Financial Type'), array('entity' => 'FinancialType'), !$this->_selfService);
+    }
+
     $type = 'next';
     if ($this->_selfService) {
       $type = 'submit';

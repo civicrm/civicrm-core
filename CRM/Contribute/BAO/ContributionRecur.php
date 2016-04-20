@@ -412,6 +412,45 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
   }
 
+  /**
+   * Does the recurring contribution support financial type change.
+   *
+   * This is conditional on there being only one line item or if there are no contributions as yet.
+   *
+   * (This second is a bit of an unusual condition but might occur in the context of a
+   *
+   * @param int $id
+   *
+   * @return bool
+   */
+  public static function supportsFinancialTypeChange($id) {
+    $contribution = self::getTemplateContribution($id);
+    return CRM_Contribute_BAO_Contribution::isSingleLineItem($contribution['id']);
+  }
+
+  /**
+   * Get the contribution to be used as the template for later contributions.
+   *
+   * Later we might merge in data stored against the contribution recur record rather than just return the contribution.
+   *
+   * @param int $id
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getTemplateContribution($id) {
+    $templateContribution = civicrm_api3('Contribution', 'get', array(
+      'contribution_recur_id' => $id,
+      'options' => array('limit' => 1, 'sort' => array('id DESC')),
+      'sequential' => 1,
+      'contribution_test' => '',
+    ));
+    if ($templateContribution['count']) {
+      return $templateContribution['values'][0];
+    }
+    return array();
+  }
+
   public static function setSubscriptionContext() {
     // handle context redirection for subscription url
     $session = CRM_Core_Session::singleton();
