@@ -959,7 +959,40 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Duplicate contact which would be deleted after merge operation.
    *
    * @return array|bool|int
-   *   'main_loc_block' => Stores all location blocks associated with the 'main' contact
+   *
+   *   rows => An array of arrays, each is row of merge information for the table
+   *   Format: move_fieldname, eg: move_contact_type
+   *     main => Value associated with the main contact
+   *     other => Value associated with the other contact
+   *     title => The title of the field to display in the merge table
+   *
+   *   elements => An array of form elements for the merge UI
+   *
+   *   rel_table_elements => An array of form elements for the merge UI for
+   *     entities related to the contact (eg: checkbox to move 'mailings')
+   *
+   *   main_loc_block => Stores all location blocks associated with the 'main' contact
+   *     @todo Why? For the JS switcher? This is duplicated in 'main_details'?
+   *     Format: main_entity_count, eg: main_address_1
+   *     display => The 'display' value for this entity
+   *     id => The ID of the entity
+   *
+   *   rel_tables => Stores the tables that have related entities for the contact
+   *     for example mailings, groups
+   *
+   *   main_details => An array of core contact field values, eg: first_name, etc.
+   *     location_blocks => An array of location block data for the main contact
+   *       stored as the 'result' of an API call.
+   *       eg: main_details['location_blocks']['address'][0]['id']
+   *       eg: main_details['location_blocks']['email'][1]['id']
+   *
+   *   other_details => As above, but for the 'other' contact
+   *
+   *   migration_info => Stores the 'default' merge actions for each field which
+   *     is used when programatically merging contacts. It contains instructions
+   *     to move all fields from the 'other' contact to the 'main' contact, as
+   *     though the form had been submitted with those options.
+   *
    */
   public static function getRowsElementsAndInfo($mainId, $otherId) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
@@ -1296,7 +1329,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               $js,
             );
 
-            // Add the information to the migrationInfo (@todo Why?)
+            // Add the information to the migrationInfo
             $migrationInfo['location_blocks'][$blockName][$count]['typeTypeId'] = $thisTypeId;
 
           }
