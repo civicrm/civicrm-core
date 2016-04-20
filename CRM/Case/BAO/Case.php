@@ -1800,8 +1800,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $dao = CRM_Core_DAO::executeQuery($query, $queryParam);
 
     while ($dao->fetch()) {
-      //to get valid assignee contact(s).
-      if (isset($dao->caseId) || $dao->rel_contact_id != $contactId) {
+      // The assignee is not the client.
+      if ($dao->rel_contact_id != $contactId) {
         $caseRelationship = $dao->relation_a_b;
         $assigneContactName = $dao->clientName;
         $assigneContactIds[$dao->rel_contact_id] = $dao->rel_contact_id;
