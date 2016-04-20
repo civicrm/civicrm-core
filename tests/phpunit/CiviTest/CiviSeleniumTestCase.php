@@ -403,6 +403,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * override this since the built in function doesn't work with the new phpunit.
+   * @param string $element
+   * @param string $text
+   */
+  public function waitForText($element, $text) {
+    $this->waitForTextPresent($text);
+    $this->assertElementContainsText($element, $text);
+  }
+
+  /**
    * Ensures the required CiviCRM components are enabled.
    * @param $components
    */
@@ -1558,7 +1568,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->clickLink('_qf_Edit_upload-bottom');
 
     // Is status message correct?
-    $this->waitForText('crm-notification-container', "$groupName");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
     return $groupName;
   }
 
