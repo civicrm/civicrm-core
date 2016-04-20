@@ -425,6 +425,30 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Ensures the required currencies are enabled.
+   * @param $currencies
+   */
+  public function enableCurrency($currencies) {
+    $this->openCiviPage("admin/setting/localization", "reset=1", "_qf_Localization_next-bottom");
+    $enabledCurrency = $this->getSelectOptions("currencyLimit-t");
+    foreach ($enabledCurrency as $k => $val) {
+      $enabledCurrency[$k] = substr($val, 0, 3);
+    }
+    $added = FALSE;
+    foreach ((array) $currencies as $curr) {
+      if (!in_array($curr, $enabledCurrency)) {
+        $this->addSelection("currencyLimit-f", "value=$curr");
+        $this->click("//option[@value='$curr']");
+        $this->click("add");
+        $added = TRUE;
+      }
+    }
+    if ($added) {
+      $this->clickLink("_qf_Localization_next-bottom");
+    }
+  }
+
+  /**
    * Add a contact with the given first and last names and either a given email.
    * (when specified), a random email (when true) or no email (when unspecified or null).
    *
