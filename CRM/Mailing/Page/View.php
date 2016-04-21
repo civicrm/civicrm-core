@@ -164,7 +164,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $details = CRM_Utils_Array::value(0, $details[0]);
       $contactId = 0;
     }
-    $mime = &$this->_mailing->compose(NULL, NULL, NULL, $contactId,
+    $mime = $this->_mailing->compose(NULL, NULL, NULL, $contactId,
       $this->_mailing->from_email,
       $this->_mailing->from_email,
       TRUE, $details, $attachments
