@@ -217,8 +217,10 @@
 {literal}
 <script type="text/javascript">
 
+  var locationBlockInfo = {/literal}{$locationBlockInfo}{literal};
+  var allBlock = {/literal}{$mainLocBlock}{literal};
+
   function mergeBlock(blockname, element, blockId, type) {
-    var allBlock = {/literal}{$mainLocBlock}{literal};
 
     // Get type of select list that's been changed (location or type)
     var locTypeId = '';
@@ -239,24 +241,20 @@
     // @todo Fix this 'special handling' for websites (no location id)
     if (!locTypeId) { locTypeId = 0; }
 
-    // Get the matching block, based on location and type, from the main contact record
-    var blockQuery = "allBlock.main_" + blockname + "_" + locTypeId;
-    if (typeTypeId) {
-      blockQuery += "_" + typeTypeId;
-    }
-    var block = eval( blockQuery );
+    // Look for a matching block on the main contact
     var mainBlockId = 0;
     var mainBlockDisplay = '';
+    var mainBlock = findBlock(allBlock, blockname, locTypeId, typeTypeId);
 
     // Create appropriate label / add new link after changing the block
-    if (typeof block == 'undefined') {
+    if (mainBlock == false) {
       label = '<span class="action_label">({/literal}{ts}add{/ts}{literal})</span>';
     }
     else {
 
       // Set display and ID
-      mainBlockDisplay = block['display'];
-      mainBlockId = block['id'];
+      mainBlockDisplay = mainBlock['display'];
+      mainBlockId = mainBlock['id'];
 
       // Set label
       var label = '<span class="action_label">({/literal}{ts}overwrite{/ts}{literal})</span> ';
@@ -271,6 +269,25 @@
     CRM.$( "input[name='location[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
     CRM.$( "#main_" + blockname + "_" + blockId ).html( mainBlockDisplay );
     CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
+  }
+
+  // Find a matching main contact location block by entity, location and type
+  function findBlock(allBlock, entName, locationID, typeID) {
+    var entityArray = allBlock[entName];
+    var result = false;
+    for (var i = 0; i < entityArray.length; i++) {
+      // Match based on location and type ID, depending on the entity info
+      if (locationBlockInfo[entName]['hasLocation'] == false || locationID == entityArray[i]['location_type_id']) {
+        if (locationBlockInfo[entName]['hasType'] == false || typeID == entityArray[i][locationBlockInfo[entName]['hasType']]) {
+          result = {
+            display: entityArray[i][locationBlockInfo[entName]['displayField']],
+            id: entityArray[i]['id']
+          };
+          break;
+        }
+      }
+    }
+    return result;
   }
 
   CRM.$(function($) {
