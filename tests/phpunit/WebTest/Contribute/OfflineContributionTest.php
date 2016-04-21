@@ -438,4 +438,31 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
+  public function testDefaultCurrancy() {
+    $this->webtestLogin();
+    $this->enableCurrency(array('GBP', 'EUR'));
+
+    //Create a contact.
+    $firstName = 'John' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Peterson' . substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, $lastName);
+
+    //Create contribution for contact
+    $this->waitForElementPresent("css=li#tab_contribute a");
+    $this->click("css=li#tab_contribute a");
+    $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
+    $this->click("link=Record Contribution (Check, Cash, EFT ...)");
+    $this->waitForElementPresent("financial_type_id");
+    $this->select("financial_type_id", "value=1");
+    $this->select("currency", "value=GBP");
+    $this->type("total_amount", "100");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Save']");
+    $this->waitForAjaxContent();
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']");
+    $this->assertElementContainsText("xpath=//table[@class='selector row-highlight']/tbody/tr//td/a", "£ 100.00");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr//td/a", "£ 100.00");
+    $this->waitForElementPresent("xpath=//table[@id='info']");
+    $this->assertElementContainsText("xpath=//table[@id='info']/tbody/tr[2]/td[1]", "£ 100.00");
+  }
+
 }
