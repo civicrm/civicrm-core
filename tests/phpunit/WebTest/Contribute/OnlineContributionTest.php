@@ -132,8 +132,16 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->type("billing_postal_code-5", "94129");
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
+    $this->waitForElementPresent("xpath=//div[@class='crm-section no-label billing_name-section']");
+    $this->assertElementContainsText("xpath=//div[@class='crm-section no-label billing_name-section']", $firstName . "billing");
+    $this->assertElementContainsText("xpath=//div[@class='crm-section no-label billing_name-section']", $lastName . "billing");
+
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->waitForElementPresent("xpath=//div[@class='crm-section no-label billing_name-section']");
+    $this->assertElementContainsText("xpath=//div[@class='crm-section no-label billing_name-section']", $firstName . "billing");
+    $this->assertElementContainsText("xpath=//div[@class='crm-section no-label billing_name-section']", $lastName . "billing");
 
     //login to check contribution
 
