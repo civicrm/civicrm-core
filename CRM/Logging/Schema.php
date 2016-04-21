@@ -372,8 +372,10 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     }
 
     if ($rebuildTrigger) {
-      // invoke the meta trigger creation call
-      CRM_Core_DAO::triggerRebuild($table);
+      foreach ($diffs as $table => $cols) {
+        // invoke the meta trigger creation call
+        CRM_Core_DAO::triggerRebuild($table);
+      }
     }
   }
 
