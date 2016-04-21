@@ -82,7 +82,6 @@ class CRM_Mailing_Page_AJAX {
     $params['rp'] = $rowCount;
 
     $params['contact_id'] = $contactID;
-    $params['context'] = $context;
 
     // get the contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailingSelector($params);
