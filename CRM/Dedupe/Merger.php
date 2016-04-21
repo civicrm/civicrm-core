@@ -739,7 +739,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // add additional details that we might need to resolve conflicts
         $migrationInfo['main_details'] = &$rowsElementsAndInfo['main_details'];
         $migrationInfo['other_details'] = &$rowsElementsAndInfo['other_details'];
-        $migrationInfo['main_loc_block'] = &$rowsElementsAndInfo['main_loc_block'];
         $migrationInfo['rows'] = &$rowsElementsAndInfo['rows'];
 
         // go ahead with merge if there is no conflict
@@ -962,12 +961,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   rel_table_elements => An array of form elements for the merge UI for
    *     entities related to the contact (eg: checkbox to move 'mailings')
    *
-   *   main_loc_block => Stores all location blocks associated with the 'main' contact
-   *     @todo Why? For the JS switcher? This is duplicated in 'main_details'?
-   *     Format: main_entity_count, eg: main_address_1
-   *     display => The 'display' value for this entity
-   *     id => The ID of the entity
-   *
    *   rel_tables => Stores the tables that have related entities for the contact
    *     for example mailings, groups
    *
@@ -1126,8 +1119,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'other' => array(),
     );
 
-    $mainLocBlock = array();
-
     // @todo This could probably be defined and used earlier
     $mergeTargets = array(
       'main' => $mainId,
@@ -1159,32 +1150,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               CRM_Core_BAO_Address::fixAddress($value);
               $display = CRM_Utils_Address::format($value);
               $locations[$moniker][$blockName][$cnt]['display'] = $display;
-            }
-
-            // Add any 'main' contact block values to an array for the JS
-            // @todo The JS should just access the main_details to find this info?
-            if ($moniker == 'main') {
-              if ($blockInfo['hasType']) {
-                // Handle websites, no location type ID
-                // @todo Remove the need for this specific 'if'
-                if ($blockName == 'website') {
-                  $value['location_type_id'] = 0;
-                }
-                $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id'] . "_" . $value[$blockInfo['hasType']]]['display'] = $value[$blockInfo['displayField']];
-                $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id'] . "_" . $value[$blockInfo['hasType']]]['id'] = $value['id'];
-              }
-              else {
-                // Get the correct display value for addresses
-                // @todo Remove the need for this if...
-                if ($blockName == 'address') {
-                  $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id']]['display'] = $display;
-                  $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id']]['id'] = $value['id'];
-                }
-                else {
-                  $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id']]['display'] = $value[$blockInfo['displayField']];
-                  $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id']]['id'] = $value['id'];
-                }
-              }
             }
 
             $cnt++;
@@ -1453,7 +1418,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'rows' => $rows,
       'elements' => $elements,
       'rel_table_elements' => $relTableElements,
-      'main_loc_block' => $mainLocBlock,
       'rel_tables' => $relTables,
       'main_details' => $main,
       'other_details' => $other,
