@@ -295,7 +295,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       11 => 'check #1041',
     );
     foreach ($expected as $label => $value) {
-      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));
+      $this->assertElementContainsText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[$label]/td[2]", $value);
     }
 
     $exp = array(
@@ -305,9 +305,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     );
 
     foreach ($exp as $lab => $val) {
-      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[3]/td[2]/table/tbody/tr[$lab]/td[3]",
-        preg_quote($val)
-      );
+      $this->assertElementContainsText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[3]/td[2]/table/tbody/tr[$lab]/td[3]", $val);
     }
   }
 
@@ -659,9 +657,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     );
 
     foreach ($exp as $lab => $val) {
-      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[3]/td[2]/table/tbody/tr[$lab]/td[3]",
-        preg_quote($val)
-      );
+      $this->assertElementContainsText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[3]/td[2]/table/tbody/tr[$lab]/td[3]", $val);
     }
 
     // verify if soft credit was created successfully
@@ -671,7 +667,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     );
 
     foreach ($softCreditValues as $value) {
-      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+      $this->assertElementContainsText("css=table.crm-soft-credit-listing", $value);
     }
 
     // Check for Soft contact created
@@ -724,7 +720,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     );
 
     foreach ($softCreditValues as $value) {
-      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+      $this->assertElementContainsText("css=table.crm-soft-credit-listing", $value);
     }
   }
 

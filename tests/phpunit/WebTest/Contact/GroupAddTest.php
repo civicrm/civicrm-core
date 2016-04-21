@@ -73,31 +73,31 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
-    $this->click('_qf_Search_refresh');
+    $this->click('title');
     $this->waitForAjaxContent();
-    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]");
-    $createdBy = $this->getText("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[3]/a");
-    $this->click("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[7]//span/a[text()='Settings']");
+    $this->waitForElementPresent("xpath=//table/tbody/tr/td/div[contains(text(), '{$params['name']}')]");
+    $createdBy = $this->getText("xpath=//table/tbody/tr/td[3]/a");
+    $this->click("xpath=//table/tbody/tr/td[7]//span/a[text()='Settings']");
     $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[1]/tbody/tr[2]/td[contains(text(), '{$createdBy}')]");
     $this->openCiviPage('group', 'reset=1');
 
     //search groups using created by
     $this->type('created_by', $createdBy);
-    $this->click('_qf_Search_refresh');
+    $this->click('created_by');
 
     //show maximum no. of groups on first result set page
     //as many groups can be created by same creator
     //and checking is done on first result set page
-    $this->waitForVisible("xpath=//table[@class='crm-group-selector no-footer dataTable']");
+    $this->waitForVisible("xpath=//table[@class='crm-group-selector crm-ajax-table dataTable no-footer']");
     $this->select("xpath=//div[@class='dataTables_length']/label/select", '100');
-    $this->waitForVisible("xpath=//table[@class='crm-group-selector no-footer dataTable']");
+    $this->waitForVisible("xpath=//table[@class='crm-group-selector crm-ajax-table dataTable no-footer']");
 
-    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]");
-    $this->click("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
-    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
+    $this->waitForElementPresent("xpath=//table/tbody/tr/td/div[contains(text(), '{$params['name']}')]");
+    $this->click("xpath=//table/tbody/tr/td/div[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
+    $this->waitForElementPresent("xpath=//table/tbody/tr/td/div[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
 
     //check link of the contact who created the group
-    $this->clickLink("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody//tr/td[1]/span[contains(text(),'{$params['name']}')]/../following-sibling::td[2]/a", "css=div.crm-summary-display_name", FALSE);
+    $this->clickLink("xpath=//table/tbody//tr/td[1]/div[contains(text(),'{$params['name']}')]/../following-sibling::td[2]/a", "css=div.crm-summary-display_name", FALSE);
     $name = explode(',', $createdBy);
     $name1 = isset($name[1]) ? trim($name[1]) : NULL;
     $name0 = trim($name[0]);
@@ -170,7 +170,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
-    $this->click('_qf_Search_refresh');
+    $this->click('title');
     $this->waitForTextPresent("Adding new reserved group.");
     // Settings link should NOT be included in selector
     // after search returns with only the reserved group.
@@ -254,8 +254,8 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('group', 'reset=1');
     $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']/div[@class='crm-submit-buttons']/a/span[text()=' Add Group']");
-    $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/span[contains(text(), '{$group}')]");
-    $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/span[text()='{$group}']/../../td[7]/span[1]/a[1]");
+    $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/div[contains(text(), '{$group}')]");
+    $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/div[text()='{$group}']/../../td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->clickLink("xpath=//form[@id='Basic']/div[2]/a/span");
     $this->waitForElementPresent("_qf_Basic_refresh");
