@@ -812,8 +812,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'mode' => $mode,
     );
 
-    $allLocationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-
     foreach ($migrationInfo as $key => $val) {
       if ($val === "null") {
         // Rule: Never overwrite with an empty value (in any mode)
@@ -841,33 +839,26 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $fieldName = $locField[2];
         $fieldCount = $locField[3];
 
-        // Rule: resolve address conflict if any
+        // Rule: Catch address conflicts (same address type on both contacts)
         if ($fieldName == 'address') {
           $mainNewLocTypeId = $migrationInfo['location_blocks'][$fieldName][$fieldCount]['locTypeId'];
-          if (!empty($migrationInfo['main_loc_block']) &&
-              array_key_exists("main_address_{$mainNewLocTypeId}", $migrationInfo['main_loc_block'])) {
-            // main loc already has some address for the loc-type. Its a overwrite situation.
-            // look for next available loc-type
-            $newTypeId = NULL;
-            foreach ($allLocationTypes as $typeId => $typeLabel) {
-              if (!array_key_exists("main_address_{$typeId}", $migrationInfo['main_loc_block'])) {
-                $newTypeId = $typeId;
+          if (
+            isset($migrationInfo['main_details']['location_blocks']['address']) &&
+            !empty($migrationInfo['main_details']['location_blocks']['address'])
+          ) {
+            // Look for this LocTypeId in the results
+            // @todo This can be streamlined using array_column() in PHP 5.5+
+            foreach ($migrationInfo['main_details']['location_blocks']['address'] as $addressKey => $addressRecord) {
+              if ($addressRecord['location_type_id'] == $mainNewLocTypeId) {
+                $conflicts[$key] = NULL;
+                break;
               }
             }
-            if ($newTypeId) {
-              // try insert address at new available loc-type
-              $migrationInfo['location_blocks'][$fieldName][$fieldCount]['locTypeId'] = $newTypeId;
-            }
-            else {
-              // note it down & lets wait for response from the hook.
-              // For no response $mode will decide if to skip this merge
-              $conflicts[$key] = NULL;
-            }
+
           }
         }
+        // For other locations, don't merge/add if the values are the same
         elseif ($migrationInfo['rows'][$key]['main'] == $migrationInfo['rows'][$key]['other']) {
-          // for loc blocks other than address like email, phone .. if values are same no point in merging
-          // and adding redundant value
           unset($migrationInfo[$key]);
         }
       }
