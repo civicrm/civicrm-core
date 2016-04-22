@@ -284,7 +284,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'Soft Credit Type' => $data['soft_credit_type'],
       );
       foreach ($expectedSoft as $value) {
-        $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+        $this->assertElementContainsText("css=table.crm-soft-credit-listing", $value);
       }
     }
     elseif ($type == "Membership") {
@@ -300,7 +300,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         4 => 'New',
       );
       foreach ($expected as $label => $value) {
-        $this->verifyText("xpath=id('MembershipView')/div[2]/div/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));
+        $this->assertElementContainsText("xpath=id('MembershipView')/div[2]/div/table[1]/tbody/tr[$label]/td[2]", $value);
       }
       //View Contribution
       $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr[1]/td[8]/span/a[1][text()='View']");
@@ -320,7 +320,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'Soft Credit Type' => $data['soft_credit_type'],
       );
       foreach ($expectedSoft as $value) {
-        $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+        $this->assertElementContainsText("css=table.crm-soft-credit-listing", $value);
       }
     }
   }

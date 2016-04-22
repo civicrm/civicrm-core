@@ -225,7 +225,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
       'Contribution Status' => 'Pending',
     );
     foreach ($expected as $label => $value) {
-      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", preg_quote($value));
+      $this->assertElementContainsText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", $value);
     }
   }
 
