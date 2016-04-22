@@ -1331,14 +1331,16 @@ FROM   civicrm_domain
   }
 
   /**
-   * @param $query
+   * Compose the query by merging the parameters into it.
+   *
+   * @param string $query
    * @param array $params
    * @param bool $abort
    *
    * @return string
    * @throws Exception
    */
-  public static function composeQuery($query, &$params, $abort = TRUE) {
+  public static function composeQuery($query, $params, $abort = TRUE) {
     $tr = array();
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
