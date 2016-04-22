@@ -66,6 +66,12 @@
     <title>Contact Type Parent</title>
     <type>int unsigned</type>
     <comment>Optional FK to parent contact type.</comment>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NULL</condition>
+    </pseudoconstant>
     <add>3.1</add>
   </field>
   <foreignKey>
