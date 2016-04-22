@@ -1666,7 +1666,7 @@ class CRM_Report_Form extends CRM_Core_Form {
               $clauses[] = "( {$field['dbAlias']} >= $min )";
             }
             else {
-              $clauses[] = "( {$field['dbAlias']} < $min )";
+              $clauses[] = "( {$field['dbAlias']} < $min OR {$field['dbAlias']} IS NULL )";
             }
           }
           if ($max) {
@@ -1683,7 +1683,7 @@ class CRM_Report_Form extends CRM_Core_Form {
               $clause = implode(' AND ', $clauses);
             }
             else {
-              $clause = implode(' OR ', $clauses);
+              $clause = '(' . implode('OR', $clauses) . ')';
             }
           }
         }
