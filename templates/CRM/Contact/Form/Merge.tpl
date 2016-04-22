@@ -259,14 +259,14 @@
       // Set label
       var label = '<span class="action_label">({/literal}{ts}overwrite{/ts}{literal})</span> ';
       if (blockname == 'email' || blockname == 'phone') {
-        var opLabel = 'location[' + blockname + '][' + blockId + '][operation]';
+        var opLabel = 'location_blocks[' + blockname + '][' + blockId + '][operation]';
         label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">{/literal}{ts}add new{/ts}{literal}</label><br />';
       }
       label += '<br>';
     }
 
     // Update DOM
-    CRM.$( "input[name='location[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
+    CRM.$( "input[name='location_blocks[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
     CRM.$( "#main_" + blockname + "_" + blockId ).html( mainBlockDisplay );
     CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
   }
