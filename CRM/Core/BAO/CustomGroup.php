@@ -526,8 +526,10 @@ ORDER BY civicrm_custom_group.weight,
               continue;
             }
             // CRM-5507
-            if ($fieldName == 'extends_entity_column_value' && $subType) {
-              $groupTree[$groupID]['subtype'] = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
+            // This is an old bit of code - per the CRM number & probably does not work reliably if
+            // that one contact sub-type exists.
+            if ($fieldName == 'extends_entity_column_value' && !empty($subTypes[0])) {
+              $groupTree[$groupID]['subtype'] = self::validateSubTypeByEntity($entityType, $subType);
             }
             $groupTree[$groupID][$fieldName] = $crmDAO->$fullFieldName;
           }
