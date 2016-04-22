@@ -50,7 +50,7 @@ class CRM_Logging_Differ {
     $this->db = $dsn['database'];
     $this->log_conn_id = $log_conn_id;
     $this->log_date = $log_date;
-    $this->interval = $interval;
+    $this->interval = self::filterInterval($interval);
   }
 
   /**
@@ -144,10 +144,6 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
     $logDateClause = '';
     if ($this->log_date) {
       $params[2] = array($this->log_date, 'String');
-      // The format of $this->interval should be something like 10 SECOND. It should not have any '
-      // characters so we don't want to declare it as a string & have them added. But if someone
-      // adds a ' then we want to neuter it.
-      $this->interval = addslashes($this->interval);
       $logDateClause = "
         AND lt.log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval})
       ";
@@ -479,6 +475,36 @@ ORDER BY log_date
       return FALSE;
     }
 
+  }
+
+  /**
+   * Filter a MySQL interval expression.
+   *
+   * @param string $interval
+   * @return string
+   *   Normalized version of $interval
+   * @throws \CRM_Core_Exception
+   *   If the expression is invalid.
+   * @see https://dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-add
+   */
+  private static function filterInterval($interval) {
+    if (empty($interval)) {
+      return $interval;
+    }
+
+    $units = array('MICROSECOND', 'SECOND', 'MINUTE', 'HOUR', 'DAY', 'WEEK', 'MONTH', 'QUARTER', 'YEAR');
+    $interval = strtoupper($interval);
+    if (preg_match('/^([0-9]+) ([A-Z]+)$/', $interval, $matches)) {
+      if (in_array($matches[2], $units)) {
+        return $interval;
+      }
+    }
+    if (preg_match('/^\'([0-9: \.\-]+)\' ([A-Z]+)_([A-Z]+)$/', $interval, $matches)) {
+      if (in_array($matches[2], $units) && in_array($matches[3], $units)) {
+        return $interval;
+      }
+    }
+    throw new CRM_Core_Exception("Malformed interval");
   }
 
 }
