@@ -875,7 +875,7 @@ COLS;
         // The log tables have not yet been converted to have varchar(17) fields for log_conn_id.
         // Continue to use the less reliable connection_id for al tables for now.
         $sqlStmt .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
-        $deleteSQL .= "@uniqueID, @civicrm_user_id, '{eventName}');";
+        $deleteSQL .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
       }
 
       $sqlStmt .= "END IF;";
