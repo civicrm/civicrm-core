@@ -2157,7 +2157,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create custom group.
    *
    * @param array $params
-   * @return array|int
+   * @return array
    */
   public function customGroupCreate($params = array()) {
     $defaults = array(

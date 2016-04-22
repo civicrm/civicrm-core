@@ -312,8 +312,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param CRM_Core_Form $form
-   *   Not used but required.
+
+   * @param CRM_Core_Form $deprecated
+   *   Not used.
    * @param int $entityID
    * @param int $groupID
    * @param string $subType
@@ -330,11 +331,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
    *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    *   With caching the performance impact would be small & the function would be cleaner
-   *
    */
-  public static function &getTree(
+  public static function getTree(
     $entityType,
-    &$form,
+    $deprecated = NULL,
     $entityID = NULL,
     $groupID = NULL,
     $subType = NULL,
