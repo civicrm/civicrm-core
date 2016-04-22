@@ -68,7 +68,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $checkboxOptionLabel2 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
     $this->type("option_label_2", $checkboxOptionLabel2);
     $this->type("option_value_2", "2");
-    $this->click("link=another choice");
+    $this->click("link=add another choice");
     $checkboxOptionLabel3 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
     $this->type("option_label_3", $checkboxOptionLabel3);
     $this->type("option_value_3", "3");
@@ -109,7 +109,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $radioOptionLabel2 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
     $this->type("option_label_2", $radioOptionLabel2);
     $this->type("option_value_2", "2");
-    $this->click("link=another choice");
+    $this->click("link=add another choice");
     $radioOptionLabel3 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
     $this->type("option_label_3", $radioOptionLabel3);
     $this->type("option_value_3", "3");
