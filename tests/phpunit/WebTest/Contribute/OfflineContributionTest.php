@@ -168,7 +168,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("xpath=//*[@id='ContributionView']/div[2]");
     foreach ($expected as $value) {
-      $this->verifyText("xpath=//*[@id='ContributionView']/div[2]", preg_quote($value));
+      $this->assertElementContainsText("xpath=//*[@id='ContributionView']/div[2]", $value);
     }
 
     // verify if soft credit was created successfully
@@ -179,7 +179,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     );
 
     foreach ($expected as $value) {
-      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+      $this->assertElementContainsText("css=table.crm-soft-credit-listing", $value);
     }
 
     // go to first soft creditor contact view page
@@ -198,7 +198,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       1 => "{$firstName} {$lastName}",
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[2]/td[$value]", preg_quote($label));
+      $this->assertElementContainsText("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[2]/td[$value]", $label);
     }
   }
 
