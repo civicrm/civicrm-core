@@ -42,7 +42,7 @@ class CRM_Logging_Differ {
    * Class constructor.
    *
    * @param string $log_conn_id
-   * @param $log_date
+   * @param string $log_date
    * @param string $interval
    */
   public function __construct($log_conn_id, $log_date, $interval = '10 SECOND') {
@@ -144,6 +144,10 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
     $logDateClause = '';
     if ($this->log_date) {
       $params[2] = array($this->log_date, 'String');
+      // The format of $this->interval should be something like 10 SECOND. It should not have any '
+      // characters so we don't want to declare it as a string & have them added. But if someone
+      // adds a ' then we want to neuter it.
+      $this->interval = addslashes($this->interval);
       $logDateClause = "
         AND lt.log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval})
       ";
