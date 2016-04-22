@@ -113,13 +113,13 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
 
     // check that expected roles are listed in the Case Roles pane
     foreach ($caseRoles as $key => $role) {
-      $this->assertText("css=div.crm-case-roles-block", $role);
+      $this->assertElementContainsText("css=div.crm-case-roles-block", $role);
     }
 
     $id = $this->urlArg('id');
     // check that expected activities are listed in the Case Activities table
     foreach ($timelineActivityTypes as $tActivityType) {
-      $this->assertText("case_id_$id", $tActivityType);
+      $this->assertElementContainsText("case_id_$id", $tActivityType);
     }
 
     // for edit case type
