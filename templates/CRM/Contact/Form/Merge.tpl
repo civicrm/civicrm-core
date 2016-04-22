@@ -134,12 +134,12 @@
             <td>
               {* Display location for fields with locations *}
               {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
-                {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
+                {$form.location_blocks.$blockName.$blockId.locTypeId.html}&nbsp;
               {/if}
 
               {* Display other_type_id for websites, ims and phones *}
               {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
-                {$form.location.$blockName.$blockId.typeTypeId.html}&nbsp;
+                {$form.location_blocks.$blockName.$blockId.typeTypeId.html}&nbsp;
               {/if}
 
               {* Display the overwrite/add/add new label *}
@@ -147,7 +147,7 @@
                 {if $row.main}
                   <span class="action_label">({ts}overwrite{/ts})</span>&nbsp;
                    {if $blockName eq 'email' || $blockName eq 'phone' }
-                     {$form.location.$blockName.$blockId.operation.html}&nbsp;
+                     {$form.location_blocks.$blockName.$blockId.operation.html}&nbsp;
                    {/if}
                    <br />
                 {else}
