@@ -94,7 +94,7 @@ class CRM_Utils_Rule {
    *
    * @return bool
    */
-  public static function MysqlColumnName($str) {
+  public static function mysqlColumnName($str) {
     //  check the length.
     // This check can be incorrect for the <table>.<column> format, which can be
     // a problem.
@@ -106,21 +106,23 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * Validate an acceptable column name for sorting results.
+   *
    * @param $str
    *
    * @return bool
    */
-  public static function MysqlColumnNameStrict($str) {
-    //  check the length.
+  public static function mysqlColumnNameStrict($str) {
+    // Check the length.
     if (empty($str) || strlen($str) > 64) {
       return FALSE;
     }
 
-    // make sure it only contains valid characters (alphanumeric and underscores)
-    // This check doesn't support the <table>.<column> format, which can be
-    // a problem.
-    // @todo : check with the standards (http://dev.mysql.com/doc/refman/5.5/en/identifiers.html)
-    if (!preg_match('/^[\w_]+$/i', $str)) {
+    // Make sure it only contains valid characters (alphanumeric and underscores).
+    //
+    // MySQL permits column names that don't match this (eg containing spaces),
+    // but CiviCRM won't create those ...
+    if (!preg_match('/^[\w_]+(\.[\w_]+)?$/i', $str)) {
       return FALSE;
     }
 
@@ -128,11 +130,14 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $str
+   * Validate that a string is ASC or DESC.
    *
+   * Empty string should be treated as invalid and ignored => default = ASC.
+   *
+   * @param $str
    * @return bool
    */
-  public static function MysqlOrderByDirection($str) {
+  public static function mysqlOrderByDirection($str) {
     if (!preg_match('/^(asc|desc)$/i', $str)) {
       return FALSE;
     }
