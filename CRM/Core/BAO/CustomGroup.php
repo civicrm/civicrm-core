@@ -317,7 +317,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   Not used.
    * @param int $entityID
    * @param int $groupID
-   * @param string $subType
+   * @param array $subTypes
    * @param string $subName
    * @param bool $fromCache
    * @param bool $onlySubType
@@ -337,7 +337,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $deprecated = NULL,
     $entityID = NULL,
     $groupID = NULL,
-    $subType = NULL,
+    $subTypes = array(),
     $subName = NULL,
     $fromCache = TRUE,
     $onlySubType = NULL
@@ -345,10 +345,17 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
     }
+    if (!is_array($subTypes)) {
+      if (empty($subTypes)) {
+        $subTypes = array();
+      }
+      else {
+        $subTypes = explode(',', $subTypes);
+      }
+    }
 
     // create a new tree
-    $strSelect = $strFrom = $strWhere = $orderBy = '';
-    $tableData = array();
+    $strWhere = $orderBy = '';
 
     // using tableData to build the queryString
     $tableData = array(
@@ -419,53 +426,13 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
       $in = "'$entityType'";
     }
 
-    if ($subType) {
-      $subTypeClause = '';
-      if (is_array($subType)) {
-        $subType = implode(',', $subType);
+    if (!empty($subTypes)) {
+      foreach ($subTypes as $key => $subType) {
+        $subTypeClauses[] = "civicrm_custom_group.extends_entity_column_value LIKE '%" . self::validateSubTypeByEntity($entityType, $subType) . "%'";
       }
-      if (strpos($subType, ',')) {
-        $subTypeParts = explode(',', $subType);
-        $subTypeClauses = array();
-        foreach ($subTypeParts as $subTypePart) {
-          // CRM-17984: Only filter by this input if valid.
-          $subTypePart = CRM_Utils_Type::escape(trim($subTypePart, CRM_Core_DAO::VALUE_SEPARATOR), 'Integer', FALSE);
-          if ($subTypePart) {
-            $subTypePart = CRM_Core_DAO::VALUE_SEPARATOR .
-              $subTypePart .
-              CRM_Core_DAO::VALUE_SEPARATOR;
-            $subTypeClauses[] = "civicrm_custom_group.extends_entity_column_value LIKE '%$subTypePart%'";
-          }
-        }
-
-        if ($onlySubType) {
-          $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
-        }
-        else {
-          $subTypeClause = '(' . implode(' OR ', $subTypeClauses) .
-            " OR civicrm_custom_group.extends_entity_column_value IS NULL )";
-        }
-      }
-      else {
-        // CRM-17984: Only filter by this input if valid.
-        $subType = CRM_Utils_Type::escape(trim($subType, CRM_Core_DAO::VALUE_SEPARATOR), 'Integer', FALSE);
-        if ($subType) {
-          $subType = CRM_Core_DAO::VALUE_SEPARATOR .
-            $subType .
-            CRM_Core_DAO::VALUE_SEPARATOR;
-
-          if ($onlySubType) {
-            $subTypeClause = "( civicrm_custom_group.extends_entity_column_value LIKE '%$subType%' )";
-          }
-          else {
-            $subTypeClause = "( civicrm_custom_group.extends_entity_column_value LIKE '%$subType%'
-      OR    civicrm_custom_group.extends_entity_column_value IS NULL )";
-          }
-        }
-      }
-
-      if (empty($subTypeClause)) {
-        $subTypeClause = '1=1';
+      $subTypeClause = '(' .  implode(' OR ', $subTypeClauses) . ')';
+      if (!$onlySubType) {
+        $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
       }
 
       $strWhere = "
@@ -644,6 +611,35 @@ ORDER BY civicrm_custom_group.weight,
 
     }
     return $groupTree;
+  }
+
+  /**
+   * Clean and validate the filter before it is used in a db query.
+   *
+   * @param string $entityType
+   * @param string $subType
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function validateSubTypeByEntity($entityType, $subType) {
+    $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
+    if (is_numeric($subType)) {
+      return $subType;
+    }
+    $contactTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_type'));
+    if ($entityType != 'Contact' && !in_array($entityType, $contactTypes['values'])) {
+      // Not quite sure if we want to fail this hard. But quiet ignore would be pretty bad too.
+      // Am inclined to go with this for RC release & considering softening.
+      throw new CRM_Core_Exception('Invalid Entity Filter');
+    }
+    $subTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_sub_type'));
+    if (!in_array($subType, $subTypes['values'])) {
+      // Same comments about fail hard as above.
+      throw new CRM_Core_Exception('Invalid Filter');
+    }
+    return $subType;
   }
 
   /**
@@ -1590,7 +1586,7 @@ ORDER BY civicrm_custom_group.weight,
       return array();
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type, $form);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type);
     $customValue = array();
     $htmlType = array(
       'CheckBox',
