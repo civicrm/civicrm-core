@@ -827,6 +827,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // add relationship "Employer of"
     // click through to the relationship view screen
+    $this->waitForAjaxContent();
     $this->click("css=li#tab_rel a");
 
     // wait for add Relationship link
@@ -875,6 +876,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // add relationship "Employer of"
     // click through to the relationship view screen
+    $this->waitForAjaxContent();
     $this->click("css=li#tab_rel a");
 
     // wait for add Relationship link
@@ -916,6 +918,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // click through to the relationship view screen
+    $this->waitForAjaxContent();
     $this->click("css=li#tab_rel a");
 
     // wait for add Relationship link

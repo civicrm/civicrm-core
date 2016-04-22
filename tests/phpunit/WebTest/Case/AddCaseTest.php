@@ -195,10 +195,10 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@id='caseRoles-selector-$id']/tbody/tr[4]/td[2]/a");
     // check that expected roles are listed in the Case Roles pane
     foreach ($caseRoles as $role) {
-      $this->assertText("css=div.crm-case-roles-block", $role);
+      $this->assertElementContainsText("xpath=//table[@id='caseRoles-selector-$id']/tbody/tr[4]/td[1]", $role);
     }
     // check that case creator role has been assigned to logged in user
-    $this->verifyText("xpath=//table[@id='caseRoles-selector-$id']/tbody/tr[4]/td[2]", $creatorName);
+    $this->assertElementContainsText("xpath=//table[@id='caseRoles-selector-$id']/tbody/tr[4]/td[2]", $creatorName);
   }
 
   /**

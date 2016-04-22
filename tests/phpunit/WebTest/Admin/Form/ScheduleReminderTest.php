@@ -43,6 +43,7 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
 
     // Fill Title
     $title = 'Title' . substr(sha1(rand()), 0, 4);
+    $htmlMessage = "Schedule Reminder Test";
     $this->type('title', $title);
 
     // Fill Entity Details
@@ -60,6 +61,8 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     // Fill Subject
     $subject = 'subject' . substr(sha1(rand()), 0, 4);
     $this->type('subject', $subject);
+    $this->waitForElementPresent("html_message");
+    $this->fillRichTextField("html_message", $htmlMessage);
 
     //click on save
     $this->click('_qf_ScheduleReminders_next-bottom');
