@@ -2328,23 +2328,23 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Select multiple options.
-   * @param $fieldid
-   * @param $params
+   * @param $fieldId
+   * @param $options
    * @param $isDate if multiple date is to be selected from datepicker
    */
-  public function multiselect2($fieldid, $params, $isDate = FALSE) {
+  public function multiselect2($fieldId, $options, $isDate = FALSE) {
     // In the case of chainSelect, wait for options to load
     $this->waitForElementNotPresent('css=select.loading');
-    foreach ($params as $value) {
+    foreach ($options as $value) {
       if ($isDate) {
-        $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
-        $this->webtestFillDate($fieldid, $value, TRUE);
+        $this->clickAt("xpath=//*[@id='$fieldId']/../div/ul//li/input");
+        $this->webtestFillDate($fieldId, $value, TRUE);
       }
       else {
-        $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
+        $this->clickAt("xpath=//*[@id='$fieldId']/../div/ul//li/input");
         $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
         $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
-        $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
+        $this->assertElementContainsText("xpath=//*[@id='$fieldId']/preceding-sibling::div[1]/", $value);
       }
     }
     // Wait a sec for select2 to update the original element
