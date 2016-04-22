@@ -629,11 +629,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     foreach ($expected as $label => $value) {
       if ($xpathPrefix) {
         $this->waitForElementPresent("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td");
-        $this->verifyText("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td", preg_quote($value));
+        $this->assertElementContainsText("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td", $value);
       }
       else {
         $this->waitForElementPresent("xpath=//table{$tableLocator}/tbody/tr/td[text()='{$label}']/following-sibling::td");
-        $this->verifyText("xpath=//table{$tableLocator}/tbody/tr/td[text()='{$label}']/following-sibling::td", preg_quote($value));
+        $this->assertElementContainsText("xpath=//table{$tableLocator}/tbody/tr/td[text()='{$label}']/following-sibling::td", $value);
       }
     }
   }
@@ -695,7 +695,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       }
       $this->type("option_label_{$oIndex}", $oValue['label']);
       $this->type("option_amount_{$oIndex}", $oValue['amount']);
-      $this->click('link=another choice');
+      $this->click('link=add another choice');
     }
   }
 
