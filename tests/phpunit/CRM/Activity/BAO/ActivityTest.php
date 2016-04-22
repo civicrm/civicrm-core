@@ -37,7 +37,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     // Now call create() to modify an existing Activity
 
-    $params = array();
     $params = array(
       'id' => $activityId,
       'source_contact_id' => $contactId,
