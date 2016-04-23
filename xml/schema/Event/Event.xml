@@ -328,7 +328,7 @@
   <field>
     <name>default_role_id</name>
     <uniqueName>default_role_id</uniqueName>
-    <title>Default Role ID</title>
+    <title>Default Role</title>
     <import>true</import>
     <type>int unsigned</type>
     <default>1</default>
