@@ -256,20 +256,20 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnName':
-        if (CRM_Utils_Rule::MysqlColumnName($data)) {
+      case 'MysqlColumnNameLoose':
+        if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
           return str_replace('`', '', $data);
         }
         break;
 
-      case 'MysqlColumnNameStrict':
-        if (CRM_Utils_Rule::MysqlColumnNameStrict($data)) {
+      case 'MysqlColumnName':
+        if (CRM_Utils_Rule::mysqlColumnName($data)) {
           return $data;
         }
         break;
 
       case 'MysqlOrderByDirection':
-        if (CRM_Utils_Rule::MysqlOrderByDirection($data)) {
+        if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
           return $data;
         }
         break;
