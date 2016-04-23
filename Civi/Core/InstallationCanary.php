@@ -53,7 +53,7 @@ class InstallationCanary {
       throw new \CRM_Core_Exception("Found installation canary. This suggests that something went wrong with tracking installation process. Please post to forum or JIRA.");
     }
     \Civi::log()->info('Creating canary table');
-    \CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_install_canary (id int(10) unsigned NOT NULL)');
+    \CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_install_canary (id int(10) unsigned NOT NULL) ENGINE=InnoDB');
   }
 
 }
