@@ -354,7 +354,7 @@ function civicrm_api3_setting_getvalue($params) {
   //  return $config->$params['name'];
   //}
   return CRM_Core_BAO_Setting::getItem(
-    $params['group'],
+    NULL,
     CRM_Utils_Array::value('name', $params),
     CRM_Utils_Array::value('component_id', $params),
     CRM_Utils_Array::value('default_value', $params),
