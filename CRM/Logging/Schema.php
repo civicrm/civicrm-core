@@ -868,18 +868,21 @@ COLS;
         $deleteSQL .= "OLD.$column, ";
       }
       if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_uniqueid_date'))) {
-        $sqlStmt .= "@uniqueID, @civicrm_user_id, '{eventName}');";
-        $deleteSQL .= "@uniqueID, @civicrm_user_id, '{eventName}');";
+        // Note that when connecting directly via mysql @uniqueID may not be set so a fallback is
+        // 'c_' to identify a non-CRM connection + timestamp to the hour + connection_id
+        // If the connection_id is longer than 6 chars it will be truncated.
+        // We tried setting the @uniqueID in the trigger but it was unreliable.
+        // An external interaction could split over 2 connections & it seems worth blocking the revert on
+        // these reports & adding extra permissioning to the api for this.
+        $connectionSQLString = "COALESCE(@uniqueID, LEFT(CONCAT('con_', unix_timestamp()/3600, CONNECTION_ID()), 17))";
       }
       else {
         // The log tables have not yet been converted to have varchar(17) fields for log_conn_id.
         // Continue to use the less reliable connection_id for al tables for now.
-        $sqlStmt .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
-        $deleteSQL .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
+        $connectionSQLString = "CONNECTION_ID()";
       }
-
-      $sqlStmt .= "END IF;";
-      $deleteSQL .= "END IF;";
+      $sqlStmt .= $connectionSQLString . ", @civicrm_user_id, '{eventName}'); END IF;";
+      $deleteSQL .= $connectionSQLString . ", @civicrm_user_id, '{eventName}'); END IF;";
 
       $insertSQL .= $sqlStmt;
       $updateSQL .= $sqlStmt;
