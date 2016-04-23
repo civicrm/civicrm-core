@@ -387,7 +387,7 @@
       // and that merged into that code as currently behaviour is inconsistent.
       var emailExists = '{$emailExists}';
       var isStandalone = ('{$context}' == 'standalone');
-      var isEmailEnabledForSite = {$isEmailEnabledForSite};
+      var isEmailEnabledForSite = {if $isEmailEnabledForSite}true{else}false{/if};
 
       {literal}
       var isEmailable = (isEmailEnabledForSite && (emailExists || isStandalone));
