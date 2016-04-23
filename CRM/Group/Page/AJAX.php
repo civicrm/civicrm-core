@@ -54,7 +54,7 @@ class CRM_Group_Page_AJAX {
       $sortMapper = array();
       $columns = CRM_Utils_Array::value('columns', $params, array());
       foreach ($columns as $key => $value) {
-        $sortMapper[$key] = $value['data'];
+        $sortMapper[$key] = CRM_Utils_Type::escape(CRM_Utils_Array::value('data', $value), 'String');
       }
 
       $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
