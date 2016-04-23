@@ -94,7 +94,7 @@ class CRM_Utils_Rule {
    *
    * @return bool
    */
-  public static function mysqlColumnName($str) {
+  public static function mysqlColumnNameLoose($str) {
     //  check the length.
     // This check can be incorrect for the <table>.<column> format, which can be
     // a problem.
@@ -112,7 +112,7 @@ class CRM_Utils_Rule {
    *
    * @return bool
    */
-  public static function mysqlColumnNameStrict($str) {
+  public static function mysqlColumnName($str) {
     // Check the length.
     if (empty($str) || strlen($str) > 64) {
       return FALSE;
