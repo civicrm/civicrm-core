@@ -389,3 +389,14 @@ function _civicrm_api3_system_get_whitelist($whitelistFile) {
   );
   return $whitelist;
 }
+
+/**
+ * Update log table structures.
+ *
+ * This updates the engine type if defined in the hook and changes the field type
+ * for log_conn_id to reflect CRM-18193.
+ */
+function civicrm_api3_system_updatelogtables() {
+  $schema = new CRM_Logging_Schema();
+  $schema->updateLogTableSchema();
+}
