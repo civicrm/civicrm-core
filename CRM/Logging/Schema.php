@@ -868,18 +868,15 @@ COLS;
         $deleteSQL .= "OLD.$column, ";
       }
       if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_uniqueid_date'))) {
-        $sqlStmt .= "@uniqueID, @civicrm_user_id, '{eventName}');";
-        $deleteSQL .= "@uniqueID, @civicrm_user_id, '{eventName}');";
+        $connectionSQLString = "COALESCE(@uniqueID, LEFT(CONCAT('con_', unix_timestamp()/3600), CONNECTION_ID()), 13)";
       }
       else {
         // The log tables have not yet been converted to have varchar(17) fields for log_conn_id.
         // Continue to use the less reliable connection_id for al tables for now.
-        $sqlStmt .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
-        $deleteSQL .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
+        $connectionSQLString = "CONNECTION_ID()";
       }
-
-      $sqlStmt .= "END IF;";
-      $deleteSQL .= "END IF;";
+      $sqlStmt .= $connectionSQLString . ", @civicrm_user_id, '{eventName}'); END IF;";
+      $deleteSQL .= $connectionSQLString . ", @civicrm_user_id, '{eventName}'); END IF;";
 
       $insertSQL .= $sqlStmt;
       $updateSQL .= $sqlStmt;
