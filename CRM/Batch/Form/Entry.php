@@ -650,6 +650,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         foreach ($dateTypes as $dateField => $dateVariable) {
           $$dateVariable = CRM_Utils_Date::processDate($value[$dateField]);
+          $fDate[$dateField] = CRM_Utils_Array::value($dateField, $value);
         }
 
         $calcDates = array();
@@ -806,12 +807,16 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             }
           }
           foreach (array('join_date', 'start_date', 'end_date') as $dateType) {
-            $formDates[$dateType] = CRM_Utils_Array::value($dateType, $value);
+            //CRM-18000 - ignore $dateType if its not explicitly passed
+            if (!empty($fDate[$dateType]) || !empty($fDate['membership_' . $dateType])) {
+              $formDates[$dateType] = CRM_Utils_Array::value($dateType, $value);
+            }
           }
           $membershipSource = CRM_Utils_Array::value('source', $value);
           list($membership) = CRM_Member_BAO_Membership::renewMembership(
             $value['contact_id'], $value['membership_type_id'], FALSE,
-            NULL, NULL, $value['custom'], NULL, NULL, FALSE,
+            //$numTerms should be default to 1.
+            NULL, NULL, $value['custom'], 1, NULL, FALSE,
             NULL, $membershipSource, $isPayLater, $campaignId, $formDates
           );
 
