@@ -183,6 +183,13 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('Add Contact Deleted by Merge Activity Type', 'addDeletedByMergeActivityType');
   }
 
+  public function upgrade_4_7_7($rev) {
+    // https://issues.civicrm.org/jira/browse/CRM-18006
+    if (CRM_Core_DAO::checkTableExists('civicrm_install_canary')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_install_canary ENGINE=InnoDB');
+    }
+  }
+
   /**
    * CRM-16354
    *
