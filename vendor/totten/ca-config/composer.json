@@ -1,0 +1,23 @@
+{
+    "name": "totten/ca-config",
+    "description": "Default configuration for certificate authorities",
+    "homepage": "https://github.com/totten/ca_config",
+    "license": "BSD-2-Clause",
+    "require": {
+        "php": ">=5.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "CA_Config": "src/"
+         }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "authors": [
+        {
+            "name": "Tim Otten",
+            "email": "to-git@think.hm"
+        }
+    ]
+}

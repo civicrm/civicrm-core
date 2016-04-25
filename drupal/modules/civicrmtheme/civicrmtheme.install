@@ -1,0 +1,60 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
+ */
+
+/*
+ * Implemenation of hook_enable()
+ */
+function civicrmtheme_enable() {
+  // update module weight to 110, to make it run after system and civicrm
+  db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrmtheme'");
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function civicrmtheme_install() {
+  $link = l(t('Administer > Appearance > Administration theme'), 'admin/appearance');
+  drupal_set_message(t("CiviCRM theme configuration setting is available under !link", array('!link' => $link)));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function civicrmtheme_uninstall() {
+  // cleaning variables
+  variable_del('civicrmtheme_theme_admin');
+  variable_del('civicrmtheme_theme_public');
+}
+

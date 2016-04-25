@@ -1,0 +1,113 @@
+array (
+  'rules' => 
+  array (
+    'rules_1' => 
+    array (
+      '#type' => 'rule',
+      '#set' => 'event_mailing_test',
+      '#label' => 'Send Mail to Scheduling Services',
+      '#active' => 1,
+      '#weight' => '0',
+      '#categories' => 
+      array (
+      ),
+      '#status' => 'custom',
+      '#conditions' => 
+      array (
+      ),
+      '#actions' => 
+      array (
+        0 => 
+        array (
+          '#weight' => 0,
+          '#type' => 'action',
+          '#settings' => 
+          array (
+            'to' => 'conference.services@example.com',
+            'from' => '',
+            'subject' => 'New Scheduling Services Email: {mailing.subject}',
+            'message' => 'A new mailing has been scheduled: {mailing.name}
+
+You can review the mail here: {mailing.editURL}
+You can schedule the mail here: {mailing.scheduleURL}
+
+The content of the email is:
+<pre>
+{mailing.html}
+</pre>
+',
+          ),
+          '#name' => 'rules_action_civicrm_mailing_send_email',
+          '#info' => 
+          array (
+            'label' => 'Send Email',
+            'arguments' => 
+            array (
+              'mailing' => 
+              array (
+                'type' => 'mailing',
+                'label' => 'Send Email',
+              ),
+            ),
+            'module' => 'CiviCRM Mailing',
+          ),
+        ),
+      ),
+      '#version' => 6003,
+    ),
+    'rules_2' => 
+    array (
+      '#type' => 'rule',
+      '#set' => 'event_mailing_scheduled',
+      '#label' => 'Send Mail to Print Production',
+      '#active' => 1,
+      '#weight' => '0',
+      '#categories' => 
+      array (
+      ),
+      '#status' => 'custom',
+      '#conditions' => 
+      array (
+      ),
+      '#actions' => 
+      array (
+        0 => 
+        array (
+          '#weight' => 0,
+          '#info' => 
+          array (
+            'label' => 'Send Email',
+            'arguments' => 
+            array (
+              'mailing' => 
+              array (
+                'type' => 'mailing',
+                'label' => 'Send Email',
+              ),
+            ),
+            'module' => 'CiviCRM Mailing',
+          ),
+          '#name' => 'rules_action_civicrm_mailing_send_email',
+          '#settings' => 
+          array (
+            'to' => print.production@example.com',
+            'from' => '',
+            'subject' => 'New Email to Print Production: {mailing.subject}',
+            'message' => 'A new mailing has been scheduled: {mailing.name}
+
+You can review the mail here: {mailing.viewURL}
+You can approve the mail here: {mailing.approveURL}
+
+The content of the email is:
+<pre>
+{mailing.html}
+</pre>
+',
+          ),
+          '#type' => 'action',
+        ),
+      ),
+      '#version' => 6003,
+    ),
+  ),
+)
