@@ -488,6 +488,16 @@
       var isStandalone = ('{$context}' == 'standalone');
       var isEmailEnabledForSite = {$isEmailEnabledForSite};
 
+    function showEmailOptions() {
+      {/literal}
+      // @todo emailExists refers to the primary contact for the page.
+      // elsewhere some script determines if there is a paying contact the
+      // email should go to instead (e.g gift membership). This should be checked for here
+      // and that merged into that code as currently behaviour is inconsistent.
+      var emailExists = '{$emailExists}';
+      var isStandalone = ('{$context}' == 'standalone');
+      var isEmailEnabledForSite = {$isEmailEnabledForSite};
+
       {literal}
       var isEmailable = (isEmailEnabledForSite && (emailExists || isStandalone));
 
