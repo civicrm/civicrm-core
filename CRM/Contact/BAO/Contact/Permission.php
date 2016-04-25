@@ -38,11 +38,11 @@ class CRM_Contact_BAO_Contact_Permission {
    * Check if the logged in user has permissions for the operation type.
    *
    * @param int $id
-   *   Contact id.
+   *   Contact id they are trying to access.
    * @param int|string $type the type of operation (view|edit)
    *
    * @return bool
-   *   true if the user has permission, false otherwise
+   *   true if the user has permission to do the given operation on this contact.
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
     $tables = array();

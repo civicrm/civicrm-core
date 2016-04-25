@@ -1583,8 +1583,6 @@ class CRM_Contact_BAO_Query {
    */
   public static function legacyConvertFormValues($id, &$values) {
     $legacyElements = array(
-      'membership_type_id',
-      'membership_status_id',
       'activity_type_id',
       'location_type',
     );
@@ -4835,7 +4833,8 @@ civicrm_relationship.is_permission_a_b = 0
         $this->_whereTables,
         NULL,
         $onlyDeleted,
-        $this->_skipDeleteClause
+        $this->_skipDeleteClause,
+        TRUE
       );
 
       // regenerate fromClause since permission might have added tables
