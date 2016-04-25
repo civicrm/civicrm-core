@@ -258,7 +258,7 @@ class CRM_Utils_Type {
 
       case 'MysqlColumnNameLoose':
         if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
-          return str_replace('`', '', $data);
+          return str_replace('`', '``', $data);
         }
         break;
 

@@ -215,7 +215,9 @@ class CRM_Core_Page_AJAX {
   }
 
   public static function defaultSortAndPagerParams($defaultOffset = 0, $defaultRowCount = 25, $defaultSort = NULL, $defaultsortOrder = 'asc') {
-    $params = array();
+    $params = array(
+      '_raw_values' => array(),
+    );
 
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
@@ -230,12 +232,33 @@ class CRM_Core_Page_AJAX {
 
     if ($sort) {
       $params['sortBy'] = "`{$sort}` {$sortOrder}";
+
+      $params['_raw_values']['sort'][0] =  $sort;
+      $params['_raw_values']['order'][0] =  $sortOrder;
     }
 
-    $params['page'] = ($offset / $rowCount) + 1;
+    $params['offset'] = $offset;
     $params['rp'] = $rowCount;
+    $params['page'] = ($offset / $rowCount) + 1;
 
     return $params;
+  }
+
+  public static function getSanitizedParams($requiredParams = array(), $optionalParams = array()) {
+    $params = array();
+
+    foreach ($requiredParams as $param => $type) {
+      $params[$param] = CRM_Utils_Type::escape(CRM_Utils_Array::value($param, $_GET), $type);
+    }
+
+    foreach ($optionalParams as $param => $type) {
+      if (CRM_Utils_Array::value($param, $_GET)) {
+        $params[$param] = CRM_Utils_Type::escape(CRM_Utils_Array::value($param, $_GET), $type);
+      }
+    }
+
+    return $params;
+
   }
 
 }
