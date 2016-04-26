@@ -377,6 +377,30 @@ class CRM_Utils_Type {
         }
         break;
 
+      case 'MysqlColumnNameLoose':
+        if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
+          return data;
+        }
+        break;
+
+      case 'MysqlColumnName':
+        if (CRM_Utils_Rule::mysqlColumnName($data)) {
+          return $data;
+        }
+        break;
+
+      case 'MysqlOrderByDirection':
+        if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
+          return $data;
+        }
+        break;
+
+      case 'MysqlOrderBy':
+        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
+          return $data;
+        }
+        break;
+
       default:
         CRM_Core_Error::fatal("Cannot recognize $type for $data");
         break;
