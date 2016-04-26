@@ -37,23 +37,23 @@
  */
 class CRM_Activity_Page_AJAX {
   public static function getCaseActivity() {
-    // Should those params be passed through the getSanitizedParams method?
-    $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
-    $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    $userID = CRM_Utils_Type::escape($_GET['userID'], 'Integer');
-    $context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
+    // Should those params be passed through the validateParams method?
+    $caseID = CRM_Utils_Type::validate($_GET['caseID'], 'Integer');
+    $contactID = CRM_Utils_Type::validate($_GET['cid'], 'Integer');
+    $userID = CRM_Utils_Type::validate($_GET['userID'], 'Integer');
+    $context = CRM_Utils_Type::validate(CRM_Utils_Array::value('context', $_GET), 'String');
 
     $optionalParameters = array(
       'source_contact_id' => 'Integer',
       'status_id' => 'Integer',
       'activity_deleted' => 'Boolean',
       'activity_type_id' => 'Integer',
-      'activity_date_low' => 'String',
-      'activity_date_high' => 'String',
+      'activity_date_low' => 'Date',
+      'activity_date_high' => 'Date',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
-    $params += CRM_Core_Page_AJAX::getSanitizedParams(array(), $optionalParameters);
+    $params += CRM_Core_Page_AJAX::validateParams(array(), $optionalParameters);
 
     // get the activities related to given case
     $activities = CRM_Case_BAO_Case::getCaseActivity($caseID, $params, $contactID, $context, $userID);
@@ -399,7 +399,7 @@ class CRM_Activity_Page_AJAX {
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
-    $params += CRM_Core_Page_AJAX::getSanitizedParams($requiredParameters, $optionalParameters);
+    $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
 
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
