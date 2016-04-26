@@ -4557,7 +4557,10 @@ civicrm_relationship.is_permission_a_b = 0
       $groupBy = 'GROUP BY civicrm_activity.id ';
     }
 
-    $order = $orderBy = $limit = '';
+    # let's sort it in alphabet order by default, for now it sorts by ID each time more than on search criteria is being selected 
+    # (like part of the name and relationship type, etc.)
+    $order = " order by contact_a.sort_name asc"; 
+    $orderBy = $limit = '';
     if (!$count) {
       $config = CRM_Core_Config::singleton();
       if ($config->includeOrderByClause ||
