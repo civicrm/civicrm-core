@@ -307,7 +307,9 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if (!empty($this->_relatedContacts)) {
       $checkBoxes = array();
       foreach ($this->_relatedContacts as $id => $row) {
-        $checkBoxes[$id] = $this->addElement('checkbox', $id, NULL, NULL, array('class' => 'select-row'));
+        foreach ($row as $key => $value) {
+          $checkBoxes[$key] = $this->addElement('checkbox', $key, NULL, NULL, array('class' => 'select-row'));
+        }
       }
 
       $this->addGroup($checkBoxes, 'contact_check');
