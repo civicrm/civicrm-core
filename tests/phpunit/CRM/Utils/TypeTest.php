@@ -46,7 +46,7 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('DESC', 'MysqlOrderByDirection', 'desc'),
       array('DESCc', 'MysqlOrderByDirection', NULL),
       array('table.civicrm_column_name desc', 'MysqlOrderBy', 'table.civicrm_column_name desc'),
-      array('table.civicrm_column_name desc,other_column,another_column desc', 'MysqlOrderBy', 'table.civicrm_column_name desc, other_column, another_column desc'),
+      array('table.civicrm_column_name desc,other_column, another_column desc', 'MysqlOrderBy', 'table.civicrm_column_name desc,other_column, another_column desc'),
     );
   }
 
