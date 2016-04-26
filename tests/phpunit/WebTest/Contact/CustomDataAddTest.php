@@ -232,7 +232,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     //verify the money custom field value in the proper format
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='custom-set-content-{$customFieldsetId}']/div/div[2]/div[2]"));
-    $this->verifyText("xpath=//div[@id='custom-set-content-{$customFieldsetId}']/div/div[2]/div[2]", '12,345,678.98');
+    $this->assertElementContainsText("xpath=//div[@id='custom-set-content-{$customFieldsetId}']/div/div[2]/div[2]", '12,345,678.98');
   }
 
   public function testCustomDataChangeLog() {

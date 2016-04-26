@@ -93,8 +93,8 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     // Search the participants
     $this->openCiviPage("event/search", "reset=1", '_qf_Search_refresh');
 
-    $eventName = 'Rain';
-    $this->select2("event_id", $eventName);
+    $eventName = 'Rain-forest Cup Youth Soccer Tournament';
+    $this->select2("event_id", $eventName, TRUE);
     $this->click('_qf_Search_refresh');
 
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
