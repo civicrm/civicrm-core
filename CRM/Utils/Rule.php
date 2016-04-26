@@ -144,6 +144,25 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * Validate that a string is valid order by clause.
+   *
+   * @param $str
+   * @return bool
+   */
+  public static function mysqlOrderBy($str) {
+    // Making a regex for a comma separated list is quite hard and not readable
+    // at all, so we split and loop over.
+    $parts = explode(',', $str);
+    foreach ($parts as $part) {
+      if (!preg_match('/^(([\w_]+)((\.)([\w_]+))?( (asc|desc))?)$/i', trim($part))) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
    * @param $str
    *
    * @return bool
