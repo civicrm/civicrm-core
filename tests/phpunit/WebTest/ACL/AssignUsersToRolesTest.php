@@ -145,7 +145,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $smartGroupTitle = "SmartGroup" . substr(sha1(rand()), 0, 4);
     $this->type("title", $smartGroupTitle);
     $this->clickLink("_qf_SaveSearch_next-bottom");
-    $this->waitForText('crm-notification-container', "Your smart group has been saved as \'$smartGroupTitle\'");
+    $this->waitForText('crm-notification-container', "Your smart group has been saved as '$smartGroupTitle'");
 
     //Create ACL role
     $this->openCiviPage("admin/options/acl_role", "reset=1", "xpath=//a[@class='button new-option']");

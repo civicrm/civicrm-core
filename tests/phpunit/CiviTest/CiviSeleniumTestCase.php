@@ -627,6 +627,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $tableLocator = "[@id='$tableId']";
     }
     foreach ($expected as $label => $value) {
+      //assertContains() accepts param as string
+      $value = "$value";
       if ($xpathPrefix) {
         $this->waitForElementPresent("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td");
         $this->assertElementContainsText("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td", $value);
