@@ -892,9 +892,7 @@ LIMIT {$offset}, {$rowCount}
       INNER JOIN civicrm_prevnext_cache old on cpc.id = old.id
       SET cpc.entity_id1 = cpc.entity_id2, cpc.entity_id2 = old.entity_id1 ";
     if (is_array($prevNextId) && !CRM_Utils_Array::crmIsEmptyArray($prevNextId)) {
-      foreach ($prevNextId as $id) {
-        CRM_Utils_Type::escape($id, 'Positive');
-      }
+      CRM_Utils_Type::escapeAll($prevNextId, 'Positive');
       $prevNextId = implode(', ', $prevNextId);
       $query     .= "WHERE cpc.id IN ({$prevNextId}) AND cpc.is_selected = 1";
     }
@@ -993,9 +991,7 @@ LIMIT {$offset}, {$rowCount}
     //check pnid is_array or integer
     $whereClause = NULL;
     if (is_array($pnid) && !CRM_Utils_Array::crmIsEmptyArray($pnid)) {
-      foreach ($pnid as $id) {
-        CRM_Utils_Type::escape($id, 'Positive');
-      }
+      CRM_Utils_Type::escapeAll($pnid, 'Positive');
       $pnid = implode(', ', $pnid);
       $whereClause = " id IN ( {$pnid} ) ";
     }
