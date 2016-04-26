@@ -343,7 +343,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    *   With caching the performance impact would be small & the function would be cleaner
    */
-  public static function getTree(
+  public static function &getTree(
     $entityType,
     $deprecated = NULL,
     $entityID = NULL,
