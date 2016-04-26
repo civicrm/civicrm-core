@@ -294,7 +294,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
             'table' => 'civicrm_currency',
             'keyColumn' => 'name',
             'labelColumn' => 'full_name',
-            'nameColumn' => 'numeric_code',
+            'nameColumn' => 'name',
           )
         ) ,
         'is_payment' => array(

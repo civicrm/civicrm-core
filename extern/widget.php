@@ -56,6 +56,10 @@ $output = '
     var ' . $jsonvar . ' = ' . json_encode($data) . ';
 ';
 
-CRM_Core_Page_AJAX::setJsHeaders(60);
+// FIXME: Not using CRM_Core_Page_AJAX::setJsHeaders because CMS is not bootstrapped
+header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 60));
+header('Content-Type: application/javascript');
+header("Cache-Control: max-age=60, public");
+
 echo $output;
 CRM_Utils_System::civiExit();

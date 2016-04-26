@@ -43,11 +43,11 @@ class civicrm_handler_field_money extends views_handler_field {
 
   function render($values) {
     $value = $this->get_value($values);
-    $currency_code = $this->get_value($values, 'currency_code');
+    $currency = $this->get_value($values, 'currency');
 
     switch ($this->options ['display_format']) {
       case 'formatted':
-        return CRM_Utils_Money::format($value);
+        return CRM_Utils_Money::format($value, $currency);
 
       case 'raw':
         return $value;

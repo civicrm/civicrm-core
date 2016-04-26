@@ -256,29 +256,21 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnNameOrAlias':
-        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
-          $data = str_replace('`', '', $data);
-          $parts = explode('.', $data);
-          $data = '`' . implode('`.`', $parts) . '`';
+      case 'MysqlColumnNameLoose':
+        if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
+          return str_replace('`', '', $data);
+        }
+        break;
 
+      case 'MysqlColumnName':
+        if (CRM_Utils_Rule::mysqlColumnName($data)) {
           return $data;
         }
         break;
 
       case 'MysqlOrderByDirection':
         if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
-          return strtolower($data);
-        }
-        break;
-
-      case 'MysqlOrderBy':
-        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
-          $parts = explode(',', $data);
-          foreach ($parts as &$part) {
-            $part = preg_replace_callback('/^(?:(?:((?:`[\w-]{1,64}`|[\w-]{1,64}))(?:\.))?(`[\w-]{1,64}`|[\w-]{1,64})(?: (asc|desc))?)$/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
-          }
-          return implode(', ', $parts);
+          return $data;
         }
         break;
 

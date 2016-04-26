@@ -786,7 +786,7 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO {
         'default_role_id' => array(
           'name' => 'default_role_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Default Role ID') ,
+          'title' => ts('Default Role') ,
           'description' => 'Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.',
           'import' => true,
           'where' => 'civicrm_event.default_role_id',
@@ -1186,7 +1186,7 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO {
             'table' => 'civicrm_currency',
             'keyColumn' => 'name',
             'labelColumn' => 'full_name',
-            'nameColumn' => 'numeric_code',
+            'nameColumn' => 'name',
           )
         ) ,
         'campaign_id' => array(

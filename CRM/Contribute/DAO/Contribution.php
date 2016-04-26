@@ -495,7 +495,7 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO {
             'table' => 'civicrm_currency',
             'keyColumn' => 'name',
             'labelColumn' => 'full_name',
-            'nameColumn' => 'numeric_code',
+            'nameColumn' => 'name',
           )
         ) ,
         'cancel_date' => array(

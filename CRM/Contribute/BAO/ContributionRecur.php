@@ -692,13 +692,18 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * The pledge payment record should already exist & will need to be updated with the new contribution ID.
    * If not the contribution will also need to be linked to the pledge
    *
-   * @param CRM_Contribute_BAO_Contribution $contribution
+   * @param int $contributionID
+   * @param int $contributionRecurID
+   * @param int $contributionStatusID
+   * @param float $contributionAmount
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function updateRecurLinkedPledge($contribution) {
+  public static function updateRecurLinkedPledge($contributionID, $contributionRecurID, $contributionStatusID, $contributionAmount) {
     $returnProperties = array('id', 'pledge_id');
     $paymentDetails = $paymentIDs = array();
 
-    if (CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $contribution->id,
+    if (CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $contributionID,
       $paymentDetails, $returnProperties
     )
     ) {
@@ -710,12 +715,12 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     else {
       //payment is not already linked - if it is linked with a pledge we need to create a link.
       // return if it is not recurring contribution
-      if (!$contribution->contribution_recur_id) {
+      if (!$contributionRecurID) {
         return;
       }
 
       $relatedContributions = new CRM_Contribute_DAO_Contribution();
-      $relatedContributions->contribution_recur_id = $contribution->contribution_recur_id;
+      $relatedContributions->contribution_recur_id = $contributionRecurID;
       $relatedContributions->find();
 
       while ($relatedContributions->fetch()) {
@@ -740,18 +745,18 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         // return now so we don't create a core error & roll back
         return;
       }
-      $paymentDetails['contribution_id'] = $contribution->id;
-      $paymentDetails['status_id'] = $contribution->contribution_status_id;
-      $paymentDetails['actual_amount'] = $contribution->total_amount;
+      $paymentDetails['contribution_id'] = $contributionID;
+      $paymentDetails['status_id'] = $contributionStatusID;
+      $paymentDetails['actual_amount'] = $contributionAmount;
 
       // put contribution against it
-      $payment = CRM_Pledge_BAO_PledgePayment::add($paymentDetails);
-      $paymentIDs[] = $payment->id;
+      $payment = civicrm_api3('PledgePayment', 'create', $paymentDetails);
+      $paymentIDs[] = $payment['id'];
     }
 
     // update pledge and corresponding payment statuses
-    CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId, $paymentIDs, $contribution->contribution_status_id,
-      NULL, $contribution->total_amount
+    CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId, $paymentIDs, $contributionStatusID,
+      NULL, $contributionAmount
     );
   }
 

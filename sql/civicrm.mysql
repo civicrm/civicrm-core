@@ -2962,7 +2962,7 @@ CREATE TABLE `civicrm_mailing_recipients` (
     PRIMARY KEY ( `id` )
  
  
-,          CONSTRAINT FK_civicrm_mailing_recipients_mailing_id FOREIGN KEY (`mailing_id`) REFERENCES `civicrm_mailing`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_recipients_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_recipients_email_id FOREIGN KEY (`email_id`) REFERENCES `civicrm_email`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_recipients_phone_id FOREIGN KEY (`phone_id`) REFERENCES `civicrm_phone`(`id`) ON DELETE CASCADE  
+,          CONSTRAINT FK_civicrm_mailing_recipients_mailing_id FOREIGN KEY (`mailing_id`) REFERENCES `civicrm_mailing`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_recipients_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_recipients_email_id FOREIGN KEY (`email_id`) REFERENCES `civicrm_email`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_mailing_recipients_phone_id FOREIGN KEY (`phone_id`) REFERENCES `civicrm_phone`(`id`) ON DELETE SET NULL  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -3009,7 +3009,7 @@ CREATE TABLE `civicrm_mailing_event_queue` (
     PRIMARY KEY ( `id` )
  
  
-,          CONSTRAINT FK_civicrm_mailing_event_queue_job_id FOREIGN KEY (`job_id`) REFERENCES `civicrm_mailing_job`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_event_queue_email_id FOREIGN KEY (`email_id`) REFERENCES `civicrm_email`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_event_queue_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_event_queue_phone_id FOREIGN KEY (`phone_id`) REFERENCES `civicrm_phone`(`id`) ON DELETE CASCADE  
+,          CONSTRAINT FK_civicrm_mailing_event_queue_job_id FOREIGN KEY (`job_id`) REFERENCES `civicrm_mailing_job`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_event_queue_email_id FOREIGN KEY (`email_id`) REFERENCES `civicrm_email`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_mailing_event_queue_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_mailing_event_queue_phone_id FOREIGN KEY (`phone_id`) REFERENCES `civicrm_phone`(`id`) ON DELETE SET NULL  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************

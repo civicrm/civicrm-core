@@ -194,7 +194,15 @@ class TokenRow {
         foreach ($textTokens as $entity => $values) {
           foreach ($values as $field => $value) {
             if (!isset($htmlTokens[$entity][$field])) {
-              $htmlTokens[$entity][$field] = htmlentities($value);
+              // CRM-18420 - Activity Details Field are enclosed within <p>,
+              // hence if $body_text is empty, htmlentities will lead to
+              // conversion of these tags resulting in raw HTML.
+              if ($entity == 'activity' && $field == 'details') {
+                $htmlTokens[$entity][$field] = $value;
+              }
+              else {
+                $htmlTokens[$entity][$field] = htmlentities($value);
+              }
             }
           }
         }

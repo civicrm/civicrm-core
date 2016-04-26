@@ -167,6 +167,11 @@ class Container {
       ))->setFactoryClass('CRM_Utils_Cache')->setFactoryMethod('create');
     }
 
+    $container->setDefinition('sql_triggers', new Definition(
+      'Civi\Core\SqlTriggers',
+      array()
+    ));
+
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactoryClass('CRM_Utils_Mail')->setFactoryMethod('createMailer');
 

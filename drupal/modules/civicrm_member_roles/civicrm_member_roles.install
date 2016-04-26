@@ -60,3 +60,28 @@ function civicrm_member_roles_uninstall() {
   variable_del('civicrm_member_roles_sync_method');
 }
 
+/**
+ * Translate the old integer-based data format for synchronization settings to
+ * the array-based format which supports multiple sync options.
+ */
+function civicrm_member_roles_update_7400() {
+  // Get the current sync method and see if a format update is needed.
+  $sync_method = variable_get('civicrm_member_roles_sync_method');
+  if (is_numeric($sync_method)) {
+    // Translate the old value to the new.
+    switch ($sync_method) {
+      case '0':
+        variable_set('civicrm_member_roles_sync_method', array('login'));
+        break;
+      case '1':
+        variable_set('civicrm_member_roles_sync_method', array('cron'));
+        break;
+      case '2':
+        variable_set('civicrm_member_roles_sync_method', array());
+        break;
+      case '3':
+        variable_set('civicrm_member_roles_sync_method', array('update'));
+        break;
+    }
+  }
+}

@@ -123,12 +123,6 @@
   <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
     <div id="mainTabContainer">
       <ul class="crm-contact-tabs-list">
-        <li id="tab_summary" class="crm-tab-button ui-corner-all">
-          <a href="#contact-summary" title="{ts}Summary{/ts}">
-            <span> </span> {ts}Summary{/ts}
-            <em></em>
-          </a>
-        </li>
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title}">

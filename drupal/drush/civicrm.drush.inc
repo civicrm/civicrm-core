@@ -254,6 +254,9 @@ function civicrm_drush_command() {
   $items['civicrm-member-records'] = array(
     'description' => "Run the CiviMember UpdateMembershipRecord cron (civicrm-member-records).",
   );
+  $items['civicrm-sync-users-contacts'] = array(
+    'description' => "Synchronize Users to Contacts: CiviCRM will check each user record for a contact record. A new contact record will be created for each user where one does not already exist.",
+  );
 
   return $items;
 }
@@ -1563,4 +1566,35 @@ function drush_civicrm_api() {
     default:
       return drush_set_error('CIVICRM_UNKNOWN_FORMAT', dt('Unknown format: @format', array('@format' => $format)));
   }
+}
+
+/**
+ * Implementation of command 'civicrm-sync-users-contacts'
+ */
+function drush_civicrm_sync_users_contacts() {
+  civicrm_initialize();
+  $result = CRM_Utils_System::synchronizeUsers();
+  $status = ts('Checked one user record.',
+    array(
+      'count' => $result['contactCount'],
+      'plural' => 'Checked %count user records.',
+    )
+  );
+  if ($result['contactMatching']) {
+    $status .=  PHP_EOL . ts('Found one matching contact record.',
+      array(
+        'count' => $result['contactMatching'],
+        'plural' => 'Found %count matching contact records.',
+      )
+    );
+  }
+
+  $status .= PHP_EOL . ts('Created one new contact record.',
+    array(
+      'count' => $result['contactCreated'],
+      'plural' => 'Created %count new contact records.',
+    )
+  );
+  drush_print(dt($status));
+  return $result;
 }

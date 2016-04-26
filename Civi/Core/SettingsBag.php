@@ -150,9 +150,6 @@ class SettingsBag {
     if (!$isUpgradeMode || \CRM_Core_DAO::checkTableExists('civicrm_setting')) {
       $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
       while ($dao->fetch()) {
-        if ($dao->id == 4461) {
-          drupal_set_message($dao->value . ' ' . $dao->id . $dao->name . json_encode(unserialize($dao->value)));
-        }
         $this->values[$dao->name] = ($dao->value !== NULL) ? unserialize($dao->value) : NULL;
       }
     }

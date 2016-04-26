@@ -246,7 +246,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
             'table' => 'civicrm_currency',
             'keyColumn' => 'name',
             'labelColumn' => 'full_name',
-            'nameColumn' => 'numeric_code',
+            'nameColumn' => 'name',
           )
         ) ,
         'financial_account_id' => array(

@@ -247,6 +247,9 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  // Disable automatic download / installation of extensions
  // $civicrm_setting['Extension Preferences']['ext_repo_url'] = false;
 
+ // set triggers to be managed offline per CRM-18212
+ // $civicrm_setting['CiviCRM Preferences']['logging_no_trigger_permission'] = 1;
+
  // Override the CMS root path defined by cmsRootPath.
  // define('CIVICRM_CMSDIR', '/path/to/install/root/');
 
@@ -322,14 +325,16 @@ if (!defined('CIVICRM_DB_CACHE_HOST')) {
 }
 
 /**
- * Change this if you are not using the standard port for your cache server
+ * Change this if you are not using the standard port for your cache server.
+ *
+ * The standard port for Memcache & APCCache is 11211. For Redis it is 6379.
  */
 if (!defined('CIVICRM_DB_CACHE_PORT')) {
   define('CIVICRM_DB_CACHE_PORT', 11211 );
 }
 
 /**
- * Change this if your cache server requires a password (currently only works 
+ * Change this if your cache server requires a password (currently only works
  * with Redis)
  */
 if (!defined('CIVICRM_DB_CACHE_PASSWORD')) {

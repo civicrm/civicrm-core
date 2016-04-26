@@ -99,6 +99,9 @@ CREATE TABLE IF NOT EXISTS `civicrm_status_pref` (
 -- CRM-17005
 UPDATE civicrm_country SET name = 'PALESTINIAN TERRITORY' WHERE name = 'PALESTINIAN TERRITORY, OCCUPIED';
 
+-- CRM-17145 update Activity detail data type
+ALTER TABLE `civicrm_activity` CHANGE `details` `details` LONGTEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'Details about the activity (agenda, notes, etc).';
+
 -- CRM-17136 Added Punjab Province for Pakistan
 INSERT IGNORE INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1163, "PB", "Punjab");

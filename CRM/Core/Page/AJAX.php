@@ -219,17 +219,17 @@ class CRM_Core_Page_AJAX {
 
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnNameOrAlias');
+      $sortMapper[$key] = CRM_Utils_Type::escape($value['data'], 'MysqlColumnName');
     };
 
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::validate($_GET['start'], 'Integer') : $defaultOffset;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::validate($_GET['length'], 'Integer') : $defaultRowCount;
+    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : $defaultOffset;
+    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : $defaultRowCount;
     // Why is the number of order by columns limited to 1?
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::validate($_GET['order'][0]['column'], 'Integer'), $sortMapper) : $defaultSort;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::validate($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : $defaultsortOrder;
+    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : $defaultSort;
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : $defaultsortOrder;
 
     if ($sort) {
-      $params['sortBy'] = "{$sort} {$sortOrder}";
+      $params['sortBy'] = "`{$sort}` {$sortOrder}";
     }
 
     $params['page'] = ($offset / $rowCount) + 1;

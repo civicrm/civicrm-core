@@ -104,7 +104,7 @@ function civicrm_member_roles_sync_user($account) {
   if (!civicrm_initialize()) {
     return;
   }
-  if (variable_get('civicrm_member_roles_sync_method', 0) == 0) {
+  if (in_array('login', variable_get('civicrm_member_roles_sync_method', array('login')), TRUE)) {
     _civicrm_member_roles_sync($account->uid);
   }
 }
@@ -116,8 +116,8 @@ function civicrm_member_roles_cron() {
   if (!civicrm_initialize(TRUE)) {
     return;
   }
-  if (variable_get('civicrm_member_roles_sync_method', 0) == 1) {
-    _civicrm_member_roles_sync();
+  if (in_array('cron', variable_get('civicrm_member_roles_sync_method', array('login')), TRUE)) {
+    _civicrm_member_roles_sync(NULL, NULL, 'cron');
   }
 }
 
@@ -238,16 +238,24 @@ function civicrm_member_roles_configure() {
     '#title' => t('Settings'),
   );
   $form['settings']['civicrm_member_roles_sync_method'] = array(
-    '#type' => 'radios',
+    '#type' => 'checkboxes',
     '#title' => t('Automatic Synchronization Method'),
-    '#description' => t('Select which method CiviMember Roles Sync will use to automatically synchronize Memberships and Roles. If you choose user login/logout, you will have to run an initial "Manual Synchronization" after you create a new rule for it to be applied to all users and contacts. Leave the default setting if you are unsure which method to use.'),
-    '#default_value' => variable_get('civicrm_member_roles_sync_method', 0),
+    '#description' => t('Select which method CiviMember Roles Sync will use to automatically synchronize Memberships and Roles. If you choose user login/logout, you will have to run an initial "Manual Synchronization" after you create a new rule for it to be applied to all users and contacts. If you do not select an option, automatic synchronization will be disabled. You will have to use the "Manually Synchronize" form to synchronize memberships and roles yourself. Leave the default setting if you are unsure which method to use.'),
+    '#default_value' => variable_get('civicrm_member_roles_sync_method', array('login')),
     '#options' => array(
-      0 => t('Synchronize whenever a user logs in or logs out. This action is performed only on the user logging in or out.'),
-      1 => t('Synchronize when Drupal cron is ran. This action will be performed on all users and contacts.'),
-      3 => t('Synchronize when membership is updated.'),
-      2 => t('Disable automatic synchronization. You will have to use the "Manually Synchronize" form to synchronize memberships and roles yourself.'),
+      'login' => t('Synchronize whenever a user logs in or logs out. This action is performed only on the user logging in or out.'),
+      'cron' => t('Synchronize when Drupal cron is ran. This action will be performed on all users and contacts.'),
+      'update' => t('Synchronize when membership is updated.'),
     ),
+  );
+  $form['settings']['civicrm_member_roles_cron_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Memberships Synchronized on Cron'),
+    '#description' => t('Enter how many Memberships and Roles you would like to synchronize per cron run. Synchronization will be performed randomly. This prevents the operation from timing out when too many items are processed at once. If this is empty, all Memberships and Roles will be processed.'),
+    '#default_value' => variable_get('civicrm_member_roles_cron_limit', 150),
+    '#element_validate' => array('element_validate_integer_positive'),
+    '#size' => 15,
+    '#maxlength' => 4,
   );
 
   return system_settings_form($form);
@@ -448,8 +456,13 @@ function civicrm_member_roles_add_rule_form_submit($form, &$form_state) {
 /**
  * Finds members and applies roles based on the rules defined in the settings page. If the ext_uid param is defined then
  * this function will only sync one user.
+ *
+ * @param string $sync_type
+ *   Whether we are syncing on cron, login, etc. Only cron is handled at this time.
+ *
+ * @return bool
  */
-function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL) {
+function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL, $sync_type = NULL) {
   if (!civicrm_initialize()) {
     return;
   }
@@ -468,12 +481,22 @@ function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL) {
   }
   //Find all contacts that have membership rules (or just use $ext_uid)
   if (empty($ext_uid) && empty($cid)) {
-    $sql = "SELECT DISTINCT uf.contact_id FROM civicrm_uf_match uf
+    // Get the number of contacts to sync at once, if we're syncing on cron.
+    $cron_limit = variable_get('civicrm_member_roles_cron_limit', 150);
+    if ($sync_type == 'cron' && is_numeric($cron_limit) && $cron_limit > 0) {
+      $sql = "SELECT DISTINCT uf.contact_id FROM civicrm_uf_match uf
+      LEFT JOIN civicrm_membership m ON uf.contact_id = m.contact_id
+      WHERE m.id IS NOT NULL AND m.membership_type_id IN (" . implode(',', array_keys($memberroles)) . ")
+      ORDER BY RAND() LIMIT " . $cron_limit;
+    }
+    else {
+      $sql = "SELECT DISTINCT uf.contact_id FROM civicrm_uf_match uf
       LEFT JOIN civicrm_membership m ON uf.contact_id = m.contact_id
       WHERE m.id IS NOT NULL AND m.membership_type_id IN (" . implode(',', array_keys($memberroles)) . ")
       ORDER BY m.end_date DESC";
-    //let's prioritise those ending last as then we are more likely to get relevant ones if it doesn't complete
-    //obviously a better fix would be for it to chunk & save where it is up to
+      //let's prioritise those ending last as then we are more likely to get relevant ones if it doesn't complete
+      //obviously a better fix would be for it to chunk & save where it is up to
+    }
     $params = CRM_Core_DAO::$_nullArray;
     $errorMsg = 'unknown error';
     $errorParams = array();
@@ -639,7 +662,7 @@ function _civicrm_member_roles_get_data($type) {
 
 function civicrm_member_roles_civicrm_post($op, $objname, $objid, &$objref) {
   if ($objname == "Membership") {
-    if (variable_get('civicrm_member_roles_sync_method', 0) == 3) {
+    if (in_array('update', variable_get('civicrm_member_roles_sync_method', array('login')), TRUE)) {
       _civicrm_member_roles_sync(NULL, $objref->contact_id);
     }
   }

@@ -240,7 +240,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
             'table' => 'civicrm_currency',
             'keyColumn' => 'name',
             'labelColumn' => 'full_name',
-            'nameColumn' => 'numeric_code',
+            'nameColumn' => 'name',
           )
         ) ,
         'pledge_payment_scheduled_date' => array(
