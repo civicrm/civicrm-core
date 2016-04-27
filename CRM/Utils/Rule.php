@@ -120,7 +120,7 @@ class CRM_Utils_Rule {
     //
     // MySQL permits column names that don't match this (eg containing spaces),
     // but CiviCRM won't create those ...
-    if (!preg_match('/^[\w_]+(\.[\w_]+)?$/i', $str)) {
+    if (!preg_match('/^[\w]+(\.[\w]+)?$/i', $str)) {
       return FALSE;
     }
 
@@ -154,7 +154,7 @@ class CRM_Utils_Rule {
     // at all, so we split and loop over.
     $parts = explode(',', $str);
     foreach ($parts as $part) {
-      if (!preg_match('/^(([\w_]+)((\.)([\w_]+))?( (asc|desc))?)$/i', trim($part))) {
+      if (!preg_match('/^(([\w]+)((\.)([\w]+))?( (asc|desc))?)$/i', trim($part))) {
         return FALSE;
       }
     }
