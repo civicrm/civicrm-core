@@ -79,11 +79,12 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * inconsistency.
    */
   public function testGetTreeCampaignSubType() {
+    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
     $this->campaignCreate();
     $this->campaignCreate();
     $customGroup = $this->CustomGroupCreate(array(
       'extends' => 'Campaign',
-      'extends_entity_column_value' => '12'
+      'extends_entity_column_value' => "{$sep}1{$sep}2{$sep}",
     ));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Campaign', NULL, NULL, NULL, '12');
