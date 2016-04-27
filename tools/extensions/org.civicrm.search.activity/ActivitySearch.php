@@ -75,7 +75,7 @@ class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {
 
     //Add custom fields to columns array for inclusion in export
     require_once 'CRM/Core/BAO/CustomGroup.php';
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Activity', $form, NULL,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', NULL, NULL,
       NULL, '', NULL
     );
 
@@ -203,7 +203,7 @@ class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {
 
     // add custom group fields to SELECT and FROM clause
     require_once 'CRM/Core/BAO/CustomGroup.php';
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Activity', $form, NULL, NULL, '', NULL);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', NULL, NULL, NULL, '', NULL);
 
     foreach ($groupTree as $key) {
       if ($key['extends'] == 'Activity') {
