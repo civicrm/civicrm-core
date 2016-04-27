@@ -254,9 +254,10 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
   public function beginPostProcessCommon() {
    if (empty($this->_params['id_value'])) {
      CRM_Core_Error::statusBounce(
-       ts('You have attempted to access the mailing details report without specifying an ID.
-       Please contact Andrew Dockery or Seamus Lee and tell them how this happened as
-       part of their analysis. Reference Redmine 10035')
+       ts('This function has been deliberately disabled due to serious stability issues.
+       Please report this incident in Atrium and explain step-by-step what
+       you did to reach this point so work can be done on resolving this problem.
+       Reference Redmine 10035')
      );
    }
   }
