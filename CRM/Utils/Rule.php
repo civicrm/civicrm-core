@@ -93,9 +93,13 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlColumnNameLoose($str) {
-    //  check the length.
-    // This check can be incorrect for the <table>.<column> format, which can be
+    // Check the length.
+    // This check is incorrect for the <table>.<column> format, which can be
     // a problem.
+    // But is quit difficult to check, as a dot is also a valid character in a
+    // column name. In that case backticks are needed, which will
+    // be escaped in the escape function, which lead to an icorrect name...
+    // So this function assumes there is only a column name.
     if (empty($str) || strlen($str) > 64) {
       return FALSE;
     }
@@ -111,16 +115,16 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlColumnName($str) {
-    // Check the length.
-    if (empty($str) || strlen($str) > 64) {
+    // Check not empty.
+    if (empty($str)) {
       return FALSE;
     }
 
-    // Make sure it only contains valid characters (alphanumeric and underscores).
+    // Ensure it only contains valid characters (alphanumeric and underscores).
     //
     // MySQL permits column names that don't match this (eg containing spaces),
     // but CiviCRM won't create those ...
-    if (!preg_match('/^[\w]+(\.[\w]+)?$/i', $str)) {
+    if (!preg_match('/^\w{1,64}(\.\w{1,64})?$/i', $str)) {
       return FALSE;
     }
 
@@ -154,7 +158,7 @@ class CRM_Utils_Rule {
     // at all, so we split and loop over.
     $parts = explode(',', $str);
     foreach ($parts as $part) {
-      if (!preg_match('/^(([\w]+)((\.)([\w]+))?( (asc|desc))?)$/i', trim($part))) {
+      if (!preg_match('/^((\w{1,64})((\.)(\w{1,64}))?( (asc|desc))?)$/i', trim($part))) {
         return FALSE;
       }
     }
