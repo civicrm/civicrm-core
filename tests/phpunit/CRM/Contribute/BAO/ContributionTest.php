@@ -78,7 +78,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->contributionDelete($contribution->id);
 
     //Delete Contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -148,7 +148,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->contributionDelete($contribution->id);
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -187,7 +187,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->assertDBNull('CRM_Contribute_DAO_Contribution', $contribution->trxn_id,
       'id', 'trxn_id', 'Database check for deleted Contribution.'
     );
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -278,13 +278,13 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     );
 
     //Delete honor contact
-    Contact::delete($honoreeContactId);
+    $this->contactDelete($honoreeContactId);
 
     //Delete Contribution record
     $this->contributionDelete($contribution->id);
 
     //Delete contributor contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -340,7 +340,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     //Delete Contribution
     $this->contributionDelete($contribution->id);
     //Delete Contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -414,7 +414,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     //Delete Contribution
     $this->contributionDelete($contribution->id);
     //Delete Contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -461,7 +461,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     // Delete Contribution
     $this->contributionDelete($contribution->id);
     // Delete Contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -501,7 +501,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     // Delete Contribution
     $this->contributionDelete($contribution->id);
     // Delete Contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -564,7 +564,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->contributionDelete($contribution->id);
 
     //Delete Contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -631,7 +631,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->contributionDelete($contribution->id);
 
     //Delete Contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -665,7 +665,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       $this->assertEquals($dao->amount, array_pop($amounts), 'Mismatch of amount proportionally assigned to financial item');
     }
 
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 

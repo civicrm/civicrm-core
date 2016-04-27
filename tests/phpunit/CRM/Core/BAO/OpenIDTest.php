@@ -167,7 +167,6 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     $this->assertEquals(0, $openIds[$openIdTwo]['is_primary'], 'Confirm is_primary field value for second openid.');
     $this->assertEquals(0, $openIds[$openIdTwo]['allowed_to_login'], 'Confirm allowed_to_login field value for second openid.');
 
-    //Contact::delete($contactId);
     $this->contactDelete($contactId);
     $this->assertDBRowNotExist('CRM_Contact_DAO_Contact', $contactId);
   }

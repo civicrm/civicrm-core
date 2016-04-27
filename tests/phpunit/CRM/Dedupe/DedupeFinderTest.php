@@ -113,9 +113,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // so 1 pair for - first + last + mail
     $this->assertEquals(count($foundDupes), 1, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
 
-    // delete all created contacts
     foreach ($contactIds as $contactId) {
-      Contact::delete($contactId);
+      $this->contactDelete($contactId);
     }
     // delete dupe group
     $params = array('id' => $groupId, 'version' => 3);
@@ -220,7 +219,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
     // delete all created contacts
     foreach ($contactIds as $contactId) {
-      Contact::delete($contactId);
+      $this->contactDelete($contactId);
     }
   }
 
