@@ -280,7 +280,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->webtestVerifyTabularData($expected);
       $expectedSoft = array(
         'Soft Credit To' => "{$data['soft_credit_first_name']} {$data['soft_credit_last_name']}",
-        'Amount (Soft Credit Type)' => $data['soft_credit_amount'],
+        'Amount (Soft Credit Type)' => "{$data['soft_credit_amount']}",
         'Soft Credit Type' => $data['soft_credit_type'],
       );
       foreach ($expectedSoft as $value) {
@@ -316,7 +316,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->webtestVerifyTabularData($expected);
       $expectedSoft = array(
         'Soft Credit To' => "{$data['soft_credit_first_name']} {$data['soft_credit_last_name']}",
-        'Amount (Soft Credit Type)' => $data['soft_credit_amount'],
+        'Amount (Soft Credit Type)' => "{$data['soft_credit_amount']}",
         'Soft Credit Type' => $data['soft_credit_type'],
       );
       foreach ($expectedSoft as $value) {
