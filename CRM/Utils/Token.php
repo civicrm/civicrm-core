@@ -858,6 +858,7 @@ class CRM_Utils_Token {
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);
     }
+
     return $value;
   }
 
@@ -1615,11 +1616,30 @@ class CRM_Utils_Token {
       foreach ($tokens as $token => $dontCare) {
         $eventTokens[] = substr($token, (strpos($token, '.') + 1), -1);
       }
-      $customtokens = CRM_CORE_BAO_CustomField::getFields('Event');
+      $customtokens = CRM_Core_BAO_CustomField::getFields('Event');
       foreach ($customtokens as $tokenkey => $tokenvalue) {
         $eventTokens[] = 'custom_' . $tokenkey;
       }
       self::$_tokens[$key] = $eventTokens;
+    }
+  }
+
+  /**
+   * store  participant tokens on the static _tokens array
+   */
+  protected static function _buildParticipantTokens() {
+    $key = 'participant';
+    if (!isset(self::$_tokens[$key]) || self::$_tokens[$key] == NULL) {
+      $participantTokens = array();
+      $tokens = CRM_Core_SelectValues::participantTokens();
+      foreach ($tokens as $token => $dontCare) {
+        $participantTokens[] = substr($token, (strpos($token, '.') + 1), -1);
+      }
+      $customtokens = CRM_Core_BAO_CustomField::getFields('Participant');
+      foreach ($customtokens as $tokenkey => $tokenvalue) {
+        $participantTokens[] = 'custom_' . $tokenkey;
+      }
+      self::$_tokens[$key] = $participantTokens;
     }
   }
 
@@ -1796,20 +1816,13 @@ class CRM_Utils_Token {
     $params = array('entity_id' => $event['id'], 'entity_table' => 'civicrm_event');
 
     switch ($token) {
-      case 'balance':
-        $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($params['participant_id'], 'event');
-        $balancePay = CRM_Utils_Array::value('balance', $info);
-        $balancePay = CRM_Utils_Money::format($balancePay);
-        $value = $balancePay;
-        break;
-
       case 'title':
         $value = $event['event_title'];
         break;
 
       case 'end_date':
       case 'start_date':
-        $value = CRM_Utils_Date::customFormat($event[$token], "%d/%m/%Y");
+        $value = CRM_Utils_Date::customFormat($event[$token]);
         break;
 
       case 'type':
@@ -1836,15 +1849,6 @@ class CRM_Utils_Token {
         $value = CIVICRM_UF_BASEURL . 'civicrm/event/register?reset=1&id=' . $event['id'];
         break;
 
-      case 'fee_amount':
-        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event['id']);
-        $result = civicrm_api3('PriceFieldValue', 'get', array('price_field_id' => $priceSetId));
-        $value = '';
-        foreach ($result['values'] as $pricefield) {
-          $value .= $pricefield['label'] . ": " . CRM_Utils_Money::format($pricefield['amount']) . "<br>";
-        }
-        break;
-
       case 'event_id':
         $value = $event['id'];
         break;
@@ -1856,6 +1860,69 @@ class CRM_Utils_Token {
       default:
         if (in_array($token, self::$_tokens[$entity])) {
           $value = $event[$token];
+        }
+        else {
+          $value = "{$entity}.{$token}";
+        }
+        break;
+    }
+
+    if ($escapeSmarty) {
+      $value = self::tokenEscapeSmarty($value);
+    }
+    return $value;
+  }
+
+  /**
+   * Get replacement strings for any participant tokens
+   * @param string $entity - name of entity type, should be Participant.
+   * @param string $token
+   * @param array $participant an api result array for a single participant
+   * @param bool $escapeSmarty
+   * @return string token replacement
+   */
+  public static function getParticipantTokenReplacement($entity, $token, $participant, $escapeSmarty = FALSE) {
+    $entity = strtolower($entity);
+    if ($entity != 'participant') {
+      // Not sure which exception is appropriate.
+      throw new Exception('$entity is expected to be "participant".');
+    }
+
+    self::_buildParticipantTokens();
+
+    $params = array('entity_id' => $participant['id'], 'entity_table' => 'civicrm_participant');
+
+    switch ($token) {
+      case 'currency':
+        $value = $participant['participant_fee_currency'];
+        break;
+
+      case 'participant_fee_level':
+        if (is_array($participant['participant_fee_level'])) {
+          $value = '';
+          foreach ($participant['participant_fee_level'] as $fee_level) {
+            $value .= $fee_level . "<br>";
+          }
+        }
+        else {
+          $value = $participant['participant_fee_level'];
+        }
+        break;
+
+      case 'event_end_date':
+      case 'event_start_date':
+        $value = CRM_Utils_Date::customFormat($participant[$token]);
+        break;
+
+      case 'participant_id':
+        // I'm not sure why participant_id is not there by default.
+        // I add it here, because I have a use case for this ;-)
+        $value = $participant['id'];
+        break;
+
+      default:
+        if (in_array($token, self::$_tokens[$entity])) {
+          $value = $participant[$token];
         }
         else {
           $value = "{$entity}.{$token}";
