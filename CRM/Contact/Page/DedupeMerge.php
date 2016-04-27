@@ -60,10 +60,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     $action = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
     $mode   = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'safe');
 
-    $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
-    $cacheKeyString = "merge {$contactType}";
-    $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
-    $cacheKeyString .= $gid ? "_{$gid}" : '_0';
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
 
     $urlQry = "reset=1&action=update&rgid={$rgid}";
     $urlQry = $gid ? ($urlQry . "&gid={$gid}") : $urlQry;

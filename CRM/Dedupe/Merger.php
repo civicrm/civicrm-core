@@ -593,12 +593,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return array|bool
    */
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
-    $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
-    $cacheKeyString = "merge {$contactType}";
-    $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
-    $cacheKeyString .= $gid ? "_{$gid}" : '_0';
-    $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
-                                                             pn.entity_id2 = de.contact_id2 )";
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
+    $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
 
     $where = "de.id IS NULL";
     if ($isSelected === 0 || $isSelected === 1) {
@@ -622,6 +618,21 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'where' => $where,
     );
     return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $autoFlip, $redirectForPerformance);
+  }
+
+  /**
+   * Get the string to join the prevnext cache to the dedupe table.
+   *
+   * @return string
+   *   The join string to join prevnext cache on the dedupe table.
+   */
+  public static function getJoinOnDedupeTable() {
+    return "
+      LEFT JOIN civicrm_dedupe_exception de
+        ON (
+          pn.entity_id1 = de.contact_id1
+          AND pn.entity_id2 = de.contact_id2 )
+       ";
   }
 
   public static function updateMergeStats($cacheKeyString, $result = array()) {
@@ -1945,6 +1956,22 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'status_id' => 'Completed',
       ));
     }
+  }
+
+  /**
+   * Get the cache key string for the merge action.
+   *
+   * @param int $rule_group_id
+   * @param int $group_id
+   *
+   * @return string
+   */
+  public static function getMergeCacheKeyString($rule_group_id, $group_id) {
+    $contactType = CRM_Dedupe_BAO_RuleGroup::getContactTypeForRuleGroup($rule_group_id);
+    $cacheKeyString = "merge {$contactType}";
+    $cacheKeyString .= $rule_group_id ? "_{$rule_group_id}" : '_0';
+    $cacheKeyString .= $group_id ? "_{$group_id}" : '_0';
+    return $cacheKeyString;
   }
 
 }
