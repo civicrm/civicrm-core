@@ -264,6 +264,59 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test function that gets duplicate pairs.
+   *
+   * It turns out there are 2 code paths retrieving this data so my initial focus is on ensuring
+   * they match.
+   */
+  public function testGetMatches() {
+    $this->setupMatchData();
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      1,
+      NULL,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[0]['id'],
+        'srcName' => 'Mr. Mickey Mouse II',
+        'dstID' => $this->contacts[1]['id'],
+        'dstName' => 'Mr. Mickey Mouse II',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+  }
+
+  public function setupMatchData() {
+    $fixtures = array(
+      array(
+        'first_name' => 'Mickey',
+        'last_name' => 'Mouse',
+        'email' => 'mickey@mouse.com',
+      ),
+      array(
+        'first_name' => 'Mickey',
+        'last_name' => 'Mouse',
+        'email' => 'mickey@mouse.com',
+      ),
+      array(
+        'first_name' => 'Minnie',
+        'last_name' => 'Mouse',
+        'email' => 'mickey@mouse.com',
+      ),
+    );
+    foreach ($fixtures as $fixture) {
+      $contactID = $this->individualCreate($fixture);
+      $this->contacts[] = array_merge($fixture, array('id' => $contactID));
+    }
+  }
+
+
+  /**
    * Get the list of tables that refer to the CID.
    *
    * This is a statically maintained (in this test list).

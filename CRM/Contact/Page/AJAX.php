@@ -726,7 +726,7 @@ LIMIT {$offset}, {$rowCount}
     if ($selected) {
       $whereClause .= ' AND pn.is_selected = 1';
     }
-    $join .= " LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND pn.entity_id2 = de.contact_id2 )";
+    $join .= CRM_Dedupe_Merger::getJoinOnDedupeTable();
 
     $select = array(
       'cc1.contact_type'     => 'src_contact_type',
