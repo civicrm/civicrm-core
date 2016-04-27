@@ -368,7 +368,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   public function webtestGetValidCountryID() {
     static $_country_id;
     if (is_null($_country_id)) {
-      $_country_id = $this->webtestGetSetting('defaultContactCountry');
+      $_country_id = Civi::settings()->get('defaultContactCountry');
     }
     return $_country_id;
   }
