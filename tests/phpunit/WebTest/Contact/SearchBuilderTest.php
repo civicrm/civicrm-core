@@ -463,6 +463,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->select("membership_type_id[0]", "label={$membershipTypes['member_of_contact']}");
 
     // select membership type
+    $this->waitForElementPresent("membership_type_id[1]");
     $this->select("membership_type_id[1]", "label={$membershipTypes['membership_type']}");
 
     // fill in Source
@@ -532,7 +533,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "_qf_Search_refresh");
     $this->select2('membership_type_id', $membershipTypes['membership_type'], TRUE);
     $this->clickLink('_qf_Search_refresh');
-    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->multiselect2("membership_status_id", array("New", "Grace"));
