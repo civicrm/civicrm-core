@@ -48,8 +48,8 @@ function civicrm_engage_civicrm_buildForm($formName, &$form) {
     if (empty($cgID)) {
       return;
     }
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Individual',
-      $form,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Individual',
+      NULL,
       $form->getVar('_contactId'),
       $cgID,
       NULL, NULL
@@ -107,8 +107,8 @@ function civicrm_engage_civicrm_postProcess($class, &$form) {
       if (empty($cgID)) {
         return;
       }
-      $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Individual',
-        $form,
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Individual',
+        NULL,
         $form->getVar('_contactId'),
         $cgID,
         NULL, NULL
@@ -155,8 +155,8 @@ function civicrm_engage_civicrm_pageRun(&$page) {
     if(empty($contactId)) {
       $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE, NULL, $_REQUEST);
     }
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Individual',
-      $page,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Individual',
+      NULL,
       $contactId,
       $cgID,
       NULL, NULL
