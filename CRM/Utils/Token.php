@@ -1881,13 +1881,19 @@ class CRM_Utils_Token {
 
   /**
    * Get replacement strings for any participant tokens
+   * @param string $entity - name of entity type, should be Participant.
    * @param string $token
    * @param array $participant an api result array for a single participant
    * @param bool $escapeSmarty
    * @return string token replacement
    */
-  public static function getParticipantTokenReplacement($token, $participant, $escapeSmarty = FALSE) {
-    $entity = 'participant';
+  public static function getParticipantTokenReplacement($entity, $token, $participant, $escapeSmarty = FALSE) {
+    $entity = strtolower($entity);
+    if ($entity != 'participant') {
+      // Not sure which exception is appropriate.
+      throw new Exception('$entity is expected to be "participant".');
+    }
+
     self::_buildParticipantTokens();
 
     $params = array('entity_id' => $participant['id'], 'entity_table' => 'civicrm_participant');
@@ -1915,7 +1921,7 @@ class CRM_Utils_Token {
         break;
 
       default:
-        
+
         if (in_array($token, self::$_tokens[$entity])) {
           $value = $participant[$token];
         }
