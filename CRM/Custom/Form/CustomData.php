@@ -125,7 +125,7 @@ class CRM_Custom_Form_CustomData {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree($form->_type,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
       $form,
       $form->_entityId,
       $gid,

@@ -190,7 +190,7 @@ function _multisite_get_all_child_groups($groupID, $includeParent = TRUE) {
   static $_cache = array();
 
   if (! array_key_exists($groupID, $_cache)) {
-    $childGroups = &CRM_Core_BAO_Cache::getItem('descendant groups for an org', $groupID);
+    $childGroups = CRM_Core_BAO_Cache::getItem('descendant groups for an org', $groupID);
 
     if (empty($childGroups)) {
       $childGroups = array();
