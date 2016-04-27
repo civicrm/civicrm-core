@@ -296,7 +296,7 @@ class CRM_Utils_Type {
         if (CRM_Utils_Rule::mysqlOrderBy($data)) {
           $parts = explode(',', $data);
           foreach ($parts as &$part) {
-            $part = preg_replace_callback('/(?:([\w_]+)(?:(?:\.)([\w_]+))?(?: (asc|desc))?)/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
+            $part = preg_replace_callback('/(?:([\w]+)(?:(?:\.)([\w]+))?(?: (asc|desc))?)/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
           }
           return implode(', ', $parts);
         }
