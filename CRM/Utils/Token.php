@@ -1836,15 +1836,6 @@ class CRM_Utils_Token {
         $value = CIVICRM_UF_BASEURL . 'civicrm/event/register?reset=1&id=' . $event['id'];
         break;
 
-      case 'fee_amount':
-        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event['id']);
-        $result = civicrm_api3('PriceFieldValue', 'get', array('price_field_id' => $priceSetId));
-        $value = '';
-        foreach ($result['values'] as $pricefield) {
-          $value .= $pricefield['label'] . ": " . CRM_Utils_Money::format($pricefield['amount']) . "<br>";
-        }
-        break;
-
       case 'event_id':
         $value = $event['id'];
         break;
