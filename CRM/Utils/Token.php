@@ -1778,13 +1778,19 @@ class CRM_Utils_Token {
 
   /**
    * Get replacement strings for any event tokens
+   * @param string $entity - name of entity type, should be Event.
    * @param string $token
    * @param array $event an api result array for a single event
    * @param bool $escapeSmarty
    * @return string token replacement
    */
-  public static function getEventTokenReplacement($token, $event, $escapeSmarty = FALSE) {
-    $entity = 'event';
+  public static function getEventTokenReplacement($entity, $token, $event, $escapeSmarty = FALSE) {
+    $entity = strtolower($entity);
+    if ($entity != 'event') {
+      // Not sure which exception is appropriate.
+      throw new Exception('$entity is expected to be "event".');
+    }
+
     self::_buildEventTokens();
 
     $params = array('entity_id' => $event['id'], 'entity_table' => 'civicrm_event');

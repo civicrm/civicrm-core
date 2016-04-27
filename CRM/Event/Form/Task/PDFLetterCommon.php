@@ -59,12 +59,16 @@ class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLette
 
       // get contact information
 
-      $params = array('contact_id' => $participant['contact_id']);
+      // Create variable $contactId which is used below as well.
+      // $contactID not existing caused the error mentioned in
+      // https://issues.civicrm.org/jira/browse/CRM-16599?focusedCommentId=77663&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-77663
+      $contactId = $participant['contact_id'];
+      $params = array('contact_id' => $contactId);
       list($contact) = CRM_Utils_Token::getTokenDetails($params, $returnProperties, $skipOnHold, $skipDeceased, NULL, $messageToken, 'CRM_Contact_Form_Task_PDFLetterCommon'
       );
 
       if (civicrm_error($contact)) {
-        $notSent[] = $participant['contact_id'];
+        $notSent[] = $contactId;
         continue;
       }
 
