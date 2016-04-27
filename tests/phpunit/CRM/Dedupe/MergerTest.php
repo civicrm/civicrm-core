@@ -22,10 +22,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'domain_id'  => 1,
       'is_active'  => 1,
       'visibility' => 'Public Pages',
-      'version'    => 3,
     );
-    // TODO: This is not an API test!!
-    $result = civicrm_api('group', 'create', $params);
+
+    $result = $this->callAPISuccess('group', 'create', $params);
     $this->_groupId = $result['id'];
 
     // contact data set
@@ -110,7 +109,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'group_id'   => $this->_groupId,
         'version'    => 3,
       );
-      $res = civicrm_api('group_contact', 'create', $grpParams);
+      $this->callAPISuccess('group_contact', 'create', $grpParams);
     }
   }
 
@@ -121,10 +120,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     foreach ($this->_contactIds as $contactId) {
       $this->contactDelete($contactId);
     }
-
-    // delete dupe group
-    $params = array('id' => $this->_groupId, 'version' => 3);
-    civicrm_api('group', 'delete', $params);
+    $this->groupDelete($this->_groupId);
   }
 
   /**
