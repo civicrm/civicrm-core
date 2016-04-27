@@ -449,7 +449,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     }
 
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**

@@ -52,7 +52,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
     $this->assertEquals($activityTypeId, 3, 'Verify activity type id is 3.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -87,8 +87,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $this->assertEquals($activities[$activityId]['subject'], 'Scheduling Meeting', 'Verify activity subject is correct.');
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
@@ -136,8 +136,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $this->assertEquals($defaults['target_contact'][0], $targetContactId, 'Verify target contact id is correct.');
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
@@ -179,13 +179,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => 2,
     );
 
-    $result = CRM_Activity_BAO_Activity::deleteActivity($params);
+    CRM_Activity_BAO_Activity::deleteActivity($params);
 
-    $activityId = $this->assertDBNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
+    $this->assertDBNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
       'subject', 'Database check for deleted activity.'
     );
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
@@ -226,8 +226,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'contact_id', 'Database check for deleted activity target.'
     );
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
@@ -268,8 +268,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'contact_id', 'Database check for deleted activity assignment.'
     );
 
-    Contact::delete($contactId);
-    Contact::delete($assigneeContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($assigneeContactId);
   }
 
   /**

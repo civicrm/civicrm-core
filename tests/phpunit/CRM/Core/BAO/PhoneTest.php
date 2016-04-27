@@ -75,7 +75,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
       "Check if phone field has expected value in updated record ( civicrm_phone.id={$phoneId} )."
     );
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -102,7 +102,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
     $this->assertEquals('(415) 222-1011 x 221', $firstPhoneValue[0]['phone'], "Confirm primary Phone value ( {$firstPhoneValue[0]['phone']} ).");
     $this->assertEquals(1, $firstPhoneValue[0]['is_primary'], 'Confirm first Phone is primary.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
