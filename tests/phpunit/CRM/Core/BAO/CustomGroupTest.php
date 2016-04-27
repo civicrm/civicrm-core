@@ -74,6 +74,25 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
   /**
    * Test calling getTree with contact subtype data.
+   *
+   * Note that the function seems to support a range of formats so 3 are tested. Yay for
+   * inconsistency.
+   */
+  public function testGetTreeCampaignSubType() {
+    $this->campaignCreate();
+    $this->campaignCreate();
+    $customGroup = $this->CustomGroupCreate(array(
+      'extends' => 'Campaign',
+      'extends_entity_column_value' => '12'
+    ));
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
+    $result1 = CRM_Core_BAO_CustomGroup::getTree('Campaign', NULL, NULL, NULL, '12');
+    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
+   * Test calling getTree with contact subtype data.
    */
   public function testGetTreeActivitySubType() {
     $customGroup = $this->CustomGroupCreate(array('extends' => 'Activity', 'extends_entity_column_value' => 1));
@@ -84,7 +103,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test retrieve() with Empty Params
+   * Test retrieve() with Empty Params.
    */
   public function testRetrieveEmptyParams() {
     $params = array();
