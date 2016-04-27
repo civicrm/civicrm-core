@@ -57,14 +57,14 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * inconsistency.
    */
   public function testGetTreeContactSubType() {
-    $this->callAPISuccess('ContactType', 'create', array('name' => 'Big Bank', 'parent_id' => 'Organization'));
-    $customGroup = $this->CustomGroupCreate(array('extends' => 'Organization', 'extends_entity_column_value' => array('Big Bank')));
+    $this->callAPISuccess('ContactType', 'create', array('name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization'));
+    $customGroup = $this->CustomGroupCreate(array('extends' => 'Organization', 'extends_entity_column_value' => array('Big_Bank')));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
-    $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, array('Big Bank'));
+    $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, array('Big_Bank'));
     $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
-    $result = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, CRM_Core_DAO::VALUE_SEPARATOR . 'Big Bank' . CRM_Core_DAO::VALUE_SEPARATOR);
+    $result = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, CRM_Core_DAO::VALUE_SEPARATOR . 'Big_Bank' . CRM_Core_DAO::VALUE_SEPARATOR);
     $this->assertEquals($result1, $result);
-    $result = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, 'Big Bank');
+    $result = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, 'Big_Bank');
     $this->assertEquals($result1, $result);
     try {
       CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, array('Small Kind Bank'));
