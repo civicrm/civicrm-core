@@ -9,6 +9,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   protected $_groupId;
   protected $_contactIds = array();
 
+  public function tearDown() {
+    $this->quickCleanup(array('civicrm_contact', 'civicrm_group_contact', 'civicrm_group'));
+    parent::tearDown();
+  }
+
   public function createDupeContacts() {
     // create a group to hold contacts, so that dupe checks don't consider any other contacts in the DB
     $params = array(
@@ -288,9 +293,53 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'weight' => 20,
         'canMerge' => TRUE,
       ),
+      1 => array(
+        'srcID' => $this->contacts[2]['id'],
+        'srcName' => 'Mr. Minnie Mouse II',
+        'dstID' => $this->contacts[3]['id'],
+        'dstName' => 'Mr. Minnie Mouse II',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
     ), $pairs);
   }
 
+  /**
+   * Test function that gets duplicate pairs.
+   *
+   * It turns out there are 2 code paths retrieving this data so my initial focus is on ensuring
+   * they match.
+   */
+  public function testGetMatchesInGroup() {
+    $this->setupMatchData();
+
+    $groupID = $this->groupCreate(array('title' => 'she-mice'));
+
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[3]['id']));
+
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      1,
+      $groupID,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[3]['id'],
+        'srcName' => 'Mr. Minnie Mouse II',
+        'dstID' => $this->contacts[2]['id'],
+        'dstName' => 'Mr. Minnie Mouse II',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+  }
+
+  /**
+   * Set up some contacts for our matching.
+   */
   public function setupMatchData() {
     $fixtures = array(
       array(
@@ -300,6 +349,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       ),
       array(
         'first_name' => 'Mickey',
+        'last_name' => 'Mouse',
+        'email' => 'mickey@mouse.com',
+      ),
+      array(
+        'first_name' => 'Minnie',
         'last_name' => 'Mouse',
         'email' => 'mickey@mouse.com',
       ),
