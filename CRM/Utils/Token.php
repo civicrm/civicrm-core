@@ -1921,7 +1921,6 @@ class CRM_Utils_Token {
         break;
 
       default:
-
         if (in_array($token, self::$_tokens[$entity])) {
           $value = $participant[$token];
         }
