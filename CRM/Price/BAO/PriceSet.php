@@ -1058,7 +1058,7 @@ WHERE  id = %1";
     }
 
     // Mark which field should have the auto-renew checkbox, if any. CRM-18305
-    if (is_array($form->_membershipTypeValues)) {
+    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
       $autoRenewMembershipTypes = array();
       foreach ($form->_membershipTypeValues as $membershiptTypeValue) {
         if ($membershiptTypeValue['auto_renew']) {
