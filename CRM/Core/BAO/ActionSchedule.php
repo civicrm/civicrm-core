@@ -1287,24 +1287,11 @@ INSERT INTO civicrm_action_log ({$selectColumns})
 {$fromClause}
 {$joinClause}
  LEFT JOIN {$reminderJoinClause}
- LEFT JOIN (
- SELECT reminder.id, reminder.action_schedule_id, reminder.entity_id, reminder.reference_date
-{$fromClause}
-{$joinClause}
- LEFT JOIN {$reminderJoinClause}
- {$whereClause} {$limitWhereClause} {$notINClause} AND {$dateClause} AND
- reminder.action_date_time IS NOT NULL AND
-  reminder.reference_date IS NOT NULL
- ) as already_sent
-   ON reminder.action_schedule_id = already_sent.action_schedule_id
-   AND reminder.entity_id = already_sent.entity_id
-   AND already_sent.reference_date = $dateField
-
 {$whereClause} {$limitWhereClause} {$notINClause} AND {$dateClause} AND
  reminder.action_date_time IS NOT NULL AND
  reminder.reference_date IS NOT NULL
- AND already_sent.id IS NULL
-GROUP BY reminder.id
+GROUP BY reminder.id, reminder.reference_date
+HAVING reminder.id = MAX(reminder.id) AND reminder.reference_date <> {$dateField}
 ";
       }
 
