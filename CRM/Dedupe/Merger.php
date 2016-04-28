@@ -993,6 +993,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (empty($result['values'][$cid]['contact_type'])) {
         return FALSE;
       }
+
+      // CRM-18480: Cancel the process if the contact is already deleted
+      if (isset($result['values'][$cid]['contact_is_deleted']) && !empty($result['values'][$cid]['contact_is_deleted'])) {
+        CRM_Core_Error::fatal(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(1 => $moniker, 2 => $cid)));
+      }
+
       $$moniker = $result['values'][$cid];
     }
 
@@ -1834,7 +1840,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $contactFields = CRM_Contact_DAO_Contact::fields();
     $invalidFields = array(
       'api_key',
-      'contact_is_deleted',
       'created_date',
       'display_name',
       'hash',
