@@ -1223,6 +1223,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'AdvMulti-Select':
       case 'Multi-Select':
         if (is_array($value)) {
+          if ($html_type == 'CheckBox') {
+            CRM_Utils_Array::formatArrayKeys($value);
+          }
           $checkedData = $value;
         }
         else {
@@ -1240,15 +1243,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
 
         $v = array();
-        if ($html_type == 'CheckBox') {
-          foreach ($checkedData as $key => $val) {
-            $v[] = CRM_Utils_Array::value($key, $option);
-          }
-        }
-        else {
-          foreach ($checkedData as $key => $val) {
-            $v[] = CRM_Utils_Array::value($val, $option);
-          }
+        foreach ($checkedData as $key => $val) {
+          $v[] = CRM_Utils_Array::value($val, $option);
         }
         if (!empty($v)) {
           $display = implode(', ', $v);
@@ -1725,14 +1721,27 @@ SELECT id
       $fName = $value['name'];
       $mimeType = $value['type'];
 
+      // If we are already passing the file id as a value then retrieve and set the file data
+      if (CRM_Utils_Rule::integer($value)) {
+        $fileDAO = new CRM_Core_DAO_File();
+        $fileDAO->id = $value;
+        $fileDAO->find(TRUE);
+        if ($fileDAO->N) {
+          $fileID = $value;
+          $fName = $fileDAO->uri;
+          $mimeType = $fileDAO->mime_type;
+        }
+      }
+
       $filename = pathinfo($fName, PATHINFO_BASENAME);
 
-      // rename this file to go into the secure directory
-      if (!rename($fName, $config->customFileUploadDir . $filename)) {
+      // rename this file to go into the secure directory only if
+      // user has uploaded new file not existing verfied on the basis of $fileID
+      if (empty($fileID) && !rename($fName, $config->customFileUploadDir . $filename)) {
         CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
       }
 
-      if ($customValueId) {
+      if ($customValueId && empty($fileID)) {
         $query = "
 SELECT $columnName
   FROM $tableName

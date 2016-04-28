@@ -1,4 +1,0 @@
-Please name your tests by scenario that you're testing, e.g.
-if you are testing the process of adding new activity, put it in
-Activity subdirectory in WebTest and name the file NewActivityTest.php.
-The class name in such case should be: WebTest_Activity_NewActivityTest

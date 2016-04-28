@@ -209,6 +209,12 @@ class CRM_Contact_DAO_ContactType extends CRM_Core_DAO
           'title' => ts('Contact Type Parent') ,
           'description' => 'Optional FK to parent contact type.',
           'FKClassName' => 'CRM_Contact_DAO_ContactType',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_contact_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'label',
+            'condition' => 'parent_id IS NULL',
+          )
         ) ,
         'is_active' => array(
           'name' => 'is_active',

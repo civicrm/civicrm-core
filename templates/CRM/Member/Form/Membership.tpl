@@ -478,9 +478,6 @@
       }
     }
     
-    </script>
-    {/literal}
-
     function showEmailOptions() {
       {/literal}
       // @todo emailExists refers to the primary contact for the page.

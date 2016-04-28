@@ -511,6 +511,11 @@
         showHidePayment(flag);
       });
     }
+    // show payment fields if other-amount already contains a valid amount.
+    if (cj('.other_amount-content input').val() > 0) {
+      flag = false;
+    }
+
     toggleConfirmButton(flag);
     showHidePayment(flag);
   }

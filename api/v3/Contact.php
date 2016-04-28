@@ -57,6 +57,18 @@ function civicrm_api3_contact_create($params) {
     return $values;
   }
 
+  if (array_key_exists('api_key', $params) && !empty($params['check_permissions'])) {
+    if (CRM_Core_Permission::check('edit api keys') || CRM_Core_Permission::check('administer CiviCRM')) {
+      // OK
+    }
+    elseif ($contactID && CRM_Core_Permission::check('edit own api keys') && CRM_Core_Session::singleton()->get('userID') == $contactID) {
+      // OK
+    }
+    else {
+      throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify api key');
+    }
+  }
+
   if (!$contactID) {
     // If we get here, we're ready to create a new contact
     if (($email = CRM_Utils_Array::value('email', $params)) && !is_array($params['email'])) {
@@ -217,30 +229,51 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['state_province_id'] = array(
     'title' => 'Primary Address State Province ID',
     'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_state_province',
+    ),
   );
   $params['state_province_name'] = array(
     'title' => 'Primary Address State Province Name',
     'type' => CRM_Utils_Type::T_STRING,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_state_province',
+    ),
   );
   $params['state_province'] = array(
     'title' => 'Primary Address State Province',
     'type' => CRM_Utils_Type::T_STRING,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_state_province',
+    ),
   );
   $params['country_id'] = array(
     'title' => 'Primary Address Country ID',
     'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_country',
+    ),
   );
   $params['country'] = array(
     'title' => 'Primary Address country',
     'type' => CRM_Utils_Type::T_STRING,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_country',
+    ),
   );
   $params['worldregion_id'] = array(
     'title' => 'Primary Address World Region ID',
     'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_world_region',
+    ),
   );
   $params['worldregion'] = array(
     'title' => 'Primary Address World Region',
     'type' => CRM_Utils_Type::T_STRING,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_world_region',
+    ),
   );
   $params['phone_id'] = array(
     'title' => 'Primary Phone ID',

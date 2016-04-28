@@ -1,5 +1,0 @@
-#!/usr/bin/env php
-<?php
-require_once dirname(dirname(__DIR__)) . '/tests/phpunit/CiviTest/bootstrap.php';
-error_reporting(E_ALL);
-\Civi\CiUtil\Command\LsCommand::main($argv);

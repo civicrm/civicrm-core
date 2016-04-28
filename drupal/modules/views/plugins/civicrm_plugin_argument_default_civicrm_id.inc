@@ -51,6 +51,7 @@ class civicrm_plugin_argument_default_civicrm_id extends views_plugin_argument_d
       '#description' => t('Select the entity type of the ID to extract from the URL'),
       '#options' => array(
         'Contact' => t('Contact'),
+        'Contribution page' => t('Contribution page'),
       ),
       '#default_value' => $this->options['id_type'],
       '#required' => TRUE,
@@ -61,17 +62,32 @@ class civicrm_plugin_argument_default_civicrm_id extends views_plugin_argument_d
    * Get the default argument.
    */
   function get_argument() {
-    
-    // Contact ID is set using the URL parameter 'cid'
-    if ($this->options['id_type'] == 'Contact') {
-      // Check that we are on a Contact entity
-      if (!empty($_GET['cid']) ) {
-        if (is_numeric($_GET['cid'])) {        
+
+    switch ($this->options['id_type']) {
+
+      // Contact ID is set using the param 'cid'
+      case 'Contact':
+        if (!empty($_GET['cid']) && is_numeric($_GET['cid'])) {
           return $_GET['cid'];
         }
-      }  
+        break;
+
+      // Contribution page ID is set using the param 'id'
+      case 'Contribution page':
+        if (
+          strpos(current_path(), 'contribute/transact') !== FALSE
+          && !empty($_GET['id'])
+          && is_numeric($_GET['id'])
+        ) {
+          return $_GET['id'];
+        }
+        break;
+
     }
 
+    // Return FALSE if we haven't returned yet
+    return FALSE;
+
   }
-  
+
 }

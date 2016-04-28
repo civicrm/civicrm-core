@@ -1405,7 +1405,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  */
 function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
   $groupTree = CRM_Core_BAO_CustomGroup::getTree($entity,
-    CRM_Core_DAO::$_nullObject,
+    NULL,
     $entity_id,
     $groupID,
     $subType,
@@ -1798,6 +1798,9 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
     }
   }
   $fields += _civicrm_api_get_custom_fields($entity, $params);
+  if ($entity == 'Contact') {
+    $fields += _civicrm_api_get_fields('Address');
+  }
   return $fields;
 }
 

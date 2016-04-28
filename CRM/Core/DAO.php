@@ -2407,4 +2407,24 @@ SELECT contact_id
   public function setApiFilter(&$params) {
   }
 
+  /**
+   * function to check valid db name containing only characters in [0-9,a-z,A-Z_]
+   *
+   * @param $database
+   *
+   * @return bool
+   */
+  public static function requireValidDBName($database) {
+    $matches = array();
+    preg_match(
+      "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
+      $database,
+      $matches
+    );
+    if (empty($matches)) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
 }

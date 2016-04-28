@@ -1,6 +1,6 @@
 name = CiviCRM
 description = Constituent relationship management system. Allows sites to manage contacts, relationships and groups, and track contact activities, contributions, memberships and events. See the <a href="https://civicrm.org/">CiviCRM website</a> for more information.
-version = 7.x-4.6.14.0
+version = 7.x-4.6.16.0
 package = CiviCRM
 core = 7.x
 project = civicrm
@@ -29,7 +29,6 @@ files[] = modules/views/civicrm/civicrm_handler_field_email.inc
 files[] = modules/views/civicrm/civicrm_handler_field_encounter_medium.inc
 files[] = modules/views/civicrm/civicrm_handler_field_event.inc
 files[] = modules/views/civicrm/civicrm_handler_field_event_link.inc
-files[] = modules/views/civicrm/civicrm_handler_field_event_price_set.inc
 files[] = modules/views/civicrm/civicrm_handler_field_file.inc
 files[] = modules/views/civicrm/civicrm_handler_field_link.inc
 files[] = modules/views/civicrm/civicrm_handler_field_link_activity.inc
@@ -48,10 +47,8 @@ files[] = modules/views/civicrm/civicrm_handler_field_money.inc
 files[] = modules/views/civicrm/civicrm_handler_field_option.inc
 files[] = modules/views/civicrm/civicrm_handler_field_pcp_raised_amount.inc
 files[] = modules/views/civicrm/civicrm_handler_field_phone.inc
-files[] = modules/views/civicrm/civicrm_handler_field_prefix.inc
 files[] = modules/views/civicrm/civicrm_handler_field_relationship_type.inc
 files[] = modules/views/civicrm/civicrm_handler_field_state.inc
-files[] = modules/views/civicrm/civicrm_handler_field_suffix.inc
 files[] = modules/views/civicrm/civicrm_handler_field_custom_file.inc
 files[] = modules/views/civicrm/civicrm_handler_field_contact_image.inc
 
@@ -63,9 +60,7 @@ files[] = modules/views/civicrm/civicrm_handler_filter_encounter_medium.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_group_status.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_custom_option.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_custom_single_option.inc
-files[] = modules/views/civicrm/civicrm_handler_filter_prefix.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_relationship_type.inc
-files[] = modules/views/civicrm/civicrm_handler_filter_suffix.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_country_multi.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_state_multi.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_domain.inc

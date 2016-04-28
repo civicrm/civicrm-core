@@ -1824,10 +1824,13 @@ class CRM_Contact_BAO_Query {
         return;
 
       case 'state_province':
+      case 'state_province_id':
+      case 'state_province_name':
         $this->stateProvince($values);
         return;
 
       case 'country':
+      case 'country_id':
         $this->country($values, FALSE);
         return;
 
@@ -2878,6 +2881,7 @@ class CRM_Contact_BAO_Query {
     $statii = array();
     $in = FALSE;
     $gcsValues = $this->getWhereValues('group_contact_status', $grouping);
+
     if ($gcsValues &&
       is_array($gcsValues[2])
     ) {
