@@ -401,6 +401,11 @@ class CRM_Activity_Page_AJAX {
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
 
+    // To be consistent, the cid parameter should be renamed to contact_id in
+    // the template file, see templates/CRM/Activity/Selector/Selector.tpl
+    $params['contact_id'] = $params['cid'];
+    unset($params['cid']);
+
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
 
