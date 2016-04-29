@@ -2460,8 +2460,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->type('frequency_day', '2');
 
     $this->webtestFillDate('acknowledge_date', 'now');
-
+    $this->waitForElementPresent('contribution_page_id');
     $this->select('contribution_page_id', 'value=3');
+    $this->waitForAjaxContent();
 
     //PaymentReminders
     $this->click('PaymentReminders');
