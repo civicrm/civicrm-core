@@ -233,8 +233,8 @@ class CRM_Core_Page_AJAX {
     if ($sort) {
       $params['sortBy'] = "`{$sort}` {$sortOrder}";
 
-      $params['_raw_values']['sort'][0] =  $sort;
-      $params['_raw_values']['order'][0] =  $sortOrder;
+      $params['_raw_values']['sort'][0] = $sort;
+      $params['_raw_values']['order'][0] = $sortOrder;
     }
 
     $params['offset'] = $offset;
