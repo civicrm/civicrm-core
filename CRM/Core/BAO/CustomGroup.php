@@ -363,7 +363,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         $subTypes = array();
       }
       else {
-        $subTypes = explode(',', $subTypes);
+        if (stristr(',', $subTypes)) {
+          $subTypes = explode(',', $subTypes);
+        }
+        else {
+          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
+        }
       }
     }
 
@@ -653,7 +658,7 @@ ORDER BY civicrm_custom_group.weight,
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
     $subTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_sub_type'));
-    if (!in_array($subType, $subTypes['values'])) {
+    if (!isset($subTypes['values'][$subType])) {
       // Same comments about fail hard as above.
       throw new CRM_Core_Exception('Invalid Filter');
     }
