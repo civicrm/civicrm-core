@@ -54,6 +54,9 @@
       {if $entityID}
         dataUrl += '&entityID=' + '{$entityID}';
       {/if}
+      {if $submittedValues}
+        dataUrl += '&post=' + '{$submittedValues}';
+      {/if}
       {literal}
 
       if (!cgCount) {

@@ -1381,7 +1381,13 @@ ORDER BY civicrm_custom_group.weight,
                 }
               }
               else {
-                $checkedValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($value, 1, -1));
+                if (is_array($value) && count($value)) {
+                  CRM_Utils_Array::formatArrayKeys($value);
+                  $checkedValue = $value;
+                }
+                else {
+                  $checkedValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($value, 1, -1));
+                }
                 foreach ($customOption as $val) {
                   if (in_array($val['value'], $checkedValue)) {
                     if ($field['html_type'] == 'CheckBox') {
@@ -1824,7 +1830,13 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    */
   public static function formatGroupTree(&$groupTree, $groupCount = 1, &$form = NULL) {
     $formattedGroupTree = array();
-    $uploadNames = array();
+    $uploadNames = $formValues = array();
+
+    // JSON encoded submitted form values passed via URL
+    $submittedValues = CRM_Utils_Request::retrieve('post', 'String');
+    if (!empty($submittedValues)) {
+      $submittedValues = json_decode($submittedValues, TRUE);
+    }
 
     foreach ($groupTree as $key => $value) {
       if ($key === 'info') {
@@ -1851,8 +1863,15 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       // add field information
       foreach ($value['fields'] as $k => $properties) {
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
+        if (isset($submittedValues[$properties['element_name']])) {
+          $properties['element_value'] = $submittedValues[$properties['element_name']];
+        }
+        elseif ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
+          $formValues[$properties['element_name']] = $value;
+        }
         if (isset($properties['customValue']) &&
-          !CRM_Utils_System::isNull($properties['customValue'])
+          !CRM_Utils_System::isNull($properties['customValue']) &&
+          !isset($properties['element_value'])
         ) {
           if (isset($properties['customValue'][$groupCount])) {
             $properties['element_name'] = "custom_{$k}_{$properties['customValue'][$groupCount]['id']}";
@@ -1872,6 +1891,10 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
     }
 
     if ($form) {
+      if (count($formValues)) {
+        $form->assign('submittedValues', json_encode($formValues));
+      }
+
       // hack for field type File
       $formUploadNames = $form->get('uploadNames');
       if (is_array($formUploadNames)) {
