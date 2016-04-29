@@ -88,8 +88,8 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->select("state_province-1", "value=1001");
 
     $this->assertTrue($this->isTextPresent("Payment Method"));
-    $xpath = "xpath=//label[text() = '{$proProcessorName}']/preceding-sibling::input[1]";
-    $this->click($xpath);
+    $this->waitForElementPresent("xpath=//label[text() = '{$proProcessorName}']/preceding-sibling::input[1]");
+    $this->click("xpath=//label[text() = '{$proProcessorName}']/preceding-sibling::input[1]");
 
     $this->waitForElementPresent("credit_card_type");
 
@@ -181,11 +181,11 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->waitForElementPresent("xpath=//div[@class='bold pay_later_receipt-section']");
 
     $payLaterInstructionsText = "Pay later instructions $hash";
-    $this->verifyText("xpath=//div[@class='bold pay_later_receipt-section']/p", $payLaterInstructionsText);
+    $this->assertElementContainsText("xpath=//div[@class='bold pay_later_receipt-section']/p", $payLaterInstructionsText);
     $this->click("_qf_Confirm_next-bottom");
 
     $this->waitForElementPresent("xpath=//div[@class='help']/div/p");
-    $this->verifyText("xpath=//div[@class='help']/div/p", $payLaterInstructionsText);
+    $this->assertElementContainsText("xpath=//div[@class='help']/div/p", $payLaterInstructionsText);
 
     //login to check contribution
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
