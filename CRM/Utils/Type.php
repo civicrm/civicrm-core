@@ -271,7 +271,7 @@ class CRM_Utils_Type {
       case 'MysqlColumnName':
         if (CRM_Utils_Rule::mysqlColumnName($data)) {
           $parts = explode('.', $data);
-          $data = '`'.implode('`.`', $parts).'`';
+          $data = '`' . implode('`.`', $parts) . '`';
 
           return $data;
         }
