@@ -221,7 +221,7 @@ class CRM_Core_Page_AJAX {
 
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = CRM_Utils_Type::escape($value['data'], 'MysqlColumnName');
+      $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnName');
     };
 
     $offset = isset($_GET['start']) ? CRM_Utils_Type::validate($_GET['start'], 'Integer') : $defaultOffset;
@@ -231,7 +231,7 @@ class CRM_Core_Page_AJAX {
     $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::validate($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : $defaultsortOrder;
 
     if ($sort) {
-      $params['sortBy'] = "`{$sort}` {$sortOrder}";
+      $params['sortBy'] = "{$sort} {$sortOrder}";
 
       $params['_raw_values']['sort'][0] = $sort;
       $params['_raw_values']['order'][0] = $sortOrder;
