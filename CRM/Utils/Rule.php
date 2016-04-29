@@ -88,26 +88,6 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $str
-   *
-   * @return bool
-   */
-  public static function mysqlColumnNameLoose($str) {
-    // Check the length.
-    // This check is incorrect for the <table>.<column> format, which can be
-    // a problem.
-    // But is quit difficult to check, as a dot is also a valid character in a
-    // column name. In that case backticks are needed, which will
-    // be escaped in the escape function, which lead to an icorrect name...
-    // So this function assumes there is only a column name.
-    if (empty($str) || strlen($str) > 64) {
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
    * Validate an acceptable column name for sorting results.
    *
    * @param $str

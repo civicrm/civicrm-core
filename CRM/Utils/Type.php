@@ -268,15 +268,6 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnNameLoose':
-        if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
-          $parts = explode('.', str_replace('`', '``', $data));
-          $data = '`'.implode('`.`', $parts).'`';
-
-          return $data;
-        }
-        break;
-
       case 'MysqlColumnName':
         if (CRM_Utils_Rule::mysqlColumnName($data)) {
           $parts = explode('.', $data);
@@ -402,12 +393,6 @@ class CRM_Utils_Type {
 
         if (CRM_Utils_Rule::validContact($data)) {
           return $data;
-        }
-        break;
-
-      case 'MysqlColumnNameLoose':
-        if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
-          return data;
         }
         break;
 
