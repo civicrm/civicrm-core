@@ -585,7 +585,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $day = date('j', $timeStamp);
 
     if (!$multiselect) {
-      $this->click("xpath=//input[starts-with(@id, '{$dateElement}_display_')]");
+      $this->click($dateElement);
     }
     $this->waitForElementPresent("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month");
     $this->select("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month", "value=$mon");
