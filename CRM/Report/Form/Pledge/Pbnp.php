@@ -84,7 +84,13 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
-            'requried' => TRUE,
+            'required' => TRUE,
+          ),
+          'frequency_unit' => array(
+            'title' => ts('Frequency Unit'),
+          ),
+          'installments' => array(
+            'title' => ts('Installments'),
           ),
           'amount' => array(
             'title' => ts('Amount'),
@@ -104,6 +110,10 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
             'title' => ts('Pledge Made'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
+          'pledge_amount' => array(
+            'title' => ts('Pledged Amount'),
+            'operatorType' => CRM_Report_Form::OP_INT,
+          ),
           'currency' => array(
             'title' => 'Currency',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -116,6 +126,17 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
+          ),
+          'pledge_status_id' => array(
+            'name' => 'status_id',
+            'title' => ts('Pledge Status'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('contribution_status'),
+          ),
+          'installments' => array(
+            'title' => ts('Installments'),
+            'type' => CRM_Utils_Type::T_INT,
           ),
         ),
         'grouping' => 'pledge-fields',
