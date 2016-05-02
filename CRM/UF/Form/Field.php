@@ -433,8 +433,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     //CRM-4363
     $js = array('onChange' => "mixProfile();");
     // should the field appear in selectors (as a column)?
-    $this->add('checkbox', 'in_selector', ts('Results Column?'), NULL, NULL, $js);
-    $this->add('checkbox', 'is_searchable', ts('Searchable?'), NULL, NULL, $js);
+    $this->add('advcheckbox', 'in_selector', ts('Results Column?'), NULL, NULL, $js);
+    $this->add('advcheckbox', 'is_searchable', ts('Searchable?'), NULL, NULL, $js);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFField');
 
@@ -445,14 +445,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $this->add('textarea', 'help_pre', ts('Field Pre Help'), $attributes['help_pre']);
     $this->add('textarea', 'help_post', ts('Field Post Help'), $attributes['help_post']);
 
-    $this->add('checkbox', 'is_required', ts('Required?'));
+    $this->add('advcheckbox', 'is_required', ts('Required?'));
 
-    $this->add('checkbox', 'is_multi_summary', ts('Include in multi-record listing?'));
-    $this->add('checkbox', 'is_active', ts('Active?'));
-    $this->add('checkbox', 'is_view', ts('View Only?'));
-
-    // $this->add( 'checkbox', 'is_registration', ts( 'Display in Registration Form?' ) );
-    //$this->add( 'checkbox', 'is_match'       , ts( 'Key to Match Contacts?'        ) );
+    $this->add('advcheckbox', 'is_multi_summary', ts('Include in multi-record listing?'));
+    $this->add('advcheckbox', 'is_active', ts('Active?'));
+    $this->add('advcheckbox', 'is_view', ts('View Only?'));
 
     $this->add('text', 'label', ts('Field Label'), $attributes['label']);
 
