@@ -214,6 +214,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     // Nav records are expendable. https://forum.civicrm.org/index.php?topic=36933.0
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE contact_id IS NOT NULL AND name = "navigation"');
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "activity_tab_filter"');
 
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP INDEX index_group_name');
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP COLUMN group_name');
