@@ -1083,7 +1083,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params, $params['invoiceID']);
     $recurParams['financial_type_id'] = $contributionType->id;
 
-    if ($form->_values['is_monetary']) {
+    if (!empty($form->_values['is_monetary'])) {
       $recurParams['payment_instrument_id'] = 1;
     }
 
