@@ -90,22 +90,6 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $str
-   *
-   * @return bool
-   */
-  public static function mysqlColumnNameLoose($str) {
-    //  check the length.
-    // This check can be incorrect for the <table>.<column> format, which can be
-    // a problem.
-    if (empty($str) || strlen($str) > 64) {
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
    * Validate an acceptable column name for sorting results.
    *
    * @param $str
@@ -113,16 +97,13 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlColumnName($str) {
-    // Check the length.
-    if (empty($str) || strlen($str) > 64) {
+    // Check not empty.
+    if (empty($str)) {
       return FALSE;
     }
 
-    // Make sure it only contains valid characters (alphanumeric and underscores).
-    //
-    // MySQL permits column names that don't match this (eg containing spaces),
-    // but CiviCRM won't create those ...
-    if (!preg_match('/^[\w_]+(\.[\w_]+)?$/i', $str)) {
+    // Ensure it only contains valid characters (alphanumeric and underscores).
+    if (!preg_match('/^\w{1,64}(\.\w{1,64})?$/i', $str)) {
       return FALSE;
     }
 
