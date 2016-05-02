@@ -309,7 +309,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
             case 'string':
               if ($val && substr($val, 0, 5) == 'date:') {
                 $val = date('m/d/Y', strtotime(trim(substr($val, 5))));
-                $item = "xpath=//input[starts-with(@id, '{$item}_display_')]";
+                $item = "xpath=//input[@id='{$item}']/following-sibling::input";
               }
               if ($val) {
                 $this->assertElementValueEquals($item, $val);
