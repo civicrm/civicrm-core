@@ -149,6 +149,10 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_DATE,
             'required' => TRUE,
           ),
+          'scheduled_amount' => array(
+            'type' => CRM_Utils_Type::T_MONEY,
+            'title' => 'Next Payment Amount',
+          ),
         ),
         'filters' => array(
           'scheduled_date' => array(
@@ -270,7 +274,11 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
                         ON ({$this->_aliases['civicrm_pledge']}.contact_id =
                             {$this->_aliases['civicrm_contact']}.id)  AND
                             {$this->_aliases['civicrm_pledge']}.status_id IN ( {$statusIds} )
-             LEFT  JOIN civicrm_pledge_payment {$this->_aliases['civicrm_pledge_payment']}
+             LEFT  JOIN ";
+
+    // Note that the derived query protects us from providing inaccurate data in the edge case where pledge
+    // payments have been edited such that they are not in id order. This might be better as a temp table.
+    $this->_from .= "(SELECT * FROM civicrm_pledge_payment ORDER BY scheduled_date) as {$this->_aliases['civicrm_pledge_payment']}
                         ON ({$this->_aliases['civicrm_pledge']}.id =
                             {$this->_aliases['civicrm_pledge_payment']}.pledge_id AND  {$this->_aliases['civicrm_pledge_payment']}.status_id = {$pendingStatus} ) ";
 
