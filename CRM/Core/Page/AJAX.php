@@ -220,9 +220,11 @@ class CRM_Core_Page_AJAX {
     );
 
     $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnName');
-    };
+    if (isset($_GET['columns'])) {
+      foreach ($_GET['columns'] as $key => $value) {
+        $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnName');
+      };
+    }
 
     $offset = isset($_GET['start']) ? CRM_Utils_Type::validate($_GET['start'], 'Integer') : $defaultOffset;
     $rowCount = isset($_GET['length']) ? CRM_Utils_Type::validate($_GET['length'], 'Integer') : $defaultRowCount;
