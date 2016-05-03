@@ -391,11 +391,13 @@ class CRM_Utils_Type {
           return $data;
         }
         break;
+
       case 'MysqlOrderByDirection':
         if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
           return strtolower($data);
         }
         break;
+
       case 'MysqlOrderBy':
         if (CRM_Utils_Rule::mysqlOrderBy($data)) {
           return $data;
