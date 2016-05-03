@@ -50,9 +50,9 @@ class CRM_Activity_Page_AJAX {
     $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
     $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
     $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : 'asc';
 
-    $params = $_GET;
+    $params = array();
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
     }
@@ -68,15 +68,15 @@ class CRM_Activity_Page_AJAX {
   public static function getCaseGlobalRelationships() {
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
+      $sortMapper[$key] = CRM_Utils_Type::escape($value['data'], 'MysqlColumnName');
     };
 
     $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
     $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
     $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : 'asc';
 
-    $params = $_GET;
+    $params = array();
 
     // CRM-14466 initialize variable to avoid php notice.
     $sortSQL = "";
@@ -119,15 +119,15 @@ class CRM_Activity_Page_AJAX {
 
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
+      $sortMapper[$key] = CRM_Utils_Type::escape($value['data'], 'MysqlColumnName');
     };
 
     $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
     $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
     $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : 'asc';
 
-    $params = $_GET;
+    $params = array();
 
     // Retrieve ALL client relationships
     $relClient = CRM_Contact_BAO_Relationship::getRelationship($contactID,
@@ -183,15 +183,15 @@ class CRM_Activity_Page_AJAX {
 
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
+      $sortMapper[$key] = CRM_Utils_Type::escape($value['data'], 'MysqlColumnName');
     };
 
     $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
     $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
     $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : 'asc';
 
-    $params = $_GET;
+    $params = array();
 
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
     $caseTypeName = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
@@ -439,15 +439,15 @@ class CRM_Activity_Page_AJAX {
 
     $sortMapper = array();
     foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
+      $sortMapper[$key] = CRM_Utils_Type::escape($value['data'], 'MysqlColumnName');
     };
 
     $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
     $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
     $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'MysqlOrderByDirection') : 'asc';
 
-    $params = $_GET;
+    $params = array();
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
     }
