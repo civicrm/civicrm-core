@@ -115,4 +115,40 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table[@class='report-layout statistics-table']/tbody/tr[3]/td", "Is greater than or equal to 10");
   }
 
+  /**
+   * CRM-18484: To check the filter criteria 'is between'
+   */
+  public function testCheckIsBetweenFilter() {
+    $this->webtestLogin();
+
+    //add contact
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual', '_qf_Contact_cancel-bottom');
+    $firstName = 'Jo' . substr(sha1(rand()), 0, 4);
+    $lastName = 'Ad' . substr(sha1(rand()), 0, 7);
+    $this->type('first_name', $firstName);
+    $this->type('last_name', $lastName);
+
+    //address section
+    $this->click("xpath=//div[@id='addressBlockId']/div");
+    $this->waitForElementPresent("address_1_street_address");
+    $this->type("address_1_street_address", "902C El Camino Way SW");
+    $this->type("address_1_city", "Dumfries");
+    $this->type("address_1_postal_code", "1234");
+    $this->click("address_1_country_id");
+    $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
+    $this->click("_qf_Contact_upload_view-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->openCiviPage('report/instance/1', 'reset=1&output=criteria', '_qf_Summary_submit_csv');
+    $this->click("fields_postal_code");
+    $this->click("xpath=//div[@class='crm-report-criteria']/div[@id='mainTabContainer']/ul//li/a[text()='Filters']");
+    $this->waitForElementPresent('gid_value');
+    $this->select('postal_code_op', "value=bw");
+    $this->waitForElementPresent('postal_code_max');
+    $this->type('postal_code_max', '1234');
+    $this->click("_qf_Summary_submit");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->assertElementContainsText("xpath=//table[@class='report-layout display']/tbody//tr/td[1]/a", "{$lastName}, {$firstName}");
+  }
+
 }
