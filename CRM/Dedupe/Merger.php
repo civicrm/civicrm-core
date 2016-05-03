@@ -586,7 +586,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *                              A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                              Does a force merge otherwise.
    * @param bool $autoFlip to let api decide which contact to retain and which to delete.
-   *   Wether to let api decide which contact to retain and which to delete.
+   *   Whether to let api decide which contact to retain and which to delete.
    * @param int $batchLimit number of merges to carry out in one batch.
    * @param int $isSelected if records with is_selected column needs to be processed.
    *

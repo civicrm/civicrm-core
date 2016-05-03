@@ -32,7 +32,6 @@ use Civi\Payment\System;
  *  Include class definitions
  */
 require_once 'api/api.php';
-require_once 'CRM/Financial/BAO/FinancialType.php';
 define('API_LATEST_VERSION', 3);
 
 /**
