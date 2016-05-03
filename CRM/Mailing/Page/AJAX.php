@@ -62,7 +62,7 @@ class CRM_Mailing_Page_AJAX {
    */
   public static function getContactMailings() {
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
-    $params += CRM_Core_Page_AJAX::getSanitizedParams(array('contact_id' => 'Integer'));
+    $params += CRM_Core_Page_AJAX::validateParams(array('contact_id' => 'Integer'));
 
     // get the contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailingSelector($params);
