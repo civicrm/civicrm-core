@@ -88,7 +88,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
-    $result = $this->callAPIFailure('job', 'create', $params);
+    $this->callAPIFailure('job', 'create', $params);
   }
 
   /**
@@ -294,6 +294,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
+  }
+
+  /**
+   * Test the batch merge function.
+   */
+  public function testBatchMerge() {
+    $this->callAPISuccess('Job', 'process_batch_merge', array());
   }
 
   /**
