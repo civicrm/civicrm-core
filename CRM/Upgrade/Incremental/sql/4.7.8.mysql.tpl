@@ -5,3 +5,7 @@ ALTER TABLE `civicrm_contact` CHANGE `image_URL` `image_URL` VARCHAR(512) CHARAC
 
 -- CRM-18537
 DELETE FROM civicrm_state_province WHERE name = 'Fernando de Noronha';
+
+-- CRM-17118 extend civicrm_address postal_code to accept full data strings from paypal etc.
+ALTER TABLE civicrm_address CHANGE `postal_code` `postal_code` varchar(64) ;
+
