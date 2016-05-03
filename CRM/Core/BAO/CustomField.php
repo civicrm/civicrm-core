@@ -905,7 +905,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $params = array(
           'date' => $field->date_format,
           'minDate' => isset($minYear) ? $minYear . '-01-01' : NULL,
-          'maxDate' => isset($maxYear) ? $maxYear . '-01-01' : NULL,
+          //CRM-18487 - max date should be the last date of the year.
+          'maxDate' => isset($maxYear) ? $maxYear . '-12-31' : NULL,
           'time' => $field->time_format ? $field->time_format * 12 : FALSE,
           'yearRange' => "{$minYear}:{$maxYear}",
         );
