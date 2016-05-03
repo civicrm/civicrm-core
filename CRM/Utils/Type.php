@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Utils_Type {
   const
@@ -258,11 +256,14 @@ class CRM_Utils_Type {
         }
         break;
 
+      case 'MysqlColumnNameLoose':
+        if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
+          return str_replace('`', '', $data);
+        }
+        break;
+
       case 'MysqlColumnName':
         if (CRM_Utils_Rule::mysqlColumnName($data)) {
-          $parts = explode('.', $data);
-          $data = '`' . implode('`.`', $parts) . '`';
-
           return $data;
         }
         break;
