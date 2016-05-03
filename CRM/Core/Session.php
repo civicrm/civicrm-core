@@ -547,6 +547,21 @@ class CRM_Core_Session {
   }
 
   /**
+   * Get display name of the logged in user.
+   *
+   * @return string
+   *
+   * @throws CiviCRM_API3_Exception
+   */
+  public function getLoggedInContactDisplayName() {
+    $userContactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    if (!$userContactID) {
+      return '';
+    }
+    return civicrm_api3('Contact', 'getvalue', array('id' => $userContactID, 'return' => 'display_name'));
+  }
+
+  /**
    * Check if session is empty.
    *
    * if so we don't cache stuff that we can get away with, helps proxies like varnish.
