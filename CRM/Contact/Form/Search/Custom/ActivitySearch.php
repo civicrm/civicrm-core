@@ -70,7 +70,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     );
 
     //Add custom fields to columns array for inclusion in export
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Activity', $form, NULL,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', $form, NULL,
       NULL, '', NULL
     );
 

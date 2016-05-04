@@ -151,6 +151,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add Index to civicrm_contribution creditnote_id field', 'addIndexContributionCreditNoteID');
   }
 
@@ -160,6 +161,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_2($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Fix Index on civicrm_financial_item combined entity_id + entity_table', 'addCombinedIndexFinancialItemEntityIDEntityType');
     $this->addTask('enable financial account relationships for chargeback & refund', 'addRefundAndChargeBackAccountsIfNotExist');
     $this->addTask('Add Index to civicrm_contribution.source', 'addIndexContributionSource');
@@ -171,6 +173,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_3($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add Index to civicrm_contribution.total_amount', 'addIndexContributionAmount');
   }
 
@@ -180,8 +183,38 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_4($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add Contact Deleted by Merge Activity Type', 'addDeletedByMergeActivityType');
   }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_7($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    // https://issues.civicrm.org/jira/browse/CRM-18006
+    if (CRM_Core_DAO::checkTableExists('civicrm_install_canary')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_install_canary ENGINE=InnoDB');
+    }
+  }
+
+  /*
+   * Important! All upgrade functions MUST call the 'runSql' task.
+   * Uncomment and use the following template for a new upgrade version
+   * (change the x in the function name):
+   */
+
+  //  /**
+  //   * Upgrade function.
+  //   *
+  //   * @param string $rev
+  //   */
+  //  public function upgrade_4_7_x($rev) {
+  //    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  //    // Additional tasks here...
+  //  }
 
   /**
    * CRM-16354
