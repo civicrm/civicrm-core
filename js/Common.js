@@ -729,7 +729,11 @@ if (!CRM.vars) CRM.vars = {};
 
   $.fn.crmAjaxTable = function() {
     return $(this).each(function() {
-      //Declare the defaults for DataTables
+      // Recall pageLength for this table
+      if ($(this).data('ajax') && window.localStorage && localStorage['dataTablePageLength:' + $(this).data('ajax')]) {
+        $(this).data('pageLength', localStorage['dataTablePageLength:' + $(this).data('ajax')]);
+      }
+      // Declare the defaults for DataTables
       var defaults = {
         "processing": true,
         "serverSide": true,
@@ -755,6 +759,12 @@ if (!CRM.vars) CRM.vars = {};
       };
       //Include any table specific data
       var settings = $.extend(true, defaults, $(this).data('table'));
+      // Remember pageLength
+      $(this).on('length.dt', function(e, settings, len) {
+        if (settings.ajax && window.localStorage) {
+          localStorage['dataTablePageLength:' + settings.ajax] = len;
+        }
+      });
       //Make the DataTables call
       $(this).DataTable(settings);
     });
