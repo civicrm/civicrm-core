@@ -88,22 +88,6 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $str
-   *
-   * @return bool
-   */
-  public static function mysqlColumnNameLoose($str) {
-    //  check the length.
-    // This check can be incorrect for the <table>.<column> format, which can be
-    // a problem.
-    if (empty($str) || strlen($str) > 64) {
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
    * Validate an acceptable column name for sorting results.
    *
    * @param $str
@@ -111,16 +95,16 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlColumnName($str) {
-    // Check the length.
-    if (empty($str) || strlen($str) > 64) {
+    // Check not empty.
+    if (empty($str)) {
       return FALSE;
     }
 
-    // Make sure it only contains valid characters (alphanumeric and underscores).
+    // Ensure it only contains valid characters (alphanumeric and underscores).
     //
     // MySQL permits column names that don't match this (eg containing spaces),
     // but CiviCRM won't create those ...
-    if (!preg_match('/^[\w_]+(\.[\w_]+)?$/i', $str)) {
+    if (!preg_match('/^\w{1,64}(\.\w{1,64})?$/i', $str)) {
       return FALSE;
     }
 
@@ -138,6 +122,25 @@ class CRM_Utils_Rule {
   public static function mysqlOrderByDirection($str) {
     if (!preg_match('/^(asc|desc)$/i', $str)) {
       return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Validate that a string is valid order by clause.
+   *
+   * @param $str
+   * @return bool
+   */
+  public static function mysqlOrderBy($str) {
+    // Making a regex for a comma separated list is quite hard and not readable
+    // at all, so we split and loop over.
+    $parts = explode(',', $str);
+    foreach ($parts as $part) {
+      if (!preg_match('/^((\w{1,64})((\.)(\w{1,64}))?( (asc|desc))?)$/i', trim($part))) {
+        return FALSE;
+      }
     }
 
     return TRUE;
