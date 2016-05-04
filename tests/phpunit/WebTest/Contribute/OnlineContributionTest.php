@@ -131,17 +131,16 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
-
-    $this->waitForElementPresent("xpath=//div[@class='crm-section no-label billing_name-section']");
-    $this->assertElementContainsText("xpath=//div[@class='crm-section no-label billing_name-section']", $firstName . "billing");
-    $this->assertElementContainsText("xpath=//div[@class='crm-section no-label billing_name-section']", $lastName . "billing");
+    $this->waitForElementPresent("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_name-section']");
+    $this->assertElementContainsText("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_name-section']", $firstName . "billing");
+    $this->assertElementContainsText("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_name-section']", $lastName . "billing");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->waitForElementPresent("xpath=//div[@class='crm-section no-label billing_name-section']");
-    $this->assertElementContainsText("xpath=//div[@class='crm-section no-label billing_name-section']", $firstName . "billing");
-    $this->assertElementContainsText("xpath=//div[@class='crm-section no-label billing_name-section']", $lastName . "billing");
+    $this->waitForElementPresent("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_name-section']");
+    $this->assertElementContainsText("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_name-section']", $firstName . "billing");
+    $this->assertElementContainsText("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_name-section']", $lastName . "billing");
 
     //login to check contribution
 
@@ -490,6 +489,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->type("sort_name", "$lastName $firstName");
     $this->multiselect2('contribution_product_id', array('Coffee Mug'));
     $this->click("_qf_Search_refresh");
+    $this->waitForAjaxContent();
     $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody//tr/td[10]/span//a[text()='View']");
     $this->click("xpath=//table[@class='selector row-highlight']/tbody//tr/td[2]/a[text()='{$lastName}, {$firstName}']/../../td[10]/span//a[text()='View']");
     $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
