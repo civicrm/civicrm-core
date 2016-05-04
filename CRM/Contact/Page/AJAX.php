@@ -760,6 +760,7 @@ LIMIT {$offset}, {$rowCount}
         $elements = explode('-', $name);
         foreach ($elements as $key => $element) {
           $elements[$key] = self::_convertToId($element);
+          CRM_Utils_Type::escapeAll($elements, 'Integer');
         }
         CRM_Core_BAO_PrevNextCache::markSelection($cacheKey, $actionToPerform, $elements);
       }
@@ -769,6 +770,7 @@ LIMIT {$offset}, {$rowCount}
     }
     elseif ($variableType == 'single') {
       $cId = self::_convertToId($name);
+      CRM_Utils_Type::escape($cId, 'Integer');
       $action = ($state == 'checked') ? 'select' : 'unselect';
       CRM_Core_BAO_PrevNextCache::markSelection($cacheKey, $action, $cId);
     }

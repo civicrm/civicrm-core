@@ -440,10 +440,6 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
         $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
       }
 
-      if (empty($subTypeClause)) {
-        $subTypeClause = '1=1';
-      }
-
       $strWhere = "
 WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_field.is_active = 1

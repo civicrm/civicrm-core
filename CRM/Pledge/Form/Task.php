@@ -124,7 +124,7 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form {
 
     $form->_pledgeIds = $form->_componentIds = $ids;
 
-    //set the context for redirection for any task actions
+    // set the context for redirection for any task actions
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
