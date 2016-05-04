@@ -206,7 +206,7 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
 
             // CRM-18062: Set CiviCRM timezone if any
             $wpBaseTimezone = date_default_timezone_get();
-            $wpUserTimezone = get_option('timezone_string');
+            $wpUserTimezone = $this->getOption('timezone', get_option('timezone_string'));
             if ($wpUserTimezone) {
               date_default_timezone_set($wpUserTimezone);
               CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
