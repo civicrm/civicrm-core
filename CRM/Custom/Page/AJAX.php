@@ -125,11 +125,8 @@ class CRM_Custom_Page_AJAX {
     $obj->_contactType = $contactType;
     $obj->_DTparams['offset'] = ($params['page'] - 1) * $params['rp'];
     $obj->_DTparams['rowCount'] = $params['rp'];
-    if (isset($params['_raw_values']['sort'][0])) {
-      // Will this work when CiviCRM is translated, as searching happens on the label column?
-      // I can't find a place where the sort is added, but it should use the name, not the label.
-      $sort = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['_raw_values']['sort'][0], 'column_name', 'label');
-      $obj->_DTparams['sort'] = $sort . ' ' . $params['_raw_values']['order'][0];
+    if ($params['sortBy']) {
+      $obj->_DTparams['sort'] = $params['sortBy'];
     }
 
     list($fields, $attributes) = $obj->browse();
@@ -143,7 +140,7 @@ class CRM_Custom_Page_AJAX {
           $fieldName = array('data' => $fieldName, 'cellClass' => $attributes[$fieldId][$id]['class']);
         }
         if (is_numeric($fieldId)) {
-          $fName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldId, 'label');
+          $fName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldId, 'column_name');
           CRM_Utils_Array::crmReplaceKey($value, $fieldId, $fName);
         }
       }
