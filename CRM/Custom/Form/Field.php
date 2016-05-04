@@ -507,7 +507,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     );
 
     // is active ?
-    $this->add('checkbox', 'is_active', ts('Active?'));
+    $this->add('advcheckbox', 'is_active', ts('Active?'));
 
     // is active ?
     $this->add('checkbox', 'is_view', ts('View Only?'));
