@@ -248,7 +248,7 @@ class CRM_Campaign_Page_AJAX {
       ),
       'sortOrder' => array(
         'name' => 'sSortDir_0',
-        'type' => 'String',
+        'type' => 'MysqlOrderByDirection',
         'default' => 'asc',
       ),
     );
@@ -603,7 +603,7 @@ class CRM_Campaign_Page_AJAX {
       ),
       'sortOrder' => array(
         'name' => 'sSortDir_0',
-        'type' => 'String',
+        'type' => 'MysqlOrderByDirection',
         'default' => 'desc',
       ),
     );
@@ -703,7 +703,7 @@ class CRM_Campaign_Page_AJAX {
       ),
       'sortOrder' => array(
         'name' => 'sSortDir_0',
-        'type' => 'String',
+        'type' => 'MysqlOrderByDirection',
         'default' => 'desc',
       ),
     );
@@ -798,7 +798,7 @@ class CRM_Campaign_Page_AJAX {
       ),
       'sortOrder' => array(
         'name' => 'sSortDir_0',
-        'type' => 'String',
+        'type' => 'MysqlOrderByDirection',
         'default' => 'desc',
       ),
     );
