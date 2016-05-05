@@ -219,6 +219,12 @@ class CRM_Utils_Type {
         }
         break;
 
+      case 'MysqlOrderByDirection':
+        if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
+          return strtolower($data);
+        }
+        break;
+
       default:
         CRM_Core_Error::fatal("Cannot recognize $type for $data");
         break;

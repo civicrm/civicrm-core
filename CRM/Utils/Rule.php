@@ -70,6 +70,22 @@ class CRM_Utils_Rule {
     return TRUE;
   }
 
+  /**
+   * Validate that a string is ASC or DESC.
+   *
+   * Empty string should be treated as invalid and ignored => default = ASC.
+   *
+   * @param $str
+   * @return bool
+   */
+  public static function mysqlOrderByDirection($str) {
+    if (!preg_match('/^(asc|desc)$/i', $str)) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
   static function qfVariable($str) {
     // check length etc
     //if ( empty( $str ) || strlen( $str ) > 31 ) {
