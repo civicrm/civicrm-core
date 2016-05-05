@@ -404,6 +404,57 @@ AND    u.status = 1
   }
 
   /**
+   * @inheritDoc
+   */
+  public function getUFLocale() {
+    // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
+    // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
+    // sometimes for CLI based on order called, this might not be set and/or empty
+    global $language;
+
+    if (empty($language)) {
+      return NULL;
+    }
+
+    if ($language->langcode == 'zh-hans') {
+      return 'zh_CN';
+    }
+
+    if ($language->langcode == 'zh-hant') {
+      return 'zh_TW';
+    }
+
+    if (preg_match('/^.._..$/', $language->langcode)) {
+      return $language->langcode;
+    }
+
+    return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->langcode, 0, 2));
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    global $language;
+
+    $langcode = substr($civicrm_language, 0, 2);
+    $languages = language_list(FALSE, TRUE);
+
+    if (isset($languages[$langcode])) {
+      $language = $languages[$langcode];
+
+      // Config must be re-initialized to reset the base URL
+      // otherwise links will have the wrong language prefix/domain.
+      $config = CRM_Core_Config::singleton();
+      $config->free();
+
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Determine the native ID of the CMS user.
    *
    * @param string $username
