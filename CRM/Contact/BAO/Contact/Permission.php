@@ -38,11 +38,11 @@ class CRM_Contact_BAO_Contact_Permission {
    * Check if the logged in user has permissions for the operation type.
    *
    * @param int $id
-   *   Contact id they are trying to access.
+   *   Contact id.
    * @param int|string $type the type of operation (view|edit)
    *
    * @return bool
-   *   true if the user has permission to do the given operation on this contact.
+   *   true if the user has permission, false otherwise
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
     $tables = array();
@@ -62,10 +62,6 @@ class CRM_Contact_BAO_Contact_Permission {
       return TRUE;
     }
 
-    if (CRM_ACL_API::isAccessingSelf($id, $type)) {
-      return TRUE;
-    }
-
     //check permission based on relationship, CRM-2963
     if (self::relationship($id)) {
       return TRUE;
@@ -76,7 +72,7 @@ class CRM_Contact_BAO_Contact_Permission {
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
     $query = "
-SELECT count(contact_a.id)
+SELECT count(DISTINCT contact_a.id)
        $from
 WHERE contact_a.id = %1 AND $permission";
     $params = array(1 => array($id, 'Integer'));
@@ -139,12 +135,6 @@ SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, 'View' as operat
 WHERE    $permission
 AND ac.id IS NULL
 ");
-    if (CRM_ACL_API::isAccessingSelf($userID, $type)){
-      CRM_Core_DAO::executeQuery("
-REPLACE INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
-  VALUES($userID, $userID, 'View')
-");
-    }
 
     $_processed[$userID] = 1;
   }
@@ -177,7 +167,7 @@ REPLACE INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
     }
 
     // fill cache
-    self::cache($contactID, $operation);
+    self::cache($contactID);
 
     $sql = "
 SELECT id

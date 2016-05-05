@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -73,19 +71,15 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   public function preProcess() {
 
-    /**
-     * set the button names
-     */
     $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
     $this->defaults = array();
 
-    /*
-     * we allow the controller to set force/reset externally, useful when we are being
-     * driven by the wizard framework
-     */
+    // we allow the controller to set force/reset externally, useful when we are being
+    // driven by the wizard framework
+
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
@@ -152,9 +146,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -208,10 +199,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_done) {
@@ -305,7 +292,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return void
    * @see valid_date
    */
   public function addRules() {
@@ -318,7 +304,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return void
+   * @return array|bool
    */
   public static function formRule($fields) {
     $errors = array();

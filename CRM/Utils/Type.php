@@ -258,14 +258,11 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnNameLoose':
-        if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
-          return str_replace('`', '', $data);
-        }
-        break;
-
       case 'MysqlColumnName':
         if (CRM_Utils_Rule::mysqlColumnName($data)) {
+          $parts = explode('.', $data);
+          $data = '`' . implode('`.`', $parts) . '`';
+
           return $data;
         }
         break;

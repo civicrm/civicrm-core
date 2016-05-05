@@ -26,17 +26,13 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * class to represent the actions that can be performed on a group of contacts
- * used by the search forms
- *
+ * used by the search forms.
  */
 class CRM_Pledge_Task {
   const DELETE_PLEDGES = 1, PRINT_PLEDGES = 2, EXPORT_PLEDGES = 3;
@@ -85,7 +81,7 @@ class CRM_Pledge_Task {
         ),
       );
 
-      //CRM-4418, check for delete
+      // CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviPledge')) {
         unset(self::$_tasks[1]);
       }
@@ -151,7 +147,7 @@ class CRM_Pledge_Task {
 
   /**
    * These tasks are the core set of tasks that the user can perform
-   * on pledges
+   * on pledges.
    *
    * @param int $value
    *
