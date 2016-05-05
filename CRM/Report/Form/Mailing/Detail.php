@@ -62,6 +62,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
         'id' => array(
           'title' => ts('Contact ID'),
           'no_display' => TRUE,
+          'required' => TRUE,
         ),
       ),
       'order_bys' => array(
@@ -245,6 +246,20 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     $this->_tagFilter = TRUE;
 
     parent::__construct();
+  }
+
+  /**
+   * Redmine 10035 - specifically prevent potentially server killing queries.
+   */
+  public function beginPostProcessCommon() {
+   if (empty($this->_params['id_value'])) {
+     CRM_Core_Error::statusBounce(
+       ts('This function has been deliberately disabled due to serious stability issues.
+       Please report this incident in Atrium and explain step-by-step what
+       you did to reach this point so work can be done on resolving this problem.
+       Reference Redmine 10035')
+     );
+   }
   }
 
   public function select() {
