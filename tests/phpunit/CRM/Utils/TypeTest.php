@@ -37,6 +37,19 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array(-10, 'Positive', NULL),
       array('-10', 'Positive', NULL),
       array('-10foo', 'Positive', NULL),
+      array('civicrm_column_name', 'MysqlColumnName', 'civicrm_column_name'),
+      array('table.civicrm_column_name', 'MysqlColumnName', 'table.civicrm_column_name'),
+      array('table.civicrm_column_name.toomanydots', 'MysqlColumnName', NULL),
+      array('invalid-column-name', 'MysqlColumnName', NULL),
+      array('column_name, sleep(5)', 'MysqlColumnName', NULL),
+      array(str_repeat('a', 64), 'MysqlColumnName', str_repeat('a', 64)),
+      array(str_repeat('a', 65), 'MysqlColumnName', NULL),
+      array(str_repeat('a', 64) . '.' . str_repeat('a', 64), 'MysqlColumnName', str_repeat('a', 64) . '.' . str_repeat('a', 64)),
+      array(str_repeat('a', 64) . '.' . str_repeat('a', 65), 'MysqlColumnName', NULL),
+      array(str_repeat('a', 65) . '.' . str_repeat('a', 64), 'MysqlColumnName', NULL),
+      array('asc', 'MysqlOrderByDirection', 'asc'),
+      array('DESC', 'MysqlOrderByDirection', 'desc'),
+      array('DESCc', 'MysqlOrderByDirection', NULL),
     );
   }
 }

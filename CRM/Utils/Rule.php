@@ -71,6 +71,30 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * Validate an acceptable column name for sorting results.
+   *
+   * @param $str
+   *
+   * @return bool
+   */
+  public static function mysqlColumnName($str) {
+    // Check not empty.
+    if (empty($str)) {
+      return FALSE;
+    }
+
+    // Ensure it only contains valid characters (alphanumeric and underscores).
+    //
+    // MySQL permits column names that don't match this (eg containing spaces),
+    // but CiviCRM won't create those ...
+    if (!preg_match('/^\w{1,64}(\.\w{1,64})?$/i', $str)) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
    * Validate that a string is ASC or DESC.
    *
    * Empty string should be treated as invalid and ignored => default = ASC.
