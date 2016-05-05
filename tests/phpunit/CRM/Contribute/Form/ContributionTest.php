@@ -618,6 +618,29 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that if a negative contribution is entered it does not get reset to $0
+   */
+  public function testEnterNegativeContribution() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => -5,
+      'financial_type_id' => 1,
+      'receive_date' => '04/24/2016',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+    ),
+      CRM_Core_Action::ADD);
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $this->assertEquals(-5, $contribution['total_amount']);
+  }
+
+  /**
    * Test the submit function on the contribution page.
    */
   public function testSubmitUpdate() {
