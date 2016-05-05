@@ -486,7 +486,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
     // is required ?
-    $this->add('checkbox', 'is_required', ts('Required?'));
+    $this->add('advcheckbox', 'is_required', ts('Required?'));
 
     // checkbox / radio options per line
     $this->add('text', 'options_per_line', ts('Options Per Line'));
@@ -510,10 +510,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->add('advcheckbox', 'is_active', ts('Active?'));
 
     // is active ?
-    $this->add('checkbox', 'is_view', ts('View Only?'));
+    $this->add('advcheckbox', 'is_view', ts('View Only?'));
 
     // is searchable ?
-    $this->addElement('checkbox',
+    $this->addElement('advcheckbox',
       'is_searchable',
       ts('Is this Field Searchable?'),
       NULL, array('onclick' => "showSearchRange(this)")
