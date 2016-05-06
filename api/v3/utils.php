@@ -626,7 +626,8 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $smartGroupCache,
     $getCount,
     $skipPermissions,
-    $mode
+    $mode,
+    $entity
   );
 
   return $entities;

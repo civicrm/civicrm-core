@@ -405,6 +405,7 @@ class CRM_Contact_BAO_Query {
    * @param bool $smartGroupCache
    * @param null $displayRelationshipType
    * @param string $operator
+   * @param string $apiEntity
    *
    * @return \CRM_Contact_BAO_Query
    */
@@ -413,8 +414,10 @@ class CRM_Contact_BAO_Query {
     $includeContactIds = FALSE, $strict = FALSE, $mode = 1,
     $skipPermission = FALSE, $searchDescendentGroups = TRUE,
     $smartGroupCache = TRUE, $displayRelationshipType = NULL,
-    $operator = 'AND'
+    $operator = 'AND',
+    $apiEntity = NULL
   ) {
+
     $this->_params = &$params;
     if ($this->_params == NULL) {
       $this->_params = array();
@@ -460,13 +463,13 @@ class CRM_Contact_BAO_Query {
     }
 
     // basically do all the work once, and then reuse it
-    $this->initialize();
+    $this->initialize($apiEntity);
   }
 
   /**
    * Function which actually does all the work for the constructor.
    */
-  public function initialize() {
+  public function initialize($apiEntity = NULL) {
     $this->_select = array();
     $this->_element = array();
     $this->_tables = array();
@@ -495,7 +498,7 @@ class CRM_Contact_BAO_Query {
 
     $this->_whereTables = $this->_tables;
 
-    $this->selectClause();
+    $this->selectClause($apiEntity);
     $this->_whereClause = $this->whereClause();
     if (array_key_exists('civicrm_contribution', $this->_whereTables)) {
       $component = 'contribution';
@@ -591,12 +594,23 @@ class CRM_Contact_BAO_Query {
   /**
    * Some composite fields do not appear in the fields array hack to make them part of the query.
    */
-  public function addSpecialFields() {
+  public function addSpecialFields($apiEntity) {
     static $special = array('contact_type', 'contact_sub_type', 'sort_name', 'display_name');
+    // if get called via Contact.get API having address_id as return parameter
+    if ($apiEntity == 'Contact') {
+      $special[] = 'address_id';
+    }
     foreach ($special as $name) {
       if (!empty($this->_returnProperties[$name])) {
-        $this->_select[$name] = "contact_a.{$name} as $name";
-        $this->_element[$name] = 1;
+        if ($name == 'address_id') {
+          $this->_tables['civicrm_address'] = 1;
+          $this->_select['address_id'] = 'civicrm_address.id as address_id';
+          $this->_element['address_id'] = 1;
+        }
+        else {
+          $this->_select[$name] = "contact_a.{$name} as $name";
+          $this->_element[$name] = 1;
+        }
       }
     }
   }
@@ -608,9 +622,9 @@ class CRM_Contact_BAO_Query {
    * tables, the initial attempt also retrieves all variables used
    * in the params list
    */
-  public function selectClause() {
+  public function selectClause($apiEntity = NULL) {
 
-    $this->addSpecialFields();
+    $this->addSpecialFields($apiEntity);
 
     foreach ($this->_fields as $name => $field) {
       // skip component fields
@@ -4263,14 +4277,17 @@ civicrm_relationship.is_permission_a_b = 0
     $smartGroupCache = TRUE,
     $count = FALSE,
     $skipPermissions = TRUE,
-    $mode = 1
+    $mode = 1,
+    $apiEntity = NULL
   ) {
 
     $query = new CRM_Contact_BAO_Query(
       $params, $returnProperties,
       NULL, TRUE, FALSE, $mode,
       $skipPermissions,
-      TRUE, $smartGroupCache
+      TRUE, $smartGroupCache,
+      NULL, 'AND',
+      $apiEntity
     );
 
     //this should add a check for view deleted if permissions are enabled

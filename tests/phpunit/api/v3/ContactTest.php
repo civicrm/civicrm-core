@@ -860,20 +860,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that address name is returned if required.
+   * Check that address name, ID is returned if required.
    */
-  public function testGetReturnAddressName() {
+  public function testGetReturnAddress() {
     $contactID = $this->individualCreate();
-    $this->callAPISuccess('address', 'create', array(
+    $result = $this->callAPISuccess('address', 'create', array(
       'contact_id' => $contactID,
       'address_name' => 'My house',
       'location_type_id' => 'Home',
       'street_address' => '1 my road',
     ));
+    $addressID = $result['id'];
+
     $result = $this->callAPISuccessGetSingle('contact', array(
-      'return' => 'address_name, street_address',
+      'return' => 'address_name, street_address, address_id',
       'id' => $contactID,
     ));
+    $this->assertEquals($addressID, $result['address_id']);
     $this->assertEquals('1 my road', $result['street_address']);
     $this->assertEquals('My house', $result['address_name']);
 
