@@ -225,6 +225,19 @@ class CRM_Core_Payment_Form {
    */
   public static function buildPaymentForm(&$form, $processor, $billing_profile_id, $isBackOffice) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
+    if ($form instanceof CRM_Financial_Form_Payment) {
+      $contribution_form = new CRM_Contribute_Form_Contribution_Main(); 
+      $contribution_form->controller = new CRM_Contribute_Controller_Contribution();
+      $contribution_form->preProcess();
+      $contribution_form->buildCustom($contribution_form->_values['custom_pre_id'], 'customPre');
+      if (!empty($contribution_form->_fields) && !empty($contribution_form->_values['custom_pre_id'])) {
+        $profileAddressFields = array();
+        foreach ($contribution_form->_fields as $key => $value) {
+          CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array('uf_group_id' => $contribution_form->_values['custom_pre_id']));
+        }
+        $form->set('profileAddressFields', $profileAddressFields);
+      }
+    }
     $profileAddressFields = $form->get('profileAddressFields');
     if (!empty($profileAddressFields)) {
       $form->assign('profileAddressFields', $profileAddressFields);
