@@ -113,19 +113,10 @@
           }
         }
       }
-      var $billingcheckbox = $('#billingcheckbox');
-      if ($billingcheckbox) {
-        if ($billingcheckbox.prop("checked")) {
-          CRM.vars.billingcheckbox = true;
-        }
-      }
 
       // Processors like pp-express will hide the form submit buttons, so re-show them when switching
       $('.crm-submit-buttons', $form).show().find('input').prop('disabled', true);
       CRM.loadPage(dataUrl, {target: '#billing-payment-block'});
-      if ($('#billingcheckbox') && CRM.vars.billingcheckbox) {
-        $('#billingcheckbox').prop('checked', true);
-      }
     }
 
     $('.crm-group.payment_options-group').show();
