@@ -142,7 +142,6 @@ class CRM_Utils_SignerTest extends CiviUnitTestCase {
     );
 
     foreach ($cases as $caseId => $case) {
-      require_once 'CRM/Utils/Signer.php';
       $signer = new CRM_Utils_Signer('secret', array('a', 'b', 'c'));
       $signature = $signer->sign($case['signParams']);
       $this->assertTrue(!empty($signature) && is_string($signature)); // arbitrary
