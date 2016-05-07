@@ -1079,13 +1079,14 @@ SELECT  pledge.contact_id              as contact_id,
                   $activityType,
                   'name'
                 ),
-                'activity_date_time' => CRM_Utils_Date::isoToMysql($now),
+                'activity_date_time' => CRM_Utils_Date::isoToMysql(date('YmdHis')),
                 'due_date_time' => CRM_Utils_Date::isoToMysql($details['scheduled_date']),
                 'is_test' => $details['is_test'],
                 'status_id' => 2,
                 'campaign_id' => $details['campaign_id'],
               );
-              if (is_a(civicrm_api('activity', 'create', $activityParams), 'CRM_Core_Error')) {
+              $result = civicrm_api3('activity', 'create', $activityParams);
+              if (civicrm_error($result)) {
                 $returnMessages[] = "Failed creating Activity for acknowledgment";
                 return array('is_error' => 1, 'message' => $returnMessages);
               }
