@@ -68,7 +68,6 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    */
   public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
-    $now = CRM_Utils_Date::getUTCTime();
 
     $query = "
 SELECT  g.id
@@ -76,8 +75,8 @@ FROM    civicrm_group g
 WHERE   ( g.saved_search_id IS NOT NULL OR g.children IS NOT NULL )
 AND     g.is_active = 1
 AND     ( g.cache_date IS NULL OR
-          ( TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout ) OR
-          ( $now >= g.refresh_date )
+          ( TIMESTAMPDIFF(MINUTE, g.cache_date, NOW()) >= $smartGroupCacheTimeout ) OR
+          ( NOW() >= g.refresh_date )
         )
 ";
 
@@ -177,7 +176,7 @@ AND     ( g.cache_date IS NULL OR
 
     if (!empty($refreshGroupIDs)) {
       $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
-      $time = CRM_Utils_Date::getUTCTime(self::smartGroupCacheTimeout() * 60);
+      $time = self::getRefreshDateTime();
       $query = "
 UPDATE civicrm_group g
 SET    g.refresh_date = $time
@@ -266,7 +265,7 @@ AND    g.refresh_date IS NULL
     if ($processed) {
       // also update the group with cache date information
       //make sure to give original timezone settings again.
-      $now = CRM_Utils_Date::getUTCTime();
+      $now = date('YmdHis');
       $refresh = 'null';
     }
     else {
@@ -329,8 +328,7 @@ WHERE  id IN ( $groupIDs )
     $params = array();
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
 
-    $now = CRM_Utils_Date::getUTCTime();
-    $refreshTime = CRM_Utils_Date::getUTCTime($smartGroupCacheTimeout * 60);
+    $refreshTime = self::getRefreshDateTime();
 
     if (!isset($groupID)) {
       if ($smartGroupCacheTimeout == 0) {
@@ -706,6 +704,17 @@ ORDER BY   gc.contact_id, g.children
     else {
       return $contactGroup;
     }
+  }
+
+  /**
+   * Get the date when the cache should be refreshed from.
+   *
+   * Ie. now + the offset & we will delete anything prior to then.
+   *
+   * @return string
+   */
+  protected static function getRefreshDateTime() {
+    return date('Ymdhis', strtotime("+ " . self::smartGroupCacheTimeout() . " Minutes"));
   }
 
 }
