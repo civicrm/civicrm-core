@@ -151,14 +151,11 @@ WHERE contact_id = %1
     $config = CRM_Core_Config::singleton();
     $smartGroupCacheTimeout = CRM_Contact_BAO_GroupContactCache::smartGroupCacheTimeout();
 
-    //make sure to give original timezone settings again.
-    $now = CRM_Utils_Date::getUTCTime();
-
     $query = "
 DELETE
 FROM   civicrm_acl_cache
 WHERE  modified_date IS NULL
-   OR  (TIMESTAMPDIFF(MINUTE, modified_date, $now) >= $smartGroupCacheTimeout)
+   OR  (TIMESTAMPDIFF(MINUTE, modified_date, NOW()) >= $smartGroupCacheTimeout)
 ";
     CRM_Core_DAO::singleValueQuery($query);
 
