@@ -100,11 +100,12 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    // Ensure it only contains valid characters (alphanumeric and underscores).
+    // Ensure it only contains valid characters (alphanumeric, hyphens and
+    // underscores).
     //
     // MySQL permits column names that don't match this (eg containing spaces),
     // but CiviCRM won't create those ...
-    if (!preg_match('/^\w{1,64}(\.\w{1,64})?$/i', $str)) {
+    if (!preg_match('/^[\w-]{1,64}(\.[\w-]{1,64})?$/i', $str)) {
       return FALSE;
     }
 
@@ -138,7 +139,7 @@ class CRM_Utils_Rule {
     // at all, so we split and loop over.
     $parts = explode(',', $str);
     foreach ($parts as $part) {
-      if (!preg_match('/^((\w{1,64})((\.)(\w{1,64}))?( (asc|desc))?)$/i', trim($part))) {
+      if (!preg_match('/^(([\w-]{1,64})((\.)([\w-]{1,64}))?( (asc|desc))?)$/i', trim($part))) {
         return FALSE;
       }
     }
