@@ -409,8 +409,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
     }
     $this->addFormRule(array('CRM_Member_Form_MembershipRenewal', 'formRule'));
-    $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different
-      Contact?'));
+    $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
     $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
     $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
   }
