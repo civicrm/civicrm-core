@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -29,7 +29,7 @@
  * Our base DAO class. All DAO classes should inherit from this class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 require_once 'PEAR.php';
@@ -1234,14 +1234,16 @@ FROM   civicrm_domain
   }
 
   /**
-   * @param $query
+   * Compose the query by merging the parameters into it.
+   *
+   * @param string $query
    * @param array $params
    * @param bool $abort
    *
    * @return string
    * @throws Exception
    */
-  public static function composeQuery($query, &$params, $abort = TRUE) {
+  public static function composeQuery($query, $params, $abort = TRUE) {
     $tr = array();
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
@@ -2266,7 +2268,7 @@ SELECT contact_id
    *   a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    */
-  public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
+  public static function createSQLFilter($fieldName, $filter, $type = NULL, $alias = NULL, $returnSanitisedArray = FALSE) {
     foreach ($filter as $operator => $criteria) {
       if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {
@@ -2389,6 +2391,55 @@ SELECT contact_id
    * @param array $params
    */
   public function setApiFilter(&$params) {
+  }
+
+  /**
+   * Generates acl clauses suitable for adding to WHERE or ON when doing an api.get for this entity
+   *
+   * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
+   * @code
+   *   array(
+   *     'location_type_id' => array('IS NOT NULL', 'IN (1,2,3)')
+   *   )
+   * @endcode
+   *
+   * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
+   *
+   * @return array
+   */
+  public function addSelectWhereClause() {
+    // This is the default fallback, and works for contact-related entities like Email, Relationship, etc.
+    $clauses = array();
+    foreach ($this->fields() as $fieldName => $field) {
+      if (strpos($fieldName, 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+        $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
+      }
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
+  /**
+   * This returns the final permissioned query string for this entity
+   *
+   * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
+   *
+   * @param string $tableAlias
+   * @return array
+   */
+  public static function getSelectWhereClause($tableAlias = NULL) {
+    $bao = new static();
+    if ($tableAlias === NULL) {
+      $tableAlias = $bao->tableName();
+    }
+    $clauses = array();
+    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+      $clauses[$field] = NULL;
+      if ($vals) {
+        $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+      }
+    }
+    return $clauses;
   }
 
   /**
