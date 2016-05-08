@@ -461,6 +461,75 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
 }
 
 /**
+ * Returns field names of the given entity fields.
+ *
+ * @param array $fields
+ *   Fields array to retrieve the field names for.
+ * @return array
+ */
+function _civicrm_api3_field_names($fields) {
+  $result = array();
+  foreach ($fields as $key => $value) {
+    if (!empty($value['name'])) {
+      $result[] = $value['name'];
+    }
+  }
+  return $result;
+}
+
+/**
+ * Returns an array with database information for the custom fields of an
+ * entity.
+ *
+ * Something similar might already exist in CiviCRM. But I was not
+ * able to find it.
+ *
+ * @param string $entity
+ *
+ * @return array
+ *   an array that maps the custom field ID's to table name and
+ *   column name. E.g.:
+ *   {
+ *     '1' => array {
+ *       'table_name' => 'table_name_1',
+ *       'column_name' => 'column_name_1',
+ *       'data_type' => 'data_type_1',
+ *     },
+ *   }
+ */
+function _civicrm_api3_custom_fields_for_entity($entity) {
+  $result = array();
+
+  $query = "
+SELECT f.id, f.label, f.data_type,
+       f.html_type, f.is_search_range,
+       f.option_group_id, f.custom_group_id,
+       f.column_name, g.table_name,
+       f.date_format,f.time_format
+  FROM civicrm_custom_field f
+  JOIN civicrm_custom_group g ON f.custom_group_id = g.id
+ WHERE g.is_active = 1
+   AND f.is_active = 1
+   AND g.extends = %1";
+
+  $params = array(
+    '1' => array($entity, 'String'),
+  );
+
+  $dao = CRM_Core_DAO::executeQuery($query, $params);
+  while ($dao->fetch()) {
+    $result[$dao->id] = array(
+      'table_name' => $dao->table_name,
+      'column_name' => $dao->column_name,
+      'data_type' => $dao->data_type,
+    );
+  }
+  $dao->free();
+
+  return $result;
+}
+
+/**
  * Get function for query object api.
  *
  * The API supports 2 types of get request. The more complex uses the BAO query object.
