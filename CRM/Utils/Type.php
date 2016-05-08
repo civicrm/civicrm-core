@@ -269,7 +269,17 @@ class CRM_Utils_Type {
 
       case 'MysqlOrderByDirection':
         if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
-          return $data;
+          return strtolower($data);
+        }
+        break;
+
+      case 'MysqlOrderBy':
+        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
+          $parts = explode(',', $data);
+          foreach ($parts as &$part) {
+            $part = preg_replace_callback('/(?:([\w]+)(?:(?:\.)([\w]+))?(?: (asc|desc))?)/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
+          }
+          return implode(', ', $parts);
         }
         break;
 
@@ -376,6 +386,24 @@ class CRM_Utils_Type {
         }
         break;
 
+      case 'MysqlColumnName':
+        if (CRM_Utils_Rule::mysqlColumnName($data)) {
+          return $data;
+        }
+        break;
+
+      case 'MysqlOrderByDirection':
+        if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
+          return strtolower($data);
+        }
+        break;
+
+      case 'MysqlOrderBy':
+        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
+          return $data;
+        }
+        break;
+
       default:
         CRM_Core_Error::fatal("Cannot recognize $type for $data");
         break;
@@ -387,6 +415,26 @@ class CRM_Utils_Type {
     }
 
     return NULL;
+  }
+
+  /**
+   * preg_replace_callback for MysqlOrderBy escape.
+   */
+  public static function mysqlOrderByCallback($matches) {
+    $output = '';
+    // Column or table name.
+    if (isset($matches[1])) {
+      $output .= '`' . $matches[1] . '`';
+    }
+    // Column name in case there is a table.
+    if (isset($matches[2]) && $matches[2]) {
+      $output .= '.`' . $matches[2] . '`';
+    }
+    // Sort order.
+    if (isset($matches[3]) && $matches[3]) {
+      $output .= ' ' . $matches[3];
+    }
+    return $output;
   }
 
 }
