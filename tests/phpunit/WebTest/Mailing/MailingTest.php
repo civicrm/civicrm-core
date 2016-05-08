@@ -468,7 +468,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
         ),
       ),
       'Click-throughs' => array(
-        'report' => array('report_name' => 'Mail Clickthroughs', 'Mailing' => "Mailing $mailingName Webtest"),
+        'report' => array('report_name' => 'Mail Click-Throughs', 'Mailing' => "Mailing $mailingName Webtest"),
         'search' => array(
           'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",
           'Mailing: Trackable URL Clicks -' => "Clicked",
