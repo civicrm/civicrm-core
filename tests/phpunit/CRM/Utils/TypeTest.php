@@ -40,7 +40,7 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('civicrm_column_name', 'MysqlColumnName', 'civicrm_column_name'),
       array('table.civicrm_column_name', 'MysqlColumnName', 'table.civicrm_column_name'),
       array('table.civicrm_column_name.toomanydots', 'MysqlColumnName', NULL),
-      array('invalid-column-name', 'MysqlColumnName', NULL),
+      array('Home-street_address', 'MysqlColumnName', 'Home-street_address'),
       array('column_name, sleep(5)', 'MysqlColumnName', NULL),
       array(str_repeat('a', 64), 'MysqlColumnName', str_repeat('a', 64)),
       array(str_repeat('a', 65), 'MysqlColumnName', NULL),
