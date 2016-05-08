@@ -632,17 +632,23 @@ ORDER BY civicrm_custom_group.weight,
    */
   protected static function validateSubTypeByEntity($entityType, $subType) {
     $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
-    if (is_numeric($subType)) {
+
+# We have a mix of numeric and strings here; lets filter numeric to pass check in line 652 
+    if (!is_numeric($subType)) {
       return $subType;
+    } else {
+      return;
     }
     $contactTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_type'));
-    if ($entityType != 'Contact' && !in_array($entityType, $contactTypes['values'])) {
+   # There is NO "Contact" in $entityType array in our case (only Individual, Organisation..), so let's skip this check completely
+    if (!in_array($entityType, $contactTypes['values'])) {
       // Not quite sure if we want to fail this hard. But quiet ignore would be pretty bad too.
       // Am inclined to go with this for RC release & considering softening.
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
     $subTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_sub_type'));
-    if (!isset($subTypes['values'][$subType])) {
+   # Why isset? Shouldn't  be same in_array check as above?
+      if (!in_array($subType, $subTypes['values'])) {
       // Same comments about fail hard as above.
       throw new CRM_Core_Exception('Invalid Filter');
     }
