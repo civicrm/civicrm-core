@@ -265,7 +265,7 @@
   <field>
     <name>image_URL</name>
     <type>varchar</type>
-    <length>255</length>
+    <length>450</length>
     <import>true</import>
     <comment>optional URL for preferred image (photo, logo, etc.) to display for this contact.</comment>
     <add>1.1</add>
