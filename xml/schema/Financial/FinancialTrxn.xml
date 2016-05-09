@@ -180,7 +180,7 @@
   </index>
   <field>
     <name>trxn_result_code</name>
-    <title>Transaction result Code</title>
+    <title>Transaction Result Code</title>
     <type>varchar</type>
     <length>255</length>
     <comment>processor result code</comment>
