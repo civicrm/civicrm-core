@@ -61,7 +61,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
             SELECT status_id, count(id) as status_total
             FROM civicrm_grant  GROUP BY status_id";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $status = array();
     $summary = array();

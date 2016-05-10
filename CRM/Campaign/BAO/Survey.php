@@ -78,7 +78,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
 
     if (!empty($params['is_default'])) {
       $query = "UPDATE civicrm_survey SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     if (!(CRM_Utils_Array::value('id', $params))) {
