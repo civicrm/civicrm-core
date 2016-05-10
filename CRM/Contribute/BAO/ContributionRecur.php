@@ -782,8 +782,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
     // Add field to check if payment is made for recurring contribution
     $recurringPaymentOptions = array(
-      1 => ts(' All recurring contributions'),
-      2 => ts(' Recurring contributions with at least one payment'),
+      1 => ts('All recurring contributions'),
+      2 => ts('Recurring contributions with at least one payment'),
     );
     $form->addRadio('contribution_recur_payment_made', NULL, $recurringPaymentOptions, array('allowClear' => TRUE));
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_start_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
