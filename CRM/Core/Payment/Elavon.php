@@ -133,8 +133,8 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
 
     // define variables for connecting with the gateway
     $requestFields['ssl_merchant_id'] = $this->_paymentProcessor['user_name'];
-    $requestFields['ssl_user_id'] = $this->_paymentProcessor['password'];
-    $requestFields['ssl_pin'] = $this->_paymentProcessor['signature'];
+    $requestFields['ssl_user_id'] = CRM_Utils_Array::value('password', $this->_paymentProcessor);
+    $requestFields['ssl_pin'] = CRM_Utils_Array::value('signature', $this->_paymentProcessor);
     $host = $this->_paymentProcessor['url_site'];
 
     if ($this->_mode == "test") {
