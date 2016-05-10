@@ -50,7 +50,18 @@ class CRM_Group_Page_AJAX {
       CRM_Utils_JSON::output($groups);
     }
     else {
+      $requiredParams = array();
+      $optionalParams = array(
+        'title' => 'String',
+        'created_by' => 'String',
+        'group_type' => 'String',
+        'visibility' => 'String',
+        'status' => 'Integer',
+        'parentsOnly' => 'Integer',
+        // Ignore 'parent_id' as that case is handled above
+      );
       $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+      $params += CRM_Core_Page_AJAX::validateParams($requiredParams, $optionalParams);
 
       // get group list
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
