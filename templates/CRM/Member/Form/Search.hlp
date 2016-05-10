@@ -43,3 +43,16 @@
     <li>{ts}Select neither to show all memberships{/ts}</li>
   </ul>
 {/htxt}
+{htxt id="id-member_auto_renew-title"}
+  {ts}Auto-Renew Subscription Status{/ts}
+{/htxt}
+{htxt id="id-member_auto_renew"}
+  <ul>
+    <li>{ts}Select "None" to display memberships that have never had an auto-renew subscription.{/ts}</li>
+    <li>{ts}Select "In Progress" to display memberships with current auto-renew subscriptions.{/ts}</li>
+    <li>{ts}Select "Failed" to display memberships with failed subscription payment.{/ts}</li>
+    <li>{ts}Select "Cancelled" to display memberships with cancelled auto-renew subscriptions.{/ts}</li>
+    <li>{ts}Select "Ended" to display memberships with an ended auto-renew subscription.{/ts}</li>
+  </ul>
+{/htxt}
+
