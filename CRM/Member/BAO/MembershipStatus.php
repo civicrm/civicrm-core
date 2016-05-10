@@ -283,7 +283,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
  WHERE    {$where}
  ORDER BY weight ASC";
 
-    $membershipStatus = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $membershipStatus = CRM_Core_DAO::executeQuery($query);
     $hour = $minute = $second = 0;
 
     while ($membershipStatus->fetch()) {

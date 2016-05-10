@@ -956,7 +956,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 UPDATE civicrm_contact
 SET image_URL=NULL
 WHERE id={$id}; ";
-    CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    CRM_Core_DAO::executeQuery($query);
     return TRUE;
   }
 

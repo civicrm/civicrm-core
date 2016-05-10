@@ -181,7 +181,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
       LEFT JOIN civicrm_event ON civicrm_event.id = cp.event_id
       WHERE cp.id = {$this->_from_participant_id}";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $details['status']  = $dao->status;
       $details['role'] = $dao->role;
@@ -291,7 +291,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $contact_details = CRM_Contact_BAO_Contact::getContactDetails($contact_id);
     $display_name = $contact_details[0];
     $query = "select event_id from civicrm_participant where contact_id = " . $contact_id;
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $to_event_id[]  = $dao->event_id;
     }
@@ -313,13 +313,13 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
     //cancel 'from' participant row
     $query = "select contact_id from civicrm_email where email = '" . $params['email'] . "'";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $contact_id  = $dao->contact_id;
     }
     $from_participant = $params = array();
     $query = "select role_id, source, fee_level, is_test, is_pay_later, fee_amount, discount_id, fee_currency,campaign_id, discount_amount from civicrm_participant where id = " . $this->_from_participant_id;
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     $value_to = array();
     while ($dao->fetch()) {
       $value_to['role_id'] = $dao->role_id;

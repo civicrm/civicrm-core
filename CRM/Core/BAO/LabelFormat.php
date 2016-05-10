@@ -471,7 +471,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     // clear other default if this is the new default label format
     if ($values['is_default']) {
       $query = "UPDATE civicrm_option_value SET is_default = 0 WHERE option_group_id = $group_id";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
     if ($id) {
       // fetch existing record

@@ -3634,7 +3634,7 @@ ORDER BY cg.weight, cf.weight";
     //CRM-18276 GROUP_CONCAT could be used with singleValueQuery and then exploded,
     //but by default that truncates to 1024 characters, which causes errors with installs with lots of custom field sets
     $customTables = array();
-    $customTablesDAO = CRM_Core_DAO::executeQuery("SELECT table_name FROM civicrm_custom_group", CRM_Core_DAO::$_nullArray);
+    $customTablesDAO = CRM_Core_DAO::executeQuery("SELECT table_name FROM civicrm_custom_group");
     while ($customTablesDAO->fetch()) {
       $customTables[] = $customTablesDAO->table_name;
     }
