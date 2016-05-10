@@ -58,16 +58,11 @@ class CRM_Group_Page_AJAX {
         'visibility' => 'String',
         'status' => 'Integer',
         'parentsOnly' => 'Integer',
+        'showOrgInfo' => 'Boolean',
         // Ignore 'parent_id' as that case is handled above
       );
       $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
       $params += CRM_Core_Page_AJAX::validateParams($requiredParams, $optionalParams);
-
-      $optionalParameters = array(
-        'parentsOnly' => 'Integer',
-        'showOrgInfo' => 'Boolean',
-      );
-      $params += CRM_Core_Page_AJAX::validateParams(array(), $optionalParameters);
 
       // get group list
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
