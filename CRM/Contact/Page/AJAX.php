@@ -761,7 +761,7 @@ LIMIT {$offset}, {$rowCount}
         foreach ($elements as $key => $element) {
           $elements[$key] = self::_convertToId($element);
         }
-	CRM_Utils_Type::escapeAll($elements, 'Integer');
+        CRM_Utils_Type::escapeAll($elements, 'Integer');
         CRM_Core_BAO_PrevNextCache::markSelection($cacheKey, $actionToPerform, $elements);
       }
       else {
