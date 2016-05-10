@@ -176,7 +176,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $attributes['name'], TRUE
     );
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+    $this->registerRule('paymentProcessorNameExists', 'callback', 'paymentProcessorNameExists', 'CRM_Admin_Form_PaymentProcessor');
+    $this->addRule('name', ts('Name already exists in Database.'), 'paymentProcessorNameExists', array(
         'CRM_Financial_DAO_PaymentProcessor',
         $this->_id,
       ));
@@ -398,6 +399,36 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     ), $values);
 
     civicrm_api3('PaymentProcessor', 'create', $params);
+  }
+
+  /**
+   * Check if there is a record with the same name in the db.
+   *
+   * @param string $value
+   *   The value of the field we are checking.
+   * @param array $options
+   *   The daoName and fieldName (optional ).
+   *
+   * @return bool
+   *   true if object exists
+   */
+  public static function paymentProcessorNameExists($value, $options) {
+    $fieldName = 'name';
+    $daoName = CRM_Utils_Array::value(0, $options);
+    $daoID = CRM_Utils_Array::value(1, $options);
+    $domain_id = CRM_Core_Config::domainID();
+    $object = new $daoName();
+    $object->$fieldName = $value;
+    $object->domain_id = $domain_id;
+
+    $config = CRM_Core_Config::singleton();
+
+    if ($object->find(TRUE)) {
+      return ($daoID && $object->id == $daoID) ? TRUE : FALSE;
+    }
+    else {
+      return TRUE;
+    }
   }
 
 }
