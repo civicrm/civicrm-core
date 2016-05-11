@@ -90,6 +90,11 @@
  *
  * -----------------------------------------------------------------------------------------------
  */
+
+// require Standard eWAY API libraries
+require_once 'eWAY/eWAY_GatewayRequest.php';
+require_once 'eWAY/eWAY_GatewayResponse.php';
+
 class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
   const CHARSET = 'UTF-8';
@@ -114,9 +119,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * *******************************************************
    */
   public function __construct($mode, &$paymentProcessor) {
-    // require Standard eWAY API libraries
-    require_once 'eWAY/eWAY_GatewayRequest.php';
-    require_once 'eWAY/eWAY_GatewayResponse.php';
 
     // live or test
     $this->_mode = $mode;
