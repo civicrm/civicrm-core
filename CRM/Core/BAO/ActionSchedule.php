@@ -600,9 +600,30 @@ FROM civicrm_action_schedule cas
    *   List of error messages.
    */
   protected static function sendReminderEmail($tokenRow, $schedule, $toContactID) {
-    $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID);
+    //CRM-18538 - check privacy settings
+    $checkPrivacy = CRM_Core_DAO::executeQuery("
+      SELECT c.id, c.is_opt_out, c.do_not_email, c.is_deceased, e.on_hold
+      FROM civicrm_contact c
+      LEFT JOIN civicrm_email e
+        ON c.id = e.contact_id
+        AND e.is_primary = 1
+      WHERE c.id = {$toContactID}
+    ");
+    while ($checkPrivacy->fetch()) {
+      if ($checkPrivacy->is_opt_out ||
+        $checkPrivacy->do_not_email ||
+        $checkPrivacy->is_deceased ||
+        $checkPrivacy->on_hold
+      ) {
+        $toEmail = '';
+      }
+      else {
+        $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID);
+      }
+    }
+
     if (!$toEmail) {
-      return array("email_missing" => "Couldn't find recipient's email address.");
+      return array("email_missing" => "Couldn't find recipient's email address or privacy settings prevent sending.");
     }
 
     $body_text = $tokenRow->render('body_text');
