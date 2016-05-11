@@ -220,6 +220,21 @@
   var locationBlockInfo = {/literal}{$locationBlockInfo}{literal};
   var allBlock = {/literal}{$mainLocBlock}{literal};
 
+  /**
+   * Triggered when a 'location' or 'type' destination is changed.
+   * Check to see if the 'main' contact record has a corresponding location
+   * block when the destination of a field is changed. Allow existing location
+   * fields to be overwritten with data from the 'other' contact.
+   *
+   * @param blockname string
+   *   The name of the entity.
+   * @param element object
+   *   The element that was changed (location or type dropdown)
+   * @param blockId int
+   *   The block ID being affected
+   * @param type string
+   *   Location or type (locTypeId / typeTypeId)
+   */
   function mergeBlock(blockname, element, blockId, type) {
 
     // Get type of select list that's been changed (location or type)
@@ -271,7 +286,23 @@
     CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
   }
 
-  // Find a matching main contact location block by entity, location and type
+  /**
+   * Look for a matching 'main' contact location block by entity, location and
+   * type
+   *
+   * @param allBlock array
+   *   All location blocks on the main contact record.
+   * @param entName string
+   *   The entity name to lookup.
+   * @param locationID int
+   *   The location ID to lookup.
+   * @param typeID int
+   *   The type ID to lookup.
+   *
+   * @returns boolean|object
+   *   Returns false if no match, otherwise an object with the location ID and
+   *   display value.
+   */
   function findBlock(allBlock, entName, locationID, typeID) {
     var entityArray = allBlock[entName];
     var result = false;
