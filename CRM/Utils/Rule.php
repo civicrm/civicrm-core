@@ -103,7 +103,7 @@ class CRM_Utils_Rule {
     // Ensure the string contains only valid characters:
     // For column names: alphanumeric and underscores
     // For aliases: backticks, alphanumeric hyphens and underscores.
-    if (!preg_match('^((`[\w-]{1,64}`|\w{1,64})\.)?(`[\w-]{1,64}`|\w{1,64})$/i', $str)) {
+    if (!preg_match('/^((`[\w-]{1,64}`|\w{1,64})\.)?(`[\w-]{1,64}`|\w{1,64})$/i', $str)) {
       return FALSE;
     }
 
