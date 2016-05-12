@@ -452,7 +452,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitEmailReceipt() {
     $form = new CRM_Contribute_Form_Contribution();
-    require_once 'CiviTest/CiviMailUtils.php';
     $mut = new CiviMailUtils($this, TRUE);
     $form->testSubmit(array(
       'total_amount' => 50,
