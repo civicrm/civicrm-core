@@ -268,7 +268,7 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'mysqlColumnNameOrAlias':
+      case 'MysqlColumnNameOrAlias':
         if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
           $data = str_replace('`', '', $data);
           $parts = explode('.', $data);
@@ -397,7 +397,7 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'mysqlColumnNameOrAlias':
+      case 'MysqlColumnNameOrAlias':
         if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
           return $data;
         }
@@ -436,7 +436,7 @@ class CRM_Utils_Type {
     $matches = str_replace('`', '', $matches);
 
     // Table name.
-    if (isset($matches[1])) {
+    if (isset($matches[1]) && $matches[1]) {
       $output .= '`' . $matches[1] . '`.';
     }
 
