@@ -383,13 +383,16 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         ON {$this->_aliases['civicrm_mailing_event_opened']}.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id
       LEFT JOIN civicrm_mailing_event_trackable_url_open {$this->_aliases['civicrm_mailing_event_trackable_url_open']}
         ON {$this->_aliases['civicrm_mailing_event_trackable_url_open']}.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id
-      LEFT JOIN civicrm_mailing_group {$this->_aliases['civicrm_mailing_group']}
-        ON {$this->_aliases['civicrm_mailing_group']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id
       LEFT JOIN civicrm_mailing_event_unsubscribe {$this->_aliases['civicrm_mailing_event_unsubscribe']}
         ON {$this->_aliases['civicrm_mailing_event_unsubscribe']}.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id AND {$this->_aliases['civicrm_mailing_event_unsubscribe']}.org_unsubscribe = 0
       LEFT JOIN civicrm_mailing_event_unsubscribe mailing_event_optout_civireport
         ON mailing_event_optout_civireport.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id AND mailing_event_optout_civireport.org_unsubscribe = 1";
 
+    if ($this->isTableSelected('civicrm_mailing_group')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_mailing_group {$this->_aliases['civicrm_mailing_group']}
+	  ON {$this->_aliases['civicrm_mailing_group']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id";
+    }
     if ($this->campaignEnabled) {
       $this->_from .= "
         LEFT JOIN civicrm_campaign {$this->_aliases['civicrm_campaign']}
