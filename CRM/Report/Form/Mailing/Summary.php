@@ -258,6 +258,17 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         ),
       ),
     );
+    $this->_columns['civicrm_mailing_group'] = array(
+      'dao' => 'CRM_Mailing_DAO_MailingGroup',
+      'filters' => array(
+        'entity_id' => array(
+          'title' => ts('Groups Included in Mailing'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'type' => CRM_Utils_Type::T_INT,
+          'options' => CRM_Core_PseudoConstant::group(),
+        ),
+      ),
+    );
     $config = CRM_Core_Config::singleton();
     $this->campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($this->campaignEnabled) {
@@ -372,6 +383,8 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         ON {$this->_aliases['civicrm_mailing_event_opened']}.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id
       LEFT JOIN civicrm_mailing_event_trackable_url_open {$this->_aliases['civicrm_mailing_event_trackable_url_open']}
         ON {$this->_aliases['civicrm_mailing_event_trackable_url_open']}.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id
+      LEFT JOIN civicrm_mailing_group {$this->_aliases['civicrm_mailing_group']}
+        ON {$this->_aliases['civicrm_mailing_group']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id
       LEFT JOIN civicrm_mailing_event_unsubscribe {$this->_aliases['civicrm_mailing_event_unsubscribe']}
         ON {$this->_aliases['civicrm_mailing_event_unsubscribe']}.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id AND {$this->_aliases['civicrm_mailing_event_unsubscribe']}.org_unsubscribe = 0
       LEFT JOIN civicrm_mailing_event_unsubscribe mailing_event_optout_civireport
