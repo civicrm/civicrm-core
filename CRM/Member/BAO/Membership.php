@@ -2277,7 +2277,7 @@ WHERE      civicrm_membership.is_test = 0";
           array(
             'membership_id' => $dao->membership_id,
             'version' => 3,
-            'ignore_admin_only' => FALSE,
+            'ignore_admin_only' => TRUE,
           ), TRUE
         );
         $statusId = CRM_Utils_Array::value('id', $newStatus);

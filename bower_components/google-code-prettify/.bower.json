@@ -20,7 +20,7 @@
     "tag": "v1.0.4",
     "commit": "80478ff92dec68d56498bad7451546d11c15e541"
   },
-  "_source": "git://github.com/tcollard/google-code-prettify.git",
+  "_source": "https://github.com/tcollard/google-code-prettify.git",
   "_target": "~1.0",
   "_originalSource": "google-code-prettify"
 }

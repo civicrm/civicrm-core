@@ -892,8 +892,8 @@ LIMIT {$offset}, {$rowCount}
       INNER JOIN civicrm_prevnext_cache old on cpc.id = old.id
       SET cpc.entity_id1 = cpc.entity_id2, cpc.entity_id2 = old.entity_id1 ";
     if (is_array($prevNextId) && !CRM_Utils_Array::crmIsEmptyArray($prevNextId)) {
+      CRM_Utils_Type::escapeAll($prevNextId, 'Positive');
       $prevNextId = implode(', ', $prevNextId);
-      $prevNextId = CRM_Utils_Type::escape($prevNextId, 'String');
       $query     .= "WHERE cpc.id IN ({$prevNextId}) AND cpc.is_selected = 1";
     }
     else {
@@ -991,8 +991,8 @@ LIMIT {$offset}, {$rowCount}
     //check pnid is_array or integer
     $whereClause = NULL;
     if (is_array($pnid) && !CRM_Utils_Array::crmIsEmptyArray($pnid)) {
+      CRM_Utils_Type::escapeAll($pnid, 'Positive');
       $pnid = implode(', ', $pnid);
-      $pnid = CRM_Utils_Type::escape($pnid, 'String');
       $whereClause = " id IN ( {$pnid} ) ";
     }
     else {
@@ -1019,23 +1019,7 @@ LIMIT {$offset}, {$rowCount}
       return CRM_Utils_System::permissionDenied();
     }
 
-    $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
-    };
-
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
-
-    $params = $_GET;
-    if ($sort && $sortOrder) {
-      $params['sortBy'] = $sort . ' ' . $sortOrder;
-    }
-
-    $params['page'] = ($offset / $rowCount) + 1;
-    $params['rp'] = $rowCount;
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
     $params['contact_id'] = $contactID;
     $params['context'] = $context;

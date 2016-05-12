@@ -5457,7 +5457,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       ts('Address Fields') => 'civicrm_address',
       ts('Notes') => 'civicrm_note',
       ts('Change Log') => 'civicrm_log',
-      ts('Mailings') => 'civicrm_mailing_event_queue',
+      ts('Mailings') => 'civicrm_mailing',
     );
     CRM_Contact_BAO_Query_Hook::singleton()->getPanesMapper($panesMapper);
 

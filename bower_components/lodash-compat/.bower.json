@@ -17,7 +17,7 @@
     "tag": "3.0.1",
     "commit": "c0dd92d1e5c993c632d8efeb083d6b2ace640118"
   },
-  "_source": "git://github.com/lodash/lodash-compat.git",
+  "_source": "https://github.com/lodash/lodash-compat.git",
   "_target": "~3.0",
   "_originalSource": "lodash-compat"
 }

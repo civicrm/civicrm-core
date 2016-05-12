@@ -181,12 +181,13 @@ AND    {$this->_componentClause}";
       $input['trxn_id'] = $contribution->trxn_id;
       $input['trxn_date'] = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
       $input['receipt_update'] = $params['receipt_update'];
+      $input['contribution_status_id'] = $contribution->contribution_status_id;
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
       $values = array();
-      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution'], $values, FALSE,
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values, FALSE,
         $elements['createPdf']);
 
       if ($mail['html']) {

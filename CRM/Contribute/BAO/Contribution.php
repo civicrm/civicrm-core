@@ -134,9 +134,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
     }
 
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
-      $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       // @todo - should we include Chargeback? If so use self::isContributionStatusNegative($params['contribution_status_id'])
       if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
         || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
@@ -2502,7 +2502,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
             $template->assign('mem_status', $membership_status);
             if ($membership_status == 'Pending' && $membership->is_pay_later == 1) {
-              $template->assign('is_pay_later', 1);
+              $values['is_pay_later'] = 1;
             }
 
             // if separate payment there are two contributions recorded and the
@@ -2552,8 +2552,18 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $addressParams = array('id' => $this->address_id);
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams, FALSE, 'id');
       $addressDetails = array_values($addressDetails);
+    }
+    // Else we assign the billing address of the contribution contact.
+    else {
+      $addressParams = array('contact_id' => $this->contact_id, 'is_billing' => 1);
+      $addressDetails = (array) CRM_Core_BAO_Address::getValues($addressParams);
+      $addressDetails = array_values($addressDetails);
+    }
+
+    if (!empty($addressDetails[0]['display'])) {
       $values['address'] = $addressDetails[0]['display'];
     }
+
     if ($this->_component == 'contribute') {
       //get soft contributions
       $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);
@@ -2825,6 +2835,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('receive_date',
       CRM_Utils_Date::processDate($this->receive_date)
     );
+    $values['receipt_date'] = (empty($this->receipt_date) ? NULL : $this->receipt_date);
     $template->assign('contributeMode', 'notify');
     $template->assign('action', $this->is_test ? 1024 : 1);
     $template->assign('receipt_text',
@@ -3980,7 +3991,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         SELECT GROUP_CONCAT(fa.`name`) as financial_account,
           ft.total_amount,
           ft.payment_instrument_id,
-          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number
+          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, con.currency
 
         FROM civicrm_contribution con
           LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
@@ -4013,6 +4024,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           'receive_date' => $resultDAO->trxn_date,
           'trxn_id' => $resultDAO->trxn_id,
           'status' => $statuses[$resultDAO->status_id],
+          'currency' => $resultDAO->currency,
         );
         if ($paidByName == 'Check') {
           $val['check_number'] = $resultDAO->check_number;
@@ -4344,6 +4356,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'campaign_id',
       'receive_date',
       'receipt_date',
+      'contribution_status_id',
     );
     if (self::isSingleLineItem($primaryContributionID)) {
       $inputContributionWhiteList[] = 'financial_type_id';
@@ -4352,16 +4365,19 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $participant = CRM_Utils_Array::value('participant', $objects);
     $memberships = CRM_Utils_Array::value('membership', $objects);
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
+    $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
     $event = CRM_Utils_Array::value('event', $objects);
 
+    $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+
     $contributionParams = array_merge(array(
-      'contribution_status_id' => 'Completed',
+      'contribution_status_id' => $completedContributionStatusID,
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
 
-    if (!empty($recurContrib->id)) {
-      $contributionParams['contribution_recur_id'] = $recurContrib->id;
+    if ($recurringContributionID) {
+      $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
     $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
 
@@ -4386,16 +4402,13 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         // Figure out what we gain from this.
         CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
       }
-      elseif ($recurContrib && $recurContrib->id) {
+      elseif ($recurContrib && $recurringContributionID) {
         $values['amount'] = $recurContrib->amount;
         $values['financial_type_id'] = $objects['contributionType']->id;
         $values['title'] = $source = ts('Offline Recurring Contribution');
-        $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-        $values['receipt_from_name'] = $domainValues[0];
-        $values['receipt_from_email'] = $domainValues[1];
       }
 
-      if ($recurContrib && $recurContrib->id && !isset($input['is_email_receipt'])) {
+      if ($recurContrib && $recurringContributionID && !isset($input['is_email_receipt'])) {
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
         // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
@@ -4491,7 +4504,7 @@ LIMIT 1;";
 
     $contributionParams['id'] = $contribution->id;
 
-    civicrm_api3('Contribution', 'create', $contributionParams);
+    $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
     // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
@@ -4524,11 +4537,11 @@ LIMIT 1;";
     elseif (!empty($contribution->_relatedObjects['membership'])) {
       $input['skipLineItem'] = TRUE;
       $input['contribution_mode'] = 'membership';
-      $contribution->contribution_status_id = $contributionStatuses['Completed'];
+      $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
       $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $input);
       $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     }
-    $input['contribution_status_id'] = $contributionStatuses['Completed'];
+    $input['contribution_status_id'] = $contributionParams['contribution_status_id'];
     $input['total_amount'] = $input['amount'];
     $input['contribution'] = $contribution;
     $input['financial_type_id'] = $contribution->financial_type_id;
@@ -4548,7 +4561,8 @@ LIMIT 1;";
     CRM_Core_Error::debug_log_message("Contribution record updated successfully");
     $transaction->commit();
 
-    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution);
+    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution->id, $recurringContributionID,
+      $input['contribution_status_id'], $input['total_amount']);
 
     // create an activity record
     if ($input['component'] == 'contribute') {
@@ -4570,7 +4584,10 @@ LIMIT 1;";
     if (!array_key_exists('is_email_receipt', $values) ||
       $values['is_email_receipt'] == 1
     ) {
-      self::sendMail($input, $ids, $objects['contribution'], $values, $recur, FALSE);
+      civicrm_api3('Contribution', 'sendconfirmation', array(
+        'id' => $contribution->id,
+        'payment_processor_id' => $paymentProcessorId,
+      ));
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
 
@@ -4579,6 +4596,7 @@ LIMIT 1;";
       CRM_Contribute_BAO_ContributionRecur::sendRecurringStartOrEndNotification($ids, $recur,
         $isFirstOrLastRecurringPayment);
     }
+    return $contributionResult;
   }
 
   /**
@@ -4593,7 +4611,7 @@ LIMIT 1;";
    *   Incoming data from Payment processor.
    * @param array $ids
    *   Related object IDs.
-   * @param CRM_Contribute_BAO_Contribution $contribution
+   * @param int $contributionID
    * @param array $values
    *   Values related to objects that have already been loaded.
    * @param bool $recur
@@ -4603,10 +4621,19 @@ LIMIT 1;";
    *   is because the function is also used to generate pdfs
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function sendMail(&$input, &$ids, $contribution, &$values, $recur = FALSE, $returnMessageText = FALSE) {
+  public static function sendMail(&$input, &$ids, $contributionID, &$values, $recur = FALSE,
+                                  $returnMessageText = FALSE) {
     $input['is_recur'] = $recur;
-    $input['receipt_date'] = $contribution->receipt_date;
+
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $contributionID;
+    if (!$contribution->find(TRUE)) {
+      throw new CRM_Core_Exception('Contribution does not exist');
+    }
+    $contribution->loadRelatedObjects($input, $ids, TRUE);
     // set receipt from e-mail and name in value
     if (!$returnMessageText) {
       $session = CRM_Core_Session::singleton();
@@ -4617,11 +4644,13 @@ LIMIT 1;";
         $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
       }
     }
+
+    $return = $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
     // Contribution ID should really always be set. But ?
-    if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update'])) {
+    if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update']) && empty($contribution->receipt_date)) {
       civicrm_api3('Contribution', 'create', array('receipt_date' => 'now', 'id' => $contribution->id));
     }
-    return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
+    return $return;
   }
 
   /**
