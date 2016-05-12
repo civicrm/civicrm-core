@@ -641,10 +641,10 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
   public function upgradeMailingFKs(CRM_Queue_TaskContext $ctx) {
 
     // Safely drop the foreign keys
-    CRM_Upgrade_Incremental_php_FourSeven::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_email_id');
-    CRM_Upgrade_Incremental_php_FourSeven::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_phone_id');
-    CRM_Upgrade_Incremental_php_FourSeven::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id');
-    CRM_Upgrade_Incremental_php_FourSeven::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_phone_id');
+    self::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_email_id');
+    self::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_phone_id');
+    self::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id');
+    self::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_phone_id');
 
     // Set up the new foreign keys
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
