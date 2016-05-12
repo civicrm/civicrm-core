@@ -172,7 +172,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
             $contribution->payment_status_id = $result['payment_status_id'];
           }
           $result['contribution'] = $contribution;
-          if ($contribution->payment_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution',
+          if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution',
             'status_id', 'Pending') && $payment->isSendReceiptForPending()) {
             CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
               $form->_values,
