@@ -121,7 +121,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
-   * @group ornery
+   * Test the batch merge.
    */
   public function testBatchMergeSelectedDuplicates() {
     $this->createDupeContacts();
@@ -183,7 +183,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
-   * @group ornery
+   * Test the batch merge.
    */
   public function testBatchMergeAllDuplicates() {
     $this->createDupeContacts();
