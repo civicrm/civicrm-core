@@ -43,7 +43,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
   /**
@@ -78,7 +78,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
   /**
@@ -112,7 +112,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
   /**
@@ -147,7 +147,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
   /**
@@ -182,7 +182,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
   /**
@@ -223,7 +223,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     );
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
   public function testCustomGroupMultiple() {
@@ -256,7 +256,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
 }

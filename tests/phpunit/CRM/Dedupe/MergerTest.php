@@ -109,10 +109,12 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Delete all created contacts.
+   */
   public function deleteDupeContacts() {
-    // delete all created contacts
     foreach ($this->_contactIds as $contactId) {
-      Contact::delete($contactId);
+      $this->contactDelete($contactId);
     }
 
     // delete dupe group
