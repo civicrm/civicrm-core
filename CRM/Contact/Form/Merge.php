@@ -73,14 +73,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('The selected pair of contacts are marked as non duplicates. If these records should be merged, you can remove this exception on the <a href="%1">Dedupe Exceptions</a> page.', array(1 => CRM_Utils_System::url('civicrm/dedupe/exception', 'reset=1'))));
     }
 
-    //load cache mechanism
-    $contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'contact_type');
-    $cacheKey = "merge $contactType";
-    $cacheKey .= $rgid ? "_{$rgid}" : '_0';
-    $cacheKey .= $gid ? "_{$gid}" : '_0';
+    $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
 
-    $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
-                                                             pn.entity_id2 = de.contact_id2 )";
+    $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
     $where = "de.id IS NULL";
 
     $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, $cid, $oid, $this->_mergeId, $join, $where, $flip);
@@ -338,12 +333,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     if ($this->next && $this->_mergeId) {
-      $cacheKey = "merge {$this->_contactType}";
-      $cacheKey .= $this->_rgid ? "_{$this->_rgid}" : '_0';
-      $cacheKey .= $this->_gid ? "_{$this->_gid}" : '_0';
+      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid);
 
-      $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
-                                                                 pn.entity_id2 = de.contact_id2 )";
+      $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
       $where = "de.id IS NULL";
 
       $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, NULL, NULL, $this->_mergeId, $join, $where);
