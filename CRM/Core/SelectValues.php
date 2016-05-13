@@ -779,6 +779,96 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * CiviCRM supported date/time display formats.
+   *
+   * @return array
+   */
+  public static function getDatePluginDisplayFormatsDateTime() {
+    $dateDisplayFormats = array(
+      "%m/%d/%Y %l:%m %P" => ts('mm/dd/yyyy hh:mm (12/31/2009 07:30 PM)'),
+      "%d/%m/%Y %l:%m %P" => ts('dd/mm/yyyy hh:mm (31/12/2009 07:30 PM)'),
+      "%Y-%m-%d %l:%m %P" => ts('yyyy-mm-dd hh:mm (2009-12-31 07:30 PM)'),
+      "%m-%d-%Y %l:%m %P" => ts('mm-dd-yyyy hh:mm (12-31-2009 07:30 PM)'),
+      "%d-%m-%Y %l:%m %P" => ts('dd-mm-yyyy hh:mm (31-12-2009 07:30 PM)'),
+      "%b %d, %Y %l:%m %P" => ts('M d, yyyy hh:mm (Dec 31, 2009 07:30 PM)'),
+      "%d %b, %Y %l:%m %P" => ts('d M, yyyy hh:mm (31 Dec, 2009 07:30 PM)'),
+      "%B %d, %Y %l:%m %P" => ts('MM d, yyyy hh:mm (December 31, 2009 07:30 PM)'),
+      "%m/%d/%Y %H:%m" => ts('mm/dd/yyyy HH:mm (12/31/2009 19:30)'),
+      "%d/%m/%Y %H:%m" => ts('dd/mm/yyyy HH:mm (31/12/2009 19:30)'),
+      "%Y-%m-%d %H:%m" => ts('yyyy-mm-dd HH:mm (2009-12-31 19:30)'),
+      "%m-%d-%Y %H:%m" => ts('mm-dd-yyyy HH:mm (12-31-2009 19:30)'),
+      "%d-%m-%Y %H:%m" => ts('dd-mm-yyyy HH:mm (31-12-2009 19:30)'),
+      "%b %d, %Y %H:%m" => ts('M d, yyyy HH:mm (Dec 31, 2009 19:30)'),
+      "%d %b, %Y %H:%m" => ts('d M, yyyy HH:mm (31 Dec, 2009 19:30)'),
+      "%B %d, %Y %H:%m" => ts('MM d, yyyy HH:mm (December 31, 2009 19:30)'),
+      "%B %E%f, %Y %l:%M %P" => ts('MM df, yyyy hh:mm (December 31st, 2009  7:30 PM)'),
+    );
+    return $dateDisplayFormats;
+  }
+
+  /**
+   * CiviCRM supported full date display formats.
+   *
+   * @return array
+   */
+  public static function getDatePluginDisplayFormatsFullDate() {
+    $dateDisplayFormats = array(
+      "%m/%d/%Y" => ts('mm/dd/yyyy (12/31/2009)'),
+      "%d/%m/%Y" => ts('dd/mm/yyyy (31/12/2009)'),
+      "%Y-%m-%d" => ts('yyyy-mm-dd (2009-12-31)'),
+      "%m-%d-%Y" => ts('mm-dd-yyyy (12-31-2009)'),
+      "%d-%m-%Y" => ts('dd-mm-yyyy (31-12-2009)'),
+      "%b %d, %Y" => ts('M d, yyyy (Dec 31, 2009)'),
+      "%d %b, %Y" => ts('d M, yyyy (31 Dec, 2009)'),
+      "%B %d, %Y" => ts('MM d, yyyy (December 31, 2009)'),
+      "%B %E%f, %Y" => ts('MM df, yyyy (December 31st, 2009)'),
+    );
+    return $dateDisplayFormats;
+  }
+
+  /**
+   * CiviCRM supported partial date display formats.
+   *
+   * @return array
+   */
+  public static function getDatePluginDisplayFormatsPartialDate() {
+    $dateDisplayFormats = array(
+      "%m/%d" => ts('mm/dd (12/31)'),
+      "%d/%m" => ts('dd/mm (31/12)'),
+      "%d-%m" => ts('dd-mm (31-12)'),
+      "%Y-%m" => ts('yyyy-mm (2009-12)'),
+      "%b %Y" => ts('M yyyy (Dec 2009)'),
+      "%B %Y" => ts('MM yyyy (December 2009)'),
+    );
+    return $dateDisplayFormats;
+  }
+
+  /**
+   * CiviCRM supported year display formats.
+   *
+   * @return array
+   */
+  public static function getDatePluginDisplayFormatsYear() {
+    $dateDisplayFormats = array(
+      "%Y" => ts('yyyy (2009)'),
+    );
+    return $dateDisplayFormats;
+  }
+
+  /**
+   * CiviCRM supported time display formats.
+   *
+   * @return array
+   */
+  public static function getDatePluginDisplayFormatsTime() {
+    $dateDisplayFormats = array(
+      "%l:%M %P" => ts('hh:mm A (7:30 PM)'),
+      "%H:%M" => ts('HH:mm (19:30)'),
+    );
+    return $dateDisplayFormats;
+  }
+
+  /**
    * Time formats.
    *
    * @return array
@@ -788,6 +878,15 @@ class CRM_Core_SelectValues {
       '1' => ts('12 Hours'),
       '2' => ts('24 Hours'),
     );
+  }
+
+  /**
+   * Date formats for Financial Batch
+   *
+   * @return array
+   */
+  public static function getDatePluginDisplayFormatsFinancialBatch() {
+    return self::getDatePluginDisplayFormatsFullDate() + self::getDatePluginDisplayFormatsDateTime();
   }
 
   /**
