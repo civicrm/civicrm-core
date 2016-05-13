@@ -739,7 +739,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // add additional details that we might need to resolve conflicts
         $migrationInfo['main_details'] = &$rowsElementsAndInfo['main_details'];
         $migrationInfo['other_details'] = &$rowsElementsAndInfo['other_details'];
-        $migrationInfo['main_loc_block'] = &$rowsElementsAndInfo['main_loc_block'];
         $migrationInfo['rows'] = &$rowsElementsAndInfo['rows'];
 
         // go ahead with merge if there is no conflict
@@ -812,8 +811,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'mode' => $mode,
     );
 
-    $allLocationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-
     foreach ($migrationInfo as $key => $val) {
       if ($val === "null") {
         // Rule: Never overwrite with an empty value (in any mode)
@@ -841,33 +838,26 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $fieldName = $locField[2];
         $fieldCount = $locField[3];
 
-        // Rule: resolve address conflict if any
+        // Rule: Catch address conflicts (same address type on both contacts)
         if ($fieldName == 'address') {
           $mainNewLocTypeId = $migrationInfo['location_blocks'][$fieldName][$fieldCount]['locTypeId'];
-          if (!empty($migrationInfo['main_loc_block']) &&
-              array_key_exists("main_address_{$mainNewLocTypeId}", $migrationInfo['main_loc_block'])) {
-            // main loc already has some address for the loc-type. Its a overwrite situation.
-            // look for next available loc-type
-            $newTypeId = NULL;
-            foreach ($allLocationTypes as $typeId => $typeLabel) {
-              if (!array_key_exists("main_address_{$typeId}", $migrationInfo['main_loc_block'])) {
-                $newTypeId = $typeId;
+          if (
+            isset($migrationInfo['main_details']['location_blocks']['address']) &&
+            !empty($migrationInfo['main_details']['location_blocks']['address'])
+          ) {
+            // Look for this LocTypeId in the results
+            // @todo This can be streamlined using array_column() in PHP 5.5+
+            foreach ($migrationInfo['main_details']['location_blocks']['address'] as $addressKey => $addressRecord) {
+              if ($addressRecord['location_type_id'] == $mainNewLocTypeId) {
+                $conflicts[$key] = NULL;
+                break;
               }
             }
-            if ($newTypeId) {
-              // try insert address at new available loc-type
-              $migrationInfo['location_blocks'][$fieldName][$fieldCount]['locTypeId'] = $newTypeId;
-            }
-            else {
-              // note it down & lets wait for response from the hook.
-              // For no response $mode will decide if to skip this merge
-              $conflicts[$key] = NULL;
-            }
+
           }
         }
+        // For other locations, don't merge/add if the values are the same
         elseif ($migrationInfo['rows'][$key]['main'] == $migrationInfo['rows'][$key]['other']) {
-          // for loc blocks other than address like email, phone .. if values are same no point in merging
-          // and adding redundant value
           unset($migrationInfo[$key]);
         }
       }
@@ -959,7 +949,34 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Duplicate contact which would be deleted after merge operation.
    *
    * @return array|bool|int
-   *   'main_loc_block' => Stores all location blocks associated with the 'main' contact
+   *
+   *   rows => An array of arrays, each is row of merge information for the table
+   *   Format: move_fieldname, eg: move_contact_type
+   *     main => Value associated with the main contact
+   *     other => Value associated with the other contact
+   *     title => The title of the field to display in the merge table
+   *
+   *   elements => An array of form elements for the merge UI
+   *
+   *   rel_table_elements => An array of form elements for the merge UI for
+   *     entities related to the contact (eg: checkbox to move 'mailings')
+   *
+   *   rel_tables => Stores the tables that have related entities for the contact
+   *     for example mailings, groups
+   *
+   *   main_details => An array of core contact field values, eg: first_name, etc.
+   *     location_blocks => An array of location block data for the main contact
+   *       stored as the 'result' of an API call.
+   *       eg: main_details['location_blocks']['address'][0]['id']
+   *       eg: main_details['location_blocks']['email'][1]['id']
+   *
+   *   other_details => As above, but for the 'other' contact
+   *
+   *   migration_info => Stores the 'default' merge actions for each field which
+   *     is used when programatically merging contacts. It contains instructions
+   *     to move all fields from the 'other' contact to the 'main' contact, as
+   *     though the form had been submitted with those options.
+   *
    */
   public static function getRowsElementsAndInfo($mainId, $otherId) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
@@ -976,6 +993,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (empty($result['values'][$cid]['contact_type'])) {
         return FALSE;
       }
+
+      // CRM-18480: Cancel the process if the contact is already deleted
+      if (isset($result['values'][$cid]['contact_is_deleted']) && !empty($result['values'][$cid]['contact_is_deleted'])) {
+        CRM_Core_Error::fatal(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(1 => $moniker, 2 => $cid)));
+      }
+
       $$moniker = $result['values'][$cid];
     }
 
@@ -1102,8 +1125,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'other' => array(),
     );
 
-    $mainLocBlock = array();
-
     // @todo This could probably be defined and used earlier
     $mergeTargets = array(
       'main' => $mainId,
@@ -1135,32 +1156,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               CRM_Core_BAO_Address::fixAddress($value);
               $display = CRM_Utils_Address::format($value);
               $locations[$moniker][$blockName][$cnt]['display'] = $display;
-            }
-
-            // Add any 'main' contact block values to an array for the JS
-            // @todo The JS should just access the main_details to find this info?
-            if ($moniker == 'main') {
-              if ($blockInfo['hasType']) {
-                // Handle websites, no location type ID
-                // @todo Remove the need for this specific 'if'
-                if ($blockName == 'website') {
-                  $value['location_type_id'] = 0;
-                }
-                $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id'] . "_" . $value[$blockInfo['hasType']]]['display'] = $value[$blockInfo['displayField']];
-                $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id'] . "_" . $value[$blockInfo['hasType']]]['id'] = $value['id'];
-              }
-              else {
-                // Get the correct display value for addresses
-                // @todo Remove the need for this if...
-                if ($blockName == 'address') {
-                  $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id']]['display'] = $display;
-                  $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id']]['id'] = $value['id'];
-                }
-                else {
-                  $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id']]['display'] = $value[$blockInfo['displayField']];
-                  $mainLocBlock["main_" . $blockName . "_" . $value['location_type_id']]['id'] = $value['id'];
-                }
-              }
             }
 
             $cnt++;
@@ -1216,7 +1211,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $migrationInfo["move_location_{$blockName}_{$count}"] = 1;
 
           // Add a hidden field to store the ID of the target main contact block
-          $elements[] = array('hidden', "location[$blockName][$count][mainContactBlockId]", $mainContactBlockId);
+          $elements[] = array('hidden', "location_blocks[$blockName][$count][mainContactBlockId]", $mainContactBlockId);
 
           // Setup variables
           $thisTypeId = FALSE;
@@ -1247,7 +1242,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             // Add the element
             $elements[] = array(
               'select',
-              "location[$blockName][$count][locTypeId]",
+              "location_blocks[$blockName][$count][locTypeId]",
               NULL,
               $defaultLocId + $tmpIdList,
               $js,
@@ -1258,7 +1253,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             // @todo Check this logic out
             $migrationInfo['location_blocks'][$blockName][$count]['locTypeId'] = $thisLocId;
             if ($blockName != 'address') {
-              $elements[] = array('advcheckbox', "location[{$blockName}][$count][operation]", NULL, ts('add new'));
+              $elements[] = array('advcheckbox', "location_blocks[{$blockName}][$count][operation]", NULL, ts('add new'));
               // always use add operation
               $migrationInfo['location_blocks'][$blockName][$count]['operation'] = 1;
             }
@@ -1290,13 +1285,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             // Add the element
             $elements[] = array(
               'select',
-              "location[$blockName][$count][typeTypeId]",
+              "location_blocks[$blockName][$count][typeTypeId]",
               NULL,
               $defaultTypeId + $tmpIdList,
               $js,
             );
 
-            // Add the information to the migrationInfo (@todo Why?)
+            // Add the information to the migrationInfo
             $migrationInfo['location_blocks'][$blockName][$count]['typeTypeId'] = $thisTypeId;
 
           }
@@ -1429,7 +1424,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'rows' => $rows,
       'elements' => $elements,
       'rel_table_elements' => $relTableElements,
-      'main_loc_block' => $mainLocBlock,
       'rel_tables' => $relTables,
       'main_details' => $main,
       'other_details' => $other,
@@ -1486,7 +1480,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // @todo Tidy this up
         $operation = 0;
         if ($fieldName != 'website') {
-          $operation = CRM_Utils_Array::value('operation', $migrationInfo['location'][$fieldName][$fieldCount]);
+          $operation = CRM_Utils_Array::value('operation', $migrationInfo['location_blocks'][$fieldName][$fieldCount]);
         }
         // default operation is overwrite.
         if (!$operation) {
@@ -1540,16 +1534,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // Add/update location and type information from the form, if applicable
           if ($locationBlocks[$name]['hasLocation']) {
-            $locTypeId = CRM_Utils_Array::value('locTypeId', $migrationInfo['location'][$name][$blkCount]);
+            $locTypeId = CRM_Utils_Array::value('locTypeId', $migrationInfo['location_blocks'][$name][$blkCount]);
             $otherBlockDAO->location_type_id = $locTypeId;
           }
           if ($locationBlocks[$name]['hasType']) {
-            $typeTypeId = CRM_Utils_Array::value('typeTypeId', $migrationInfo['location'][$name][$blkCount]);
+            $typeTypeId = CRM_Utils_Array::value('typeTypeId', $migrationInfo['location_blocks'][$name][$blkCount]);
             $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
           }
 
           // Get main block ID
-          $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location'][$name][$blkCount], 0);
+          $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location_blocks'][$name][$blkCount], 0);
 
           // if main contact already has primary & billing, set the flags to 0.
           if ($primaryDAOId) {
@@ -1846,7 +1840,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $contactFields = CRM_Contact_DAO_Contact::fields();
     $invalidFields = array(
       'api_key',
-      'contact_is_deleted',
       'created_date',
       'display_name',
       'hash',
@@ -1931,6 +1924,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       2 => $mainId,
     );
     $activity = civicrm_api3('activity', 'create', array(
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
+        $mainId,
       'subject' => ts('Contact ID %1 has been merged and deleted.', $params),
       'target_contact_id' => $mainId,
       'activity_type_id' => 'Contact Merged',
@@ -1938,6 +1933,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     ));
     if (civicrm_api3('Setting', 'getvalue', array('name' => 'contact_undelete', 'group' => 'CiviCRM Preferences'))) {
       civicrm_api3('activity', 'create', array(
+        'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
+          $otherId,
         'subject' => ts('Contact ID %1 has been merged into Contact ID %2 and deleted.', $params),
         'target_contact_id' => $otherId,
         'activity_type_id' => 'Contact Deleted by Merge',
