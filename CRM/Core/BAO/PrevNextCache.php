@@ -215,8 +215,6 @@ WHERE  cacheKey     = %3 AND
    *   Should we return rows that have already been idenfified as having a conflict.
    *   When this is TRUE you should be careful you do not set up a loop.
    *
-   * @param array $select
-   *
    * @return array
    */
   public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = array(), $orderByClause = '', $includeConflicts = TRUE) {
