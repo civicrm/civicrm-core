@@ -57,6 +57,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    */
   public function doDirectPayment(&$params) {
+    require_once 'PayJunction/pjClasses.php'; // necessary for event registrations 
     $logon = $this->_paymentProcessor['user_name'];
     $password = $this->_paymentProcessor['password'];
     $url_site = $this->_paymentProcessor['url_site'];
