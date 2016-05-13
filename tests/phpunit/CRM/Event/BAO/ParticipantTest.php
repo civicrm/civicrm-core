@@ -80,7 +80,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'id', 3, 'Check DB for updated status id  of the participant'
     );
 
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -125,7 +125,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     }
 
     Participant::delete($participantId);
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -134,11 +134,11 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
    */
   public function testgetValuesWithoutValidParams() {
     $params = $values = $ids = array();
-    $participantId = Participant::create($this->_contactId, $this->_eventId);
+    Participant::create($this->_contactId, $this->_eventId);
     $fetchParticipant = CRM_Event_BAO_Participant::getValues($params, $values, $ids);
     $this->assertNull($fetchParticipant);
 
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -158,7 +158,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($eventFull, 'This event is full.', 'Checking if Event is full.');
 
     Participant::delete($participantId);
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -169,7 +169,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $importableFields = CRM_Event_BAO_Participant::importableFields();
     $this->assertNotEquals(count($importableFields), 0, 'Checking array not to be empty.');
 
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -187,7 +187,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($participantDetails['title'], $params['title'], 'Checking Event Title in which participant is enroled.');
 
     Participant::delete($participantId);
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -218,10 +218,10 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'id', $this->_contactId, 'Check DB for contact of the participant'
     );
 
-    $deleteParticipant = CRM_Event_BAO_Participant::deleteParticipant($participant->id);
+    CRM_Event_BAO_Participant::deleteParticipant($participant->id);
     $this->assertDBNull('CRM_Event_BAO_Participant', $participant->id, 'contact_id', 'id', 'Check DB for deleted Participant.');
 
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -251,7 +251,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       $partidel[] = Participant::delete($partiId[$i]);
     }
 
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -320,7 +320,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'contact_id', 'Check DB for deleted participant. Should be NULL.'
     );
 
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -331,7 +331,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $exportableFields = CRM_Event_BAO_Participant::exportableFields();
     $this->assertNotEquals(count($exportableFields), 0, 'Checking array not to be empty.');
 
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($this->_eventId);
   }
 
@@ -411,18 +411,18 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       CRM_Event_BAO_Participant::fixEventLevel($values[$participant->id]['fee_level']);
     }
 
-    $deletePricefield = CRM_Price_BAO_PriceField::deleteField($pricefield->id);
+    CRM_Price_BAO_PriceField::deleteField($pricefield->id);
     $this->assertDBNull('CRM_Price_BAO_PriceField', $pricefield->id, 'name',
       'id', 'Check DB for non-existence of Price Field.'
     );
 
-    $deletePriceset = CRM_Price_BAO_PriceSet::deleteSet($priceset->id);
+    CRM_Price_BAO_PriceSet::deleteSet($priceset->id);
     $this->assertDBNull('CRM_Price_BAO_PriceSet', $priceset->id, 'title',
       'id', 'Check DB for non-existence of Price Set.'
     );
 
     Participant::delete($participant->id);
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
     Event::delete($eventId);
   }
 

@@ -1207,7 +1207,12 @@ GROUP BY p.id
   }
 
   /**
-   * Get list of contribution In Honor of contact Ids.
+   * Get list of contributions which credit the passed in contact ID.
+   *
+   * The returned array provides details about the original contribution & donor.
+   *
+   * @todo - this is a confusing function called from one place. It has a test. It would be
+   * nice to deprecate it.
    *
    * @param int $honorId
    *   In Honor of Contact ID.

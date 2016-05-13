@@ -63,7 +63,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
     $this->membershipStatusDelete($this->_membershipStatusID);
-    Contact::delete($this->_contactID);
+    $this->contactDelete($this->_contactID);
 
     $this->_contactID = $this->_membershipStatusID = $this->_membershipTypeID = NULL;
   }
@@ -114,7 +114,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($membershipTypeId, $this->_membershipTypeID, 'Verify membership type id is fetched.');
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   public function testGetValues() {
@@ -172,7 +172,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $this->membershipDelete($membershipId1);
     $this->membershipDelete($membershipId2);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   public function testRetrieve() {
@@ -260,7 +260,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $this->membershipDelete($membershipId1);
     $this->membershipDelete($membershipId2);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   public function testDeleteMembership() {
@@ -284,10 +284,10 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
     CRM_Member_BAO_Membership::del($membershipId);
 
-    $membershipId = $this->assertDBNull('CRM_Member_BAO_Membership', $contactId, 'id',
+    $this->assertDBNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for deleted membership.'
     );
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   public function testGetContactMembership() {
@@ -315,7 +315,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($membership['id'], $membershipId, 'Verify membership record is retrieved.');
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 
@@ -345,7 +345,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $membership[$membershipId]['renewPageId'] = CRM_Member_BAO_Membership::getContributionPageId($membershipId);
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -377,7 +377,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     CRM_Member_BAO_Membership::getMembershipStarts($this->_membershipTypeID, $yearStart, $currentDate);
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -408,7 +408,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     CRM_Member_BAO_Membership::getMembershipCount($this->_membershipTypeID, $currentDate, $test);
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 
@@ -444,7 +444,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -474,7 +474,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId);
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -540,7 +540,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($endDate, $MembershipRenew->end_date, 'Verify correct end date is calculated after membership renewal');
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -624,7 +624,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
 
     $this->membershipDelete($membershipId);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 }
