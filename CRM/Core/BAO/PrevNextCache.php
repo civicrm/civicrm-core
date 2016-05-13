@@ -325,10 +325,7 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
    */
   public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL) {
     if (!$cacheKeyString && $rgid) {
-      $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
-      $cacheKeyString = "merge {$contactType}";
-      $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
-      $cacheKeyString .= $gid ? "_{$gid}" : '_0';
+      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
     }
 
     if (!$cacheKeyString) {
