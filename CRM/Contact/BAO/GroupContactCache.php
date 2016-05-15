@@ -68,18 +68,18 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    *   the sql query which lists the groups that need to be refreshed
    */
   public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
-    $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
+    $smartGroupCacheTimeoutDateTime = self::getCacheInvalidDateTime();
 
     $query = "
 SELECT  g.id
 FROM    civicrm_group g
 WHERE   ( g.saved_search_id IS NOT NULL OR g.children IS NOT NULL )
 AND     g.is_active = 1
-AND     ( g.cache_date IS NULL OR
-          ( TIMESTAMPDIFF(MINUTE, g.cache_date, NOW()) >= $smartGroupCacheTimeout ) OR
-          ( NOW() >= g.refresh_date )
-        )
-";
+AND (
+  g.cache_date IS NULL
+  OR cache_date <= $smartGroupCacheTimeoutDateTime
+  OR NOW() >= g.refresh_date
+)";
 
     if (!$includeHiddenGroups) {
       $query .= "AND (g.is_hidden = 0 OR g.is_hidden IS NULL)";
@@ -265,7 +265,6 @@ AND    g.refresh_date IS NULL
     // only update cache entry if we had any values
     if ($processed) {
       // also update the group with cache date information
-      //make sure to give original timezone settings again.
       $now = date('YmdHis');
       $refresh = 'null';
     }
@@ -303,7 +302,7 @@ WHERE  id IN ( $groupIDs )
     static $invoked = FALSE;
 
     // typically this needs to happy only once per instance
-    // this is especially TRUE in import, where we dont need
+    // this is especially TRUE in import, where we don't need
     // to do this all the time
     // this optimization is done only when no groupID is passed
     // i.e. cache is reset for all groups
@@ -328,10 +327,11 @@ WHERE  id IN ( $groupIDs )
     }
 
     $refresh = NULL;
-    $params = array();
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
-
-    $refreshTime = self::getRefreshDateTime();
+    $params = array(
+      1 => array(self::getCacheInvalidDateTime(), 'String'),
+      2 => array(self::getRefreshDateTime(), 'String'),
+    );
 
     if (!isset($groupID)) {
       if ($smartGroupCacheTimeout == 0) {
@@ -360,12 +360,10 @@ WHERE  g.cache_date <= %1
 ";
         $refresh = "
 UPDATE civicrm_group g
-SET    refresh_date = $refreshTime
-WHERE  g.cache_date > %1
+SET    refresh_date = %2
+WHERE  g.cache_date < %1
 AND    refresh_date IS NULL
 ";
-        $cacheTime = date('Y-m-d H-i-s', strtotime("- $smartGroupCacheTimeout minutes"));
-        $params = array(1 => array($cacheTime, 'String'));
       }
     }
     elseif (is_array($groupID)) {
@@ -449,10 +447,10 @@ WHERE  id = %1
       return;
     }
 
-    // grab a lock so other processes dont compete and do the same query
+    // grab a lock so other processes don't compete and do the same query
     $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.core.group.{$groupID}");
     if (!$lock->isAcquired()) {
-      // this can cause inconsistent results since we dont know if the other process
+      // this can cause inconsistent results since we don't know if the other process
       // will fill up the cache before our calling routine needs it.
       // however this routine does not return the status either, so basically
       // its a "lets return and hope for the best"
@@ -704,13 +702,25 @@ ORDER BY   gc.contact_id, g.children
   }
 
   /**
+   * Get the datetime from which the cache should be considered invalid.
+   *
+   * Ie if the smartgroup cache timeout is 5 minutes ago then the cache is invalid if it was
+   * refreshed 6 minutes ago, but not if it was refreshed 4 minutes ago.
+   *
+   * @return string
+   */
+  public static function getCacheInvalidDateTime() {
+    return date('Ymdhis', strtotime("-" . self::smartGroupCacheTimeout() . " Minutes"));
+  }
+
+  /**
    * Get the date when the cache should be refreshed from.
    *
    * Ie. now + the offset & we will delete anything prior to then.
    *
    * @return string
    */
-  protected static function getRefreshDateTime() {
+  public static function getRefreshDateTime() {
     return date('Ymdhis', strtotime("+ " . self::smartGroupCacheTimeout() . " Minutes"));
   }
 
