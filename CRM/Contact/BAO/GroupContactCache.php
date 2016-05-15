@@ -40,7 +40,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
-   * @param $groupIDs
+   * @param array $groupIDs
    *   Of group that we are checking against.
    *
    * @return bool
@@ -55,8 +55,9 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
   }
 
   /**
-   * Common function that formulates the query to see which groups needs to be refreshed
-   * based on their cache date and the smartGroupCacheTimeOut
+   * Formulate the query to see which groups needs to be refreshed.
+   *
+   * The calculation is based on their cache date and the smartGroupCacheTimeOut
    *
    * @param string $groupIDClause
    *   The clause which limits which groups we need to evaluate.
@@ -93,8 +94,9 @@ AND     ( g.cache_date IS NULL OR
   }
 
   /**
-   * Checks to see if a group has been refreshed recently. This is primarily used
-   * in a locking scenario when some other process might have refreshed things underneath
+   * Check to see if a group has been refreshed recently.
+   *
+   * This is primarily used in a locking scenario when some other process might have refreshed things underneath
    * this process
    *
    * @param int $groupID
@@ -114,10 +116,11 @@ AND     ( g.cache_date IS NULL OR
   }
 
   /**
-   * Check to see if we have cache entries for this group
+   * Check to see if we have cache entries for this group.
+   *
    * if not, regenerate, else return
    *
-   * @param int /array $groupIDs groupIDs of group that we are checking against
+   * @param int|array $groupIDs groupIDs of group that we are checking against
    *                           if empty, all groups are checked
    * @param int $limit
    *   Limits the number of groups we evaluate.
@@ -195,7 +198,9 @@ AND    g.refresh_date IS NULL
   }
 
   /**
-   * FIXME: This function should not be needed, because the cache table should not be getting truncated
+   * Fill the group contact cache if it is empty.
+   *
+   * Do this by the expensive operation of loading all groups. Call sparingly.
    */
   public static function fillIfEmpty() {
     if (!CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_group_contact_cache")) {
@@ -204,6 +209,8 @@ AND    g.refresh_date IS NULL
   }
 
   /**
+   * Build the smart group cache for a given group.
+   *
    * @param int $groupID
    */
   public static function add($groupID) {
@@ -222,8 +229,13 @@ AND    g.refresh_date IS NULL
   }
 
   /**
+   * Store values into the group contact cache.
+   *
+   * @todo review use of INSERT IGNORE. This function appears to be slower that inserting
+   * with a left join. Also, 200 at once seems too little.
+   *
    * @param int $groupID
-   * @param $values
+   * @param array $values
    */
   public static function store(&$groupID, &$values) {
     $processed = FALSE;
@@ -274,6 +286,7 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * Removes all the cache entries pertaining to a specific group.
+   *
    * If no groupID is passed in, removes cache entries for all groups
    * Has an optimization to bypass repeated invocations of this function.
    * Note that this function is an advisory, i.e. the removal respects the
@@ -397,9 +410,11 @@ WHERE  id = %1
   }
 
   /**
-   * Removes one or more contacts from the smart group cache.
+   * Remove one or more contacts from the smart group cache.
+   *
    * @param int|array $cid
    * @param int $groupId
+   *
    * @return bool
    *   TRUE if successful.
    */
@@ -587,6 +602,12 @@ AND  civicrm_group_contact.group_id = $groupID ";
   }
 
   /**
+   * Retrieve the smart group cache timeout in minutes.
+   *
+   * This checks if a timeout has been configured. If one has then smart groups should not
+   * be refreshed more frequently than the time out. If a group was recently refreshed it should not
+   * refresh again within that period.
+   *
    * @return int
    */
   public static function smartGroupCacheTimeout() {
@@ -600,12 +621,13 @@ AND  civicrm_group_contact.group_id = $groupID ";
       return $config->smartGroupCacheTimeout;
     }
 
-    // lets have a min cache time of 5 mins if not set
+    // Default to 5 minutes.
     return 5;
   }
 
   /**
    * Get all the smart groups that this contact belongs to.
+   *
    * Note that this could potentially be a super slow function since
    * it ensure that all contact groups are loaded in the cache
    *
