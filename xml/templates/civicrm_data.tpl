@@ -209,7 +209,8 @@ VALUES
    ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1, 0),
    ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , 1, 1, 0),
    ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1),
-   ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , 1, 1, 0);
+   ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , 1, 1, 0),
+   ('smart_group_cache_refresh_mode', '{ts escape="sql"}Smart Group Cache Management Mode{/ts}'   , 1, 1, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -288,6 +289,7 @@ SELECT @option_group_id_communication_style := max(id) from civicrm_option_group
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
 SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group where name = 'relative_date_filters';
+SELECT @option_group_smart_group_cache_refresh_mode    := max(id) from civicrm_option_group where name = 'smart_group_cache_refresh_mode';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -1018,7 +1020,9 @@ VALUES
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous week{/ts}', 'greater_previous.week', 'greater_previous.week', NULL, NULL, NULL,59, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar month{/ts}', 'greater_previous.month', 'greater_previous.month', NULL, NULL, NULL,60, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous quarter{/ts}', 'greater_previous.quarter', 'greater_previous.quarter', NULL, NULL, NULL,61, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar year{/ts}', 'greater_previous.year', 'greater_previous.year', NULL, NULL, NULL,62, NULL, 0, 0, 1, NULL, NULL);
+   (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar year{/ts}', 'greater_previous.year', 'greater_previous.year', NULL, NULL, NULL,62, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_smart_group_cache_refresh_mode, '{ts escape="sql"}Opportunistic{/ts}', 'opportunistic','opportunistic', NULL, NULL, NULL,1, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_smart_group_cache_refresh_mode, '{ts escape="sql"}Deterministic{/ts}', 'deterministic','deterministic', NULL, NULL, NULL,1, NULL, 0, 0, 2, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
