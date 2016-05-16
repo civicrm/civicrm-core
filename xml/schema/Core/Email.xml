@@ -60,7 +60,7 @@
     <length>254</length>
     <html>
       <type>Text</type>
-      <size>30</size>
+      <size>MEDIUM</size>
     </html>
     <import>true</import>
     <headerPattern>/e.?mail/i</headerPattern>
@@ -115,9 +115,6 @@
     <required>true</required>
     <comment>Is this address on bounce hold?</comment>
     <add>1.1</add>
-    <html>
-      <type>CheckBox</type>
-    </html>
   </field>
   <field>
     <name>is_bulkmail</name>

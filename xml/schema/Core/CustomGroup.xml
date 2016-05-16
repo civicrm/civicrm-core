@@ -122,7 +122,7 @@
   <field>
     <name>weight</name>
     <type>int</type>
-    <title>Order</title>
+    <title>Custom Group Weight</title>
     <required>true</required>
     <default>1</default>
     <comment>Controls display order when multiple extended property groups are setup for the same class.</comment>

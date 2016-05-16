@@ -6,7 +6,6 @@ require_once 'angularex.civix.php';
  * Implementation of hook_civicrm_config
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
- * @param $config
  */
 function angularex_civicrm_config(&$config) {
   _angularex_civix_civicrm_config($config);
@@ -81,7 +80,6 @@ function angularex_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * is installed, disabled, uninstalled.
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
- * @param $entities
  */
 function angularex_civicrm_managed(&$entities) {
   return _angularex_civix_civicrm_managed($entities);
@@ -95,7 +93,6 @@ function angularex_civicrm_managed(&$entities) {
  * Note: This hook only runs in CiviCRM 4.4+.
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
- * @param $caseTypes
  */
 function angularex_civicrm_caseTypes(&$caseTypes) {
   _angularex_civix_civicrm_caseTypes($caseTypes);
@@ -105,7 +102,6 @@ function angularex_civicrm_caseTypes(&$caseTypes) {
  * Implementation of hook_civicrm_alterSettingsFolders
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
- * @param null $metaDataFolders
  */
 function angularex_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _angularex_civix_civicrm_alterSettingsFolders($metaDataFolders);
@@ -115,9 +111,5 @@ function angularex_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  * @param $angularModule
  */
 function angularex_civicrm_angularModules(&$angularModule) {
-  $angularModule['example'] = array(
-    'ext' => 'org.civicrm.angularex',
-    'js' => array('js/*.js'),
-    'partials' => array('partials'),
-  );
+  $angularModule['example'] = array('ext' => 'org.civicrm.angularex', 'js' => array('js/example.js'));
 }

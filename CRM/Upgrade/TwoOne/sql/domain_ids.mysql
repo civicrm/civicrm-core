@@ -1,0 +1,335 @@
+-- /************************************************************************
+-- *
+-- * Upgrade script MySQL Script 2.0 -> 2.1 - Remove Domain Id Column from all tables
+-- *
+-- *************************************************************************/
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_acl table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_acl` DROP FOREIGN KEY `FK_civicrm_acl_domain_id`;
+ALTER TABLE `civicrm_acl` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_acl_entity_role table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_acl_entity_role` DROP FOREIGN KEY `FK_civicrm_acl_entity_role_domain_id`;
+ALTER TABLE `civicrm_acl_entity_role` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_contact table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_contact`
+    DROP FOREIGN KEY `FK_civicrm_contact_domain_id`;
+ALTER TABLE `civicrm_contact` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_contribution_page table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_contribution_page` DROP FOREIGN KEY `FK_civicrm_contribution_page_domain_id`;
+ALTER TABLE `civicrm_contribution_page` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_contribution table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_contribution`
+    DROP FOREIGN KEY `FK_civicrm_contribution_domain_id`,
+    DROP INDEX UI_contrib_trxn_id_domain_id,
+    DROP INDEX UI_contrib_invoice_id_domain_id;
+
+ALTER TABLE `civicrm_contribution` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_contribution_recur table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_contribution_recur`
+    DROP FOREIGN KEY `FK_civicrm_contribution_recur_domain_id`,
+    DROP INDEX UI_contrib_trxn_id_domain_id,
+    DROP INDEX UI_contrib_invoice_id_domain_id;
+
+ALTER TABLE `civicrm_contribution_recur` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_contribution_type table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_contribution_type`
+    DROP FOREIGN KEY `FK_civicrm_contribution_type_domain_id`,
+    DROP INDEX UI_name_domain_id;
+
+ALTER TABLE `civicrm_contribution_type` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_dedupe_rule_group table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_dedupe_rule_group` DROP FOREIGN KEY `FK_civicrm_dedupe_rule_group_domain_id`;
+ALTER TABLE `civicrm_dedupe_rule_group` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_dupe_match table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_dupe_match` DROP FOREIGN KEY `FK_civicrm_dupe_match_domain_id`;
+ALTER TABLE `civicrm_dupe_match` DROP domain_id;
+-- /*******************************************************
+-- *
+-- * Alter civicrm_event table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_event` DROP FOREIGN KEY `FK_civicrm_event_domain_id`;
+ALTER TABLE `civicrm_event` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_financial_trxn table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_financial_trxn`
+    DROP FOREIGN KEY `FK_civicrm_financial_trxn_domain_id`,
+    DROP INDEX UI_ft_trxn_id_domain_id;
+ALTER TABLE `civicrm_financial_trxn` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_group table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_group`
+    DROP FOREIGN KEY `FK_civicrm_group_domain_id`,
+    DROP INDEX UI_title_domain_id,
+    DROP INDEX UI_name_domain_id;
+ALTER TABLE `civicrm_group` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_location_type table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_location_type`
+    DROP FOREIGN KEY `FK_civicrm_location_type_domain_id`,
+    DROP INDEX UI_name_domain_id;
+ALTER TABLE `civicrm_location_type` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_mailing table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_mailing` DROP FOREIGN KEY `FK_civicrm_mailing_domain_id`;
+ALTER TABLE `civicrm_mailing` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_mailing_component table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_mailing_component` DROP FOREIGN KEY `FK_civicrm_mailing_component_domain_id`;
+ALTER TABLE `civicrm_mailing_component` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_mailing_spool table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_mailing_spool` DROP FOREIGN KEY `FK_civicrm_mailing_spool_domain_id`;
+ALTER TABLE `civicrm_mailing_spool` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_mapping table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_mapping` DROP FOREIGN KEY `FK_civicrm_mapping_domain_id`;
+ALTER TABLE `civicrm_mapping` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_membership_status table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_membership_status` DROP FOREIGN KEY `FK_civicrm_membership_status_domain_id`;
+ALTER TABLE `civicrm_membership_status` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_membership_type table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_membership_type` DROP FOREIGN KEY `FK_civicrm_membership_type_domain_id`;
+ALTER TABLE `civicrm_membership_type` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_msg_template table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_msg_template` DROP FOREIGN KEY `FK_civicrm_msg_template_domain_id`;
+ALTER TABLE `civicrm_msg_template` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_option_group table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_option_group`
+    DROP FOREIGN KEY `FK_civicrm_option_group_domain_id`,
+    DROP INDEX option_group_name_domain_id;
+ALTER TABLE `civicrm_option_group` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_payment_processor table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_payment_processor` DROP FOREIGN KEY `FK_civicrm_payment_processor_domain_id`;
+ALTER TABLE `civicrm_payment_processor` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_payment_processor_type table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_payment_processor_type`
+    DROP FOREIGN KEY `FK_civicrm_payment_processor_type_domain_id`,
+    DROP INDEX UI_name_domain_id;
+ALTER TABLE `civicrm_payment_processor_type` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_preferences table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_preferences` DROP FOREIGN KEY `FK_civicrm_preferences_domain_id`;
+ALTER TABLE `civicrm_preferences` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_preferences_date table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_preferences_date` DROP FOREIGN KEY `FK_civicrm_preferences_date_domain_id`;
+ALTER TABLE `civicrm_preferences_date` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_price_set table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_price_set` DROP FOREIGN KEY `FK_civicrm_price_set_domain_id`;
+ALTER TABLE `civicrm_price_set` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_product table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_product` DROP FOREIGN KEY `FK_civicrm_product_domain_id`;
+ALTER TABLE `civicrm_product` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_project table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_project` DROP FOREIGN KEY `FK_civicrm_project_domain_id`;
+ALTER TABLE `civicrm_project` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_relationship_type table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_relationship_type`
+    DROP FOREIGN KEY `FK_civicrm_relationship_type_domain_id`,
+    DROP INDEX UI_name_a_b_domain_id,
+    DROP INDEX UI_name_b_a_domain_id;
+ALTER TABLE `civicrm_relationship_type` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_tag table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_tag`
+    DROP FOREIGN KEY `FK_civicrm_tag_domain_id`,
+    DROP INDEX UI_name_domain_id;
+ALTER TABLE `civicrm_tag` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_task table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_task` DROP FOREIGN KEY `FK_civicrm_task_domain_id`;
+ALTER TABLE `civicrm_task` DROP domain_id;
+
+-- /*******************************************************
+-- *
+-- * Alter civicrm_uf_group table
+-- *
+-- *******************************************************/
+
+ALTER TABLE `civicrm_uf_group` DROP FOREIGN KEY `FK_civicrm_uf_group_domain_id`;
+ALTER TABLE `civicrm_uf_group` DROP domain_id;
+
+
+ALTER TABLE `civicrm_uf_match`
+    DROP INDEX UI_uf_domain_id,
+    DROP INDEX UI_uf_name_domain_id,
+    DROP FOREIGN KEY FK_civicrm_uf_match_domain_id;
+ALTER TABLE `civicrm_uf_match`
+    DROP `domain_id`;
+
+
+ALTER TABLE `civicrm_custom_group`
+    DROP FOREIGN KEY FK_civicrm_custom_group_domain_id;
+ALTER TABLE `civicrm_custom_group`
+    DROP `domain_id`;
+

@@ -1,0 +1,74 @@
+From 6e8129a1390d1ec2f68b3c6f84e29850b4b9af52 Mon Sep 17 00:00:00 2001
+From: Stephen Palmstrom <stephen.palmstrom@outlook.com>
+Date: Sat, 28 Nov 2015 12:27:50 +0000
+Subject: [PATCH] Fix TimeZone issue
+
+---
+ CRM/Utils/System/Base.php   |  6 +++---
+ CRM/Utils/System/Joomla.php | 22 ++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 3 deletions(-)
+
+diff --git a/CRM/Utils/System/Base.php b/CRM/Utils/System/Base.php
+index 0e076d3..1c29716 100644
+--- a/CRM/Utils/System/Base.php
++++ b/CRM/Utils/System/Base.php
+@@ -555,14 +555,14 @@ abstract class CRM_Utils_System_Base {
+       $tzObj = new DateTimeZone($timezone);
+       $dateTime = new DateTime("now", $tzObj);
+       $tz = $tzObj->getOffset($dateTime);
+-
+-      if (empty($tz)) {
++      // Europe/London in winter has an offset of zero.
++      if ($tz===false) {
+         return FALSE;
+       }
+ 
+       $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
+ 
+-      if ($timeZoneOffset > 0) {
++      if ($timeZoneOffset >= 0) {
+         $timeZoneOffset = '+' . $timeZoneOffset;
+       }
+       return $timeZoneOffset;
+diff --git a/CRM/Utils/System/Joomla.php b/CRM/Utils/System/Joomla.php
+index ae11502..411c2a7 100644
+--- a/CRM/Utils/System/Joomla.php
++++ b/CRM/Utils/System/Joomla.php
+@@ -501,6 +501,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+    *
+    * @return bool
+    */
++
+   public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
+     // Setup the base path related constant.
+     $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
+@@ -725,5 +726,26 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+   public function appendCoreResources(&$list) {
+     $list[] = 'js/crm.joomla.js';
+   }
++  /**
++   * Get the time zone from Joomla
++   */
++  public function getTimeZoneString() {
++      $config = JFactory::getConfig();
++      $user = JFactory::getUser();
++      $timezone = $user->getParam('timezone');
++      //$phpTimezone = ini_get('date.timezone');
++      if(!$timezone)
++      {
++          // Get the timezone configured in Joomla
++          $timezone = $config->get('offset');
++      }
++      if (!timezone)
++      {
++          // Get the time in PHP.
++          $timezone = ini_get('date.timezone');
++      }
++      
++    return $timezone; 
++  }
+ 
+ }
+-- 
+1.9.5.msysgit.1
+

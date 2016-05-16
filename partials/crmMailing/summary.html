@@ -1,0 +1,29 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+FIXME: Don't hardcode table-based layout!
+-->
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="{name: 'subform.mailingName', title: ts('Mailing Name'), help: hs('name')}">
+      <div>
+        <input
+          crm-ui-id="subform.mailingName"
+          type="text"
+          class="crm-form-text"
+          ng-model="mailing.name"
+          placeholder="Mailing Name"
+          required
+          name="mailingName" />
+      </div>
+    </div>
+    <div crm-ui-field="{name: 'subform.campaign', title: ts('Campaign'), help: hs({id: 'id-campaign_id', file: 'CRM/Campaign/Form/addCampaignToComponent'})}" ng-show="crmMailingConst.campaignEnabled">
+      <input
+        crm-entityref="{entity: 'Campaign', select: {allowClear: true, placeholder: ts('Select Campaign')}}"
+        crm-ui-id="subform.campaign"
+        name="campaign"
+        ng-model="mailing.campaign_id"
+      />
+    </div>
+  </div>
+</div>

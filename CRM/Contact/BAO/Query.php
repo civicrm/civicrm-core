@@ -3899,11 +3899,19 @@ WHERE  $smartGroupClause
 
     if (!is_array($value)) {
       $value = str_replace(array('(', ')'), '', explode(",", $value));
+<<<<<<< HEAD
     }
     elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
       $op = key($value);
       $value = $value[$op];
     }
+=======
+    }
+    elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
+>>>>>>> refs/remotes/civicrm/master
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Contact', $name, $value, $op);
 
     if (self::caseImportant($op)) {
@@ -4277,8 +4285,12 @@ civicrm_relationship.is_permission_a_b = 0
     $smartGroupCache = TRUE,
     $count = FALSE,
     $skipPermissions = TRUE,
+<<<<<<< HEAD
+    $mode = 1
+=======
     $mode = 1,
     $apiEntity = NULL
+>>>>>>> refs/remotes/civicrm/master
   ) {
 
     $query = new CRM_Contact_BAO_Query(

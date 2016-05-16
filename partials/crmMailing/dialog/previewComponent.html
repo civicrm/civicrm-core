@@ -1,0 +1,28 @@
+<div ng-controller="PreviewComponentDialogCtrl">
+  <div class="crm-block">
+    <div class="crm-group">
+      <div class="crm-section" ng-show="model.name">
+        <div class="label">{{ts('Name')}}</div>
+        <div class="content">
+          {{model.name}}
+        </div>
+        <div class="clear"></div>
+      </div>
+      <div class="crm-section" ng-show="model.subject">
+        <div class="label">{{ts('Subject')}}</div>
+        <div class="content">
+          {{model.subject}}
+        </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+  </div>
+  <div crm-ui-tab-set>
+    <div crm-ui-tab id="preview-html" crm-title="ts('HTML')">
+      <iframe crm-ui-iframe="model.body_html"></iframe>
+    </div>
+    <div crm-ui-tab id="preview-text" crm-title="ts('Plain Text')">
+      <pre>{{model.body_text}}</pre>
+    </div>
+  </div>
+</div>

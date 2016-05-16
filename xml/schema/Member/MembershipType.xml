@@ -214,7 +214,7 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Order</title>
+    <title>Weight</title>
     <type>int</type>
     <add>1.5</add>
   </field>
@@ -248,9 +248,6 @@
     <name>auto_renew</name>
     <type>boolean</type>
     <default>0</default>
-    <pseudoconstant>
-      <callback>CRM_Core_SelectValues::memberAutoRenew</callback>
-    </pseudoconstant>
     <comment>0 = No auto-renew option; 1 = Give option, but not required; 2 = Auto-renew required;</comment>
     <add>3.3</add>
   </field>

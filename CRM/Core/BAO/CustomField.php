@@ -905,8 +905,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $params = array(
           'date' => $field->date_format,
           'minDate' => isset($minYear) ? $minYear . '-01-01' : NULL,
+<<<<<<< HEAD
+          'maxDate' => isset($maxYear) ? $maxYear . '-01-01' : NULL,
+=======
           //CRM-18487 - max date should be the last date of the year.
           'maxDate' => isset($maxYear) ? $maxYear . '-12-31' : NULL,
+>>>>>>> refs/remotes/civicrm/master
           'time' => $field->time_format ? $field->time_format * 12 : FALSE,
           'yearRange' => "{$minYear}:{$maxYear}",
         );
@@ -1251,6 +1255,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'TextArea':
         $display = nl2br($display);
         break;
+<<<<<<< HEAD
+=======
 
       case 'Text':
         if ($field['data_type'] == 'Money' && isset($value)) {
@@ -1261,6 +1267,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = implode(', ', $disp);
         }
         break;
+>>>>>>> refs/remotes/civicrm/master
     }
     return $display;
   }

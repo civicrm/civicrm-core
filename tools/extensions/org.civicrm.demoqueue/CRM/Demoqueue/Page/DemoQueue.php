@@ -41,10 +41,6 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
 
   /**
    * Perform some business logic
-   * @param \CRM_Queue_TaskContext $ctx
-   * @param $delay
-   * @param $message
-   * @return bool
    */
   static function doMyWork(CRM_Queue_TaskContext $ctx, $delay, $message) {
     sleep(1);
@@ -58,8 +54,6 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
 
   /**
    * Perform some business logic
-   * @param \CRM_Queue_TaskContext $ctx
-   * @return bool
    */
   static function addMoreWork(CRM_Queue_TaskContext $ctx) {
     sleep(1);
@@ -77,7 +71,6 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
 
   /**
    * Handle the final step of the queue
-   * @param \CRM_Queue_TaskContext $ctx
    */
   static function onEnd(CRM_Queue_TaskContext $ctx) {
     //CRM_Utils_System::redirect('civicrm/demo-queue/done');

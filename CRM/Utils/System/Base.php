@@ -705,7 +705,7 @@ abstract class CRM_Utils_System_Base {
 
       $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
 
-      if ($timeZoneOffset > 0) {
+      if ($tz >= 0) {  // $tz is a number, not a string, so it is better to test it.  00:00 needs a plus sigh.
         $timeZoneOffset = '+' . $timeZoneOffset;
       }
       return $timeZoneOffset;

@@ -20,8 +20,6 @@ cp $SRC/civicrm.config.php $TRG
 dm_generate_version "$TRG/civicrm-version.php" Joomla
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
-dm_install_vendor "$SRC/vendor" "$TRG/vendor"
-dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
 
 ## WTF: It's so good we'll install it twice!
 ## (The first is probably extraneous, but there could be bugs dependent on it.)
@@ -36,14 +34,14 @@ cd $DM_TMPDIR;
 
 # generate alt version of package
 cp -r -p civicrm com_civicrm/admin/civicrm
-${DM_PHP:-php} $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION alt
-${DM_ZIP:-zip} -q -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-joomla-alt.zip com_civicrm
+$DM_PHP $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION alt
+$DM_ZIP -q -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-joomla-alt.zip com_civicrm
 rm -rf com_civicrm/admin/civicrm
 
 # generate zip version of civicrm.xml
-${DM_PHP:-php} $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION zip
-${DM_ZIP:-zip} -q -r -9 com_civicrm/admin/civicrm.zip civicrm
-${DM_ZIP:-zip} -q -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-joomla.zip com_civicrm -x 'com_civicrm/admin/civicrm'
+$DM_PHP $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION zip
+$DM_ZIP -q -r -9 com_civicrm/admin/civicrm.zip civicrm
+$DM_ZIP -q -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-joomla.zip com_civicrm -x 'com_civicrm/admin/civicrm'
 
 # clean up
 rm -rf com_civicrm

@@ -9,9 +9,8 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
-    <title>Saved Search ID</title>
     <required>true</required>
-    <comment>Saved Search ID</comment>
+    <comment>Saved search ID</comment>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -38,7 +37,6 @@
   <field>
     <name>is_active</name>
     <type>boolean</type>
-    <title>Saved Search Enabled</title>
     <comment>Is this entry active?</comment>
     <add>1.1</add>
     <drop>1.5</drop>
@@ -46,7 +44,6 @@
   <field>
     <name>mapping_id</name>
     <type>int unsigned</type>
-    <title>Mapping ID</title>
     <comment>Foreign key to civicrm_mapping used for saved search-builder searches.</comment>
     <add>1.5</add>
   </field>
@@ -59,28 +56,24 @@
   <field>
     <name>search_custom_id</name>
     <type>int unsigned</type>
-    <title>Option Value ID</title>
     <comment>Foreign key to civicrm_option value table used for saved custom searches.</comment>
     <add>2.0</add>
   </field>
   <field>
     <name>where_clause</name>
     <type>text</type>
-    <title>Where Clause</title>
     <comment>the sql where clause if a saved search acl</comment>
     <add>1.6</add>
   </field>
   <field>
     <name>select_tables</name>
     <type>text</type>
-    <title>Select Tables</title>
     <comment>the tables to be included in a select data</comment>
     <add>1.6</add>
   </field>
   <field>
     <name>where_tables</name>
     <type>text</type>
-    <title>Where Tables</title>
     <comment>the tables to be included in the count statement</comment>
     <add>1.6</add>
   </field>

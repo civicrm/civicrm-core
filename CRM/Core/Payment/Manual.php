@@ -192,6 +192,8 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
     return $result;
   }
 
+<<<<<<< HEAD
+=======
   /**
    * Should a receipt be sent out for a pending payment.
    *
@@ -201,4 +203,5 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
     return TRUE;
   }
 
+>>>>>>> refs/remotes/civicrm/master
 }

@@ -7,7 +7,6 @@
   <add>3.2</add>
   <field>
     <name>id</name>
-    <title>Entity Financial Transaction ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID</comment>
@@ -19,7 +18,6 @@
   </primaryKey>
   <field>
     <name>entity_table</name>
-    <title>Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -29,7 +27,6 @@
   </field>
   <field>
     <name>entity_id</name>
-    <title>Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>3.2</add>
@@ -41,7 +38,6 @@
   </dynamicForeignKey>
   <field>
     <name>financial_trxn_id</name>
-    <title>Financial Transaction Id</title>
     <type>int unsigned</type>
     <add>3.2</add>
   </field>
@@ -54,7 +50,6 @@
   </foreignKey>
   <field>
     <name>amount</name>
-    <title>Amount</title>
     <type>decimal</type>
     <required>true</required>
     <import>true</import>

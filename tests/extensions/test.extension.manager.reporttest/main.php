@@ -5,10 +5,10 @@
  */
 class test_extension_manager_reporttest extends CRM_Core_Report {
   /**
-   * Class constructor.
+   *
    */
-  public function __construct() {
-    $logging        = new CRM_Logging_Schema();
+  function __construct() {
+    $logging        = new CRM_Logging_Schema;
     $this->tables[] = 'civicrm_contact';
     $this->tables   = array_merge($this->tables, array_keys($logging->customDataLogTables()));
     $this->tables[] = 'civicrm_email';
@@ -26,7 +26,7 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
     parent::__construct();
   }
 
-  public function buildQuickForm() {
+  function buildQuickForm() {
     $layout = CRM_Utils_Request::retrieve('layout', 'String', $this);
     $this->assign('layout', $layout);
 
@@ -55,5 +55,4 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
             WHERE log_action = 'Update' AND log_conn_id = %1 AND log_date = %2 ORDER BY log_date DESC LIMIT 1
         ";
   }
-
 }

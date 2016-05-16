@@ -31,7 +31,7 @@
   </field>
   <field>
     <name>deny</name>
-    <title>Deny ACL?</title>
+    <title>Deny ACl?</title>
     <type>boolean</type>
     <default>0</default>
     <required>true</required>

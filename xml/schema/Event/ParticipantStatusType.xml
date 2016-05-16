@@ -46,7 +46,7 @@
     <length>8</length>
     <comment>the general group of status type this one belongs to</comment>
     <pseudoconstant>
-      <callback>CRM_Event_PseudoConstant::participantStatusClassOptions</callback>
+      <callback>CRM_Event_PseudoConstant::participantStatusClass</callback>
     </pseudoconstant>
     <add>3.0</add>
     <html>
@@ -77,7 +77,7 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Order</title>
+    <title>Status Weight</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>controls sort order</comment>

@@ -74,7 +74,7 @@
     <length>512</length>
     <html>
       <type>Text</type>
-      <size>8</size>
+      <size>EIGHT</size>
     </html>
     <required>true</required>
     <comment>Price field option amount</comment>
@@ -102,7 +102,6 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Order</title>
     <type>int</type>
     <default>1</default>
     <comment>Order in which the field options should appear</comment>

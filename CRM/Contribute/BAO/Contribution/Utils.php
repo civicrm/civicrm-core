@@ -145,6 +145,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $form->_params['source'] = $paymentParams['contribution_source'];
       }
 
+<<<<<<< HEAD
+=======
       // get the price set values for receipt.
       if ($form->_priceSetId && $form->_lineItem) {
         $form->_values['lineItem'] = $form->_lineItem;
@@ -154,6 +156,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_values['contribution_id'] = $contribution->id;
       $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
 
+>>>>>>> refs/remotes/civicrm/master
       if (!empty($form->_paymentProcessor)) {
         try {
           $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
@@ -212,6 +215,22 @@ class CRM_Contribute_BAO_Contribution_Utils {
         'payment_processor_id' => 0,
       );
     }
+<<<<<<< HEAD
+
+    $form->_values['contribution_id'] = $contribution->id;
+    $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
+    if ($form->_params['amount'] == 0) {
+      // This is kind of a back-up for pay-later $0 transactions.
+      // In other flows they pick up the manual processor & get dealt with above (I
+      // think that might be better...).
+      return array(
+        'payment_status_id' => 1,
+        'contribution' => $contribution,
+        'payment_processor_id' => 0,
+      );
+    }
+=======
+>>>>>>> refs/remotes/civicrm/master
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $form->_values,
       $contribution->is_test

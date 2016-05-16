@@ -33,5 +33,5 @@ if [ "$ERRORS_BUFFER" != "" ]; then
     echo "Can't commit, fix errors first."
     exit 1
 else
-    echo "Committed successfully."
+    echo "Commited successfully."
 fi

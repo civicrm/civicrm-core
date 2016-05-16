@@ -12,7 +12,7 @@ SELECT @caseCompId := id FROM `civicrm_component` where `name` like 'CiviCase';
 -- * Case Types
 -- *
 -- *******************************************************/
-SELECT @max_wt  :=  COALESCE( max(weight), 0 ) from civicrm_case_type;
+SELECT @max_wt  :=  COALESCE ( max(weight), 0 ) from civicrm_case_type;
 
 INSERT IGNORE INTO `civicrm_case_type` (  `title`, `name`, `description`, `weight`, `is_reserved`, `is_active`) VALUES
   ('{ts}Housing Support{/ts}', 'housing_support', '{ts}Help homeless individuals obtain temporary and long-term housing{/ts}', @max_wt + 1, 0, 1),

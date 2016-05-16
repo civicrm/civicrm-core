@@ -39,7 +39,7 @@
     <length>128</length>
     <html>
       <type>Text</type>
-      <size>30</size>
+      <size>BIG</size>
     </html>
     <import>true</import>
     <headerPattern>/Website/i</headerPattern>

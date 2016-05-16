@@ -153,7 +153,12 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         // reset so we not displaying same message again
         CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
       }
+<<<<<<< HEAD
+      $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
+                                                                 pn.entity_id2 = de.contact_id2 )";
+=======
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
+>>>>>>> refs/remotes/civicrm/master
       $where = "de.id IS NULL";
       if ($context == 'conflicts') {
         $where .= " AND pn.is_selected = 1";

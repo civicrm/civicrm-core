@@ -142,7 +142,11 @@ class CRM_Core_BAO_CustomValueTable {
                       CRM_Core_PseudoConstant::countryIsoCode(), TRUE
                     );
                   }
+<<<<<<< HEAD
+                  $validCountries[] = CRM_Utils_Array::value('country_id', $states);
+=======
                   $validCountries[] = CRM_Utils_Array::value('country_id', $countries);
+>>>>>>> refs/remotes/civicrm/master
                 }
                 $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
                   $validCountries

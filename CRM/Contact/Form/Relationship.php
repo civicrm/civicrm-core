@@ -146,6 +146,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
+    // Check for permissions
+    if (in_array($this->_action, array(CRM_Core_Action::ADD, CRM_Core_Action::UPDATE, CRM_Core_Action::DELETE))) {
+      if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
+        CRM_Core_Error::statusBounce(ts('You do not have the necessary permission to edit this contact.'));
+      }
+    }
+
     // Set page title based on action
     switch ($this->_action) {
       case CRM_Core_Action::VIEW:

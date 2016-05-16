@@ -5,7 +5,7 @@
  */
 class Custom extends CiviUnitTestCase {
   /**
-   * Helper function to create Custom Group.
+   * Helper function to create Custom Group
    *
    * @deprecated - use functions on test case parent class
    *
@@ -13,10 +13,9 @@ class Custom extends CiviUnitTestCase {
    * @param null $extends
    * @param bool $isMultiple
    *
-   * @return object
-   *   of created group
+   * @return object of created group
    */
-  public static function createGroup($group, $extends = NULL, $isMultiple = FALSE) {
+  static function createGroup($group, $extends = NULL, $isMultiple = FALSE) {
     if (empty($group)) {
       if (isset($extends) &&
         !is_array($extends)
@@ -60,14 +59,13 @@ class Custom extends CiviUnitTestCase {
   }
 
   /**
-   * Helper function to create Custom Field.
+   * Helper function to create Custom Field
    * @deprecated use parent object create fn
    * @param array $params
    * @param null $fields
-   * @return object
-   *   of created field
-   */
-  public static function createField($params, $fields = NULL) {
+   * @return object of created field
+*/
+  static function createField($params, $fields = NULL) {
     if (empty($params)) {
       $params = array(
         'custom_group_id' => $fields['groupId'],
@@ -99,29 +97,26 @@ class Custom extends CiviUnitTestCase {
   }
 
   /**
-   * Helper function to delete custom field.
-   *
+   * Helper function to delete custom field
    * @deprecated use function on parent class
-   *
-   * @param $params
+   * @param  object of Custom Field to delete
    */
-  public static function deleteField($params) {
+  static function deleteField($params) {
+    require_once 'CRM/Core/BAO/CustomField.php';
     CRM_Core_BAO_CustomField::deleteField($params);
   }
 
   /**
-   * Helper function to delete custom group.
-   *
+   * Helper function to delete custom group
    * @deprecated use function on parent class
-   *
-   * @param $params
-   *
-   * @return bool
-   *   true if Group deleted, false otherwise
+   * @param  object Custom Group to delete
+   * @return boolean true if Group deleted, false otherwise
    */
-  public static function deleteGroup($params) {
+  static function deleteGroup($params) {
+    require_once 'CRM/Core/BAO/CustomGroup.php';
     $deleteCustomGroup = CRM_Core_BAO_CustomGroup::deleteGroup($params, TRUE);
     return $deleteCustomGroup;
   }
-
 }
+
+

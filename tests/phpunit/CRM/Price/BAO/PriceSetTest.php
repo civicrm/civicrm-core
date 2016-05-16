@@ -26,13 +26,23 @@
  */
 
 /**
+<<<<<<< HEAD:CRM/Contact/Page/View/Sunlight.php
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+=======
  * Test class for CRM_Price_BAO_PriceSet.
  * @group headless
+>>>>>>> refs/remotes/civicrm/master:tests/phpunit/CRM/Price/BAO/PriceSetTest.php
  */
 class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
 
   /**
+<<<<<<< HEAD:CRM/Contact/Page/View/Sunlight.php
+   * Called when action is browse.
+=======
    * Sets up the fixtures.
+>>>>>>> refs/remotes/civicrm/master:tests/phpunit/CRM/Price/BAO/PriceSetTest.php
    */
   protected function setUp() {
     parent::setUp();

@@ -1,0 +1,25 @@
+.crm-mailing-ab-slider .slider-test .ui-slider-range {
+    background: #5050b0;
+}
+
+.crm-mailing-ab-slider .slider-win .ui-slider-range {
+    background: #50b050;
+}
+
+.crm-mailing-ab-stats .series {
+    fill: none;
+}
+
+.crm-mailing-ab-stats .axis path, .crm-mailing-ab-stats .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.crm-mailing-ab-col {
+  width: 18em;
+}
+
+.crm-mailing-ab-table tbody tr:last-child td {
+  padding-bottom: 2em;
+}

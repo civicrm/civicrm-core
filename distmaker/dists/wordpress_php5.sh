@@ -20,13 +20,11 @@ cp $SRC/WordPress/civicrm.config.php.wordpress $TRG/civicrm/civicrm/civicrm.conf
 dm_generate_version "$TRG/civicrm/civicrm/civicrm-version.php" Wordpress
 dm_install_core "$SRC" "$TRG/civicrm/civicrm"
 dm_install_packages "$SRC/packages" "$TRG/civicrm/civicrm/packages"
-dm_install_vendor "$SRC/vendor" "$TRG/civicrm/civicrm/vendor"
-dm_install_bower "$SRC/bower_components" "$TRG/civicrm/civicrm/bower_components"
 dm_install_wordpress "$SRC/WordPress" "$TRG/civicrm"
 
 # gen tarball
 cd $TRG
-${DM_ZIP:-zip} -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-wordpress.zip *
+$DM_ZIP -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-wordpress.zip *
 
 # clean up
 rm -rf $TRG

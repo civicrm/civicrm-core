@@ -818,5 +818,29 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       'contactCreated' => $contactCreated,
     );
   }
+<<<<<<< HEAD
+/**
+   * Get the time zone from Joomla
+   */
+  public function getTimeZoneString() {
+      $config = JFactory::getConfig();
+      $user = JFactory::getUser();
+      $timezone = $user->getParam('timezone');
+      //$phpTimezone = ini_get('date.timezone');
+      if(!$timezone)
+      {
+          // Get the timezone configured in Joomla
+          $timezone = $config->get('offset');
+      }
+      if (!$timezone)
+      {
+          // Get the time in PHP.
+          $timezone = ini_get('date.timezone');
+      }
+
+    return $timezone; 
+}
+=======
+>>>>>>> refs/remotes/civicrm/master
 
 }

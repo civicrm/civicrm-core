@@ -255,6 +255,8 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'title' => ts('Opt-outs'),
           'alias' => 'mailing_event_optout_civireport',
           'dbAlias' => 'mailing_event_optout_civireport.event_queue_id',
+<<<<<<< HEAD
+=======
         ),
       ),
     );
@@ -266,6 +268,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'type' => CRM_Utils_Type::T_INT,
           'options' => CRM_Core_PseudoConstant::group(),
+>>>>>>> refs/remotes/civicrm/master
         ),
       ),
     );

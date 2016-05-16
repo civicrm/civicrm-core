@@ -1,0 +1,17 @@
+<h1>Page 1</h1>
+<div ng-controller="demoCtrl">
+    <form name="demoForm" ng-submit="demoFormSubmit()" novalidate unsaved-warning-form>
+        <input id="userName" type="text" name="name" lazy-model="user.name" required>
+        <input type="text" name="email" lazy-model="user.email">
+        <button id="submitForm" type="submit">Submit Form</button>
+        <button id="clear" type="reset" unsaved-warning-clear ng-disabled="demoForm.$pristine">Disregard Changes</button>    
+    </form>
+
+    <pre>
+    {{user | json}}
+    </pre>
+
+    <p>Is Form Dirty?: {{demoForm.$dirty}}</p>
+    <p ng-show="message">Message: {{message}}</p>
+</div>
+<input ng-model="outsideForm">

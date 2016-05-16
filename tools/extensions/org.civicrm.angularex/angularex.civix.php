@@ -6,7 +6,6 @@
  * (Delegated) Implementation of hook_civicrm_config
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
- * @param null $config
  */
 function _angularex_civix_civicrm_config(&$config = NULL) {
   static $configured = FALSE;
@@ -157,14 +156,12 @@ function _angularex_civix_find_files($dir, $pattern) {
   }
   return $result;
 }
-
 /**
  * (Delegated) Implementation of hook_civicrm_managed
  *
  * Find any *.mgd.php files, merge their content, and return.
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
- * @param $entities
  */
 function _angularex_civix_civicrm_managed(&$entities) {
   $mgdFiles = _angularex_civix_find_files(__DIR__, '*.mgd.php');
@@ -187,8 +184,6 @@ function _angularex_civix_civicrm_managed(&$entities) {
  * Note: This hook only runs in CiviCRM 4.4+.
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
- * @param $caseTypes
- * @throws \Exception
  */
 function _angularex_civix_civicrm_caseTypes(&$caseTypes) {
   if (!is_dir(__DIR__ . '/xml/case')) {
@@ -234,11 +229,6 @@ function _angularex_civix_glob($pattern) {
  * $path - path where insertion should happen (ie. Administer/System Settings)
  * $item - menu you need to insert (parent/child attributes will be filled for you)
  * $parentId - used internally to recurse in the menu structure
- * @param $menu
- * @param $path
- * @param $item
- * @param null $parentId
- * @return bool
  */
 function _angularex_civix_insert_navigation_menu(&$menu, $path, $item, $parentId = NULL) {
   static $navId;
@@ -275,7 +265,6 @@ function _angularex_civix_insert_navigation_menu(&$menu, $path, $item, $parentId
  * (Delegated) Implementation of hook_civicrm_alterSettingsFolders
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
- * @param null $metaDataFolders
  */
 function _angularex_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   static $configured = FALSE;

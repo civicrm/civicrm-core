@@ -54,9 +54,12 @@ if (strlen($query_string) > 0) {
   }
 }
 
+<<<<<<< HEAD
+=======
 // CRM-18320 - Fix encoded ampersands (see CRM_Utils_System::redirect)
 $url = str_replace('&amp;', '&', $url);
 
+>>>>>>> refs/remotes/civicrm/master
 // CRM-17953 - The CMS is not bootstrapped so cannot use CRM_Utils_System::redirect
 header('Location: ' . $url);
 CRM_Utils_System::civiExit();

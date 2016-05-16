@@ -1336,6 +1336,8 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     return FALSE;
   }
 
+<<<<<<< HEAD
+=======
   /**
    * Should a receipt be sent out for a pending payment.
    *
@@ -1345,4 +1347,5 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     return FALSE;
   }
 
+>>>>>>> refs/remotes/civicrm/master
 }

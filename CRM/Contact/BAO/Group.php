@@ -771,10 +771,17 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       if (!empty($value['group_type'])) {
         $group['group_type'] = $value['group_type'];
+<<<<<<< HEAD
       }
       else {
         $group['group_type'] = '';
       }
+=======
+      }
+      else {
+        $group['group_type'] = '';
+      }
+>>>>>>> refs/remotes/civicrm/master
 
       $group['visibility'] = $value['visibility'];
       $group['links'] = $value['action'];

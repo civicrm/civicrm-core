@@ -197,7 +197,11 @@ class CRM_Extension_Browser {
     }
 
     $this->_remotesDiscovered = array();
+<<<<<<< HEAD
+    foreach ($remotes as $id => $xml) {
+=======
     foreach ((array) $remotes as $id => $xml) {
+>>>>>>> refs/remotes/civicrm/master
       $ext = CRM_Extension_Info::loadFromString($xml);
       $this->_remotesDiscovered[] = $ext;
     }

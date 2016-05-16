@@ -121,7 +121,13 @@ class CRM_Utils_Sort {
 
     foreach ($vars as $weight => $value) {
       $this->_vars[$weight] = array(
+<<<<<<< HEAD
+        //'name' => CRM_Utils_Type::validate($value['sort'], 'MysqlColumnName'),
+        'name' => CRM_Utils_Type::validate($value['sort'], 'String'),
+         
+=======
         'name' => CRM_Utils_Type::validate($value['sort'], 'MysqlColumnName'),
+>>>>>>> refs/remotes/civicrm/master
         'direction' => CRM_Utils_Array::value('direction', $value),
         'title' => $value['name'],
       );

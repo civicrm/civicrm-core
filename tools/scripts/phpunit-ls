@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+#!/usr/bin/env php
+<?php
+require_once dirname(dirname(__DIR__)) . '/tests/phpunit/CiviTest/bootstrap.php';
+error_reporting(E_ALL);
+=======
 #!/usr/bin/env php
 <?php
 
@@ -14,4 +20,5 @@ if (!class_exists('PHPUnit_Framework_TestCase')) {
   class PHPUnit_Extensions_SeleniumTestCase {}
 }
 
+>>>>>>> refs/remotes/civicrm/master
 \Civi\CiUtil\Command\LsCommand::main($argv);

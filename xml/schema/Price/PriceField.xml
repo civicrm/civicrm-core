@@ -101,7 +101,7 @@
   </field>
   <field>
     <name>help_post</name>
-    <title>Price Field Post Text</title>
+    <title>Price Field Post Test</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Description and/or help text to display after this field.</comment>
@@ -114,7 +114,7 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Order</title>
+    <title>Price Field Weight</title>
     <type>int</type>
     <default>1</default>
     <comment>Order in which the fields should appear</comment>
@@ -204,7 +204,7 @@
     <title>Price Field Visibility</title>
     <type>int unsigned</type>
     <default>1</default>
-    <comment>Implicit FK to civicrm_option_group with name = 'visibility'</comment>
+    <comment>Implicit FK to civicrm_option_group with name = \'visibility\'</comment>
     <add>3.2</add>
     <pseudoconstant>
       <optionGroupName>visibility</optionGroupName>

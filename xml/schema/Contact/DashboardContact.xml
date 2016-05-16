@@ -80,7 +80,6 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Order</title>
     <type>int</type>
     <comment>Ordering of the widgets.</comment>
     <default>0</default>

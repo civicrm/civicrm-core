@@ -404,6 +404,8 @@ AND    u.status = 1
   }
 
   /**
+<<<<<<< HEAD
+=======
    * @inheritDoc
    */
   public function getUFLocale() {
@@ -455,6 +457,7 @@ AND    u.status = 1
   }
 
   /**
+>>>>>>> refs/remotes/civicrm/master
    * Determine the native ID of the CMS user.
    *
    * @param string $username

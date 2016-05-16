@@ -78,7 +78,7 @@
   <field>
     <name>html_type</name>
     <type>varchar</type>
-    <title>Custom Field HTML Type</title>
+    <title>Custom Field HTMl Type</title>
     <length>32</length>
     <required>true</required>
     <comment>HTML types plus several built-in extended types.</comment>
@@ -120,7 +120,7 @@
   <field>
     <name>weight</name>
     <type>int</type>
-    <title>Order</title>
+    <title>Custom Field Weight</title>
     <required>true</required>
     <default>1</default>
     <comment>Controls field display order within an extended property group.</comment>
