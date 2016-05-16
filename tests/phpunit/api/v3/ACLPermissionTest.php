@@ -289,7 +289,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         'api.pledge.get' => 1,
         'sequential' => 1,
       ),
-      'Error in call to pledge_get : API permission check failed for pledge/get call; missing permission: access CiviCRM.'
+      'Error in call to Pledge_get : API permission check failed for Pledge/get call; insufficient permission: require access CiviCRM and access CiviPledge'
     );
   }
 

@@ -203,7 +203,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'start_date' => '2008-12-20',
       'is_active' => 1,
     );
-    $this->callAPIFailure('relationship', 'create', $params, 'Relationship already exists');
+    $this->callAPIFailure('relationship', 'create', $params, 'Duplicate Relationship');
 
     $params['id'] = $relationship['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
