@@ -290,6 +290,12 @@ WHERE  id IN ( $groupIDs )
    * cache date, i.e. the removal is not done if the group was recently
    * loaded into the cache.
    *
+   * In fact it turned out there is little overlap between the code when group is passed in
+   * and group is not so it makes more sense as separate functions.
+   *
+   * @todo remove last call to this function from outside the class then make function protected,
+   * enforce groupID as an array & remove non group handling.
+   *
    * @param int $groupID
    *   the groupID to delete cache entries, NULL for all groups.
    * @param bool $onceOnly
@@ -411,12 +417,23 @@ WHERE  id = %1
    * clear.
    */
   protected static function refreshCaches() {
-    if (self::isRefreshAlreadyInitiated()) {
+    try {
+      $lock = self::getLockForRefresh();
+    }
+    catch (CRM_Core_Exception $e) {
+      // Someone else is kindly doing the refresh for us right now.
       return;
     }
-
     $params = array(1 => array(self::getCacheInvalidDateTime(), 'String'));
-
+    // @todo this is consistent with previous behaviour but as the first query could take several seconds the second
+    // could become inaccurate. It seems to make more sense to fetch them first & delete from an array (which would
+    // also reduce joins). If we do this we should also consider how best to iterate the groups. If we do them one at
+    // a time we could call a hook, allowing people to manage the frequency on their groups, or possibly custom searches
+    // might do that too. However, for 2000 groups that's 2000 iterations. If we do all once we potentially create a
+    // slow query. It's worth noting the speed issue generally relates to the size of the group but if one slow group
+    // is in a query with 500 fast ones all 500 get locked. One approach might be to calculate group size or the
+    // number of groups & then process all at once or many query runs depending on what is found. Of course those
+    // preliminary queries would need speed testing.
     CRM_Core_DAO::executeQuery(
       "
         DELETE gc
@@ -427,15 +444,18 @@ WHERE  id = %1
       $params
     );
 
+    // Clear these out without resetting them because we are not building caches here, only clearing them,
+    // so the state is 'as if they had never been built'.
     CRM_Core_DAO::executeQuery(
       "
         UPDATE civicrm_group g
-        SET    cache_date = null,
-        refresh_date = NOW()
+        SET    cache_date = NULL,
+        refresh_date = NULL
         WHERE  g.cache_date <= %1
       ",
       $params
     );
+    $lock->release();
   }
 
   /**
@@ -446,16 +466,24 @@ WHERE  id = %1
    *   2) a mysql lock. This works fine as long as CiviMail is not running, or if mysql is version 5.7+
    *
    * Where these 2 locks fail we get 2 processes running at the same time, but we have at least minimised that.
+   *
+   * @return \Civi\Core\Lock\LockInterface
+   * @throws \CRM_Core_Exception
    */
-  protected static function isRefreshAlreadyInitiated() {
-    static $invoked = FALSE;
-    if ($invoked) {
-      return TRUE;
+  protected static function getLockForRefresh() {
+    if (!isset(Civi::$statics[__CLASS__])) {
+      Civi::$statics[__CLASS__] = array('is_refresh_init' => FALSE);
+    }
+
+    if (Civi::$statics[__CLASS__]['is_refresh_init']) {
+      throw new CRM_Core_Exception('A refresh has already run in this process');
     }
     $lock = Civi::lockManager()->acquire('data.core.group.refresh');
-    if (!$lock->isAcquired()) {
-      return TRUE;
+    if ($lock->isAcquired()) {
+      Civi::$statics[__CLASS__]['is_refresh_init'] = TRUE;
+      return $lock;
     }
+    throw new CRM_Core_Exception('Mysql lock unavailable');
   }
 
   /**
@@ -463,11 +491,9 @@ WHERE  id = %1
    *
    * Sites that do not run the smart group clearing cron job should refresh the caches under an opportunistic mode, akin
    * to a poor man's cron. The user session will be forced to wait on this so it is less desirable.
-   *
-   * @return bool
    */
   public static function opportunisticCacheRefresh() {
-    if (Civi::settings()->get('contact_smart_group_display') == 'opportunistic') {
+    if (Civi::settings()->get('smart_group_cache_refresh_mode') == 'opportunistic') {
       self::refreshCaches();
     }
   }
@@ -476,8 +502,6 @@ WHERE  id = %1
    * Do a forced cache refresh.
    *
    * This function is appropriate to be called by system jobs & non-user sessions.
-   *
-   * @return bool
    */
   public static function deterministicCacheRefresh() {
     if (self::smartGroupCacheTimeout() == 0) {
