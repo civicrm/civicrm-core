@@ -294,8 +294,7 @@ class CRM_Contact_Page_AJAX {
       echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroupID, $contactId);
     }
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
     CRM_Utils_System::civiExit();
   }
 

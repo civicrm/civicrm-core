@@ -208,7 +208,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_8($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Upgrade mailing foreign key constraints', 'upgradeMailingFKs');
-    $this->addSmartGroupRefreshOptions();
+    $this->addTask('Add Smartgroup refresh options', 'addSmartGroupRefreshOptions');
   }
 
   /*
@@ -723,6 +723,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'filter' => 1,
       'is_reserved' => 1,
     ));
+    return TRUE;
   }
 
 }
