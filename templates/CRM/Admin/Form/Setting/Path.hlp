@@ -4,7 +4,11 @@
     <tbody>
     <tr>
       <td><tt>[cms.root]</tt></td>
+<<<<<<< HEAD
        <td><tt>{crmResURL ext='cms.root'}</tt></td>
+=======
+      <td><tt>{crmResPath ext='cms.root'}</tt></td>
+>>>>>>> refs/remotes/civicrm/master
     </tr>
     <tr>
       <td><tt>[civicrm.root]</tt></td>

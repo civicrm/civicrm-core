@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,8 +26,6 @@
  */
 
 namespace Civi\Angular;
-
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Test the Angular base page.
@@ -103,7 +101,7 @@ class ManagerTest extends \CiviUnitTestCase {
     $this->assertTrue($counts['js'] > 0, 'Expect to find at least one JS file');
     $this->assertTrue($counts['css'] > 0, 'Expect to find at least one CSS file');
     $this->assertTrue($counts['partials'] > 0, 'Expect to find at least one partial HTML file');
-    $this->assertTrue($counts['settings'] > 1, 'Expect to find at least one setting');
+    $this->assertTrue($counts['settings'] > 0, 'Expect to find at least one setting');
   }
 
   /**

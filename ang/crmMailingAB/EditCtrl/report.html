@@ -82,7 +82,11 @@
         <a
           class="crm-hover-button action-item"
           ng-href="{{statUrl(am.mailing, statType, 'report')}}"
+<<<<<<< HEAD
           title="{{ts('Reports for  \'%1\'', {1: statType.title})}}"
+=======
+          title="{{ts('Reports for \'%1\'', {1: statType.title})}}"
+>>>>>>> refs/remotes/civicrm/master
           crm-icon="clipboard"
           ></a>
       </td>
@@ -150,7 +154,7 @@
     <tr>
       <td>{{ts('Tracking')}}</td>
       <td ng-repeat="am in getActiveMailings()">
-        <div crm-mailing-review-bool crm-on="am.mailing.url_tracking=='1'" crm-title="ts('Click Throughs')"></div>
+        <div crm-mailing-review-bool crm-on="am.mailing.url_tracking=='1'" crm-title="ts('Click-Throughs')"></div>
         <div crm-mailing-review-bool crm-on="am.mailing.open_tracking=='1'" crm-title="ts('Opens')"></div>
       </td>
       <td ng-show="abtest.ab.status == 'Testing'"></td>

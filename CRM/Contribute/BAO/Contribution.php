@@ -1207,7 +1207,12 @@ GROUP BY p.id
   }
 
   /**
-   * Get list of contribution In Honor of contact Ids.
+   * Get list of contributions which credit the passed in contact ID.
+   *
+   * The returned array provides details about the original contribution & donor.
+   *
+   * @todo - this is a confusing function called from one place. It has a test. It would be
+   * nice to deprecate it.
    *
    * @param int $honorId
    *   In Honor of Contact ID.
@@ -2597,7 +2602,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         if (!empty($lineItem)) {
           $itemId = key($lineItem);
           foreach ($lineItem as &$eachItem) {
-            if (is_array($this->_relatedObjects['membership']) && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
+            if (isset($this->_relatedObjects['membership'])
+             && is_array($this->_relatedObjects['membership'])
+             && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
               $eachItem['join_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->join_date);
               $eachItem['start_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->start_date);
               $eachItem['end_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->end_date);

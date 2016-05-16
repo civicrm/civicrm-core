@@ -134,12 +134,20 @@
             <td>
               {* Display location for fields with locations *}
               {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
+<<<<<<< HEAD
                 {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
+=======
+                {$form.location_blocks.$blockName.$blockId.locTypeId.html}&nbsp;
+>>>>>>> refs/remotes/civicrm/master
               {/if}
 
               {* Display other_type_id for websites, ims and phones *}
               {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
+<<<<<<< HEAD
                 {$form.location.$blockName.$blockId.typeTypeId.html}&nbsp;
+=======
+                {$form.location_blocks.$blockName.$blockId.typeTypeId.html}&nbsp;
+>>>>>>> refs/remotes/civicrm/master
               {/if}
 
               {* Display the overwrite/add/add new label *}
@@ -147,11 +155,16 @@
                 {if $row.main}
                   <span class="action_label">({ts}overwrite{/ts})</span>&nbsp;
                    {if $blockName eq 'email' || $blockName eq 'phone' }
+<<<<<<< HEAD
                      {$form.location.$blockName.$blockId.operation.html}&nbsp;
+=======
+                     {$form.location_blocks.$blockName.$blockId.operation.html}&nbsp;
+>>>>>>> refs/remotes/civicrm/master
                    {/if}
                    <br />
                 {else}
                   <span class="action_label">({ts}add{/ts})</span>&nbsp;
+<<<<<<< HEAD
                 {/if}
               </span>
             </td>
@@ -172,6 +185,28 @@
             </td>
 
             <td>
+=======
+                {/if}
+              </span>
+            </td>
+
+          {* For non-location blocks *}
+          {else}
+
+            <td>
+              <span>
+                {if !is_array($row.main)}
+                  {$row.main}
+                {elseif $row.main.fileName}
+                  {$row.main.fileName}
+                {else}
+                  {', '|implode:$row.main}
+                {/if}
+              </span>
+            </td>
+
+            <td>
+>>>>>>> refs/remotes/civicrm/master
               {if isset($row.main) || isset($row.other)}
                 <span>
                   {if $row.main == $row.other}
@@ -186,10 +221,17 @@
             </td>
 
           {/if}
+<<<<<<< HEAD
 
        </tr>
     {/foreach}
 
+=======
+
+       </tr>
+    {/foreach}
+
+>>>>>>> refs/remotes/civicrm/master
     {foreach from=$rel_tables item=params key=paramName}
       {if $paramName eq 'move_rel_table_users'}
         <tr class="{cycle values="even-row,odd-row"}">
@@ -217,8 +259,30 @@
 {literal}
 <script type="text/javascript">
 
+<<<<<<< HEAD
   function mergeBlock(blockname, element, blockId, type) {
     var allBlock = {/literal}{$mainLocBlock}{literal};
+=======
+  var locationBlockInfo = {/literal}{$locationBlockInfo}{literal};
+  var allBlock = {/literal}{$mainLocBlock}{literal};
+
+  /**
+   * Triggered when a 'location' or 'type' destination is changed.
+   * Check to see if the 'main' contact record has a corresponding location
+   * block when the destination of a field is changed. Allow existing location
+   * fields to be overwritten with data from the 'other' contact.
+   *
+   * @param blockname string
+   *   The name of the entity.
+   * @param element object
+   *   The element that was changed (location or type dropdown)
+   * @param blockId int
+   *   The block ID being affected
+   * @param type string
+   *   Location or type (locTypeId / typeTypeId)
+   */
+  function mergeBlock(blockname, element, blockId, type) {
+>>>>>>> refs/remotes/civicrm/master
 
     // Get type of select list that's been changed (location or type)
     var locTypeId = '';
@@ -227,18 +291,27 @@
     // If the location was changed, lookup the type if it exists
     if (type == 'locTypeId') {
       locTypeId = element.value;
+<<<<<<< HEAD
       typeTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_typeTypeId' ).val();
+=======
+      typeTypeId = CRM.$( 'select#location_blocks_' + blockname + '_' + blockId + '_typeTypeId' ).val();
+>>>>>>> refs/remotes/civicrm/master
     }
 
     // Otherwise the type was changed, lookup the location if it exists
     else {
+<<<<<<< HEAD
       locTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_locTypeId' ).val();
+=======
+      locTypeId = CRM.$( 'select#location_blocks_' + blockname + '_' + blockId + '_locTypeId' ).val();
+>>>>>>> refs/remotes/civicrm/master
       typeTypeId = element.value;
     }
 
     // @todo Fix this 'special handling' for websites (no location id)
     if (!locTypeId) { locTypeId = 0; }
 
+<<<<<<< HEAD
     // Get the matching block, based on location and type, from the main contact record
     var blockQuery = "allBlock.main_" + blockname + "_" + locTypeId;
     if (typeTypeId) {
@@ -250,29 +323,89 @@
 
     // Create appropriate label / add new link after changing the block
     if (typeof block == 'undefined') {
+=======
+    // Look for a matching block on the main contact
+    var mainBlockId = 0;
+    var mainBlockDisplay = '';
+    var mainBlock = findBlock(allBlock, blockname, locTypeId, typeTypeId);
+
+    // Create appropriate label / add new link after changing the block
+    if (mainBlock == false) {
+>>>>>>> refs/remotes/civicrm/master
       label = '<span class="action_label">({/literal}{ts}add{/ts}{literal})</span>';
     }
     else {
 
       // Set display and ID
+<<<<<<< HEAD
       mainBlockDisplay = block['display'];
       mainBlockId = block['id'];
+=======
+      mainBlockDisplay = mainBlock['display'];
+      mainBlockId = mainBlock['id'];
+>>>>>>> refs/remotes/civicrm/master
 
       // Set label
       var label = '<span class="action_label">({/literal}{ts}overwrite{/ts}{literal})</span> ';
       if (blockname == 'email' || blockname == 'phone') {
+<<<<<<< HEAD
         var opLabel = 'location[' + blockname + '][' + blockId + '][operation]';
+=======
+        var opLabel = 'location_blocks[' + blockname + '][' + blockId + '][operation]';
+>>>>>>> refs/remotes/civicrm/master
         label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">{/literal}{ts}add new{/ts}{literal}</label><br />';
       }
       label += '<br>';
     }
 
     // Update DOM
+<<<<<<< HEAD
     CRM.$( "input[name='location[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
+=======
+    CRM.$( "input[name='location_blocks[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
+>>>>>>> refs/remotes/civicrm/master
     CRM.$( "#main_" + blockname + "_" + blockId ).html( mainBlockDisplay );
     CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * Look for a matching 'main' contact location block by entity, location and
+   * type
+   *
+   * @param allBlock array
+   *   All location blocks on the main contact record.
+   * @param entName string
+   *   The entity name to lookup.
+   * @param locationID int
+   *   The location ID to lookup.
+   * @param typeID int
+   *   The type ID to lookup.
+   *
+   * @returns boolean|object
+   *   Returns false if no match, otherwise an object with the location ID and
+   *   display value.
+   */
+  function findBlock(allBlock, entName, locationID, typeID) {
+    var entityArray = allBlock[entName];
+    var result = false;
+    for (var i = 0; i < entityArray.length; i++) {
+      // Match based on location and type ID, depending on the entity info
+      if (locationBlockInfo[entName]['hasLocation'] == false || locationID == entityArray[i]['location_type_id']) {
+        if (locationBlockInfo[entName]['hasType'] == false || typeID == entityArray[i][locationBlockInfo[entName]['hasType']]) {
+          result = {
+            display: entityArray[i][locationBlockInfo[entName]['displayField']],
+            id: entityArray[i]['id']
+          };
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+>>>>>>> refs/remotes/civicrm/master
   CRM.$(function($) {
 
     $('body').on('change', "input[id*='[operation]']", function() {
@@ -306,6 +439,7 @@
           $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
         });
       }
+<<<<<<< HEAD
     });
 
     // Show/hide matching data rows
@@ -313,6 +447,15 @@
       $('tr.merge-row-equal').toggle();
     });
 
+=======
+    });
+
+    // Show/hide matching data rows
+    $('.toggle_equal_rows').click(function() {
+      $('tr.merge-row-equal').toggle();
+    });
+
+>>>>>>> refs/remotes/civicrm/master
   });
 
 </script>

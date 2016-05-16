@@ -2,7 +2,7 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright Chirojeugd-Vlaanderen vzw 2015                           |
   +--------------------------------------------------------------------+
@@ -26,12 +26,11 @@
   +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  *  Class api_v3_SavedSearchTest
  *
  * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_SavedSearchTest extends CiviUnitTestCase {
 

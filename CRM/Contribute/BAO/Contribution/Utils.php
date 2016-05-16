@@ -141,7 +141,22 @@ class CRM_Contribute_BAO_Contribution_Utils {
       if ($form->_values['is_recur'] && $contribution->contribution_recur_id) {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
+      if (isset($paymentParams['contribution_source'])) {
+        $form->_params['source'] = $paymentParams['contribution_source'];
+      }
 
+<<<<<<< HEAD
+=======
+      // get the price set values for receipt.
+      if ($form->_priceSetId && $form->_lineItem) {
+        $form->_values['lineItem'] = $form->_lineItem;
+        $form->_values['priceSetID'] = $form->_priceSetId;
+      }
+
+      $form->_values['contribution_id'] = $contribution->id;
+      $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
+
+>>>>>>> refs/remotes/civicrm/master
       if (!empty($form->_paymentProcessor)) {
         try {
           $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
@@ -160,6 +175,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
             $contribution->payment_status_id = $result['payment_status_id'];
           }
           $result['contribution'] = $contribution;
+          if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution',
+            'status_id', 'Pending') && $payment->isSendReceiptForPending()) {
+            CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
+              $form->_values,
+              $contribution->is_test
+            );
+          }
           return $result;
         }
         catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
@@ -179,19 +201,21 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
     }
 
-    // Only pay later or unpaid should reach this point. The theory is that paylater should get a receipt now &
-    // processor
-    // transaction receipts should be outcome driven.
+    // Only pay later or unpaid should reach this point, although pay later likely does not & is handled via the
+    // manual processor, so it's unclear what this set is for and whether the following send ever fires.
     $form->set('params', $form->_params);
-    if (isset($paymentParams['contribution_source'])) {
-      $form->_params['source'] = $paymentParams['contribution_source'];
-    }
 
-    // get the price set values for receipt.
-    if ($form->_priceSetId && $form->_lineItem) {
-      $form->_values['lineItem'] = $form->_lineItem;
-      $form->_values['priceSetID'] = $form->_priceSetId;
+    if ($form->_params['amount'] == 0) {
+      // This is kind of a back-up for pay-later $0 transactions.
+      // In other flows they pick up the manual processor & get dealt with above (I
+      // think that might be better...).
+      return array(
+        'payment_status_id' => 1,
+        'contribution' => $contribution,
+        'payment_processor_id' => 0,
+      );
     }
+<<<<<<< HEAD
 
     $form->_values['contribution_id'] = $contribution->id;
     $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
@@ -205,6 +229,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
         'payment_processor_id' => 0,
       );
     }
+=======
+>>>>>>> refs/remotes/civicrm/master
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $form->_values,
       $contribution->is_test

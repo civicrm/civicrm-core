@@ -160,6 +160,7 @@ distmaker/out
 =======
 *~
 *.bak
+backdrop/
 bower_components
 CRM/ACL/DAO
 CRM/Activity/DAO
@@ -242,6 +243,7 @@ CRM/Core/DAO/PrintLabel.php
 CRM/Core/DAO/RecurringEntity.php
 CRM/Core/DAO/Setting.php
 CRM/Core/DAO/StateProvince.php
+CRM/Core/DAO/StatusPreference.php
 CRM/Core/DAO/SystemLog.php
 CRM/Core/DAO/Tag.php
 CRM/Core/DAO/Timezone.php

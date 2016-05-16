@@ -738,7 +738,11 @@ GROUP BY  currency
    * @return array
    *   array of exportable Fields
    */
+<<<<<<< HEAD
   public static function exportableFields($checkPermission) {
+=======
+  public static function exportableFields($checkPermission = TRUE) {
+>>>>>>> refs/remotes/civicrm/master
     if (!self::$_exportableFields) {
       if (!self::$_exportableFields) {
         self::$_exportableFields = array();

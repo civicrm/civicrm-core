@@ -23,13 +23,11 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  *  Test APIv3 civicrm_mailingab_* functions
  *
  * @package   CiviCRM
+ * @group headless
  */
 class api_v3_MailingABTest extends CiviUnitTestCase {
   protected $_mailingID_A;

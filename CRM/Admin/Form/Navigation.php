@@ -72,7 +72,11 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       $permissions[] = array('id' => $id, 'label' => $vals[0], 'description' => (array) CRM_Utils_Array::value(1, $vals));
     }
     $this->add('text', 'permission', ts('Permission'),
+<<<<<<< HEAD
       array('placeholder' => ts('Unrestricted'), 'class' => 'huge', 'data-select-params' => json_encode(array('data' => $permissions)))
+=======
+      array('placeholder' => ts('Unrestricted'), 'class' => 'huge', 'data-select-params' => json_encode(array('data' => array('results' => $permissions, 'text' => 'label'))))
+>>>>>>> refs/remotes/civicrm/master
     );
 
     $operators = array('AND' => ts('AND'), 'OR' => ts('OR'));

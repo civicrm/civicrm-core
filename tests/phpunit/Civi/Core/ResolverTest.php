@@ -1,7 +1,6 @@
 <?php
 
 namespace Civi\Core {
-  require_once 'CiviTest/CiviUnitTestCase.php';
 
   /**
    * Class ResolverTest
@@ -76,7 +75,7 @@ namespace Civi\Core {
      */
     public function testCall() {
       // Note: ResolverTestExampleService is implemented at the bottom of this file.
-      Container::singleton()->set('callbackTestService', new ResolverTestExampleService());
+      \Civi::container()->set('callbackTestService', new ResolverTestExampleService());
       $cb = $this->resolver->get('call://callbackTestService/ping');
       $expected = 'service dummy received foo';
       $actual = call_user_func($cb, 'foo');
@@ -93,11 +92,30 @@ namespace Civi\Core {
     }
 
     /**
+     * Test callback which returns a global variable.
+     */
+    public function testGlobalGetter() {
+      $_GET['resolverTest'] = 123;
+      $cb = $this->resolver->get('global://_GET/resolverTest?getter');
+      $_GET['resolverTest'] = 456;
+      $this->assertEquals(456, call_user_func($cb, 'side-effect-free'));
+      $this->assertEquals(456, $_GET['resolverTest']);
+      unset($_GET['resolverTest']);
+    }
+
+    public function testGlobalSetter() {
+      $GLOBALS['resolverTest2'] = 78;
+      $cb = $this->resolver->get('global://resolverTest2?setter');
+      call_user_func($cb, 90);
+      $this->assertEquals(90, $GLOBALS['resolverTest2']);
+    }
+
+    /**
      * Test object-lookup in the container.
      */
     public function testObj() {
       // Note: ResolverTestExampleService is implemented at the bottom of this file.
-      Container::singleton()->set('callbackTestService', new ResolverTestExampleService());
+      \Civi::container()->set('callbackTestService', new ResolverTestExampleService());
       $obj = $this->resolver->get('obj://callbackTestService');
       $this->assertTrue($obj instanceof ResolverTestExampleService);
     }

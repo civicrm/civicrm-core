@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,10 +28,18 @@
   <div class="content description">
     {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click <strong>Continue</strong> at the bottom of the page.{/ts}
   </div>
+<<<<<<< HEAD
 </div>
 <div class="crm-section no-label {$form.$expressButtonName.name}-section">
   <div class="content description">
     {$form.$expressButtonName.html}
     <div class="description">Save time. Checkout securely. Pay without sharing your financial information.</div>
+=======
+  <div class="crm-section no-label {$form.$expressButtonName.name}-section">
+    <div class="content description">
+      {$form.$expressButtonName.html}
+      <div class="description">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</div>
+    </div>
+>>>>>>> refs/remotes/civicrm/master
   </div>
 </div>

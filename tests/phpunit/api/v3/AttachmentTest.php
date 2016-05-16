@@ -26,16 +26,11 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
-/**
  *  Test for the Attachment API
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
+ * @group headless
  */
 class api_v3_AttachmentTest extends CiviUnitTestCase {
   protected static $filePrefix = NULL;
@@ -62,7 +57,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   protected function tearDown() {
     parent::tearDown();
     $this->cleanupFiles();
-    \Civi\Core\Container::singleton(TRUE);
+    \Civi::reset();
   }
 
   /**

@@ -807,7 +807,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Contact_Form_Location::buildQuickForm($this);
 
     // add attachment
-    $this->addField('image_URL', array('maxlength' => '60', 'label' => ts('Browse/Upload Image')));
+    $this->addField('image_URL', array('maxlength' => '255', 'label' => ts('Browse/Upload Image')));
 
     // add the dedupe button
     $this->addElement('submit',

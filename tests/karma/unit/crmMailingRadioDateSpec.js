@@ -80,11 +80,32 @@ describe('crmMailingRadioDate', function() {
 
       model.the_date = '2014-01-02 02:03:00';
       $rootScope.$digest();
-      expect($rootScope.myForm.$valid).toBe(true);
+      expect($rootScope.myForm.$valid).toBe(false);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
       expect(element.find('.crm-form-date').datepicker('getDate').toDateString()).toEqual('Thu Jan 02 2014');
       expect(element.find('.crm-form-time').timeEntry('getTime').getMinutes()).toBe(3);
+
+      var now = new Date();
+      var month = '' + (now.getMonth() + 1);
+      var day = '' + (now.getDate() + 1);
+      var year = (now.getFullYear() + 1);
+      if (day.length < 2) day = '0' + day;
+      if (month.length < 2) month = '0' + month;
+      var minutes = "30";
+      var hours = "09";
+      var datenow = [year, month, day].join('-');
+      var time = [hours, minutes, "00"].join(':');
+      var currentDate = datenow + ' ' + time;
+      var ndate = new Date(datenow);
+      model.the_date = currentDate;
+
+      $rootScope.$digest();
+      expect($rootScope.myForm.$valid).toBe(true);
+      expect(element.find('.radio-now').prop('checked')).toBe(false);
+      expect(element.find('.radio-at').prop('checked')).toBe(true);
+      expect(element.find('.crm-form-date').datepicker('getDate').toDateString()).toEqual(ndate.toDateString());
+      expect(element.find('.crm-hidden-date').val()).toEqual(currentDate);
     });
 
     it('should update the model after changing the date and time', function() {
@@ -107,7 +128,7 @@ describe('crmMailingRadioDate', function() {
       element.find('.crm-form-time').timeEntry('setTime', '04:05').trigger('change');
       $rootScope.$digest();
       expect(model.the_date).toBe('2014-01-03 04:05:00');
-      expect($rootScope.myForm.$valid).toBe(true);
+      expect($rootScope.myForm.$valid).toBe(false);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
 

@@ -260,7 +260,11 @@ AND    $operationClause LIMIT 1";
       }
     }
     if ($contactID == $selectedContactID &&
+<<<<<<< HEAD
       (CRM_Core_Permission::check('edit my contact') || CRM_Core_Permission::check('view my contact'))
+=======
+      (CRM_Core_Permission::check('edit my contact'))
+>>>>>>> refs/remotes/civicrm/master
     ) {
       return TRUE;
     }
