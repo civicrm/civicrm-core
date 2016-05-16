@@ -403,6 +403,95 @@ WHERE  id = %1
   }
 
   /**
+   * Refresh the smart group cache tables.
+   *
+   * This involves clearing out any aged entries (based on the site timeout setting) and resetting the time outs.
+   *
+   * This function should be called via the opportunistic or deterministic cache refresh function to make the intent
+   * clear.
+   */
+  protected static function refreshCaches() {
+    if (self::isRefreshAlreadyInitiated()) {
+      return;
+    }
+
+    $params = array(1 => array(self::getCacheInvalidDateTime(), 'String'));
+
+    CRM_Core_DAO::executeQuery(
+      "
+        DELETE gc
+        FROM civicrm_group_contact_cache gc
+        INNER JOIN civicrm_group g ON g.id = gc.group_id
+        WHERE g.cache_date <= %1
+      ",
+      $params
+    );
+
+    CRM_Core_DAO::executeQuery(
+      "
+        UPDATE civicrm_group g
+        SET    cache_date = null,
+        refresh_date = NOW()
+        WHERE  g.cache_date <= %1
+      ",
+      $params
+    );
+  }
+
+  /**
+   * Check if the refresh is already initiated.
+   *
+   * We have 2 imperfect methods for this:
+   *   1) a static variable in the function. This works fine within a request
+   *   2) a mysql lock. This works fine as long as CiviMail is not running, or if mysql is version 5.7+
+   *
+   * Where these 2 locks fail we get 2 processes running at the same time, but we have at least minimised that.
+   */
+  protected static function isRefreshAlreadyInitiated() {
+    static $invoked = FALSE;
+    if ($invoked) {
+      return TRUE;
+    }
+    $lock = Civi::lockManager()->acquire('data.core.group.refresh');
+    if (!$lock->isAcquired()) {
+      return TRUE;
+    }
+  }
+
+  /**
+   * Do an opportunistic cache refresh if the site is configured for these.
+   *
+   * Sites that do not run the smart group clearing cron job should refresh the caches under an opportunistic mode, akin
+   * to a poor man's cron. The user session will be forced to wait on this so it is less desirable.
+   *
+   * @return bool
+   */
+  public static function opportunisticCacheRefresh() {
+    if (Civi::settings()->get('contact_smart_group_display') == 'opportunistic') {
+      self::refreshCaches();
+    }
+  }
+
+  /**
+   * Do a forced cache refresh.
+   *
+   * This function is appropriate to be called by system jobs & non-user sessions.
+   *
+   * @return bool
+   */
+  public static function deterministicCacheRefresh() {
+    if (self::smartGroupCacheTimeout() == 0) {
+      CRM_Core_DAO::executeQuery("TRUNCATE civicrm_group_contact_cache");
+      CRM_Core_DAO::executeQuery("
+        UPDATE civicrm_group g
+        SET cache_date = null, refresh_date = null");
+    }
+    else {
+      self::refreshCaches();
+    }
+  }
+
+  /**
    * Remove one or more contacts from the smart group cache.
    *
    * @param int|array $cid
@@ -558,7 +647,7 @@ WHERE  civicrm_group_contact.status = 'Added'
       }
       $insertSql = "CREATE TEMPORARY TABLE $tempTable ($selectSql);";
       $processed = TRUE;
-      $result = CRM_Core_DAO::executeQuery($insertSql);
+      CRM_Core_DAO::executeQuery($insertSql);
       CRM_Core_DAO::executeQuery(
         "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
         SELECT DISTINCT $idName, group_id FROM $tempTable
