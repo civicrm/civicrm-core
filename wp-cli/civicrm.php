@@ -203,7 +203,21 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
             }
 
             civicrm_initialize();
+
+            // CRM-18062: Set CiviCRM timezone if any
+            $wpBaseTimezone = date_default_timezone_get();
+            $wpUserTimezone = $this->getOption('timezone', get_option('timezone_string'));
+            if ($wpUserTimezone) {
+              date_default_timezone_set($wpUserTimezone);
+              CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+            }
+
             $result = civicrm_api($entity, $action, $params);
+
+            // restore WP's timezone
+            if ($wpBaseTimezone) {
+              date_default_timezone_set($wpBaseTimezone);
+            }
 
             switch ($this->getOption('out', 'pretty')) {
 
