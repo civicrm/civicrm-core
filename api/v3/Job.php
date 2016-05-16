@@ -644,6 +644,24 @@ function civicrm_api3_job_group_rebuild($params) {
 }
 
 /**
+ * Flush smart groups caches.
+ *
+ * This job purges aged smart group cache data (based on the timeout value). Sites can decide whether they want this
+ * job and / or the group cache rebuild job to run. In some cases performance is better when old caches are cleared out
+ * prior to any attempt to rebuild them. Also, many sites are very happy to have caches built on demand, provided the
+ * user is not having to wait for deadlocks to clear when invalidating them.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ */
+function civicrm_api3_job_group_cache_flush($params) {
+  CRM_Contact_BAO_GroupContactCache::deterministicCacheRefresh();
+  return civicrm_api3_create_success();
+}
+
+/**
  * Check for CiviCRM software updates.
  *
  * Anonymous site statistics are sent back to civicrm.org during this check.
