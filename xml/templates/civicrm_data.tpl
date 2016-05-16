@@ -1021,8 +1021,8 @@ VALUES
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar month{/ts}', 'greater_previous.month', 'greater_previous.month', NULL, NULL, NULL,60, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous quarter{/ts}', 'greater_previous.quarter', 'greater_previous.quarter', NULL, NULL, NULL,61, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar year{/ts}', 'greater_previous.year', 'greater_previous.year', NULL, NULL, NULL,62, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_smart_group_cache_refresh_mode, '{ts escape="sql"}Opportunistic{/ts}', 'opportunistic','opportunistic', NULL, NULL, NULL,1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_smart_group_cache_refresh_mode, '{ts escape="sql"}Deterministic{/ts}', 'deterministic','deterministic', NULL, NULL, NULL,1, NULL, 0, 0, 2, NULL, NULL);
+   (@option_group_smart_group_cache_refresh_mode, '{ts escape="sql"}Opportunistic{/ts}', 'opportunistic','opportunistic', NULL, NULL, 1, 1, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_smart_group_cache_refresh_mode, '{ts escape="sql"}Deterministic{/ts}', 'deterministic','deterministic', NULL, NULL, 0, 2, NULL, 0, 0, 1, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
