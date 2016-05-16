@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,32 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
+require_once 'CRM/Core/Page.php';
+
 /**
- * Formats an array of attributes as html
- *
- * @param array $params
- *   ['a'] array of attributes.
- * @param CRM_Core_Smarty $smarty
- *
- * @return string
+ * Page for displaying list of auctions
  */
-function smarty_function_crmAttributes($params, &$smarty) {
-  $attributes = isset($params['a']) ? $params['a'] : array();
-  return CRM_Utils_String::htmlAttributes($attributes);
+class CRM_Auction_Page_DashBoard extends CRM_Core_Page {
+
+  /**
+   * This function is the main function that is called when the page loads,
+   * it decides the which action has to be taken for the page.
+   *
+   * return null
+   * @access public
+   */
+  function run() {
+    parent::run();
+  }
 }
+

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,70 +23,58 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
-namespace Civi\Core\Lock;
+*/
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2014
+ * $Id$
+ *
  */
-class NullLock implements LockInterface {
 
-  private $hasLock = FALSE;
-
-  /**
-   * Create lock.
-   *
-   * @param string $name
-   *
-   * @return static
-   */
-  public static function create($name) {
-    return new static();
-  }
+/**
+ * class to represent the actions that can be performed on a group of contacts
+ * used by the search forms
+ *
+ */
+class CRM_Touchstone_Task {
+  CONST FIRST_ACTION = 1, SECOND_ACTION = 2, THIRD_ACTION = 3;
 
   /**
-   * Acquire lock.
+   * the task array
    *
-   * @param int|NULL $timeout
-   *   The number of seconds to wait to get the lock.
-   *   For a default value, use NULL.
-   *
-   * @return bool
+   * @var array
+   * @static
    */
-  public function acquire($timeout = NULL) {
-    $this->hasLock = TRUE;
-    return TRUE;
-  }
+  static $_tasks = NULL;
 
   /**
-   * Release lock.
+   * the optional task array
    *
-   * @return bool|null|string
-   *   Trueish/falsish.
+   * @var array
+   * @static
    */
-  public function release() {
-    $this->hasLock = FALSE;
-    return TRUE;
-  }
+  static $_optionalTasks = NULL;
 
   /**
-   * @return bool|null|string
-   *   Trueish/falsish.
-   * @deprecated
-   *   Not supported by some locking strategies. If you need to poll, better
-   *   to use acquire(0).
+   * These tasks are the core set of tasks that the user can perform
+   * on a contact / group of contacts
+   *
+   * @return array the set of tasks for a group of contacts
+   * @static
+   * @access public
    */
-  public function isFree() {
-    return !$this->hasLock;
+  static
+  function &tasks() {
+    if (!(self::$_tasks)) {
+      self::$_tasks = array(
+        1 => ts('Perform First Task'),
+        1 => ts('Perform Second Task'),
+        5 => ts('Perform Third Task'),
+      );
+    }
+    return self::$_tasks;
   }
-
-  /**
-   * @return bool
-   */
-  public function isAcquired() {
-    return $this->hasLock;
-  }
-
 }
+

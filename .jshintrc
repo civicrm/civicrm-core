@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "indent": 2,
   "jasmine": true,
@@ -9,4 +10,17 @@
     "CRM"
   ],
   "-W097": true
+=======
+{
+  "indent": 2,
+  "jasmine": true,
+  "predef": [
+    "angular",
+    "inject",
+    "module",
+
+    "CRM"
+  ],
+  "-W097": true
+>>>>>>> 8f0ef8a271f3b11538ad73ff9b29bba7abb0cae0
 }

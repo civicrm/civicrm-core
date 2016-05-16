@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,41 +23,45 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2014
+ * $Id$
+ *
  */
+
+require_once 'CRM/Core/StateMachine.php';
 
 /**
- * Given the selected contacts, prepare a mailing with a hidden group.
+ * State machine for managing different states of Auction Item create process.
+ *
  */
-class CRM_Mailing_Form_Task_AdhocMailing extends CRM_Contact_Form_Task {
+class CRM_Auction_StateMachine_Item extends CRM_Core_StateMachine {
 
-  public function preProcess() {
-    parent::preProcess();
-    list ($groupId, $ssId) = $this->createHiddenGroup();
-    $mailing = civicrm_api3('Mailing', 'create', array(
-      'name' => "",
-      'campaign_id' => NULL,
-      'replyto_email' => "",
-      'subject' => "",
-      'body_html' => "",
-      'body_text' => "",
-      'groups' => array(
-        'include' => array($groupId),
-        'exclude' => array(),
-        'base' => array(),
-      ),
-      'mailings' => array(
-        'include' => array(),
-        'exclude' => array(),
-      ),
-    ));
+  /**
+   * class constructor
+   *
+   * @param object $controller
+   * @param \const|int $action
+   *
+   * @internal param \CRM_Auction_Controller $object
+   * @return \CRM_Auction_StateMachine_Item CRM_Contact_Import_StateMachine
+   */
+  function __construct($controller, $action = CRM_Core_Action::NONE) {
+    parent::__construct($controller, $action);
 
-    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mailing['id']));
+    $session = CRM_Core_Session::singleton();
+    $session->set('singleForm', FALSE);
+
+    $this->_pages = array(
+      'CRM_Auction_Form_ItemAccount' => NULL,
+      'CRM_Auction_Form_Item' => NULL,
+    );
+
+    $this->addSequentialPages($this->_pages, $action);
   }
-
 }
+

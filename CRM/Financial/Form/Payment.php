@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,84 +23,39 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2014
+ * $Id$
+ *
  */
-class CRM_Financial_Form_Payment extends CRM_Core_Form {
+
+/**
+ * This class holds all the Pseudo constants that are specific to this component.
+ */
+class CRM_Touchstone_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * @var int
-   */
-  protected $_paymentProcessorID;
-  protected $currency;
-  public $_values = array();
-
-  /**
+   * pseudoconstant definition
    * @var array
+   * @static
    */
-  public $_paymentProcessor;
-  /**
-   * Set variables up before form is built.
-   */
-  public function preProcess() {
-    parent::preProcess();
-    $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
-      TRUE);
-    $this->currency = CRM_Utils_Request::retrieve('currency', 'String', CRM_Core_DAO::$_nullObject,
-      TRUE);
-
-    $this->assignBillingType();
-
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID);
-
-    CRM_Core_Payment_ProcessorForm::preProcess($this);
-
-    self::addCreditCardJs();
-
-    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
-    $this->assign('currency', $this->currency);
-
-    $this->assign('suppressForm', TRUE);
-    $this->controller->_generateQFKey = FALSE;
-  }
+  private static $pseudoConst;
 
   /**
-   * @return string
+   * Get all values for $pseudoConst pseudoconstant
+   *
+   * @access public
+   *
+   * @param null $id
+   *
+   * @return array - array reference of all $pseudoConst values
    */
-  public function getCurrency() {
-    return $this->currency;
+  public static function &pseudoConst($id = NULL) {
+    return self::$pseudoConst;
   }
-
-  /**
-   * Build quickForm.
-   */
-  public function buildQuickForm() {
-    CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-  }
-
-  /**
-   * Set default values for the form.
-   */
-  public function setDefaultValues() {
-    $contactID = $this->getContactID();
-    CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
-    return $this->_defaults;
-  }
-
-  /**
-   * Add JS to show icons for the accepted credit cards.
-   */
-  public static function addCreditCardJs() {
-    $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();
-    CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10)
-      // workaround for CRM-13634
-      // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));
-      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';');
-  }
-
 }
+

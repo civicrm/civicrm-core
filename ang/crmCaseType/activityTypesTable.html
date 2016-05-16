@@ -14,14 +14,14 @@ Required vars: caseType
   <tbody ui-sortable ng-model="caseType.definition.activityTypes">
   <tr ng-repeat="activityType in caseType.definition.activityTypes">
     <td>
-      <i class="crm-i fa-arrows grip-n-drag"></i>
+      <span class="icon ui-icon-grip-dotted-vertical"></span>
       {{ activityType.name }}
     </td>
     <td>
       <input class="number" type="text" ng-pattern="/^[0-9]*$/" ng-model="activityType.max_instances" />
     </td>
     <td>
-      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)" title="{{ts('Remove')}}"></a>
+      <a crm-icon="trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)" title="{{ts('Remove')}}"></a>
     </td>
   </tr>
   </tbody>
@@ -29,11 +29,11 @@ Required vars: caseType
   <tfoot>
   <tr class="addRow">
     <td colspan="3">
+      {{ts('Add activity type:')}}
       <span crm-add-name
            crm-options="activityTypeNames"
            crm-var="newActivity"
            crm-on-add="addActivityType(newActivity)"
-           placeholder="{{ts('Add activity type')}}"
               />
     </td>
   </tr>

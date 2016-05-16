@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,33 +23,24 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
+ * Config handles all the run time configuration changes that the system needs to deal with.
+ * Typically we'll have different values for a user's sandbox, a qa sandbox and a production area.
+ * The default values in general, should reflect production values (minimizes chances of screwing up)
+ *
  * @package CRM
- * @copyright CiviCRM LLC
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
+require_once 'CRM/Core/Component/Config.php';
+
 /**
- * Fetch an attribute from html
- *
- * @param array $params
- * @param CRM_Core_Smarty $smarty
- *
- * @return string
+ * Class CRM_Touchstone_Config
  */
-function smarty_function_crmGetAttribute($params, &$smarty) {
-  $ret = '';
-  if (preg_match('#\W' . $params['attr'] . '="([^"]+)#', $params['html'], $matches)) {
-    $ret = $matches[1];
-  }
-  if (!empty($params['assign'])) {
-    $smarty->assign($params['assign'], $ret);
-  }
-  else {
-    return $ret;
-  }
-}
+class CRM_Touchstone_Config extends CRM_Core_Component_Config {}
+
