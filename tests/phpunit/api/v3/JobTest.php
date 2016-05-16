@@ -317,7 +317,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $this->callAPISuccess('Contact', 'create', $params);
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
     $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
     $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
     $result = $this->callAPISuccess('Contact', 'get', array('contact_sub_type' => 'Student', 'sequential' => 1));
@@ -330,12 +330,20 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that in aggressive mode our conflicted contacts are merged.
+   */
+  public function testBatchMergeAggressive() {
+
+  }
+
+  /**
    * Get data for batch merge.
    */
   public function getMergeSets() {
     $data = array(
       array(
         array(
+          'mode' => 'safe',
           'contacts' => array(
             array(
               'first_name' => 'Michael',
@@ -370,6 +378,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       ),
       array(
         array(
+          'mode' => 'safe',
           'contacts' => array(
             array(
               'first_name' => 'Michael',
@@ -413,6 +422,46 @@ class api_v3_JobTest extends CiviUnitTestCase {
             ),
           ),
         ),
+      ),
+      array(
+        array(
+          'mode' => 'aggressive',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'bigger house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+          ),
+          'skipped' => 0,
+          'merged' => 1,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'street_address' => 'big house',
+            ),
+          ),
+        )
       ),
     );
     return $data;
