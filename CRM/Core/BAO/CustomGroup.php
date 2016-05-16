@@ -433,7 +433,9 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
 
     if (!empty($subTypes)) {
       foreach ($subTypes as $key => $subType) {
-        $subTypeClauses[] = "civicrm_custom_group.extends_entity_column_value LIKE '%" . self::validateSubTypeByEntity($entityType, $subType) . "%'";
+        // CRM-18559: the value returned from validateSubTypeByEntity does not
+        // include value separators, so they need to be added for the query.
+        $subTypeClauses[] = "civicrm_custom_group.extends_entity_column_value LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . self::validateSubTypeByEntity($entityType, $subType) . CRM_Core_DAO::VALUE_SEPARATOR . "%'";
       }
       $subTypeClause = '(' .  implode(' OR ', $subTypeClauses) . ')';
       if (!$onlySubType) {
