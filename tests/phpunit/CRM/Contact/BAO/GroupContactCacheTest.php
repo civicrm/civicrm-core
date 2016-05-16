@@ -37,28 +37,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * Manually add and remove contacts from a smart group.
    */
   public function testManualAddRemove() {
-    // Create smart group $g
-    $params = array(
-      'name' => 'Deceased Contacts',
-      'title' => 'Deceased Contacts',
-      'is_active' => 1,
-      'formValues' => array('is_deceased' => 1),
-    );
-    $group = CRM_Contact_BAO_Group::createSmartGroup($params);
-    $this->registerTestObjects(array($group));
-
-    // Create contacts $y1, $y2, $y3 which do match $g; create $n1, $n2, $n3 which do not match $g
-    $living = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 0), 3);
-    $deceased = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 1), 3);
-    $this->assertEquals(3, count($deceased));
-    $this->assertEquals(3, count($living));
-
-    // Assert: $g cache has exactly $y1, $y2, $y3
-    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
-    $this->assertCacheMatches(
-      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
-      $group->id
-    );
+    list($group, $living, $deceased) = $this->setupSmartGroup();
 
     // Add $n1 to $g
     $this->callAPISuccess('group_contact', 'create', array(
@@ -180,6 +159,49 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertEquals($expectedContactIds, $actualContactIds);
   }
 
+  /**
+   * Test the opportunistic refresh cache function does not touch non-expired entries.
+   */
+  public function testOpportunisticRefreshCacheNoChangeIfNotExpired() {
+    list($group, $living, $deceased) = $this->setupSmartGroup();
+    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->assertCacheMatches(
+      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
+      $group->id
+    );
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+
+    $this->assertCacheMatches(
+      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
+      $group->id
+    );
+    $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
+    $this->assertEquals($group->cache_date, $afterGroup['cache_date']);
+    // we don't check for refresh_date here as it was not set when building the cache & it
+    // feels like it should have been.... but that is out of scope.
+  }
+
+  /**
+   * Test the opportunistic refresh cache function does not touch non-expired entries.
+   */
+  public function testOpportunisticRefreshChangeIfCacheDateFieldStale() {
+    list($group, $living, $deceased) = $this->setupSmartGroup();
+    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_group SET cache_date = DATE_SUB(NOW(), INTERVAL 7 MINUTE) WHERE id = ' . $group->id);
+    Civi::$statics['CRM_Contact_BAO_GroupContactCache']['is_refresh_init'] = FALSE;
+    sleep(1);
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+
+    $this->assertCacheMatches(
+      array(),
+      $group->id
+    );
+
+    $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
+    $this->assertTrue(empty($afterGroup['cache_date']), 'refresh date should not be set as the cache is not built');
+    $this->assertTrue(empty($afterGroup['refresh_date']), 'refresh date should not be set as the cache is not built');
+  }
+
   // *** Everything below this should be moved to parent class ****
 
   /**
@@ -259,6 +281,38 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       }
     }
     $this->_testObjects = array();
+  }
+
+  /**
+   * Set up a smart group testing scenario.
+   *
+   * @return array
+   */
+  protected function setupSmartGroup() {
+    $params = array(
+      'name' => 'Deceased Contacts',
+      'title' => 'Deceased Contacts',
+      'is_active' => 1,
+      'formValues' => array('is_deceased' => 1),
+    );
+    $group = CRM_Contact_BAO_Group::createSmartGroup($params);
+    $this->registerTestObjects(array($group));
+
+    // Create contacts $y1, $y2, $y3 which do match $g; create $n1, $n2, $n3 which do not match $g
+    $living = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 0), 3);
+    $deceased = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 1), 3);
+    $this->assertEquals(3, count($deceased));
+    $this->assertEquals(3, count($living));
+
+    // Assert: $g cache has exactly $y1, $y2, $y3
+    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+    $group->find(TRUE);
+    $this->assertCacheMatches(
+      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
+      $group->id
+    );
+    // Reload the group so we have the cache_date & refresh_date.
+    return array($group, $living, $deceased);
   }
 
 }
