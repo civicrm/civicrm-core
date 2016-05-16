@@ -63,41 +63,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Donor Name'),
-            'required' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-          ),
-          'middle_name' => array(
-            'title' => ts('Middle Name'),
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-          ),
-          'age' => array(
-            'title' => ts('Age'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'fields' => $this->getBasicContactFields(),
         'filters' => array(
           'sort_name' => array(
             'title' => ts('Donor Name'),
@@ -338,7 +304,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         ),
       ),
     ) + $this->addAddressFields(FALSE);
-
+    // The tests test for this variation of the sort_name field. Don't argue with the tests :-).
+    $this->_columns['civicrm_contact']['fields']['sort_name']['title'] = ts('Donor Name');
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -777,6 +744,7 @@ UNION ALL
         unset($rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id']);
       }
 
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contribution/detail', ts('View Contribution Details')) ? TRUE : $entryFound;
       // convert donor sort name to link
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
         !empty($rows[$rowNum]['civicrm_contact_sort_name']) &&
@@ -895,24 +863,6 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       }
 
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s) for this ') ? TRUE : $entryFound;
-
-      //handle gender
-      if (array_key_exists('civicrm_contact_gender_id', $row)) {
-        if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
-        }
-        $entryFound = TRUE;
-      }
-
-      // display birthday in the configured custom format
-      if (array_key_exists('civicrm_contact_birth_date', $row)) {
-        $birthDate = $row['civicrm_contact_birth_date'];
-        if ($birthDate) {
-          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
-        }
-        $entryFound = TRUE;
-      }
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
