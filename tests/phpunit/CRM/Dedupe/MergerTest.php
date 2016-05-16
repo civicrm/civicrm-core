@@ -157,6 +157,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $object->set('gid', $this->_groupId);
     $object->set('rgid', $dao->id);
     $object->set('action', CRM_Core_Action::UPDATE);
+    $object->setEmbedded(TRUE);
     @$object->run();
 
     // Retrieve pairs from prev next cache table
@@ -219,6 +220,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $object->set('gid', $this->_groupId);
     $object->set('rgid', $dao->id);
     $object->set('action', CRM_Core_Action::UPDATE);
+    $object->setEmbedded(TRUE);
     @$object->run();
 
     // Retrieve pairs from prev next cache table
