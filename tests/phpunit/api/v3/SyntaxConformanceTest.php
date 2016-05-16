@@ -1026,12 +1026,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
-   * @expectedException PHPUnit_Framework_Error
+   * @expectedException CiviCRM_API3_Exception
    * @param $Entity
    */
   public function testWithoutParam_create($Entity) {
     // should create php complaining that a param is missing
-    $result = civicrm_api($Entity, 'Create');
+    $result = civicrm_api3($Entity, 'Create');
   }
 
   /**
