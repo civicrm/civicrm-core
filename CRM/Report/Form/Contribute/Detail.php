@@ -305,7 +305,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       ),
     ) + $this->addAddressFields(FALSE);
     // The tests test for this variation of the sort_name field. Don't argue with the tests :-).
-    $this->_columns['fields']['sort_name']['title'] = ts('Donor Name');
+    $this->_columns['civicrm_contact']['fields']['sort_name']['title'] = ts('Donor Name');
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
