@@ -529,7 +529,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    */
   public static function ensureOptionValueExists($params) {
     $existingValues = civicrm_api3('OptionValue', 'get', array(
-      'option_group_name' => $params['option_group_id'],
+      'option_group_id' => $params['option_group_id'],
       'name' => $params['name'],
     ));
     if (!$existingValues['count']) {
