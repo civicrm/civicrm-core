@@ -1552,7 +1552,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
  *
  * @throws Exception
  */
-function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $errorMode = FALSE) {
+function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
   //CRM-15792 handle datetime for custom fields below code handles chain api call
   $chainApikeys = array_flip(preg_grep("/^api./", array_keys($params)));
   if (!empty($chainApikeys) && is_array($chainApikeys)) {
