@@ -234,7 +234,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Pending',
     ), 1);
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
-    $this->assertEmpty($contact['source']);
+    $this->assertTrue(empty($contact['source']));
   }
 
   /**
