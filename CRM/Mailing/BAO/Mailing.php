@@ -287,7 +287,7 @@ WHERE  c.group_id = {$groupDAO->id}
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
 
-                    SELECT DISTINCT     $email.id as email_id,
+                    SELECT      $email.id as email_id,
                                         $contact.id as contact_id
                     FROM                $email
                     INNER JOIN          $contact
@@ -312,6 +312,7 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
+                        GROUP BY $email.id, $contact.id
                     $order_by";
 
     if ($mode == 'sms') {
@@ -348,7 +349,7 @@ WHERE  c.group_id = {$groupDAO->id}
     // Query prior mailings.
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
-                    SELECT DISTINCT     $email.id as email_id,
+                    SELECT      $email.id as email_id,
                                         $contact.id as contact_id
                     FROM                $email
                     INNER JOIN          $contact
@@ -370,6 +371,7 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
+                        GROUP BY $email.id, $contact.id
                     $order_by";
 
     if ($mode == 'sms') {
@@ -472,7 +474,7 @@ AND    $mg.mailing_id = {$mailing_id}
     // Get the emails with only location override.
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
-                    SELECT DISTINCT     $email.id as local_email_id,
+                    SELECT              $email.id as local_email_id,
                                         $contact.id as contact_id
                     FROM                $email
                     INNER JOIN          $contact
@@ -494,6 +496,7 @@ AND    $mg.mailing_id = {$mailing_id}
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
+                        GROUP BY $email.id, $contact.id
                     $order_by";
     if ($mode == "sms") {
       $query = "REPLACE INTO       I_$job_id (phone_id, contact_id)
@@ -2525,8 +2528,11 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
             LEFT JOIN   $job ON ( $job.mailing_id = $mailing.id AND $job.is_test = 0 AND $job.parent_id IS NULL )
             LEFT JOIN   civicrm_contact createdContact ON ( civicrm_mailing.created_id = createdContact.id )
             LEFT JOIN   civicrm_contact scheduledContact ON ( civicrm_mailing.scheduled_id = scheduledContact.id )
-            WHERE       $mailingACL $additionalClause
-            GROUP BY    {$groupFromSelect}";
+            WHERE       $mailingACL $additionalClause";
+
+    if (!empty($groupFromSelect)) {
+      $query .= " GROUP BY {$groupFromSelect}";
+    }
 
     if ($sort) {
       $orderBy = trim($sort->orderBy());

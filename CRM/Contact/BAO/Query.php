@@ -4530,8 +4530,13 @@ civicrm_relationship.is_permission_a_b = 0
    * @return string
    */
   public static function getGroupByFromSelectColumns($selectClauses, $groupBy = NULL) {
+    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
+    if (version_compare($mysqlVersion, '5.7', '<') && (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode)))) {
+      return '';
+    }
     $groupBy = (array) $groupBy;
-    $regexToExclude = '/(COALESCE|ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+    $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
     foreach ($selectClauses as $key => $val) {
       $aliasArray = preg_split('/ as /i', $val);
       // if more than 1 alias we need to split by ','.
@@ -4547,7 +4552,7 @@ civicrm_relationship.is_permission_a_b = 0
       else {
         list($selectColumn, $alias) = array_pad($aliasArray, 2, NULL);
         $dateRegex = '/^(DATE_FORMAT|DATE_ADD)/i';
-        // exclude columns which are alreagy included in groupBy and aggregate functions from select
+        // exclude columns which are already included in groupBy and aggregate functions from select
         if (!in_array($selectColumn, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
           if (!empty($alias) && preg_match($dateRegex, trim($selectColumn))) {
             $selectColAlias[] = $alias;
@@ -4723,7 +4728,7 @@ civicrm_relationship.is_permission_a_b = 0
     list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
-    $groupBy = " GROUP BY contact_a.id";
+    $groupBy = " GROUP BY contact_a.id, pnc.id";
     $groupBy .= self::getGroupByFromSelectColumns($this->_select, 'contact_a.id');
     $limit = " LIMIT $offset, $rowCount";
     $query = "$select $from $where $groupBy $order $limit";
