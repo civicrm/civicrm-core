@@ -541,16 +541,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       'Contribution',
       'name'
     );
-    if (!$activity->find(TRUE)) {
-      if (empty($contribution->contact_id)) {
-        $contribution->find(TRUE);
-      }
-      CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
-    }
-    else {
+
+    //CRM-18406: Update activity when edit contribution.
+    if ($activity->find(TRUE)) {
       // CRM-13237 : if activity record found, update it with campaign id of contribution
       CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
+      $contribution->activity_id = $activity->id;
     }
+    CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
 
     // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {

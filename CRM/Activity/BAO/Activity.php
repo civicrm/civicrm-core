@@ -1880,6 +1880,9 @@ SELECT  display_name
       'campaign_id' => $activity->campaign_id,
     );
 
+    if (!empty($activity->activity_id)) {
+      $activityParams['id'] = $activity->activity_id;
+    }
     // create activity with target contacts
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
