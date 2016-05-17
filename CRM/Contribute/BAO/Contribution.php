@@ -548,8 +548,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
     }
     else {
-      // CRM-13237 : if activity record found, update it with campaign id of contribution
-      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
+      self::updateContributionActivity($activity, $contribution);
     }
 
     // do not add to recent items for import, CRM-4399
@@ -4955,5 +4954,34 @@ LIMIT 1;";
     }
     return $prevFinancialItem->financial_account_id;
   }
+  
+  /**
+   * CRM-18406 Updates a contribution activity if it is different to the original
+   *
+   * @param $activity
+   * @param $contribution
+   * @return array
+   * @throws CiviCRM_API3_Exception
+   */
+  public static function updateContributionActivity($activity, $contribution) {
 
+    $new_activity_subject = $contribution->total_amount . ' - ' . $contribution->source;
+
+    //If the activity subject is different to the the result from the contribution total and the source we should update it
+    if (strpos($activity->subject, $new_activity_subject) !== 0 ) {
+      //Append the previous subject to keep a track of changes to the contribution
+      $activity->subject = $new_activity_subject . ' [was ' . $activity->subject . ']';
+    }
+
+    $activityFieldsToUpdate = array(
+      'id'                 => $activity->id,
+      'subject'            => $activity->subject,
+      'activity_date_time' => $contribution->receive_date,
+      'campaign_id'        => $contribution->campaign_id,);
+
+    $activity = civicrm_api3('Activity', 'create', $activityFieldsToUpdate);
+
+    return $activity;
+  }
+  
 }
