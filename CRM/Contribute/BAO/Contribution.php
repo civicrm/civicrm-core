@@ -4983,10 +4983,11 @@ LIMIT 1;";
       'receipt_from_email',
       'receipt_from_name',
       'receipt_text',
-      'custom-pre_id',
+      'custom_pre_id',
       'custom_post_id',
       'honoree_profile_id',
       'onbehalf_profile_id',
+      'honor_block_is_active',
       // Kinda might be - but would be on the contribution...
       'campaign_id',
       'currency',
