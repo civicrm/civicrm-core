@@ -4335,6 +4335,7 @@ civicrm_relationship.is_permission_a_b = 0
     // add group by
     if ($query->_useGroupBy) {
       $sql .= ' GROUP BY contact_a.id';
+      $sql .= self::getGroupByFromSelectColumns($query->_select, 'contact_a.id');
     }
     if (!empty($sort)) {
       $sort = CRM_Utils_Type::escape($sort, 'String');
@@ -4521,6 +4522,51 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
+   * Include Select columns in groupBy clause.
+   *
+   * @param array $selectArray
+   * @param array $groupBy - Columns already included in GROUP By clause.
+   *
+   * @return string
+   */
+  public static function getGroupByFromSelectColumns($selectClauses, $groupBy = NULL) {
+    $groupBy = (array) $groupBy;
+    $regexToExclude = '/(COALESCE|ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+    foreach ($selectClauses as $key => $val) {
+      $aliasArray = preg_split('/ as /i', $val);
+      // if more than 1 alias we need to split by ','.
+      if (count($aliasArray) > 2) {
+        $aliasArray = preg_split('/,/', $val);
+        foreach ($aliasArray as $key => $value) {
+          $alias = current(preg_split('/ as /i', $value));
+          if (!in_array($alias, $groupBy) && preg_match($regexToExclude, trim($alias)) !== 1) {
+            $selectColAlias[] = $alias;
+          }
+        }
+      }
+      else {
+        list($selectColumn, $alias) = array_pad($aliasArray, 2, NULL);
+        $dateRegex = '/^(DATE_FORMAT|DATE_ADD)/i';
+        // exclude columns which are alreagy included in groupBy and aggregate functions from select
+        if (!in_array($selectColumn, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
+          if (!empty($alias) && preg_match($dateRegex, trim($selectColumn))) {
+            $selectColAlias[] = $alias;
+          }
+          else {
+            $selectColAlias[] = $selectColumn;
+          }
+        }
+      }
+    }
+
+    if (!empty($selectColAlias)) {
+      $groupStmt = implode(', ', $selectColAlias);
+      return empty($groupBy) ? $groupStmt : ", {$groupStmt}";
+    }
+    return '';
+  }
+
+  /**
    * Create and query the db for an contact search.
    *
    * @param int $offset
@@ -4584,12 +4630,16 @@ civicrm_relationship.is_permission_a_b = 0
     if (!$count) {
       if (isset($this->_groupByComponentClause)) {
         $groupBy = $this->_groupByComponentClause;
+        $groupCols = preg_replace('/^' . preg_quote('GROUP BY ', '/') . '/', '', $this->_groupByComponentClause);
+        $groupByCol = explode(', ', $groupCols);
       }
       elseif ($this->_useGroupBy) {
+        $groupByCol = 'contact_a.id';
         $groupBy = ' GROUP BY contact_a.id';
       }
     }
     if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
+      $groupByCol = 'civicrm_activity.id';
       $groupBy = 'GROUP BY civicrm_activity.id ';
     }
 
@@ -4611,6 +4661,10 @@ civicrm_relationship.is_permission_a_b = 0
     $this->includePseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
+
+    if (!empty($groupBy)) {
+      $groupBy .= self::getGroupByFromSelectColumns($this->_select, $groupByCol);
+    }
 
     if ($additionalWhereClause) {
       $where = $where . ' AND ' . $additionalWhereClause;
@@ -4670,6 +4724,7 @@ civicrm_relationship.is_permission_a_b = 0
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
     $groupBy = " GROUP BY contact_a.id";
+    $groupBy .= self::getGroupByFromSelectColumns($this->_select, 'contact_a.id');
     $limit = " LIMIT $offset, $rowCount";
     $query = "$select $from $where $groupBy $order $limit";
 
@@ -4749,7 +4804,6 @@ civicrm_relationship.is_permission_a_b = 0
 SELECT COUNT( conts.total_amount ) as total_count,
        SUM(   conts.total_amount ) as total_amount,
        AVG(   conts.total_amount ) as total_avg,
-       conts.total_amount          as amount,
        conts.currency              as currency";
     if ($this->_permissionWhereClause) {
       $where .= " AND " . $this->_permissionWhereClause;
@@ -4777,7 +4831,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
       civicrm_contribution.currency $from $completedWhere";
     $query = "$select FROM (
-      $innerQuery GROUP BY civicrm_contribution.id
+      $innerQuery GROUP BY civicrm_contribution.id, civicrm_contribution.total_amount, civicrm_contribution.currency
     ) as conts
     GROUP BY currency";
 
@@ -4793,9 +4847,12 @@ SELECT COUNT( conts.total_amount ) as total_count,
 
     $orderBy = 'ORDER BY civicrm_contribution_total_amount_count DESC';
     $groupBy = 'GROUP BY currency, civicrm_contribution.total_amount';
-    $modeSQL = "$select, conts.civicrm_contribution_total_amount_count as civicrm_contribution_total_amount_count FROM ($innerQuery
-    $groupBy $orderBy) as conts
-    GROUP BY currency";
+    $modeSQL = "$select, SUBSTRING_INDEX(GROUP_CONCAT(conts.total_amount
+      ORDER BY conts.civicrm_contribution_total_amount_count DESC SEPARATOR ';'), ';', 1) as amount,
+      MAX(conts.civicrm_contribution_total_amount_count) as civicrm_contribution_total_amount_count
+      FROM ($innerQuery
+      $groupBy $orderBy) as conts
+      GROUP BY currency";
 
     $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
 
@@ -4819,7 +4876,6 @@ SELECT COUNT( conts.total_amount ) as total_count,
       $query = "
         $select FROM (
           SELECT civicrm_contribution_soft.amount as total_amount, civicrm_contribution_soft.currency $from $softCreditWhere
-          GROUP BY civicrm_contribution_soft.id
         ) as conts
         GROUP BY currency";
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -4866,7 +4922,6 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
 
     $query = "$select FROM (
       SELECT civicrm_contribution.total_amount, civicrm_contribution.currency $from $where
-      GROUP BY civicrm_contribution.id
     ) as conts
     GROUP BY currency";
 

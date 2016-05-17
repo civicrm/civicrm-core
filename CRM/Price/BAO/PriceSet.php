@@ -499,7 +499,7 @@ WHERE     ct.id = cp.financial_type_id AND
       // Do not display any price sets
       $query .= " AND 0 ";
     }
-    $query .= " GROUP BY s.id";
+    $query .= " GROUP BY s.id, f.price_set_id, s.title";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $priceSets[$dao->id] = $dao->$column;

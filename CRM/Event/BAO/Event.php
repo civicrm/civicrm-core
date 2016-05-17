@@ -416,7 +416,6 @@ WHERE      civicrm_event.is_active = 1 AND
            ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0) AND
            civicrm_event.start_date >= DATE_SUB( NOW(), INTERVAL 7 day )
            $validEventIDs
-GROUP BY   civicrm_event.id
 ORDER BY   civicrm_event.start_date ASC
 $event_summary_limit
 ";

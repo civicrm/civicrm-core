@@ -854,7 +854,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           ON createdBy.id = groups.created_id
         {$from}
         WHERE $whereClause {$where}
-        GROUP BY groups.id
         {$orderBy}
         {$limit}";
 

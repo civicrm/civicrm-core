@@ -539,7 +539,7 @@ WHERE  mailing_id = %1
       $groupBy = $groupJoin = '';
       if ($dedupeEmail) {
         $groupJoin = " INNER JOIN civicrm_email e ON e.id = i.email_id";
-        $groupBy = " GROUP BY e.email ";
+        $groupBy = " GROUP BY e.email, i.contact_id, i.email_id ";
       }
 
       $sql = "
@@ -2466,7 +2466,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
         $mailings = implode(',', $mailingIDs);
         $mailingQuery = "
            SELECT DISTINCT ( m.id ) as id
-           FROM civicrm_mailing m 
+           FROM civicrm_mailing m
            LEFT JOIN civicrm_mailing_group g ON g.mailing_id = m.id
            WHERE g.entity_table like 'civicrm_mailing%' AND g.entity_id IN ($mailings)";
         $mailingDao = CRM_Core_DAO::executeQuery($mailingQuery);
@@ -2505,31 +2505,28 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
+    $select = array(
+      "$mailing.id", "$mailing.name", "$job.status",
+      "$mailing.approval_status_id", "createdContact.sort_name as created_by", "scheduledContact.sort_name as scheduled_by",
+      "$mailing.created_id as created_id", "$mailing.scheduled_id as scheduled_id", "$mailing.is_archived as archived",
+      "$mailing.created_date as created_date", "campaign_id", "$mailing.sms_provider_id as sms_provider_id"
+    );
 
     // we only care about parent jobs, since that holds all the info on
     // the mailing
+    $selectClause = implode(', ', $select);
+    $groupFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select);
     $query = "
-            SELECT      $mailing.id,
-                        $mailing.name,
-                        $job.status,
-                        $mailing.approval_status_id,
+            SELECT      {$selectClause},
                         MIN($job.scheduled_date) as scheduled_date,
                         MIN($job.start_date) as start_date,
-                        MAX($job.end_date) as end_date,
-                        createdContact.sort_name as created_by,
-                        scheduledContact.sort_name as scheduled_by,
-                        $mailing.created_id as created_id,
-                        $mailing.scheduled_id as scheduled_id,
-                        $mailing.is_archived as archived,
-                        $mailing.created_date as created_date,
-                        campaign_id,
-                        $mailing.sms_provider_id as sms_provider_id
+                        MAX($job.end_date) as end_date
             FROM        $mailing
             LEFT JOIN   $job ON ( $job.mailing_id = $mailing.id AND $job.is_test = 0 AND $job.parent_id IS NULL )
             LEFT JOIN   civicrm_contact createdContact ON ( civicrm_mailing.created_id = createdContact.id )
             LEFT JOIN   civicrm_contact scheduledContact ON ( civicrm_mailing.scheduled_id = scheduledContact.id )
             WHERE       $mailingACL $additionalClause
-            GROUP BY    $mailing.id ";
+            GROUP BY    {$groupFromSelect}";
 
     if ($sort) {
       $orderBy = trim($sort->orderBy());

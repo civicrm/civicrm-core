@@ -132,14 +132,15 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
    * @param int $limit
    */
   public function moveIDs($fromTable, $toTable, $limit) {
+    $select = 'ca.id, substr(ca.subject, 1, 50), substr(ca.details, 1, 250),
+           c1.id, c1.sort_name, cac.record_type_id,
+           ca.activity_type_id,
+           cca.case_id';
     $sql = "
 INSERT INTO {$toTable}
 ( table_name, activity_id, subject, details, contact_id, sort_name, record_type,
   activity_type_id, case_id, client_id )
-SELECT    'Activity', ca.id, substr(ca.subject, 1, 50), substr(ca.details, 1, 250),
-           c1.id, c1.sort_name, cac.record_type_id,
-           ca.activity_type_id,
-           cca.case_id,
+SELECT    'Activity', {$select},
            ccc.contact_id as client_id
 FROM       {$fromTable} eid
 INNER JOIN civicrm_activity ca ON ca.id = eid.entity_id
@@ -148,7 +149,7 @@ INNER JOIN  civicrm_contact c1 ON cac.contact_id = c1.id
 LEFT JOIN  civicrm_case_activity cca ON cca.activity_id = ca.id
 LEFT JOIN  civicrm_case_contact ccc ON ccc.case_id = cca.case_id
 WHERE (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
-GROUP BY ca.id
+GROUP BY {$select}, ccc.contact_id
 {$this->toLimit($limit)}
 ";
     CRM_Core_DAO::executeQuery($sql);

@@ -172,8 +172,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     $query = "SELECT * FROM `civicrm_mailing_abtest` ab
       where (ab.mailing_id_a = %1
       OR ab.mailing_id_b = %1
-      OR ab.mailing_id_c = %1)
-      GROUP BY ab.id";
+      OR ab.mailing_id_c = %1)";
     $params = array(1 => array($mailingID, 'Integer'));
     $abTest = CRM_Core_DAO::executeQuery($query, $params);
     $abTest->fetch();

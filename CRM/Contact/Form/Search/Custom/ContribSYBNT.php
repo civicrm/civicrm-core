@@ -186,7 +186,7 @@ LEFT JOIN  civicrm_contribution contrib_1 ON contrib_1.contact_id = contact_a.id
 WHERE      contrib_1.contact_id = contact_a.id
 AND        contrib_1.is_test = 0
            $where
-GROUP BY   contact_a.id
+GROUP BY   contact_a.id, contact_a.display_name
            $having
 ORDER BY   donation_amount desc
 ";

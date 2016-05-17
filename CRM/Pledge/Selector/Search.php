@@ -169,7 +169,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
     );
 
     $this->_query->_distinctComponentClause = "civicrm_pledge.id";
-    $this->_query->_groupByComponentClause = " GROUP BY civicrm_pledge.id ";
+    $this->_query->_groupByComponentClause = " GROUP BY civicrm_pledge.id, civicrm_pledge.financial_type_id ";
   }
 
   /**
