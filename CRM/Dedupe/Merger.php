@@ -590,15 +590,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $batchLimit number of merges to carry out in one batch.
    * @param int $isSelected if records with is_selected column needs to be processed.
    *
+   * @param array $criteria
+   *   Criteria to use in the filter.
+   *
    * @return array|bool
    */
-  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2, $criteria = array()) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
     $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
-    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'));
+    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria);
 
     $cacheParams = array(
-      'cache_key_string' => self::getMergeCacheKeyString($rgid, $gid),
+      'cache_key_string' => self::getMergeCacheKeyString($rgid, $gid, $criteria),
       // @todo stop passing these parameters in & instead calculate them in the merge function based
       // on the 'real' params like $isRespectExclusions $batchLimit and $isSelected.
       'join' => self::getJoinOnDedupeTable(),
@@ -1978,20 +1981,22 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param bool $isSelected
    * @param array $orderByClause
    * @param bool $includeConflicts
+   * @param array $criteria
+   *   Additional criteria to narrow down the merge group.
    *
    * @return array
    *   Array of matches meeting the criteria.
    */
-  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE) {
+  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = array()) {
     $where = self::getWhereString($batchLimit, $isSelected);
-    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $includeConflicts);
+    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria);
     $join = self::getJoinOnDedupeTable();
     $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
     if (empty($dupePairs) && $reloadCacheIfEmpty) {
       // If we haven't found any dupes, probably cache is empty.
       // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
       // until we have done some processing.
-      CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString);
+      CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria);
       $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
       return $dupePairs;
     }
@@ -2003,14 +2008,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param int $rule_group_id
    * @param int $group_id
+   * @param array $criteria
+   *   Additional criteria to narrow down the merge group.
+   *   Currently we are only supporting the key 'contact' within it.
    *
    * @return string
    */
-  public static function getMergeCacheKeyString($rule_group_id, $group_id) {
+  public static function getMergeCacheKeyString($rule_group_id, $group_id, $criteria) {
     $contactType = CRM_Dedupe_BAO_RuleGroup::getContactTypeForRuleGroup($rule_group_id);
     $cacheKeyString = "merge {$contactType}";
     $cacheKeyString .= $rule_group_id ? "_{$rule_group_id}" : '_0';
     $cacheKeyString .= $group_id ? "_{$group_id}" : '_0';
+    $cacheKeyString .= !empty($criteria) ? serialize($criteria) : '_0';
     return $cacheKeyString;
   }
 

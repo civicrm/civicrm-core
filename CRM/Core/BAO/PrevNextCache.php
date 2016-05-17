@@ -336,15 +336,19 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
   }
 
   /**
+   * Repopulate the cache of merge prospects.
+   *
    * @param int $rgid
    * @param int $gid
    * @param NULL $cacheKeyString
+   * @param array $criteria
+   *   Additional criteria to filter by.
    *
    * @return bool
    */
-  public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL) {
+  public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL, $criteria = array()) {
     if (!$cacheKeyString && $rgid) {
-      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
+      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
     }
 
     if (!$cacheKeyString) {
@@ -364,7 +368,12 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
       $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid);
     }
     elseif ($rgid) {
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid);
+      $contactIDs = array();
+      if (!empty($criteria)) {
+        $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
+        $contactIDs = array_keys($contacts['values']);
+      }
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs);
     }
 
     if (!empty($foundDupes)) {
