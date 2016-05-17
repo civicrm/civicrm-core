@@ -576,7 +576,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1922, 1029, "CE", "Ceara"),
 (1923, 1029, "DF", "Distrito Federal"),
 (1924, 1029, "ES", "Espirito Santo"),
-(1925, 1029, "FN", "Fernando de Noronha"),
 (1926, 1029, "GO", "Goias"),
 (1927, 1029, "MA", "Maranhao"),
 (1928, 1029, "MG", "Minas Gerais"),
