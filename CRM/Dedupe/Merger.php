@@ -583,8 +583,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Group id.
    * @param string $mode
    *   Helps decide how to behave when there are conflicts.
-   *                              A 'safe' value skips the merge if there are any un-resolved conflicts.
-   *                              Does a force merge otherwise.
+   *   A 'safe' value skips the merge if there are any un-resolved conflicts, wheras 'aggressive'
+   *   mode does a force merge.
    * @param bool $autoFlip to let api decide which contact to retain and which to delete.
    *   Whether to let api decide which contact to retain and which to delete.
    * @param int $batchLimit number of merges to carry out in one batch.
