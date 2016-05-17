@@ -1502,6 +1502,35 @@ if (!CRM.vars) CRM.vars = {};
     return format.replace(/1.*234.*56/, result);
   };
 
+  /**
+   * Clientside currency unformatting
+   * @param number value
+   * @return string
+   */
+  CRM.unformatMoney = function(value) {
+    var decimal, result, format;
+    format = currencyTemplate;
+    result = /1(.?)234(.?)56/.exec(format);
+    if (result === null) {
+      return 'Invalid format passed to CRM.unformatMoney';
+    }
+
+    decimal = result[2];
+    value = value || 0;
+
+    // Return the value as it is, if already a number
+    if (typeof value === "number") return value;
+
+    var regex = new RegExp("[^0-9-" + decimal + "]", ["g"]),
+    unformatted = parseFloat(
+      ("" + value)
+      .replace(regex, '')      // strip
+      .replace(decimal, '.')   // make sure decimal point is standard
+    );
+
+    return !isNaN(unformatted) ? unformatted : 0;
+  };
+
   CRM.console = function(method, title, msg) {
     if (window.console) {
       method = $.isFunction(console[method]) ? method : 'log';
