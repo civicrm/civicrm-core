@@ -171,35 +171,86 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     );
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
 
-    $this->assertCacheMatches(
-      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
-      $group->id
-    );
-    $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
-    $this->assertEquals($group->cache_date, $afterGroup['cache_date']);
-    // we don't check for refresh_date here as it was not set when building the cache & it
-    // feels like it should have been.... but that is out of scope.
+    $this->assertCacheNotRefreshed($deceased, $group);
   }
 
   /**
-   * Test the opportunistic refresh cache function does not touch non-expired entries.
+   * Test the opportunistic refresh cache function does refresh stale entries.
    */
   public function testOpportunisticRefreshChangeIfCacheDateFieldStale() {
     list($group, $living, $deceased) = $this->setupSmartGroup();
     $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
     CRM_Core_DAO::executeQuery('UPDATE civicrm_group SET cache_date = DATE_SUB(NOW(), INTERVAL 7 MINUTE) WHERE id = ' . $group->id);
+    $group->find(TRUE);
     Civi::$statics['CRM_Contact_BAO_GroupContactCache']['is_refresh_init'] = FALSE;
     sleep(1);
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
 
-    $this->assertCacheMatches(
-      array(),
-      $group->id
-    );
+    $this->assertCacheRefreshed($group);
+  }
 
-    $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
-    $this->assertTrue(empty($afterGroup['cache_date']), 'refresh date should not be set as the cache is not built');
-    $this->assertTrue(empty($afterGroup['refresh_date']), 'refresh date should not be set as the cache is not built');
+  /**
+   * Test the opportunistic refresh cache function does refresh expired entries if mode is deterministic.
+   */
+  public function testOpportunisticRefreshNoChangeWithDeterministicSetting() {
+    list($group, $living, $deceased) = $this->setupSmartGroup();
+    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
+    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->makeCacheStale($group);
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+    $this->assertCacheNotRefreshed($deceased, $group);
+    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
+  }
+
+  /**
+   * Test the deterministic cache function refreshes with the deterministic setting.
+   */
+  public function testDeterministicRefreshChangeWithDeterministicSetting() {
+    list($group, $living, $deceased) = $this->setupSmartGroup();
+    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
+    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->makeCacheStale($group);
+    CRM_Contact_BAO_GroupContactCache::deterministicCacheRefresh();
+    $this->assertCacheRefreshed($group);
+    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
+  }
+
+  /**
+   * Test the deterministic cache function refresh doesn't mess up non-expired.
+   */
+  public function testDeterministicRefreshChangeDoesNotTouchNonExpired() {
+    list($group, $living, $deceased) = $this->setupSmartGroup();
+    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
+    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    CRM_Contact_BAO_GroupContactCache::deterministicCacheRefresh();
+    $this->assertCacheNotRefreshed($deceased, $group);
+    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
+  }
+
+  /**
+   * Test the deterministic cache function refreshes with the opportunistic setting.
+   *
+   * (hey it's an opportunity!).
+   */
+  public function testDeterministicRefreshChangeWithOpportunisticSetting() {
+    list($group, $living, $deceased) = $this->setupSmartGroup();
+    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
+    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->makeCacheStale($group);
+    CRM_Contact_BAO_GroupContactCache::deterministicCacheRefresh();
+    $this->assertCacheRefreshed($group);
+  }
+
+  /**
+   * Test the api job wrapper around the deterministic refresh works.
+   */
+  public function testJobWrapper() {
+    list($group, $living, $deceased) = $this->setupSmartGroup();
+    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
+    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->makeCacheStale($group);
+    $this->callAPISuccess('Job', 'group_cache_flush', array());
+    $this->assertCacheRefreshed($group);
   }
 
   // *** Everything below this should be moved to parent class ****
@@ -313,6 +364,49 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     );
     // Reload the group so we have the cache_date & refresh_date.
     return array($group, $living, $deceased);
+  }
+
+  /**
+   * @param $deceased
+   * @param $group
+   *
+   * @throws \Exception
+   */
+  protected function assertCacheNotRefreshed($deceased, $group) {
+    $this->assertCacheMatches(
+      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
+      $group->id
+    );
+    $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
+    $this->assertEquals($group->cache_date, $afterGroup['cache_date']);
+  }
+
+  /**
+   * Make the cache for the group stale, resetting it to before the timeout period.
+   *
+   * @param CRM_Contact_BAO_Group $group
+   */
+  protected function makeCacheStale(&$group) {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_group SET cache_date = DATE_SUB(NOW(), INTERVAL 7 MINUTE) WHERE id = ' . $group->id);
+    unset($group->cache_date);
+    $group->find(TRUE);
+    Civi::$statics['CRM_Contact_BAO_GroupContactCache']['is_refresh_init'] = FALSE;
+  }
+
+  /**
+   * @param $group
+   *
+   * @throws \Exception
+   */
+  protected function assertCacheRefreshed($group) {
+    $this->assertCacheMatches(
+      array(),
+      $group->id
+    );
+
+    $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
+    $this->assertTrue(empty($afterGroup['cache_date']), 'refresh date should not be set as the cache is not built');
+    $this->assertTrue(empty($afterGroup['refresh_date']), 'refresh date should not be set as the cache is not built');
   }
 
 }
