@@ -123,14 +123,14 @@
   </field>
   <field>
     <name>cache_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
     <title>Group Cache Date</title>
     <comment>Date when we created the cache for a smart group</comment>
     <add>2.1</add>
   </field>
   <field>
     <name>refresh_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
     <title>Next Group Refresh Time</title>
     <comment>Date and time when we need to refresh the cache next.</comment>
     <add>4.3</add>
