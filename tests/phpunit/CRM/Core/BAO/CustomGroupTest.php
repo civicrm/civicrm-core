@@ -57,7 +57,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * inconsistency.
    */
   public function testGetTreeContactSubType() {
-    $this->callAPISuccess('ContactType', 'create', array('name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization'));
+    $contactType = $this->callAPISuccess('ContactType', 'create', array('name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization'));
     $customGroup = $this->CustomGroupCreate(array('extends' => 'Organization', 'extends_entity_column_value' => array('Big_Bank')));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, array('Big_Bank'));
@@ -71,9 +71,24 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception $e) {
       $this->customGroupDelete($customGroup['id']);
+      $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType['id']));
       return;
     }
     $this->fail('There is no such thing as a small kind bank');
+  }
+
+  /**
+   * Test calling getTree for a custom field extending a renamed contact type.
+   */
+  public function testGetTreeContactSubTypeForNameChangedContactType() {
+    $contactType = $this->callAPISuccess('ContactType', 'create', array('name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization'));
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact_type SET label = "boo" WHERE name = "Organization"');
+    $customGroup = $this->CustomGroupCreate(array('extends' => 'Organization', 'extends_entity_column_value' => array('Big_Bank')));
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
+    $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, array('Big_Bank'));
+    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType['id']));
   }
 
   /**

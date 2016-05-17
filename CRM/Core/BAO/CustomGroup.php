@@ -636,7 +636,7 @@ ORDER BY civicrm_custom_group.weight,
       return $subType;
     }
     $contactTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_type'));
-    if ($entityType != 'Contact' && !in_array($entityType, $contactTypes['values'])) {
+    if ($entityType != 'Contact' && !array_key_exists($entityType, $contactTypes['values'])) {
       // Not quite sure if we want to fail this hard. But quiet ignore would be pretty bad too.
       // Am inclined to go with this for RC release & considering softening.
       throw new CRM_Core_Exception('Invalid Entity Filter');
