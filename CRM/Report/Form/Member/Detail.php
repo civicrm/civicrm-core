@@ -288,6 +288,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       }
     }
 
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 

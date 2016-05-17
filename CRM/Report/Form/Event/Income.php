@@ -99,15 +99,18 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $activeParticipantStatus = implode(',', $activeParticipantStatusIDArray);
     $activeparticipnatStutusLabel = implode(', ', $activeParticipantStatusLabelArray);
     $activeParticipantClause = " AND civicrm_participant.status_id IN ( $activeParticipantStatus ) ";
+    $select = array(
+      "civicrm_event.id as event_id",
+      "civicrm_event.title as event_title",
+      "civicrm_event.max_participants as max_participants",
+      "civicrm_event.start_date as start_date",
+      "civicrm_event.end_date as end_date",
+      "civicrm_option_value.label as event_type",
+      "civicrm_participant.fee_currency as currency",
+    );
 
     $sql = "
-            SELECT  civicrm_event.id                    as event_id,
-                    civicrm_event.title                 as event_title,
-                    civicrm_event.max_participants      as max_participants,
-                    civicrm_event.start_date            as start_date,
-                    civicrm_event.end_date              as end_date,
-                    civicrm_option_value.label          as event_type,
-                    civicrm_participant.fee_currency    as currency,
+            SELECT  " . implode(', ', $select) . ",
                     SUM(civicrm_participant.fee_amount) as total,
                     COUNT(civicrm_participant.id)       as participant
 
@@ -120,8 +123,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
             WHERE      civicrm_event.id IN( {$eventID})
 
-            GROUP BY   civicrm_event.id
-            ";
+            GROUP BY " . CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select);
 
     $eventDAO = CRM_Core_DAO::executeQuery($sql);
     $currency = array();
@@ -166,7 +168,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
             WHERE    civicrm_participant.event_id IN ( {$eventID}) AND
                      civicrm_participant.is_test  = 0
                      {$activeParticipantClause}
-            GROUP BY civicrm_participant.role_id, civicrm_participant.event_id
+            GROUP BY civicrm_participant.role_id, civicrm_participant.event_id, civicrm_participant.fee_currency
             ";
 
     $roleDAO = CRM_Core_DAO::executeQuery($role);

@@ -647,6 +647,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    */
   public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id";
+    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_activity']}.id");
   }
 
   /**
@@ -831,9 +832,10 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       }
     }
     $this->limit();
+    $groupByFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, 'civicrm_activity_id');
     $sql = "{$this->_select}
 FROM civireport_activity_temp_target tar
-GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}";
+GROUP BY civicrm_activity_id {$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
     $this->buildRows($sql, $rows);
 
     // format result set.

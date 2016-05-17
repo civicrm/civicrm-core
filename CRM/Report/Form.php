@@ -2663,6 +2663,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
     if (!empty($groupBys)) {
       $this->_groupBy = "GROUP BY " . implode(', ', $groupBys);
+      $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBys);
     }
   }
 
