@@ -322,22 +322,16 @@
   function toggleRecur( ) {
     var isRecur = cj('input[id="is_recur"]:checked');
     var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
+    if ( allowAutoRenew && cj("#auto_renew") ) {
+      showHideAutoRenew( null );
+    }
     if (isRecur.val() > 0) {
       cj('#recurHelp').show();
       cj('#amount_sum_label').text(ts('Regular amount'));
-      //get back to auto renew settings.
-      if ( allowAutoRenew && cj("#auto_renew") ) {
-        showHideAutoRenew( null );
-      }
     }
     else {
       cj('#recurHelp').hide();
       cj('#amount_sum_label').text(ts('Total amount'));
-      //disabled auto renew settings.
-      if ( allowAutoRenew && cj("#auto_renew") ) {
-        cj("#auto_renew").prop('checked', false );
-        cj('#allow_auto_renew').hide( );
-      }
     }
   }
 
