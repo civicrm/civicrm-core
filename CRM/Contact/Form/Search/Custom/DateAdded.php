@@ -163,7 +163,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
                        contact_a.contact_type as contact_type,
                        contact_a.sort_name    as sort_name,
                       d.date_added           as date_added";
-      $groupBy = " GROUP BY contact_id ";
+      $groupBy = " GROUP BY contact_id, contact_a.contact_type, contact_a.sort_name, d.date_added ";
     }
 
     return $this->sql($selectClause,
@@ -206,9 +206,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
               ON (civicrm_contact.id = civicrm_log.entity_id AND
                   civicrm_log.entity_table = 'civicrm_contact')
           GROUP BY
-              civicrm_contact.id
+              civicrm_contact.id, civicrm_log.modified_date
           HAVING
-              date_added >= '$startDate'
+              civicrm_log.modified_date >= '$startDate'
               $endDateFix";
 
     if ($this->_debug > 0) {

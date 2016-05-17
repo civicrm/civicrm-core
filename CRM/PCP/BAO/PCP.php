@@ -189,12 +189,12 @@ AND target_entity_id NOT IN ( " . implode(',', $entityIds) . ") )";
     }
 
     $query = "
-SELECT *
+SELECT block.target_entity_type, block.target_entity_id
 FROM civicrm_pcp_block block
 LEFT JOIN civicrm_pcp pcp ON pcp.pcp_block_id = block.id
 WHERE block.is_active = 1
 {$clause}
-GROUP BY block.id
+GROUP BY block.id, block.target_entity_type, block.target_entity_id
 ORDER BY target_entity_type, target_entity_id
 ";
     $pcpBlockDao = CRM_Core_DAO::executeQuery($query);

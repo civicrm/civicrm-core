@@ -195,7 +195,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     $where = $this->where($includeContactIDs);
 
     if (!$justIDs && !$this->_allSearch) {
-      $groupBy = " GROUP BY contact_a.id";
+      $groupBy = " GROUP BY contact_a.id, contact_a.contact_type, contact_a.sort_name";
     }
     else {
       // CRM-10850
