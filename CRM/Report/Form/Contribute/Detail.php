@@ -357,6 +357,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     //total_amount was affected by sum as it is considered as one of the stat field
     //so it is been replaced with correct alias, CRM-13833
     $this->_select = str_replace("sum({$this->_aliases['civicrm_contribution']}.total_amount)", "{$this->_aliases['civicrm_contribution']}.total_amount", $this->_select);
+    $this->_selectClauses = str_replace("sum({$this->_aliases['civicrm_contribution']}.total_amount)", "{$this->_aliases['civicrm_contribution']}.total_amount", $this->_selectClauses);
   }
 
   public function orderBy() {
@@ -456,7 +457,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.id ";
+    $groupBy = array("{$this->_aliases['civicrm_contact']}.id", "{$this->_aliases['civicrm_contribution']}.id");
+    $this->_groupBy = " GROUP BY " . implode(', ', $groupBy);
+    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   /**
@@ -591,6 +594,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $this->customDataFrom();
 
     $select = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_select);
+    $this->_groupBy = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_groupBy);
     $select = str_ireplace("'Contribution' as", "'Soft Credit' as", $select);
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
     $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy}";

@@ -399,6 +399,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       }
     }
 
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -536,12 +537,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
-      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy) .
-        " {$this->_rollup} ";
+      $groupBy = $this->_groupBy;
+      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
     }
     else {
+      $groupBy = "{$this->_aliases['civicrm_contact']}.id";
       $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id";
     }
+    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy .= $this->_rollup;
   }
 
   /**
@@ -610,8 +614,10 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     $groupBy = "\n{$group}, {$this->_aliases['civicrm_contribution']}.total_amount";
     $orderBy = "\nORDER BY civicrm_contribution_total_amount_count DESC";
-    $modeSQL = "SELECT civicrm_contribution_total_amount_count, amount, currency
-    FROM (SELECT {$this->_aliases['civicrm_contribution']}.total_amount as amount,
+    $modeSQL = "SELECT MAX(civicrm_contribution_total_amount_count) as civicrm_contribution_total_amount_count,
+      SUBSTRING_INDEX(GROUP_CONCAT(amount ORDER BY mode.civicrm_contribution_total_amount_count DESC SEPARATOR ';'), ';', 1) as amount,
+      currency
+      FROM (SELECT {$this->_aliases['civicrm_contribution']}.total_amount as amount,
     {$contriQuery} {$groupBy} {$orderBy}) as mode GROUP BY currency";
 
     $mode = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
