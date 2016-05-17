@@ -354,6 +354,39 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the batch merge by id range.
+   *
+   * We have 2 sets of 5 matches & set the merge only to merge the lower set.
+   */
+  public function testBatchMergeIDRange() {
+    for ($x = 0; $x <= 4; $x++) {
+      $id = $this->individualCreate(array('email' => 'batman@gotham.met'));
+    }
+    for ($x = 0; $x <= 4; $x++) {
+      $this->individualCreate(array('email' => 'robin@gotham.met'));
+    }
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('criteria' => array('contact' => array('id' => array('<' => $id)))));
+    $this->assertEquals(4, count($result['values']['merged']));
+    $this->callAPISuccessGetCount('Contact', array('email' => 'batman@gotham.met'), 1);
+    $this->callAPISuccessGetCount('Contact', array('email' => 'robin@gotham.met'), 5);
+    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'batman@gotham.met',
+      'contact_id' => array('IN' => array_keys($contacts['values'])),
+    ), 1);
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'batman@gotham.met',
+      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
+    ), 1);
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'robin@gotham.met',
+      'contact_id' => array('IN' => array_keys($contacts['values'])),
+    ), 5);
+
+  }
+
+  /**
    * Get data for batch merge.
    */
   public function getMergeSets() {
