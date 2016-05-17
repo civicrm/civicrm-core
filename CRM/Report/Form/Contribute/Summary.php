@@ -509,7 +509,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 !empty($this->_params['group_bys_freq'][$fieldName])
               ) {
 
-                $append = "YEAR({$field['dbAlias']}),";
+                $append = "YEAR({$field['dbAlias']});;";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
                   array('year')
                 )) {
@@ -537,15 +537,24 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
-      $groupBy = $this->_groupBy;
-      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
+      $groupBy = array();
+      foreach ($this->_groupBy as $key => $val) {
+        if (strpos($val, ';;') !== false) {
+          $groupBy = array_merge($groupBy, explode(';;', $val));
+        }
+        else {
+          $groupBy[] = $this->_groupBy[$key];
+        }
+      }
+      $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
     }
     else {
       $groupBy = "{$this->_aliases['civicrm_contact']}.id";
       $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id";
     }
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     $this->_groupBy .= $this->_rollup;
+    // append select with ANY_VALUE() keyword
+    $this->appendSelect($this->_selectClauses, $groupBy);
   }
 
   /**

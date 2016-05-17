@@ -280,7 +280,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       $groupBy = "{$this->_aliases['civicrm_contact']}.id";
       $this->_groupBy = "GROUP BY {$groupBy}";
     }
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->appendSelect($this->_selectClauses, $groupBy);
     $this->_groupBy .= " {$this->_rollup}";
   }
 

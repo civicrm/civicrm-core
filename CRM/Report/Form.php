@@ -2643,6 +2643,35 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * append select with ANY_VALUE() keyword.
+   *
+   * @param array $selectArray
+   * @param array $groupBy - Columns already included in GROUP By clause.
+   */
+  public function appendSelect($selectClauses, $groupBy) {
+    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    $sqlMode = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
+
+    // Disable only_full_group_by mode for lower sql versions.
+    if (version_compare($mysqlVersion, '5.7', '<') || (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', $sqlMode))) {
+      $key = array_search('ONLY_FULL_GROUP_BY', $sqlMode);
+      unset($sqlMode[$key]);
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlMode) . "'");
+      return;
+    }
+    $groupBy = array_map('trim', (array) $groupBy);
+    $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+    foreach ($selectClauses as $key => &$val) {
+      list($selectColumn, $alias) = array_pad(preg_split('/ as /i', $val), 2, NULL);
+      // append ANY_VALUE() keyword
+      if (!in_array($selectColumn, $groupBy) && preg_match($aggregateFunctions, trim($selectColumn)) !== 1) {
+        $val = str_replace($selectColumn, "ANY_VALUE({$selectColumn})", $val);
+      }
+    }
+    $this->_select = "SELECT " . implode(', ', $selectClauses) . " ";
+  }
+
+  /**
    * Build group by clause.
    */
   public function groupBy() {

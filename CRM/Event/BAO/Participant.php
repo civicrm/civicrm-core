@@ -1926,12 +1926,14 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 ";
       CRM_Core_DAO::executeQuery($updateLineItem);
 
+      $fiColumns = "fi.contact_id, fi.description, fi.amount, fi.currency,
+        fi.financial_account_id, fi.status_id, fi.entity_table, fi.entity_id";
       // gathering necessary info to record negative (deselected) financial_item
       $updateFinancialItem = "
-  SELECT fi.*, SUM(fi.amount) as differenceAmt, price_field_value_id, financial_type_id, tax_amount
+  SELECT {$fiColumns}, SUM(fi.amount) as differenceAmt, price_field_value_id, financial_type_id, tax_amount
     FROM civicrm_financial_item fi LEFT JOIN civicrm_line_item li ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId})
-GROUP BY li.entity_table, li.entity_id, price_field_value_id
+GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id, {$fiColumns}
 ";
       $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
       $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId, 'DESC', TRUE);
@@ -1943,9 +1945,7 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
       while ($updateFinancialItemInfoDAO->fetch()) {
         $updateFinancialItemInfoValues = (array) $updateFinancialItemInfoDAO;
         $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
-        // the below params are not needed
-        unset($updateFinancialItemInfoValues['id']);
-        unset($updateFinancialItemInfoValues['created_date']);
+
         // if not submitted and difference is not 0 make it negative
         if (!in_array($updateFinancialItemInfoValues['price_field_value_id'], $submittedFieldValueIds) && $updateFinancialItemInfoValues['differenceAmt'] != 0) {
           // INSERT negative financial_items
