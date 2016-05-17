@@ -203,6 +203,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
           $row['log_civicrm_entity_altered_contact'] = $row['log_civicrm_entity_altered_contact'] . " [{$entity}]";
         }
         if ($entity == 'Contact Merged') {
+          // We're looking at a merge activity created against the surviving
+          // contact record. There should be a single activity created against
+          // the deleted contact record, with this activity as parent.
           $deletedID = CRM_Core_DAO::singleValueQuery('
             SELECT GROUP_CONCAT(contact_id) FROM civicrm_activity_contact ac
             INNER JOIN civicrm_activity a
@@ -231,6 +234,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         $row['log_civicrm_entity_log_action'] = ts('Update');
       }
 
+      // For certain tables, we may want to look at an alternate column to
+      // determine which action to display, determined by the 'action_column'
+      // key of the entry in $this->_logTables.
       if ($newAction = $this->getEntityAction($row['log_civicrm_entity_id'],
         $row['log_civicrm_entity_log_conn_id'],
         $row['log_civicrm_entity_log_type'],
@@ -247,13 +253,16 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         $row = $this->addDetailReportLinksToRow($baseQueryCriteria, $row);
       }
 
+      // In the summary, we only want to show one row per entity type,
+      // connection ID, contact ID, and user ID, rolling up multiple
+      // related actions against the same entity.
       $key = $date . '_' .
         $row['log_civicrm_entity_log_type'] . '_' .
         // This ensures merge activities are not 'lost' by aggregation.
         // I would prefer not to lose other entities either but it's a balancing act as
         // described in https://issues.civicrm.org/jira/browse/CRM-12867 so adding this criteria
         // while hackish saves us from figuring out if the original decision is still good.
-        $isMerge .
+        $isMerge . '_' .
         $row['log_civicrm_entity_log_conn_id'] . '_' .
         $row['log_civicrm_entity_log_user_id'] . '_' .
         $row['log_civicrm_entity_altered_contact_id'];
