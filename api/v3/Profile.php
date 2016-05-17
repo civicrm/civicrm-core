@@ -364,6 +364,7 @@ function civicrm_api3_profile_apply($params) {
  */
 function _civicrm_api3_profile_apply_spec(&$params) {
   $params['profile_id']['api.required'] = 1;
+  $params['profile_id']['title'] = 'Profile ID';
 }
 
 /**

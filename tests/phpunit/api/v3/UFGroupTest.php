@@ -196,7 +196,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   }
 
   public function testUFGroupUpdateWithEmptyParams() {
-    $result = $this->callAPIFailure('uf_group', 'create', array(), 'Mandatory key(s) missing from params array: version, title');
+    $result = $this->callAPIFailure('uf_group', 'create', array(), 'Mandatory key(s) missing from params array: title');
   }
 
   public function testUFGroupDelete() {
