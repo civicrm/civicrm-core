@@ -1041,6 +1041,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Fix the Location Fields.
    *
+   * @todo Reconcile with the contribution method formatParamsForPaymentProcessor
+   * rather than adding different logic to check when to keep the billing
+   * fields. There might be a difference in handling guest/multiple
+   * participants though.
+   *
    * @param array $params
    * @param array $fields
    * @param CRM_Core_Form $form
@@ -1054,10 +1059,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // If there's no 'first_name' in the profile then overwrite the names from
     // the billing fields (if they are set)
-    // @todo Reconcile with the contribution method formatParamsForPaymentProcessor
-    // rather than adding different logic to check when to keep the billing
-    // fields. There might be a difference in handling guest/multiple
-    // participants though.
     if (is_array($fields)) {
       if (!array_key_exists('first_name', $fields)) {
         $nameFields = array('first_name', 'middle_name', 'last_name');
