@@ -5142,6 +5142,13 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $value = $value[$op];
       }
 
+      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
+
+      // handle IS NULL / IS NOT NULL / IS EMPTY / IS NOT EMPTY
+      if ($this->nameNullOrEmptyOp($fieldName, $op, $grouping)) {
+        return;
+      }
+
       $date = $format = NULL;
       if (strstr($op, 'IN')) {
         $format = array();
@@ -5162,13 +5169,6 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         }
         $format = CRM_Utils_Date::customFormat($date);
         $date = "'$date'";
-      }
-
-      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
-
-      // handle IS NULL / IS NOT NULL / IS EMPTY / IS NOT EMPTY
-      if ($this->nameNullOrEmptyOp($fieldName, $op, $grouping)) {
-        return;
       }
 
       if ($date) {
