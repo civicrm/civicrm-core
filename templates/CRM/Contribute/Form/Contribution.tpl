@@ -608,11 +608,14 @@ function showStartDate( ) {
 }
 
 {/literal}{/if}{literal}
+var thousandMarker = "{/literal}{$config->monetaryThousandSeparator}{literal}";
+var separator = "{/literal}{$config->monetaryDecimalPoint}{literal}";
+
 cj('#fee_amount').change( function() {
-  var totalAmount = cj('#total_amount').val();
-  var feeAmount = cj('#fee_amount').val();
-  var netAmount = totalAmount.replace(/,/g, '') - feeAmount.replace(/,/g, '');
-  if (!cj('#net_amount').val() && totalAmount) {
+  var totalAmount = cj('#total_amount').val().replace(thousandMarker,'').replace(separator,'.');
+  var feeAmount = cj('#fee_amount').val().replace(thousandMarker,'').replace(separator,'.');
+  var netAmount = totalAmount - feeAmount;
+  if (totalAmount) {
     cj('#net_amount').val(CRM.formatMoney(netAmount, true));
   }
 });
@@ -650,16 +653,14 @@ CRM.$(function($) {
           cj("#totalTaxAmount").show( );
         }
         var totalAmount = $('#total_amount').val();
-        var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
-        var seperator = '{/literal}{$config->monetaryDecimalPoint}{literal}';
-        // replace all thousandMarker and change the seperator to a dot
-  totalAmount = totalAmount.replace(thousandMarker,'').replace(seperator,'.');
+        // replace all thousandMarker and change the separator to a dot
+        totalAmount = totalAmount.replace(thousandMarker,'').replace(separator,'.');
 
         var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
         var taxAmount = (taxRate/100)*totalAmount;
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         var totalTaxAmount = taxAmount + Number(totalAmount);
-        totalTaxAmount = formatMoney( totalTaxAmount, 2, seperator, thousandMarker );
+        totalTaxAmount = formatMoney( totalTaxAmount, 2, separator, thousandMarker );
 
         $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
       }
