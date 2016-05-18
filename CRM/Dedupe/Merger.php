@@ -590,15 +590,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $batchLimit number of merges to carry out in one batch.
    * @param int $isSelected if records with is_selected column needs to be processed.
    *
+   * @param array $criteria
+   *   Criteria to use in the filter.
+   *
    * @return array|bool
    */
-  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2, $criteria = array()) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
     $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
-    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'));
+    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria);
 
     $cacheParams = array(
-      'cache_key_string' => self::getMergeCacheKeyString($rgid, $gid),
+      'cache_key_string' => self::getMergeCacheKeyString($rgid, $gid, $criteria),
       // @todo stop passing these parameters in & instead calculate them in the merge function based
       // on the 'real' params like $isRespectExclusions $batchLimit and $isSelected.
       'join' => self::getJoinOnDedupeTable(),
@@ -730,9 +733,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // doNotResetCache flag
     $config = CRM_Core_Config::singleton();
     $config->doNotResetCache = 1;
+    $deletedContacts = array();
 
     while (!empty($dupePairs)) {
-      foreach ($dupePairs as $dupes) {
+      foreach ($dupePairs as $index => $dupes) {
+        if (in_array($dupes['dstID'], $deletedContacts) || in_array($dupes['srcID'], $deletedContacts)) {
+          unset($dupePairs[$index]);
+          continue;
+        }
         CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
         $mainId = $dupes['dstID'];
         $otherId = $dupes['srcID'];
@@ -763,6 +771,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
           CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo);
           $resultStats['merged'][] = array('main_id' => $mainId, 'other_id' => $otherId);
+          $deletedContacts[] = $otherId;
         }
         else {
           $resultStats['skipped'][] = array('main_id' => $mainId, 'other_id' => $otherId);
@@ -829,11 +838,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = array()) {
 
-    $migrationData = array(
-      'old_migration_info' => $migrationInfo,
-      'mode' => $mode,
-    );
-
+    $originalMigrationInfo = $migrationInfo;
     foreach ($migrationInfo as $key => $val) {
       if ($val === "null") {
         // Rule: Never overwrite with an empty value (in any mode)
@@ -890,12 +895,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // there's a conflict (to handle "gotchas"). fields_in_conflict could be modified here
     // merge happens with new values filled in here. For a particular field / row not to be merged
     // field should be unset from fields_in_conflict.
-    $migrationData['fields_in_conflict'] = $conflicts;
-    $migrationData['merge_mode']         = $mode;
+    $migrationData = array(
+      'old_migration_info' => $originalMigrationInfo,
+      'mode' => $mode,
+      'fields_in_conflict' => $conflicts,
+      'merge_mode' => $mode,
+      'migration_info' => $migrationInfo,
+    );
     CRM_Utils_Hook::merge('batch', $migrationData, $mainId, $otherId);
     $conflicts = $migrationData['fields_in_conflict'];
     // allow hook to override / manipulate migrationInfo as well
-    $migrationInfo = $migrationData['old_migration_info'];
+    $migrationInfo = $migrationData['migration_info'];
 
     if (!empty($conflicts)) {
       foreach ($conflicts as $key => $val) {
@@ -1019,7 +1029,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       // CRM-18480: Cancel the process if the contact is already deleted
       if (isset($result['values'][$cid]['contact_is_deleted']) && !empty($result['values'][$cid]['contact_is_deleted'])) {
-        CRM_Core_Error::fatal(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(1 => $moniker, 2 => $cid)));
+        throw new CRM_Core_Exception(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(1 => $moniker, 2 => $cid)));
       }
 
       $$moniker = $result['values'][$cid];
@@ -1977,20 +1987,22 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param bool $isSelected
    * @param array $orderByClause
    * @param bool $includeConflicts
+   * @param array $criteria
+   *   Additional criteria to narrow down the merge group.
    *
    * @return array
    *   Array of matches meeting the criteria.
    */
-  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE) {
+  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = array()) {
     $where = self::getWhereString($batchLimit, $isSelected);
-    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $includeConflicts);
+    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria);
     $join = self::getJoinOnDedupeTable();
     $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
     if (empty($dupePairs) && $reloadCacheIfEmpty) {
       // If we haven't found any dupes, probably cache is empty.
       // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
       // until we have done some processing.
-      CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString);
+      CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria);
       $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
       return $dupePairs;
     }
@@ -2002,14 +2014,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param int $rule_group_id
    * @param int $group_id
+   * @param array $criteria
+   *   Additional criteria to narrow down the merge group.
+   *   Currently we are only supporting the key 'contact' within it.
    *
    * @return string
    */
-  public static function getMergeCacheKeyString($rule_group_id, $group_id) {
+  public static function getMergeCacheKeyString($rule_group_id, $group_id, $criteria) {
     $contactType = CRM_Dedupe_BAO_RuleGroup::getContactTypeForRuleGroup($rule_group_id);
     $cacheKeyString = "merge {$contactType}";
     $cacheKeyString .= $rule_group_id ? "_{$rule_group_id}" : '_0';
     $cacheKeyString .= $group_id ? "_{$group_id}" : '_0';
+    $cacheKeyString .= !empty($criteria) ? serialize($criteria) : '_0';
     return $cacheKeyString;
   }
 
