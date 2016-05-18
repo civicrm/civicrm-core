@@ -1657,6 +1657,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'displayName:::Mr. Anthony Anderson II',
       'contributionPageId:::' . $contributionPageResult['id'],
       'title:::' . $contributionPageParams['title'],
+      'amount:::' . $params['amount'],
     ));
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
