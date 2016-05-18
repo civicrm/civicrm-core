@@ -2410,9 +2410,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     if (!$componentId || $allow) {
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
       // Account for possibility of activity not having a source contact (as it may have been deleted).
-      if ($sourceContactId) {
-        $allow = CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission);
-      }
+      $allow = $sourceContactId ? CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission) : TRUE;
     }
 
     // Check for target and assignee contacts.
