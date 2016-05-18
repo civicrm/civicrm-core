@@ -192,9 +192,12 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @param string $rev
    */
-  public function upgrade_4_7_5($rev) {
+  public function upgrade_4_7_7($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask('Upgrade mailing foreign key constraints', 'upgradeMailingFKs');
+    // https://issues.civicrm.org/jira/browse/CRM-18006
+    if (CRM_Core_DAO::checkTableExists('civicrm_install_canary')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_install_canary ENGINE=InnoDB');
+    }
   }
 
   /**
@@ -202,12 +205,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @param string $rev
    */
-  public function upgrade_4_7_7($rev) {
+  public function upgrade_4_7_8($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    // https://issues.civicrm.org/jira/browse/CRM-18006
-    if (CRM_Core_DAO::checkTableExists('civicrm_install_canary')) {
-      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_install_canary ENGINE=InnoDB');
-    }
+    $this->addTask('Upgrade mailing foreign key constraints', 'upgradeMailingFKs');
   }
 
   /*
