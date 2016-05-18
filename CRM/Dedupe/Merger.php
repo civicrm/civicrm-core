@@ -829,11 +829,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = array()) {
 
-    $migrationData = array(
-      'old_migration_info' => $migrationInfo,
-      'mode' => $mode,
-    );
-
+    $originalMigrationInfo = $migrationInfo;
     foreach ($migrationInfo as $key => $val) {
       if ($val === "null") {
         // Rule: Never overwrite with an empty value (in any mode)
@@ -890,12 +886,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // there's a conflict (to handle "gotchas"). fields_in_conflict could be modified here
     // merge happens with new values filled in here. For a particular field / row not to be merged
     // field should be unset from fields_in_conflict.
-    $migrationData['fields_in_conflict'] = $conflicts;
-    $migrationData['merge_mode']         = $mode;
+    $migrationData = array(
+      'old_migration_info' => $originalMigrationInfo,
+      'mode' => $mode,
+      'fields_in_conflict' => $conflicts,
+      'merge_mode' => $mode,
+      'migration_info' => $migrationInfo,
+    );
     CRM_Utils_Hook::merge('batch', $migrationData, $mainId, $otherId);
     $conflicts = $migrationData['fields_in_conflict'];
     // allow hook to override / manipulate migrationInfo as well
-    $migrationInfo = $migrationData['old_migration_info'];
+    $migrationInfo = $migrationData['migration_info'];
 
     if (!empty($conflicts)) {
       foreach ($conflicts as $key => $val) {
