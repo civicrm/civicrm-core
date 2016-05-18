@@ -658,7 +658,7 @@ ORDER BY civicrm_custom_group.weight,
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
     $subTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_sub_type'));
-    if (!isset($subTypes['values'][$subType])) {
+    if (!array_key_exists($subType, $subTypes['values'])) {
       // Same comments about fail hard as above.
       throw new CRM_Core_Exception('Invalid Filter');
     }
