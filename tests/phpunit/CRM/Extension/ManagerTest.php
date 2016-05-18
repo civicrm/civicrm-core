@@ -105,6 +105,86 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   }
 
   /**
+   * This is the same as testInstall_Disable_Uninstall, but we also install and remove a dependency.
+   *
+   * @throws \CRM_Extension_Exception
+   */
+  public function test_InstallAuto_DisableDownstream_UninstallDownstream() {
+    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $manager = $this->_createManager(array(
+      self::TESTING_TYPE => $testingTypeManager,
+    ));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
+    $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
+    $this->assertEquals(array('test.foo.bar', 'test.foo.downstream'),
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $manager->install(
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->once())->method('onPreDisable');
+    $testingTypeManager->expects($this->once())->method('onPostDisable');
+    $this->assertEquals(array('test.foo.downstream'),
+      $manager->findDisableRequirements(array('test.foo.downstream')));
+    $manager->disable(array('test.foo.downstream'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('disabled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->once())->method('onPreUninstall');
+    $testingTypeManager->expects($this->once())->method('onPostUninstall');
+    $manager->uninstall(array('test.foo.downstream'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+  }
+
+  public function test_InstallAuto_DisableUpstream() {
+    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $manager = $this->_createManager(array(
+      self::TESTING_TYPE => $testingTypeManager,
+    ));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
+    $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
+    $this->assertEquals(array('test.foo.bar', 'test.foo.downstream'),
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $manager->install(
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->never())->method('onPreDisable');
+    $testingTypeManager->expects($this->never())->method('onPostDisable');
+    $this->assertEquals(array('test.foo.downstream', 'test.foo.bar'),
+      $manager->findDisableRequirements(array('test.foo.bar')));
+
+    try {
+      $manager->disable(array('test.foo.bar'));
+      $this->fail('Expected disable to fail due to dependency');
+    }
+    catch (CRM_Extension_Exception $e) {
+      $this->assertRegExp('/test.foo.downstream/', $e->getMessage());
+    }
+
+    // Status unchanged
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+  }
+
+
+  /**
    * Install an extension and then harshly remove the underlying source.
    * Subseuently disable and uninstall.
    */
@@ -420,6 +500,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     mkdir("$basedir/weird/whizbang");
     file_put_contents("$basedir/weird/whizbang/info.xml", "<extension key='test.whiz.bang' type='" . self::TESTING_TYPE . "'><file>oddball</file></extension>");
     // not needed for now // file_put_contents("$basedir/weird/whizbang/oddball.php", "<?php\n");
+    mkdir("$basedir/weird/downstream");
+    file_put_contents("$basedir/weird/downstream/info.xml", "<extension key='test.foo.downstream' type='" . self::TESTING_TYPE . "'><file>oddball</file><requires><ext>test.foo.bar</ext></requires></extension>");
+    // not needed for now // file_put_contents("$basedir/weird/downstream/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir, 'http://example/basedir', $cache, $cacheKey);
     return array($basedir, $c);
   }

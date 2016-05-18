@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6d663f79b264d072ee699147bc572115",
-    "content-hash": "9d0da097291dbad481650b039869f719",
+    "hash": "0ca998c104ff0a9bca9ec0ad584d7af3",
+    "content-hash": "4ed00f05170a410f80edc258a60fd5e4",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -87,6 +87,46 @@
             "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
             "homepage": "https://github.com/dompdf/dompdf",
             "time": "2015-12-07 04:07:13"
+        },
+        {
+            "name": "marcj/topsort",
+            "version": "dev-1.0-php53",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/totten/topsort.php.git",
+                "reference": "2765723d36f0e536d987e42cbc60de52209212bd"
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "dev-master",
+                "phpunit/phpunit": "~4.0",
+                "symfony/console": "~2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MJS\\TopSort\\": "src/",
+                    "MJS\\TopSort\\Tests\\": "tests/Tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marc J. Schmidt",
+                    "email": "marc@marcjschmidt.de"
+                }
+            ],
+            "description": "High-Performance TopSort/Dependency resolving algorithm",
+            "keywords": [
+                "dependency resolving",
+                "topological sort",
+                "topsort"
+            ],
+            "time": "2016-03-25 21:38:05"
         },
         {
             "name": "phenx/php-font-lib",
@@ -269,7 +309,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "url": "https://api.github.com/repos/symfony/config/zipball/d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
                 "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e",
                 "shasum": ""
             },
@@ -788,7 +828,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "zetacomponents/mail": 20
+        "zetacomponents/mail": 20,
+        "marcj/topsort": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
