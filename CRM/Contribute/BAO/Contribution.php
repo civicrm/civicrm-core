@@ -2576,10 +2576,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $values['softContributions'] = $softContributions['soft_credit'];
       }
       if (isset($this->contribution_page_id)) {
-        CRM_Contribute_BAO_ContributionPage::setValues(
-          $this->contribution_page_id,
-          $values
-        );
+        $values = $this->addContributionPageValuesToValuesHeavyHandedly($values);
         if ($this->contribution_page_id) {
           // CRM-8254 - override default currency if applicable
           $config = CRM_Core_Config::singleton();
@@ -4954,6 +4951,87 @@ LIMIT 1;";
       );
     }
     return $prevFinancialItem->financial_account_id;
+  }
+
+  /**
+   * ContributionPage values were being imposed onto values.
+   *
+   * I have made this explicit and removed the couple (is_recur, is_pay_later) we
+   * REALLY didn't want superimposed. The rest are left there in their overkill out
+   * of cautiousness.
+   *
+   * The rationale for making this explicit is that it was a case of carefully set values being
+   * seemingly randonly overwritten without much care. In general I think array randomly setting
+   * variables en mass is risky.
+   *
+   * @param array $values
+   *
+   * @return array
+   */
+  protected function addContributionPageValuesToValuesHeavyHandedly(&$values) {
+    $contributionPageValues = array();
+    CRM_Contribute_BAO_ContributionPage::setValues(
+      $this->contribution_page_id,
+      $contributionPageValues
+    );
+    $valuesToCopy = array(
+      // These are the values that I believe to be useful.
+      'title',
+      'is_email_receipt',
+      'pay_later_receipt',
+      'pay_later_text',
+      'receipt_from_email',
+      'receipt_from_name',
+      'receipt_text',
+      'custom_pre_id',
+      'custom_post_id',
+      'honoree_profile_id',
+      'onbehalf_profile_id',
+      'honor_block_is_active',
+      // Kinda might be - but would be on the contribution...
+      'campaign_id',
+      'currency',
+      // Included for 'fear of regression' but can't justify any use for these....
+      'intro_text',
+      'payment_processor',
+      'financial_type_id',
+      'amount_block_is_active',
+      'bcc_receipt',
+      'cc_receipt',
+      'created_date',
+      'created_id',
+      'default_amount_id',
+      'end_date',
+      'footer_text',
+      'goal_amount',
+      'initial_amount_help_text',
+      'initial_amount_label',
+      'intro_text',
+      'is_allow_other_amount',
+      'is_billing_required',
+      'is_confirm_enabled',
+      'is_credit_card_only',
+      'is_monetary',
+      'is_partial_payment',
+      'is_recur_installments',
+      'is_recur_interval',
+      'is_share',
+      'max_amount',
+      'min_amount',
+      'min_initial_amount',
+      'recur_frequency_unit',
+      'start_date',
+      'thankyou_footer',
+      'thankyou_text',
+      'thankyou_title',
+
+    );
+    foreach ($valuesToCopy as $valueToCopy) {
+      if (isset($contributionPageValues[$valueToCopy])) {
+        $values[$valueToCopy] = $contributionPageValues[$valueToCopy];
+      }
+    }
+    return $values;
   }
 
 }
