@@ -773,4 +773,61 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
   }
 
+  /**
+   * Test activity amount updation.
+   */
+  public function testActivityCreate() {
+    $contactId = $this->individualCreate();
+    $defaults = array();
+
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 1,
+      'payment_instrument_id' => 1,
+      'source' => 'STUDENT',
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'non_deductible_amount' => 0.00,
+      'total_amount' => 100.00,
+      'trxn_id' => '22ereerwww444444',
+      'invoice_id' => '86ed39c9e9ee6ef6031621ce0eafe7eb81',
+      'thankyou_date' => '20160519',
+    );
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+
+    $this->assertEquals($params['total_amount'], $contribution->total_amount, 'Check for total amount in contribution.');
+    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+
+    // Check amount in activity.
+    $activityParams = array(
+      'source_record_id' => $contribution->id,
+      'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
+        'Contribution',
+        'name'
+      ),
+    );
+    $activity = CRM_Activity_BAO_Activity::retrieve($activityParams, $defaults);
+
+    $this->assertEquals($contribution->id, $activity->source_record_id, 'Check for activity associated with contribution.');
+    $this->assertEquals("$ 100.00 - STUDENT", $activity->subject, 'Check for total amount in activity.');
+
+    // Update contribution amount.
+    $ids = array('contribution' => $contribution->id);
+    $params['total_amount'] = 200;
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+
+    $this->assertEquals($params['total_amount'], $contribution->total_amount, 'Check for total amount in contribution.');
+    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+
+    // Retrieve activity again.
+    $activity = CRM_Activity_BAO_Activity::retrieve($activityParams, $defaults);
+
+    $this->assertEquals($contribution->id, $activity->source_record_id, 'Check for activity associated with contribution.');
+    $this->assertEquals("$ 200.00 - STUDENT", $activity->subject, 'Check for total amount in activity.');
+  }
+
 }
