@@ -435,7 +435,7 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
       foreach ($subTypes as $key => $subType) {
         // CRM-18559: the value returned from validateSubTypeByEntity does not
         // include value separators, so they need to be added for the query.
-        $subTypeClauses[] = "civicrm_custom_group.extends_entity_column_value LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . self::validateSubTypeByEntity($entityType, $subType) . CRM_Core_DAO::VALUE_SEPARATOR . "%'";
+        $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", self::validateSubTypeByEntity($entityType, $subType));
       }
       $subTypeClause = '(' .  implode(' OR ', $subTypeClauses) . ')';
       if (!$onlySubType) {
@@ -649,6 +649,22 @@ ORDER BY civicrm_custom_group.weight,
       throw new CRM_Core_Exception('Invalid Filter');
     }
     return $subType;
+  }
+
+  /**
+   * Suppose you have a SQL column, $column, which includes a delimited list, and you want
+   * a WHERE condition for rows that include $value. Use whereListHas().
+   *
+   * @param string $column
+   * @param string $value
+   * @param string $delimiter
+   * @return string
+   *   SQL condition.
+   */
+  static private function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
+    $bareValue = trim($value, $delimiter); // ?
+    $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
+    return "($column LIKE \"$escapedValue\")";
   }
 
   /**
