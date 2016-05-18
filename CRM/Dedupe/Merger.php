@@ -733,9 +733,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // doNotResetCache flag
     $config = CRM_Core_Config::singleton();
     $config->doNotResetCache = 1;
+    $deletedContacts = array();
 
     while (!empty($dupePairs)) {
-      foreach ($dupePairs as $dupes) {
+      foreach ($dupePairs as $index => $dupes) {
+        if (in_array($dupes['dstID'], $deletedContacts) || in_array($dupes['srcID'], $deletedContacts)) {
+          unset($dupePairs[$index]);
+          continue;
+        }
         CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
         $mainId = $dupes['dstID'];
         $otherId = $dupes['srcID'];
@@ -766,6 +771,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
           CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo);
           $resultStats['merged'][] = array('main_id' => $mainId, 'other_id' => $otherId);
+          $deletedContacts[] = $otherId;
         }
         else {
           $resultStats['skipped'][] = array('main_id' => $mainId, 'other_id' => $otherId);
@@ -1023,7 +1029,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       // CRM-18480: Cancel the process if the contact is already deleted
       if (isset($result['values'][$cid]['contact_is_deleted']) && !empty($result['values'][$cid]['contact_is_deleted'])) {
-        CRM_Core_Error::fatal(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(1 => $moniker, 2 => $cid)));
+        throw new CRM_Core_Exception(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(1 => $moniker, 2 => $cid)));
       }
 
       $$moniker = $result['values'][$cid];
