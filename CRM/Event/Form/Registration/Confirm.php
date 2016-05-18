@@ -1041,6 +1041,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Fix the Location Fields.
    *
+   * @todo Reconcile with the contribution method formatParamsForPaymentProcessor
+   * rather than adding different logic to check when to keep the billing
+   * fields. There might be a difference in handling guest/multiple
+   * participants though.
+   *
    * @param array $params
    * @param array $fields
    * @param CRM_Core_Form $form
@@ -1052,6 +1057,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
+    // If there's no 'first_name' in the profile then overwrite the names from
+    // the billing fields (if they are set)
     if (is_array($fields)) {
       if (!array_key_exists('first_name', $fields)) {
         $nameFields = array('first_name', 'middle_name', 'last_name');
@@ -1065,11 +1072,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    // also add location name to the array
-    if ($form->_values['event']['is_monetary']) {
+    // Add the billing names to the billing address, if a billing name is set
+    if (!empty($params['billing_first_name'])) {
       $params["address_name-{$form->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
       $fields["address_name-{$form->_bltID}"] = 1;
     }
+
     $fields["email-{$form->_bltID}"] = 1;
     $fields['email-Primary'] = 1;
 
