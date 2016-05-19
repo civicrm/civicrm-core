@@ -667,7 +667,7 @@ LIMIT {$offset}, {$rowCount}
       $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
     }
 
-    $cacheKeyString   = "merge {$contactType}_{$rgid}_{$gid}";
+    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
     $searchRows       = array();
     $selectorElements = array('is_selected', 'is_selected_input', 'src_image', 'src', 'src_email', 'src_street', 'src_postcode', 'dst_image', 'dst', 'dst_email', 'dst_street', 'dst_postcode', 'conflicts', 'weight', 'actions');
 
