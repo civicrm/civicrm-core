@@ -137,6 +137,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $this->_defaults = array();
     $this->_defaults['amount'] = $this->_subscriptionDetails->amount;
     $this->_defaults['installments'] = $this->_subscriptionDetails->installments;
+
+    $this->_defaults['campaign_id'] = $this->_subscriptionDetails->campaign_id;
+    $this->_defaults['financial_type_id'] = $this->_subscriptionDetails->financial_type_id;
     $this->_defaults['is_notify'] = 1;
 
     return $this->_defaults;
@@ -165,7 +168,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     }
 
     if (CRM_Core_Permission::check('edit contributions')) {
-      CRM_Campaign_BAO_Campaign::addCampaign($this, $this->_subscriptionDetails->campaign_id);
+      CRM_Campaign_BAO_Campaign::addCampaign($this);
     }
 
     if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->_crid)) {

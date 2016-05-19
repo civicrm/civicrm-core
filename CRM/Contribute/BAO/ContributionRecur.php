@@ -374,7 +374,9 @@ SELECT rec.id                   as recur_id,
        rec.is_test,
        rec.auto_renew,
        rec.currency,
-       con.id                   as contribution_id,
+       rec.campaign_id,
+       rec.financial_type_id,
+       con.id as contribution_id,
        con.contribution_page_id,
        rec.contact_id,
        mp.membership_id";
@@ -408,7 +410,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       return $dao;
     }
     else {
-      return CRM_Core_DAO::$_nullObject;
+      return NULL;
     }
   }
 
