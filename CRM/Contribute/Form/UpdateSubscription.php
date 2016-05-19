@@ -77,6 +77,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    */
   public function preProcess() {
 
+    $this->setAction(CRM_Core_Action::UPDATE);
+
     $this->contributionRecurID = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->contributionRecurID) {
       $this->_paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($this->contributionRecurID);
