@@ -169,7 +169,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
       $group->id
     );
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     $this->assertCacheNotRefreshed($deceased, $group);
   }
@@ -184,7 +184,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $group->find(TRUE);
     Civi::$statics['CRM_Contact_BAO_GroupContactCache']['is_refresh_init'] = FALSE;
     sleep(1);
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     $this->assertCacheRefreshed($group);
   }
@@ -197,7 +197,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
     $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
     $this->makeCacheStale($group);
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
     $this->assertCacheNotRefreshed($deceased, $group);
     $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
   }
@@ -210,7 +210,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
     $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
     $this->makeCacheStale($group);
-    CRM_Contact_BAO_GroupContactCache::deterministicCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
     $this->assertCacheRefreshed($group);
     $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
   }
@@ -222,7 +222,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     list($group, $living, $deceased) = $this->setupSmartGroup();
     $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
     $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
-    CRM_Contact_BAO_GroupContactCache::deterministicCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
     $this->assertCacheNotRefreshed($deceased, $group);
     $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
   }
@@ -237,7 +237,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
     $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
     $this->makeCacheStale($group);
-    CRM_Contact_BAO_GroupContactCache::deterministicCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
     $this->assertCacheRefreshed($group);
   }
 

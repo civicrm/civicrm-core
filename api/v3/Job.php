@@ -657,7 +657,7 @@ function civicrm_api3_job_group_rebuild($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_job_group_cache_flush($params) {
-  CRM_Contact_BAO_GroupContactCache::deterministicCacheRefresh();
+  CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
   return civicrm_api3_create_success();
 }
 
