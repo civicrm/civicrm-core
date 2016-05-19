@@ -147,26 +147,26 @@ class CRM_Core_DAO extends DB_DataObject {
       if ($fkDAO->find(TRUE)) {
         $this->$dbName = $fkDAO->id;
       }
-      unset($fkDAO);
+      $fkDAO->free();
     }
 
     elseif (in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)) {
       $depObject = new $FKClassName();
       $depObject->find(TRUE);
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
     elseif ($daoName == 'CRM_Member_DAO_MembershipType' && $fieldName == 'member_of_contact_id') {
       // FIXME: the fields() metadata is not specific enough
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, array('contact_type' => 'Organization'));
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
     else {
       //if it is required we need to generate the dependency object first
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, CRM_Utils_Array::value($dbName, $params, 1));
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
   }
 
@@ -520,6 +520,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
     \Civi::service('dispatcher')->dispatch("DAO::post-delete", $event);
+    $this->free();
 
     return $result;
   }
