@@ -53,7 +53,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
    * @return array
    */
   public static function internal($rg) {
-    $query = "
+    $query = self::filterQueryByContactList($rg->contactIds, "
             SELECT contact1.id as id1, contact2.id as id2, {$rg->threshold} as weight
             FROM civicrm_contact as contact1
               JOIN civicrm_email as email1 ON email1.contact_id=contact1.id
@@ -63,8 +63,8 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
               JOIN civicrm_email as email2 ON
                 email2.contact_id=contact2.id AND
                 email1.email=email2.email
-            WHERE contact1.contact_type = 'Individual'
-              AND " . self::internalFilters($rg);
+            WHERE contact1.contact_type = 'Individual'");
+
     return array(
       "civicrm_contact.{$rg->name}.{$rg->threshold}" => $query,
     );
