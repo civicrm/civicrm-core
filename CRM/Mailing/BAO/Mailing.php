@@ -749,7 +749,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   /**
    * Retrieve a ref to an array that holds the email and text templates for this email
    * assembles the complete template including the header and footer
-   * that the user has uploaded or declared (if they have dome that)
+   * that the user has uploaded or declared (if they have done that)
    *
    * @return array
    *   reference to an assoc array

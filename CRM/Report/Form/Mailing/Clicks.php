@@ -292,7 +292,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     }
 
     $chartInfo = array(
-      'legend' => ts('Mail Clickthrough Report'),
+      'legend' => ts('Mail Click-Through Report'),
       'xname' => ts('Mailing'),
       'yname' => ts('Clicks'),
       'xLabelAngle' => 20,

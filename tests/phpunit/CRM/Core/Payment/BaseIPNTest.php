@@ -269,7 +269,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function testsendMailParticipantObjectsCheckLog() {
     $this->_setUpParticipantObjects();
     $values = array();
-    require_once 'CiviTest/CiviMailUtils.php';
     $mut = new CiviMailUtils($this, TRUE);
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, FALSE);
@@ -296,7 +295,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'civicrm_mailing_spool',
     );
     $this->quickCleanup($tablesToTruncate, FALSE);
-    require_once 'CiviTest/CiviMailUtils.php';
     $mut = new CiviMailUtils($this, TRUE);
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, FALSE);

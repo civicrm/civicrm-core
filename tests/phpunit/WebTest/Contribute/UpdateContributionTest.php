@@ -301,14 +301,14 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
     $amount = 100.00;
     $this->_testOfflineContribution($amount, "Pending");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
-    $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom', FALSE);
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom', FALSE);
     //Contribution status
     $this->select("contribution_status_id", "label=Cancelled");
-    $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+    $contId = explode('&id=', $this->getAttribute("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
     $contId = explode('&', $contId[1]);
     $contId = $contId[0];
-    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+    $this->clickLink("_qf_Contribution_upload", "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     //Assertions

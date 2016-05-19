@@ -202,6 +202,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
 
     //submit with matching passwords
     $this->_fillCMSUserForm($firstName, $password, $password);
+    $this->waitForAjaxContent();
     $this->click("_qf_Useradd_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

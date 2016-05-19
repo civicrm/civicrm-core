@@ -116,8 +116,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $entityTag->delete();
 
     //invoke post hook on entityTag
-    $object = array(0 => array(0 => $params['entity_id']), 1 => $params['entity_table']);
-    CRM_Utils_Hook::post('delete', 'EntityTag', $params['tag_id'], $object);
+    if (!empty($params['tag_id'])) {
+      $object = array(0 => array(0 => $params['entity_id']), 1 => $params['entity_table']);
+      CRM_Utils_Hook::post('delete', 'EntityTag', $params['tag_id'], $object);
+    }
   }
 
   /**

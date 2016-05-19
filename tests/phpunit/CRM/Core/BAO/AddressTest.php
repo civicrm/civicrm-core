@@ -89,13 +89,13 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $block = CRM_Core_BAO_Address::create($params, $fixAddress, $entity = NULL);
 
-    $cid = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
+    $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for updated address by contactId.'
     );
-    $addressId = $this->assertDBNotNull('CRM_Core_DAO_Address', '120 Terminal Road', 'id', 'street_address',
+    $this->assertDBNotNull('CRM_Core_DAO_Address', '120 Terminal Road', 'id', 'street_address',
       'Database check for updated address by street_name.'
     );
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -134,7 +134,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($addAddress->geo_code_1, '31.694842', 'In line' . __LINE__);
     $this->assertEquals($addAddress->geo_code_2, '-106.29998', 'In line' . __LINE__);
     $this->assertEquals($addAddress->country_id, '1228', 'In line' . __LINE__);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -192,7 +192,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $this->assertEquals(count($allAddress), 2, 'Checking number of returned addresses.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -230,7 +230,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $this->assertEquals($allAddress, NULL, 'Checking null for returned addresses.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -270,7 +270,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($address[1]['id'], $addressId);
     $this->assertEquals($address[1]['contact_id'], $contactId);
     $this->assertEquals($address[1]['street_address'], 'Oberoi Garden');
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**

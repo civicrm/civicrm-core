@@ -26,42 +26,58 @@
  */
 
 /**
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
+ * This api exposes CiviCRM rule_groups.
+ *
+ * RuleGroups are used to group dedupe critieria.
+ *
+ * @package CiviCRM_APIv3
  */
 
-if (defined('PANTHEON_ENVIRONMENT')) {
-  ini_set('session.save_handler', 'files');
+/**
+ * Create or update a rule_group.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_rule_group_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-session_start();
 
-require_once '../civicrm.config.php';
+/**
+ * Specify Meta data for create.
+ *
+ * Note that this data is retrievable via the getfields function
+ * and is used for pre-filling defaults and ensuring mandatory requirements are met.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_rule_group_create_spec(&$params) {
+}
 
-/* Cache the real UF, override it with the SOAP environment */
+/**
+ * Delete an existing RuleGroup.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_rule_group_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
 
-$config = CRM_Core_Config::singleton();
-$log = new CRM_Utils_SystemLogger();
-if (empty($_GET)) {
-  $log->alert('payment_notification processor_name=PayPal', $_REQUEST);
-  $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
-}
-else {
-  $log->alert('payment_notification PayPal_Standard', $_REQUEST);
-  $paypalIPN = new CRM_Core_Payment_PayPalIPN();
-  // @todo upgrade standard per Pro
-}
-try {
-  //CRM-18245
-  if ($config->userFramework == 'Joomla') {
-    CRM_Utils_System::loadBootStrap();
-  }
-  $paypalIPN->main();
-}
-catch (CRM_Core_Exception $e) {
-  CRM_Core_Error::debug_log_message($e->getMessage());
-  CRM_Core_Error::debug_var('error data', $e->getErrorData(), TRUE, TRUE);
-  CRM_Core_Error::debug_var('REQUEST', $_REQUEST, TRUE, TRUE);
-  //@todo give better info to logged in user - ie dev
-  echo "The transaction has failed. Please review the log for more detail";
+/**
+ * Get a RuleGroup.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_rule_group_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

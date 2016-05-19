@@ -468,4 +468,27 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     return $result;
   }
 
+
+  /**
+   * Get the cached contact type for a particular rule group.
+   *
+   * @param int $rule_group_id
+   *
+   * @return string
+   */
+  public static function getContactTypeForRuleGroup($rule_group_id) {
+    if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['rule_groups'])) {
+      \Civi::$statics[__CLASS__]['rule_groups'] = array();
+    }
+    if (empty(\Civi::$statics[__CLASS__]['rule_groups'][$rule_group_id])) {
+      \Civi::$statics[__CLASS__]['rule_groups'][$rule_group_id]['contact_type'] = CRM_Core_DAO::getFieldValue(
+        'CRM_Dedupe_DAO_RuleGroup',
+        $rule_group_id,
+        'contact_type'
+      );
+    }
+
+    return \Civi::$statics[__CLASS__]['rule_groups'][$rule_group_id]['contact_type'];
+  }
+
 }

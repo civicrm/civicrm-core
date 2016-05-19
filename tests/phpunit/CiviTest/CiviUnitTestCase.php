@@ -32,7 +32,6 @@ use Civi\Payment\System;
  *  Include class definitions
  */
 require_once 'api/api.php';
-require_once 'CRM/Financial/BAO/FinancialType.php';
 define('API_LATEST_VERSION', 3);
 
 /**
@@ -2270,8 +2269,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     global $civicrm_root;
     if (file_exists($civicrm_root . '/tests/templates/documentFunction.tpl')) {
-      if (!is_dir($civicrm_root . '/api/v3/examples/$entity')) {
-        mkdir($civicrm_root . '/api/v3/examples/$entity');
+      if (!is_dir($civicrm_root . "/api/v3/examples/$entity")) {
+        mkdir($civicrm_root . "/api/v3/examples/$entity");
       }
       $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.php", "w+b");
       fwrite($f, $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl'));

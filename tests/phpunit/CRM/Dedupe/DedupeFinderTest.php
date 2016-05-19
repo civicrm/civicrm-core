@@ -26,10 +26,9 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'domain_id' => 1,
       'is_active' => 1,
       'visibility' => 'Public Pages',
-      'version' => 3,
     );
-    // TODO: This is not an API test!!
-    $result = civicrm_api('group', 'create', $params);
+
+    $result = $this->callAPISuccess('group', 'create', $params);
     $groupId = $result['id'];
 
     // contact data set
@@ -80,18 +79,15 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     );
 
     $count = 1;
-    // TODO: This is not an API test!!
     foreach ($params as $param) {
-      $param['version'] = 3;
-      $contact = civicrm_api('contact', 'create', $param);
+      $contact = $this->callAPISuccess('contact', 'create', $param);
       $contactIds[$count++] = $contact['id'];
 
       $grpParams = array(
         'contact_id' => $contact['id'],
         'group_id' => $groupId,
-        'version' => 3,
       );
-      $res = civicrm_api('group_contact', 'create', $grpParams);
+      $this->callAPISuccess('group_contact', 'create', $grpParams);
     }
 
     // verify that all contacts have been created separately
@@ -113,9 +109,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // so 1 pair for - first + last + mail
     $this->assertEquals(count($foundDupes), 1, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
 
-    // delete all created contacts
     foreach ($contactIds as $contactId) {
-      Contact::delete($contactId);
+      $this->contactDelete($contactId);
     }
     // delete dupe group
     $params = array('id' => $groupId, 'version' => 3);
@@ -182,17 +177,15 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     );
 
     $count = 1;
-    // TODO: This is not an API test!!
+
     foreach ($params as $param) {
-      $param['version'] = 3;
-      $contact = civicrm_api('contact', 'create', $param);
+      $contact = $this->callAPISuccess('contact', 'create', $param);
       $params = array(
         'contact_id' => $contact['id'],
         'street_address' => 'Ambachtstraat 23',
         'location_type_id' => 1,
-        'version' => 3,
       );
-      $result = civicrm_api('address', 'create', $params);
+      $this->callAPISuccess('address', 'create', $params);
       $contactIds[$count++] = $contact['id'];
     }
 
@@ -211,7 +204,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'email' => 'hood@example.com',
       'street_address' => 'Ambachtstraat 23',
     );
-    $errorScope = CRM_Core_TemporaryErrorScope::useException();
+    CRM_Core_TemporaryErrorScope::useException();
     $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
     $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'General');
 
@@ -220,7 +213,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
     // delete all created contacts
     foreach ($contactIds as $contactId) {
-      Contact::delete($contactId);
+      $this->contactDelete($contactId);
     }
   }
 

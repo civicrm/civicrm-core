@@ -122,7 +122,7 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
       )
     );
     $obj = new CRM_Contact_Form_Search_Custom_Sample($fv);
-    $sql = $obj->all();
+    $sql = $obj->all(0, 0, 'contact_id');
     $this->assertTrue(is_string($sql));
     $dao = CRM_Core_DAO::executeQuery($sql);
     $all = array();

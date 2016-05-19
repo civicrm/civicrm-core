@@ -78,8 +78,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
       'Database check, Address created successfully.'
     );
 
-    //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -201,9 +200,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
     //delete the location block
     CRM_Core_BAO_Location::deleteLocBlock($locBlockId);
-
-    //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -354,7 +351,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
     //cleanup DB by deleting the record.
     Event::delete($eventId);
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
   }
 
   /**
@@ -442,7 +439,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
     //cleanup DB by deleting the record.
     Event::delete($eventId);
-    Contact::delete($this->_contactId);
+    $this->contactDelete($this->_contactId);
 
     //Now check DB for Event
     $this->assertDBNull('CRM_Event_DAO_Event', $eventId, 'id', 'id',
@@ -549,9 +546,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['im']),
       CRM_Utils_Array::value('1', $values['im'])
     );
-
-    //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 }

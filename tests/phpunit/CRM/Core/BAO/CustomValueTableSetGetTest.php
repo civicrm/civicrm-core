@@ -106,7 +106,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     // Cleanup
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
   /**
@@ -192,7 +192,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     // Cleanup
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->contactDelete($contactID);
   }
 
 }

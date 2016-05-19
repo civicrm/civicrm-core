@@ -75,9 +75,9 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->type('title', $params['name']);
     $this->click('title');
     $this->waitForAjaxContent();
-    $this->waitForElementPresent("xpath=//table/tbody/tr/td/div[contains(text(), '{$params['name']}')]");
-    $createdBy = $this->getText("xpath=//table/tbody/tr/td[3]/a");
-    $this->click("xpath=//table/tbody/tr/td[7]//span/a[text()='Settings']");
+    $this->waitForElementPresent("xpath=//table/tbody//tr/td/div[contains(text(), '{$params['name']}')]");
+    $createdBy = $this->getText("xpath=//table/tbody//tr/td[3]/a");
+    $this->click("xpath=//table/tbody//tr/td[7]//span/a[text()='Settings']");
     $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[1]/tbody/tr[2]/td[contains(text(), '{$createdBy}')]");
     $this->openCiviPage('group', 'reset=1');
 

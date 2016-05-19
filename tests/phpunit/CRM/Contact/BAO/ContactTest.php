@@ -67,7 +67,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($firstName, $contact->first_name, 'Check for updated first name.');
 
     $contactId = $contact->id;
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -210,7 +210,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     }
     $this->assertAttributesEquals($checkPrefComm, $prefComm);
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -242,7 +242,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($firstName, $contact->first_name, 'Check for updated first name.');
     $contactId = $contact->id;
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
 
     $householdName = 'Adams house';
     $params = array(
@@ -262,7 +262,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     );
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($householdName, $contact->sort_name, 'Check for updated household.');
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
 
     $organizationName = 'My Organization';
     $params = array(
@@ -282,7 +282,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     );
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($organizationName, $contact->sort_name, 'Check for updated organization.');
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -493,7 +493,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     CRM_Core_BAO_Note::cleanContactNotes($contactId);
 
     // Cleanup DB by deleting the contact.
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
     $this->quickCleanup(array('civicrm_contact', 'civicrm_note'));
   }
 
@@ -624,14 +624,14 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       //Now check values of Relationship type.
       $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
-      Contact::delete(CRM_Utils_Array::value('contact_id_b', $val));
+      $this->contactDelete(CRM_Utils_Array::value('contact_id_b', $val));
     }
 
     //delete all notes related to contact
     CRM_Core_BAO_Note::cleanContactNotes($contactId);
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
     $this->quickCleanup(array('civicrm_contact'));
   }
 
@@ -893,7 +893,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       //Now check values of Relationship type.
       $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
-      Contact::delete(CRM_Utils_Array::value('cid', $val));
+      $this->contactDelete(CRM_Utils_Array::value('cid', $val));
     }
 
     //Now check values of tag ids.
@@ -1096,7 +1096,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       //Now check values of Relationship type.
       $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
-      Contact::delete(CRM_Utils_Array::value('cid', $val));
+      $this->contactDelete(CRM_Utils_Array::value('cid', $val));
     }
 
     //Now check values of tag ids.
@@ -1107,7 +1107,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertAttributesEquals($updatePfParams['tag'], $tagIds);
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -1132,7 +1132,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertAttributesEquals($compareParams, $contactDetails);
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
     $this->quickCleanup(array('civicrm_contact'));
   }
 
@@ -1180,7 +1180,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($email, CRM_Utils_Array::value('email', $params['email'][2]), 'Check Primary Email');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
     $this->quickCleanup(array('civicrm_contact'));
   }
 
@@ -1205,7 +1205,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($openID, strtolower($params['openid'][2]['openid']), 'Check Primary OpenID');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -1225,7 +1225,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($contactId, $match->contact_id, 'Check For Matching Contact');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
     $this->quickCleanup(array('civicrm_contact'));
   }
 
@@ -1244,7 +1244,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($contactType, $params['contact_type'], 'Check For Contact Type');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
     $this->quickCleanup(array('civicrm_contact'));
   }
 
@@ -1271,7 +1271,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($dbDisplayName, $paramsDisplayName, 'Check For Display Name');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
     $this->quickCleanup(array('civicrm_contact'));
   }
 
@@ -1301,7 +1301,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($image, $checkImage, 'Check For Image');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -1560,7 +1560,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       $prevTimestamps = $newTimestamps;
     }
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 }

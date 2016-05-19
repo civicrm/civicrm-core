@@ -50,7 +50,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     );
     $this->assertEquals($isBulkMail, 1, 'Verify bulkmail value is 1.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -59,7 +59,6 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   public function testHoldEmail() {
     $contactId = Contact::createIndividual();
 
-    $params = array();
     $params = array(
       'email' => 'jane.doe@example.com',
       'is_primary' => 1,
@@ -123,7 +122,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'Compare reset_date (' . $resetDate . ') in DB to current year.'
     );
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -149,7 +148,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $this->assertEquals('alan.smith1@example.com', $firstEmailValue[0]['email'], 'Confirm primary email address value.');
     $this->assertEquals(1, $firstEmailValue[0]['is_primary'], 'Confirm first email address is primary.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 }

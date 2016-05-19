@@ -88,7 +88,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
-    $result = $this->callAPIFailure('job', 'create', $params);
+    $this->callAPIFailure('job', 'create', $params);
   }
 
   /**
@@ -294,6 +294,194 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
+  }
+
+  /**
+   * Test the batch merge function.
+   *
+   * We are just checking it returns without error here.
+   */
+  public function testBatchMerge() {
+    $this->callAPISuccess('Job', 'process_batch_merge', array());
+  }
+
+  /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeWorks($dataSet) {
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
+    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
+    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
+    $result = $this->callAPISuccess('Contact', 'get', array('contact_sub_type' => 'Student', 'sequential' => 1));
+    $this->assertEquals(count($dataSet['expected']), $result['count']);
+    foreach ($dataSet['expected'] as $index => $contact) {
+      foreach ($contact as $key => $value) {
+        $this->assertEquals($value, $result['values'][$index][$key]);
+      }
+    }
+  }
+
+  /**
+   * Test the batch merge does not create duplicate emails.
+   *
+   * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
+   */
+  public function testBatchMergeEmailHandling() {
+    for ($x = 0; $x <= 4; $x++) {
+      $id = $this->individualCreate(array('email' => 'batman@gotham.met'));
+    }
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals(4, count($result['values']['merged']));
+    $this->callAPISuccessGetCount('Contact', array('email' => 'batman@gotham.met'), 1);
+    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 1));
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'batman@gotham.met',
+      'contact_id' => array('IN' => array_keys($contacts['values'])),
+    ), 1);
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'batman@gotham.met',
+      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
+    ), 4);
+  }
+
+  /**
+   * Get data for batch merge.
+   */
+  public function getMergeSets() {
+    $data = array(
+      array(
+        array(
+          'mode' => 'safe',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+            ),
+          ),
+          'skipped' => 0,
+          'merged' => 1,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+            ),
+          ),
+        ),
+      ),
+      array(
+        array(
+          'mode' => 'safe',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'bigger house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+          ),
+          'skipped' => 1,
+          'merged' => 0,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'street_address' => 'big house',
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'street_address' => 'bigger house',
+            ),
+          ),
+        ),
+      ),
+      array(
+        array(
+          'mode' => 'aggressive',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'bigger house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+          ),
+          'skipped' => 0,
+          'merged' => 1,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'street_address' => 'big house',
+            ),
+          ),
+        ),
+      ),
+    );
+    return $data;
   }
 
   /**

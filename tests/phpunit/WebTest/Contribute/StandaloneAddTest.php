@@ -77,6 +77,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->addeditFinancialType($financialType);
 
     // Assign the created Financial Account $financialAccountTitle to $financialType
+    $this->waitForElementPresent("xpath=id('ltype')");
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]//span//a[text()='Accounts']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']//button//span[contains(text(), 'Assign Account')]");
     $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[contains(text(), 'Assign Account')]");
@@ -160,7 +161,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     );
 
     foreach ($expected as $label => $value) {
-      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", preg_quote($value));
+      $this->assertElementContainsText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", $value);
     }
 
     // verify if soft credit was created successfully
@@ -170,7 +171,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     );
 
     foreach ($expected as $value) {
-      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+      $this->assertElementContainsText("css=table.crm-soft-credit-listing", $value);
     }
 
     // go to first soft creditor contact view page
@@ -180,7 +181,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
-    $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[1]/a", preg_quote($contact['display_name']));
+    $this->assertElementContainsText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[1]/a", $contact['display_name']);
     // verify soft credit details
     $expected = array(
       4 => $financialType['name'],
@@ -188,7 +189,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       6 => 'Completed',
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
+      $this->assertElementContainsText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", $label);
     }
 
     // CRM-17418 fix: Now cancel the contribution
@@ -225,7 +226,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("financial_type_id", "label={$financialType['name']}");
     $this->clickLink("_qf_Search_refresh");
     $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
-    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type ID In {$financialType['name']}");
+    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type In {$financialType['name']}");
 
     $this->openCiviPage("contact/search/advanced", "reset=1", "_qf_Advanced_refresh-top");
     $this->clickAjaxLink('CiviContribute', "financial_type_id");
@@ -234,7 +235,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("financial_type_id", "label={$financialType['name']}");
     $this->clickLink("_qf_Advanced_refresh-top");
     $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']//table/tbody/tr[1]/td[1]", "2 Contacts");
-    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type ID In {$financialType['name']}");
+    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type In {$financialType['name']}");
   }
 
   /**
@@ -300,7 +301,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     );
 
     foreach ($expected as $label => $value) {
-      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", preg_quote($value));
+      $this->assertElementContainsText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", $value);
     }
   }
 

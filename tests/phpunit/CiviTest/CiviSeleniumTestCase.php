@@ -368,7 +368,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   public function webtestGetValidCountryID() {
     static $_country_id;
     if (is_null($_country_id)) {
-      $_country_id = $this->webtestGetSetting('defaultContactCountry');
+      $_country_id = Civi::settings()->get('defaultContactCountry');
     }
     return $_country_id;
   }
@@ -585,7 +585,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $day = date('j', $timeStamp);
 
     if (!$multiselect) {
-      $this->click("xpath=//input[starts-with(@id, '{$dateElement}_display_')]");
+      $this->click("xpath=//input[@id='{$dateElement}']/following-sibling::input");
     }
     $this->waitForElementPresent("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month");
     $this->select("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month", "value=$mon");
@@ -627,6 +627,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $tableLocator = "[@id='$tableId']";
     }
     foreach ($expected as $label => $value) {
+      //assertContains() accepts param as string
+      $value = "$value";
       if ($xpathPrefix) {
         $this->waitForElementPresent("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td");
         $this->assertElementContainsText("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td", $value);
@@ -1524,17 +1526,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // select the radio first since the element id changes after membership org search results are loaded
     switch ($auto_renew) {
       case 'optional':
-        $this->click("xpath=//div[@id='membership_type_form']//table/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'Give option, but not required')]");
+        $this->click("xpath=//table[@class='form-layout-compressed']/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'Give option, but not required')]");
         break;
 
       case 'required':
-        $this->click("xpath=//div[@id='membership_type_form']//table/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'Auto-renew required')]");
+        $this->click("xpath=//table[@class='form-layout-compressed']/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'Auto-renew required')]");
         break;
 
       default:
         //check if for the element presence (the Auto renew options can be absent when proper payment processor not configured)
         if ($this->isElementPresent("xpath=//div[@id='membership_type_form']//table/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'No auto-renew option')]")) {
-          $this->click("xpath=//div[@id='membership_type_form']//table/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'No auto-renew option')]");
+          $this->click("xpath=//table[@class='form-layout-compressed']/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'No auto-renew option')]");
         }
         break;
     }
@@ -1545,8 +1547,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->select('financial_type_id', "label={$memTypeParams['financial_type']}");
 
     $this->type('duration_interval', $duration_interval);
+    $this->waitForElementPresent('duration_unit');
     $this->select('duration_unit', "label={$duration_unit}");
-
+    $this->waitForElementPresent('period_type');
     $this->select('period_type', "value={$period_type}");
 
     $this->click('_qf_MembershipType_upload-bottom');
@@ -1589,7 +1592,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     // Clicking save.
-    $this->clickLink('_qf_Edit_upload-bottom');
+    $this->click('_qf_Edit_upload-bottom');
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
@@ -2458,8 +2461,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->type('frequency_day', '2');
 
     $this->webtestFillDate('acknowledge_date', 'now');
-
+    $this->waitForElementPresent('contribution_page_id');
     $this->select('contribution_page_id', 'value=3');
+    $this->waitForAjaxContent();
 
     //PaymentReminders
     $this->click('PaymentReminders');
@@ -2495,8 +2499,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     );
     $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/a", FALSE);
     $this->waitForAjaxContent();
-    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/a");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td/div/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
+    $this->click("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/a");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']//div[@class='view-content']//table//tbody/tr[2]/td/div/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
     return $contact;
   }
 

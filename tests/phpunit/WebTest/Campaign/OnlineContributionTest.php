@@ -301,7 +301,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Search_refresh", "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", FALSE);
     $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[10]/span//a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
     //View Contribution Record
-    $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[11]/td[2]", preg_quote($campaignTitle));
+    $this->assertElementContainsText("xpath=//form[@class='CRM_Contribute_Form_ContributionView']/div[2]//table[1]/tbody/tr[10]/td[2]", $campaignTitle);
   }
 
 }
