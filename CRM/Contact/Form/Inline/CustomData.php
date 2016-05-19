@@ -97,7 +97,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
     $this->log();
 
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     $this->response();
   }

@@ -416,7 +416,7 @@ WHERE  id = %1
    * This function should be called via the opportunistic or deterministic cache refresh function to make the intent
    * clear.
    */
-  protected static function refreshCaches() {
+  protected static function flushCaches() {
     try {
       $lock = self::getLockForRefresh();
     }
@@ -492,9 +492,9 @@ WHERE  id = %1
    * Sites that do not run the smart group clearing cron job should refresh the caches under an opportunistic mode, akin
    * to a poor man's cron. The user session will be forced to wait on this so it is less desirable.
    */
-  public static function opportunisticCacheRefresh() {
+  public static function opportunisticCacheFlush() {
     if (Civi::settings()->get('smart_group_cache_refresh_mode') == 'opportunistic') {
-      self::refreshCaches();
+      self::flushCaches();
     }
   }
 
@@ -503,7 +503,7 @@ WHERE  id = %1
    *
    * This function is appropriate to be called by system jobs & non-user sessions.
    */
-  public static function deterministicCacheRefresh() {
+  public static function deterministicCacheFlush() {
     if (self::smartGroupCacheTimeout() == 0) {
       CRM_Core_DAO::executeQuery("TRUNCATE civicrm_group_contact_cache");
       CRM_Core_DAO::executeQuery("
@@ -511,7 +511,7 @@ WHERE  id = %1
         SET cache_date = null, refresh_date = null");
     }
     else {
-      self::refreshCaches();
+      self::flushCaches();
     }
   }
 

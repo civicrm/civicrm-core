@@ -910,7 +910,7 @@ Group By  componentId";
       CRM_Core_BAO_PrevNextCache::deleteItem();
     }
 
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
   /**

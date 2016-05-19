@@ -309,7 +309,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       $this->ajaxResponse += CRM_Contact_Form_Inline::renderFooter($this->_tableID);
     }
 
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheRefresh();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
 }
