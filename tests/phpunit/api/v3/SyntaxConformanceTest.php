@@ -899,6 +899,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     for ($i = 0; $i < 30; $i++) {
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
       $ids[] = $baoObj->id;
+      $baoObj->free();
     }
 
     // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
@@ -945,6 +946,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       for ($i = 0; $i < 3 - $totalEntities; $i++) {
         $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
         $ids[] = $baoObj->id;
+        $baoObj->free();
       }
       $totalEntities = 3;
     }
