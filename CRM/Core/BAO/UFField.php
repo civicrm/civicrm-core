@@ -1125,6 +1125,10 @@ SELECT  id
           'name' => 'contribution_status_id',
           'title' => ts('Contribution Status'),
         ),
+        'trxn_id' => array(
+          'name' => 'contribution_trxn_id',
+          'title' => ts('Contribution Transaction ID'),
+        ),
       );
     }
     return self::$_memberBatchEntryFields;
