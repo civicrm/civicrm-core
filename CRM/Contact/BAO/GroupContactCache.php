@@ -710,7 +710,7 @@ ORDER BY   gc.contact_id, g.children
    * @return string
    */
   public static function getCacheInvalidDateTime() {
-    return date('Ymdhis', strtotime("-" . self::smartGroupCacheTimeout() . " Minutes"));
+    return date('YmdHis', strtotime("-" . self::smartGroupCacheTimeout() . " Minutes"));
   }
 
   /**
@@ -721,7 +721,7 @@ ORDER BY   gc.contact_id, g.children
    * @return string
    */
   public static function getRefreshDateTime() {
-    return date('Ymdhis', strtotime("+ " . self::smartGroupCacheTimeout() . " Minutes"));
+    return date('YmdHis', strtotime("+ " . self::smartGroupCacheTimeout() . " Minutes"));
   }
 
 }
