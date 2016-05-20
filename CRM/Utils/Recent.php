@@ -40,7 +40,7 @@ class CRM_Utils_Recent {
    *
    * @var string
    */
-  const STORE_NAME = 'CRM_Utils_Recent';
+  const MAX_ITEMS = 30, STORE_NAME = 'CRM_Utils_Recent';
 
   /**
    * The list of recently viewed items.
@@ -53,14 +53,14 @@ class CRM_Utils_Recent {
    * Maximum stack size
    * @var int
    */
-  static private $_maxItems = 20;
+  static private $_maxItems = 10;
 
   /**
    * Initialize this class and set the static variables.
    */
   public static function initialize() {
     $maxItemsSetting = Civi::settings()->get('recentItemsMaxCount');
-    if (isset($maxItemsSetting) && $maxItemsSetting > 0 && $maxItemsSetting < 100) {
+    if (isset($maxItemsSetting) && $maxItemsSetting > 0 && $maxItemsSetting < self::MAX_ITEMS) {
       self::$_maxItems = $maxItemsSetting;
     }
     if (!self::$_recent) {
