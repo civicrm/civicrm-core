@@ -81,6 +81,29 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-18528 - Retrieve groups with filter
+   */
+  public function testGroupListWithFilter() {
+    global $_GET;
+    $_GET = $this->_params;
+    $obj = new CRM_Group_Page_AJAX();
+
+    //filter with title
+    $_GET['title'] = "not-me-active";
+    $groups = $obj->getGroupList();
+    $this->assertEquals(1, $groups['recordsTotal']);
+    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
+    unset($_GET['title']);
+
+    // check on status
+    $_GET['status'] = 2;
+    $groups = $obj->getGroupList();
+    $this->assertEquals(2, $groups['recordsTotal']);
+    $this->assertEquals('not-me-disabled', $groups['data'][0]['title']);
+    $this->assertEquals('pick-me-disabled', $groups['data'][1]['title']);
+  }
+
+  /**
    * Retrieve groups as 'view all contacts'
    */
   public function testGroupListViewAllContacts() {
