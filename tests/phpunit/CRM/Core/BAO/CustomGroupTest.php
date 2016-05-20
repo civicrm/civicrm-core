@@ -103,13 +103,14 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
   public function testGetTreetContactSubTypeForMultipleSubTypes() {
     $contactType1 = $this->callApiSuccess('ContactType', 'create', array('name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization'));
-    $contactType2 = $this->callAPISuccess('ContactType', 'create', array('name' => 'Small Bank', 'label' => 'small', 'parent_id' => 'Organization'));
+    $contactType2 = $this->callAPISuccess('ContactType', 'create', array('name' => 'Small Bank', 'label' => 'smallee', 'parent_id' => 'Organization'));
     $customGroup = $this->CustomGroupCreate(array('extends' => 'Organization', 'extends_entity_column_value' => array('Big_Bank', 'Small_Bank')));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, array('Big_Bank'));
     $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
     $this->customGroupDelete($customGroup['id']);
-    $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType['id']));
+    $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType1['id']));
+    $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType2['id']));
   }
 
   /**
