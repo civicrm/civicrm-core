@@ -106,7 +106,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $contactType2 = $this->callAPISuccess('ContactType', 'create', array('name' => 'Small Bank', 'label' => 'smallee', 'parent_id' => 'Organization'));
     $customGroup = $this->CustomGroupCreate(array('extends' => 'Organization', 'extends_entity_column_value' => array('Big_Bank', 'Small_Bank')));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
-    $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, array('Big_Bank'));
+    $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, CRM_Core_DAO::VALUE_SEPARATOR . 'Big_Bank' . CRM_Core_DAO::VALUE_SEPARATOR . 'Small_Bank' . CRM_Core_DAO::VALUE_SEPARATOR);
     $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
     $this->customGroupDelete($customGroup['id']);
     $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType1['id']));
