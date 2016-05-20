@@ -723,6 +723,40 @@ SELECT count( a.id )
   }
 
   /**
+   * Build a join and where part for a query
+   *
+   * @param int $contactId
+   * @return array - the first key is join part of the query and the second key is the where part of the query
+   */
+  public static function buildAcl($contactId) {
+    $tables = array();
+    $whereTables = array();
+    $whereClause = CRM_ACL_BAO_ACL::whereClause(CRM_Core_Permission::VIEW, $tables, $whereTables, $contactId);
+    if (strlen($whereClause)) {
+      $whereClause = " AND (" . $whereClause . ")";
+    }
+
+    $join = "";
+    foreach ($whereTables as $name => $value) {
+      if (!$value) {
+        continue;
+      }
+      if ($value != 1) {
+        // if there is already a join statement in value, use value itself
+        if (strpos($value, 'JOIN')) {
+          $join .= " $value ";
+        }
+        continue;
+      }
+    }
+
+    return array(
+      $join,
+      $whereClause,
+    );
+  }
+
+  /**
    * @param $type
    * @param $tables
    * @param $whereTables
