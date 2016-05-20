@@ -1517,7 +1517,7 @@ ORDER BY civicrm_custom_group.weight,
 
             //store the file in d/b
             $entityId = explode('=', $groupTree['info']['where'][0]);
-            $fileParams = array('upload_date' => date('Ymdhis'));
+            $fileParams = array('upload_date' => date('YmdHis'));
 
             if ($groupTree[$groupID]['fields'][$fieldId]['customValue']['fid']) {
               $fileParams['id'] = $groupTree[$groupID]['fields'][$fieldId]['customValue']['fid'];
