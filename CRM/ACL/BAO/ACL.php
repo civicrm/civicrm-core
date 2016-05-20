@@ -729,9 +729,14 @@ SELECT count( a.id )
    * @return array - the first key is join part of the query and the second key is the where part of the query
    */
   public static function buildAcl($contactId) {
+    // If there is no $contactId passed return empty ACL join and where clause
+    if (empty($contactId)) {
+      return array('', '');
+    }
+
     $tables = array();
     $whereTables = array();
-    $whereClause = CRM_ACL_BAO_ACL::whereClause(CRM_Core_Permission::VIEW, $tables, $whereTables, $contactId);
+    $whereClause = CRM_ACL_BAO_ACL::whereClause(CRM_Core_Permission::VIEW, $tables, $whereTables, $contactId, TRUE);
     if (strlen($whereClause)) {
       $whereClause = " AND (" . $whereClause . ")";
     }
@@ -761,10 +766,11 @@ SELECT count( a.id )
    * @param $tables
    * @param $whereTables
    * @param int $contactID
+   * @param bool $strictReturn If there is no where clause build for ACL
    *
    * @return null|string
    */
-  public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
+  public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL, $strictReturn = FALSE) {
     $acls = CRM_ACL_BAO_Cache::build($contactID);
 
     $whereClause = NULL;
@@ -874,7 +880,7 @@ SELECT g.*
     // call the hook to get additional whereClauses
     CRM_Utils_Hook::aclWhereClause($type, $tables, $whereTables, $contactID, $whereClause);
 
-    if (empty($whereClause)) {
+    if (empty($whereClause) && !$strictReturn) {
       $whereClause = ' ( 0 ) ';
     }
 
