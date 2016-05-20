@@ -1678,7 +1678,7 @@ SELECT $columnName
 
       $fileDAO->uri = $filename;
       $fileDAO->mime_type = $mimeType;
-      $fileDAO->upload_date = date('Ymdhis');
+      $fileDAO->upload_date = date('YmdHis');
       $fileDAO->save();
       $fileId = $fileDAO->id;
       $value = $filename;
