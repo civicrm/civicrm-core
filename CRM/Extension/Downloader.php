@@ -83,11 +83,6 @@ class CRM_Extension_Downloader {
       );
     }
 
-    if (empty($errors) && !CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
-      CRM_Core_Session::setStatus(ts('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.'));
-      CRM_Core_Error::debug_log_message('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
-    }
-
     return $errors;
   }
 
