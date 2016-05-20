@@ -590,7 +590,7 @@ AND li.entity_id = {$entityId}
    *   tax rate
    */
   public static function calculateTaxRate($lineItemId) {
-    if ($lineItemId['unit_price'] == 0) {
+    if ($lineItemId['unit_price'] == 0 || $lineItemId['qty'] == 0) {
       return FALSE;
     }
     if ($lineItemId['html_type'] == 'Text') {
