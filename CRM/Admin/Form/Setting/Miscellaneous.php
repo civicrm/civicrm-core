@@ -103,10 +103,10 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     }
 
     // validate recent items stack size
-    if ($fields['recentItemsMaxCount'] && ($fields['recentItemsMaxCount'] < 1 || $fields['recentItemsMaxCount'] > CRM_Utils_Recent::MAX_ITEMS)) { 
-      $errors['recentItemsMaxCount'] = ts("Illegal stack size. Use values between 1 and %1.", array( 1 => CRM_Utils_Recent::MAX_ITEMS));
+    if ($fields['recentItemsMaxCount'] && ($fields['recentItemsMaxCount'] < 1 || $fields['recentItemsMaxCount'] > CRM_Utils_Recent::MAX_ITEMS)) {
+      $errors['recentItemsMaxCount'] = ts("Illegal stack size. Use values between 1 and %1.", array(1 => CRM_Utils_Recent::MAX_ITEMS));
     }
-    
+
     if (!empty($fields['wkhtmltopdfPath'])) {
       // check and ensure that thi leads to the wkhtmltopdf binary
       // and it is a valid executable binary
