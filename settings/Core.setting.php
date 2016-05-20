@@ -839,6 +839,7 @@ return array(
     'title' => 'Size of "Recent Items" stack',
     'is_domain' => 1,
     'is_contact' => 0,
+    'description' => 'How many items should CiviCRM store in it\'s "Recently viewed" list.',
     'help_text' => NULL,
   ),
   'recentItemsProviders' => array(
