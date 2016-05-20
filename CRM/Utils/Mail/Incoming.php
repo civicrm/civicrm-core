@@ -338,7 +338,7 @@ class CRM_Utils_Mail_Incoming {
 
     // format and move attachments to the civicrm area
     if (!empty($attachments)) {
-      $date = date('Ymdhis');
+      $date = date('YmdHis');
       $config = CRM_Core_Config::singleton();
       for ($i = 0; $i < count($attachments); $i++) {
         $attachNum = $i + 1;
