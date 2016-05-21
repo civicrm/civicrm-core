@@ -1590,7 +1590,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
         _civicrm_api3_validate_date($dateParams, $fieldName, $fieldInfo);
         break;
 
-      case 32:
+      case CRM_Utils_Type::T_TEXT:
         //blob
         _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
         break;

@@ -910,8 +910,7 @@ Group By  componentId";
       CRM_Core_BAO_PrevNextCache::deleteItem();
     }
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
   /**

@@ -294,6 +294,23 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
+  'smart_group_cache_refresh_mode' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'smart_group_cache_refresh_mode',
+    'type' => 'String',
+    'html_type' => 'radio',
+    'default' => 'opportunistic',
+    'add' => '4.7',
+    'title' => 'Smart Group Refresh Mode',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Contact_BAO_GroupContactCache::getModes',
+    ),
+    'description' => 'Should the smart groups be by cron jobs or user actions',
+    'help_text' => 'In "Opportunistic Flush" mode, caches are flushed in response to user actions; this mode is broadly compatible but may add latency during form-submissions. In "Cron Flush" mode, you should schedule a cron job to flush caches; this can improve latency on form-submissions but requires more setup.',
+  ),
   'installed' => array(
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'CiviCRM Preferences',

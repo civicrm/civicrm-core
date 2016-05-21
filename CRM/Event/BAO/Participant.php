@@ -138,8 +138,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     $session = CRM_Core_Session::singleton();
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Participant', $participantBAO->id, $participantBAO);
