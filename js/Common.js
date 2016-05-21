@@ -728,8 +728,20 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   $.fn.crmAjaxTable = function() {
+    // Strip the ids from ajax urls to make pageLength storage more generic
+    function simplifyUrl(ajax) {
+      // Datatables ajax prop could be a url string or an object containing the url
+      var url = typeof ajax === 'object' ? ajax.url : ajax;
+      return typeof url === 'string' ? url.replace(/[&?]\w*id=\d+/g, '') : null;
+    }
+
     return $(this).each(function() {
-      //Declare the defaults for DataTables
+      // Recall pageLength for this table
+      var url = simplifyUrl($(this).data('ajax'));
+      if (url && window.localStorage && localStorage['dataTablePageLength:' + url]) {
+        $(this).data('pageLength', localStorage['dataTablePageLength:' + url]);
+      }
+      // Declare the defaults for DataTables
       var defaults = {
         "processing": true,
         "serverSide": true,
@@ -755,6 +767,12 @@ if (!CRM.vars) CRM.vars = {};
       };
       //Include any table specific data
       var settings = $.extend(true, defaults, $(this).data('table'));
+      // Remember pageLength
+      $(this).on('length.dt', function(e, settings, len) {
+        if (settings.ajax && window.localStorage) {
+          localStorage['dataTablePageLength:' + simplifyUrl(settings.ajax)] = len;
+        }
+      });
       //Make the DataTables call
       $(this).DataTable(settings);
     });
