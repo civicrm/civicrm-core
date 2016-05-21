@@ -212,8 +212,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       );
     }
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if ($contributionID) {
       CRM_Utils_Hook::post('edit', 'Contribution', $contribution->id, $contribution);
