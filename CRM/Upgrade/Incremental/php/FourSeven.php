@@ -208,7 +208,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_8($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Upgrade mailing foreign key constraints', 'upgradeMailingFKs');
-    $this->addTask('Add Smartgroup refresh options', 'addSmartGroupRefreshOptions');
   }
 
   /*
@@ -688,41 +687,6 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
 
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
 
-    return TRUE;
-  }
-
-  /**
-   * CRM-16642 Add option for smart group refreshing.
-   *
-   * @param \CRM_Queue_TaskContext $ctx
-   *
-   * @return bool
-   */
-  public function addSmartGroupRefreshOptions(CRM_Queue_TaskContext $ctx) {
-    $optionGroupID = CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array(
-      'name' => 'smart_group_cache_refresh_mode',
-      'title' => ts('Mode for refreshing smart group cache'),
-      'description' => ts('This provides the option for the smart group cache setting'),
-      'is_reserved' => 1,
-    ));
-    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
-      'option_group_id' => $optionGroupID,
-      'name' => 'opportunistic',
-      'label' => ts('Opportunistic'),
-      'description' => ts('Purge the cache in response to user actions'),
-      'is_active' => TRUE,
-      'filter' => 1,
-      'is_reserved' => 1,
-    ));
-    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
-      'option_group_id' => $optionGroupID,
-      'name' => 'deterministic',
-      'label' => ts('Deterministic'),
-      'description' => ts('Only purge the cache on system jobs'),
-      'is_active' => TRUE,
-      'filter' => 1,
-      'is_reserved' => 1,
-    ));
     return TRUE;
   }
 

@@ -35,6 +35,21 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
   static $_alreadyLoaded = array();
 
   /**
+   * Get a list of caching modes.
+   *
+   * @return array
+   */
+  public static function getModes() {
+    return array(
+      // Flush expired caches in response to user actions.
+      'opportunistic' => ts('Opportunistic Flush'),
+
+      // Flush expired caches via background cron jobs.
+      'deterministic' => ts('Cron Flush'),
+    );
+  }
+
+  /**
    * Check to see if we have cache entries for this group.
    *
    * If not, regenerate, else return.
