@@ -66,21 +66,31 @@
 
       dataUrl += '&cgcount=' + cgCount;
 
-
       if (isMultiple) {
         fname = '#custom_group_' + groupID + '_' + prevCount;
-        if ($(".add-more-link-" + groupID + "-" + prevCount).length) {
-          $(".add-more-link-" + groupID + "-" + prevCount).hide();
-        }
-        else {
-          $("#add-more-link-" + prevCount).hide();
-        }
+
+        // load dataUrl after target fname is loaded.
+        var checkFnameExists = setInterval(function() {
+          if ($(fname).length) {
+            clearInterval(checkFnameExists);
+
+            if ($(".add-more-link-" + groupID + "-" + prevCount).length) {
+              $(".add-more-link-" + groupID + "-" + prevCount).hide();
+            }
+            else {
+              $("#add-more-link-" + prevCount).hide();
+            }
+            CRM.loadPage(dataUrl, {target: fname});
+          }
+        }, 5);
       }
       else if (subName && subName != 'null') {
         fname += subName;
       }
 
-      CRM.loadPage(dataUrl, {target: fname});
+      if (!isMultiple) {
+        CRM.loadPage(dataUrl, {target: fname});
+      }
     };
   })(CRM.$);
 </script>
