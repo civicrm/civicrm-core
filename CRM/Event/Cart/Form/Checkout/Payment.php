@@ -744,7 +744,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param array &$price_set_amount
    * @param &$cost
    */
-  function apply_discount($discountCode, &$price_set_amount, &$cost) {
+  protected function apply_discount($discountCode, &$price_set_amount, &$cost) {
     //need better way to determine if cividiscount installed
     $autoDiscount = array();
     $sql = "select is_active from civicrm_extension where name like 'CiviDiscount%'";
