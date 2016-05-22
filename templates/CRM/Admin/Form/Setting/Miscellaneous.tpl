@@ -82,8 +82,8 @@
             <td>{$form.max_attachments.html}<br />
                 <span class="description">{ts}Maximum number of files (documents, images, etc.) which can attached to emails or activities.{/ts}</span></td>
         </tr>
-  <tr class="crm-miscellaneous-form-block-maxFileSize">
-      <td class="label">{$form.maxFileSize.label}</td>
+        <tr class="crm-miscellaneous-form-block-maxFileSize">
+            <td class="label">{$form.maxFileSize.label}</td>
             <td>{$form.maxFileSize.html}<br />
                 <span class="description">{$maxFileSize_description}</span></td>
         </tr>
@@ -92,6 +92,16 @@
             <td>{$form.secondDegRelPermissions.html}<br />
                 <p class="description">{ts}If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts.{/ts}</p>
             </td>
+        </tr>
+        <tr class="crm-miscellaneous-form-block-recentItemsMaxCount">
+            <td class="label">{$form.recentItemsMaxCount.label}</td>
+            <td>{$form.recentItemsMaxCount.html}<br />
+                <span class="description">{$recentItemsMaxCount_description}</span></td>
+        </tr>
+        <tr class="crm-miscellaneous-form-block-recentItemsProviders">
+            <td class="label">{$form.recentItemsProviders.label}</td>
+            <td>{$form.recentItemsProviders.html}<br />
+                <span class="description">{$recentItemsProviders_description}</span></td>
         </tr>
 
     </table>
