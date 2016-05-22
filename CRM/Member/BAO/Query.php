@@ -222,13 +222,14 @@ class CRM_Member_BAO_Query {
           $value = array('IN' => explode(',', $value));
         }
       case 'membership_id':
+      case 'member_id': // CRM-18523 Updated to membership_id but kept member_id case for backwards compatibility
       case 'member_campaign_id':
 
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
           $qillName = ts('Membership Status');
         }
-        elseif ($name == 'membership_id') {
+        elseif ($name == 'membership_id' || $name == 'member_id') {
           $name = 'id';
           $qillName = ts('Membership ID');
         }
