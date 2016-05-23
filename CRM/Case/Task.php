@@ -86,6 +86,11 @@ class CRM_Case_Task {
           'class' => 'CRM_Case_Form_Task_Restore',
           'result' => FALSE,
         ),
+        5 => array(
+          'title' => ts('Export Document'),
+          'class' => 'CRM_Case_Form_Task_ExportDocument',
+          'result' => FALSE,
+        ),
       );
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviCase')) {
