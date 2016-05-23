@@ -108,7 +108,7 @@ $('#civicrm-menu').ready(function() {
               ret.push({value: v.id, label: v.data});
             });
           } else {
-            ret.push({value: '0', label: 'No matches'});
+            ret.push({value: '0', label: {/literal}'{ts escape='js'}None found.{/ts}'{literal}});
           }
           response(ret);
         })
