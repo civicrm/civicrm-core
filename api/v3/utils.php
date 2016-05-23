@@ -373,7 +373,7 @@ function _civicrm_api3_get_DAO($name) {
 }
 
 /**
- * Return the DAO of the function or Entity.
+ * Return the BAO name of the function or Entity.
  *
  * @param string $name
  *   Is either a function of the api (civicrm_{entity}_create or the entity name.
@@ -549,10 +549,16 @@ SELECT f.id, f.label, f.data_type,
  *   Array of options (so we can modify the filter).
  * @param bool $getCount
  *   Are we just after the count.
+ * @param int $mode
+ *   This basically correlates to the component.
+ * @param null|array $defaultReturnProperties
+ *   Default return properties for the entity
+ *  (used if return not set - but don't do that - set return!).
  *
  * @return array
+ * @throws API_Exception
  */
-function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL) {
+function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL, $mode = 1, $defaultReturnProperties = NULL) {
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   // Convert id to e.g. contact_id
   if (empty($params[$lowercase_entity . '_id']) && isset($params['id'])) {
@@ -571,7 +577,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     CRM_Utils_Array::value('return', $additional_options, array())
   );
   if (empty($returnProperties)) {
-    $returnProperties = NULL;
+    $returnProperties = $defaultReturnProperties;
   }
   if (!empty($params['check_permissions'])) {
     // we will filter query object against getfields
@@ -609,7 +615,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
 
   $skipPermissions = !empty($params['check_permissions']) ? 0 : 1;
 
-  list($entities, $options) = CRM_Contact_BAO_Query::apiQuery(
+  list($entities) = CRM_Contact_BAO_Query::apiQuery(
     $newParams,
     $returnProperties,
     NULL,
@@ -618,7 +624,8 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $limit,
     $smartGroupCache,
     $getCount,
-    $skipPermissions
+    $skipPermissions,
+    $mode
   );
   if ($getCount) {
     // only return the count of contacts
@@ -674,14 +681,19 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
 /**
  * Function transfers the filters being passed into the DAO onto the params object.
  *
+ * @deprecated DAO based retrieval is being phased out.
+ *
  * @param CRM_Core_DAO $dao
  * @param array $params
  * @param bool $unique
+ * @param array $extraSql
+ *   API specific queries eg for event isCurrent would be converted to
+ *   $extraSql['where'] = array('civicrm_event' => array('(start_date >= CURDATE() || end_date >= CURDATE())'));
  *
  * @throws API_Exception
  * @throws Exception
  */
-function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE) {
+function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql = array()) {
   $entity = _civicrm_api_get_entity_name_from_dao($dao);
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   if (!empty($params[$lowercase_entity . "_id"]) && empty($params['id'])) {
@@ -734,6 +746,13 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE) {
       }
       else {
         $dao->$field = $params[$field];
+      }
+    }
+  }
+  if (!empty($extraSql['where'])) {
+    foreach ($extraSql['where'] as $table => $sqlWhere) {
+      foreach ($sqlWhere as $where) {
+        $dao->whereAdd($where);
       }
     }
   }
@@ -876,7 +895,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     return $options;
   }
   //here comes the legacy support for $returnProperties, $inputParams e.g for contat_get
-  // if the queryobject is being used this should be used
+  // if the query object is being used this should be used
   $inputParams = array();
   $legacyreturnProperties = array();
   $otherVars = array(
@@ -975,6 +994,8 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
 /**
  * Converts an DAO object to an array.
  *
+ * @deprecated - DAO based retrieval is being phased out.
+ *
  * @param CRM_Core_DAO $dao
  *   Object to convert.
  * @param array $params
@@ -1000,8 +1021,7 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
     return $dao->count;
   }
 
-  $fields = array_keys(_civicrm_api3_build_fields_array($dao, $uniqueFields));
-
+  $fields = array_keys(_civicrm_api3_build_fields_array($dao, FALSE));
   while ($dao->fetch()) {
     $tmp = array();
     foreach ($fields as $key) {
@@ -1046,6 +1066,7 @@ function _civicrm_api3_custom_fields_are_required($entity, $params) {
     return TRUE;
   }
 }
+
 /**
  * Converts an object to an array.
  *
@@ -1247,7 +1268,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  * @param string $daoName
  * @param bool $return
  *
- * @daoName string DAO to check params agains
+ * @daoName string DAO to check params against
  *
  * @return bool
  *   Should the missing fields be returned as an array (core error created as default)
@@ -1307,18 +1328,22 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
  * @param bool $returnAsSuccess
  *   Return in api success format.
  * @param string $entity
+ * @param CRM_Utils_SQL_Select|NULL $sql
+ *   Extra SQL bits to add to the query. For filtering current events, this might be:
+ *   CRM_Utils_SQL_Select::fragment()->where('(start_date >= CURDATE() || end_date >= CURDATE())');
+ * @param bool $uniqueFields
+ *   Should unique field names be returned (for backward compatibility)
  *
  * @return array
  */
-function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $entity = "") {
-  $bao = new $bao_name();
-  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
+function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
+  $query = new \Civi\API\SelectQuery($bao_name, $params, $uniqueFields);
+  $query->merge($sql);
+  $result = $query->run();
   if ($returnAsSuccess) {
-    return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity, 'get');
+    return civicrm_api3_create_success($result, $params, $entity, 'get');
   }
-  else {
-    return _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity, 'get');
-  }
+  return $result;
 }
 
 /**
@@ -1361,7 +1386,7 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
     return civicrm_api3_create_error('Entity not created (' . $fct_name . ')');
   }
   elseif (is_a($bao, 'CRM_Core_Error')) {
-    //some wierd circular thing means the error takes itself as an argument
+    //some weird circular thing means the error takes itself as an argument
     $msg = $bao->getMessages($bao);
     // the api deals with entities on a one-by-one basis. However, the contribution bao pushes entities
     // onto the error object - presumably because the contribution import is not handling multiple errors correctly
@@ -2257,6 +2282,9 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  *   fieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create') {
+  if (!$fieldName) {
+    return FALSE;
+  }
   if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
     return $fieldName;
   }
@@ -2275,7 +2303,7 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create'
     return $meta[$fieldName]['name'];
   }
   foreach ($meta as $info) {
-    if ($fieldName == CRM_Utils_Array::value('uniqueName', $info)) {
+    if ($fieldName == $info['name'] || $fieldName == CRM_Utils_Array::value('uniqueName', $info)) {
       return $info['name'];
     }
     if (array_search($fieldName, CRM_Utils_Array::value('api.aliases', $info, array())) !== FALSE) {
@@ -2338,6 +2366,7 @@ function _civicrm_api3_field_value_check(&$params, $fieldName) {
  * _civicrm_api3_basic_get but does not use DAO/BAO. This is useful for
  * small/mid-size data loaded from external JSON or XML documents.
  *
+ * @param $entity
  * @param array $params
  *   API parameters.
  * @param array $records
@@ -2346,7 +2375,9 @@ function _civicrm_api3_field_value_check(&$params, $fieldName) {
  *   The property which defines the ID of a record
  * @param array $fields
  *   List of filterable fields.
+ *
  * @return array
+ * @throws \API_Exception
  */
 function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fields) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');

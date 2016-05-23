@@ -666,6 +666,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that an invalid sort is ignored & there is no breakage.
+   *
+   * @dataProvider entities_get
+   * @param $Entity
+   */
+  public function testEmptyParam_getInvalidSort($Entity) {
+
+    if (in_array($Entity, $this->toBeImplemented['get'])) {
+      // $this->markTestIncomplete("civicrm_api3_{$Entity}_get to be implemented");
+      return;
+    }
+    $this->callAPISuccess($Entity, 'Get', array('options' => array('sort' => 'Silly thing')));
+  }
+
+  /**
    * @dataProvider entities_get
    * @param $Entity
    */
