@@ -41,7 +41,7 @@ $MYSQLCMD < civicrm_data.mysql
 $MYSQLCMD < civicrm_sample.mysql
 echo "DROP TABLE IF EXISTS zipcodes" | $MYSQLCMD
 $MYSQLCMD < zipcodes.mysql
-php GenerateData.php
+env CIVICRM_UF=UnitTests php GenerateData.php
 
 # run the cli script to build the menu and the triggers
 cd $CIVISOURCEDIR
