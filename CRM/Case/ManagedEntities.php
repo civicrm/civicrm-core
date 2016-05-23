@@ -106,11 +106,8 @@ class CRM_Case_ManagedEntities {
   public static function createManagedRelationshipTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
     $result = array();
 
-    if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
-      Civi::$statics[__CLASS__]['reltypes'] = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::REL_TYPE_CNAME, $relationshipInfo);
-    }
-    $validRelTypes = Civi::$statics[__CLASS__]['reltypes'];
+    $p = new CRM_Case_XMLProcessor();
+    $validRelTypes = $p->allRelationshipTypes();
 
     $relTypes = $xmlRepo->getAllDeclaredRelationshipTypes();
     foreach ($relTypes as $relType) {
