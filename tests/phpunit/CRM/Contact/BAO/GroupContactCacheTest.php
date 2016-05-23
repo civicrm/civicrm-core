@@ -25,10 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-
 /**
  * Test class for CRM_Contact_BAO_GroupContact BAO
  *
@@ -50,7 +46,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $group = CRM_Contact_BAO_Group::createSmartGroup($params);
     $this->registerTestObjects(array($group));
 
-    // Create contacs $y1, $y2, $y3 which do match $g; create $n1, $n2, $n3 which do not match $g
+    // Create contacts $y1, $y2, $y3 which do match $g; create $n1, $n2, $n3 which do not match $g
     $living = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 0), 3);
     $deceased = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 1), 3);
     $this->assertEquals(3, count($deceased));
@@ -64,12 +60,11 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     );
 
     // Add $n1 to $g
-    $result = civicrm_api('group_contact', 'create', array(
+    $this->callAPISuccess('group_contact', 'create', array(
       'contact_id' => $living[0]->id,
       'group_id' => $group->id,
-      'version' => '3',
     ));
-    $this->assertAPISuccess($result);
+
     CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     $this->assertCacheMatches(
       array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id, $living[0]->id),
@@ -77,16 +72,15 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     );
 
     // Remove $y1 from $g
-    $result = civicrm_api('group_contact', 'create', array(
+    $this->callAPISuccess('group_contact', 'create', array(
       'contact_id' => $deceased[0]->id,
       'group_id' => $group->id,
       'status' => 'Removed',
-      'version' => '3',
     ));
-    $this->assertAPISuccess($result);
+
     CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     $this->assertCacheMatches(
-      array(/* deceased[0], */
+      array(
         $deceased[1]->id,
         $deceased[2]->id,
         $living[0]->id,
@@ -96,8 +90,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   }
 
   /**
-   * Allow removing contact from a parent group even if contact is in
-   * a child group. (CRM-8858)
+   * Allow removing contact from a parent group even if contact is in a child group. (CRM-8858).
    */
   public function testRemoveFromParentSmartGroup() {
     // Create smart group $parent
@@ -125,13 +118,12 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
 
     // Add $c1, $c2, $c3 to $child
     foreach ($deceased as $contact) {
-      $result = $this->callAPISuccess('group_contact', 'create', array(
+      $this->callAPISuccess('group_contact', 'create', array(
         'contact_id' => $contact->id,
         'group_id' => $child->id,
       ));
     }
 
-    // GroupContactCache::load()
     CRM_Contact_BAO_GroupContactCache::load($parent, TRUE);
     $this->assertCacheMatches(
       array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
@@ -139,18 +131,16 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     );
 
     // Remove $c1 from $parent
-    $result = civicrm_api('group_contact', 'create', array(
+    $this->callAPISuccess('group_contact', 'create', array(
       'contact_id' => $deceased[0]->id,
       'group_id' => $parent->id,
       'status' => 'Removed',
-      'version' => '3',
     ));
-    $this->assertAPISuccess($result);
 
     // Assert $c1 not in $parent
     CRM_Contact_BAO_GroupContactCache::load($parent, TRUE);
     $this->assertCacheMatches(
-      array(/* deceased[0], */
+      array(
         $deceased[1]->id,
         $deceased[2]->id,
       ),
@@ -198,6 +188,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
+   *
    * This method is called before a test is executed.
    */
   protected function setUp() {
@@ -207,6 +198,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
 
   /**
    * Tears down the fixture, for example, closes a network connection.
+   *
    * This method is called after a test is executed.
    */
   protected function tearDown() {
@@ -215,14 +207,16 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   }
 
   /**
-   * This is a wrapper for CRM_Core_DAO::createTestObject which tracks
-   * created entities and provides for brainless clenaup.
+   * This is a wrapper for CRM_Core_DAO::createTestObject which tracks created entities.
    *
    * @see CRM_Core_DAO::createTestObject
-   * @param $daoName
+   *
+   * @param string $daoName
    * @param array $params
    * @param int $numObjects
    * @param bool $createOnly
+   *
+   * @return array|NULL|object
    */
   public function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
@@ -236,25 +230,28 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   }
 
   /**
+   * Register test objects.
+   *
    * @param array $objects
    *   DAO or BAO objects.
    */
   public function registerTestObjects($objects) {
-    //if (is_object($objects)) {
-    //  $objects = array($objects);
-    //}
     foreach ($objects as $object) {
       $daoName = preg_replace('/_BAO_/', '_DAO_', get_class($object));
       $this->_testObjects[$daoName][] = $object->id;
     }
   }
 
+  /**
+   * Delete test objects.
+   *
+   * Note: You might argue that the FK relations between test
+   * objects could make this problematic; however, it should
+   * behave intuitively as long as we mentally split our
+   *  test-objects between the "manual/primary records"
+   * and the "automatic/secondary records"
+   */
   public function deleteTestObjects() {
-    // Note: You might argue that the FK relations between test
-    // objects could make this problematic; however, it should
-    // behave intuitively as long as we mentally split our
-    // test-objects between the "manual/primary records"
-    // and the "automatic/secondary records"
     foreach ($this->_testObjects as $daoName => $daoIds) {
       foreach ($daoIds as $daoId) {
         CRM_Core_DAO::deleteTestObjects($daoName, array('id' => $daoId));
