@@ -1056,16 +1056,14 @@ WHERE  id = %1";
    *   Db column name/label.
    * @param bool $reset
    *   Reset relationship types if true.
-   * @param bool|NULL $isActive
-   *   Filter by is_active. NULL to disable.
+   *
    *
    * @return array
    *   array reference of all relationship types.
    */
-  public static function &relationshipType($valueColumnName = 'label', $reset = FALSE, $isActive = 1) {
-    $cacheKey = $valueColumnName . '::' . $isActive;
-    if (!CRM_Utils_Array::value($cacheKey, self::$relationshipType) || $reset) {
-      self::$relationshipType[$cacheKey] = array();
+  public static function &relationshipType($valueColumnName = 'label', $reset = FALSE) {
+    if (!CRM_Utils_Array::value($valueColumnName, self::$relationshipType) || $reset) {
+      self::$relationshipType[$valueColumnName] = array();
 
       //now we have name/label columns CRM-3336
       $column_a_b = "{$valueColumnName}_a_b";
@@ -1074,13 +1072,11 @@ WHERE  id = %1";
       $relationshipTypeDAO = new CRM_Contact_DAO_RelationshipType();
       $relationshipTypeDAO->selectAdd();
       $relationshipTypeDAO->selectAdd("id, {$column_a_b}, {$column_b_a}, contact_type_a, contact_type_b, contact_sub_type_a, contact_sub_type_b");
-      if ($isActive !== NULL) {
-        $relationshipTypeDAO->is_active = $isActive;
-      }
+      $relationshipTypeDAO->is_active = 1;
       $relationshipTypeDAO->find();
       while ($relationshipTypeDAO->fetch()) {
 
-        self::$relationshipType[$cacheKey][$relationshipTypeDAO->id] = array(
+        self::$relationshipType[$valueColumnName][$relationshipTypeDAO->id] = array(
           'id' => $relationshipTypeDAO->id,
           $column_a_b => $relationshipTypeDAO->$column_a_b,
           $column_b_a => $relationshipTypeDAO->$column_b_a,
@@ -1092,7 +1088,7 @@ WHERE  id = %1";
       }
     }
 
-    return self::$relationshipType[$cacheKey];
+    return self::$relationshipType[$valueColumnName];
   }
 
   /**
