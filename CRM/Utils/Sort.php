@@ -152,11 +152,11 @@ class CRM_Utils_Sort {
       $this->_vars[$this->_currentSortID]['direction'] == self::DONTCARE
     ) {
       $this->_vars[$this->_currentSortID]['name'] = str_replace(' ', '_', $this->_vars[$this->_currentSortID]['name']);
-      return $this->_vars[$this->_currentSortID]['name'] . ' asc';
+      return CRM_Utils_Type::escape($this->_vars[$this->_currentSortID]['name'], 'MysqlColumnNameOrAlias') . ' asc';
     }
     else {
       $this->_vars[$this->_currentSortID]['name'] = str_replace(' ', '_', $this->_vars[$this->_currentSortID]['name']);
-      return $this->_vars[$this->_currentSortID]['name'] . ' desc';
+      return CRM_Utils_Type::escape($this->_vars[$this->_currentSortID]['name'], 'MysqlColumnNameOrAlias') . ' desc';
     }
   }
 

@@ -4573,8 +4573,8 @@ civicrm_relationship.is_permission_a_b = 0
           if (!empty($orderBy)) {
             // this is special case while searching for
             // change log CRM-1718
-            if (preg_match('/sort_name/i', $orderBy)) {
-              $orderBy = str_replace('sort_name', 'contact_a.sort_name', $orderBy);
+            if (preg_match('/`sort_name`/i', $orderBy)) {
+              $orderBy = str_replace('`sort_name`', '`contact_a`.`sort_name`', $orderBy);
             }
 
             $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
