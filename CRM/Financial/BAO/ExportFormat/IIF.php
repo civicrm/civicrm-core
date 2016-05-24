@@ -351,7 +351,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     $s1 = str_replace(self::$SEPARATOR, '\t', $s);
     switch ($type) {
       case 'date':
-        $sout = date('Y/m/d', strtotime($s1));
+        $sout = CRM_Utils_Date::customFormat(date('Ymd', strtotime($s1)));
         break;
 
       case 'money':
