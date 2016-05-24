@@ -37,7 +37,7 @@ class CRM_Utils_PDF_Document {
    * @param string $fileName
    * @param array|int $format
    *
-   * @return string
+   * @return void
    */
   public static function html2doc($pages, $fileName, $format = array()) {
     if (is_array($format)) {
