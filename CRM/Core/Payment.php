@@ -1336,4 +1336,13 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     return FALSE;
   }
 
+  /**
+   * Should a receipt be sent out for a pending payment.
+   *
+   * e.g for traditional pay later & ones with a delayed settlement a pending receipt makes sense.
+   */
+  public function isSendReceiptForPending() {
+    return FALSE;
+  }
+
 }

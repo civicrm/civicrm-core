@@ -72,11 +72,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
 
       if ($rgid) {
-        $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
-        $cacheKeyString = "merge $contactType";
-        $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
-        $cacheKeyString .= $gid ? "_{$gid}" : '_0';
-        CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKeyString);
+        CRM_Core_BAO_PrevNextCache::deleteItem(NULL, CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid));
       }
       $urlQry = "reset=1&action=update&rgid={$rgid}";
       if ($gid) {
@@ -135,14 +131,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
       $this->action = CRM_Core_Action::UPDATE;
 
-      //calculate the $contactType
-      if ($rgid) {
-        $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup',
-          $rgid,
-          'contact_type'
-        );
-      }
-
       $sourceParams = 'snippet=4';
       if ($gid) {
         $sourceParams .= "&gid={$gid}";
@@ -157,9 +145,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       $this->assign('sourceUrl', CRM_Utils_System::url('civicrm/ajax/dedupefind', $sourceParams, FALSE, NULL, FALSE));
 
       //reload from cache table
-      $cacheKeyString = "merge $contactType";
-      $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
-      $cacheKeyString .= $gid ? "_{$gid}" : '_0';
+      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
 
       $stats = CRM_Dedupe_Merger::getMergeStatsMsg($cacheKeyString);
       if ($stats) {
@@ -167,8 +153,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         // reset so we not displaying same message again
         CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
       }
-      $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
-                                                                 pn.entity_id2 = de.contact_id2 )";
+      $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
       $where = "de.id IS NULL";
       if ($context == 'conflicts') {
         $where .= " AND pn.is_selected = 1";

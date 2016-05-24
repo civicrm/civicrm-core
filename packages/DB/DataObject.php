@@ -179,7 +179,7 @@ $GLOBALS['_DB_DATAOBJECT']['QUERYENDTIME'] = 0;
 // NOTE: Overload SEGFAULTS ON PHP4 + Zend Optimizer (see define before..)
 // these two are BC/FC handlers for call in PHP4/5
 
-if ( substr(phpversion(),0,1) == 5) {
+if ( substr(phpversion(),0,1) > 4) {
     class DB_DataObject_Overload
     {
         function __call($method,$args)

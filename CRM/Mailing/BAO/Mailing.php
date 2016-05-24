@@ -749,7 +749,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   /**
    * Retrieve a ref to an array that holds the email and text templates for this email
    * assembles the complete template including the header and footer
-   * that the user has uploaded or declared (if they have dome that)
+   * that the user has uploaded or declared (if they have done that)
    *
    * @return array
    *   reference to an assoc array
@@ -784,7 +784,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
         $this->templates['text'] = implode("\n", $template);
       }
 
-      if ($this->body_html) {
+      // To check for an html part strip tags
+      if (trim(strip_tags($this->body_html))) {
 
         $template = array();
         if ($this->header) {
@@ -916,6 +917,10 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return void
    */
   public function getTestRecipients($testParams) {
+    $session = CRM_Core_Session::singleton();
+    $senderId = $session->get('userID');
+    list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($senderId);
+
     if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', array(
           'version' => 3,
@@ -933,13 +938,15 @@ SELECT     civicrm_email.id AS email_id,
            civicrm_email.is_primary as is_primary,
            civicrm_email.is_bulkmail as is_bulkmail
 FROM       civicrm_email
-INNER JOIN civicrm_contact ON civicrm_email.contact_id = civicrm_contact.id
+INNER JOIN civicrm_contact contact_a ON civicrm_email.contact_id = contact_a.id
+{$aclJoin}
 WHERE      (civicrm_email.is_bulkmail = 1 OR civicrm_email.is_primary = 1)
-AND        civicrm_contact.id = {$groupContact}
-AND        civicrm_contact.do_not_email = 0
-AND        civicrm_contact.is_deceased <> 1
+AND        contact_a.id = {$groupContact}
+AND        contact_a.do_not_email = 0
+AND        contact_a.is_deceased <> 1
 AND        civicrm_email.on_hold = 0
-AND        civicrm_contact.is_opt_out = 0
+AND        contact_a.is_opt_out = 0
+{$aclWhere}
 GROUP BY   civicrm_email.id
 ORDER BY   civicrm_email.is_bulkmail DESC
 ";

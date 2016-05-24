@@ -198,18 +198,28 @@ WHERE  cacheKey     = %3 AND
   /**
    * Retrieve from prev-next cache.
    *
+   * This function is used from a variety of merge related functions, although
+   * it would probably be good to converge on calling CRM_Dedupe_Merger::getDuplicatePairs.
+   *
+   * We seem to currently be storing stats in this table too & they might make more sense in
+   * the main cache table.
+   *
    * @param string $cacheKey
    * @param string $join
-   * @param string $where
+   * @param string $whereClause
    * @param int $offset
    * @param int $rowCount
-   *
    * @param array $select
+   * @param string $orderByClause
+   * @param bool $includeConflicts
+   *   Should we return rows that have already been idenfified as having a conflict.
+   *   When this is TRUE you should be careful you do not set up a loop.
    *
    * @return array
    */
-  public static function retrieve($cacheKey, $join = NULL, $where = NULL, $offset = 0, $rowCount = 0, $select = array()) {
+  public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = array(), $orderByClause = '', $includeConflicts = TRUE) {
     $selectString = 'pn.*';
+
     if (!empty($select)) {
       $aliasArray = array();
       foreach ($select as $column => $alias) {
@@ -217,20 +227,29 @@ WHERE  cacheKey     = %3 AND
       }
       $selectString .= " , " . implode(' , ', $aliasArray);
     }
+
+    $params = array(
+      1 => array($cacheKey, 'String'),
+    );
+
+    if (!empty($whereClause)) {
+      $whereClause = " AND " . $whereClause;
+    }
+    if ($includeConflicts) {
+      $where = ' WHERE (pn.cacheKey = %1 OR pn.cacheKey = %2)' . $whereClause;
+      $params[2] = array("{$cacheKey}_conflicts", 'String');
+    }
+    else {
+      $where = ' WHERE (pn.cacheKey = %1)' . $whereClause;
+    }
+
     $query = "
 SELECT SQL_CALC_FOUND_ROWS {$selectString}
 FROM   civicrm_prevnext_cache pn
        {$join}
-WHERE  (pn.cacheKey = %1 OR pn.cacheKey = %2)
+       $where
+       $orderByClause
 ";
-    $params = array(
-      1 => array($cacheKey, 'String'),
-      2 => array("{$cacheKey}_conflicts", 'String'),
-    );
-
-    if ($where) {
-      $query .= " AND {$where}";
-    }
 
     if ($rowCount) {
       $offset = CRM_Utils_Type::escape($offset, 'Int');
@@ -317,18 +336,19 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
   }
 
   /**
+   * Repopulate the cache of merge prospects.
+   *
    * @param int $rgid
    * @param int $gid
    * @param NULL $cacheKeyString
+   * @param array $criteria
+   *   Additional criteria to filter by.
    *
    * @return bool
    */
-  public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL) {
+  public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL, $criteria = array()) {
     if (!$cacheKeyString && $rgid) {
-      $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
-      $cacheKeyString = "merge {$contactType}";
-      $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
-      $cacheKeyString .= $gid ? "_{$gid}" : '_0';
+      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
     }
 
     if (!$cacheKeyString) {
@@ -348,7 +368,12 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
       $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid);
     }
     elseif ($rgid) {
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid);
+      $contactIDs = array();
+      if (!empty($criteria)) {
+        $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
+        $contactIDs = array_keys($contacts['values']);
+      }
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs);
     }
 
     if (!empty($foundDupes)) {

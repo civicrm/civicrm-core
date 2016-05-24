@@ -192,4 +192,13 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
     return $result;
   }
 
+  /**
+   * Should a receipt be sent out for a pending payment.
+   *
+   * e.g for traditional pay later & ones with a delayed settlement a pending receipt makes sense.
+   */
+  public function isSendReceiptForPending() {
+    return TRUE;
+  }
+
 }

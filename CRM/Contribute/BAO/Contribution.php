@@ -212,8 +212,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       );
     }
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if ($contributionID) {
       CRM_Utils_Hook::post('edit', 'Contribution', $contribution->id, $contribution);
@@ -541,16 +540,17 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       'Contribution',
       'name'
     );
-    if (!$activity->find(TRUE)) {
-      if (empty($contribution->contact_id)) {
-        $contribution->find(TRUE);
-      }
-      CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
-    }
-    else {
+
+    //CRM-18406: Update activity when edit contribution.
+    if ($activity->find(TRUE)) {
       // CRM-13237 : if activity record found, update it with campaign id of contribution
       CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
+      $contribution->activity_id = $activity->id;
     }
+    if (empty($contribution->contact_id)) {
+      $contribution->find(TRUE);
+    }
+    CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
 
     // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {
@@ -1207,7 +1207,12 @@ GROUP BY p.id
   }
 
   /**
-   * Get list of contribution In Honor of contact Ids.
+   * Get list of contributions which credit the passed in contact ID.
+   *
+   * The returned array provides details about the original contribution & donor.
+   *
+   * @todo - this is a confusing function called from one place. It has a test. It would be
+   * nice to deprecate it.
    *
    * @param int $honorId
    *   In Honor of Contact ID.
@@ -2571,10 +2576,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $values['softContributions'] = $softContributions['soft_credit'];
       }
       if (isset($this->contribution_page_id)) {
-        CRM_Contribute_BAO_ContributionPage::setValues(
-          $this->contribution_page_id,
-          $values
-        );
+        $values = $this->addContributionPageValuesToValuesHeavyHandedly($values);
         if ($this->contribution_page_id) {
           // CRM-8254 - override default currency if applicable
           $config = CRM_Core_Config::singleton();
@@ -2597,7 +2599,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         if (!empty($lineItem)) {
           $itemId = key($lineItem);
           foreach ($lineItem as &$eachItem) {
-            if (is_array($this->_relatedObjects['membership']) && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
+            if (isset($this->_relatedObjects['membership'])
+             && is_array($this->_relatedObjects['membership'])
+             && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
               $eachItem['join_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->join_date);
               $eachItem['start_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->start_date);
               $eachItem['end_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->end_date);
@@ -4960,6 +4964,87 @@ LIMIT 1;";
       );
     }
     return $prevFinancialItem->financial_account_id;
+  }
+
+  /**
+   * ContributionPage values were being imposed onto values.
+   *
+   * I have made this explicit and removed the couple (is_recur, is_pay_later) we
+   * REALLY didn't want superimposed. The rest are left there in their overkill out
+   * of cautiousness.
+   *
+   * The rationale for making this explicit is that it was a case of carefully set values being
+   * seemingly randonly overwritten without much care. In general I think array randomly setting
+   * variables en mass is risky.
+   *
+   * @param array $values
+   *
+   * @return array
+   */
+  protected function addContributionPageValuesToValuesHeavyHandedly(&$values) {
+    $contributionPageValues = array();
+    CRM_Contribute_BAO_ContributionPage::setValues(
+      $this->contribution_page_id,
+      $contributionPageValues
+    );
+    $valuesToCopy = array(
+      // These are the values that I believe to be useful.
+      'title',
+      'is_email_receipt',
+      'pay_later_receipt',
+      'pay_later_text',
+      'receipt_from_email',
+      'receipt_from_name',
+      'receipt_text',
+      'custom_pre_id',
+      'custom_post_id',
+      'honoree_profile_id',
+      'onbehalf_profile_id',
+      'honor_block_is_active',
+      // Kinda might be - but would be on the contribution...
+      'campaign_id',
+      'currency',
+      // Included for 'fear of regression' but can't justify any use for these....
+      'intro_text',
+      'payment_processor',
+      'financial_type_id',
+      'amount_block_is_active',
+      'bcc_receipt',
+      'cc_receipt',
+      'created_date',
+      'created_id',
+      'default_amount_id',
+      'end_date',
+      'footer_text',
+      'goal_amount',
+      'initial_amount_help_text',
+      'initial_amount_label',
+      'intro_text',
+      'is_allow_other_amount',
+      'is_billing_required',
+      'is_confirm_enabled',
+      'is_credit_card_only',
+      'is_monetary',
+      'is_partial_payment',
+      'is_recur_installments',
+      'is_recur_interval',
+      'is_share',
+      'max_amount',
+      'min_amount',
+      'min_initial_amount',
+      'recur_frequency_unit',
+      'start_date',
+      'thankyou_footer',
+      'thankyou_text',
+      'thankyou_title',
+
+    );
+    foreach ($valuesToCopy as $valueToCopy) {
+      if (isset($contributionPageValues[$valueToCopy])) {
+        $values[$valueToCopy] = $contributionPageValues[$valueToCopy];
+      }
+    }
+    return $values;
   }
 
 }

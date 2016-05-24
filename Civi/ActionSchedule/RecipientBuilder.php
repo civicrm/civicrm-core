@@ -281,6 +281,7 @@ class RecipientBuilder {
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : array())
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
+      // @todo replace use of timestampdiff with a direct comparison as TIMESTAMPDIFF cannot use an index.
       ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval))")
       ->param(array(
         'casRepetitionInterval' => $this->parseRepetitionInterval(),
@@ -328,6 +329,7 @@ class RecipientBuilder {
         ->merge($this->prepareAddlFilter('c.id'))
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
         ->groupBy("reminder.contact_id")
+        // @todo replace use of timestampdiff with a direct comparison as TIMESTAMPDIFF cannot use an index.
         ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval)")
         ->param(array(
           'casRepetitionInterval' => $this->parseRepetitionInterval(),

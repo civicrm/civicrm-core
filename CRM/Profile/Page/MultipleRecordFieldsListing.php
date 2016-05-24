@@ -428,6 +428,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     if (!empty($fieldIDs)) {
       foreach ($fieldIDs as $fieldID) {
         $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : $fieldLabels[$fieldID]['label'];
+        $headerAttr[$fieldID]['columnName'] = $fieldLabels[$fieldID]['column_name'];
       }
     }
     $this->assign('dateFields', $dateFields);

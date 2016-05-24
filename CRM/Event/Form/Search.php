@@ -297,6 +297,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
+      CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, array('participant_status_id'));
     }
 
     if (empty($this->_formValues)) {

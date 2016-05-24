@@ -1274,9 +1274,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           elseif ($status == self::DISABLED) {
             $mask |= CRM_Core_Action::ENABLE;
           }
-          // temporary hold the value of $mask.
-          $tempMask = $mask;
         }
+        // temporary hold the value of $mask.
+        $tempMask = $mask;
       }
 
       while ($relationship->fetch()) {

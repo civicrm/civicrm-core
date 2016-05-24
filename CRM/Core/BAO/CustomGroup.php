@@ -363,7 +363,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         $subTypes = array();
       }
       else {
-        if (stristr(',', $subTypes)) {
+        if (stristr($subTypes, ',')) {
           $subTypes = explode(',', $subTypes);
         }
         else {
@@ -651,15 +651,13 @@ ORDER BY civicrm_custom_group.weight,
     if (is_numeric($subType)) {
       return $subType;
     }
-    $contactTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_type'));
-    if ($entityType != 'Contact' && !in_array($entityType, $contactTypes['values'])) {
-      // Not quite sure if we want to fail this hard. But quiet ignore would be pretty bad too.
-      // Am inclined to go with this for RC release & considering softening.
+
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
+    if ($entityType != 'Contact' && !array_key_exists($entityType, $contactTypes)) {
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
-    $subTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_sub_type'));
-    if (!isset($subTypes['values'][$subType])) {
-      // Same comments about fail hard as above.
+    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+    if (!array_key_exists($subType, $subTypes)) {
       throw new CRM_Core_Exception('Invalid Filter');
     }
     return $subType;
@@ -1519,7 +1517,7 @@ ORDER BY civicrm_custom_group.weight,
 
             //store the file in d/b
             $entityId = explode('=', $groupTree['info']['where'][0]);
-            $fileParams = array('upload_date' => date('Ymdhis'));
+            $fileParams = array('upload_date' => date('YmdHis'));
 
             if ($groupTree[$groupID]['fields'][$fieldId]['customValue']['fid']) {
               $fileParams['id'] = $groupTree[$groupID]['fields'][$fieldId]['customValue']['fid'];

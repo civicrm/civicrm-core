@@ -150,7 +150,7 @@
     <tr>
       <td>{{ts('Tracking')}}</td>
       <td ng-repeat="am in getActiveMailings()">
-        <div crm-mailing-review-bool crm-on="am.mailing.url_tracking=='1'" crm-title="ts('Click Throughs')"></div>
+        <div crm-mailing-review-bool crm-on="am.mailing.url_tracking=='1'" crm-title="ts('Click-Throughs')"></div>
         <div crm-mailing-review-bool crm-on="am.mailing.open_tracking=='1'" crm-title="ts('Opens')"></div>
       </td>
       <td ng-show="abtest.ab.status == 'Testing'"></td>

@@ -88,22 +88,23 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * Validate that a string is a valid MySQL column name or alias.
+   * Validate an acceptable column name for sorting results.
    *
    * @param $str
    *
    * @return bool
    */
-  public static function mysqlColumnNameOrAlias($str) {
+  public static function mysqlColumnName($str) {
     // Check not empty.
     if (empty($str)) {
       return FALSE;
     }
 
-    // Ensure the string contains only valid characters:
-    // For column names: alphanumeric and underscores
-    // For aliases: backticks, alphanumeric hyphens and underscores.
-    if (!preg_match('/^((`[\w-]{1,64}`|[\w-]{1,64})\.)?(`[\w-]{1,64}`|[\w-]{1,64})$/i', $str)) {
+    // Ensure it only contains valid characters (alphanumeric and underscores).
+    //
+    // MySQL permits column names that don't match this (eg containing spaces),
+    // but CiviCRM won't create those ...
+    if (!preg_match('/^\w{1,64}(\.\w{1,64})?$/i', $str)) {
       return FALSE;
     }
 
@@ -137,65 +138,9 @@ class CRM_Utils_Rule {
     // at all, so we split and loop over.
     $parts = explode(',', $str);
     foreach ($parts as $part) {
-      if (!preg_match('/^((`[\w-]{1,64}`|[\w-]{1,64})\.)?(`[\w-]{1,64}`|[\w-]{1,64})( (asc|desc))?$/i', trim($part))) {
+      if (!preg_match('/^((\w{1,64})((\.)(\w{1,64}))?( (asc|desc))?)$/i', trim($part))) {
         return FALSE;
       }
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * @param $str
-   *
-   * @return bool
-   */
-  public static function mysqlColumnNameLoose($str) {
-    //  check the length.
-    // This check can be incorrect for the <table>.<column> format, which can be
-    // a problem.
-    if (empty($str) || strlen($str) > 64) {
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Validate an acceptable column name for sorting results.
-   *
-   * @param $str
-   *
-   * @return bool
-   */
-  public static function mysqlColumnName($str) {
-    // Check the length.
-    if (empty($str) || strlen($str) > 64) {
-      return FALSE;
-    }
-
-    // Make sure it only contains valid characters (alphanumeric and underscores).
-    //
-    // MySQL permits column names that don't match this (eg containing spaces),
-    // but CiviCRM won't create those ...
-    if (!preg_match('/^[\w_]+(\.[\w_]+)?$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Validate that a string is ASC or DESC.
-   *
-   * Empty string should be treated as invalid and ignored => default = ASC.
-   *
-   * @param $str
-   * @return bool
-   */
-  public static function mysqlOrderByDirection($str) {
-    if (!preg_match('/^(asc|desc)$/i', $str)) {
-      return FALSE;
     }
 
     return TRUE;

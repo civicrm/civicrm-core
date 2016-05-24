@@ -474,22 +474,25 @@ function civicrm_api3_job_process_respondent($params) {
  *
  * @return array
  *   API Result Array
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_job_process_batch_merge($params) {
-  $rgid = CRM_Utils_Array::value('rgid', $params);
+  $rule_group_id = CRM_Utils_Array::value('rgid', $params);
+  if (!$rule_group_id) {
+    $rule_group_id = civicrm_api3('RuleGroup', 'getvalue', array(
+      'contact_type' => 'Individual',
+      'used' => 'Unsupervised',
+      'return' => 'id',
+    ));
+  }
   $gid = CRM_Utils_Array::value('gid', $params);
 
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
   $autoFlip = CRM_Utils_Array::value('auto_flip', $params, TRUE);
 
-  $result = CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $autoFlip);
+  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, $autoFlip, 1, 2, CRM_Utils_Array::value('criteria', $params, array()));
 
-  if ($result['is_error'] == 0) {
-    return civicrm_api3_create_success();
-  }
-  else {
-    return civicrm_api3_create_error($result['messages']);
-  }
+  return civicrm_api3_create_success($result, $params);
 }
 
 /**
@@ -499,7 +502,7 @@ function civicrm_api3_job_process_batch_merge($params) {
  */
 function _civicrm_api3_job_process_batch_merge_spec(&$params) {
   $params['rgid'] = array(
-    'title' => 'rule group id',
+    'title' => 'Dedupe rule group id, defaults to Contact Unsupervised rule',
     'type' => CRM_Utils_Type::T_INT,
   );
   $params['gid'] = array(
@@ -637,6 +640,24 @@ function civicrm_api3_job_group_rebuild($params) {
   CRM_Contact_BAO_GroupContactCache::loadAll(NULL, $limit);
   $lock->release();
 
+  return civicrm_api3_create_success();
+}
+
+/**
+ * Flush smart groups caches.
+ *
+ * This job purges aged smart group cache data (based on the timeout value). Sites can decide whether they want this
+ * job and / or the group cache rebuild job to run. In some cases performance is better when old caches are cleared out
+ * prior to any attempt to rebuild them. Also, many sites are very happy to have caches built on demand, provided the
+ * user is not having to wait for deadlocks to clear when invalidating them.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ */
+function civicrm_api3_job_group_cache_flush($params) {
+  CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
   return civicrm_api3_create_success();
 }
 

@@ -558,7 +558,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Postal Code') ,
           'description' => 'Store both US (zip5) AND international postal codes. App is responsible for country/region appropriate validation.',
-          'maxlength' => 12,
+          'maxlength' => 64,
           'size' => 6,
           'import' => true,
           'where' => 'civicrm_address.postal_code',

@@ -49,8 +49,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     // skip some contacts ?
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
-
-    list($contributions, $contacts) = self::buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator);
+    $contributionIDs = $form->getVar('_contributionIds');
+    if ($form->_includesSoftCredits) {
+      //@todo - comment on what is stored there
+      $contributionIDs = $form->getVar('_contributionContactIds');
+    }
+    list($contributions, $contacts) = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->_includesSoftCredits);
     $html = array();
     foreach ($contributions as $contributionId => $contribution) {
       $contact = &$contacts[$contribution['contact_id']];
@@ -204,23 +208,19 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * around contact_id of contribution_recur_id
    *
    * @param string $groupBy
-   * @param CRM_Contribute_Form_Task $form
+   * @param array $contributionIDs
    * @param array $returnProperties
    * @param bool $skipOnHold
    * @param bool $skipDeceased
    * @param array $messageToken
    * @param string $task
    * @param string $separator
+   * @param bool $isIncludeSoftCredits
    *
    * @return array
    */
-  public static function buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator) {
+  public static function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = $notSent = array();
-    $contributionIDs = $form->getVar('_contributionIds');
-    if ($form->_includesSoftCredits) {
-      //@todo - comment on what is stored there
-      $contributionIDs = $form->getVar('_contributionContactIds');
-    }
     foreach ($contributionIDs as $item => $contributionId) {
       // get contribution information
       $contribution = CRM_Utils_Token::getContributionTokenDetails(array('contribution_id' => $contributionId),
@@ -231,7 +231,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       );
       $contribution = $contributions[$contributionId] = $contribution[$contributionId];
 
-      if ($form->_includesSoftCredits) {
+      if ($isIncludeSoftCredits) {
         //@todo find out why this happens & add comments
         list($contactID) = explode('-', $item);
         $contactID = (int) $contactID;

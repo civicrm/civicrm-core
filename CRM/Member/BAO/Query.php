@@ -312,7 +312,7 @@ class CRM_Member_BAO_Query {
 
       case 'member_is_override':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.is_override", $op, $value, "Boolean");
-        $query->_qill[$grouping][] = $value ? ts("Is Membership Status overriden? Yes") : ts("Is Membership Status overriden? No");
+        $query->_qill[$grouping][] = $value ? ts("Membership Status Is Overriden") : ts("Membership Status Is NOT Overriden");
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
     }
@@ -416,13 +416,13 @@ class CRM_Member_BAO_Query {
    */
   public static function buildSearchForm(&$form) {
     $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label', FALSE, FALSE);
-    $form->add('select', 'membership_status_id', ts('Membership Status(s)'), $membershipStatus, FALSE, array(
+    $form->add('select', 'membership_status_id', ts('Membership Status'), $membershipStatus, FALSE, array(
       'id' => 'membership_status_id',
       'multiple' => 'multiple',
       'class' => 'crm-select2',
     ));
 
-    $form->addEntityRef('membership_type_id', ts('Membership Type(s)'), array(
+    $form->addEntityRef('membership_type_id', ts('Membership Type'), array(
       'entity' => 'MembershipType',
       'multiple' => TRUE,
       'placeholder' => ts('- any -'),
@@ -446,7 +446,7 @@ class CRM_Member_BAO_Query {
     $form->addYesNo('member_pay_later', ts('Pay Later?'), TRUE);
     $form->addYesNo('member_auto_renew', ts('Auto-Renew?'), TRUE);
     $form->addYesNo('member_test', ts('Membership is a Test?'), TRUE);
-    $form->addYesNo('member_is_override', ts('Membership Status Is Override?'), TRUE);
+    $form->addYesNo('member_is_override', ts('Membership Status Is Overriden?'), TRUE);
 
     // add all the custom  searchable fields
     $extends = array('Membership');

@@ -211,10 +211,10 @@
               $.each( response.data, function( i, val ) {
                 appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="crm-entity parent_is_'+parent_id+' crm-row-child">';
                 if ( val.is_parent ) {
-                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crm-editable">{literal}' + val.title + '</div></td>';
+                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title crm-editable">{literal}' + val.title + '</div></td>';
                 }
                 else {
-                  appendHTML += '<td class="' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><span class="crm-group-name crmf-title crm-editable">{literal}' + val.title + '</span></td>';
+                  appendHTML += '<td class="crm-group-name  crmf-title crm-editable ' + levelClass + '"><span class="crm-no-children"></span>' + val.title + '</td>';
                 }
                 appendHTML += '<td class="right">' + val.count + "</td>";
                 appendHTML += "<td>" + val.created_by + "</td>";

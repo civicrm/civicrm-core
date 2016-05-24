@@ -173,6 +173,12 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'access CiviCRM',
       'delete activities',
     ),
+    'get' => array(
+      'access CiviCRM',
+      // Note that view all activities is also required within the api
+      // if the id is not passed in. Where the id is passed in the activity
+      // specific check functions are used and tested.
+    ),
     'default' => array(
       'access CiviCRM',
       'view all activities',

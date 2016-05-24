@@ -911,7 +911,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $params = array(
           'date' => $field->date_format,
           'minDate' => isset($minYear) ? $minYear . '-01-01' : NULL,
-          'maxDate' => isset($maxYear) ? $maxYear . '-01-01' : NULL,
+          //CRM-18487 - max date should be the last date of the year.
+          'maxDate' => isset($maxYear) ? $maxYear . '-12-31' : NULL,
           'time' => $field->time_format ? $field->time_format * 12 : FALSE,
           'yearRange' => "{$minYear}:{$maxYear}",
         );
@@ -1257,6 +1258,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'TextArea':
         $display = nl2br($display);
+        break;
+
+      case 'Text':
+        if ($field['data_type'] == 'Money' && isset($value)) {
+          //$value can also be an array(while using IN operator from search builder or api).
+          foreach ((array) $value as $val) {
+            $disp[] = CRM_Utils_Money::format($val);
+          }
+          $display = implode(', ', $disp);
+        }
         break;
     }
     return $display;
@@ -1670,7 +1681,7 @@ SELECT $columnName
 
       $fileDAO->uri = $filename;
       $fileDAO->mime_type = $mimeType;
-      $fileDAO->upload_date = date('Ymdhis');
+      $fileDAO->upload_date = date('YmdHis');
       $fileDAO->save();
       $fileId = $fileDAO->id;
       $value = $filename;

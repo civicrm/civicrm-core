@@ -113,18 +113,10 @@ function civicrm_api3_setting_getdefaults(&$params) {
   $defaults = array();
   foreach ($domains as $domainID) {
     $defaults[$domainID] = array();
-    $noDefaults = array();
     foreach ($settings['values'] as $setting => $spec) {
       if (array_key_exists('default', $spec) && !is_null($spec['default'])) {
         $defaults[$domainID][$setting] = $spec['default'];
       }
-      else {
-        $noDefaults[$setting] = 1;
-      }
-    }
-    if (!empty($params['debug'])) {
-      // we are only tracking 'noDefaults' to help us check the xml
-      print_r($noDefaults);
     }
   }
   return civicrm_api3_create_success($defaults, $params, 'Setting', 'getfields');

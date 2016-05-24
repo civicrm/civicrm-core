@@ -216,7 +216,7 @@
                   {foreach from=$searchRows item=row key=id}
                     {foreach from=$searchRows.$id item=row1 key=id1}
                       <tr class="{cycle values="odd-row,even-row"}">
-                        <td class="crm-case-activity-form-block-contact_{$id}">{$form.contact_check[$id].html}</td>
+                        <td class="crm-case-activity-form-block-contact_{$id1}">{$form.contact_check[$id1].html}</td>
                         <td class="crm-case-activity-form-block-role">{$row1.role}</td>
                         <td class="crm-case-activity-form-block-display_name">{$row1.display_name}</td>
                         <td class="crm-case-activity-form-block-email">{$row1.email}</td>

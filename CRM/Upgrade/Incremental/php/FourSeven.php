@@ -183,8 +183,48 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_4($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add Contact Deleted by Merge Activity Type', 'addDeletedByMergeActivityType');
   }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_7($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    // https://issues.civicrm.org/jira/browse/CRM-18006
+    if (CRM_Core_DAO::checkTableExists('civicrm_install_canary')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_install_canary ENGINE=InnoDB');
+    }
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_8($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Upgrade mailing foreign key constraints', 'upgradeMailingFKs');
+  }
+
+  /*
+   * Important! All upgrade functions MUST call the 'runSql' task.
+   * Uncomment and use the following template for a new upgrade version
+   * (change the x in the function name):
+   */
+
+  //  /**
+  //   * Upgrade function.
+  //   *
+  //   * @param string $rev
+  //   */
+  //  public function upgrade_4_7_x($rev) {
+  //    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  //    // Additional tasks here...
+  //  }
 
   /**
    * CRM-16354
@@ -214,7 +254,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     // Nav records are expendable. https://forum.civicrm.org/index.php?topic=36933.0
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE contact_id IS NOT NULL AND name = "navigation"');
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "activity_tab_filter"');
 
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP INDEX index_group_name');
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP COLUMN group_name');
@@ -559,5 +598,95 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'filter' => 1,
     ));
     return TRUE;
+
+  /**
+   * Remove a foreign key from a table if it exists
+   *
+   * @param $table_name
+   * @param $constraint_name
+   */
+  public function safeRemoveFK($table_name, $constraint_name) {
+
+    $config = CRM_Core_Config::singleton();
+    $dbUf = DB::parseDSN($config->dsn);
+    $query = "
+      SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+      WHERE TABLE_SCHEMA = %1
+      AND TABLE_NAME = %2
+      AND CONSTRAINT_NAME = %3
+      AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+    ";
+    $params = array(
+      1 => array($dbUf['database'], 'String'),
+      2 => array($table_name, 'String'),
+      3 => array($constraint_name, 'String'),
+    );
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+    if ($dao->fetch()) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", array());
+    }
+
+  }
+
+  /**
+   * CRM-18345 Don't delete mailing data on email/phone deletion
+   * Implemented here in CRM-18526
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function upgradeMailingFKs(CRM_Queue_TaskContext $ctx) {
+
+    // Safely drop the foreign keys
+    self::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_email_id');
+    self::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_phone_id');
+    self::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id');
+    self::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_phone_id');
+
+    // Set up the new foreign keys
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_mailing_event_queue`
+        ADD CONSTRAINT `FK_civicrm_mailing_event_queue_email_id`
+        FOREIGN KEY (`email_id`)
+        REFERENCES `civicrm_email`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_mailing_event_queue`
+        ADD CONSTRAINT `FK_civicrm_mailing_event_queue_phone_id`
+        FOREIGN KEY (`phone_id`)
+        REFERENCES `civicrm_phone`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_mailing_recipients`
+        ADD CONSTRAINT `FK_civicrm_mailing_recipients_email_id`
+        FOREIGN KEY (`email_id`)
+        REFERENCES `civicrm_email`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_mailing_recipients`
+        ADD CONSTRAINT `FK_civicrm_mailing_recipients_phone_id`
+        FOREIGN KEY (`phone_id`)
+        REFERENCES `civicrm_phone`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+
+    return TRUE;
+  }
 
 }
