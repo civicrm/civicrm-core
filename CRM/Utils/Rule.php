@@ -103,7 +103,7 @@ class CRM_Utils_Rule {
     // Ensure the string contains only valid characters:
     // For column names: alphanumeric and underscores
     // For aliases: backticks, alphanumeric hyphens and underscores.
-    if (!preg_match('/^((`[\w-]{1,64}`|[\w–]{1,64})\.)?(`[\w-]{1,64}`|[\w–]{1,64})$/i', $str)) {
+    if (!preg_match('/^((`[\w-]{1,64}`|[\w-]{1,64})\.)?(`[\w-]{1,64}`|[\w-]{1,64})$/i', $str)) {
       return FALSE;
     }
 
@@ -137,7 +137,7 @@ class CRM_Utils_Rule {
     // at all, so we split and loop over.
     $parts = explode(',', $str);
     foreach ($parts as $part) {
-      if (!preg_match('/^((`[\w-]{1,64}`|[\w–]{1,64})\.)?(`[\w-]{1,64}`|[\w–]{1,64})( (asc|desc))?$/i', trim($part))) {
+      if (!preg_match('/^((`[\w-]{1,64}`|[\w-]{1,64})\.)?(`[\w-]{1,64}`|[\w-]{1,64})( (asc|desc))?$/i', trim($part))) {
         return FALSE;
       }
     }
