@@ -560,7 +560,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
     $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
-
+    // CRM-15656 - align PHP and MySQL time zones to Joomla's.  This is what WordPress does
+    $timezone = getTimeZoneString();
+    date_default_timezone_set($timezone);
+    CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     return TRUE;
   }
 
