@@ -38,7 +38,7 @@
         <strong>Copy icon</strong>
         (next to the column title).{/ts}
     {/if}
-    <p>{ts}Click<strong>Update Participant(s)</strong>below to save all your changes.{/ts}</p>
+    <p>{ts}Click <strong>Update Participant(s)</strong> below to save all your changes.{/ts}</p>
   </div>
         <table class="crm-copy-fields">
        <thead class="sticky">
