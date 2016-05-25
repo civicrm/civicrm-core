@@ -49,14 +49,21 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
       ) + $statuses
     );
 
-    $this->assign('context', 'statusChange');
-
     # CRM-4321: display info on users being notified if any of the below statuses is enabled
-    $notifyingStatuses = array('Pending from waitlist', 'Pending from approval', 'Expired', 'Cancelled');
-    $notifyingStatuses = array_intersect($notifyingStatuses, CRM_Event_PseudoConstant::participantStatus());
-    $this->assign('notifyingStatuses', implode(', ', $notifyingStatuses));
+    self::assignToTemplate('statusChange');
 
     parent::buildQuickForm();
   }
 
+  public function assignToTemplate($context) {
+    $notifyingStatuses = array('Pending from waitlist', 'Pending from approval', 'Expired', 'Cancelled');
+    $notifyingStatuses = array_intersect($notifyingStatuses, CRM_Event_PseudoConstant::participantStatus());
+    $statuses = implode(', ', $notifyingStatuses);
+    $status = ts('Participants whose status is changed FROM Pending Pay Later TO Registered or Attended will receive a confirmation email and their payment status will be set to completed. If this is not you want to do, you can change their participant status by editing their event registration record directly.');
+    if (!empty($notifyingStatuses)) {
+      $status .= '<br />' .ts("Participants whose status is changed TO any of the following will be automatically notified via email: %1", array(1 => $statuses));
+    }
+    $this->assign('status', $status);
+    $this->assign('context', $context);
+  }
 }

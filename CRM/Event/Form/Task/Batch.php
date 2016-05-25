@@ -95,7 +95,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    */
   public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
-
     if (!$ufGroupId) {
       CRM_Core_Error::fatal('ufGroupId is missing');
     }
@@ -105,6 +104,9 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = array();
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
+    if (array_key_exists('participant_status', $this->_fields)) {
+      CRM_Event_Form_Task_ParticipantStatus::assignToTemplate('statusChangeBatch');
+    }	
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
