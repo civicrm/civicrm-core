@@ -31,7 +31,7 @@
       {$form.status_change.html}  {help id="id-status_change"}
       <div class="status">{$status}</div>
     {else}
-      {if $context EQ 'statusChangeBatch'} {* Update Participant Status in batch task *}
+      {if $statusProfile EQ 1} {* Update Participant Status in batch task *}
         <div class="status">{$status}</div>
       {/if}
       {ts}Update field values for each participant as needed. To set a field to the same value for ALL rows, enter that value for the first participation and then click the
