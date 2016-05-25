@@ -131,7 +131,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       require_once str_replace('_', DIRECTORY_SEPARATOR, "CRM_" . $name[0] . "_BAO_" . $name[1]) . ".php";
       $className = "CRM_{$name[0]}_BAO_{$name[1]}";
       $bao = new $className();
-      $bao->$name[2] = $financialAccountId;
+      $bao->{$name[2]} = $financialAccountId;
       if ($bao->find(TRUE)) {
         $check = TRUE;
       }
