@@ -636,7 +636,8 @@ class CRM_Contact_BAO_Query {
         (substr($name, 0, 5) == 'case_') ||
         (substr($name, 0, 13) == 'contribution_' &&
           (strpos($name, 'source') !== FALSE && strpos($name, 'recur') !== FALSE)) ||
-        (substr($name, 0, 8) == 'payment_')
+        (substr($name, 0, 8) == 'payment_') ||
+        (substr($name, 0, 6) == 'grant_')
       ) {
         continue;
       }
