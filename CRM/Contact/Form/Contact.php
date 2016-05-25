@@ -355,7 +355,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           //loop the group
           for ($i = 0; $i <= $groupCount; $i++) {
             CRM_Custom_Form_CustomData::preProcess($this, NULL, $contactSubType,
-              $i, $this->_contactType
+              $i, $this->_contactType, $this->_contactId
             );
             CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
           }
