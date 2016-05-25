@@ -105,8 +105,9 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $this->_fields = array();
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
     if (array_key_exists('participant_status', $this->_fields)) {
-      CRM_Event_Form_Task_ParticipantStatus::assignToTemplate('statusChangeBatch');
-    }	
+      $this->assign('statusProfile', 1);
+      $this->assignToTemplate();
+    }
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
@@ -512,6 +513,20 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $template->clearTemplateVars();
 
     return $statusId;
+  }
+
+  /**
+   * Assign the minimal set of variables to the template.
+   */
+  public function assignToTemplate() {
+    $notifyingStatuses = array('Pending from waitlist', 'Pending from approval', 'Expired', 'Cancelled');
+    $notifyingStatuses = array_intersect($notifyingStatuses, CRM_Event_PseudoConstant::participantStatus());
+    $statuses = implode(', ', $notifyingStatuses);
+    $status = ts('Participants whose status is changed FROM Pending Pay Later TO Registered or Attended will receive a confirmation email and their payment status will be set to completed. If this is notyou want to do, you can change their participant status by editing their event registration record directly.');
+    if (!empty($notifyingStatuses)) {
+      $status .= '<br />' . ts("Participants whose status is changed TO any of the following will be automatically notified via email: %1", array(1 => $statuses));
+    }
+    $this->assign('status', $status);
   }
 
 }
