@@ -34,7 +34,7 @@
 /**
  * This class provides the functionality to create PDF letter for a group of contacts.
  */
-class CRM_Case_Form_Task_ExportDocument extends CRM_Case_Form_Task {
+class CRM_Case_Form_Task_PrintMergeDoc extends CRM_Case_Form_Task {
   /**
    * All the existing templates in the system.
    *
