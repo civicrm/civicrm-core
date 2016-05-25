@@ -1391,6 +1391,8 @@ FROM   civicrm_domain
     foreach ($ids as $id) {
       if (isset($_DB_DATAOBJECT['RESULTS'][$id])) {
         if (is_resource($_DB_DATAOBJECT['RESULTS'][$id]->result)) {
+          // @fixme mysql_free_result() does not exist in PHP7.
+          // No fatal error, however, because mysqli result is not a resource.
           mysql_free_result($_DB_DATAOBJECT['RESULTS'][$id]->result);
         }
         unset($_DB_DATAOBJECT['RESULTS'][$id]);
@@ -1636,17 +1638,13 @@ SELECT contact_id
     if (!$_dao) {
       // If this is an atypical case (e.g. preparing .sql files
       // before Civi has been installed), then we fallback to
-      // DB-less escaping helper (mysql_real_escape_string).
+      // DB-less escaping helper (addslashes). This is unsafe
+      // so should only be used on trusted strings.
       // Note: In typical usage, escapeString() will only
       // check one conditional ("if !$_dao") rather than
       // two conditionals ("if !defined(DSN)")
       if (!defined('CIVICRM_DSN')) {
-        if (function_exists('mysql_real_escape_string')) {
-          return mysql_real_escape_string($string);
-        }
-        else {
-          throw new CRM_Core_Exception("Cannot generate SQL. \"mysql_real_escape_string\" is missing. Have you installed PHP \"mysql\" extension?");
-        }
+        return addslashes($string);
       }
 
       $_dao = new CRM_Core_DAO();
