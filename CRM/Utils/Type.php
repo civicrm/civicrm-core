@@ -258,8 +258,9 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnName':
-        if (CRM_Utils_Rule::mysqlColumnName($data)) {
+      case 'MysqlColumnNameOrAlias':
+        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
+          $data = str_replace('`', '', $data);
           $parts = explode('.', $data);
           $data = '`' . implode('`.`', $parts) . '`';
 
@@ -277,7 +278,7 @@ class CRM_Utils_Type {
         if (CRM_Utils_Rule::mysqlOrderBy($data)) {
           $parts = explode(',', $data);
           foreach ($parts as &$part) {
-            $part = preg_replace_callback('/(?:([\w]+)(?:(?:\.)([\w]+))?(?: (asc|desc))?)/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
+            $part = preg_replace_callback('/^(?:(?:((?:`[\w-]{1,64}`|[\w-]{1,64}))(?:\.))?(`[\w-]{1,64}`|[\w-]{1,64})(?: (asc|desc))?)$/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
           }
           return implode(', ', $parts);
         }
@@ -386,8 +387,8 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnName':
-        if (CRM_Utils_Rule::mysqlColumnName($data)) {
+      case 'MysqlColumnNameOrAlias':
+        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
           return $data;
         }
         break;
@@ -422,13 +423,14 @@ class CRM_Utils_Type {
    */
   public static function mysqlOrderByCallback($matches) {
     $output = '';
-    // Column or table name.
-    if (isset($matches[1])) {
-      $output .= '`' . $matches[1] . '`';
+    $matches = str_replace('`', '', $matches);
+    // Table name.
+    if (isset($matches[1]) && $matches[1]) {
+      $output .= '`' . $matches[1] . '`.';
     }
-    // Column name in case there is a table.
+    // Column name.
     if (isset($matches[2]) && $matches[2]) {
-      $output .= '.`' . $matches[2] . '`';
+      $output .= '`' . $matches[2] . '`';
     }
     // Sort order.
     if (isset($matches[3]) && $matches[3]) {
