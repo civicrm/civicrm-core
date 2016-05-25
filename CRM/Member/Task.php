@@ -105,7 +105,7 @@ class CRM_Member_Task {
           'result' => TRUE,
         ),
         7 => array(
-          'title' => ts('PDF letters - print for memberships'),
+          'title' => ts('Print/merge document for memberships'),
           'class' => 'CRM_Member_Form_Task_PDFLetter',
           'result' => FALSE,
         ),

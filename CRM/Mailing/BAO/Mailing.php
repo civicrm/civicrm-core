@@ -2699,7 +2699,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $className != 'CRM_Contact_Form_Task_SMS'
     ) {
       $form->add('wysiwyg', 'html_message',
-        ts('HTML Format'),
+        strstr($className, 'PDF') ? ts('Document Body') : ts('HTML Format'),
         array(
           'cols' => '80',
           'rows' => '8',
