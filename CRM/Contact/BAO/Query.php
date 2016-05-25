@@ -4570,18 +4570,20 @@ civicrm_relationship.is_permission_a_b = 0
           else {
             $orderBy = trim($sort->orderBy());
           }
+          // Deliberately remove the backticks again, as they mess up the evil
+          // string munging below. This balanced by re-escaping before use.
+          $orderBy = str_replace('`', '', $orderBy);
+
           if (!empty($orderBy)) {
             // this is special case while searching for
             // change log CRM-1718
-            if (preg_match('/`sort_name`/i', $orderBy)) {
-              $orderBy = str_replace('`sort_name`', '`contact_a`.`sort_name`', $orderBy);
+            if (preg_match('/sort_name/i', $orderBy)) {
+              $orderBy = str_replace('sort_name', 'contact_a.sort_name', $orderBy);
             }
 
-            $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
             $order = " ORDER BY $orderBy";
 
             if ($sortOrder) {
-              $sortOrder = CRM_Utils_Type::escape($sortOrder, 'String');
               $order .= " $sortOrder";
             }
 
@@ -4639,6 +4641,13 @@ civicrm_relationship.is_permission_a_b = 0
           $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
           $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
         }
+      }
+
+      // The above code relies on crazy brittle string manipulation of a peculiarly-encoded ORDER BY
+      // clause. But this magic helper which forgivingly reescapes ORDER BY.
+      // Note: $sortByChar implies that $order was hard-coded/trusted, so it can do funky things.
+      if ($order && !$sortByChar) {
+        $order = ' ORDER BY ' . CRM_Utils_Type::escape(preg_replace('/^\s*ORDER BY\s*/', '', $order), 'MysqlOrderBy');
       }
 
       if ($rowCount > 0 && $offset >= 0) {
