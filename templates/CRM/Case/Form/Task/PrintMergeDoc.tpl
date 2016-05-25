@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form-block crm-block crm-contact-task-pdf-form-block">
-<div class="messages status no-popup">{include file="CRM/Case/Form/Task.tpl"}</div>
-{include file="CRM/Contact/Form/Task/PDFLetterCommon.tpl"}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  <div class="messages status no-popup">{include file="CRM/Case/Form/Task.tpl"}</div>
+    {include file="CRM/Contact/Form/Task/PDFLetterCommon.tpl"}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
