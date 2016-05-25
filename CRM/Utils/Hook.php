@@ -28,9 +28,7 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 abstract class CRM_Utils_Hook {
 
@@ -44,9 +42,9 @@ abstract class CRM_Utils_Hook {
 
   // by default - place content below existing content
   const SUMMARY_BELOW = 1;
-  // pace hook content above
+  // place hook content above
   const SUMMARY_ABOVE = 2;
-  // create your own summarys
+  // create your own summaries
   const SUMMARY_REPLACE = 3;
 
   static $_nullObject = NULL;
@@ -490,6 +488,19 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * @param string|CRM_Core_DAO $entity
+   * @param array $clauses
+   * @return mixed
+   */
+  public static function selectWhereClause($entity, &$clauses) {
+    $entityName = is_object($entity) ? _civicrm_api_get_entity_name_from_dao($entity) : $entity;
+    return self::singleton()->invoke(2, $entityName, $clauses,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_selectWhereClause'
+    );
+  }
+
+  /**
    * This hook is called when building the menu table.
    *
    * @param array $files
@@ -640,6 +651,7 @@ abstract class CRM_Utils_Hook {
    *   The contactID for whom the dashboard is being rendered.
    *
    * @return null
+   * @deprecated Use tabset() instead.
    */
   public static function tabs(&$tabs, $contactID) {
     return self::singleton()->invoke(2, $tabs, $contactID,
