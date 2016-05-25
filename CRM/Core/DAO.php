@@ -1639,8 +1639,8 @@ SELECT contact_id
       if (!defined('CIVICRM_DSN')) {
         // See http://php.net/manual/en/mysqli.real-escape-string.php for the
         // list of characters mysqli_real_escape_string escapes.
-        $search = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
-        $replace = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");
+        $search = array("\\", "\x00", "\n", "\r", "'", '"', "\x1a");
+        $replace = array("\\\\", "\\0", "\\n", "\\r", "\'", '\"', "\\Z");
         return str_replace($search, $replace, $string);
       }
       $_dao = new CRM_Core_DAO();
