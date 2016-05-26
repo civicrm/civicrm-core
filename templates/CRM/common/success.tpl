@@ -52,7 +52,7 @@
       <div class="bold" style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
-          {ts 1="https://civicrm.org/become-a-member?src=ug&sid=$sid" 2="https://civicrm.org/contribute?src=ug&sid=$sid"}Congrats! You’ve successfully upgraded to the latest CiviCRM LTS version. Emphasizing stability over the newest features, CiviCRM LTS is delivers solid functionality and is well supported by a group of CiviCRM enthusiasts and avid contributors. You can support ongoing maintenance of CiviCRM by <a href="%1" target="_blank">becoming a member</a> or by <a href="%2" target="_blank">making a donation</a> today. ~ Coleman Watts, CiviCRM Product Manager{/ts}
+          {ts 1="https://civicrm.org/become-a-member?src=ug&sid=$sid" 2="https://civicrm.org/contribute?src=ug&sid=$sid"}Congrats! You’ve successfully upgraded to the latest CiviCRM LTS version. Emphasizing stability over the newest features, CiviCRM LTS delivers solid functionality and is well supported by a group of CiviCRM enthusiasts and avid contributors. You can support ongoing maintenance of CiviCRM by <a href="%1" target="_blank">becoming a member</a> or by <a href="%2" target="_blank">making a donation</a> today. ~ Coleman Watts, CiviCRM Product Manager{/ts}
         </p>
         <p>
           {ts 1="https://civicrm.org/register-your-site?src=ug&sid=$sid"}Not ready for a membership yet? You can still help us learn how to improve CiviCRM by <a href="%1" target="_blank">registering your site</a>.{/ts}
