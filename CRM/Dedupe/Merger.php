@@ -768,7 +768,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
         // Generate var $migrationInfo. The variable structure is exactly same as
         // $formValues submitted during a UI merge for a pair of contacts.
-        $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId);
+        $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId, $checkPermissions);
 
         $migrationInfo = &$rowsElementsAndInfo['migration_info'];
 
@@ -1025,6 +1025,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Main contact with whom merge has to happen.
    * @param int $otherId
    *   Duplicate contact which would be deleted after merge operation.
+   * @param bool $checkPermissions
+   *   Should the logged in user's permissions be ignore. Setting this to false is
+   *   highly risky as it could cause data to be lost due to conflicts not showing up.
+   *   OTOH there is a risk a merger might view custom data they do not have permission to.
+   *   Hence for now only making this really explicit and making it reflect perms in
+   *   an api call.
+   *
+   * @todo review permissions issue!
    *
    * @return array|bool|int
    *
@@ -1059,7 +1067,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
-  public static function getRowsElementsAndInfo($mainId, $otherId) {
+  public static function getRowsElementsAndInfo($mainId, $otherId, $checkPermissions = TRUE) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
 
     // Fetch contacts
@@ -1456,11 +1464,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], CRM_Core_DAO::$_nullObject, $mainId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $main)
+    $mainTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], NULL, $mainId, -1,
+      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, NULL, TRUE, $checkPermissions
     );
     $otherTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], CRM_Core_DAO::$_nullObject, $otherId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $other)
+      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, NULL, TRUE, $checkPermissions
     );
     CRM_Core_DAO::freeResult();
 
