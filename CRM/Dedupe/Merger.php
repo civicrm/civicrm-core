@@ -593,21 +593,24 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $criteria
    *   Criteria to use in the filter.
    *
+   * @param bool $checkPermissions
+   *   Respect logged in user permissions.
+   *
    * @return array|bool
    */
-  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2, $criteria = array()) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
     $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
-    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria);
+    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria, $checkPermissions);
 
     $cacheParams = array(
-      'cache_key_string' => self::getMergeCacheKeyString($rgid, $gid, $criteria),
+      'cache_key_string' => self::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions),
       // @todo stop passing these parameters in & instead calculate them in the merge function based
       // on the 'real' params like $isRespectExclusions $batchLimit and $isSelected.
       'join' => self::getJoinOnDedupeTable(),
       'where' => self::getWhereString($batchLimit, $isSelected),
     );
-    return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $autoFlip, $redirectForPerformance);
+    return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $autoFlip, $redirectForPerformance, $checkPermissions);
   }
 
   /**
@@ -716,15 +719,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *                             A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                             Does a force merge otherwise (aggressive mode).
    * @param bool $autoFlip to let api decide which contact to retain and which to delete.
-   *   Wether to let api decide which contact to retain and which to delete.
-   *
+   *   Whether to let api decide which contact to retain and which to delete.
    *
    * @param bool $redirectForPerformance
+   *   Redirect to a url for batch processing.
+   *
+   * @param bool $checkPermissions
+   *   Respect logged in user permissions.
    *
    * @return array|bool
    */
   public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
-                               $autoFlip = TRUE, $redirectForPerformance = FALSE
+                               $autoFlip = TRUE, $redirectForPerformance = FALSE, $checkPermissions = TRUE
   ) {
     $cacheKeyString = CRM_Utils_Array::value('cache_key_string', $cacheParams);
     $resultStats = array('merged' => array(), 'skipped' => array());
@@ -769,7 +775,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // go ahead with merge if there is no conflict
         $conflicts = array();
         if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
-          CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo);
+          CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions);
           $resultStats['merged'][] = array('main_id' => $mainId, 'other_id' => $otherId);
           $deletedContacts[] = $otherId;
         }
@@ -1044,6 +1050,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *     to move all fields from the 'other' contact to the 'main' contact, as
    *     though the form had been submitted with those options.
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
   public static function getRowsElementsAndInfo($mainId, $otherId) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
@@ -1515,9 +1524,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param $migrationInfo
    *
+   * @param bool $checkPermissions
+   *   Respect logged in user permissions.
+   *
    * @return bool
    */
-  public static function moveAllBelongings($mainId, $otherId, $migrationInfo) {
+  public static function moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions = TRUE) {
     if (empty($migrationInfo)) {
       return FALSE;
     }
@@ -1838,22 +1850,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_BAO_CustomValueTable::setValues($viewOnlyCustomFields);
     }
 
-    if (CRM_Core_Permission::check('merge duplicate contacts') &&
-      CRM_Core_Permission::check('delete contacts')
+    if (!$checkPermissions || (CRM_Core_Permission::check('merge duplicate contacts') &&
+      CRM_Core_Permission::check('delete contacts'))
     ) {
       // if ext id is submitted then set it null for contact to be deleted
       if (!empty($submitted['external_identifier'])) {
         $query = "UPDATE civicrm_contact SET external_identifier = null WHERE id = {$otherId}";
         CRM_Core_DAO::executeQuery($query);
       }
-
       civicrm_api3('contact', 'delete', array('id' => $otherId));
-      CRM_Core_BAO_PrevNextCache::deleteItem($otherId);
     }
-    // FIXME: else part
-    // else {
-    //  CRM_Core_Session::setStatus( ts('Do not have sufficient permission to delete duplicate contact.') );
-    // }
 
     // CRM-15681 merge sub_types
     if ($other_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['other_details'])) {
@@ -2019,24 +2025,27 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param bool $reloadCacheIfEmpty
    * @param int $batchLimit
    * @param bool $isSelected
-   * @param array $orderByClause
+   * @param array|string $orderByClause
    * @param bool $includeConflicts
    * @param array $criteria
    *   Additional criteria to narrow down the merge group.
    *
+   * @param bool $checkPermissions
+   *   Respect logged in user permissions.
+   *
    * @return array
-   *   Array of matches meeting the criteria.
+   *    Array of matches meeting the criteria.
    */
-  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = array()) {
+  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = array(), $checkPermissions = TRUE) {
     $where = self::getWhereString($batchLimit, $isSelected);
-    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria);
+    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions);
     $join = self::getJoinOnDedupeTable();
     $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
     if (empty($dupePairs) && $reloadCacheIfEmpty) {
       // If we haven't found any dupes, probably cache is empty.
       // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
       // until we have done some processing.
-      CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria);
+      CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria, $checkPermissions);
       $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
       return $dupePairs;
     }
@@ -2052,14 +2061,28 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Additional criteria to narrow down the merge group.
    *   Currently we are only supporting the key 'contact' within it.
    *
+   * @param bool $checkPermissions
+   *   Respect the users permissions.
+   *
    * @return string
    */
-  public static function getMergeCacheKeyString($rule_group_id, $group_id, $criteria = array()) {
+  public static function getMergeCacheKeyString($rule_group_id, $group_id, $criteria = array(), $checkPermissions = TRUE) {
     $contactType = CRM_Dedupe_BAO_RuleGroup::getContactTypeForRuleGroup($rule_group_id);
     $cacheKeyString = "merge {$contactType}";
     $cacheKeyString .= $rule_group_id ? "_{$rule_group_id}" : '_0';
     $cacheKeyString .= $group_id ? "_{$group_id}" : '_0';
     $cacheKeyString .= !empty($criteria) ? serialize($criteria) : '_0';
+    if ($checkPermissions) {
+      $contactID = CRM_Core_Session::getLoggedInContactID();
+      if (!$contactID) {
+        // Distinguish between no permission check & no logged in user.
+        $contactID = 'null';
+      }
+      $cacheKeyString .= '_' . $contactID;
+    }
+    else {
+      $cacheKeyString .= '_0';
+    }
     return $cacheKeyString;
   }
 

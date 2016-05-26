@@ -439,6 +439,42 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeWorksCheckPermissionsTrue($dataSet) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'administer CiviCRM');
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 1, 'mode' => $dataSet['mode']));
+    $this->assertEquals(0, count($result['values']['merged']), 'User does not have permission to any contacts, so no merging');
+    $this->assertEquals(0, count($result['values']['skipped']), 'User does not have permission to any contacts, so no skip visibility');
+  }
+
+  /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeWorksCheckPermissionsFalse($dataSet) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit my contact');
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => $dataSet['mode']));
+    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
+    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
+  }
+
+  /**
    * Get data for batch merge.
    */
   public function getMergeSets() {

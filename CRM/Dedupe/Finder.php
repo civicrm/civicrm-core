@@ -48,10 +48,14 @@ class CRM_Dedupe_Finder {
    * @param array $cids
    *   Contact ids to limit the search to.
    *
+   * @param bool $checkPermissions
+   *   Respect logged in user permissions.
+   *
    * @return array
-   *   array of (cid1, cid2, weight) dupe triples
+   *   Array of (cid1, cid2, weight) dupe triples
+   * @throws \Exception
    */
-  public static function dupes($rgid, $cids = array()) {
+  public static function dupes($rgid, $cids = array(), $checkPermissions = TRUE) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
@@ -61,7 +65,7 @@ class CRM_Dedupe_Finder {
 
     $rgBao->fillTable();
     $dao = new CRM_Core_DAO();
-    $dao->query($rgBao->thresholdQuery());
+    $dao->query($rgBao->thresholdQuery($checkPermissions));
     $dupes = array();
     while ($dao->fetch()) {
       $dupes[] = array($dao->id1, $dao->id2, $dao->weight);

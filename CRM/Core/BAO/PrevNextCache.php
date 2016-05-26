@@ -344,11 +344,16 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
    * @param array $criteria
    *   Additional criteria to filter by.
    *
+   * @param bool $checkPermissions
+   *   Respect logged in user's permissions.
+   *
    * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL, $criteria = array()) {
+  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions) {
     if (!$cacheKeyString && $rgid) {
-      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
+      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
     }
 
     if (!$cacheKeyString) {
@@ -373,7 +378,7 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
         $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
         $contactIDs = array_keys($contacts['values']);
       }
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs);
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions);
     }
 
     if (!empty($foundDupes)) {
