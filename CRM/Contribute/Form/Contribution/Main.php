@@ -1055,27 +1055,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
     $params['amount'] = self::computeAmount($params, $this->_values);
-    if (($this->_values['is_pay_later'] &&
-        empty($this->_paymentProcessor) &&
-        !array_key_exists('hidden_processor', $params)) ||
-      (CRM_Utils_Array::value('payment_processor_id', $params) == 0)
-      && ($is_quick_config == 0 || $params['amount'] != 0)
-    ) {
-      $params['is_pay_later'] = 1;
-    }
-    else {
-      $params['is_pay_later'] = 0;
-    }
-
-    // Would be nice to someday understand the point of this set.
-    $this->set('is_pay_later', $params['is_pay_later']);
-    // assign pay later stuff
-    $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
-    $this->assign('is_pay_later', $params['is_pay_later']);
-    if ($params['is_pay_later']) {
-      $this->assign('pay_later_text', $this->_values['pay_later_text']);
-      $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
-    }
 
     $params['separate_amount'] = $params['amount'];
     $memFee = NULL;
@@ -1166,6 +1145,27 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
       $this->set('lineItem', $lineItem);
+    }
+
+    if ($params['amount'] != 0 && (($this->_values['is_pay_later'] &&
+          empty($this->_paymentProcessor) &&
+          !array_key_exists('hidden_processor', $params)) ||
+        (CRM_Utils_Array::value('payment_processor_id', $params) == 0))
+    ) {
+      $params['is_pay_later'] = 1;
+    }
+    else {
+      $params['is_pay_later'] = 0;
+    }
+
+    // Would be nice to someday understand the point of this set.
+    $this->set('is_pay_later', $params['is_pay_later']);
+    // assign pay later stuff
+    $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $this->assign('is_pay_later', $params['is_pay_later']);
+    if ($params['is_pay_later']) {
+      $this->assign('pay_later_text', $this->_values['pay_later_text']);
+      $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
 
     if ($this->_membershipBlock['is_separate_payment'] && !empty($params['separate_amount'])) {
