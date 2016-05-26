@@ -682,8 +682,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     CRM_Core_BAO_PrevNextCache::setItem($values);
   }
 
+  /**
+   * Delete information about merges for the given string.
+   *
+   * @param $cacheKeyString
+   */
   public static function resetMergeStats($cacheKeyString) {
-    return CRM_Core_BAO_PrevNextCache::deleteItem(NULL, "{$cacheKeyString}_stats");
+    CRM_Core_BAO_PrevNextCache::deleteItem(NULL, "{$cacheKeyString}_stats");
   }
 
   public static function getMergeStats($cacheKeyString) {
@@ -1227,11 +1232,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           foreach ($values['values'] as $index => $value) {
             $locations[$moniker][$blockName][$cnt] = $value;
             // Fix address display
-            $display = '';
             if ($blockName == 'address') {
               CRM_Core_BAO_Address::fixAddress($value);
-              $display = CRM_Utils_Address::format($value);
-              $locations[$moniker][$blockName][$cnt]['display'] = $display;
+              $locations[$moniker][$blockName][$cnt]['display'] = CRM_Utils_Address::format($value);
             }
 
             $cnt++;
