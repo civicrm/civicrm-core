@@ -1150,9 +1150,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if ($params['amount'] != 0 && (($this->_values['is_pay_later'] &&
           empty($this->_paymentProcessor) &&
           !array_key_exists('hidden_processor', $params)) ||
-        (CRM_Utils_Array::value('payment_processor_id', $params) == 0)
-        && ($is_quick_config == 0)
-      )
+        (CRM_Utils_Array::value('payment_processor_id', $params) == 0))
     ) {
       $params['is_pay_later'] = 1;
     }
