@@ -44,7 +44,7 @@
  *
  * @group headless
  */
-class api_v3_JobTestCustomData extends CiviUnitTestCase {
+class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   public $_entity = 'Job';
