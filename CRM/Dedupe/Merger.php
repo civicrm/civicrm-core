@@ -1671,6 +1671,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fid);
             break;
 
+          case 'Select Date':
+            if ($cFields[$fid]['attributes']['is_view']) {
+              $submitted[$key] = date('YmdHis', strtotime($submitted[$key]));
+            }
+            break;
+
           case 'CheckBox':
           case 'AdvMulti-Select':
           case 'Multi-Select':
