@@ -1615,7 +1615,7 @@ class CRM_Utils_Token {
       foreach ($tokens as $token => $dontCare) {
         $eventTokens[] = substr($token, (strpos($token, '.') + 1), -1);
       }
-      $customtokens = CRM_CORE_BAO_CustomField::getFields('Event');
+      $customtokens = CRM_Core_BAO_CustomField::getFields('Event');
       foreach ($customtokens as $tokenkey => $tokenvalue) {
         $eventTokens[] = 'custom_' . $tokenkey;
       }
@@ -1634,7 +1634,7 @@ class CRM_Utils_Token {
       foreach ($tokens as $token => $dontCare) {
         $participantTokens[] = substr($token, (strpos($token, '.') + 1), -1);
       }
-      $customtokens = CRM_CORE_BAO_CustomField::getFields('Participant');
+      $customtokens = CRM_Core_BAO_CustomField::getFields('Participant');
       foreach ($customtokens as $tokenkey => $tokenvalue) {
         $participantTokens[] = 'custom_' . $tokenkey;
       }
