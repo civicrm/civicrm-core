@@ -50,40 +50,41 @@ class CRM_Grant_BAO_Query {
    * @return void
    */
   public static function select(&$query) {
-    if (($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) || !empty($query->_returnProperties)) {
-      if (!empty($query->_returnProperties['grant_status_id'])) {
-        $query->_select['grant_status_id'] = 'grant_status.id as grant_status_id';
-        $query->_element['grant_status'] = 1;
-        $query->_tables['grant_status'] = $query->_whereTables['grant_status'] = 1;
-        $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
-      }
+    if (!empty($query->_returnProperties['grant_status_id'])) {
+      $query->_select['grant_status_id'] = 'grant_status.id as grant_status_id';
+      $query->_element['grant_status'] = 1;
+      $query->_tables['grant_status'] = $query->_whereTables['grant_status'] = 1;
+      $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
+    }
 
-      if (!empty($query->_returnProperties['grant_status'])) {
-        $query->_select['grant_status'] = 'grant_status.label as grant_status';
-        $query->_element['grant_status'] = 1;
-        $query->_tables['grant_status'] = $query->_whereTables['grant_status'] = 1;
-        $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
-      }
+    if (!empty($query->_returnProperties['grant_status'])) {
+      $query->_select['grant_status'] = 'grant_status.label as grant_status';
+      $query->_element['grant_status'] = 1;
+      $query->_tables['grant_status'] = $query->_whereTables['grant_status'] = 1;
+      $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
+    }
 
-      if (!empty($query->_returnProperties['grant_type_id'])) {
-        $query->_select['grant_type_id'] = 'grant_type.id as grant_type_id';
-        $query->_element['grant_type'] = 1;
-        $query->_tables['grant_type'] = $query->_whereTables['grant_type'] = 1;
-        $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
-      }
+    if (!empty($query->_returnProperties['grant_type_id'])) {
+      $query->_select['grant_type_id'] = 'grant_type.id as grant_type_id';
+      $query->_element['grant_type'] = 1;
+      $query->_tables['grant_type'] = $query->_whereTables['grant_type'] = 1;
+      $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
+    }
 
-      if (!empty($query->_returnProperties['grant_type'])) {
-        $query->_select['grant_type'] = 'grant_type.label as grant_type';
-        $query->_element['grant_type'] = 1;
-        $query->_tables['grant_type'] = $query->_whereTables['grant_type'] = 1;
-        $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
-      }
+    if (!empty($query->_returnProperties['grant_type'])) {
+      $query->_select['grant_type'] = 'grant_type.label as grant_type';
+      $query->_element['grant_type'] = 1;
+      $query->_tables['grant_type'] = $query->_whereTables['grant_type'] = 1;
+      $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
+    }
 
-      if (!empty($query->_returnProperties['grant_note'])) {
-        $query->_select['grant_note'] = "civicrm_note.note as grant_note";
-        $query->_element['grant_note'] = 1;
-        $query->_tables['grant_note'] = 1;
-      }
+    if (!empty($query->_returnProperties['grant_note'])) {
+      $query->_select['grant_note'] = "civicrm_note.note as grant_note";
+      $query->_element['grant_note'] = 1;
+      $query->_tables['grant_note'] = 1;
+    }
+
+    if ($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) {
       $query->_select['grant_amount_requested'] = 'civicrm_grant.amount_requested as grant_amount_requested';
       $query->_select['grant_amount_granted'] = 'civicrm_grant.amount_granted as grant_amount_granted';
       $query->_select['grant_amount_total'] = 'civicrm_grant.amount_total as grant_amount_total';
