@@ -2445,10 +2445,15 @@ SELECT contact_id
       $tableAlias = $bao->tableName();
     }
     $clauses = array();
+    $fields = $bao->fields();
     foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
       $clauses[$field] = NULL;
       if ($vals) {
         $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+        // Optional field may be null
+        if (empty($fields[$field]['required'])) {
+          $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR (" . $clauses[$field] . "))";
+        }
       }
     }
     return $clauses;
