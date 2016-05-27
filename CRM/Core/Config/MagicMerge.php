@@ -125,6 +125,7 @@ class CRM_Core_Config_MagicMerge {
       'dateformatPartial' => array('setting'),
       'dateformatTime' => array('setting'),
       'dateformatYear' => array('setting'),
+      'dateformatFinancialBatch' => array('setting'),
       'debug' => array('setting', 'debug_enabled'), // renamed.
       'defaultContactCountry' => array('setting'),
       'defaultContactStateProvince' => array('setting'),
