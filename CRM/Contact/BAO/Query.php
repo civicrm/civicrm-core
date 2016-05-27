@@ -5807,6 +5807,10 @@ AND   displayRelType.is_active = 1
         else {
           $orderBy = trim($sort->orderBy());
         }
+        // Deliberately remove the backticks again, as they mess up the evil
+        // string munging below. This balanced by re-escaping before use.
+        $orderBy = str_replace('`', '', $orderBy);
+
         if (!empty($orderBy)) {
           // this is special case while searching for
           // change log CRM-1718
