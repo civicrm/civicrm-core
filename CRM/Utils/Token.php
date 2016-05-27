@@ -1821,7 +1821,7 @@ class CRM_Utils_Token {
 
       case 'end_date':
       case 'start_date':
-        $value = CRM_Utils_Date::customFormat($event[$token], "%d/%m/%Y");
+        $value = CRM_Utils_Date::customFormat($event[$token]);
         break;
 
       case 'type':
@@ -1910,7 +1910,7 @@ class CRM_Utils_Token {
 
       case 'event_end_date':
       case 'event_start_date':
-        $value = CRM_Utils_Date::customFormat($participant[$token], "%d/%m/%Y");
+        $value = CRM_Utils_Date::customFormat($participant[$token]);
         break;
 
       default:
