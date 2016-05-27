@@ -1815,13 +1815,6 @@ class CRM_Utils_Token {
     $params = array('entity_id' => $event['id'], 'entity_table' => 'civicrm_event');
 
     switch ($token) {
-      case 'balance':
-        $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($params['participant_id'], 'event');
-        $balancePay = CRM_Utils_Array::value('balance', $info);
-        $balancePay = CRM_Utils_Money::format($balancePay);
-        $value = $balancePay;
-        break;
-
       case 'title':
         $value = $event['event_title'];
         break;
