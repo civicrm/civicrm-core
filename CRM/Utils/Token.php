@@ -1913,6 +1913,12 @@ class CRM_Utils_Token {
         $value = CRM_Utils_Date::customFormat($participant[$token]);
         break;
 
+      case 'participant_id':
+        // I'm not sure why participant_id is not there by default.
+        // I add it here, because I have a use case for this ;-)
+        $value = $participant['id'];
+        break;
+
       default:
         if (in_array($token, self::$_tokens[$entity])) {
           $value = $participant[$token];
