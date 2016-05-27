@@ -681,7 +681,7 @@ LIMIT {$offset}, {$rowCount}
     $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
     $searchData['regex'] = CRM_Utils_Type::escape($searchData['regex'], 'Boolean');
     $sqlCmp = $searchData['regex'] ? "REGEXP '%s'" : " LIKE '%%%s%'";
-    
+
     if ($src || !empty($searchData['value'])) {
       $src = $src ? $src : $searchData['value'];
       $where[] = sprintf(" cc1.display_name $sqlCmp", $src);
