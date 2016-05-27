@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,11 +60,11 @@
           </td>
           <td class="crm-contact-form-block-postcode1">
             <label for="postcode1">{ts}Postcode 1{/ts}</label><br />
-            <input type="text" placeholder="Search Postcode1" search-column="9" />
+            <input type="text" placeholder="Search Postcode1" search-column="9" data-search-type="prefix" />
           </td>
           <td class="crm-contact-form-block-postcode2">
             <label for="postcode2">{ts}Postcode 2{/ts}</label><br />
-            <input type="text" placeholder="Search Postcode2" search-column="10" />
+            <input type="text" placeholder="Search Postcode2" search-column="10" data-search-type="prefix" /> 
           </td>
         </tr>
       </table>
@@ -273,10 +273,16 @@
 
       // apply the search
       $('#searchOptions input').on( 'keyup change', function () {
-        table
-          .column($(this).attr('search-column'))
-          .search(this.value)
-          .draw();
+        var col = table.column($(this).attr('search-column'));
+        var searchType = $(this).data("search-type");
+        if (searchType == "prefix") {
+          var val = CRM.$.fn.dataTable.util.escapeRegex(this.value);
+          var prefixRegex = '^' + val;
+          col.search(prefixRegex, true, false).draw();
+        }
+        else {
+          col.search(this.value).draw();
+        }
       });
 
       // show / hide columns
