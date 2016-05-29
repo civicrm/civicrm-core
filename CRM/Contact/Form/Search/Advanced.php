@@ -400,7 +400,8 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         $tag->retrieve($params, $result);
         $parentId = $result['parent_id'];
         $element = "contact_taglist[$parentId]";
-        if ($this->elementExists($element)) {    // It's a tagset
+        if ($this->elementExists($element)) {
+          // This tag is a tagset
           unset($defaults['contact_tags'][$key]);
           if (!isset($defaults[$element])) {
             $defaults[$element] = array();
