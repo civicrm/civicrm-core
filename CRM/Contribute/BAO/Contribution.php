@@ -4525,6 +4525,24 @@ LIMIT 1;";
       }
     }
 
+    $paymentProcessorId = $paymentProcessorType = '';
+    if (isset($objects['paymentProcessor'])) {
+      if (is_array($objects['paymentProcessor'])) {
+        $paymentProcessorId = $objects['paymentProcessor']['id'];
+        $paymentProcessorType = $objects['paymentProcessor']['payment_type'];
+      }
+      else {
+        $paymentProcessorId = $objects['paymentProcessor']->id;
+        $paymentProcessorType = $objects['paymentProcessor']->payment_type;
+      }
+    }
+    if (empty($contributionParams['payment_instrument_id']) && $paymentProcessorType) {
+      $paymentMethod = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'payment_instrument_id', array(
+        'labelColumn' => 'name',
+      ));
+      $contributionParams['payment_instrument_id'] = $paymentProcessorType == 1 ? array_search('Credit Card', $paymentMethod) : array_search('Debit Card', $paymentMethod);
+    }
+
     $contributionParams['id'] = $contribution->id;
 
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
@@ -4532,16 +4550,6 @@ LIMIT 1;";
     // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-    }
-
-    $paymentProcessorId = '';
-    if (isset($objects['paymentProcessor'])) {
-      if (is_array($objects['paymentProcessor'])) {
-        $paymentProcessorId = $objects['paymentProcessor']['id'];
-      }
-      else {
-        $paymentProcessorId = $objects['paymentProcessor']->id;
-      }
     }
 
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
