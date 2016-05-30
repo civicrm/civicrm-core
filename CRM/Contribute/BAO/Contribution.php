@@ -144,7 +144,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Core_DAO::setCreateDefaults($params, $defaults);
     }
     // CRM-18573
-    if (empty($params['receive_date'])
+    if (empty($params['receive_date']) && !empty($params['contribution_status_id'])
       && !in_array($contributionStatus[$params['contribution_status_id']],
         array('Failed', 'Pending')
       )
