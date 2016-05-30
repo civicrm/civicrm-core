@@ -72,7 +72,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
 
   /**
    * Exports sbatches in $this->_batchIds, and saves to file.
-   * 
+   *
    * @param string $fileName - use this file name (if applicable)
    */
   public function output($fileName = NULL) {
