@@ -380,7 +380,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['financial_type_id'] = $this->_contributionType;
     }
 
-    if (empty($defaults['payment_instrument_id'])) {
+    if ($this->_action & CRM_Core_Action::ADD && empty($defaults['payment_instrument_id'])) {
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
 
