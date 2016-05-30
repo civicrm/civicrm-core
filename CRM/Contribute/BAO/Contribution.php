@@ -131,25 +131,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //set defaults in create mode
-    if (!$contributionID) {
-      $defaults = self::getDefaults();
-      if (empty($params['payment_instrument_id'])) {
-        $contributionStatusID = CRM_Utils_Array::value('contribution_status_id', $params, $defaults['contribution_status_id']);
-        if (!in_array($contributionStatus[$contributionStatusID],
-          array('Completed', 'Partially paid', 'Pending refund'))
-        ) {
-          unset($defaults['payment_instrument_id']);
-        }
-      }
-      CRM_Core_DAO::setCreateDefaults($params, $defaults);
+    $isEmptyPaymentMethod = FALSE;
+    if (empty($params['payment_instrument_id'])) {
+      $isEmptyPaymentMethod = TRUE;
     }
-    // CRM-18573
-    if (empty($params['receive_date']) && !empty($params['contribution_status_id'])
-      && !in_array($contributionStatus[$params['contribution_status_id']],
-        array('Failed', 'Pending')
-      )
-    ) {
-      $params['receive_date'] = date('YmdHis');
+    if (!$contributionID) {
+      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
     }
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
@@ -191,6 +178,28 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
     if ($contributionID && $setPrevContribution) {
       $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    }
+    // CRM-18573
+    if (!empty($params['contribution_status_id'])) {
+      if ($isEmptyPaymentMethod) {
+        if (!in_array($contributionStatus[$params['contribution_status_id']],
+          array('Completed', 'Partially paid', 'Pending refund'))
+        ) {
+          unset($params['payment_instrument_id']);
+        }
+        elseif (empty($params['payment_instrument_id']) && !empty($params['prevContribution'])
+          && empty($params['prevContribution']->payment_instrument_id)
+        ) {
+          $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+        }
+      }
+      if (empty($params['receive_date'])
+        && !in_array($contributionStatus[$params['contribution_status_id']],
+          array('Failed', 'Pending')
+        )
+      ) {
+        $params['receive_date'] = date('YmdHis');
+      }
     }
     $errorMessage = CRM_Contribute_BAO_Contribution::checkPaymentInstrument($params);
     if ($errorMessage) {
