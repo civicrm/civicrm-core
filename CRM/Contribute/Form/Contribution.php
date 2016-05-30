@@ -646,7 +646,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
+        FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
       );
     }
 
@@ -934,6 +934,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       else {
         // validate payment instrument (e.g. credit card number)
         CRM_Core_Payment_Form::validatePaymentInstrument($fields['payment_processor_id'], $fields, $errors, NULL);
+      }
+    }
+    else {
+      $errorMessage = CRM_Contribute_BAO_Contribution::checkPaymentInstrument($fields);
+      if ($errorMessage) {
+        $errors['payment_instrument_id'] = $errorMessage;
       }
     }
 
