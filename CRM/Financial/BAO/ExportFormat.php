@@ -71,21 +71,13 @@ abstract class CRM_Financial_BAO_ExportFormat {
   }
 
   /**
-   * @param null $fileName
+   * Exports sbatches in $this->_batchIds, and saves to file.
+   * 
+   * @param string $fileName - use this file name (if applicable)
    */
   public function output($fileName = NULL) {
-    switch ($this->getFileExtension()) {
-      case 'csv':
-        self::createActivityExport($this->_batchIds, $fileName);
-        break;
-
-      case 'iif':
-        $tplFile = $this->getHookedTemplateFileName();
-        $out = self::getTemplate()->fetch($tplFile);
-        $fileName = $this->putFile($out);
-        self::createActivityExport($this->_batchIds, $fileName);
-        break;
-    }
+    // Default behaviour, override if needed:
+    self::createActivityExport($this->_batchIds, $fileName);
   }
 
   /**

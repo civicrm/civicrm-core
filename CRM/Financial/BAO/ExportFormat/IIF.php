@@ -79,6 +79,16 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
+   * @param null $fileName
+   */
+  public function output($fileName = NULL) {
+    $tplFile = $this->getHookedTemplateFileName();
+    $out = self::getTemplate()->fetch($tplFile);
+    $fileName = $this->putFile($out);
+    self::createActivityExport($this->_batchIds, $fileName);
+  }
+
+  /**
    * @param $out
    *
    * @return string
