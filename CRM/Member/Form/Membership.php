@@ -639,8 +639,17 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       $allowStatuses = array();
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
+      $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      $this->assign(
+        'statusCheck',
+        json_encode(
+          array(
+            array_search('Pending', $statusNames),
+            array_search('Failed', $statusNames),
+          )
+        )
+      );
       if ($this->_onlinePendingContributionId) {
-        $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
         foreach ($statusNames as $val => $name) {
           if (in_array($name, array(
             'In Progress',
