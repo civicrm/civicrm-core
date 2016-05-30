@@ -5057,7 +5057,7 @@ LIMIT 1;";
     ) {
       return FALSE;
     }
-    $status = CRM_Contribute_PseudoConstant::contributionStatus();
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if (in_array($status[$params['contribution_status_id']],
       array('Completed', 'Partially paid', 'Pending refund'))
     ) {
