@@ -129,12 +129,21 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //set defaults in create mode
     if (!$contributionID) {
-      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+      $defaults = self::getDefaults();
+      if (empty($params['payment_instrument_id'])) {
+        $contributionStatusID = CRM_Utils_Array::value('contribution_status_id', $params, $defaults['contribution_status_id']);
+        if (!in_array($contributionStatus[$contributionStatusID],
+          array('Completed', 'Partially paid', 'Pending refund'))
+        ) {
+          unset($defaults['payment_instrument_id']);
+        }
+      }
+      CRM_Core_DAO::setCreateDefaults($params, $defaults);
     }
 
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
       // @todo - should we include Chargeback? If so use self::isContributionStatusNegative($params['contribution_status_id'])
@@ -176,7 +185,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if ($contributionID && $setPrevContribution) {
       $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
-
+    $errorMessage = CRM_Contribute_BAO_Contribution::checkPaymentInstrument($params);
+    if ($errorMessage) {
+      throw new CRM_Core_Exception($errorMessage);
+    }
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
     }
