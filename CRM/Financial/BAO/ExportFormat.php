@@ -95,11 +95,14 @@ abstract class CRM_Financial_BAO_ExportFormat {
   }
 
   /**
+   * Returns some kind of identification for your export format.
+   *
+   * This does not really has to be a file extension, you can name your
+   * file as you wish as you override output.
+   *
    * @return string
    */
-  public function getFileExtension() {
-    return 'txt';
-  }
+  public abstract function getFileExtension();
 
   /**
    * @return object
