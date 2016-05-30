@@ -661,6 +661,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // suppressing contribution statuses that are NOT relevant to pledges (CRM-5169)
     $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $this->assign(
+      'statusCheck',
+      json_encode(
+        array(
+          array_search('Pending', $statusName),
+          array_search('Failed', $statusName),
+        )
+      )
+    );
     if ($this->_ppID) {
       foreach (array(
                  'Cancelled',
