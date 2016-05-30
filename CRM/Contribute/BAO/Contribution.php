@@ -5028,4 +5028,30 @@ LIMIT 1;";
     return $values;
   }
 
+  /**
+   * Validate if payment instrument is required
+   *
+   * @param array $params
+   *  array of order params.
+   *
+   * @return string
+   */
+  public static function checkPaymentInstrument($params) {
+    if (!empty($params['payment_instrument_id'])
+      || !CRM_Utils_Array::value('contribution_status_id', $params)
+      || (!array_key_exists('payment_instrument_id', $params)
+        && !empty($params['prevContribution'])
+        && !empty($params['prevContribution']->payment_instrument_id))
+    ) {
+      return FALSE;
+    }
+    $status = CRM_Contribute_PseudoConstant::contributionStatus();
+    if (in_array($status[$params['contribution_status_id']],
+      array('Completed', 'Partially paid', 'Pending refund'))
+    ) {
+      return ts('Payment Method is a required field.');
+    }
+    return FALSE;
+  }
+
 }
