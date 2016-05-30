@@ -26,9 +26,8 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 /**
- * Class WebTest_Mailing_ValidateBodyMailingComponentTest 
+ * Class WebTest_Mailing_ValidateBodyMailingComponentTest
  */
-
 class WebTest_Mailing_ValidateBodyMailingComponentTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -41,7 +40,7 @@ class WebTest_Mailing_ValidateBodyMailingComponentTest extends CiviSeleniumTestC
     $this->openCiviPage("admin/component", "action=add&reset=1");
 
     // fill component name.
-    $componentName = 'ComponentName_' . substr(sha1(rand()), 0, 7);
+    $componentName = 'ComponentName_' . substr(base_convert(rand(), 10, 36), 0, 7);
     $this->type("name", $componentName);
 
     // fill component type
@@ -68,4 +67,5 @@ class WebTest_Mailing_ValidateBodyMailingComponentTest extends CiviSeleniumTestC
     // Verify the error text.
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[2]/span[text()='{$status}']"), "The row doesn't consists of proper component details");
   }
+
 }
