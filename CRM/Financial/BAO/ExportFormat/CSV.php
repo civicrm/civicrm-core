@@ -172,7 +172,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    *
    * @param array $export
    */
-  public function makeCSV($export) {
+  public function makeExport($export) {
     // getting data from admin page
     $prefixValue = Civi::settings()->get('contribution_invoice_settings');
 
