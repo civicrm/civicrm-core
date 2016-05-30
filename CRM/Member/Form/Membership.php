@@ -800,7 +800,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if (!empty($params['record_contribution']) && empty($params['payment_instrument_id'])) {
-      $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
+      $errorMessage = CRM_Contribute_BAO_Contribution::checkPaymentInstrument($params);
+      if ($errorMessage) {
+        $errors['payment_instrument_id'] = $errorMessage;
+      }
     }
 
     if (!empty($params['is_different_contribution_contact'])) {
