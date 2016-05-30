@@ -483,12 +483,25 @@
 
     {/literal}{if !$contributionMode}{literal}
      CRM.$(function($) {
-      showHideCancelInfo(cj('#contribution_status_id'));
-
-      cj('#contribution_status_id').change(function() {
        showHideCancelInfo(cj('#contribution_status_id'));
-      }
-       );
+
+       cj('#contribution_status_id').change(function() {
+         showHideCancelInfo(cj('#contribution_status_id'));
+         var statusId = cj(this).val();
+         var statusCheck = '{/literal}{$statusCheck}{literal}';
+         if (cj.inArray(statusId, statusCheck) > -1) {
+           cj('.crm-contribution-form-block-receive_date a.crm-clear-link').trigger('click');
+         }
+         else {
+           var date = '{/literal}{$receive_date}{literal}';
+           cj(".crm-contribution-form-block-receive_date .dateplugin").datepicker("setDate", date);
+	   cj('#receive_date_time').val(
+             (new Date()).getTime()
+           );
+	   cj('#receive_date_time').focus();
+	   cj('#receive_date_time').trigger('blur');
+         }
+       });
      });
 
      function showHideCancelInfo(obj) {
@@ -523,7 +536,6 @@
 
 {literal}
 <script type="text/javascript">
-
 {/literal}
 
 // load form during form rule.
