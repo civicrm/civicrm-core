@@ -583,7 +583,7 @@ class CRM_Core_I18n {
       setlocale(LC_MESSAGES, $locale);
       setlocale(LC_CTYPE, $locale);
 
-      bindtextdomain('civicrm', $config->gettextResourceDir);
+      bindtextdomain('civicrm', CRM_Core_I18n::getResourceDir());
       bind_textdomain_codeset('civicrm', 'UTF-8');
       textdomain('civicrm');
 
@@ -595,7 +595,11 @@ class CRM_Core_I18n {
       require_once 'PHPgettext/streams.php';
       require_once 'PHPgettext/gettext.php';
 
-      $mo_file = $config->gettextResourceDir . $language . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      if (!file_exists($mo_file)) {
+        // fallback to pre-4.5 mode
+        $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      }
 
       $streamer = new FileReader($mo_file);
       $this->_phpgettext = new gettext_reader($streamer);
