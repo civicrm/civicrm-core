@@ -253,8 +253,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     parent::groupBy();
     if (empty($this->_groupBy) && $this->_totalPaid) {
       $groupBy = array("{$this->_aliases['civicrm_pledge']}.id", "{$this->_aliases['civicrm_pledge']}.currency");
-      $this->_groupBy = " GROUP BY " . implode(', ', $groupBy);
-      $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
   }
 

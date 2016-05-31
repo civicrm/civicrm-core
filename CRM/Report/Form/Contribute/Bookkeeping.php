@@ -513,13 +513,11 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $groupFromSelect = '';
     $groupBy = array(
       "{$this->_aliases['civicrm_entity_financial_trxn']}.id",
       "{$this->_aliases['civicrm_line_item']}.id"
     );
-    $groupFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
-    $this->_groupBy = " GROUP BY " . implode(', ', $groupBy) . " {$groupFromSelect}";
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   /**

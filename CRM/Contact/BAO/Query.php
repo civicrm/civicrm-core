@@ -4334,7 +4334,6 @@ civicrm_relationship.is_permission_a_b = 0
 
     // add group by
     if ($query->_useGroupBy) {
-      $sql .= ' GROUP BY contact_a.id';
       $sql .= self::getGroupByFromSelectColumns($query->_select, 'contact_a.id');
     }
     if (!empty($sort)) {
@@ -4530,12 +4529,14 @@ civicrm_relationship.is_permission_a_b = 0
    * @return string
    */
   public static function getGroupByFromSelectColumns($selectClauses, $groupBy = NULL) {
-    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
-    $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
-    if (version_compare($mysqlVersion, '5.7', '<') && (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode)))) {
-      return '';
-    }
     $groupBy = (array) $groupBy;
+    $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
+
+    //return if ONLY_FULL_GROUP_BY is not enabled.
+    if (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
+      return " GROUP BY " . implode(', ', $groupBy);
+    }
+
     $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
     foreach ($selectClauses as $key => $val) {
       $aliasArray = preg_split('/ as /i', $val);
@@ -4545,7 +4546,7 @@ civicrm_relationship.is_permission_a_b = 0
         foreach ($aliasArray as $key => $value) {
           $alias = current(preg_split('/ as /i', $value));
           if (!in_array($alias, $groupBy) && preg_match($regexToExclude, trim($alias)) !== 1) {
-            $selectColAlias[] = $alias;
+            $groupBy[] = $alias;
           }
         }
       }
@@ -4555,18 +4556,17 @@ civicrm_relationship.is_permission_a_b = 0
         // exclude columns which are already included in groupBy and aggregate functions from select
         if (!in_array($selectColumn, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
           if (!empty($alias) && preg_match($dateRegex, trim($selectColumn))) {
-            $selectColAlias[] = $alias;
+            $groupBy[] = $alias;
           }
           else {
-            $selectColAlias[] = $selectColumn;
+            $groupBy[] = $selectColumn;
           }
         }
       }
     }
 
-    if (!empty($selectColAlias)) {
-      $groupStmt = implode(', ', $selectColAlias);
-      return empty($groupBy) ? $groupStmt : ", {$groupStmt}";
+    if (!empty($groupBy)) {
+      return " GROUP BY " . implode(', ', $groupBy);
     }
     return '';
   }
@@ -4631,11 +4631,11 @@ civicrm_relationship.is_permission_a_b = 0
     }
 
     // building the query string
-    $groupBy = NULL;
+    $groupBy = $groupByCol = NULL;
     if (!$count) {
       if (isset($this->_groupByComponentClause)) {
         $groupBy = $this->_groupByComponentClause;
-        $groupCols = preg_replace('/^' . preg_quote('GROUP BY ', '/') . '/', '', $this->_groupByComponentClause);
+        $groupCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
         $groupByCol = explode(', ', $groupCols);
       }
       elseif ($this->_useGroupBy) {
@@ -4667,8 +4667,8 @@ civicrm_relationship.is_permission_a_b = 0
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
-    if (!empty($groupBy)) {
-      $groupBy .= self::getGroupByFromSelectColumns($this->_select, $groupByCol);
+    if (!empty($groupByCol)) {
+      $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
     }
 
     if ($additionalWhereClause) {
@@ -4728,8 +4728,8 @@ civicrm_relationship.is_permission_a_b = 0
     list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
-    $groupBy = " GROUP BY contact_a.id, pnc.id";
-    $groupBy .= self::getGroupByFromSelectColumns($this->_select, 'contact_a.id');
+    $groupByCol = array('contact_a.id', 'pnc.id');
+    $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
     $limit = " LIMIT $offset, $rowCount";
     $query = "$select $from $where $groupBy $order $limit";
 

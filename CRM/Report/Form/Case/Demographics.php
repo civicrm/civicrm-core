@@ -359,8 +359,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
 
   public function groupBy() {
     $groupBy = array("{$this->_aliases['civicrm_contact']}.id", "{$this->_aliases['civicrm_case']}.id");
-    $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {

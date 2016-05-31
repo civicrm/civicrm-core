@@ -463,8 +463,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       "{$this->_aliases['civicrm_mailing']}.id",
       "{$this->_aliases['civicrm_mailing_job']}.end_date",
     );
-    $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {

@@ -307,8 +307,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
       "{$this->_aliases['civicrm_pledge']}.id",
       "{$this->_aliases['civicrm_pledge']}.currency",
     );
-    $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {
