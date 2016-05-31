@@ -193,7 +193,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
         }
       }
-      if (empty($params['receive_date'])
+      if (empty($params['receive_date']) && !(!empty($params['prevContribution']) && !empty($params['prevContribution']->receive_date))
         && !in_array($contributionStatus[$params['contribution_status_id']],
           array('Failed', 'Pending')
         )
