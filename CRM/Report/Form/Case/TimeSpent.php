@@ -293,8 +293,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
         $groupBy[] = "{$this->_aliases['civicrm_activity']}.activity_type_id";
       }
 
-      $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
-      $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
   }
 

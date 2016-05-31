@@ -327,8 +327,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       "{$this->_aliases['civicrm_contact']}.id"
     );
 
-    $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {

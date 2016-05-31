@@ -193,8 +193,7 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
   }
 
   public function groupBy() {
-    $groupFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_pcp']}.id");
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_pcp']}.id {$groupFromSelect}";
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_pcp']}.id");
   }
 
   public function orderBy() {

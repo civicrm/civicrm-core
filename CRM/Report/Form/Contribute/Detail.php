@@ -458,8 +458,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
 
   public function groupBy() {
     $groupBy = array("{$this->_aliases['civicrm_contact']}.id", "{$this->_aliases['civicrm_contribution']}.id");
-    $this->_groupBy = " GROUP BY " . implode(', ', $groupBy);
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   /**
@@ -882,6 +881,8 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
+      $this->_select = "SELECT " . implode(", ", $ifnulls);
+      $this->appendSelect($ifnulls, $sectionAliases);
 
       /* Group (un-limited) report by all aliases and get counts. This might
        * be done more efficiently when the contents of $sql are known, ie. by
@@ -897,9 +898,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         $showsumcontribs = TRUE;
       }
 
-      $query = "select "
-        . implode(", ", $ifnulls)
-        .
+      $query = $this->_select .
         "$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by " .
         implode(", ", $sectionAliases);
       // initialize array of total counts

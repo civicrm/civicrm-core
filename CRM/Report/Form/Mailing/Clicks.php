@@ -264,8 +264,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     else {
       $groupBy = "civicrm_mailing_event_trackable_url_open.id";
     }
-    $this->_groupBy = " GROUP BY {$groupBy}";
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function postProcess() {

@@ -386,8 +386,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
         " {$this->_rollup} ";
     }
     else {
-      $groupFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_membership']}.join_date");
-      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_membership']}.join_date {$groupFromSelect}";
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_membership']}.join_date");
     }
   }
 

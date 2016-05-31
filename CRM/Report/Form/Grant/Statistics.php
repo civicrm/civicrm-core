@@ -325,9 +325,8 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
         }
       }
     }
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy = " GROUP BY " . implode(', ', $groupBy);
-      $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    if (!empty($groupBy)) {
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
   }
 

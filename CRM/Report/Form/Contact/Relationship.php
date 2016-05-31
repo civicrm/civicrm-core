@@ -566,8 +566,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $groupBy = array("{$this->_aliases['civicrm_relationship']}.id");
     }
 
-    $this->_groupBy = " GROUP BY  " . implode(', ', $groupBy);
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {

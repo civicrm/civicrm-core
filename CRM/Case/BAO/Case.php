@@ -986,8 +986,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
               AND ca.activity_date_time <= '{$toActivityDate}'";
     }
 
-    $groupBy = "
-      GROUP BY id " . CRM_Contact_BAO_Query::getGroupByFromSelectColumns($selectClause, 'ca.id');
+    $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($selectClause, 'ca.id');
 
     $sortBy = CRM_Utils_Array::value('sortBy', $params);
     if (!$sortBy) {

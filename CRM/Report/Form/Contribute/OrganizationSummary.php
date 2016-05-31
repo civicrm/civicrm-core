@@ -335,8 +335,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       "{$this->_aliases['civicrm_contribution']}.id",
       "{$this->_aliases['civicrm_relationship']}.relationship_type_id",
     );
-    $this->_groupBy = " GROUP BY " . implode(', ', $groupBy);
-    $this->_groupBy .= CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {
