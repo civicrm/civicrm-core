@@ -95,4 +95,8 @@ class CRM_Utils_PDF_Document {
     return \PhpOffice\PhpWord\Shared\Converter::pointToTwip($point);
   }
 
+  public static function docReader($path) {
+    return \PhpOffice\PhpWord\IOFactory::load($path);
+
+  }
 }

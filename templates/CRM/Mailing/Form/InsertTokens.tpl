@@ -131,10 +131,19 @@ function selectValue( val, prefix) {
   var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0 }"{literal};
 
   cj.post( dataUrl, {tid: val}, function( data ) {
+    if (data.document_path) {
+      cj("#document").attr('data', data.document_path);
+      cj("#document").attr('type', data.mime_type);
+      cj("#document embed").attr('type', data.mime_type);
+      cj('#document embed').attr('src', data.document_path);
+      console.log(data.document_path);
+    }
+
     if ( !isPDF ) {
       if (prefix == "SMS") {
           text_message = "sms_text_message";
       }
+
       if ( data.msg_text ) {
         cj("#"+text_message).val( data.msg_text );
         cj("div.text").show();

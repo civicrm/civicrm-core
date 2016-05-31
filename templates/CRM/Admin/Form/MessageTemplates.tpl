@@ -50,6 +50,12 @@
             </td>
         </tr>
         <tr>
+           <td class="label-left">{$form.file_type.label}</td>
+            <td>{$form.file_type.html}
+                <br /><span class="description html-adjust">{ts}Choose the file type{/ts}</span>
+            </td>
+        </tr>
+        <tr>
             <td class="label-left">{$form.msg_subject.label}</td>
             <td>
               {$form.msg_subject.html|crmAddClass:huge}
@@ -59,9 +65,26 @@
             </td>
         </tr>
         <tr>
+            <td class="label-left">{$form.file_id.label}</td>
+            <td>{$form.file_id.html}
+              {if $attachment}
+                 {foreach from=$attachment key=attKey item=attVal}
+                 <div class="crm-attachment-wrapper crm-entity" id="file_{$attVal.fileID}">
+                   <strong><a class="crm-attachment" href="{$attVal.url}">{$attVal.cleanName}</a></strong>
+                   {if $attVal.description}&nbsp;-&nbsp;{$attVal.description}{/if}
+                   {if $attVal.deleteURLArgs}
+                    <a href="#" class="crm-hover-button delete-attachment" data-mimetype="{$attVal.mime_type}" data-filename="{$attVal.cleanName}" data-args="{$attVal.deleteURLArgs}" title="{ts}Delete File{/ts}"><span class="icon delete-icon"></span></a>
+                   {/if}
+                   {include file="CRM/Form/attachmentjs.tpl" context='MessageTemplate'}
+                 {/foreach}
+              {/if}
+                <br /><span class="description html-adjust">{ts}Upload the document file{/ts}</span>
+            </td>
+        </tr>
+        <tr>
   </table>
 
-      <div class="crm-accordion-wrapper crm-html_email-accordion ">
+      <div id="msg_html" class="crm-accordion-wrapper crm-html_email-accordion ">
         <div class="crm-accordion-header">
             {ts}HTML Format{/ts}
             {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
@@ -79,7 +102,7 @@
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
 
-      <div class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
+      <div id="msg_text" class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
         <div class="crm-accordion-header">
                 {ts}Plain-Text Format{/ts}
         </div><!-- /.crm-accordion-header -->
@@ -124,3 +147,41 @@
 </div>
 </div> <!-- end of crm-form-block -->
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
+
+{literal}
+  <script type='text/javascript'>
+    CRM.$(function($) {
+      var mimeType = null;
+      // if default file is selected then hide the file upload field
+      if ($('a.delete-attachment').length) {
+        $('#file_id').hide();
+        mimeType = $('a.delete-attachment').data('mimetype');
+      }
+
+      $('#file_type').on('change', function(){
+        toggleByFileType(this.value);
+      });
+      toggleByFileType($('#file_type').val());
+
+      function toggleByFileType(type) {
+        var show = (type == 'odt' || type == 'docx') ? false : true;
+        $("#msg_html").toggle(show);
+        $("#msg_text").toggle(show);
+        $("#file_id").parent().parent().toggle(!show);
+
+        // auto file type validation
+        if (!show) {
+          var validType = (type == 'odt') ? 'application/vnd.oasis.opendocument.text' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+          $("#file_id").attr('accept', validType);
+        }
+
+        // when you change file type other than the type of default uploaded document
+        if (mimeType) {
+          var hide = (mimeType != type) ? true : false;
+          $("#file_id").toggle(hide);
+          $('.crm-attachment-wrapper').toggle(!hide);
+        }
+      }
+    });
+  </script>
+{/literal}
