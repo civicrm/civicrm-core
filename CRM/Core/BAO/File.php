@@ -170,8 +170,6 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     // lets call the post hook here so attachments code can do the right stuff
     CRM_Utils_Hook::post($op, 'File', $fileDAO->id, $fileDAO);
-
-    return $fileDAO;
   }
 
   /**
