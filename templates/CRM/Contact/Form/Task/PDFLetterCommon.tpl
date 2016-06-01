@@ -85,6 +85,15 @@
   </div>
 </div>
 
+<div class="crm-accordion-wrapper crm-document-accordion ">
+  <div class="crm-accordion-header">
+    {$form.html_message.label}
+  </div><!-- /.crm-accordion-header -->
+  <div class="crm-accordion-body">
+    <div id='document'></div>
+  </div><!-- /.crm-accordion-body -->
+</div><!-- /.crm-accordion-wrapper -->
+
 <div class="crm-accordion-wrapper crm-html_email-accordion ">
 <div class="crm-accordion-header">
     {$form.html_message.label}
@@ -129,6 +138,12 @@
 <script type="text/javascript">
 CRM.$(function($) {
   var $form = $('form.{/literal}{$form.formClass}{literal}');
+
+  {/literal}{if $form.formName eq 'PDF'}{literal}
+    cj('.crm-document-accordion').hide();
+  {/literal}{/if}{literal}
+
+
   $('#format_id', $form).on('change', function() {
     selectFormat($(this).val());
   });

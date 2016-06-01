@@ -252,6 +252,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   static protected function processMessageTemplate(&$form) {
     $formValues = $form->controller->exportValues($form->getName());
 
+    $html_message = $formValues['html_message'];
+
     // process message template
     if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
       $messageTemplate = array(
@@ -285,6 +287,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = NULL WHERE id = {$formValues['template']}";
       }
       CRM_Core_DAO::executeQuery($query);
+
+      $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $formValues['template']);
+      foreach ((array) $documentInfo as $info) {
+        $docType = array_search($info['mime_type'], CRM_Core_SelectValues::documentApplicationType());
+        $html_message = CRM_Utils_PDF_Document::docReader($info['fullPath'], $docType, TRUE);
+      }
     }
     if (!empty($formValues['update_format'])) {
       $bao = new CRM_Core_BAO_PdfFormat();
@@ -296,8 +304,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $tokens = array();
     CRM_Utils_Hook::tokens($tokens);
     $categories = array_keys($tokens);
-
-    $html_message = $formValues['html_message'];
 
     //time being hack to strip '&nbsp;'
     //from particular letter line, CRM-6798

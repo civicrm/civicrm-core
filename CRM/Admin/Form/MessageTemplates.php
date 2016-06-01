@@ -38,7 +38,9 @@
 class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   // which (and whether) mailing workflow this template belongs to
   protected $_workflow_id = NULL;
-  protected $_documentID = NULL;
+
+  // document ID set during loading default values and later used in formRule
+  protected $_document_id = NULL;
 
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -89,7 +91,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
         foreach ($documentInfo as &$info) {
           $defaults['file_type'] = array_search($info['mime_type'], CRM_Core_SelectValues::documentApplicationType());
           $info['mime_type'] = $defaults['file_type'];
-          $this->_documentID = $info['fileID'];
+          $this->_document_id = $info['fileID'];
         }
         $this->assign('attachment', $documentInfo);
       }
@@ -168,7 +170,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     $this->add('text', 'msg_title', ts('Message Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_title'), TRUE);
 
     $this->add('select', 'file_type', ts('File Type'), CRM_Core_SelectValues::documentFormat());
-
     $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=60');
     $this->addUploadElement("file_id");
 
@@ -227,10 +228,11 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   /**
    * Global form rule.
    *
-   * @param array $fields
+   * @param array $params
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
+   * @param array $self
    *
    * @return array
    *   array of errors
@@ -241,9 +243,9 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     //empty file upload validation for odt/docx template
     if (empty($files['file_id']['tmp_name']) && in_array($params['file_type'], array('odt', 'docx'))) {
       //On edit page of docx/odt message template if user changes file type but forgot to upload document
-      if (!empty($self->_documentID)) {
+      if (!empty($self->_document_id)) {
         $fileDAO = new CRM_Core_DAO_File();
-        $fileDAO->id = $self->_documentID;
+        $fileDAO->id = $self->_document_id;
         if ($fileDAO->find(TRUE) &&
           $fileDAO->mime_type != CRM_Utils_Array::value($params['file_type'], CRM_Core_SelectValues::documentApplicationType())
         ) {

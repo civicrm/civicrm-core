@@ -95,8 +95,63 @@ class CRM_Utils_PDF_Document {
     return \PhpOffice\PhpWord\Shared\Converter::pointToTwip($point);
   }
 
-  public static function docReader($path) {
-    return \PhpOffice\PhpWord\IOFactory::load($path);
+  /**
+   * @param array $path  docx/odt file path
+   * @param string $type  File type
+   * @param bool $returnContent extract content of docx/odt file as a text, later used for token replacement
+   *
+   * @return string
+   *    Return filepath of created html copy of document OR extracted content of document
+   */
+  public static function docReader($path, $type, $returnContent = FALSE) {
+    if ($returnContent) {
+      return self::doc2Text($path, $type);
+    }
 
+    $newpath = str_replace('.' . $type, '.html', $path);
+    $fileType = ($type == 'docx') ? 'Word2007' : 'ODText';
+    if (!file_exists($newpath)) {
+      $phpWord = \PhpOffice\PhpWord\IOFactory::load($path, $fileType);
+      $phpWord->save($newpath, 'HTML');
+    }
+
+    $relPath = str_replace('/Users/monish/www/civicrm-master/', CRM_Utils_System::baseURL(), $newpath);
+    return $relPath;
   }
+
+  /**
+   * Extract content of docx/odt file as text and later used for token replacement
+   * @param string $filePath Document file path
+   * @param string $type File type of document
+   *
+   * @return string
+   *   File content of document as text
+   */
+  public static function doc2Text($filePath, $type) {
+    $content = '';
+
+    $zip = zip_open($filePath);
+    $dataFile = ($type == 'docx') ? "word/document.xml" : "content.xml";
+
+    if (!$zip || is_numeric($zip)) {
+      return $content;
+    }
+
+    while ($zip_entry = zip_read($zip)) {
+      if (zip_entry_open($zip, $zip_entry) == FALSE || zip_entry_name($zip_entry) != $dataFile) {
+        continue;
+      }
+      $content .= zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
+      zip_entry_close($zip_entry);
+    }
+
+    zip_close($zip);
+
+    $content = str_replace('</w:r></w:p></w:tc><w:tc>', " ", $content);
+    $content = str_replace('</w:r></w:p>', "\r\n", $content);
+    $striped_content = strip_tags($content);
+
+    return nl2br($striped_content);
+  }
+
 }

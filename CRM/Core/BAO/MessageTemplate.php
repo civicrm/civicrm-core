@@ -97,7 +97,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
     if (!empty($fileParams)) {
       $params['file_id'] = $fileParams;
-      $fileDao = CRM_Core_BAO_File::filePostProcess(
+      CRM_Core_BAO_File::filePostProcess(
         $params['file_id']['location'],
         NULL,
         'civicrm_msg_template',
@@ -108,8 +108,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         'file_id',
         $params['file_id']['type']
       );
-
-      $messageTemplates->save();
     }
 
     CRM_Utils_Hook::post($hook, 'MessageTemplate', $messageTemplates->id, $messageTemplates);
