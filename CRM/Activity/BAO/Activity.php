@@ -1427,7 +1427,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
 
     // get token details for contacts, call only if tokens are used
     $details = array();
-    if (!empty($returnProperties) || !empty($tokens)) {
+    if (!empty($returnProperties) && !empty($tokens)) {
       list($details) = CRM_Utils_Token::getTokenDetails($contactIds,
         $returnProperties,
         NULL, NULL, FALSE,
