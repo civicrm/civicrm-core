@@ -25,14 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-// Patch for CRM-3154
-if (phpversion() == "5.2.2" &&
-  !isset($GLOBALS['HTTP_RAW_POST_DATA'])
-) {
-  $GLOBALS['HTTP_RAW_POST_DATA'] = file_get_contents('php://input');
-}
-
 if (defined('PANTHEON_ENVIRONMENT')) {
   ini_set('session.save_handler', 'files');
 }
