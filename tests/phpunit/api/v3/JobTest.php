@@ -354,6 +354,58 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the batch merge does not create duplicate emails.
+   *
+   * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
+   */
+  public function testBatchMergeMatchingAddress() {
+    for ($x = 0; $x <= 2; $x++) {
+      $this->individualCreate(array(
+        'api.address.create' => array(
+          'location_type_id' => 'Home',
+          'street_address' => 'Appt 115, The Batcave',
+          'city' => 'Gotham',
+          'postal_code' => 'Nananananana',
+        ),
+      ));
+    }
+    // Different location type, still merge, identical.
+    $this->individualCreate(array(
+      'api.address.create' => array(
+        'location_type_id' => 'Main',
+        'street_address' => 'Appt 115, The Batcave',
+        'city' => 'Gotham',
+        'postal_code' => 'Nananananana',
+      ),
+    ));
+
+    $this->individualCreate(array(
+      'api.address.create' => array(
+        'location_type_id' => 'Home',
+        'street_address' => 'Appt 115, The Batcave',
+        'city' => 'Gotham',
+        'postal_code' => 'Batman',
+      ),
+    ));
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals(3, count($result['values']['merged']));
+    $this->assertEquals(1, count($result['values']['skipped']));
+    $this->callAPISuccessGetCount('Contact', array('street_address' => 'Appt 115, The Batcave'), 2);
+    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 1));
+    $this->callAPISuccessGetCount('Address', array(
+      'street_address' => 'Appt 115, The Batcave',
+      'contact_id' => array('IN' => array_keys($contacts['values'])),
+    ), 3);
+
+    $this->callAPISuccessGetCount('Address', array(
+      'street_address' => 'Appt 115, The Batcave',
+      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
+    ), 2);
+  }
+
+  /**
    * Test the batch merge by id range.
    *
    * We have 2 sets of 5 matches & set the merge only to merge the lower set.
