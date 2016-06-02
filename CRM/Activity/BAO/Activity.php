@@ -717,7 +717,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $insertSQL = "INSERT INTO {$activityTempTable} (" . implode(',', $insertValueSQL) . " ) ";
 
     $order = $limit = $groupBy = '';
-    $groupBy = " GROUP BY " . implode(',', $insertValueSQL);
+    $groupBy = " GROUP BY tbl.activity_id, tbl.activity_type, tbl.case_id, tbl.case_subject ";
 
     if (!empty($input['sort'])) {
       if (is_a($input['sort'], 'CRM_Utils_Sort')) {
@@ -791,21 +791,20 @@ WHERE ac.record_type_id != %1
 
     // for each activity insert one target contact
     // if we load all target contacts the performance will suffer a lot for mass-activities.
-    $select = "ac.activity_id,
+    $query = "
+INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name, is_deleted, counter )
+SELECT     ac.activity_id,
            ac.contact_id,
            ac.record_type_id,
            c.sort_name,
-           c.is_deleted";
-    $query = "
-INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name, is_deleted, counter )
-SELECT     {$select},
+           c.is_deleted,
            count(ac.contact_id)
 FROM       {$activityTempTable}
 INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_activity_contact ac ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
 WHERE ac.record_type_id = %1
-GROUP BY {$select}
+GROUP BY ac.activity_id, ac.contact_id
 ";
 
     CRM_Core_DAO::executeQuery($query, $params);

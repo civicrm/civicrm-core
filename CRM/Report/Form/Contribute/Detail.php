@@ -593,8 +593,10 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $this->customDataFrom();
 
     $select = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_select);
-    $this->_groupBy = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_groupBy);
     $select = str_ireplace("'Contribution' as", "'Soft Credit' as", $select);
+    if (!empty($this->_groupBy)) {
+      $this->_groupBy .= ', contribution_soft_civireport.amount';
+    }
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
     $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy}";
     $tempQuery = 'CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 AS ' . $sql;

@@ -292,7 +292,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     if ($visibility) {
       $where .= " AND civicrm_group.visibility != 'User and User Admin Only'";
     }
-    $groupBy = " GROUP BY civicrm_group.id, civicrm_group.title";
+    $groupBy = " GROUP BY civicrm_group.id";
 
     $orderby = " ORDER BY civicrm_group.name";
     $sql = $select . $from . $where . $groupBy . $orderby;

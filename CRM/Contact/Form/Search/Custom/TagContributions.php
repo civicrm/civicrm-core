@@ -133,7 +133,7 @@ FROM   $from
 WHERE  $where
 ";
 
-    $sql .= " GROUP BY contact_a.id, contact_a.sort_name, contact_a.first_name, contact_a.last_name";
+    $sql .= " GROUP BY contact_a.id";
     // Define ORDER BY for query in $sort, with default value
     if (!empty($sort)) {
       if (is_string($sort)) {
