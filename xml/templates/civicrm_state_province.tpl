@@ -3419,7 +3419,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4978, 1227, "71", "Midway Islands"),
 (4979, 1227, "76", "Navassa Island"),
 (4980, 1227, "95", "Palmyra Atoll"),
-(4981, 1227, "79", "Wake Ialand"),
+(4981, 1227, "79", "Wake Island"),
 (4982, 1229, "AR", "Artigsa"),
 (4983, 1229, "CA", "Canelones"),
 (4984, 1229, "CL", "Cerro Largo"),
