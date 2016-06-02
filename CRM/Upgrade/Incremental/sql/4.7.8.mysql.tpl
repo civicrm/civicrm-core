@@ -13,5 +13,3 @@ DELETE FROM civicrm_state_province WHERE name = 'Fernando de Noronha';
 -- CRM-17118 extend civicrm_address postal_code to accept full data strings from paypal etc.
 ALTER TABLE civicrm_address CHANGE `postal_code` `postal_code` varchar(64) ;
 
--- CRM-18699 Fix Wake Island misspelling, was Wake Ialand
-UPDATE civicrm_state_province SET name="Wake Island" WHERE id=4981;
