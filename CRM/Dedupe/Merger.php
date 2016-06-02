@@ -868,20 +868,33 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
         // Rule: Catch address conflicts (same address type on both contacts)
         if ($fieldName == 'address') {
-          $mainNewLocTypeId = $migrationInfo['location_blocks'][$fieldName][$fieldCount]['locTypeId'];
           if (
             isset($migrationInfo['main_details']['location_blocks']['address']) &&
             !empty($migrationInfo['main_details']['location_blocks']['address'])
           ) {
+            $otherAddresses = $migrationInfo['other_details']['location_blocks']['address'];
+            $otherAddressLookup = array();
+            foreach ($otherAddresses as $otherAddressIndex => $otherAddress) {
+              $otherAddressLookup[$otherAddress['location_type_id']] = $otherAddressIndex;
+            }
             // Look for this LocTypeId in the results
             // @todo This can be streamlined using array_column() in PHP 5.5+
             foreach ($migrationInfo['main_details']['location_blocks']['address'] as $addressKey => $addressRecord) {
-              if ($addressRecord['location_type_id'] == $mainNewLocTypeId) {
+              $otherAddressIndex = CRM_Utils_Array::value($addressRecord['location_type_id'], $otherAddressLookup);
+              $hasMatchingAddress = FALSE;
+              foreach ($otherAddresses as $otherAddress) {
+                if (self::addressIsSame($addressRecord, $otherAddress)) {
+                  $hasMatchingAddress = TRUE;
+                }
+              }
+              if ($hasMatchingAddress) {
+                unset($migrationInfo[$key]);
+              }
+              elseif (!empty($otherAddresses[$otherAddressIndex]) && !self::addressIsSame($addressRecord, $otherAddresses[$otherAddressIndex])) {
                 $conflicts[$key] = NULL;
                 break;
               }
             }
-
           }
         }
         // For other locations, don't merge/add if the values are the same
@@ -924,6 +937,27 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Compare 2 addresses to see if they are the same.
+   *
+   * @param array $mainAddress
+   * @param array $comparisonAddress
+   *
+   * @return bool
+   */
+  static protected function addressIsSame($mainAddress, $comparisonAddress) {
+    $keysToIgnore = array('id', 'is_primary', 'is_billing', 'manual_geo_code', 'contact_id');
+    foreach ($comparisonAddress as $field => $value) {
+      if (in_array($field, $keysToIgnore)) {
+        continue;
+      }
+      if (!empty($value) && $mainAddress[$field] != $value) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**
