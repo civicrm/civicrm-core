@@ -542,7 +542,7 @@ WHERE  mailing_id = %1
       $groupBy = $groupJoin = '';
       if ($dedupeEmail) {
         $groupJoin = " INNER JOIN civicrm_email e ON e.id = i.email_id";
-        $groupBy = " GROUP BY e.email, i.contact_id, i.email_id ";
+        $groupBy = " GROUP BY e.email, i.contact_id ";
       }
 
       $sql = "
@@ -2518,7 +2518,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     // we only care about parent jobs, since that holds all the info on
     // the mailing
     $selectClause = implode(', ', $select);
-    $groupFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select);
+    $groupFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, "$mailing.id");
     $query = "
             SELECT      {$selectClause},
                         MIN($job.scheduled_date) as scheduled_date,

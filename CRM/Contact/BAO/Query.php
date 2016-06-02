@@ -4530,11 +4530,15 @@ civicrm_relationship.is_permission_a_b = 0
    */
   public static function getGroupByFromSelectColumns($selectClauses, $groupBy = NULL) {
     $groupBy = (array) $groupBy;
+    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
     $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
 
     //return if ONLY_FULL_GROUP_BY is not enabled.
-    if (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
-      return " GROUP BY " . implode(', ', $groupBy);
+    if (version_compare($mysqlVersion, '5.7', '<') || !empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
+      if (!empty($groupBy)) {
+        return " GROUP BY " . implode(', ', $groupBy);
+      }
+      return '';
     }
 
     $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
@@ -4552,9 +4556,12 @@ civicrm_relationship.is_permission_a_b = 0
       }
       else {
         list($selectColumn, $alias) = array_pad($aliasArray, 2, NULL);
-        $dateRegex = '/^(DATE_FORMAT|DATE_ADD)/i';
+        $dateRegex = '/^(DATE_FORMAT|DATE_ADD|CASE)/i';
+        $tableName = current(explode('.', $selectColumn));
+        $primaryKey = "{$tableName}.id";
         // exclude columns which are already included in groupBy and aggregate functions from select
-        if (!in_array($selectColumn, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
+        // CRM-18439 - Also exclude the columns which are functionally dependent on columns in $groupBy (MySQL 5.7+)
+        if (!in_array($selectColumn, $groupBy) && !in_array($primaryKey, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
           if (!empty($alias) && preg_match($dateRegex, trim($selectColumn))) {
             $groupBy[] = $alias;
           }
@@ -4836,7 +4843,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
       civicrm_contribution.currency $from $completedWhere";
     $query = "$select FROM (
-      $innerQuery GROUP BY civicrm_contribution.id, civicrm_contribution.total_amount, civicrm_contribution.currency
+      $innerQuery GROUP BY civicrm_contribution.id
     ) as conts
     GROUP BY currency";
 
@@ -4881,6 +4888,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
       $query = "
         $select FROM (
           SELECT civicrm_contribution_soft.amount as total_amount, civicrm_contribution_soft.currency $from $softCreditWhere
+          GROUP BY civicrm_contribution_soft.id
         ) as conts
         GROUP BY currency";
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -4927,6 +4935,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
 
     $query = "$select FROM (
       SELECT civicrm_contribution.total_amount, civicrm_contribution.currency $from $where
+      GROUP BY civicrm_contribution.id
     ) as conts
     GROUP BY currency";
 

@@ -148,7 +148,7 @@ count(contrib.id) AS donation_count
 SELECT $select
 FROM   $from
 WHERE  $where
-GROUP BY contact_a.id, contact_a.sort_name
+GROUP BY contact_a.id
 $having
 ";
     //for only contact ids ignore order.

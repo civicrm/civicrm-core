@@ -757,7 +757,7 @@ AND civicrm_case.status_id != $closedId";
       $myCaseWhereClause = " AND case_relationship.contact_id_b = {$userID}";
       $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
     }
-    $myGroupByClause .= ", case_status.label, status_id, civicrm_case_type.title, case_type_id, case_relationship.contact_id_b";
+    $myGroupByClause .= ", case_status.label, status_id, case_type_id";
 
     // FIXME: This query could be a lot more efficient if it used COUNT() instead of returning all rows and then counting them with php
     $query = "
@@ -878,33 +878,31 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-    $selectClause = array(
-      "ca.id AS id",
-      "ca.activity_type_id AS type",
-      "ca.activity_type_id AS activity_type_id",
-      "tcc.sort_name AS target_contact_name",
-      "tcc.id AS target_contact_id",
-      "scc.sort_name AS source_contact_name",
-      "scc.id AS source_contact_id",
-      "scc.sort_name AS source_contact_name",
-      "acc.sort_name AS assignee_contact_name",
-      "acc.id AS assignee_contact_id",
-      "ca.status_id AS status",
-      "ca.subject AS subject",
-      "ca.is_deleted AS deleted",
-      "ca.priority_id AS priority",
-      "ca.weight AS weight",
-      "DATE_FORMAT(IF(ca.activity_date_time < NOW() AND ca.status_id=ov.value,
-        ca.activity_date_time,
-        DATE_ADD(NOW(), INTERVAL 1 YEAR)
-      ), '%Y%m%d%H%i00')  AS overdue_date",
-      "DATE_FORMAT(ca.activity_date_time, '%Y%m%d%H%i00') AS display_date",
-    );
 
     // CRM-5081 - formatting the dates to omit seconds.
     // Note the 00 in the date format string is needed otherwise later on it thinks scheduled ones are overdue.
     $select = "
-           SELECT SQL_CALC_FOUND_ROWS COUNT(ca.id) AS ismultiple, " . implode(', ', $selectClause) . ",
+           SELECT SQL_CALC_FOUND_ROWS COUNT(ca.id) AS ismultiple,
+                  ca.id AS id,
+                  ca.activity_type_id AS type,
+                  ca.activity_type_id AS activity_type_id,
+                  tcc.sort_name AS target_contact_name,
+                  tcc.id AS target_contact_id,
+                  scc.sort_name AS source_contact_name,
+                  scc.id AS source_contact_id,
+                  acc.sort_name AS assignee_contact_name,
+                  acc.id AS assignee_contact_id,
+                  DATE_FORMAT(
+                    IF(ca.activity_date_time < NOW() AND ca.status_id=ov.value,
+                      ca.activity_date_time,
+                      DATE_ADD(NOW(), INTERVAL 1 YEAR)
+                    ), '%Y%m%d%H%i00') AS overdue_date,
+                  DATE_FORMAT(ca.activity_date_time, '%Y%m%d%H%i00') AS display_date,
+                  ca.status_id AS status,
+                  ca.subject AS subject,
+                  ca.is_deleted AS deleted,
+                  ca.priority_id AS priority,
+                  ca.weight AS weight,
                   GROUP_CONCAT(ef.file_id) AS attachment_ids ";
 
     $from = "
@@ -986,7 +984,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
               AND ca.activity_date_time <= '{$toActivityDate}'";
     }
 
-    $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($selectClause, 'ca.id');
+    $groupBy = "
+         GROUP BY ca.id, tcc.id, scc.id, acc.id, ov.value";
 
     $sortBy = CRM_Utils_Array::value('sortBy', $params);
     if (!$sortBy) {

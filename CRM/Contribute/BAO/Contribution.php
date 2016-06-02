@@ -4005,12 +4005,14 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     if ($getTrxnInfo && $baseTrxnId) {
       $arRelationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $arAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $arRelationTypeId);
-      $select = "ft.total_amount,
-          ft.payment_instrument_id,
-          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, con.currency";
+
       // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
       $sql = "
-        SELECT GROUP_CONCAT(fa.`name`) as financial_account, {$select}
+        SELECT GROUP_CONCAT(fa.`name`) as financial_account,
+          ft.total_amount,
+          ft.payment_instrument_id,
+          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, con.currency
+
         FROM civicrm_contribution con
           LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
           INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
@@ -4019,9 +4021,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           LEFT JOIN civicrm_financial_item fi ON fi.id = ef.entity_id
           INNER JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
 
-        WHERE con.id = %1 AND ft.to_financial_account_id <> %3";
+        WHERE con.id = %1 AND ft.to_financial_account_id <> %3
+        GROUP BY ft.id";
 
-      $sql .= " GROUP BY ft.id, {$select}";
       $queryParams = array(
         1 => array($contributionId, 'Integer'),
         2 => array($feeFinancialAccount, 'Integer'),

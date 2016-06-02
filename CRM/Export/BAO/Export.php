@@ -172,37 +172,40 @@ class CRM_Export_BAO_Export {
    *   Group By Clause
    */
   public static function getGroupBy($exportMode, $queryMode, $returnProperties, $query) {
+    $groupBy = '';
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
       CRM_Utils_Array::value('notes', $returnProperties) ||
       // CRM-9552
       ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)
     ) {
-      $groupBy = " GROUP BY contact_a.id";
+      $groupBy = "contact_a.id";
     }
 
     switch ($exportMode) {
       case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        $groupBy = 'GROUP BY civicrm_contribution.id';
+        $groupBy = 'civicrm_contribution.id';
         if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
           // especial group by  when soft credit columns are included
-          $groupBy = 'GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.scredit_id';
+          $groupBy = array('contribution_search_scredit_combined.id', 'contribution_search_scredit_combined.scredit_id');
         }
         break;
 
       case CRM_Export_Form_Select::EVENT_EXPORT:
-        $groupBy = 'GROUP BY civicrm_participant.id';
+        $groupBy = 'civicrm_participant.id';
         break;
 
       case CRM_Export_Form_Select::MEMBER_EXPORT:
-        $groupBy = " GROUP BY civicrm_membership.id";
+        $groupBy = "civicrm_membership.id";
         break;
     }
 
     if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
-      $groupBy = " GROUP BY civicrm_activity.id ";
+      $groupBy = "civicrm_activity.id ";
     }
 
-    $groupBy = !empty($groupBy) ? $groupBy : '';
+    if (!empty($groupBy)) {
+      $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($query->_select, $groupBy);
+    }
 
     return $groupBy;
   }
