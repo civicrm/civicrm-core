@@ -6,3 +6,6 @@ UPDATE civicrm_option_value SET
   {localize field="label"}label = '{ts escape="sql"}Print/Merge Document{/ts}'{/localize},
   {localize field="description"}description = '{ts escape="sql"}Export letters and other printable documents.{/ts}'{/localize}
 WHERE name = 'Print PDF Letter' AND option_group_id = @option_group_id_act;
+
+-- CRM-18699 Fix Wake Island misspelling, was Wake Ialand
+UPDATE civicrm_state_province SET name="Wake Island" WHERE name="Wake Ialand";
