@@ -400,13 +400,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
             )));
       }
     }
-
     $mailContent = array(
       'subject' => $dao->subject,
       'text' => $dao->text,
       'html' => $dao->html,
       'format' => $dao->format,
     );
+
     $dao->free();
 
     CRM_Utils_Hook::alterMailContent($mailContent);
