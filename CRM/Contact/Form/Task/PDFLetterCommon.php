@@ -169,12 +169,16 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
 
+    $documentTypes = implode(',', CRM_Core_SelectValues::documentApplicationType());
+    $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=60 accept="' . $documentTypes . '"');
+    $form->addUploadElement("document_file");
+
     CRM_Mailing_BAO_Mailing::commonCompose($form);
 
     $buttons = array();
     if ($form->get('action') != CRM_Core_Action::VIEW) {
       $buttons[] = array(
-        'type' => 'submit',
+        'type' => 'upload',
         'name' => ts('Download Document'),
         'isDefault' => TRUE,
         'icon' => 'fa-download',
@@ -279,6 +283,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
+    // extract the content of uploaded document file
+    elseif (!empty($formValues['document_file'])) {
+      $html_message = CRM_Utils_PDF_Document::docReader($formValues['document_file']['name'], $formValues['document_file']['type'], TRUE);
+    }
     elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
       if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = {$formValues['format_id']} WHERE id = {$formValues['template']}";
@@ -290,8 +298,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
       $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $formValues['template']);
       foreach ((array) $documentInfo as $info) {
-        $docType = array_search($info['mime_type'], CRM_Core_SelectValues::documentApplicationType());
-        $html_message = CRM_Utils_PDF_Document::docReader($info['fullPath'], $docType, TRUE);
+        $html_message = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type'], TRUE);
       }
     }
     if (!empty($formValues['update_format'])) {

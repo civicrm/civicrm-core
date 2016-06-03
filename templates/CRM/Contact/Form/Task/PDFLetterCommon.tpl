@@ -31,6 +31,13 @@
       <td>{$form.template.html}</td>
     </tr>
     <tr>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<sub>OR</sub></td>
+    </tr>
+    <tr>
+      <td class="label-left">{$form.document_file.label}</td>
+      <td>{$form.document_file.html}<br/><br/></td>
+    </tr>
+    <tr>
       <td class="label-left">{$form.subject.label}</td>
       <td>{$form.subject.html}</td>
     </tr>
@@ -90,7 +97,7 @@
     {$form.html_message.label}
   </div><!-- /.crm-accordion-header -->
   <div class="crm-accordion-body">
-    <div id='document'></div>
+    <div id='document-preview'></div>
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
@@ -140,7 +147,13 @@ CRM.$(function($) {
   var $form = $('form.{/literal}{$form.formClass}{literal}');
 
   {/literal}{if $form.formName eq 'PDF'}{literal}
-    cj('.crm-document-accordion').hide();
+    $('.crm-document-accordion').hide();
+    $('#document_file').on('change', function() {
+      if (this.value) {
+        $('.crm-html_email-accordion, .crm-document-accordion').toggle(false);
+        $('#template').val('');
+      }
+    });
   {/literal}{/if}{literal}
 
 

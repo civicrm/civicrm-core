@@ -129,9 +129,10 @@ class CRM_Utils_PDF_Document {
    */
   public static function doc2Text($filePath, $type) {
     $content = '';
+    $docType = array_search($type, CRM_Core_SelectValues::documentApplicationType());
+    $dataFile = ($docType == 'docx') ? "word/document.xml" : "content.xml";
 
     $zip = zip_open($filePath);
-    $dataFile = ($type == 'docx') ? "word/document.xml" : "content.xml";
 
     if (!$zip || is_numeric($zip)) {
       return $content;

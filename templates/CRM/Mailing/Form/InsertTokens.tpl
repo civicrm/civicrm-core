@@ -143,10 +143,15 @@ function selectValue( val, prefix) {
     cj('.crm-html_email-accordion').toggle(hide);
     cj('.crm-document-accordion').toggle(!hide);
 
+    // Unset any uploaded document when any template is chosen
+    if (cj('#document.file').length) {
+      cj('#document_file').val('');
+    }
+
     if (!hide) {
       cj("#document_type").val( data.file_type );
       cj("#subject").val( data.subject );
-      document.getElementById("document").innerHTML='<object type="text/html" data='+ data.document_path +' width="680" height="400" style="background:white;"></object>';
+      document.getElementById("document-preview").innerHTML='<object type="text/html" data='+ data.document_path +' width="680" height="400" style="background:white;"></object>';
       return;
     }
 
