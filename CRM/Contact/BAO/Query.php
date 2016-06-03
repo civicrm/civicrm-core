@@ -4856,8 +4856,8 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     if ($dao->N <= 1) {
       if ($dao->fetch()) {
         $summary['cancel']['count'] = $dao->cancel_count;
-        $summary['cancel']['amount'] = $dao->cancel_amount;
-        $summary['cancel']['avg'] = $dao->cancel_avg;
+        $summary['cancel']['amount'] = CRM_Utils_Money::format($dao->cancel_amount, $dao->currency);
+        $summary['cancel']['avg'] = CRM_Utils_Money::format($dao->cancel_avg, $dao->currency);
       }
     }
     else {
