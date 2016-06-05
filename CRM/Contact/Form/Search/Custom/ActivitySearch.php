@@ -201,7 +201,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     }
 
     // add custom group fields to SELECT and FROM clause
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', $this);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity');
 
     foreach ($groupTree as $key) {
       if (!empty($key['extends']) && $key['extends'] == 'Activity') {
