@@ -71,6 +71,8 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionGroup', 'description')
     );
 
+    $this->addSelect('Data Type', CRM_Utils_Type::dataTypes(), TRUE);
+
     $element = $this->add('checkbox', 'is_active', ts('Enabled?'));
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (in_array($this->_values['name'], array(

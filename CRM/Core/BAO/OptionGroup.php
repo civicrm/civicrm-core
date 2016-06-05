@@ -142,6 +142,22 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
+   * Get DataType for a specified option Group
+   *
+   * @param int $optionGroupId
+   *   Id of the Option Group.
+   *
+   * @return string|null
+   *   Data Type
+   */
+  public static function getDataType($optionGroupId) {
+    $optionGroup = new CRM_Core_DAO_OptionGroup();
+    $optionGroup->id = $optionGroupId;
+    $optionGroup->find(TRUE);
+    return $optionGroup->data_type;
+  }
+
+  /**
    * Ensure an option group exists.
    *
    * This function is intended to be called from the upgrade script to ensure
