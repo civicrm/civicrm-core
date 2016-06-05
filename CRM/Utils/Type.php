@@ -463,12 +463,12 @@ class CRM_Utils_Type {
    */
   public static function dataTypes() {
     $types = array(
-      'integer',
+      'Integer',
       'String',
-      'date',
-      'time',
+      'Date',
+      'Time',
       'Timestamp',
-      'money',
+      'Money',
       'Email',
     );
     return array_combine($types, $types);

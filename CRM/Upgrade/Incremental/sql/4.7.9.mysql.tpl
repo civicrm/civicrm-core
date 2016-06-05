@@ -62,3 +62,7 @@ INSERT INTO
   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
 (@option_group_id_act, {localize}'{ts escape="sql"}Close Accounting Period{/ts}'{/localize}, @option_group_id_act_val+1, 'Close Accounting Period', NULL, 0, 0, @option_group_id_act_wt+1, {localize}'Close Accounting Period'{/localize}, 0, 1, 1, 2, NULL);
+
+--CRM-
+ALTER TABLE civicrm_option_group
+ADD `data_type` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Data Type of Option Group.';
