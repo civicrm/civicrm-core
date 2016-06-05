@@ -88,9 +88,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       'multipleCustomData',
     ));
 
-    $entity = 'multipleCustomData';
-
-    $this->submitFileForMapping('CRM_Custom_Import_Parser_Api', $entity);
+    $this->submitFileForMapping('CRM_Custom_Import_Parser_Api', 'multipleCustomData');
   }
 
 }
