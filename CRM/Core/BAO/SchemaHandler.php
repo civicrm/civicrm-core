@@ -526,4 +526,42 @@ MODIFY      {$columnName} varchar( $length )
     }
   }
 
+  /**
+   * Check if the table has an index matching the name.
+   *
+   * @param string $tableName
+   * @param array $indexName
+   *
+   * @return \CRM_Core_DAO|object
+   */
+  public static function checkIfIndexExists($tableName, $indexName) {
+    $result = CRM_Core_DAO::executeQuery(
+      "SHOW INDEX FROM $tableName WHERE key_name = %1 AND seq_in_index = 1",
+      array(1 => array($indexName, 'String'))
+    );
+    if ($result->fetch()) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Check if the table has a specified column
+   *
+   * @param string $tableName
+   * @param string $columnName
+   *
+   * @return \CRM_Core_DAO|object
+   */
+  public static function checkIfFieldExists($tableName, $columnName) {
+    $result = CRM_Core_DAO::executeQuery(
+      "SHOW COLUMNS FROM $tableName LIKE ' %1 '",
+      array(1 => array($columnName, 'mysqlColumnNameOrAlias'))
+    );
+    if ($result->fetch()) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
