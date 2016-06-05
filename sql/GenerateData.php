@@ -1978,22 +1978,6 @@ AND    a.details = 'Participant Payment'
 
 }
 
-/**
- * @param null $str
- *
- * @return bool
- */
-function user_access($str = NULL) {
-  return TRUE;
-}
-
-/**
- * @return array
- */
-function module_list() {
-  return array();
-}
-
 echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");
 $gcd = new CRM_GCD();
 $gcd->initID();
