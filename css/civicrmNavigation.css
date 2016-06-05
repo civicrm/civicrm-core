@@ -133,3 +133,12 @@ li.menu-separator{
   height: 16px;
   vertical-align:middle;
 }
+
+/* No results */
+.crm-quickSearch-results.ui-menu-disabled {
+  opacity: .9;
+  background-color: #f8f8f8;
+}
+.crm-quickSearch-results.ui-menu-disabled li {
+  cursor: default;
+}
