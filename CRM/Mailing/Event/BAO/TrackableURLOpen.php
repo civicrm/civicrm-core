@@ -53,41 +53,57 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    *   The redirection url, or base url on failure.
    */
   public static function track($queue_id, $url_id) {
-
-    $search = new CRM_Mailing_BAO_TrackableURL();
-
     // To find the url, we also join on the queue and job tables.  This
     // prevents foreign key violations.
-    $job = CRM_Mailing_BAO_MailingJob::getTableName();
-    $eq = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $turl = CRM_Mailing_BAO_TrackableURL::getTableName();
+    $job = CRM_Utils_Type::escape(CRM_Mailing_BAO_MailingJob::getTableName(), 'MysqlColumnNameOrAlias');
+    $eq = CRM_Utils_Type::escape(CRM_Mailing_Event_BAO_Queue::getTableName(), 'MysqlColumnNameOrAlias');
+    $turl = CRM_Utils_Type::escape(CRM_Mailing_BAO_TrackableURL::getTableName(), 'MysqlColumnNameOrAlias');
 
     if (!$queue_id) {
-      $search->query("SELECT $turl.url as url from $turl
-                    WHERE $turl.id = " . CRM_Utils_Type::escape($url_id, 'Integer')
+      $search = CRM_Core_DAO::executeQuery(
+        "SELECT url
+           FROM $turl
+          WHERE $turl.id = %1",
+        array(
+          1 => array($url_id, 'Integer'),
+        )
       );
+
       if (!$search->fetch()) {
         return CRM_Utils_System::baseURL();
       }
+
       return $search->url;
     }
 
-    $search->query("SELECT $turl.url as url from $turl
-                    INNER JOIN $job ON $turl.mailing_id = $job.mailing_id
-                    INNER JOIN $eq ON $job.id = $eq.job_id
-                    WHERE $eq.id = " . CRM_Utils_Type::escape($queue_id, 'Integer') . " AND $turl.id = " . CRM_Utils_Type::escape($url_id, 'Integer')
+    $search = CRM_Core_DAO::executeQuery(
+      "SELECT $turl.url as url
+         FROM $turl
+        INNER JOIN $job ON $turl.mailing_id = $job.mailing_id
+        INNER JOIN $eq ON $job.id = $eq.job_id
+        WHERE $eq.id = %1 AND $turl.id = %2",
+      array(
+        1 => array($queue_id, 'Integer'),
+        2 => array($url_id, 'Integer'),
+      )
     );
 
     if (!$search->fetch()) {
       // Can't find either the URL or the queue. If we can find the URL then
       // return the URL without tracking.  Otherwise return the base URL.
-
-      $search->query("SELECT $turl.url as url from $turl
-                    WHERE $turl.id = " . CRM_Utils_Type::escape($url_id, 'Integer')
+      $search = CRM_Core_DAO::executeQuery(
+        "SELECT $turl.url as url
+           FROM $turl
+          WHERE $turl.id = %1",
+        array(
+          1 => array($url_id, 'Integer'),
+        )
       );
+
       if (!$search->fetch()) {
         return CRM_Utils_System::baseURL();
       }
+
       return $search->url;
     }
 
