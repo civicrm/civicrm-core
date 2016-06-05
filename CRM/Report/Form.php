@@ -3979,17 +3979,35 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     );
 
     if ($filters) {
-      $addressFields['civicrm_address']['filters'] = array(
-        'street_number' => array(
-          'title' => ts('Street Number'),
-          'type' => 1,
-          'name' => 'street_number',
-        ),
-        'street_name' => array(
-          'title' => ts('Street Name'),
-          'name' => 'street_name',
-          'operator' => 'like',
-        ),
+      // Address filter depends on whether street address parsing is enabled.
+      // (CRM-18696)
+      $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'address_options'
+      );
+      if ($addressOptions['street_address_parsing']) {
+        $street_address_filters = array(
+          'street_number' => array(
+            'title' => ts('Street Number'),
+            'type' => 1,
+            'name' => 'street_number',
+          ),
+          'street_name' => array(
+            'title' => ts('Street Name'),
+            'name' => 'street_name',
+            'operator' => 'like',
+          ),
+        );
+      }
+      else {
+        $street_address_filters = array(
+          'street_address' => array(
+            'title' => ts('Street Address'),
+            'operator' => 'like',
+            'name' => 'street_address',
+          ),
+        );
+      }
+      $general_address_filters = array(
         'postal_code' => array(
           'title' => ts('Postal Code'),
           'type' => 1,
@@ -4023,6 +4041,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         ),
       );
     }
+    $addressFields['civicrm_address']['filters'] = array_merge(
+        $street_address_filters,
+        $general_address_filters);
 
     if ($orderBy) {
       $addressFields['civicrm_address']['order_bys'] = array(
