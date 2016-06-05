@@ -356,7 +356,10 @@ class CRM_Utils_Type {
       case 'String':
       case 'Link':
       case 'Memo':
-        return $data;
+        if (CRM_Utils_Rule::string($data)) {
+          return $data;
+        }
+        break;
 
       case 'Date':
         // a null date is valid
