@@ -103,10 +103,12 @@ $('#civicrm-menu').ready(function() {
           };
         CRM.api3('contact', 'getquick', params).done(function(result) {
           var ret = [];
-          if (result.values) {
+          if (result.values.length > 0) {
             $.each(result.values, function(k, v) {
               ret.push({value: v.id, label: v.data});
-            })
+            });
+          } else {
+            ret.push({value: '0', label: {/literal}'{ts escape='js'}None found.{/ts}'{literal}});
           }
           response(ret);
         })
@@ -115,7 +117,11 @@ $('#civicrm-menu').ready(function() {
         return false;
       },
       select: function (event, ui) {
-        document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
+        if (ui.item.value > 0) {
+          document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
+        } else {
+          document.location = CRM.url('civicrm/contact/search/advanced', {reset: 1});
+        }
         return false;
       },
       create: function() {
@@ -182,8 +188,10 @@ $('#civicrm-menu').ready(function() {
     var $menu = $('#sort_name_navigation').autocomplete('widget');
     if ($('li.ui-menu-item', $menu).length === 1) {
       var cid = $('li.ui-menu-item', $menu).data('ui-autocomplete-item').value;
-      document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: cid});
-      return false;
+      if (cid > 0) {
+        document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: cid});
+        return false;
+      }
     }
   });
   // Close menu after selecting an item
