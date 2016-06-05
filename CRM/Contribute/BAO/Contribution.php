@@ -129,12 +129,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //set defaults in create mode
+    $isEmptyPaymentMethod = FALSE;
+    if (empty($params['payment_instrument_id'])) {
+      $isEmptyPaymentMethod = TRUE;
+    }
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
     }
-
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
       // @todo - should we include Chargeback? If so use self::isContributionStatusNegative($params['contribution_status_id'])
@@ -176,7 +179,32 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if ($contributionID && $setPrevContribution) {
       $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
-
+    // CRM-18573
+    if (!empty($params['contribution_status_id'])) {
+      if ($isEmptyPaymentMethod) {
+        if (!in_array($contributionStatus[$params['contribution_status_id']],
+          array('Completed', 'Partially paid', 'Pending refund'))
+        ) {
+          unset($params['payment_instrument_id']);
+        }
+        elseif (empty($params['payment_instrument_id']) && !empty($params['prevContribution'])
+          && empty($params['prevContribution']->payment_instrument_id)
+        ) {
+          $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+        }
+      }
+      if (empty($params['receive_date']) && !(!empty($params['prevContribution']) && !empty($params['prevContribution']->receive_date))
+        && !in_array($contributionStatus[$params['contribution_status_id']],
+          array('Failed', 'Pending')
+        )
+      ) {
+        $params['receive_date'] = date('YmdHis');
+      }
+    }
+    $errorMessage = CRM_Contribute_BAO_Contribution::checkPaymentInstrument($params);
+    if ($errorMessage) {
+      throw new CRM_Core_Exception($errorMessage);
+    }
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
     }
@@ -4506,6 +4534,24 @@ LIMIT 1;";
       }
     }
 
+    $paymentProcessorId = $paymentProcessorType = '';
+    if (isset($objects['paymentProcessor'])) {
+      if (is_array($objects['paymentProcessor'])) {
+        $paymentProcessorId = $objects['paymentProcessor']['id'];
+        $paymentProcessorType = $objects['paymentProcessor']['payment_type'];
+      }
+      else {
+        $paymentProcessorId = $objects['paymentProcessor']->id;
+        $paymentProcessorType = $objects['paymentProcessor']->payment_type;
+      }
+    }
+    if (empty($contributionParams['payment_instrument_id']) && $paymentProcessorType) {
+      $paymentMethod = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'payment_instrument_id', array(
+        'labelColumn' => 'name',
+      ));
+      $contributionParams['payment_instrument_id'] = $paymentProcessorType == 1 ? array_search('Credit Card', $paymentMethod) : array_search('Debit Card', $paymentMethod);
+    }
+
     $contributionParams['id'] = $contribution->id;
 
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
@@ -4513,16 +4559,6 @@ LIMIT 1;";
     // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-    }
-
-    $paymentProcessorId = '';
-    if (isset($objects['paymentProcessor'])) {
-      if (is_array($objects['paymentProcessor'])) {
-        $paymentProcessorId = $objects['paymentProcessor']['id'];
-      }
-      else {
-        $paymentProcessorId = $objects['paymentProcessor']->id;
-      }
     }
 
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
@@ -5032,6 +5068,32 @@ LIMIT 1;";
       }
     }
     return $values;
+  }
+
+  /**
+   * Validate if payment instrument is required
+   *
+   * @param array $params
+   *  array of order params.
+   *
+   * @return string
+   */
+  public static function checkPaymentInstrument($params) {
+    if (!empty($params['payment_instrument_id'])
+      || !CRM_Utils_Array::value('contribution_status_id', $params)
+      || (!array_key_exists('payment_instrument_id', $params)
+        && !empty($params['prevContribution'])
+        && !empty($params['prevContribution']->payment_instrument_id))
+    ) {
+      return FALSE;
+    }
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    if (in_array($status[$params['contribution_status_id']],
+      array('Completed', 'Partially paid', 'Pending refund'))
+    ) {
+      return ts('Payment Method is a required field.');
+    }
+    return FALSE;
   }
 
 }

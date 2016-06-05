@@ -639,8 +639,17 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       $allowStatuses = array();
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
+      $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      $this->assign(
+        'statusCheck',
+        json_encode(
+          array(
+            array_search('Pending', $statusNames),
+            array_search('Failed', $statusNames),
+          )
+        )
+      );
       if ($this->_onlinePendingContributionId) {
-        $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
         foreach ($statusNames as $val => $name) {
           if (in_array($name, array(
             'In Progress',
@@ -795,7 +804,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if (!empty($params['record_contribution']) && empty($params['payment_instrument_id'])) {
-      $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
+      $errorMessage = CRM_Contribute_BAO_Contribution::checkPaymentInstrument($params);
+      if ($errorMessage) {
+        $errors['payment_instrument_id'] = $errorMessage;
+      }
     }
 
     if (!empty($params['is_different_contribution_contact'])) {

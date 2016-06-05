@@ -90,7 +90,7 @@
                     <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
                 </tr>
                 <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}</td></tr>
-                <tr>
+                <tr class="crm-event-eventfees-form-block-receive_date">
                     <td class="label" >{$form.receive_date.label}</td>
                     <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
                 </tr>
@@ -114,6 +114,28 @@
             field_type          ="radio"
             invert              = 0
         }
+        {literal}
+        <script type="text/javascript">
+ 	  CRM.$(function($) {
+       	    cj('#contribution_status_id').change(function() {
+              var statusId = cj(this).val();
+              var statusCheck = '{/literal}{$statusCheck}{literal}';
+              if (cj.inArray(statusId, statusCheck) > -1) {
+                cj('.crm-event-eventfees-form-block-receive_date a.crm-clear-link').trigger('click');
+              }
+              else {
+                var date = new Date();
+              	cj(".crm-event-eventfees-form-block-receive_date .dateplugin").datepicker("setDate", date);
+	      	cj('#receive_date_time').val(
+                  date.getTime()
+                );
+	      	cj('#receive_date_time').focus();
+	      	cj('#receive_date_time').trigger('blur');
+              }
+            });
+          });  
+        </script>
+        {/literal}
     {/if}
     </table>
 

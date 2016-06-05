@@ -452,6 +452,15 @@ SELECT  id, html_type
 
         // CRM-14417 suppressing contribution statuses that are NOT relevant to new participant registrations
         $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+        $form->assign(
+          'statusCheck',
+          json_encode(
+            array(
+              array_search('Pending', $statusName),
+              array_search('Failed', $statusName),
+            )
+          )
+        );
         foreach (array(
                    'Cancelled',
                    'Failed',

@@ -380,7 +380,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['financial_type_id'] = $this->_contributionType;
     }
 
-    if (empty($defaults['payment_instrument_id'])) {
+    if ($this->_action & CRM_Core_Action::ADD && empty($defaults['payment_instrument_id'])) {
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
 
@@ -646,7 +646,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
+        FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
       );
     }
 
@@ -661,6 +661,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // suppressing contribution statuses that are NOT relevant to pledges (CRM-5169)
     $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $this->assign(
+      'statusCheck',
+      json_encode(
+        array(
+          array_search('Pending', $statusName),
+          array_search('Failed', $statusName),
+        )
+      )
+    );
     if ($this->_ppID) {
       foreach (array(
                  'Cancelled',
@@ -934,6 +943,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       else {
         // validate payment instrument (e.g. credit card number)
         CRM_Core_Payment_Form::validatePaymentInstrument($fields['payment_processor_id'], $fields, $errors, NULL);
+      }
+    }
+    else {
+      $errorMessage = CRM_Contribute_BAO_Contribution::checkPaymentInstrument($fields);
+      if ($errorMessage) {
+        $errors['payment_instrument_id'] = $errorMessage;
       }
     }
 
