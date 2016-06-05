@@ -355,7 +355,7 @@ class CRM_Contact_Form_Edit_Address {
               $streetAddress .= ' ';
             }
             // CRM-17619 - if the street number suffix begins with a number, add a space
-            if (ctype_digit(substr(CRM_Utils_Array::value($fld, $address), 0, 1 ))) {
+            if (ctype_digit(substr(CRM_Utils_Array::value($fld, $address), 0, 1))) {
               $streetAddress .= ' ';
             }
             $streetAddress .= CRM_Utils_Array::value($fld, $address);
