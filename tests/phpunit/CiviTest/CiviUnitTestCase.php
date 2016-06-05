@@ -3064,6 +3064,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'class_name' => 'Payment_PayPalImpl',
         'billing_mode' => 3,
         'financial_type_id' => 1,
+        'financial_account_id' => 12,
       ),
       $params);
     if (!is_numeric($params['payment_processor_type_id'])) {
