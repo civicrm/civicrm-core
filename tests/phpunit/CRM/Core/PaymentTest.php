@@ -46,4 +46,15 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals('payment_notification processor_name=Paypal', $log['values'][$log['id']]['message']);
   }
 
+  public function testSettingUrl() {
+    /** @var CRM_Core_Payment $processor */
+    $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate());
+    $success = 'http://success.com';
+    $cancel = 'http://cancel.com';
+    $processor->setCancelUrl($cancel);
+    $processor->setSuccessUrl($success);
+    $this->assertEquals($success, $processor->getReturnSuccessUrl(NULL));
+    $this->assertEquals($cancel, $processor->getReturnFailUrl(NULL));
+  }
+
 }
