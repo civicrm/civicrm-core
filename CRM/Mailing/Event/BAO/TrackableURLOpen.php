@@ -60,11 +60,11 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     $turl = CRM_Utils_Type::escape(CRM_Mailing_BAO_TrackableURL::getTableName(), 'MysqlColumnNameOrAlias');
 
     if (!$queue_id) {
-      $search = CRM_Core_DAO::executeQuery(
-        "SELECT url
+      $search = CRM_Core_DAO::executeQuery("
+        SELECT url
            FROM $turl
           WHERE $turl.id = %1", array(
-        1 => array($url_id, 'Integer')
+        1 => array($url_id, 'Integer'),
       ));
 
       if (!$search->fetch()) {
@@ -74,8 +74,8 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
       return $search->url;
     }
 
-    $search = CRM_Core_DAO::executeQuery(
-      "SELECT $turl.url as url
+    $search = CRM_Core_DAO::executeQuery("
+      SELECT $turl.url as url
          FROM $turl
         INNER JOIN $job ON $turl.mailing_id = $job.mailing_id
         INNER JOIN $eq ON $job.id = $eq.job_id
