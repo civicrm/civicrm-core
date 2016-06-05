@@ -666,6 +666,7 @@ LIMIT {$offset}, {$rowCount}
       $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
     }
 
+    $whereClause = $orderByClause = '';
     $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
     $searchRows       = array();
     $selectorElements = array('is_selected', 'is_selected_input', 'src_image', 'src', 'src_email', 'src_street', 'src_postcode', 'dst_image', 'dst', 'dst_email', 'dst_street', 'dst_postcode', 'conflicts', 'weight', 'actions');
@@ -680,35 +681,35 @@ LIMIT {$offset}, {$rowCount}
     $searchData = CRM_Utils_Array::value('search', $_REQUEST);
     $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
 
-    if ($src || !empty($searchData['value'])) {
+    if (!empty($src) || !empty($searchData['value'])) {
       $src = $src ? $src : $searchData['value'];
       $where[] = " cc1.display_name LIKE '%{$src}%'";
     }
-    if ($dst || !empty($searchData['value'])) {
+    if (!empty($dst) || !empty($searchData['value'])) {
       $dst = $dst ? $dst : $searchData['value'];
       $where[] = " cc2.display_name LIKE '%{$dst}%'";
     }
-    if ($src_email || !empty($searchData['value'])) {
+    if (!empty($src_email) || !empty($searchData['value'])) {
       $src_email = $src_email ? $src_email : $searchData['value'];
       $where[] = " (ce1.is_primary = 1 AND ce1.email LIKE '%{$src_email}%')";
     }
-    if ($dst_email || !empty($searchData['value'])) {
+    if (!empty($dst_email) || !empty($searchData['value'])) {
       $dst_email = $dst_email ? $dst_email : $searchData['value'];
       $where[] = " (ce2.is_primary = 1 AND ce2.email LIKE '%{$dst_email}%')";
     }
-    if ($src_postcode || !empty($searchData['value'])) {
+    if (!empty($src_postcode) || !empty($searchData['value'])) {
       $src_postcode = $src_postcode ? $src_postcode : $searchData['value'];
       $where[] = " (ca1.is_primary = 1 AND ca1.postal_code LIKE '%{$src_postcode}%')";
     }
-    if ($dst_postcode || !empty($searchData['value'])) {
+    if (!empty($dst_postcode) || !empty($searchData['value'])) {
       $dst_postcode = $dst_postcode ? $dst_postcode : $searchData['value'];
       $where[] = " (ca2.is_primary = 1 AND ca2.postal_code LIKE '%{$dst_postcode}%')";
     }
-    if ($src_street || !empty($searchData['value'])) {
+    if (!empty($src_street) || !empty($searchData['value'])) {
       $src_street = $src_street ? $src_street : $searchData['value'];
       $where[] = " (ca1.is_primary = 1 AND ca1.street_address LIKE '%{$src_street}%')";
     }
-    if ($dst_street || !empty($searchData['value'])) {
+    if (!empty($dst_street) || !empty($searchData['value'])) {
       $dst_street = $dst_street ? $dst_street : $searchData['value'];
       $where[] = " (ca2.is_primary = 1 AND ca2.street_address LIKE '%{$dst_street}%')";
     }
@@ -751,13 +752,15 @@ LIMIT {$offset}, {$rowCount}
       $join .= " LEFT JOIN civicrm_address ca2 ON (ca2.contact_id = pn.entity_id2 AND ca2.is_primary = 1 )";
     }
     $iTotal = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, $join, $whereClause);
-    foreach ($_REQUEST['order'] as $orderInfo) {
-      if (!empty($orderInfo['column'])) {
-        $orderColumnNumber = $orderInfo['column'];
-        $dir               = $orderInfo['dir'];
+    if (!empty($_REQUEST['order'])) {
+      foreach ($_REQUEST['order'] as $orderInfo) {
+        if (!empty($orderInfo['column'])) {
+          $orderColumnNumber = $orderInfo['column'];
+          $dir = $orderInfo['dir'];
+        }
       }
+      $columnDetails = CRM_Utils_Array::value($orderColumnNumber, $_REQUEST['columns']);
     }
-    $columnDetails = CRM_Utils_Array::value($orderColumnNumber, $_REQUEST['columns']);
     if (!empty($columnDetails)) {
       switch ($columnDetails['data']) {
         case 'src':
@@ -852,6 +855,9 @@ LIMIT {$offset}, {$rowCount}
       'recordsTotal'    => $iTotal,
       'recordsFiltered' => $iFilteredTotal,
     );
+    if (!empty($_REQUEST['is_unit_test'])) {
+      return $dupePairs;
+    }
     CRM_Utils_JSON::output($dupePairs);
   }
 
