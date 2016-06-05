@@ -103,10 +103,12 @@ $('#civicrm-menu').ready(function() {
           };
         CRM.api3('contact', 'getquick', params).done(function(result) {
           var ret = [];
-          if (result.values) {
+          if (result.values.length > 0) {
             $.each(result.values, function(k, v) {
               ret.push({value: v.id, label: v.data});
-            })
+            });
+          } else {
+            ret.push({value: '0', label: {/literal}'{ts escape='js'}None found.{/ts}'{literal}});
           }
           response(ret);
         })
@@ -115,7 +117,9 @@ $('#civicrm-menu').ready(function() {
         return false;
       },
       select: function (event, ui) {
-        document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
+        if (ui.item.value > 0) {
+          document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
+        }
         return false;
       },
       create: function() {
