@@ -376,6 +376,19 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
 
+    $optionGroup = civicrm_api3('OptionGroup', 'get', array(
+      'sequential' => 1,
+      'name' => $self->_gName,
+    ));
+    $dataType = CRM_Core_BAO_OptionGroup::getDataType($optionGroup['id']);
+    if ($dataType) {
+      $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
+      if (!$validate) {
+        CRM_Core_Session::setStatus(
+          ts('Data Type of the value field for this option value does not match ' . $dataType),
+          ts('Value field Data Type mismatch'));
+      }
+    }
     return $errors;
   }
 
