@@ -1821,7 +1821,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *
    * @return array
    */
-  public static function formatGroupTree(&$groupTree, $groupCount = 1, &$form) {
+  public static function formatGroupTree(&$groupTree, $groupCount = 1, &$form = NULL) {
     $formattedGroupTree = array();
     $uploadNames = array();
 
