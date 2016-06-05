@@ -456,4 +456,22 @@ class CRM_Utils_Type {
     return $output;
   }
 
+  /**
+   * Get list of avaliable Data Tupes for Option Groups
+   *
+   * @return array
+   */
+  public static function dataTypes() {
+    $types = array(
+      'integer',
+      'String',
+      'date',
+      'time',
+      'Timestamp',
+      'money',
+      'Email',
+    );
+    return array_combine($types, $types);
+  }
+
 }
