@@ -23,6 +23,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   const AUTH_APPROVED = 1;
   const AUTH_DECLINED = 2;
   const AUTH_ERROR = 3;
+  const AUTH_REVIEW = 4;
   const TIMEZONE = 'America/Denver';
 
   protected $_mode = NULL;
@@ -166,7 +167,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     curl_close($submit);
 
     $response_fields = $this->explode_csv($response);
-
     // check gateway MD5 response
     if (!$this->checkMD5($response_fields[37], $response_fields[6], $response_fields[9])) {
       return self::error(9003, 'MD5 Verification failed');
@@ -175,30 +175,42 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     // check for application errors
     // TODO:
     // AVS, CVV2, CAVV, and other verification results
-    if ($response_fields[0] != self::AUTH_APPROVED) {
-      $errormsg = $response_fields[2] . ' ' . $response_fields[3];
-      return self::error($response_fields[1], $errormsg);
-    }
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    switch ($response_fields[0]) {
+      case self::AUTH_REVIEW :
+        $params['payment_status_id'] = array_search('Pending', $contributionStatus);
+        break;
 
-    // Success
+      case self::AUTH_ERROR :
+        $params['payment_status_id'] = array_search('Failed', $contributionStatus);
+        break;
 
-    // test mode always returns trxn_id = 0
-    // also live mode in CiviCRM with test mode set in
-    // Authorize.Net return $response_fields[6] = 0
-    // hence treat that also as test mode transaction
-    // fix for CRM-2566
-    if (($this->_mode == 'test') || $response_fields[6] == 0) {
-      $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id RLIKE 'test[0-9]+'";
-      $p = array();
-      $trxn_id = strval(CRM_Core_DAO::singleValueQuery($query, $p));
-      $trxn_id = str_replace('test', '', $trxn_id);
-      $trxn_id = intval($trxn_id) + 1;
-      $params['trxn_id'] = sprintf('test%08d', $trxn_id);
+      case self::AUTH_DECLINED :
+        $errormsg = $response_fields[2] . ' ' . $response_fields[3];
+        return self::error($response_fields[1], $errormsg);
+
+      default:
+        // Success
+
+        // test mode always returns trxn_id = 0
+        // also live mode in CiviCRM with test mode set in
+        // Authorize.Net return $response_fields[6] = 0
+        // hence treat that also as test mode transaction
+        // fix for CRM-2566
+        if (($this->_mode == 'test') || $response_fields[6] == 0) {
+          $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id RLIKE 'test[0-9]+'";
+          $p = array();
+          $trxn_id = strval(CRM_Core_DAO::singleValueQuery($query, $p));
+          $trxn_id = str_replace('test', '', $trxn_id);
+          $trxn_id = intval($trxn_id) + 1;
+          $params['trxn_id'] = sprintf('test%08d', $trxn_id);
+        }
+        else {
+          $params['trxn_id'] = $response_fields[6];
+        }
+        $params['gross_amount'] = $response_fields[9];
+        break;
     }
-    else {
-      $params['trxn_id'] = $response_fields[6];
-    }
-    $params['gross_amount'] = $response_fields[9];
     // TODO: include authorization code?
 
     return $params;
