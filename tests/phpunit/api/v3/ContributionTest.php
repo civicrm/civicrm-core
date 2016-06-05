@@ -1777,7 +1777,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     unset($lineItem1['values'][0]['id'], $lineItem1['values'][0]['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
-
+    $this->_checkFinancialRecords(array('id' => $originalContribution['id'] + 1), 'online');
     $this->quickCleanUpFinancialEntities();
   }
 
@@ -2885,6 +2885,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       );
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
     }
+    // This checks that empty Sales tax rows are not being created. If for any reason it needs to be removed the
+    // line should be copied into all the functions that call this function & evaluated there
+    // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
+    // when calling completeTransaction or repeatTransaction.
+    $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
   }
 
   /**
