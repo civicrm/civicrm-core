@@ -895,7 +895,7 @@ abstract class CRM_Core_Payment {
    *
    * @return string
    */
-  public function getReturnSuccessUrl($qfKey) {
+  protected function getReturnSuccessUrl($qfKey) {
     if (isset($this->successUrl)) {
       return $this->successUrl;
     }
@@ -918,7 +918,7 @@ abstract class CRM_Core_Payment {
    * @return string
    *   URL for a failing transactor to be redirected to.
    */
-  public function getReturnFailUrl($key, $participantID = NULL, $eventID = NULL) {
+  protected function getReturnFailUrl($key, $participantID = NULL, $eventID = NULL) {
     if (isset($this->cancelUrl)) {
       return $this->cancelUrl;
     }

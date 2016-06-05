@@ -47,14 +47,21 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
   }
 
   public function testSettingUrl() {
-    /** @var CRM_Core_Payment $processor */
+    /** @var CRM_Core_Payment_Dummy $processor */
     $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate());
     $success = 'http://success.com';
     $cancel = 'http://cancel.com';
     $processor->setCancelUrl($cancel);
     $processor->setSuccessUrl($success);
-    $this->assertEquals($success, $processor->getReturnSuccessUrl(NULL));
-    $this->assertEquals($cancel, $processor->getReturnFailUrl(NULL));
+
+    // Using ReflectionUtils to access protected methods
+    $successGetter = new ReflectionMethod($processor, 'getReturnSuccessUrl');
+    $successGetter->setAccessible(TRUE);
+    $this->assertEquals($success, $successGetter->invoke($processor, NULL));
+
+    $cancelGetter = new ReflectionMethod($processor, 'getReturnFailUrl');
+    $cancelGetter->setAccessible(TRUE);
+    $this->assertEquals($cancel, $cancelGetter->invoke($processor, NULL));
   }
 
 }
