@@ -116,6 +116,46 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test for international string acceptance (CRM-10210).
+   *
+   * @dataProvider getInternationalStrings
+   *
+   * @param string $string
+   *   String to be tested.
+   *
+   * @throws \Exception
+   */
+  public function testInternationalStrings($string) {
+    $this->callAPISuccess('Contact', 'create', array_merge(
+      $this->_params,
+      array('first_name' => $string)
+    ));
+    $result = $this->callAPISuccessGetSingle('Contact', array('first_name' => $string));
+    $this->assertEquals($string, $result['first_name']);
+
+    $organizationParams = array(
+      'organization_name' => $string,
+      'contact_type' => 'Organization',
+    );
+
+    $this->callAPISuccess('Contact', 'create', $organizationParams);
+    $result = $this->callAPISuccessGetSingle('Contact', $organizationParams);
+    $this->assertEquals($string, $result['organization_name']);
+  }
+
+  /**
+   * Get international string data for testing against api calls.
+   */
+  public function getInternationalStrings() {
+    $invocations = array();
+    $invocations[] = array('Scarabée');
+    $invocations[] = array('Iñtërnâtiônàlizætiøn');
+    $invocations[] = array('これは日本語のテキストです。読めますか');
+    $invocations[] = array('देखें हिन्दी कैसी नजर आती है। अरे वाह ये तो नजर आती है।');
+    return $invocations;
+  }
+
+  /**
    * Test civicrm_contact_create.
    *
    * Verify that preferred language can be set.
