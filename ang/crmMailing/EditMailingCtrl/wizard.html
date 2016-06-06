@@ -48,7 +48,7 @@
 
       <div crm-ui-wizard-step crm-title="ts('Review')" ng-form="reviewForm">
         <div crm-ui-accordion="{title: ts('Review')}" >
-          <div crm-mailing-block-review crm-mailing="mailing"/>
+          <div crm-mailing-block-review crm-mailing="mailing" crm-mailing-attachments="attachments"/>
         </div>
         <center>
           <a class="button crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailing.$invalid}">
