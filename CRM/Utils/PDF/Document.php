@@ -104,19 +104,28 @@ class CRM_Utils_PDF_Document {
    *    Return filepath of created html copy of document OR extracted content of document
    */
   public static function docReader($path, $type, $returnContent = FALSE) {
+    // get path of civicrm upload directory which is used for temporary file storage
+    $uploadDir = Civi::settings()->get('uploadDir');
+
+    // build the path of of new html file
+    $pathInfo = pathinfo($path);
+    $newFile = $pathInfo['filename'] . ".html";
+    $absPath = Civi::paths()->getPath($uploadDir) . $newFile;
+
+    // cleanup temporary html file created for preview
+    if (file_exists($absPath)) {
+      unlink($absPath);
+    }
+
     if ($returnContent) {
       return self::doc2Text($path, $type);
     }
 
-    $newpath = str_replace('.' . $type, '.html', $path);
     $fileType = ($type == 'docx') ? 'Word2007' : 'ODText';
-    if (!file_exists($newpath)) {
-      $phpWord = \PhpOffice\PhpWord\IOFactory::load($path, $fileType);
-      $phpWord->save($newpath, 'HTML');
-    }
+    $phpWord = \PhpOffice\PhpWord\IOFactory::load($path, $fileType);
+    $phpWord->save($absPath, 'HTML');
 
-    $relPath = str_replace('/Users/monish/www/civicrm-master/', CRM_Utils_System::baseURL(), $newpath);
-    return $relPath;
+    return \Civi::paths()->getUrl($uploadDir) . $newFile;
   }
 
   /**
