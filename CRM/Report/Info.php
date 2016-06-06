@@ -87,13 +87,9 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
         ts('access Report Criteria'),
         ts('Change report search criteria'),
       ),
-      'access own private reports' => array(
-        ts('access own private reports'),
-        ts('Access reports owned by the contact'),
-      ),
-      'access all private reports' => array(
-        ts('access all private reports'),
-        ts('Access all private reports'),
+      'administer private reports' => array(
+        ts('administer private reports'),
+        ts('Edit all private reports'),
       ),
       'administer reserved reports' => array(
         ts('administer reserved reports'),

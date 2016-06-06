@@ -368,8 +368,6 @@ class CRM_Report_Form_Instance {
     // it seems to be not set at all if unchecked.
     if (!empty($formValues['add_to_my_reports'])) {
       $params['owner_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
-      $params['permission'] = 'access own private reports';
-      $params['grouprole'] = array();
     }
     else {
       $params['owner_id'] = 'null';
