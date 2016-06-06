@@ -5796,6 +5796,7 @@ AND   displayRelType.is_active = 1
    *   list(string $orderByClause, string $additionalFromClause).
    */
   protected function prepareOrderBy($sort, $sortByChar, $sortOrder, $additionalFromClause) {
+    $order = NULL;
     $config = CRM_Core_Config::singleton();
     if ($config->includeOrderByClause ||
       isset($this->_distinctComponentClause)
