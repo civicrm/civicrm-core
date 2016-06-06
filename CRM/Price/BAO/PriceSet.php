@@ -851,20 +851,20 @@ WHERE  id = %1";
           break;
 
         case 'CheckBox':
-          $params['amount_priceset_level_checkbox'] = $optionIds = array();
+          $amount_price_set_level_checkbox = $optionIds = array();
           foreach ($params["price_{$id}"] as $optionId => $option) {
             $optionIds[] = $optionId;
             $optionLabel = $field['options'][$optionId]['label'];
-            $params['amount_priceset_level_checkbox']["{$field['options'][$optionId]['id']}"] = $optionLabel;
+            $amount_price_set_level_checkbox["{$field['options'][$optionId]['id']}"] = $optionLabel;
             if (isset($checkboxLevel)) {
               $checkboxLevel = array_unique(array_merge(
                   $checkboxLevel,
-                  array_keys($params['amount_priceset_level_checkbox'])
+                  array_keys($amount_price_set_level_checkbox)
                 )
               );
             }
             else {
-              $checkboxLevel = array_keys($params['amount_priceset_level_checkbox']);
+              $checkboxLevel = array_keys($amount_price_set_level_checkbox);
             }
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
