@@ -2645,7 +2645,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   /**
    * append select with ANY_VALUE() keyword.
    *
-   * @param array $selectArray
+   * @param array $selectClauses
    * @param array $groupBy - Columns already included in GROUP By clause.
    */
   public function appendSelect($selectClauses, $groupBy) {

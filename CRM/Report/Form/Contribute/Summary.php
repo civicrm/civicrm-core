@@ -539,7 +539,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       }
       $groupBy = array();
       foreach ($this->_groupBy as $key => $val) {
-        if (strpos($val, ';;') !== false) {
+        if (strpos($val, ';;') !== FALSE) {
           $groupBy = array_merge($groupBy, explode(';;', $val));
         }
         else {

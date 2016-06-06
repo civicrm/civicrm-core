@@ -324,7 +324,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
   public function groupBy() {
     $groupBy = array(
       "{$this->_aliases['civicrm_employer']}.id",
-      "{$this->_aliases['civicrm_contact']}.id"
+      "{$this->_aliases['civicrm_contact']}.id",
     );
 
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
