@@ -281,6 +281,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(10, $contribution['total_amount']);
     $this->assertEquals(.85, $contribution['fee_amount']);
     $this->assertEquals(9.15, $contribution['net_amount']);
+    $this->_checkFinancialRecords(array(
+      'id' => $contribution['id'],
+      'total_amount' => $contribution['total_amount'],
+    ), 'online');
   }
 
   /**

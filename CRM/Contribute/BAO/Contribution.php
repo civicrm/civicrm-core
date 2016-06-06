@@ -2084,7 +2084,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if (!empty($input['amount'])) {
         $contribution->total_amount = $contributionParams['total_amount'] = $input['amount'];
       }
-      $contributionParams['payment_processor'] = $input['payment_processor'] = $paymentProcessorID;
 
       if (!empty($contributionParams['contribution_recur_id'])) {
         $recurringContribution = civicrm_api3('ContributionRecur', 'getsingle', array(
@@ -3120,6 +3119,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       elseif (!empty($params['payment_processor'])) {
         $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($params['payment_processor'], 'civicrm_payment_processor', 'financial_account_id');
+        $params['payment_instrument_id'] = civicrm_api3('PaymentProcessor', 'getvalue', array(
+          'id' => $params['payment_processor'],
+          'return' => 'payment_instrument_id',
+        ));
       }
       elseif (!empty($params['payment_instrument_id'])) {
         $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
@@ -3146,7 +3149,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'currency' => $params['contribution']->currency,
         'trxn_id' => $params['contribution']->trxn_id,
         'status_id' => $statusId,
-        'payment_instrument_id' => $params['contribution']->payment_instrument_id,
+        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, $params['contribution']->payment_instrument_id),
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
       if ($contributionStatus == 'Refunded' || $contributionStatus == 'Chargeback') {
@@ -4397,6 +4400,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
+    $contributionParams['payment_processor'] = $input['payment_processor'] = $paymentProcessorId;
 
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
