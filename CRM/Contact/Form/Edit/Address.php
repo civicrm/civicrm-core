@@ -370,7 +370,7 @@ class CRM_Contact_Form_Edit_Address {
             if ($thesuffix) {
               if (ctype_digit(substr($thesuffix, 0, 1))) {
                 $address['street_number'] .= " ";
-             }
+              }
             }
             $address['street_number'] .= $thesuffix;
           }
