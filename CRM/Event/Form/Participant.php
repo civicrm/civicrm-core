@@ -1412,14 +1412,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $transaction = new CRM_Core_Transaction();
 
         // CRM-11124
-        if ($this->_quickConfig) {
-          if (!empty($this->_params['amount_priceset_level_radio'])) {
-            $feeLevel = $this->_params['amount_priceset_level_radio'];
-          }
-          else {
-            $feeLevel[] = $this->_params['fee_level'];
-          }
-          CRM_Event_BAO_Participant::createDiscountTrxn($this->_eventId, $contributionParams, $feeLevel);
+        if ($this->_params['discount_id']) {
+          CRM_Event_BAO_Participant::createDiscountTrxn(
+            $this->_eventId,
+            $contributionParams,
+            NULL,
+            CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($this->_params)
+          );
         }
         $transaction->commit();
       }
