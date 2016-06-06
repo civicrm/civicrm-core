@@ -361,9 +361,15 @@ class CRM_Contact_Form_Edit_Address {
             $address['street_address'] = $streetAddress;
           }
           if (isset($address['street_number'])) {
-            $address['street_number'] .= CRM_Utils_Array::value('street_number_suffix', $address);
+            // CRM-17619 - if the street number suffix begins with a number, add a space
+            $thesuffix = CRM_Utils_Array::value('street_number_suffix', $address);
+            if ($thesuffix) {
+              if (ctype_digit(substr($thesuffix, 0, 1))) {
+                $address['street_number'] .= " ";
+              }
+            }
+            $address['street_number'] .= $thesuffix;
           }
-
           // build array for set default.
           foreach ($parseFields as $field) {
             $addressValues["{$field}_{$cnt}"] = CRM_Utils_Array::value($field, $address);
