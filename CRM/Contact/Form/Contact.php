@@ -1290,8 +1290,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             $streetAddress .= ' ';
           }
           // CRM-17619 - if the street number suffix begins with a number, add a space
-          if ($fld === 'street_number_suffix' && ctype_digit(substr(CRM_Utils_Array::value($fld, $address), 0, 1))) {
-            $streetAddress .= ' ';
+          $thesuffix = CRM_Utils_Array::value('street_number_suffix', $address);
+          if ($fld === 'street_number_suffix' && $thesuffix) {
+            if (ctype_digit(substr($thesuffix, 0, 1))) {
+              $streetAddress .= ' ';
+            }
           }
           $streetAddress .= CRM_Utils_Array::value($fld, $address);
         }
