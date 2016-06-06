@@ -3064,6 +3064,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'class_name' => 'Payment_PayPalImpl',
         'billing_mode' => 3,
         'financial_type_id' => 1,
+        'financial_account_id' => 12,
       ),
       $params);
     if (!is_numeric($params['payment_processor_type_id'])) {
@@ -3466,6 +3467,108 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     $this->flushFinancialTypeStatics();
     CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+  }
+
+  /**
+   * @param array $params
+   * @param $context
+   */
+  public function _checkFinancialRecords($params, $context) {
+    $entityParams = array(
+      'entity_id' => $params['id'],
+      'entity_table' => 'civicrm_contribution',
+    );
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $params['id']));
+    $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
+    if ($context == 'pending') {
+      $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
+      $this->assertNull($trxn, 'No Trxn to be created until IPN callback');
+      return;
+    }
+    $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $trxnParams = array(
+      'id' => $trxn['financial_trxn_id'],
+    );
+    if ($context != 'online' && $context != 'payLater') {
+      $compareParams = array(
+        'to_financial_account_id' => 6,
+        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'status_id' => 1,
+      );
+    }
+    if ($context == 'feeAmount') {
+      $compareParams['fee_amount'] = 50;
+    }
+    elseif ($context == 'online') {
+      $compareParams = array(
+        'to_financial_account_id' => 12,
+        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'status_id' => 1,
+        'payment_instrument_id' => 1,
+      );
+    }
+    elseif ($context == 'payLater') {
+      $compareParams = array(
+        'to_financial_account_id' => 7,
+        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'status_id' => 2,
+      );
+    }
+    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
+    $entityParams = array(
+      'financial_trxn_id' => $trxn['financial_trxn_id'],
+      'entity_table' => 'civicrm_financial_item',
+    );
+    $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $fitemParams = array(
+      'id' => $entityTrxn['entity_id'],
+    );
+    $compareParams = array(
+      'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+      'status_id' => 1,
+      'financial_account_id' => 1,
+    );
+    if ($context == 'payLater') {
+      $compareParams = array(
+        'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'status_id' => 3,
+        'financial_account_id' => 1,
+      );
+    }
+    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
+    if ($context == 'feeAmount') {
+      $maxParams = array(
+        'entity_id' => $params['id'],
+        'entity_table' => 'civicrm_contribution',
+      );
+      $maxTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($maxParams, TRUE));
+      $trxnParams = array(
+        'id' => $maxTrxn['financial_trxn_id'],
+      );
+      $compareParams = array(
+        'to_financial_account_id' => 5,
+        'from_financial_account_id' => 6,
+        'total_amount' => 50,
+        'status_id' => 1,
+      );
+      $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['id'], 'DESC');
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
+      $fitemParams = array(
+        'entity_id' => $trxnId['financialTrxnId'],
+        'entity_table' => 'civicrm_financial_trxn',
+      );
+      $compareParams = array(
+        'amount' => 50,
+        'status_id' => 1,
+        'financial_account_id' => 5,
+      );
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
+    }
+    // This checks that empty Sales tax rows are not being created. If for any reason it needs to be removed the
+    // line should be copied into all the functions that call this function & evaluated there
+    // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
+    // when calling completeTransaction or repeatTransaction.
+    $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
   }
 
 }
