@@ -590,7 +590,7 @@ MODIFY      {$columnName} varchar( $length )
   public static function checkIfFieldExists($tableName, $columnName) {
     $result = CRM_Core_DAO::executeQuery(
       "SHOW COLUMNS FROM $tableName LIKE ' %1 '",
-      array(1 => array($columnName, 'mysqlColumnNameOrAlias'))
+      array(1 => array($columnName, 'String'))
     );
     if ($result->fetch()) {
       return TRUE;
