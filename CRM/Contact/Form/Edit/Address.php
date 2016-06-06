@@ -357,7 +357,7 @@ class CRM_Contact_Form_Edit_Address {
             // CRM-17619 - if the street number suffix begins with a number, add a space
             if ($fld === 'street_number_suffix' && ctype_digit(substr(CRM_Utils_Array::value($fld, $address), 0, 1))) {
               $streetAddress .= ' ';
-            }            
+            }
             $streetAddress .= CRM_Utils_Array::value($fld, $address);
           }
           $streetAddress = trim($streetAddress);
@@ -366,10 +366,13 @@ class CRM_Contact_Form_Edit_Address {
           }
           if (isset($address['street_number'])) {
             // CRM-17619 - if the street number suffix begins with a number, add a space
-            if (ctype_digit(substr(CRM_Utils_Array::value('street_number_suffix', $address),0,1))) {
-              $address['street_number'] .= " ";
+            $thesuffix = CRM_Utils_Array::value('street_number_suffix', $address);
+            if ($thesuffix) {
+              if (ctype_digit(substr($thesuffix, 0, 1))) {
+                $address['street_number'] .= " ";
+             }
             }
-            $address['street_number'] .= CRM_Utils_Array::value('street_number_suffix', $address);
+            $address['street_number'] .= $thesuffix;
           }
 
           // build array for set default.
