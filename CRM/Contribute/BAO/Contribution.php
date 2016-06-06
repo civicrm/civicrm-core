@@ -3800,10 +3800,8 @@ WHERE con.id = {$contributionId}
     do {
       $creditNoteNum++;
       $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . $creditNoteNum;
-      $result = civicrm_api3('Contribution', 'getcount', array(
-        'sequential' => 1,
-        'creditnote_id' => $creditNoteId,
-      ));
+      $params = array(1 => array($creditNoteId, 'String'));
+      $result = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_contribution WHERE creditnote_id = %1", $params);
     } while ($result > 0);
 
     return $creditNoteId;
