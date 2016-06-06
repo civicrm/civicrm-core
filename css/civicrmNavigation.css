@@ -162,3 +162,12 @@ li.menu-separator{
 #civicrm-menu > li.menumain {
   height: 19px !important;
 }
+
+/* No results */
+.crm-quickSearch-results.ui-menu-disabled {
+  opacity: .9;
+  background-color: #f8f8f8;
+}
+.crm-quickSearch-results.ui-menu-disabled li {
+  cursor: default;
+}

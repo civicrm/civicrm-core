@@ -104,10 +104,12 @@ $('#civicrm-menu').ready(function() {
         CRM.api3('contact', 'getquick', params).done(function(result) {
           var ret = [];
           if (result.values.length > 0) {
+            $('#sort_name_navigation').autocomplete('widget').menu('option', 'disabled', false);
             $.each(result.values, function(k, v) {
               ret.push({value: v.id, label: v.data});
             });
           } else {
+            $('#sort_name_navigation').autocomplete('widget').menu('option', 'disabled', true);
             ret.push({value: '0', label: {/literal}'{ts escape='js'}None found.{/ts}'{literal}});
           }
           response(ret);
@@ -119,14 +121,14 @@ $('#civicrm-menu').ready(function() {
       select: function (event, ui) {
         if (ui.item.value > 0) {
           document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
-        } else {
-          document.location = CRM.url('civicrm/contact/search/advanced', {reset: 1});
         }
         return false;
       },
       create: function() {
         // Place menu in front
-        $(this).autocomplete('widget').css('z-index', $('#civicrm-menu').css('z-index'));
+        $(this).autocomplete('widget')
+          .addClass('crm-quickSearch-results')
+          .css('z-index', $('#civicrm-menu').css('z-index'));
       }
     })
     .keydown(function() {
