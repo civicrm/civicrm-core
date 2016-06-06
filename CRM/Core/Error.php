@@ -651,11 +651,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * CRM-13640.
    */
   protected static function generateLogFileHash($config) {
+    // Use multiple (but stable) inputs for hash information. TMI?
     $md5inputs = array(
+      defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
+      $config->userFrameworkBaseURL,
       md5($config->dsn),
       $config->dsn,
     );
-    return md5(var_export($md5inputs,1));
+    // Trim 8 chars off the string, make it slightly easier to find
+    // but reveals less information from the hash.
+    return substr(md5(var_export($md5inputs,1)), 8);
   }
 
   /**
