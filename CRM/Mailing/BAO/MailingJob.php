@@ -298,7 +298,27 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       }
     }
   }
-
+  /**
+   * Update the recipients table with a given job Id
+   * @param int $jobId
+   */
+  private static function getRecipientsPreJob($jobId) {
+    $job = new CRM_Mailing_BAO_MailingJob();
+    $job->id = $jobId;
+    if($job->id && $job->find(TRUE)) {
+        $mailing = new CRM_Mailing_BAO_Mailing();
+        $mailing->id = $job->mailing_id;
+        if ($mailing->id && $mailing->find(TRUE)) {
+          $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, $mailing->dedupe_email);
+        }
+        else {
+          throw new CRM_Core_Exception("Failed to getRecipientsPreJob: Unknown mailing ID");
+        }
+    }
+    else {
+      throw new CRM_Core_Exception("Failed to getRecipientsPreJob: Unknown job ID");
+    }
+}
 
   /**
    * before we run jobs, we need to split the jobs
@@ -346,6 +366,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     // For each of the "Parent Jobs" we find, we split them into
     // X Number of child jobs
     while ($job->fetch()) {
+	  // fill/update the recipients for this job
+	  self::getRecipientsPreJob($job->id);
       // still use job level lock for each child job
       $lock = Civi::lockManager()->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
