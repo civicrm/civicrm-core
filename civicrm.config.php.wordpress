@@ -135,12 +135,14 @@ class Bootstrap {
       }
 
       list ($cmsType, $cmsBasePath) = $this->findCmsRoot($this->getSearchDir());
-      $_SERVER['SCRIPT_FILENAME'] = $cmsBasePath . '/index.php';
-      $_SERVER['REMOTE_ADDR'] = "127.0.0.1";
-      $_SERVER['SERVER_SOFTWARE'] = NULL;
-      $_SERVER['REQUEST_METHOD'] = 'GET';
-      if (ord($_SERVER['SCRIPT_NAME']) != 47) {
-        $_SERVER['SCRIPT_NAME'] = '/' . $_SERVER['SCRIPT_NAME'];
+      if (PHP_SAPI === 'cli') {
+        $_SERVER['SCRIPT_FILENAME'] = $cmsBasePath . '/index.php';
+        $_SERVER['REMOTE_ADDR'] = "127.0.0.1";
+        $_SERVER['SERVER_SOFTWARE'] = NULL;
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        if (ord($_SERVER['SCRIPT_NAME']) != 47) {
+          $_SERVER['SCRIPT_NAME'] = '/' . $_SERVER['SCRIPT_NAME'];
+        }
       }
     }
 
