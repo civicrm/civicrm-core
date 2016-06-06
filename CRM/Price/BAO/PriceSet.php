@@ -750,7 +750,7 @@ WHERE  id = %1";
   public static function processAmount($fields, &$params, &$lineItem, $component = '') {
     // using price set
     $totalPrice = $totalTax = 0;
-    $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
+
     if ($component) {
       $autoRenew = array();
       $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
@@ -795,14 +795,7 @@ WHERE  id = %1";
           $optionLabel = CRM_Utils_Array::value('label', $field['options'][$optionValueId]);
           $params['amount_priceset_level_radio'] = array();
           $params['amount_priceset_level_radio'][$optionValueId] = $optionLabel;
-          if (isset($radioLevel)) {
-            $radioLevel = array_merge($radioLevel,
-              array_keys($params['amount_priceset_level_radio'])
-            );
-          }
-          else {
-            $radioLevel = array_keys($params['amount_priceset_level_radio']);
-          }
+
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
@@ -829,12 +822,7 @@ WHERE  id = %1";
           $optionLabel = $field['options'][$optionValueId]['label'];
           $params['amount_priceset_level_select'] = array();
           $params['amount_priceset_level_select'][CRM_Utils_Array::key(1, $params["price_{$id}"])] = $optionLabel;
-          if (isset($selectLevel)) {
-            $selectLevel = array_merge($selectLevel, array_keys($params['amount_priceset_level_select']));
-          }
-          else {
-            $selectLevel = array_keys($params['amount_priceset_level_select']);
-          }
+
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
@@ -851,24 +839,9 @@ WHERE  id = %1";
           break;
 
         case 'CheckBox':
-          $params['amount_priceset_level_checkbox'] = $optionIds = array();
-          foreach ($params["price_{$id}"] as $optionId => $option) {
-            $optionIds[] = $optionId;
-            $optionLabel = $field['options'][$optionId]['label'];
-            $params['amount_priceset_level_checkbox']["{$field['options'][$optionId]['id']}"] = $optionLabel;
-            if (isset($checkboxLevel)) {
-              $checkboxLevel = array_unique(array_merge(
-                  $checkboxLevel,
-                  array_keys($params['amount_priceset_level_checkbox'])
-                )
-              );
-            }
-            else {
-              $checkboxLevel = array_keys($params['amount_priceset_level_checkbox']);
-            }
-          }
+
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
-          foreach ($optionIds as $optionId) {
+          foreach ($params["price_{$id}"] as $optionId => $option) {
             if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionId])) {
               $lineItem = self::setLineItem($field, $lineItem, $optionId);
               $totalTax += $field['options'][$optionId]['tax_amount'];
