@@ -44,7 +44,7 @@
 
       <div crm-ui-wizard-step="40" crm-title="ts('Review')" ng-form="schedForm" ng-if="checkPerm('schedule mailings') || checkPerm('access CiviMail')">
         <div crm-ui-accordion="{title: ts('Review')}" >
-          <div crm-mailing-block-review crm-mailing="mailing"/>
+          <div crm-mailing-block-review crm-mailing="mailing" crm-mailing-attachments="attachments"/>
         </div>
         <div crm-ui-accordion="{title: ts('Schedule')}" >
           <div crm-mailing-block-schedule crm-mailing="mailing"/>
