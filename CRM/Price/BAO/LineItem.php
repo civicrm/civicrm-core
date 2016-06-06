@@ -323,21 +323,17 @@ AND li.entity_id = {$entityId}
    * @param array $params
    *   Reference to form values.
    * @param array $fields
-   *   Reference to array of fields belonging.
+   *   Array of fields belonging.
    *                          to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
    *   this is
    *                          lineItem array)
-   *
-   * @return void
    */
-  public static function format($fid, &$params, &$fields, &$values) {
+  public static function format($fid, $params, $fields, &$values) {
     if (empty($params["price_{$fid}"])) {
       return;
     }
-
-    $optionIDs = implode(',', array_keys($params["price_{$fid}"]));
 
     //lets first check in fun parameter,
     //since user might modified w/ hooks.
