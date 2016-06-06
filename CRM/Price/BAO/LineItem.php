@@ -83,6 +83,15 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $lineItemBAO->copyValues($params);
 
     $return = $lineItemBAO->save();
+    if ($lineItemBAO->entity_table == 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+      $membershipPaymentParams = array(
+        'membership_id' => $lineItemBAO->entity_id,
+        'contribution_id' => $lineItemBAO->contribution_id,
+      );
+      if (!civicrm_api3('MembershipPayment', 'getcount', $membershipPaymentParams)) {
+        civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
+      }
+    }
 
     if ($id) {
       CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO);
@@ -449,7 +458,7 @@ AND li.entity_id = {$entityId}
         $lineItems = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
           CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
-          if (isset($line['tax_amount'])) {
+          if (!empty($line['tax_amount'])) {
             CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails, TRUE);
           }
         }
