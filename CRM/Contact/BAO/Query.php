@@ -4523,7 +4523,7 @@ civicrm_relationship.is_permission_a_b = 0
   /**
    * Include Select columns in groupBy clause.
    *
-   * @param array $selectArray
+   * @param array $selectClauses
    * @param array $groupBy - Columns already included in GROUP By clause.
    *
    * @return string
@@ -4534,39 +4534,34 @@ civicrm_relationship.is_permission_a_b = 0
     $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
 
     //return if ONLY_FULL_GROUP_BY is not enabled.
-    if (version_compare($mysqlVersion, '5.7', '<') || !empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
-      if (!empty($groupBy)) {
-        return " GROUP BY " . implode(', ', $groupBy);
-      }
-      return '';
-    }
-
-    $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
-    foreach ($selectClauses as $key => $val) {
-      $aliasArray = preg_split('/ as /i', $val);
-      // if more than 1 alias we need to split by ','.
-      if (count($aliasArray) > 2) {
-        $aliasArray = preg_split('/,/', $val);
-        foreach ($aliasArray as $key => $value) {
-          $alias = current(preg_split('/ as /i', $value));
-          if (!in_array($alias, $groupBy) && preg_match($regexToExclude, trim($alias)) !== 1) {
-            $groupBy[] = $alias;
+    if (!version_compare($mysqlVersion, '5.7', '<') && !empty($sqlMode) && in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
+      $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+      foreach ($selectClauses as $key => $val) {
+        $aliasArray = preg_split('/ as /i', $val);
+        // if more than 1 alias we need to split by ','.
+        if (count($aliasArray) > 2) {
+          $aliasArray = preg_split('/,/', $val);
+          foreach ($aliasArray as $key => $value) {
+            $alias = current(preg_split('/ as /i', $value));
+            if (!in_array($alias, $groupBy) && preg_match($regexToExclude, trim($alias)) !== 1) {
+              $groupBy[] = $alias;
+            }
           }
         }
-      }
-      else {
-        list($selectColumn, $alias) = array_pad($aliasArray, 2, NULL);
-        $dateRegex = '/^(DATE_FORMAT|DATE_ADD|CASE)/i';
-        $tableName = current(explode('.', $selectColumn));
-        $primaryKey = "{$tableName}.id";
-        // exclude columns which are already included in groupBy and aggregate functions from select
-        // CRM-18439 - Also exclude the columns which are functionally dependent on columns in $groupBy (MySQL 5.7+)
-        if (!in_array($selectColumn, $groupBy) && !in_array($primaryKey, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
-          if (!empty($alias) && preg_match($dateRegex, trim($selectColumn))) {
-            $groupBy[] = $alias;
-          }
-          else {
-            $groupBy[] = $selectColumn;
+        else {
+          list($selectColumn, $alias) = array_pad($aliasArray, 2, NULL);
+          $dateRegex = '/^(DATE_FORMAT|DATE_ADD|CASE)/i';
+          $tableName = current(explode('.', $selectColumn));
+          $primaryKey = "{$tableName}.id";
+          // exclude columns which are already included in groupBy and aggregate functions from select
+          // CRM-18439 - Also exclude the columns which are functionally dependent on columns in $groupBy (MySQL 5.7+)
+          if (!in_array($selectColumn, $groupBy) && !in_array($primaryKey, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
+            if (!empty($alias) && preg_match($dateRegex, trim($selectColumn))) {
+              $groupBy[] = $alias;
+            }
+            else {
+              $groupBy[] = $selectColumn;
+            }
           }
         }
       }

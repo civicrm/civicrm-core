@@ -287,7 +287,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
     if ($this->has_grouping) {
       $groupBy = array(
         "{$this->_aliases['civicrm_contact']}.id",
-        "civicrm_activity_activity_date_time"
+        "civicrm_activity_activity_date_time",
       );
       if ($this->has_activity_type) {
         $groupBy[] = "{$this->_aliases['civicrm_activity']}.activity_type_id";

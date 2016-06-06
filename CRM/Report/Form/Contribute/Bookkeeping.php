@@ -515,7 +515,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   public function groupBy() {
     $groupBy = array(
       "{$this->_aliases['civicrm_entity_financial_trxn']}.id",
-      "{$this->_aliases['civicrm_line_item']}.id"
+      "{$this->_aliases['civicrm_line_item']}.id",
     );
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
@@ -528,16 +528,16 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_contribution');
+    $financialSelect = "CASE WHEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
+            THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
+            ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
+            END as amount";
 
     $this->_selectClauses = array(
       "{$this->_aliases['civicrm_contribution']}.id",
       "{$this->_aliases['civicrm_entity_financial_trxn']}.id as trxnID",
       "{$this->_aliases['civicrm_contribution']}.currency",
-      "CASE
-         WHEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
-         THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
-         ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
-       END as amount",
+      $financialSelect,
     );
     $select = "SELECT " . implode(', ', $this->_selectClauses);
 
