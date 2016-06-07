@@ -646,8 +646,7 @@ class CRM_Core_Resources {
         $this->addStyleUrl($config->customCSSURL, 99, $region);
       }
       if (!Civi::settings()->get('disable_core_css')) {
-        $themeKey = Civi::settings()->get(FALSE ? 'theme_backend' : 'theme_frontend');
-        $cssUrls = Civi::service('theme')->getCssUrls($themeKey, 'civicrm.css');
+        $cssUrls = Civi::service('theme')->getUrls('civicrm.css');
         foreach ($cssUrls as $cssUrl) {
           $this->addStyleUrl($cssUrl, -99, $region);
         }

@@ -519,13 +519,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * A theme is a set of CSS files which are loaded on CiviCRM pages. To register a new
+   * theme, add it to the $themes array. Use these properties:
+   *
+   *  - ext: string (required)
+   *         The full name of the extension which defines the theme.
+   *         Ex: "org.civicrm.themes.greenwich".
+   *  - title: string (required)
+   *         Visible title.
+   *  - help: string (optional)
+   *         Description of the theme's appearance.
+   *  - url_callback: mixed (optional)
+   *         A function ($theme, $file) which returns the URL(s) for a CSS resource.
+   *         Ex: \Civi\Core\Theme\Formats::simple (default)
+   *         Ex: \Civi\Core\Theme\Formats::multitheme
+   *         Ex: \Civi\Core\Theme\Formats::none
+   *  - prefix: string (optional)
+   *         A prefix within the extension folder to prepend to the file name.
+   *
    * @param array $themes
    *   List of themes, keyed by name.
-   *   Ex:
-   *   array('judy' => array(
-   *     'title' => 'The Judy Theme',
-   *     'css_callback' => $callable, // Optional: override file mapping mechanism
-   *   )).
    * @return mixed
    */
   public static function themes(&$themes) {
