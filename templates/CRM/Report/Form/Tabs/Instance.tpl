@@ -88,6 +88,12 @@
         <td>{$form.grouprole.html|crmAddClass:huge}</td>
       </tr>
     {/if}
+    <tr class="crm-report-instanceForm-form-block-add-to-my-reports">
+      <td class="report-label">{$form.add_to_my_reports.label} {help id="id-add_to_my_reports" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td>{$form.add_to_my_reports.html}
+        <span class="description">{ts}If set to Yes, this report will appear in the My Reports section of the reports listing page and will only be visible by you.{/ts}</span>
+      </td>
+    </tr>
     <tr class="crm-report-instanceForm-form-block-isReserved">
       <td class="report-label">{$form.is_reserved.label} {help id="id-is_reserved" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
       <td>{$form.is_reserved.html}
