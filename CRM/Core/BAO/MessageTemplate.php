@@ -476,6 +476,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $contact = $contact[$contactID];
     }
 
+    $mailContent['text'] = CRM_Utils_Token::replaceTemplateTokens($mailContent['text'], FALSE, $tokens['text'], TRUE);
+    $mailContent['html'] = CRM_Utils_Token::replaceTemplateTokens($mailContent['html'], TRUE, $tokens['html'], TRUE);
+
     $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['text'], TRUE);
     $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], TRUE);
     $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], TRUE);

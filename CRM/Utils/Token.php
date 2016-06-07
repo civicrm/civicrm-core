@@ -86,6 +86,11 @@ class CRM_Utils_Token {
     'unsubscribe' => array('group'),
     'resubscribe' => array('group'),
     'welcome' => array('group'),
+    //for replacing header and footer components
+    'transaction' => array(
+      'header',
+      'footer',
+    ),
   );
 
 
@@ -245,6 +250,7 @@ class CRM_Utils_Token {
     $escapeSmarty = FALSE
   ) {
     $key = 'domain';
+//    echo $domain;
     if (
       !$knownTokens || empty($knownTokens[$key])
     ) {
@@ -1421,7 +1427,13 @@ class CRM_Utils_Token {
    * @param string $className
    * @param bool $escapeSmarty
    */
-  public static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL, $escapeSmarty = FALSE) {
+  public static function replaceGreetingTokens(
+    &$tokenString,
+    $contactDetails = NULL,
+    $contactId = NULL,
+    $className = NULL,
+    $escapeSmarty = FALSE
+  ){
 
     if (!$contactDetails && !$contactId) {
       return;
@@ -1903,4 +1915,110 @@ class CRM_Utils_Token {
     return $output;
   }
 
-}
+  /*
+   * Replace all Template Tokens
+   *
+   * @param string str
+   *    The string with tokens to be replaced
+   * @param bool $html
+   *    Replace token with HTML or plain text
+   *
+   * @param null $knownTokens
+   * @param bool $escapeSmarty
+   *
+   * @return string
+   *   The processed string
+   */
+  public static function &replaceTemplateTokens(
+    $str,
+    $html = FALSE,
+    $knownTokens = NULL,
+    $escapeSmarty = FALSE
+  ){
+    $key = 'transaction';
+    //if tokens are not known at all, return the str as it is
+    if(!$knownTokens || empty($knownTokens[$key])){
+      return $str;
+    }
+    $str = preg_replace_callback(
+      self::tokenRegex($key),
+      function ($matches) use ($html, $escapeSmarty) {
+        return self::getTemplateTokenReplacement($matches[1], $html, $escapeSmarty);
+      },
+      $str
+    );
+    return $str;
+  }
+
+  /**
+   * @param $token
+   * @param $transaction
+   * @param bool $html
+   * @param bool $escapeSmarty
+   *
+   * @return mixed|null|string
+   */
+  public static function getTemplateTokenReplacement($token, $html = FALSE, $escapeSmarty = FALSE) {
+    // check if the token we were passed is valid
+    // we have to do this because this function is
+    // called only when we find a token in the string
+    $value = '';
+    
+    if(!in_array($token, self::$_tokens['transaction'])) {
+      $value = "{transaction.$token}";
+    }
+    else{
+      $value = $token;
+      if ($token == 'header') {
+        //find the header component from DB and replace the token with the html/text.
+        $header_component = new CRM_Mailing_BAO_Component();
+        $header_component->is_default = 1;
+        $header_component->is_active = 1;
+        $header_component->component_type = 'T_Header';
+        $header_component->find(TRUE);
+        $header_html = $header_component->body_html;
+        if ($header_component->body_text) {
+          $header_text = $header_component->body_text;
+        }
+        else {
+          $header_text = CRM_Utils_String::htmlToText($header_component->body_html);
+        }
+        //replacing the token with the text/html
+        if ($html) {
+          $value = $header_html;
+        }
+        else {
+          $value = $header_text;
+        }
+      }
+      elseif ($token=='footer'){
+        $footer_component = new CRM_Mailing_BAO_Component();
+        $footer_component->is_default = 1;
+        $footer_component->is_active = 1;
+        $footer_component->component_type = 'T_Footer';
+        $footer_component->find(TRUE);
+        $footer_html = $footer_component->body_html;
+        if ($footer_component->body_text) {
+          $footer_text = $footer_component->body_text;
+        }
+        else {
+          $footer_text = CRM_Utils_String::htmlToText($footer_component->body_html);
+        }
+        //replacing the token with the text/html
+        if ($html) {
+          $value = $footer_html;
+        }
+        else {
+          $value = $footer_text;
+        }
+      }
+    }
+    if ($escapeSmarty) {
+      $value = self::tokenEscapeSmarty($value);
+    }
+
+    return $value;
+
+  }
+
+  }
