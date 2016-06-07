@@ -1,4 +1,6 @@
 <?php
+namespace Civi\Core;
+
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
@@ -25,12 +27,14 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi;
+
 /**
  *
  * @package CiviCRM_Hook
  * @copyright CiviCRM LLC (c) 2004-2016
  */
-class CRM_Core_Theme {
+class Theme {
 
   const DEFAULT_THEME = 'classic';
 
@@ -58,7 +62,7 @@ class CRM_Core_Theme {
           'title' => 'No theming',
         ),
       );
-      CRM_Utils_Hook::themes(Civi::$statics[__CLASS__]['themes']);
+      \CRM_Utils_Hook::themes(Civi::$statics[__CLASS__]['themes']);
 
       $defaults = array(
         'subdir' => 'css/',
@@ -118,7 +122,7 @@ class CRM_Core_Theme {
       ));
     }
 
-    $prefix = empty($theme['subdir']) ? '' : CRM_Utils_File::addTrailingSlash($theme['subdir'], '/');
+    $prefix = empty($theme['subdir']) ? '' : \CRM_Utils_File::addTrailingSlash($theme['subdir'], '/');
 
     return array(
       Civi::resources()->getUrl($theme['ext'], $prefix . $cssKey),

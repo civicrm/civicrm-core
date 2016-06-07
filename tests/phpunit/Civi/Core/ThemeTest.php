@@ -1,10 +1,11 @@
 <?php
+namespace Civi\Core;
 
 /**
  * Class CRM_Core_RegionTest
  * @group headless
  */
-class CRM_Core_RegionTest extends CiviUnitTestCase {
+class ThemeTest extends \CiviUnitTestCase {
 
   public function getThemeExamples() {
     $cases = array();
@@ -128,13 +129,13 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       }
     });
 
-    $themes = CRM_Core_Theme::getThemes();
+    $themes = Theme::getThemes();
     if ($expectedTitle) {
       $this->assertEquals($expectedTitle, $themes[$themeKey]['title']);
     }
 
-    $this->assertEquals($expectedBootstrapUrl, CRM_Core_Theme::getCssUrls($themeKey, 'bootstrap.css'));
-    $this->assertEquals($expectedCivicrmUrl, CRM_Core_Theme::getCssUrls($themeKey, 'civicrm.css'));
+    $this->assertEquals($expectedBootstrapUrl, Theme::getCssUrls($themeKey, 'bootstrap.css'));
+    $this->assertEquals($expectedCivicrmUrl, Theme::getCssUrls($themeKey, 'civicrm.css'));
   }
 
   public static function fakeCallback($themeKey, $cssKey) {
