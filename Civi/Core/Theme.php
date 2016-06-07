@@ -39,6 +39,12 @@ class Theme {
   const DEFAULT_THEME = 'classic';
 
   /**
+   * @var array
+   *   Array(string $themeKey => array $themeSpec).
+   */
+  private $themes = NULL;
+
+  /**
    * Get a list of available themes.
    *
    * @return array
@@ -55,28 +61,28 @@ class Theme {
    *     'css_callback' => function($themeKey, $cssKey) {...},
    *   )).
    */
-  public static function getThemes() {
-    if (!isset(Civi::$statics[__CLASS__]['themes'])) {
-      Civi::$statics[__CLASS__]['themes'] = array(
+  public function getAll() {
+    if ($this->themes === NULL) {
+      $this->themes = array(
         'none' => array(
           'title' => 'No theming',
         ),
       );
-      \CRM_Utils_Hook::themes(Civi::$statics[__CLASS__]['themes']);
+      \CRM_Utils_Hook::themes($this->themes);
 
       $defaults = array(
         'subdir' => 'css/',
       );
 
-      foreach (array_keys(Civi::$statics[__CLASS__]['themes']) as $themeKey) {
-        Civi::$statics[__CLASS__]['themes'][$themeKey] = array_merge(
+      foreach (array_keys($this->themes) as $themeKey) {
+        $this->themes[$themeKey] = array_merge(
           $defaults,
-          Civi::$statics[__CLASS__]['themes'][$themeKey]
+          $this->themes[$themeKey]
         );
       }
 
     }
-    return Civi::$statics[__CLASS__]['themes'];
+    return $this->themes;
   }
 
   /**
@@ -95,7 +101,7 @@ class Theme {
    *   List of URLs to display.
    *   Ex: array(string $url)
    */
-  public static function getCssUrls($themeKey, $cssKey) {
+  public function getCssUrls($themeKey, $cssKey) {
     if ($themeKey === 'default') {
       $themeKey = self::DEFAULT_THEME;
     }
@@ -103,7 +109,7 @@ class Theme {
       return array();
     }
 
-    $themes = self::getThemes();
+    $themes = self::getAll();
     if (!isset($themes[$themeKey]) || !isset($themes[$themeKey]['ext'])) {
       if (isset($themes[self::DEFAULT_THEME])) {
         $themeKey = self::DEFAULT_THEME;

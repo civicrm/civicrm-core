@@ -128,14 +128,13 @@ class ThemeTest extends \CiviUnitTestCase {
         $themes[$key] = $value;
       }
     });
-
-    $themes = Theme::getThemes();
+    $themes = \Civi::service('theme')->getAll();
     if ($expectedTitle) {
       $this->assertEquals($expectedTitle, $themes[$themeKey]['title']);
     }
 
-    $this->assertEquals($expectedBootstrapUrl, Theme::getCssUrls($themeKey, 'bootstrap.css'));
-    $this->assertEquals($expectedCivicrmUrl, Theme::getCssUrls($themeKey, 'civicrm.css'));
+    $this->assertEquals($expectedBootstrapUrl, \Civi::service('theme')->getCssUrls($themeKey, 'bootstrap.css'));
+    $this->assertEquals($expectedCivicrmUrl, \Civi::service('theme')->getCssUrls($themeKey, 'civicrm.css'));
   }
 
   public static function fakeCallback($themeKey, $cssKey) {
