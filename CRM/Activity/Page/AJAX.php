@@ -396,6 +396,8 @@ class CRM_Activity_Page_AJAX {
 
     $optionalParameters = array(
       'context' => 'String',
+      'activity_type_id' => 'Integer',
+      'activity_type_exclude_id' => 'Integer',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
@@ -408,6 +410,10 @@ class CRM_Activity_Page_AJAX {
 
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
+
+    if (!empty($_GET['is_unit_test'])) {
+      return $activities;
+    }
 
     foreach ($activities['data'] as $key => $value) {
       // Check if recurring activity.
