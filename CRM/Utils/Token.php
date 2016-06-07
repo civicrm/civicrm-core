@@ -1969,50 +1969,33 @@ class CRM_Utils_Token {
     }
     else{
       $value = $token;
+      $component = new CRM_Mailing_BAO_Component();
+      $component->is_default = 1;
+      $component->is_active = 1;
       if ($token == 'header') {
         //find the header component from DB and replace the token with the html/text.
-        $header_component = new CRM_Mailing_BAO_Component();
-        $header_component->is_default = 1;
-        $header_component->is_active = 1;
-        $header_component->component_type = 'T_Header';
-        $header_component->find(TRUE);
-        $header_html = $header_component->body_html;
-        if ($header_component->body_text) {
-          $header_text = $header_component->body_text;
-        }
-        else {
-          $header_text = CRM_Utils_String::htmlToText($header_component->body_html);
-        }
-        //replacing the token with the text/html
-        if ($html) {
-          $value = $header_html;
-        }
-        else {
-          $value = $header_text;
-        }
+        $component->component_type = 'T_Header';
       }
-      elseif ($token=='footer'){
-        $footer_component = new CRM_Mailing_BAO_Component();
-        $footer_component->is_default = 1;
-        $footer_component->is_active = 1;
-        $footer_component->component_type = 'T_Footer';
-        $footer_component->find(TRUE);
-        $footer_html = $footer_component->body_html;
-        if ($footer_component->body_text) {
-          $footer_text = $footer_component->body_text;
-        }
-        else {
-          $footer_text = CRM_Utils_String::htmlToText($footer_component->body_html);
-        }
-        //replacing the token with the text/html
-        if ($html) {
-          $value = $footer_html;
-        }
-        else {
-          $value = $footer_text;
-        }
+      elseif($token == 'footer'){
+          $component->component_type = 'T_Footer';
+      }
+      $component->find(TRUE);
+      $html = $component->body_html;
+      if ($component->body_text) {
+        $text = $component->body_text;
+      }
+      else {
+        $text = CRM_Utils_String::htmlToText($component->body_html);
+      }
+      //replacing the token with the text/html
+      if ($html) {
+        $value = $html;
+      }
+      else {
+        $value = $text;
       }
     }
+
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);
     }
