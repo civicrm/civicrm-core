@@ -191,29 +191,32 @@
     });
 
     $('.customDataPresent').change(function() {
-      //$('.crm-custom-accordion').remove();
       var values = $("#contact_sub_type").val();
-      var contactType = {/literal}"{$contactType}"{literal};
-      CRM.buildCustomData(contactType, values);
-      loadMultiRecordFields(values);
-      $('.crm-custom-accordion').each(function() {
+      CRM.buildCustomData({/literal}"{$contactType}"{literal}, values).one('crmLoad', function() {
         highlightTabs(this);
+        loadMultiRecordFields(values);
       });
     });
 
     function loadMultiRecordFields(subTypeValues) {
-      if (subTypeValues == false) {
-        var subTypeValues = null;
+      if (subTypeValues === false) {
+        subTypeValues = null;
       }
-        else if (!subTypeValues) {
-        var subTypeValues = {/literal}"{$paramSubType}"{literal};
+      else if (!subTypeValues) {
+        subTypeValues = {/literal}"{$paramSubType}"{literal};
+      }
+      function loadNextRecord(i, groupValue, groupCount) {
+        if (i < groupCount) {
+          CRM.buildCustomData({/literal}"{$contactType}"{literal}, subTypeValues, null, i, groupValue, true).one('crmLoad', function() {
+            highlightTabs(this);
+            loadNextRecord(i+1, groupValue, groupCount);
+          });
+        }
       }
       {/literal}
       {foreach from=$customValueCount item="groupCount" key="groupValue"}
       {if $groupValue}{literal}
-        for ( var i = 1; i < {/literal}{$groupCount}{literal}; i++ ) {
-          CRM.buildCustomData( {/literal}"{$contactType}"{literal}, subTypeValues, null, i, {/literal}{$groupValue}{literal}, true );
-        }
+        loadNextRecord(1, {/literal}{$groupValue}{literal}, {/literal}{$groupCount}{literal});
       {/literal}
       {/if}
       {/foreach}
