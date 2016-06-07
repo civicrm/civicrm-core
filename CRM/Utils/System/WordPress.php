@@ -275,7 +275,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   private function getBaseUrl($absolute, $frontend, $forceBackend) {
     $config = CRM_Core_Config::singleton();
     if (!defined('CIVICRM_UF_ADMINURL')) {
-      define('CIVICRM_UF_ADMINURL', CIVICRM_UF_BASEURL . '/wp-admin/');
+      define('CIVICRM_UF_ADMINURL', CIVICRM_UF_BASEURL . 'wp-admin/');
     }
     if (!defined('CIVICRM_UF_WP_BASEURL')) {
       define('CIVICRM_UF_WP_BASEURL', CIVICRM_UF_BASEURL );
