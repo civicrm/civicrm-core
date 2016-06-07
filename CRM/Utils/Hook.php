@@ -519,6 +519,23 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * @param array $themes
+   *   List of themes, keyed by name.
+   *   Ex:
+   *   array('judy' => array(
+   *     'title' => 'The Judy Theme',
+   *     'css_callback' => $callable, // Optional: override file mapping mechanism
+   *   )).
+   * @return mixed
+   */
+  public static function themes(&$themes) {
+    return self::singleton()->invoke(1, $themes,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_themes'
+    );
+  }
+
+  /**
    * This hook is called for declaring managed entities via API.
    *
    * @param array $entities
