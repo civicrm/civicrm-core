@@ -122,4 +122,30 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('hash')));
   }
 
+  /**
+   * @return array
+   */
+  public function columnTests() {
+    $columns = array();
+    $columns[] = array('civicrm_contribution', 'total_amount');
+    $columns[] = array('civicrm_contact', 'first_name');
+    $columns[] = array('civicrm_contact', 'xxxx');
+    return $columns;
+  }
+
+  /**
+   * @param $tableName
+   * @param $columnName
+   *
+   * @dataProvider columnTests
+   */
+  public function testCheckIfColumnExists($tableName, $columnName) {
+    if ($columnName == 'xxxx') {
+      $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $columnName));
+    }
+    else {
+      $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $columnName));
+    }
+  }
+
 }
