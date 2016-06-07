@@ -102,7 +102,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     ) {
       $session = CRM_Core_Session::singleton();
       $allCases = CRM_Case_BAO_Case::getCases(TRUE, $session->get('userID'), 'any');
-      if (!array_key_exists($this->_caseId, $allCases)) {
+      if (count(array_intersect($this->_caseId, array_keys($allCases))) == 0) {
         CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
       }
     }
