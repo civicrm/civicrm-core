@@ -221,14 +221,15 @@ class CRM_Member_BAO_Query {
         if (is_string($value) && strpos($value, ',') && $op == '=') {
           $value = array('IN' => explode(',', $value));
         }
-      case 'member_id':
+      case 'membership_id':
+      case 'member_id': // CRM-18523 Updated to membership_id but kept member_id case for backwards compatibility
       case 'member_campaign_id':
 
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
           $qillName = ts('Membership Status');
         }
-        elseif ($name == 'member_id') {
+        elseif ($name == 'membership_id' || $name == 'member_id') {
           $name = 'id';
           $qillName = ts('Membership ID');
         }
