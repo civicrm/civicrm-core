@@ -209,6 +209,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         CRM_Utils_Token::getTokens($body_html),
         CRM_Utils_Token::getTokens($body_subject));
 
+      //replace header footer template tokens
+      $body_html = CRM_Utils_Token::replaceTemplateTokens($body_html, TRUE, $tokens, TRUE);
+      $body_text = CRM_Utils_Token::replaceTemplateTokens($body_text, FALSE, $tokens, TRUE);
+
       // get replacement text for these tokens
       $returnProperties = array("preferred_mail_format" => 1);
       if (isset($tokens['contact'])) {

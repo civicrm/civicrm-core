@@ -188,17 +188,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
-    //Adding wysiwyg editor to every emails
-    $this->add('wysiwyg', 'msg_html', ts('HTML Message'),
-      array(
-        'cols' => '80',
-        'rows' => '8',
-        'onkeyup' => "return verify(this)",
-        'class' => 'crm-wysiwyg-fullpage',
-      )
-    );
-
-    /*// if not a system message use a wysiwyg editor, CRM-5971
+    // if not a system message use a wysiwyg editor, CRM-5971
     if ($this->_id &&
       CRM_Core_DAO::getFieldValue('CRM_Core_DAO_MessageTemplate',
         $this->_id,
@@ -218,7 +208,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
           'class' => 'crm-wysiwyg-fullpage',
         )
       );
-    }*/
+    }
 
     $this->add('textarea', 'msg_text', ts('Text Message'),
       "cols=50 rows=6"

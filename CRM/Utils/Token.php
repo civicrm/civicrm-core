@@ -88,8 +88,8 @@ class CRM_Utils_Token {
     'welcome' => array('group'),
     //for replacing header and footer components
     'transaction' => array(
-      'header',
-      'footer',
+      'header' => 'T_Header',
+      'footer'=> 'T_Footer',
     ),
   );
 
@@ -1952,7 +1952,6 @@ class CRM_Utils_Token {
 
   /**
    * @param $token
-   * @param $transaction
    * @param bool $html
    * @param bool $escapeSmarty
    *
@@ -1963,45 +1962,40 @@ class CRM_Utils_Token {
     // we have to do this because this function is
     // called only when we find a token in the string
     $value = '';
-    
-    if(!in_array($token, self::$_tokens['transaction'])) {
-      $value = "{transaction.$token}";
+
+    if(!array_key_exists($token, self::$_tokens['transaction'])) {
+        $value = "{transaction.$token}";
     }
-    else{
-      $value = $token;
+    else {
       $component = new CRM_Mailing_BAO_Component();
       $component->is_default = 1;
       $component->is_active = 1;
-      if ($token == 'header') {
-        //find the header component from DB and replace the token with the html/text.
-        $component->component_type = 'T_Header';
-      }
-      elseif($token == 'footer'){
-          $component->component_type = 'T_Footer';
-      }
+      //find the header/footer component from DB and replace the token with the html/text.
+      $component->component_type =self::$_tokens['transaction'][$token];
       $component->find(TRUE);
-      $html = $component->body_html;
-      if ($component->body_text) {
-        $text = $component->body_text;
+      if(!empty($component)) {
+        $html = $component->body_html;
+        if ($component->body_text) {
+          $text = $component->body_text;
+        }
+        else {
+          $text = CRM_Utils_String::htmlToText($component->body_html);
+        }
+        //replacing the token with the text/html
+        if ($html) {
+          $value = $html;
+        }
+        else {
+          $value = $text;
+        }
       }
-      else {
-        $text = CRM_Utils_String::htmlToText($component->body_html);
-      }
-      //replacing the token with the text/html
-      if ($html) {
-        $value = $html;
-      }
-      else {
-        $value = $text;
+      else{
+        $value = '';
       }
     }
-
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);
     }
-
     return $value;
-
   }
-
-  }
+}
