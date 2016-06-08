@@ -79,7 +79,7 @@
       </tr>
       <tr class="crm-campaign-survey-form-block-thankyou_title">
         <td
-          class="label">{$form.thankyou_title.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='thankyou_title' id=$contributionPageID}{/if}</td>
+          class="label">{$form.thankyou_title.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_survey' field='thankyou_title' id=$surveyId}{/if}</td>
         <td>{$form.thankyou_title.html}<br/>
 
           <div class="description">{ts}This title will be displayed at the top of the thank-you page.{/ts}</div>
@@ -87,7 +87,7 @@
       </tr>
       <tr class="crm-campaign-survey-form-block-thankyou_text">
         <td
-          class="label">{$form.thankyou_text.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='thankyou_text' id=$contributionPageID}{/if}</td>
+          class="label">{$form.thankyou_text.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_survey' field='thankyou_text' id=$surveyId}{/if}</td>
         <td>{$form.thankyou_text.html}<br/>
 
           <div
