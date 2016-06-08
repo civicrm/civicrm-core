@@ -496,7 +496,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *  - Upgrade from an old version (with first-run tracking)
    */
   public function handleFirstRun() {
-
     // Ordinarily, we prefetch settings en masse and find that the system is already installed.
     // No extra SQL queries required.
     if (Civi::settings()->get('installed')) {
@@ -521,7 +520,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       return;
     }
     $dao = CRM_Core_DAO::executeQuery('SELECT version FROM civicrm_domain');
-
     while ($dao->fetch()) {
       if ($dao->version && version_compare($dao->version, CRM_Utils_System::version(), '<')) {
         return;
