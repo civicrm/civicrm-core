@@ -224,7 +224,7 @@
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/36.png</icon>
      <weight>97</weight>
-  </item>. 
+  </item>
   <item>
      <path>civicrm/admin/menu</path>
      <title>Navigation Menu</title>
