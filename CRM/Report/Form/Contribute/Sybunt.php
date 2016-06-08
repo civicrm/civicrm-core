@@ -1,4 +1,4 @@
-x<?php
+<?php
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
@@ -32,19 +32,17 @@ x<?php
  */
 class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
+  public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
   protected $_charts = array(
     '' => 'Tabular',
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
   );
-
   protected $_customGroupExtends = array(
     'Contact',
     'Individual',
     'Contribution',
   );
-
-  public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   /**
    */
@@ -165,32 +163,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       ),
-        'civicrm_line_item' => array(
-            'dao' => 'CRM_Price_DAO_LineItem',
-            'fields' => array(
-                'financial_type_id' => array(
-                    'title' => ts('Line Item Financial Type'),
-                    'default' => FALSE,
-                ),
-                'line_total' => array(
-                    'title' => ts('Yearly Line Item Totals'),
-                    'default' => FALSE,
-                ),
-            ),
-            'filters' => array(
-                'financial_type_id' => array(
-                    'title' => ts('Line Item Financial Type'),
-                    'type' => CRM_Utils_Type::T_INT,
-                    'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-                    'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
-                ),
-            ),
-            'group_bys' => array(
-                'financial_type_id' => array(
-                    'title' => ts('Line Item Financial Type'),
-                ),
-      )
-        ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'grouping' => 'contact-field',
@@ -214,6 +186,36 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     );
     $this->_columns += $this->addAddressFields();
     $this->_columns += array(
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+        'fields' => array(
+          'line_item_financial_type_id' => array(
+            'name' => 'financial_type_id',
+            'title' => ts('Line Item Financial Type'),
+            'default' => FALSE,
+          ),
+          'line_total' => array(
+            'title' => ts('Yearly Line Item Totals (Use only with Line Item Financial Type filters in order to avoid double counting)'),
+            'type' => CRM_Utils_Type::T_MONEY,
+            'default' => FALSE,
+          ),
+        ),
+        'filters' => array(
+          'line_item_financial_type_id' => array(
+            'name' => 'financial_type_id',
+            'title' => ts('Line Item Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+          ),
+        ),
+        'group_bys' => array(
+          'line_item_financial_type_id' => array(
+            'name' => 'financial_type_id',
+            'title' => ts('Line Item Financial Type'),
+          ),
+        )
+      ),
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
         'fields' => array(
@@ -233,6 +235,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
+          'financial_type_id' => array(
+            'name' => 'financial_type_id',
+            'title' => ts('Contribution Financial Type'),
+            'default' => FALSE,
+          ),
         ),
         'filters' => array(
           'yid' => array(
@@ -243,12 +250,12 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'default' => date('Y'),
             'type' => CRM_Utils_Type::T_INT,
           ),
-//          'financial_type_id' => array(
-//            'title' => ts('Financial Type'),
-//            'type' => CRM_Utils_Type::T_INT,
-//            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-//            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
-//          ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+          ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -256,41 +263,14 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'default' => array('1'),
           ),
         ),
+        'group_bys' => array(
+          'financial_type_id' => array(
+            'name' => 'financial_type_id',
+            'title' => ts('Contribution Financial Type'),
+          ),
+        )
       ),
     );
-//    $this->_columns += array(
-//        'civicrm_line_item' => array(
-//            'dao' => 'CRM_Price_DAO_LineItem',
-//            'fields' => array(
-//                'contribution_id' => array(
-//                    'title' => ts('contributionID'),
-//                    'no_display' => TRUE,
-//                    'required' => TRUE,
-//                    'no_repeat' => TRUE,
-//                ),
-//                'line_total' => array(
-//                    'title' => ts('Line Total'),
-//                    'no_display' => FALSE,
-//                    'required' => FALSE,
-//                    'no_repeat' => FALSE,
-//                ),
-//                'financial_type_id' => array(
-//                    'title' => ts('Financial Type ID'),
-//                    'no_display' => FALSE,
-//                    'required' => FALSE,
-//                    'no_repeat' => FALSE,
-//                ),
-//            ),
-//            'filters' => array(
-//                'financial_type_id' => array(
-//                    'title' => ts('Financial Type'),
-//                    'type' => CRM_Utils_Type::T_INT,
-//                    'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-//                    'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
-//                ),
-//            ),
-//        ),
-//    );
 
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
@@ -315,6 +295,182 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     parent::preProcess();
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
+  public function statistics(&$rows) {
+    $statistics = parent::statistics($rows);
+
+    if (!empty($rows)) {
+      if (sizeof($this->_params['fields']['line_total']) > 0) {
+        $select = "
+                   SELECT
+                        SUM({$this->_aliases['civicrm_line_item']}.line_total ) as lineamount ";
+
+
+        $sql = "{$select} {$this->_from} {$this->_where}";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        if ($dao->fetch()) {
+          $statistics['counts']['lineamount'] = array(
+            'value' => $dao->lineamount,
+            'title' => 'Total Line Items LifeTime',
+            'type' => CRM_Utils_Type::T_MONEY,
+          );
+        }
+      }
+      if (sizeof($this->_params['fields']['total_amount']) > 0 || sizeof($this->_params['fields']['line_total']) == 0) {
+        $select = "
+                   SELECT
+                        SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
+
+
+        $sql = "{$select} {$this->_from} {$this->_where}";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        if ($dao->fetch()) {
+          $statistics['counts']['amount'] = array(
+            'value' => $dao->amount,
+            'title' => 'Total Contributions LifeTime',
+            'type' => CRM_Utils_Type::T_MONEY,
+          );
+        }
+      }
+
+    }
+    return $statistics;
+  }
+
+  public function postProcess() {
+    // get ready with post process params
+    $this->beginPostProcess();
+    $this->buildACLClause($this->_aliases['civicrm_contact']);
+    $this->select();
+    $this->from();
+    $this->where();
+    $this->groupBy();
+    $this->getPermissionedFTQuery($this);
+
+    $rows = $contactIds = array();
+    if (empty($this->_params['charts'])) {
+      $this->limit();
+      $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
+
+      $dao = CRM_Core_DAO::executeQuery($getContacts);
+
+      while ($dao->fetch()) {
+        $contactIds[] = $dao->cid;
+      }
+      $dao->free();
+      $this->setPager();
+    }
+
+    if (!empty($contactIds) || !empty($this->_params['charts'])) {
+      if (!empty($this->_params['charts'])) {
+        $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy}";
+      }
+      else {
+        $sql = "" .
+          "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
+          implode(',', $contactIds) .
+          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
+      }
+
+      $current_year = $this->_params['yid_value'];
+      $previous_year = $current_year - 1;
+      $previous_pyear = $current_year - 2;
+      $previous_ppyear = $current_year - 3;
+      $upTo_year = $current_year - 4;
+
+      $rows = $row = array();
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      $this->addToDeveloperTab($sql);
+      $contributionSum = 0;
+      $linetotalSum = 0;
+      $yearcal = array();
+      $count = 0;
+      while ($dao->fetch()) {
+        $count++;
+        if (!$dao->civicrm_contribution_contact_id) {
+          continue;
+        }
+
+        // these conditions set row index values to keep groupings collated, and eliminate subtotals from the rollup results, yet preserving the last row which is the grand total
+        if ($this->_params['group_bys']['line_item_financial_type_id'] && $this->_params['group_bys']['financial_type_id']) {
+          if (is_null($dao->civicrm_contribution_financial_type_id) && $count != $dao->N - 1) {
+            continue;
+          }
+          $rowindex = "-l" . $dao->civicrm_line_item_line_item_financial_type_id . "-c" . $dao->civicrm_contribution_financial_type_id;
+        }
+        elseif ($this->_params['group_bys']['line_item_financial_type_id']) {
+          if (is_null($dao->civicrm_line_item_line_item_financial_type_id) && $count != $dao->N - 1) {
+            continue;
+          }
+          $rowindex = "-l" . $dao->civicrm_line_item_line_item_financial_type_id;
+        }
+        elseif ($this->_params['group_bys']['financial_type_id'] || $this->_params['group_bys']['line_item_financial_type_id']) {
+          if (is_null($dao->civicrm_contribution_financial_type_id) && $count != $dao->N - 1) {
+            continue;
+          }
+          $rowindex = "-c" . $dao->civicrm_contribution_financial_type_id;
+        }
+        else {
+          $rowindex = "";
+        }
+        $row = array();
+        foreach ($this->_columnHeaders as $key => $value) {
+          if (property_exists($dao, $key)) {
+            $rows[$dao->civicrm_contribution_contact_id . $rowindex][$key] = $dao->$key;
+          }
+        }
+
+        //if ($this->_params['group_bys']['line_item_financial_type_id']) {
+        if ($dao->civicrm_contribution_receive_date) {
+          if ($dao->civicrm_contribution_receive_date > $upTo_year) {
+            $linetotalSum += $dao->civicrm_line_item_line_total;
+            $rows[$dao->civicrm_contribution_contact_id . $rowindex]['line_items_year_' . $dao->civicrm_contribution_receive_date] = $dao->civicrm_line_item_line_total;
+          }
+        }
+        else {
+          $rows[$dao->civicrm_contribution_contact_id . $rowindex]['line_items_life_time_total'] = $dao->civicrm_line_item_line_total;
+          if (($dao->civicrm_line_item_line_total - $linetotalSum) > 0
+          ) {
+            $rows[$dao->civicrm_contribution_contact_id . $rowindex]["line_items_civicrm_upto_{$upTo_year}"]
+              = $dao->civicrm_line_item_line_total - $linetotalSum;
+          }
+          $linetotalSum = 0;
+        }
+        //}
+        //if ($this->_params['group_bys']['financial_type_id'] || $this->_params['group_bys']['line_item_financial_type_id']) {
+        if ($dao->civicrm_contribution_receive_date) {
+          if ($dao->civicrm_contribution_receive_date > $upTo_year) {
+            $contributionSum += $dao->civicrm_contribution_total_amount;
+            $rows[$dao->civicrm_contribution_contact_id . $rowindex]['contributions_year_' . $dao->civicrm_contribution_receive_date] = $dao->civicrm_contribution_total_amount;
+          }
+        }
+        else {
+          $rows[$dao->civicrm_contribution_contact_id . $rowindex]['contributions_life_time_total'] = $dao->civicrm_contribution_total_amount;
+          if (($dao->civicrm_contribution_total_amount - $contributionSum) > 0
+          ) {
+            $rows[$dao->civicrm_contribution_contact_id . $rowindex]["contributions_civicrm_upto_{$upTo_year}"]
+              = $dao->civicrm_contribution_total_amount - $contributionSum;
+          }
+          $contributionSum = 0;
+        }
+        //}
+      }
+      $dao->free();
+    }
+    // format result set.
+    $this->formatDisplay($rows, FALSE);
+
+    // assign variables to templates
+    $this->doTemplateAssignment($rows);
+
+    // do print / pdf / instance stuff if needed
+    $this->endPostProcess($rows);
+  }
+
   public function select() {
     $select = array();
     $this->_columnHeaders = array();
@@ -327,24 +483,19 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-
-          if (!empty($field['required']) ||
-            !empty($this->_params['fields'][$fieldName])
-          ) {
+          // if field is required, or if specified, or, default to include total amount if line total isn't specified (so that it behaves like it did before line total was an option and total amount was required
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName]) || (empty($this->_params['fields']['line_total']) && $fieldName == 'total_amount')) {
             if ($fieldName == 'total_amount' || $fieldName == 'line_total') {
-                if ($fieldName == 'line_total') {
-                    if (sizeof($this->_params['financial_type_id_value']) > 0) {
-                        $select[] = "SUM(line_item_civireport.line_total) as {$tableName}_{$fieldName}";
-                    }
-                    $labelprefix = "Line Items";
-                    $columnprefix = "line_items";
-                } else {// if total_amount or default to total_amount
-                    if (sizeof($this->_params['financial_type_id_value']) > 0) {
-                        $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
-                    }
-                    $labelprefix = "Contributions";
-                    $columnprefix = "contributions";
-                }
+              if ($fieldName == 'line_total') {
+                $select[] = "SUM(line_item_civireport.line_total) as {$tableName}_{$fieldName}";
+                $labelprefix = "Line Items";
+                $columnprefix = "line_items";
+              }
+              else {// if total_amount or default to total_amount
+                $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
+                $labelprefix = "Contributions";
+                $columnprefix = "contributions";
+              }
 
               $this->_columnHeaders["{$columnprefix}_civicrm_upto_{$upTo_year}"]['type'] = $field['type'];
               $this->_columnHeaders["{$columnprefix}_civicrm_upto_{$upTo_year}"]['title'] = "$labelprefix Up To $upTo_year";
@@ -358,8 +509,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               $this->_columnHeaders["{$columnprefix}_year_{$previous_year}"]['type'] = $field['type'];
               $this->_columnHeaders["{$columnprefix}_year_{$previous_year}"]['title'] = "$labelprefix for $previous_year";
 
-              $this->_columnHeaders["{$columnprefix}_civicrm_life_time_total"]['type'] = $field['type'];
-              $this->_columnHeaders["{$columnprefix}_civicrm_life_time_total"]['title'] = "$labelprefix for LifeTime";
+              $this->_columnHeaders["{$columnprefix}_life_time_total"]['type'] = $field['type'];
+              $this->_columnHeaders["{$columnprefix}_life_time_total"]['title'] = "$labelprefix for LifeTime";
             }
             elseif ($fieldName == 'receive_date') {
               $select[] = self::fiscalYearOffset($field['dbAlias']) .
@@ -388,11 +539,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
              {$this->_aclFrom}";
-      if ($this->isTableSelected('civicrm_line_item')) {
-          $this->_from .= "
+    if ($this->isTableSelected('civicrm_line_item')) {
+      $this->_from .= "
               LEFT  JOIN civicrm_line_item  {$this->_aliases['civicrm_line_item']}
                       ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id";
-      }
+    }
     if ($this->isTableSelected('civicrm_email')) {
       $this->_from .= "
               LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
@@ -442,6 +593,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
                 CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
               );
               if (($fieldName == 'contribution_status_id' ||
+                  $fieldName == 'line_item_financial_type_id' ||
                   $fieldName == 'financial_type_id') && !empty($clause)
               ) {
                 $this->_statusClause .= " AND " . $clause;
@@ -466,159 +618,15 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   public function groupBy() {
     $this->assign('chartSupported', TRUE);
     $this->_groupBy = "Group BY {$this->_aliases['civicrm_contribution']}.contact_id, ";
-      if ($this->isTableSelected('civicrm_line_item')) {
-          $this->_groupBy .= " {$this->_aliases['civicrm_line_item']}.financial_type_id, ";
-      }
-      $this->_groupBy .= self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
-        '.receive_date') . " "  . " " . $this->_rollup;
-
-  }
-
-  /**
-   * @param $rows
-   *
-   * @return array
-   */
-  public function statistics(&$rows) {
-    $statistics = parent::statistics($rows);
-
-    if (!empty($rows)) {
-        if (sizeof($this->_params['fields']['line_total'])>0) {
-            $select = "
-                   SELECT
-                        SUM({$this->_aliases['civicrm_line_item']}.line_total ) as lineamount ";
-
-
-            $sql = "{$select} {$this->_from} {$this->_where}";
-            $dao = CRM_Core_DAO::executeQuery($sql);
-            if ($dao->fetch()) {
-                $statistics['counts']['lineamount'] = array(
-                    'value' => $dao->lineamount,
-                    'title' => 'Total Line Items LifeTime',
-                    'type' => CRM_Utils_Type::T_MONEY,
-                );
-            }
-        }
-        if (sizeof($this->_params['fields']['total_amount'])>0 || sizeof($this->_params['fields']['line_total'])==0) {
-            $select = "
-                   SELECT
-                        SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
-
-
-            $sql = "{$select} {$this->_from} {$this->_where}";
-            $dao = CRM_Core_DAO::executeQuery($sql);
-            if ($dao->fetch()) {
-                $statistics['counts']['amount'] = array(
-                    'value' => $dao->amount,
-                    'title' => 'Total Contributions LifeTime',
-                    'type' => CRM_Utils_Type::T_MONEY,
-                );
-            }
-        }
-
+    if ($this->_params['group_bys']['line_item_financial_type_id']) {
+      $this->_groupBy .= " {$this->_aliases['civicrm_line_item']}.financial_type_id, ";
     }
-    return $statistics;
-  }
-
-  public function postProcess() {
-    // get ready with post process params
-    $this->beginPostProcess();
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-    $this->select();
-    $this->from();
-    $this->where();
-    $this->groupBy();
-    $this->getPermissionedFTQuery($this);
-
-    $rows = $contactIds = array();
-    if (empty($this->_params['charts'])) {
-      $this->limit();
-      $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
-
-      $dao = CRM_Core_DAO::executeQuery($getContacts);
-
-      while ($dao->fetch()) {
-        $contactIds[] = $dao->cid;
-      }
-      $dao->free();
-      $this->setPager();
+    if ($this->_params['group_bys']['financial_type_id']) {
+      $this->_groupBy .= " {$this->_aliases['civicrm_contribution']}.financial_type_id, ";
     }
+    $this->_groupBy .= self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
+        '.receive_date') . " " . " " . $this->_rollup;
 
-    if (!empty($contactIds) || !empty($this->_params['charts'])) {
-      if (!empty($this->_params['charts'])) {
-        $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy}";
-      }
-      else {
-        $sql = "" .
-          "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
-          implode(',', $contactIds) .
-          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
-      }
-
-      $current_year = $this->_params['yid_value'];
-      $previous_year = $current_year - 1;
-      $previous_pyear = $current_year - 2;
-      $previous_ppyear = $current_year - 3;
-      $upTo_year = $current_year - 4;
-
-      $rows = $row = array();
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      $contributionSum = 0;
-        $linetotalSum = 0;
-      $yearcal = array();
-      while ($dao->fetch()) {
-        if (!$dao->civicrm_contribution_contact_id) {
-          continue;
-        }
-        $row = array();
-        foreach ($this->_columnHeaders as $key => $value) {
-          if (property_exists($dao, $key)) {
-            $rows[$dao->civicrm_contribution_contact_id."-".$dao->civicrm_line_item_financial_type_id][$key] = $dao->$key;
-          }
-        }
-          if (sizeof($this->_params['fields']['line_total'])>0) {
-              if ($dao->civicrm_contribution_receive_date) {
-                  if ($dao->civicrm_contribution_receive_date > $upTo_year) {
-                      $linetotalSum += $dao->civicrm_line_item_line_total;
-                      $rows[$dao->civicrm_contribution_contact_id . "-" . $dao->civicrm_line_item_financial_type_id]['line_item_year_' . $dao->civicrm_contribution_receive_date] = $dao->civicrm_line_item_line_total;
-                  }
-              } else {
-                  $rows[$dao->civicrm_contribution_contact_id . "-" . $dao->civicrm_line_item_financial_type_id]['civicrm_line_life_time_total'] = $dao->civicrm_line_item_line_total;
-                  if (($dao->civicrm_line_item_line_total - $linetotalSum) > 0
-                  ) {
-                      $rows[$dao->civicrm_contribution_contact_id . "-" . $dao->civicrm_line_item_financial_type_id]["line_item_civicrm_line_upto_{$upTo_year}"]
-                          = $dao->civicrm_line_item_line_total - $linetotalSum;
-                  }
-                  $linetotalSum = 0;
-              }
-          }
-          if (sizeof($this->_params['fields']['total_amount'])>0 || sizeof($this->_params['fields']['line_total'])==0) {
-              if ($dao->civicrm_contribution_receive_date) {
-                  if ($dao->civicrm_contribution_receive_date > $upTo_year) {
-                      $contributionSum += $dao->civicrm_contribution_total_amount;
-                      $rows[$dao->civicrm_contribution_contact_id . "-" . $dao->civicrm_line_item_financial_type_id]['contribution_year_' . $dao->civicrm_contribution_receive_date] = $dao->civicrm_contribution_total_amount;
-                  }
-              } else {
-                  $rows[$dao->civicrm_contribution_contact_id . "-" . $dao->civicrm_line_item_financial_type_id]['contribution_civicrm_life_time_total'] = $dao->civicrm_contribution_total_amount;
-                  if (($dao->civicrm_contribution_total_amount - $contributionSum) > 0
-                  ) {
-                      $rows[$dao->civicrm_contribution_contact_id . "-" . $dao->civicrm_line_item_financial_type_id]["contribution_civicrm_upto_{$upTo_year}"]
-                          = $dao->civicrm_contribution_total_amount - $contributionSum;
-                  }
-                  $contributionSum = 0;
-              }
-          }
-      }
-      $dao->free();
-    }
-    // format result set.
-    $this->formatDisplay($rows, FALSE);
-
-    // assign variables to templates
-    $this->doTemplateAssignment($rows);
-
-    // do print / pdf / instance stuff if needed
-    $this->endPostProcess($rows);
   }
 
   /**
@@ -678,7 +686,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-      $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
+    $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
 
     foreach ($rows as $rowNum => $row) {
       //Convert Display name into link
@@ -722,13 +730,21 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         }
         $entryFound = TRUE;
       }
-        // change financial type ID to financial type name
-        if ((array_key_exists('civicrm_line_item_financial_type_id', $row))) {
-            if ($value = $row['civicrm_line_item_financial_type_id']) {
-                $rows[$rowNum]['civicrm_line_item_financial_type_id'] = $contributionTypes[$value];
-            }
-            $entryFound = TRUE;
+      // change line item financial type ID to financial type name
+      if ((array_key_exists('civicrm_line_item_line_item_financial_type_id', $row))) {
+        if ($value = $row['civicrm_line_item_line_item_financial_type_id']) {
+          $rows[$rowNum]['civicrm_line_item_line_item_financial_type_id'] = $contributionTypes[$value];
         }
+        $entryFound = TRUE;
+      }
+
+      // change contribution financial type ID to financial type name
+      if ((array_key_exists('civicrm_contribution_financial_type_id', $row))) {
+        if ($value = $row['civicrm_contribution_financial_type_id']) {
+          $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $contributionTypes[$value];
+        }
+        $entryFound = TRUE;
+      }
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
