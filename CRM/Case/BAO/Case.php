@@ -775,7 +775,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
 {$myCaseWhereClause} {$myGroupByClause}";
 
-    $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $res = CRM_Core_DAO::executeQuery($query);
     while ($res->fetch()) {
       if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
@@ -1562,7 +1562,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     $query = self::getCaseActivityQuery($type, $userID, $condition, $cases['case_deleted']);
 
-    $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $res = CRM_Core_DAO::executeQuery($query);
 
     $activityInfo = array();
     while ($res->fetch()) {
@@ -2140,7 +2140,7 @@ SELECT civicrm_contact.id as casemanager_id,
             $from = ' FROM ' . $tableName;
             $where = " WHERE {$tableName}.entity_id = {$otherCaseId}";
             $query = $insert . $select . $from . $where;
-            $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+            $dao = CRM_Core_DAO::executeQuery($query);
           }
         }
 

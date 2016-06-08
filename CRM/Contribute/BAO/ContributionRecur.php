@@ -200,7 +200,7 @@ SELECT r.payment_processor_id
          WHERE contribution_recur_id IN ( {$recurID}) AND is_test = 0
          GROUP BY contribution_recur_id";
 
-    $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $res = CRM_Core_DAO::executeQuery($query);
 
     while ($res->fetch()) {
       $totalCount[$res->contribution_recur_id] = $res->commpleted;
@@ -602,7 +602,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
           $from = ' FROM ' . $tableName;
           $where = " WHERE {$tableName}.entity_id = {$sourceContributionId}";
           $query = $insert . $select . $from . $where;
-          CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          CRM_Core_DAO::executeQuery($query);
         }
       }
     }

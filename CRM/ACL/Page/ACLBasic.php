@@ -129,9 +129,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
    WHERE ( object_table NOT IN ( 'civicrm_saved_search', 'civicrm_uf_group', 'civicrm_custom_group' ) )
 ORDER BY entity_id
 ";
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $roles = CRM_Core_OptionGroup::values('acl_role');
 

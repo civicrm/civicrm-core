@@ -800,7 +800,7 @@ FROM   civicrm_participant
    LEFT JOIN civicrm_contact ON (civicrm_participant.contact_id = civicrm_contact.id)
 WHERE  civicrm_participant.id = {$participantId}
 ";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $details = array();
     while ($dao->fetch()) {

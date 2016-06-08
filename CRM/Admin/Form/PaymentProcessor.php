@@ -362,7 +362,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     if (!empty($values['is_default'])) {
       $query = "UPDATE civicrm_payment_processor SET is_default = 0 WHERE domain_id = $domainID";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     $this->updatePaymentProcessor($values, $domainID, FALSE);
