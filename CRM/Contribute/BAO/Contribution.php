@@ -1337,7 +1337,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
       $additionalWhere
       GROUP BY currency
       ";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     $count = 0;
     $amount = $average = array();
     while ($dao->fetch()) {

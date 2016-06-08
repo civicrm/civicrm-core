@@ -284,7 +284,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       else {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = NULL WHERE id = {$formValues['template']}";
       }
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
     if (!empty($formValues['update_format'])) {
       $bao = new CRM_Core_BAO_PdfFormat();
