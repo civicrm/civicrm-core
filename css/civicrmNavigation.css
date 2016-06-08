@@ -59,7 +59,7 @@ html>body .innerbox
   color: white;
   cursor: default;
   font-size: 12px;
-  font-family: Tahoma, Verdana, Arial, Sans;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
 }
 
 #civicrm-menu {
