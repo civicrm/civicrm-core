@@ -1191,7 +1191,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $lineItem = array($this->_priceSetId => array());
 
     CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-      $formValues, $lineItem[$this->_priceSetId]);
+      $formValues, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId);
 
     if (CRM_Utils_Array::value('tax_amount', $formValues)) {
       $params['tax_amount'] = $formValues['tax_amount'];

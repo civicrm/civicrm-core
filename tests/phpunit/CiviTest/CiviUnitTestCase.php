@@ -3526,13 +3526,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $compareParams = array(
       'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
       'status_id' => 1,
-      'financial_account_id' => 1,
+      'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
     );
     if ($context == 'payLater') {
       $compareParams = array(
         'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
         'status_id' => 3,
-        'financial_account_id' => 1,
+        'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
       );
     }
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
