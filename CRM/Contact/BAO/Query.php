@@ -5088,7 +5088,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op $date";
       }
       else {
-        $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op";
+        $this->_where[$grouping][] = self::buildClause("{$tableName}.{$dbFieldName}", $op);
       }
 
       $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
