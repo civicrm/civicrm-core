@@ -177,7 +177,7 @@ foreach ($langs as $locale => $_) {
   }
 }
 
-// Set the locale (required by CRM_Core_Config)
+// Set the CMS
 // This is mostly sympbolic, since nothing we do during the install
 // really requires CIVICRM_UF to be defined.
 $installTypeToUF = array(
@@ -189,6 +189,7 @@ $installTypeToUF = array(
 $uf = (isset($installTypeToUF[$installType]) ? $installTypeToUF[$installType] : 'Drupal');
 define('CIVICRM_UF', $uf);
 
+// Set the Locale (required by CRM_Core_Config)
 global $tsLocale;
 
 $tsLocale = 'en_US';
@@ -1486,6 +1487,11 @@ class Installer extends InstallRequirements {
 
         // now enable civicrm module.
         module_enable(array('civicrm', 'civicrmtheme'));
+
+        CRM_Core_DAO::executeQuery('select * from civicrm_domain');
+
+        // SystemInstallEvent will be call from here with the first call of CiviCRM_Core_Settings
+        // FIXME: we need to pass the seedLanguage somehow but we don't have access to the db yet
 
         // clear block, page, theme, and hook caches
         drupal_flush_all_caches();

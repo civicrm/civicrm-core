@@ -27,6 +27,9 @@
 
 namespace Civi\Core;
 
+use Civi;
+use Civi\Core\Event\SystemInstallEvent;
+
 /**
  * Class LocalizationInitializer
  * @package Civi\Core
@@ -40,17 +43,24 @@ class LocalizationInitializer {
    * @throws \CRM_Core_Exception
    */
   public static function initialize(SystemInstallEvent $event) {
+
     // get the current installation language
-    $seedLanguage = 'fr_CA';
-    $resourceDir = \CRM_Core_I18n::getResourceDir();
-    //\CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
+    global $tsLocale;
+    $seedLanguage = $tsLocale;
+    print $seedLanguage; die();
+    if (!$seedLanguage) return;
 
     // get the corresponding settings file if any
-    $settingsParams = array();
-    $fileName = $resourceDir . $seedLanguage . DIRECTORY_SEPARATOR . 'settings.json';
+    $localeDir = \CRM_Core_I18n::getResourceDir();
+    $fileName = $localeDir . $seedLanguage . DIRECTORY_SEPARATOR . 'settings.json';
+
     if (file_exists($fileName)) {
+
+      // load the file and parse it
+      $settingsParams = array();
       $json = file_get_contents($fileName);
       $settings = json_decode($json, TRUE);
+
       if (!empty($settings)) {
         // get all valid settings
         $results = civicrm_api3('Setting', 'getfields', array());
@@ -63,13 +73,15 @@ class LocalizationInitializer {
           // TODO: add support for currencies_enabled which is an OptionGroup
         }
       }
-    }
-    $settingsParams['domain_id'] = 'current_domain';
-    //$settingsParams['lcMessages'] = $seedLanguage;
-watchdog('debug', 'params -- ' . print_r($settingsParams,1));
 
-    // apply the config
-    civicrm_api3('Setting', 'create', $settingsParams);
+      // TODO: add some validation ? or it should be in the API ?
+
+      // enforce the seedLanguage as the default language
+      $settingsParams['lcMessages'] = $seedLanguage;
+
+      // apply the config
+      civicrm_api3('Setting', 'create', $settingsParams);
+    }
   }
 
 }
