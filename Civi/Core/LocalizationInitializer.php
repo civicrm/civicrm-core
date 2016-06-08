@@ -36,7 +36,7 @@ use Civi\Core\Event\SystemInstallEvent;
  */
 class LocalizationInitializer {
 
-  /*
+  /**
    * Load the locale settings based on the installation language
    *
    * @param \Civi\Core\Event\SystemInstallEvent $event
@@ -47,7 +47,9 @@ class LocalizationInitializer {
     // get the current installation language
     global $tsLocale;
     $seedLanguage = $tsLocale;
-    if (!$seedLanguage) return;
+    if (!$seedLanguage) {
+      return;
+    }
 
     // get the corresponding settings file if any
     $localeDir = \CRM_Core_I18n::getResourceDir();
@@ -99,6 +101,12 @@ class LocalizationInitializer {
 
   }
 
+  /**
+   * Enable provided languages and disable all others
+   *
+   * @param $languages array of languages (locale code) ['fr_CA', 'en_CA']
+   * @throws \CiviCRM_API3_Exception
+   */
   protected static function updateLanguages($languages) {
     $result = civicrm_api3('OptionValue', 'get', array(
       'option_group_id' => "languages",
@@ -109,7 +117,8 @@ class LocalizationInitializer {
       $params = $language;
       if (in_array($language['name'], $languages)) {
         $params['is_active'] = 1;
-      } else {
+      }
+      else {
         // disable every language that is not in the given list
         $params['is_active'] = 0;
       }
@@ -118,6 +127,12 @@ class LocalizationInitializer {
 
   }
 
+  /**
+   * Replace available currencies by the ones provided
+   *
+   * @param $currencies array of currencies ['USD', 'CAD']
+   * @param $default default currency
+   */
   protected static function updateCurrencies($currencies, $default) {
 
     // sort so that when we display drop down, weights have right value
