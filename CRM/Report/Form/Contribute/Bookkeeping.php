@@ -214,20 +214,20 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'dao' => 'CRM_Price_DAO_LineItem',
         'fields' => array(
           'financial_type_id' => array(
-            'title' => ts('Financial Type'),
+            'title' => ts('Line Item Financial Type'),
             'default' => TRUE,
           ),
         ),
         'filters' => array(
           'financial_type_id' => array(
-            'title' => ts('Financial Type'),
+            'title' => ts('Line Item Financial Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
         ),
         'order_bys' => array(
-          'financial_type_id' => array('title' => ts('Financial Type')),
+          'financial_type_id' => array('title' => ts('Line Item Financial Type')),
         ),
       ),
       'civicrm_batch' => array(
