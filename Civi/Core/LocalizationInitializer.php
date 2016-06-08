@@ -47,17 +47,18 @@ class LocalizationInitializer {
     // get the current installation language
     global $tsLocale;
     $seedLanguage = $tsLocale;
-    print $seedLanguage; die();
     if (!$seedLanguage) return;
 
     // get the corresponding settings file if any
     $localeDir = \CRM_Core_I18n::getResourceDir();
-    $fileName = $localeDir . $seedLanguage . DIRECTORY_SEPARATOR . 'settings.json';
+    $fileName = $localeDir . $seedLanguage . DIRECTORY_SEPARATOR . 'settings.default.json';
+
+    // initalization
+    $settingsParams = array();
 
     if (file_exists($fileName)) {
 
       // load the file and parse it
-      $settingsParams = array();
       $json = file_get_contents($fileName);
       $settings = json_decode($json, TRUE);
 
@@ -70,18 +71,75 @@ class LocalizationInitializer {
           if (in_array($setting, $validSettings)) {
             $settingsParams[$setting] = $value;
           }
-          // TODO: add support for currencies_enabled which is an OptionGroup
+
         }
+
+        // ensure we don't mess with multilingual
+        unset($settingsParams['languageLimit']);
+
+        // support for enabled languages (option group)
+        if (isset($settings['languagesOption']) && count($settings['languagesOption']) > 0) {
+          self::updateLanguages($settings['languagesOption']);
+        }
+
+        // set default currency in currencies_enabled (option group)
+        if (isset($settings['defaultCurrency'])) {
+          self::updateCurrencies(array($settings['defaultCurrency']), $settings['defaultCurrency']);
+        }
+
       }
 
-      // TODO: add some validation ? or it should be in the API ?
-
-      // enforce the seedLanguage as the default language
-      $settingsParams['lcMessages'] = $seedLanguage;
-
-      // apply the config
-      civicrm_api3('Setting', 'create', $settingsParams);
     }
+
+    // in any case, enforce the seedLanguage as the default language
+    $settingsParams['lcMessages'] = $seedLanguage;
+
+    // apply the config
+    civicrm_api3('Setting', 'create', $settingsParams);
+
+  }
+
+  protected static function updateLanguages($languages) {
+    $result = civicrm_api3('OptionValue', 'get', array(
+      'option_group_id' => "languages",
+      'options' => array('limit' => 0),
+    ));
+
+    foreach ($result['values'] as $id => $language) {
+      $params = $language;
+      if (in_array($language['name'], $languages)) {
+        $params['is_active'] = 1;
+      } else {
+        // disable every language that is not in the given list
+        $params['is_active'] = 0;
+      }
+      civicrm_api3('OptionValue', 'create', $params);
+    }
+
+  }
+
+  protected static function updateCurrencies($currencies, $default) {
+
+    // sort so that when we display drop down, weights have right value
+    sort($currencies);
+
+    // get labels for all the currencies
+    $options = array();
+
+    $currencySymbols = \CRM_Admin_Form_Setting_Localization::getCurrencySymbols();
+    for ($i = 0; $i < count($currencies); $i++) {
+      $options[] = array(
+        'label' => $currencySymbols[$currencies[$i]],
+        'value' => $currencies[$i],
+        'weight' => $i + 1,
+        'is_active' => 1,
+        'is_default' => $currencies[$i] == $default,
+      );
+    }
+
+    $dontCare = NULL;
+    \CRM_Core_OptionGroup::createAssoc('currencies_enabled', $options, $dontCare);
+
   }
 
 }
