@@ -646,10 +646,7 @@ class CRM_Core_Resources {
         $this->addStyleUrl($config->customCSSURL, 99, $region);
       }
       if (!Civi::settings()->get('disable_core_css')) {
-        $cssUrls = Civi::service('theme')->getUrls('civicrm.css');
-        foreach ($cssUrls as $cssUrl) {
-          $this->addStyleUrl($cssUrl, -99, $region);
-        }
+        $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
       }
       // crm-i.css added ahead of other styles so it can be overridden by FA.
       $this->addStyleFile('civicrm', 'css/crm-i.css', -101, $region);
