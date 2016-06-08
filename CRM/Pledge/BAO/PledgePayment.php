@@ -98,7 +98,10 @@ WHERE     pledge_id = %1
    */
   public static function create($params) {
     $transaction = new CRM_Core_Transaction();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
 
     //calculate the scheduled date for every installment
     $now = date('Ymd') . '000000';
@@ -106,19 +109,19 @@ WHERE     pledge_id = %1
     $prevScheduledDate[1] = CRM_Utils_Date::processDate($params['scheduled_date']);
 
     if (CRM_Utils_Date::overdue($prevScheduledDate[1], $now)) {
-      $statues[1] = array_search('Overdue', $contributionStatus);
+      $statues[1] = $contributionStatuses['Overdue'];
     }
     else {
-      $statues[1] = array_search('Pending', $contributionStatus);
+      $statues[1] = $contributionStatuses['Pending'];
     }
 
     for ($i = 1; $i < $params['installments']; $i++) {
       $prevScheduledDate[$i + 1] = self::calculateNextScheduledDate($params, $i);
       if (CRM_Utils_Date::overdue($prevScheduledDate[$i + 1], $now)) {
-        $statues[$i + 1] = array_search('Overdue', $contributionStatus);
+        $statues[$i + 1] = $contributionStatuses['Overdue'];
       }
       else {
-        $statues[$i + 1] = array_search('Pending', $contributionStatus);
+        $statues[$i + 1] = $contributionStatuses['Pending'];
       }
     }
 
@@ -288,7 +291,10 @@ WHERE     pledge_id = %1
    */
   public static function resetPledgePayment($contributionID) {
     // get all status
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
 
     $transaction = new CRM_Core_Transaction();
 
@@ -296,7 +302,7 @@ WHERE     pledge_id = %1
     $payment->contribution_id = $contributionID;
     if ($payment->find(TRUE)) {
       $payment->contribution_id = 'null';
-      $payment->status_id = array_search('Pending', $allStatus);
+      $payment->status_id = $contributionStatuses['Pending'];
       $payment->scheduled_date = NULL;
       $payment->reminder_date = NULL;
       $payment->scheduled_amount = $payment->actual_amount;
@@ -349,7 +355,10 @@ WHERE     pledge_id = %1
     $editScheduled = FALSE;
 
     // get all statuses
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
 
     // if we get do not get contribution id means we are editing the scheduled payment.
     if (!empty($paymentIDs)) {
@@ -367,13 +376,14 @@ WHERE     pledge_id = %1
     }
 
     // if payment ids are passed, we update payment table first, since payments statuses are not dependent on pledge status
-    if ((!empty($paymentIDs) || $pledgeStatusID == array_search('Cancelled', $allStatus)) && (!$editScheduled || $isScriptUpdate)) {
-      if ($pledgeStatusID == array_search('Cancelled', $allStatus)) {
+    if ((!empty($paymentIDs) || $pledgeStatusID == $contributionStatuses['Cancelled']) && (!$editScheduled || $isScriptUpdate)) {
+      if ($pledgeStatusID == $contributionStatuses['Cancelled']) {
         $paymentStatusID = $pledgeStatusID;
       }
 
       self::updatePledgePayments($pledgeID, $paymentStatusID, $paymentIDs, $actualAmount, $paymentContributionId, $isScriptUpdate);
     }
+
     if (!empty($paymentIDs) && $actualAmount) {
       $payments = implode(',', $paymentIDs);
       $pledgeScheduledAmount = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
@@ -383,12 +393,14 @@ WHERE     pledge_id = %1
       );
 
       $pledgeStatusId = self::calculatePledgeStatus($pledgeID);
+
       // Actual Pledge Amount
       $actualPledgeAmount = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
         $pledgeID,
         'amount',
         'id'
       );
+
       // while editing scheduled  we need to check if we are editing last pending
       $lastPending = FALSE;
       if (!$paymentContributionId) {
@@ -399,7 +411,7 @@ WHERE     pledge_id = %1
       }
 
       // check if this is the last payment and adjust the actual amount.
-      if ($pledgeStatusId && $pledgeStatusId == array_search('Completed', $allStatus) || $lastPending) {
+      if ($pledgeStatusId && $pledgeStatusId == $contributionStatuses['Completed'] || $lastPending) {
         // last scheduled payment
         if ($actualAmount >= $pledgeScheduledAmount) {
           $adjustTotalAmount = TRUE;
@@ -418,7 +430,7 @@ WHERE     pledge_id = %1
             $pledgeFrequencyInterval, $newDate
           ));
           $pledgeParams = array(
-            'status_id' => array_search('Pending', $allStatus),
+            'status_id' => $contributionStatuses['Pending'],
             'pledge_id' => $pledgeID,
             'scheduled_amount' => ($pledgeScheduledAmount - $actualAmount),
             'scheduled_date' => $ScheduledDate,
@@ -437,6 +449,7 @@ WHERE     pledge_id = %1
           'contribution_id',
           'id'
         );
+
         self::adjustPledgePayment($pledgeID, $actualAmount, $pledgeScheduledAmount, $paymentContributionId, $payments, $paymentStatusID);
         // while editing schedule,  after adding a new pledge payemnt update the scheduled amount of the current payment
         if (!$paymentContributionId) {
@@ -453,7 +466,7 @@ WHERE     pledge_id = %1
         $totalPaidParams = array(1 => array($pledgeID, 'Integer'));
         $totalPaidAmount = CRM_Core_DAO::singleValueQuery($balanceQuery, $totalPaidParams);
         $remainingTotalAmount = ($actualPledgeAmount - $totalPaidAmount);
-        if (($pledgeStatusId && $pledgeStatusId == array_search('Completed', $allStatus)) && (($actualAmount > $remainingTotalAmount) || ($actualAmount >= $actualPledgeAmount))) {
+        if (($pledgeStatusId && $pledgeStatusId == $contributionStatuses['Completed']) && (($actualAmount > $remainingTotalAmount) || ($actualAmount >= $actualPledgeAmount))) {
           $totalAmountClause = ", civicrm_pledge.amount = {$totalPaidAmount}";
         }
       }
@@ -468,7 +481,7 @@ WHERE     pledge_id = %1
 
     $cancelDateClause = $endDateClause = NULL;
     // update pledge and payment status if status is Completed/Cancelled.
-    if ($pledgeStatusID && $pledgeStatusID == array_search('Cancelled', $allStatus)) {
+    if ($pledgeStatusID && $pledgeStatusID == $contributionStatuses['Cancelled']) {
       $paymentStatusID = $pledgeStatusID;
       $cancelDateClause = ", civicrm_pledge.cancel_date = CURRENT_TIMESTAMP ";
     }
@@ -477,7 +490,7 @@ WHERE     pledge_id = %1
       $pledgeStatusID = self::calculatePledgeStatus($pledgeID);
     }
 
-    if ($pledgeStatusID == array_search('Completed', $allStatus)) {
+    if ($pledgeStatusID == $contributionStatuses['Completed']) {
       $endDateClause = ", civicrm_pledge.end_date = CURRENT_TIMESTAMP ";
     }
 
@@ -602,34 +615,44 @@ WHERE  civicrm_pledge.id = %2
    *   $statusId calculated status id of pledge
    */
   public static function calculatePledgeStatus($pledgeId) {
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
 
     // retrieve all pledge payments for this particular pledge
-    $allPledgePayments = $allStatus = array();
+    $allPledgePayments = array();
     $returnProperties = array('status_id');
     CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id', $pledgeId, $allPledgePayments, $returnProperties);
 
-    // build pledge payment statuses
+    $found_payment_complete = FALSE;
+    $found_payment_pending = FALSE;
+
     foreach ($allPledgePayments as $key => $value) {
-      $allStatus[$value['id']] = $paymentStatusTypes[$value['status_id']];
+      // If any payment is overdue, no need to bother checking the rest
+      if ($value['status_id'] == $contributionStatuses['Overdue']) {
+        return $contributionStatuses['Overdue'];
+      }
+
+      if ($value['status_id'] == $contributionStatuses['Completed']) {
+        $found_payment_complete = TRUE;
+      }
+      elseif ($value['status_id'] == $contributionStatuses['Pending']) {
+        $found_payment_pending = TRUE;
+      }
     }
 
-    if (array_search('Overdue', $allStatus)) {
-      $statusId = array_search('Overdue', $paymentStatusTypes);
-    }
-    elseif (array_search('Completed', $allStatus)) {
-      if (count(array_count_values($allStatus)) == 1) {
-        $statusId = array_search('Completed', $paymentStatusTypes);
+    if ($found_payment_complete) {
+      if ($found_payment_pending) {
+        return $contributionStatuses['In Progress'];
       }
       else {
-        $statusId = array_search('In Progress', $paymentStatusTypes);
+        return $contributionStatuses['Completed'];
       }
     }
-    else {
-      $statusId = array_search('Pending', $paymentStatusTypes);
-    }
 
-    return $statusId;
+    // The contributor has not sent any payments for the pledge yet.
+    return $contributionStatuses['Pending'];
   }
 
   /**
@@ -656,14 +679,16 @@ WHERE  civicrm_pledge.id = %2
     $contributionId = NULL,
     $isScriptUpdate = FALSE
   ) {
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $paymentClause = NULL;
+
     if (!empty($paymentIds)) {
       $payments = implode(',', $paymentIds);
       $paymentClause = " AND civicrm_pledge_payment.id IN ( {$payments} )";
     }
+
     $actualAmountClause = NULL;
     $contributionIdClause = NULL;
+
     if (isset($contributionId) && !$isScriptUpdate) {
       $contributionIdClause = ", civicrm_pledge_payment.contribution_id = {$contributionId}";
       $actualAmountClause = ", civicrm_pledge_payment.actual_amount = {$actualAmount}";
@@ -712,11 +737,14 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
    */
   public static function getOldestPledgePayment($pledgeID, $limit = 1) {
     // get pending / overdue statuses
-    $pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
 
     // get pending and overdue payments
-    $status[] = array_search('Pending', $pledgeStatuses);
-    $status[] = array_search('Overdue', $pledgeStatuses);
+    $status[] = $contributionStatuses['Pending'];
+    $status[] = $contributionStatuses['Overdue'];
 
     $statusClause = " IN (" . implode(',', $status) . ")";
 
@@ -758,8 +786,12 @@ LIMIT 0, %2
    * @param int $paymentStatusID
    */
   public static function adjustPledgePayment($pledgeID, $actualAmount, $pledgeScheduledAmount, $paymentContributionId = NULL, $pPaymentId = NULL, $paymentStatusID = NULL) {
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if ($paymentStatusID == array_search('Cancelled', $allStatus) || $paymentStatusID == array_search('Refunded', $allStatus)) {
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
+
+    if ($paymentStatusID == $contributionStatuses['Cancelled'] || $paymentStatusID == $contributionStatuses['Refunded']) {
       $query = "
 SELECT civicrm_pledge_payment.id id
 FROM  civicrm_pledge_payment
@@ -776,7 +808,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
         $payment->id = $value;
         if ($payment->find(TRUE)) {
           $payment->contribution_id = 'null';
-          $payment->status_id = array_search('Pending', $allStatus);
+          $payment->status_id = $contributionStatuses['Pending'];
           $payment->scheduled_date = NULL;
           $payment->reminder_date = NULL;
           $payment->scheduled_amount = $pledgeScheduledAmount;
@@ -803,7 +835,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
       $newDate = date('YmdHis', mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
       $ScheduledDate = CRM_Utils_Date::format(CRM_Utils_Date::intervalAdd($pledgeFrequencyUnit, $pledgeFrequencyInterval, $newDate));
       $pledgeParams = array(
-        'status_id' => array_search('Pending', $allStatus),
+        'status_id' => $contributionStatuses['Pending'],
         'pledge_id' => $pledgeID,
         'scheduled_amount' => $pledgeScheduledAmount,
         'scheduled_date' => $ScheduledDate,
@@ -812,6 +844,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
     }
     else {
       $oldestPayment = self::getOldestPledgePayment($pledgeID);
+
       if (!$paymentContributionId) {
         // means we are editing payment scheduled payment, so get the second pending to update.
         $oldestPayment = self::getOldestPledgePayment($pledgeID, 2);
@@ -825,6 +858,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
         if (($actualAmount != $pledgeScheduledAmount) && (($actualAmount < $pledgeScheduledAmount) || (($actualAmount - $pledgeScheduledAmount) < $oldestPayment['amount']))) {
           $oldScheduledAmount = $oldestPayment['amount'];
           $newScheduledAmount = $oldScheduledAmount + ($pledgeScheduledAmount - $actualAmount);
+
           // store new amount in oldest pending payment record.
           CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment',
             $oldestPayment['id'],
@@ -843,17 +877,21 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
           // here the actual amount is greater than expected and also greater than the next installment amount, so update the next installment as complete and again add it to next subsequent pending payment
           // set the actual amount of the next pending to '0', set contribution Id to current contribution Id and status as completed
           $paymentId = array($oldestPayment['id']);
-          self::updatePledgePayments($pledgeID, array_search('Completed', $allStatus), $paymentId, 0, $paymentContributionId);
+
+          self::updatePledgePayments($pledgeID, $contributionStatuses['Completed'], $paymentId, 0, $paymentContributionId);
           CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $oldestPayment['id'], 'scheduled_amount', 0, 'id');
           $oldestPayment = self::getOldestPledgePayment($pledgeID);
           if (!$paymentContributionId) {
             // means we are editing payment scheduled payment.
             $oldestPaymentAmount = self::getOldestPledgePayment($pledgeID, 2);
           }
-          $newActualAmount = ($actualAmount - $pledgeScheduledAmount);
+
+          // CRM-17281 The amount must be rounded, otherwise the substraction of two floats rarely equals zero.
+          $newActualAmount = round($actualAmount - $pledgeScheduledAmount, 2);
           $newPledgeScheduledAmount = $oldestPayment['amount'];
+
           if (!$paymentContributionId) {
-            $newActualAmount = ($actualAmount - $pledgeScheduledAmount);
+            $newActualAmount = round($actualAmount - $pledgeScheduledAmount, 2);
             $newPledgeScheduledAmount = $oldestPaymentAmount['amount'];
             // means we are editing payment scheduled payment, so update scheduled amount.
             CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment',
@@ -862,6 +900,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
               $newActualAmount
             );
           }
+
           if ($newActualAmount > 0) {
             self::adjustPledgePayment($pledgeID, $newActualAmount, $newPledgeScheduledAmount, $paymentContributionId);
           }
