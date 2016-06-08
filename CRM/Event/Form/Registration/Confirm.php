@@ -99,9 +99,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $params['discountAmount'] = $this->_params[0]['discountAmount'];
           $params['discountMessage'] = $this->_params[0]['discountMessage'];
         }
-        if (!empty($this->_params[0]['amount_priceset_level_radio'])) {
-          $params['amount_priceset_level_radio'] = $this->_params[0]['amount_priceset_level_radio'];
-        }
+
         $params['amount_level'] = $this->_params[0]['amount_level'];
         $params['currencyID'] = $this->_params[0]['currencyID'];
 
@@ -1025,7 +1023,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, CRM_Utils_Array::value('amount_priceset_level_radio', $params, NULL));
+    CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
     // process soft credit / pcp pages
     if (!empty($params['pcp_made_through_id'])) {

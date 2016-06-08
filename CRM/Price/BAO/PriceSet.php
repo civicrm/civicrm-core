@@ -792,9 +792,6 @@ WHERE  id = %1";
           }
           $params["price_{$id}"] = array($params["price_{$id}"] => 1);
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
-          $optionLabel = CRM_Utils_Array::value('label', $field['options'][$optionValueId]);
-          $params['amount_priceset_level_radio'] = array();
-          $params['amount_priceset_level_radio'][$optionValueId] = $optionLabel;
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
@@ -819,9 +816,6 @@ WHERE  id = %1";
         case 'Select':
           $params["price_{$id}"] = array($params["price_{$id}"] => 1);
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
-          $optionLabel = $field['options'][$optionValueId]['label'];
-          $params['amount_priceset_level_select'] = array();
-          $params['amount_priceset_level_select'][CRM_Utils_Array::key(1, $params["price_{$id}"])] = $optionLabel;
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
@@ -1651,6 +1645,59 @@ WHERE       ps.id = %1
     $lineItem[$optionValueId]['tax_rate'] = $taxRate;
 
     return $lineItem;
+  }
+
+  /**
+   * Get the first price set value IDs from a parameters array.
+   *
+   * In practice this is really used when we only expect one to exist.
+   *
+   * @param array $params
+   *
+   * @return array
+   *   Array of the ids of the price set values.
+   */
+  public static function parseFirstPriceSetValueIDFromParams($params) {
+    $priceSetValueIDs = self::parsePriceSetValueIDsFromParams($params);
+    return reset($priceSetValueIDs);
+  }
+
+  /**
+   * Get the price set value IDs from a set of parameters
+   *
+   * @param array $params
+   *
+   * @return array
+   *   Array of the ids of the price set values.
+   */
+  public static function parsePriceSetValueIDsFromParams($params) {
+    $priceSetParams = self::parsePriceSetArrayFromParams($params);
+    $priceSetValueIDs = array();
+    foreach ($priceSetParams as $priceSetParam) {
+      foreach (array_keys($priceSetParam) as $priceValueID) {
+        $priceSetValueIDs[] = $priceValueID;
+      }
+    }
+    return $priceSetValueIDs;
+  }
+
+  /**
+   * Get the price set value IDs from a set of parameters
+   *
+   * @param array $params
+   *
+   * @return array
+   *   Array of price fields filtered from the params.
+   */
+  public static function parsePriceSetArrayFromParams($params) {
+    $priceSetParams = array();
+    foreach ($params as $field => $value) {
+      $parts = explode('_', $field);
+      if (count($parts) == 2 && $parts[0] == 'price' && is_numeric($parts[1])) {
+        $priceSetParams[$field] = $value;
+      }
+    }
+    return $priceSetParams;
   }
 
 }
