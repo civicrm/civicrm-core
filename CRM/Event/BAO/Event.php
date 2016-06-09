@@ -139,6 +139,16 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       }
       $params['created_date'] = date('YmdHis');
     }
+    // CRM-18169 Check for start date change
+    if (!empty($params['id']) && CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+      $prevEvent = new CRM_Event_DAO_Event();
+
+      $prevEvent->id = $params['id'];
+      $prevEvent->find(TRUE);
+      if ((date('Ymd', strtotime($prevEvent->start_date))) != (date('Ymd', strtotime($params['start_date'])))) {
+        self::updateDeferredTransactions($params);
+      }
+    }
 
     $event = self::add($params);
     CRM_Price_BAO_PriceSet::setPriceSets($params, $event, 'event');
@@ -2259,6 +2269,50 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  }
+
+  /**
+   * Change revenue recognition date for participants.
+   *
+   * @param array $event
+   */
+  public static function updateDeferredTransactions($event) {
+    if (empty($event['id'])) {
+      return;
+    }
+    $status = CRM_Contribute_PseudoConstant::contributionStatus();
+    $sql = "SELECT ft.*
+      FROM civicrm_participant_payment cpp
+      INNER JOIN civicrm_participant cp ON cp.id = cpp.participant_id
+      INNER JOIN civicrm_entity_financial_trxn eft ON eft.entity_id = cpp.contribution_id AND eft.entity_table = 'civicrm_contribution'
+      INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
+      INNER JOIN civicrm_entity_financial_account efa ON efa.financial_account_id = ft.from_financial_account_id
+      LEFT JOIN civicrm_option_group og ON og.name = 'account_relationship'
+      INNER JOIN civicrm_option_value ov ON ov.value = efa.account_relationship AND ov.option_group_id = og.id AND ov.name = 'Deferred Revenue Account is'
+      LEFT JOIN civicrm_option_group cog ON cog.name = 'contribution_status'
+      INNER JOIN civicrm_option_value cov ON cov.option_group_id = cog.id AND cov.name = 'Completed'
+      WHERE cp.event_id = %1 AND ft.from_financial_account_id = efa.financial_account_id AND ft.status_id = cov.value";
+    $sqlParams = array(
+      1 => array($event['id'], 'Integer'),
+    );
+    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
+    while ($dao->fetch()) {
+      // Cancel the trxn
+      $trxn = new CRM_Financial_DAO_FinancialTrxn();
+      $trxn->id = $dao->id;
+      $trxn->status_id = array_search('Cancelled', $status);
+      $trxn->save();
+
+      // Create new deferred transaction
+      $newTrxn = new CRM_Financial_DAO_FinancialTrxn();
+      $newTrxn->from_financial_account_id = $dao->from_financial_account_id;
+      $newTrxn->to_financial_account_id = $dao->to_financial_account_id;
+      $newTrxn->trxn_date = date('Ymd', strtotime($event['start_date']));
+      $newTrxn->total_amount = $dao->total_amount;
+      $newTrxn->net_amount = $dao->net_amount;
+      $newTrxn->currency = $dao->currency;
+      // FIXME: WIP
+    }
   }
 
 }
