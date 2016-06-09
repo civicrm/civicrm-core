@@ -77,6 +77,7 @@ class CRM_Utils_PDF_Document {
       // todo
       'pdf' => 'PDF',
     );
+
     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, $formats[$ext]);
 
     // TODO: Split document generation and output into separate functions
@@ -117,13 +118,17 @@ class CRM_Utils_PDF_Document {
       unlink($absPath);
     }
 
-    if ($returnContent) {
-      return self::doc2Text($path, $type);
-    }
-
     $fileType = ($type == 'docx') ? 'Word2007' : 'ODText';
     $phpWord = \PhpOffice\PhpWord\IOFactory::load($path, $fileType);
     $phpWord->save($absPath, 'HTML');
+
+    // return the html content for tokenreplacment and eventually dused for document download
+    if ($returnContent) {
+      $filename = fopen($absPath, 'r');
+      $content = fread($filename, filesize($absPath));
+      fclose($filename);
+      return array($content, array_search($type, CRM_Core_SelectValues::documentApplicationType()));
+    }
 
     return \Civi::paths()->getUrl($uploadDir) . $newFile;
   }
@@ -139,7 +144,25 @@ class CRM_Utils_PDF_Document {
   public static function doc2Text($filePath, $type) {
     $content = '';
     $docType = array_search($type, CRM_Core_SelectValues::documentApplicationType());
-    $dataFile = ($docType == 'docx') ? "word/document.xml" : "content.xml";
+
+    // for reference on document entry type check http://phpword.readthedocs.io/en/latest/writersreaders.html
+    $dataFiles = array(
+      'odt' => array(
+        'content.xml',
+        'styles.xml',
+        'Pictures/',
+      ),
+      'docx' => array(
+        'word/document.xml',
+        'word/styles.xml',
+        'docProps/custom.xml',
+        'word/numbering.xml',
+        'word/settings.xml',
+        'word/webSettings.xml',
+        'word/fontTable.xml',
+        'word/theme/theme1.xml',
+      ),
+    );
 
     $zip = zip_open($filePath);
 
@@ -148,7 +171,7 @@ class CRM_Utils_PDF_Document {
     }
 
     while ($zip_entry = zip_read($zip)) {
-      if (zip_entry_open($zip, $zip_entry) == FALSE || zip_entry_name($zip_entry) != $dataFile) {
+      if (zip_entry_open($zip, $zip_entry) == FALSE || !in_array(zip_entry_name($zip_entry), $dataFiles[$docType])) {
         continue;
       }
       $content .= zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
@@ -157,11 +180,11 @@ class CRM_Utils_PDF_Document {
 
     zip_close($zip);
 
-    $content = str_replace('</w:r></w:p></w:tc><w:tc>', " ", $content);
+    $content = str_replace('</w:r></w:p></w:tc><w:tc>', "&nbsp;&nbsp;", $content);
     $content = str_replace('</w:r></w:p>', "\r\n", $content);
-    $striped_content = strip_tags($content);
+    $striped_content = nl2br(strip_tags($content));
 
-    return nl2br($striped_content);
+    return array($striped_content, $docType);
   }
 
 }

@@ -127,6 +127,7 @@ function selectValue( val, prefix) {
     else {
       cj('.crm-html_email-accordion').show();
       cj('.crm-document-accordion').hide();
+      cj('#document_type').closest('tr').show();
     }
 
     CRM.wysiwyg.setVal('#' + html_message, '');
@@ -142,6 +143,7 @@ function selectValue( val, prefix) {
     var hide = (data.document_path && isPDF) ? false : true;
     cj('.crm-html_email-accordion').toggle(hide);
     cj('.crm-document-accordion').toggle(!hide);
+    cj('#document_type').closest('tr').toggle(hide);
 
     // Unset any uploaded document when any template is chosen
     if (cj('#document.file').length) {
@@ -149,7 +151,6 @@ function selectValue( val, prefix) {
     }
 
     if (!hide) {
-      cj("#document_type").val( data.file_type );
       cj("#subject").val( data.subject );
       document.getElementById("document-preview").innerHTML='<object type="text/html" data='+ data.document_path +' width="680" height="400" style="background:white;"></object>';
       return;
