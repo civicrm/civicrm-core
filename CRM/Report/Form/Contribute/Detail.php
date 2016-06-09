@@ -448,16 +448,17 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     }
 
     if (!empty($this->_params['ordinality_value'])) {
-      if (!empty($this->_params['line_item_financial_type_id_value'])) {
+      if (!empty($this->_params['line_item_financial_type_id_value']) || ($this->_params['line_total_value'] !== "")) {
         $this->_from .= "
           INNER JOIN (SELECT c.id, IF(COUNT(ol.id) = 0, 0, 1) AS ordinality
            FROM civicrm_contribution c
            LEFT JOIN civicrm_line_item l ON c.id = l.contribution_id
            LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date
-           LEFT JOIN civicrm_line_item ol ON oc.id = ol.contribution_id AND ol.financial_type_id IN (".implode(",",$this->_params['line_item_financial_type_id_value']).")
+           LEFT JOIN civicrm_line_item ol ON oc.id = ol.contribution_id AND ol.financial_type_id IN (" . implode(",", $this->_params['line_item_financial_type_id_value']) . ")
            GROUP BY l.id)
 	       cordinality_civireport ON cordinality_civireport.id = contribution_civireport.id ";
-      } else {
+      }
+      else {
 
         $this->_from .= "
               INNER JOIN (SELECT c.id, IF(COUNT(oc.id) = 0, 0, 1) AS ordinality FROM civicrm_contribution c LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date GROUP BY c.id) {$this->_aliases['civicrm_contribution_ordinality']}
@@ -512,7 +513,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     }
 
     // for line item financial types
-    if (!empty($this->_params['line_item_financial_type_id_value'])) {
+    if (!empty($this->_params['line_item_financial_type_id_value']) || ($this->_params['line_total_value'] !== "")) {
       $this->_from .= "
               LEFT  JOIN civicrm_line_item  {$this->_aliases['civicrm_line_item']}
                       ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id";
@@ -541,17 +542,35 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                SUM( {$this->_aliases['civicrm_contribution']}.fee_amount ) as fees,
                SUM( {$this->_aliases['civicrm_contribution']}.net_amount ) as net
         ";
+    // for line item financial types
+    if (!empty($this->_params['line_item_financial_type_id_value']) || ($this->_params['line_total_value'] !== "")) {
+      $select .= ",
+               COUNT({$this->_aliases['civicrm_line_item']}.line_total ) as line_count,
+               SUM( {$this->_aliases['civicrm_line_item']}.line_total ) as line_totals";
+    }
 
     $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $sql = "{$select} {$this->_from} {$this->_where} {$group}";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
+      // for line item financial types
+      if (!empty($this->_params['line_item_financial_type_id_value']) || ($this->_params['line_total_value'] !== "")) {
+        $lineAmounts[] = CRM_Utils_Money::format($dao->line_totals, $dao->currency) . " (" . $statistics['counts']['rowsFound']['value'] . ")";
+      }
       $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" . $dao->count . ")";
       $fees[] = CRM_Utils_Money::format($dao->fees, $dao->currency);
       $net[] = CRM_Utils_Money::format($dao->net, $dao->currency);
       $average[] = CRM_Utils_Money::format($dao->avg, $dao->currency);
       $count += $dao->count;
+    }
+    // for line item financial types
+    if (!empty($this->_params['line_item_financial_type_id_value']) || ($this->_params['line_total_value'] !== "")) {
+      $statistics['counts']['line_totals'] = array(
+        'title' => ts('Total Amounts (Line Items)'),
+        'value' => implode(',  ', $lineAmounts),
+        'type' => CRM_Utils_Type::T_STRING,
+      );
     }
     $statistics['counts']['amount'] = array(
       'title' => ts('Total Amount (Contributions)'),
