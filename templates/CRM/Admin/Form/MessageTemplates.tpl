@@ -119,7 +119,7 @@
             </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
 
-      <div class="crm-accordion-wrapper crm-html_email-accordion ">
+      <div id="pdf_format" class="crm-accordion-wrapper crm-html_email-accordion ">
         <div class="crm-accordion-header">
             {$form.pdf_format_id.label}
         </div><!-- /.crm-accordion-header -->
@@ -166,7 +166,7 @@
       function toggleByFileType(type) {
         var show = (type == 'odt' || type == 'docx') ? false : true;
         $("#msg_html").toggle(show);
-        $("#msg_text").toggle(show);
+        $("#msg_text, #pdf_format").toggle(show);
         $("#file_id").parent().parent().toggle(!show);
 
         // auto file type validation

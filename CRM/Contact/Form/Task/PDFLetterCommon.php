@@ -285,7 +285,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
     // extract the content of uploaded document file
     elseif (!empty($formValues['document_file'])) {
-      $html_message = CRM_Utils_PDF_Document::docReader($formValues['document_file']['name'], $formValues['document_file']['type'], TRUE);
+      list($html_message, $formValues['document_type']) = CRM_Utils_PDF_Document::docReader($formValues['document_file']['name'], $formValues['document_file']['type'], TRUE);
     }
     elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
       if (!empty($formValues['bind_format']) && $formValues['format_id']) {
@@ -298,7 +298,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
       $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $formValues['template']);
       foreach ((array) $documentInfo as $info) {
-        $html_message = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type'], TRUE);
+        list($html_message, $formValues['document_type']) = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type'], TRUE);
       }
     }
     if (!empty($formValues['update_format'])) {
@@ -351,6 +351,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         $messageToken,
         'CRM_Contact_Form_Task_PDFLetterCommon'
       );
+
       if (civicrm_error($contact)) {
         $notSent[] = $contactId;
         continue;
