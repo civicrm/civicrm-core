@@ -1561,6 +1561,7 @@ class CRM_Contact_BAO_Query {
       'membership_type_id',
       'membership_status_id',
       'activity_type_id',
+      'group',
       'location_type',
     );
     if (in_array($id, $legacyElements) && is_array($values)) {
