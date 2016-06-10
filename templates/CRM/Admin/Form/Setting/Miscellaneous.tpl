@@ -73,6 +73,23 @@
             </td>
           </tr>
         {/foreach}
+        </tr>
+        <tr class="crm-miscellaneous-form-block-recentItemsMaxCount">
+            <td class="label">{$form.recentItemsMaxCount.label}</td>
+            <td>{$form.recentItemsMaxCount.html}<br />
+                <span class="description">{$recentItemsMaxCount_description}</span></td>
+        </tr>
+        <tr class="crm-miscellaneous-form-block-recentItemsProviders">
+            <td class="label">{$form.recentItemsProviders.label}</td>
+            <td>{$form.recentItemsProviders.html}<br />
+                <span class="description">{$recentItemsProviders_description}</span></td>
+        </tr>
+        <tr class="crm-miscellaneous-form-block-allow_profile_html_snippet">
+          <td class="label">{$form.allow_profile_html_snippet.label}</td>
+          <td>{$form.allow_profile_html_snippet.html}<br />
+            <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles using HTML snippets.{/ts}</p>
+          </td>
+        </tr>
 
     </table>
 <h3>{ts}reCAPTCHA Keys{/ts}</h3>
