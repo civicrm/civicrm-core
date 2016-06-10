@@ -289,6 +289,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
     $this->buildCustom($this->_values['custom_post_id'], 'customPost');
 
+    // CRM-18399: used by template to pass pre profile id as a url arg
+    $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
+
     $this->buildComponentForm($this->_id, $this);
 
     // Build payment processor form
