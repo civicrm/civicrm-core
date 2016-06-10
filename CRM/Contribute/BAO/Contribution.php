@@ -2575,6 +2575,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!empty($softContributions)) {
         $values['softContributions'] = $softContributions['soft_credit'];
       }
+      
+      //CRM-18805: Allow fetching values for cc_receipt and bcc_receipt when we get here via civicrm_api3_contribution_sendconfirmation
+      if (!isset($this->contribution_page_id) && isset($input['contribution_page_id'])) 
+         $this->contribution_page_id = $input['contribution_page_id']; 
+      
       if (isset($this->contribution_page_id)) {
         $values = $this->addContributionPageValuesToValuesHeavyHandedly($values);
         if ($this->contribution_page_id) {
@@ -4591,6 +4596,9 @@ LIMIT 1;";
       civicrm_api3('Contribution', 'sendconfirmation', array(
         'id' => $contribution->id,
         'payment_processor_id' => $paymentProcessorId,
+ 
+        //CRM-18805: Allow fetching values for cc_receipt and bcc_receipt when we get here via civicrm_api3_contribution_sendconfirmation
+        'contribution_page_id' => $input['component'] == 'contribute' && isset($contribution->contribution_page_id) ? $contribution->contribution_page_id : 0, 
       ));
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
