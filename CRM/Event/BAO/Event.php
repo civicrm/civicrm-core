@@ -2311,6 +2311,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       $newTrxn->trxn_date = date('Ymd', strtotime($event['start_date']));
       $newTrxn->total_amount = $dao->total_amount;
       $newTrxn->net_amount = $dao->net_amount;
+      $newTrxn->fee_amount = $dao->fee_amount;
       $newTrxn->currency = $dao->currency;
       $newTrxn->is_payment = $dao->is_payment;
       $newTrxn->trxn_id = $dao->trxn_id;
