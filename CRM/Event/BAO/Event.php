@@ -2281,7 +2281,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       return;
     }
     $status = CRM_Contribute_PseudoConstant::contributionStatus();
-    $sql = "SELECT ft.*
+    $sql = "SELECT ft.*, cpp.contribution_id, eft.amount
       FROM civicrm_participant_payment cpp
       INNER JOIN civicrm_participant cp ON cp.id = cpp.participant_id
       INNER JOIN civicrm_entity_financial_trxn eft ON eft.entity_id = cpp.contribution_id AND eft.entity_table = 'civicrm_contribution'
@@ -2297,13 +2297,13 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     );
     $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
     while ($dao->fetch()) {
-      // Cancel the trxn
+      // Cancel the trxn.
       $trxn = new CRM_Financial_DAO_FinancialTrxn();
       $trxn->id = $dao->id;
       $trxn->status_id = array_search('Cancelled', $status);
       $trxn->save();
 
-      // Create new deferred transaction
+      // Create new deferred transaction.
       $newTrxn = new CRM_Financial_DAO_FinancialTrxn();
       $newTrxn->from_financial_account_id = $dao->from_financial_account_id;
       $newTrxn->to_financial_account_id = $dao->to_financial_account_id;
@@ -2311,7 +2311,23 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       $newTrxn->total_amount = $dao->total_amount;
       $newTrxn->net_amount = $dao->net_amount;
       $newTrxn->currency = $dao->currency;
-      // FIXME: WIP
+      $newTrxn->is_payment = $dao->is_payment;
+      $newTrxn->trxn_id = $dao->trxn_id;
+      $newTrxn->trxn_result_code = $dao->trxn_result_code;
+      $newTrxn->status_id = $dao->status_id;
+      $newTrxn->payment_processor_id = $dao->payment_processor_id;
+      $newTrxn->payment_instrument_id = $dao->payment_instrument_id;
+      $newTrxn->check_number = $dao->check_number;
+      $newTrxn->save();
+
+      // Add entity financial trxn.
+      $entityParams = array(
+        'entity_table' => 'civicrm_contribution',
+        'financial_trxn_id' => $newTrxn->id,
+        'entity_id' => $dao->contribution_id,
+        'amount' => $dao->amount,
+      );
+      CRM_Financial_BAO_FinancialItem::createEntityTrxn($entityParams);
     }
   }
 
