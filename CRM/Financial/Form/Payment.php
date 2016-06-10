@@ -49,11 +49,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   public function preProcess() {
     parent::preProcess();
 
-    // reload and set values of contributionPage
-    $id = CRM_Utils_Request::retrieve('id', 'Integer');
-    if (!empty($id)) {
-      CRM_Contribute_BAO_ContributionPage::setValues($id, $this->_values);
-    }
+    $this->_values['custom_pre_id'] = CRM_Utils_Request::retrieve('pre_profile_id', 'Integer', $this);
 
     $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
       TRUE);
