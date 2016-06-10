@@ -15,98 +15,128 @@ class ThemeTest extends \CiviUnitTestCase {
   public function getThemeExamples() {
     $cases = array();
 
+    // --- Library of example themes which we can include in tests. ---
+
+    $hookJudy = array(
+      'judy' => array(
+        'title' => 'Judy Garland',
+        'ext' => 'civicrm',
+        'prefix' => 'tests/phpunit/Civi/Core/Theme/judy/',
+      ),
+    );
+    $hookLiza = array(
+      'liza' => array(
+        'title' => 'Liza Minnelli',
+        'prefix' => 'tests/phpunit/Civi/Core/Theme/liza/',
+        'ext' => 'civicrm',
+      ),
+    );
+    $hookBlueMarine = array(
+      'bluemarine' => array(
+        'title' => 'Blue Marine',
+        'url_callback' => array(__CLASS__, 'fakeCallback'),
+        'ext' => 'civicrm',
+      ),
+    );
+    $hookAquaMarine = array(
+      'aquamarine' => array(
+        'title' => 'Aqua Marine',
+        'url_callback' => array(__CLASS__, 'fakeCallback'),
+        'ext' => 'civicrm',
+        'search_order' => array('aquamarine', 'bluemarine', '*fallback*'),
+      ),
+    );
+
+    $civicrmBaseUrl = "";
+
+    // --- Library of tests ---
+
+    // Use the default theme, Greenwich.
+    $cases[] = array(
+      array(),
+      'default',
+      'Greenwich',
+      array(
+        'civicrm-css/civicrm.css' => array("$civicrmBaseUrl/css/civicrm.css"),
+        'civicrm-css/joomla.css' => array("$civicrmBaseUrl/css/joomla.css"),
+        'test.extension.uitest-files/foo.css' => array("/tests/extensions/test.extension.uitest/files/foo.css"),
+      ),
+    );
+
     // judy is defined. Let's use judy.
     $cases[] = array(
       // Example hook data
+      $hookJudy,
+      'judy',
+      // Example theme to inspect
+      'Judy Garland',
       array(
-        'judy' => array(
-          'title' => 'Judy Garland',
-          'ext' => 'civicrm',
-          'prefix' => 'judy/',
-        ),
+        'civicrm-css/civicrm.css' => array("$civicrmBaseUrl/tests/phpunit/Civi/Core/Theme/judy/css/civicrm.css"),
+        'civicrm-css/joomla.css' => array("$civicrmBaseUrl/css/joomla.css"),
+        'test.extension.uitest-files/foo.css' => array("/tests/extensions/test.extension.uitest/files/foo.css"),
       ),
-      'judy', // Example theme to inspect
-      'Judy Garland', // Expect: Title of the example theme
-      array('/judy/css/bootstrap.css'), // Expect: URL of the bootstrap.css within judy
-      array('/judy/css/civicrm.css'), // Expect: URL of the civicrm.css within judy
     );
 
-    // Misconfiguration: liza was configured but then disappeared. Fallback to Greenwich.
+    // Misconfiguration: liza was previously used but then disappeared. Fallback to default, Greenwich.
     $cases[] = array(
-      array(
-        'judy' => array(
-          'title' => 'Judy Garland',
-          'ext' => 'civicrm',
-        ),
-      ),
+      $hookJudy,
       'liza',
       'Greenwich',
-      array('/css/bootstrap.css'),
-      array('/css/civicrm.css'),
+      array(
+        'civicrm-css/civicrm.css' => array("$civicrmBaseUrl/css/civicrm.css"),
+        'civicrm-css/joomla.css' => array("$civicrmBaseUrl/css/joomla.css"),
+        'test.extension.uitest-files/foo.css' => array("/tests/extensions/test.extension.uitest/files/foo.css"),
+      ),
     );
 
-    // We have some themes available, but they were disabled by admin.
+    // We have some themes available, but the admin opted out.
     $cases[] = array(
-      array(
-        'judy' => array(
-          'title' => 'Judy Garland',
-          'ext' => 'civicrm',
-        ),
-      ),
+      $hookJudy,
       'none',
       'Empty Theme',
-      array(),
-      array(),
+      array(
+        'civicrm-css/civicrm.css' => array(),
+        'civicrm-css/joomla.css' => array("$civicrmBaseUrl/css/joomla.css"),
+        'test.extension.uitest-files/foo.css' => array("/tests/extensions/test.extension.uitest/files/foo.css"),
+      ),
     );
 
-    // A custom theme with a different name
+    // Theme which overrides an extension's CSS file.
     $cases[] = array(
-      array(
-        'liza' => array(
-          'title' => 'Liza Minnelli',
-          'prefix' => 'super/secret/',
-          'ext' => 'civicrm',
-        ),
-      ),
+      $hookJudy + $hookLiza,
       'liza',
       'Liza Minnelli',
-      array('/super/secret/css/bootstrap.css'),
-      array('/super/secret/css/civicrm.css'),
-    );
-
-    // The theme is part of a multitheme extension.
-    $cases[] = array(
       array(
-        'judy' => array(
-          'title' => 'Judy Garland',
-          'ext' => 'civicrm',
-          'prefix' => 'judy/',
-        ),
-        'liza' => array(
-          'title' => 'Liza Minnelli',
-          'ext' => 'civicrm',
-          'prefix' => 'liza/',
-        ),
+        // Warning: If your local system has overrides for the `debug_enabled`, these results may vary.
+        'civicrm-css/civicrm.css' => array("$civicrmBaseUrl/tests/phpunit/Civi/Core/Theme/liza/css/civicrm.css"),
+        'civicrm-css/civicrm.min.css' => array("$civicrmBaseUrl/tests/phpunit/Civi/Core/Theme/liza/css/civicrm.min.css"),
+        'civicrm-css/joomla.css' => array("$civicrmBaseUrl/css/joomla.css"),
+        'test.extension.uitest-files/foo.css' => array("/tests/phpunit/Civi/Core/Theme/liza/test.extension.uitest-files/foo.css"),
       ),
-      'liza',
-      'Liza Minnelli',
-      array('/liza/css/bootstrap.css'),
-      array('/liza/css/civicrm.css'),
     );
 
     // Theme has a custom URL-lookup function.
     $cases[] = array(
-      array(
-        'bluemarine' => array(
-          'title' => 'Blue Marine',
-          'url_callback' => array(__CLASS__, 'fakeCallback'),
-          'ext' => 'civicrm',
-        ),
-      ),
+      $hookBlueMarine + $hookAquaMarine,
       'bluemarine',
       'Blue Marine',
-      array('http://example.com/blue/bootstrap.css'),
-      array('http://example.com/blue/civicrm.css'),
+      array(
+        'civicrm-css/civicrm.css' => array('http://example.com/blue/civicrm.css'),
+        'civicrm-css/joomla.css' => array("$civicrmBaseUrl/css/joomla.css"),
+        'test.extension.uitest-files/foo.css' => array('http://example.com/blue/foobar/foo.css'),
+      ),
+    );
+
+    // Theme is derived from another.
+    $cases[] = array(
+      $hookBlueMarine + $hookAquaMarine,
+      'aquamarine',
+      'Aqua Marine',
+      array(
+        'civicrm-css/civicrm.css' => array('http://example.com/aqua/civicrm.css'),
+        'civicrm-css/joomla.css' => array("$civicrmBaseUrl/css/joomla.css"),
+        'test.extension.uitest-files/foo.css' => array('http://example.com/blue/foobar/foo.css'),
+      ),
     );
 
     return $cases;
@@ -115,11 +145,12 @@ class ThemeTest extends \CiviUnitTestCase {
   /**
    * @param array $inputtedHook
    * @param string $themeKey
-   * @param string $expectedBootstrapUrl
-   * @param string $expectedCivicrmUrl
+   * @param array $expectedUrls
+   *   List of files to lookup plus the expected URLs.
+   *   Array("{$extName}-{$fileName}" => "{$expectUrl}").
    * @dataProvider getThemeExamples
    */
-  public function testTheme($inputtedHook, $themeKey, $expectedTitle, $expectedBootstrapUrl, $expectedCivicrmUrl) {
+  public function testTheme($inputtedHook, $themeKey, $expectedTitle, $expectedUrls) {
     $this->hookClass->setHook('civicrm_themes', function (&$themes) use ($inputtedHook) {
       foreach ($inputtedHook as $key => $value) {
         $themes[$key] = $value;
@@ -129,19 +160,26 @@ class ThemeTest extends \CiviUnitTestCase {
     \Civi::settings()->set('theme_frontend', $themeKey);
     \Civi::settings()->set('theme_backend', $themeKey);
 
-    $theme = \Civi::service('theme')->getActive();
+    /** @var \Civi\Core\Theme $themeSvc */
+    $themeSvc = \Civi::service('theme');
+    $theme = $themeSvc->get($themeSvc->getActiveThemeKey());
     if ($expectedTitle) {
       $this->assertEquals($expectedTitle, $theme['title']);
     }
 
-    $this->assertEquals($expectedBootstrapUrl, \Civi::service('theme')->getUrls('css/bootstrap.css'));
-    $this->assertEquals($expectedCivicrmUrl, \Civi::service('theme')->getUrls('css/civicrm.css'));
+    foreach ($expectedUrls as $inputFile => $expectedUrl) {
+      list ($ext, $file) = explode('-', $inputFile, 2);
+      $actualUrl = $themeSvc->resolveUrls($themeSvc->getActiveThemeKey(), $ext, $file);
+      $this->assertEquals($expectedUrl, $actualUrl, "Check URL for $inputFile");
+    }
   }
 
-  public static function fakeCallback($theme, $cssKey) {
-    $map['bluemarine']['css/bootstrap.css'] = array('http://example.com/blue/bootstrap.css');
-    $map['bluemarine']['css/civicrm.css'] = array('http://example.com/blue/civicrm.css');
-    return $map[$theme['name']][$cssKey];
+  public static function fakeCallback($themes, $themeKey, $cssExt, $cssFile) {
+    $map['bluemarine']['civicrm']['css/bootstrap.css'] = array('http://example.com/blue/bootstrap.css');
+    $map['bluemarine']['civicrm']['css/civicrm.css'] = array('http://example.com/blue/civicrm.css');
+    $map['bluemarine']['test.extension.uitest']['files/foo.css'] = array('http://example.com/blue/foobar/foo.css');
+    $map['aquamarine']['civicrm']['css/civicrm.css'] = array('http://example.com/aqua/civicrm.css');
+    return isset($map[$themeKey][$cssExt][$cssFile]) ? $map[$themeKey][$cssExt][$cssFile] : Theme::PASSTHRU;
   }
 
 }

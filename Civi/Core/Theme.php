@@ -36,13 +36,25 @@ use Civi;
  */
 class Theme {
 
+  /**
+   * The "default" theme adapts based on the latest recommendation from civicrm.org
+   * by switching to DEFAULT_THEME at runtime.
+   */
   const DEFAULT_THEME = 'greenwich';
+
+  /**
+   * Fallback is a pseudotheme which can be included in "search_order".
+   * It locates files in the core/extension (non-theme) codebase.
+   */
+  const FALLBACK_THEME = '*fallback*';
+
+  const PASSTHRU = 'PASSTHRU';
 
   /**
    * @var string
    *   Ex: 'judy', 'liza'.
    */
-  private $activeThemeKey;
+  private $activeThemeKey = NULL;
 
   /**
    * @var array
@@ -87,14 +99,15 @@ class Theme {
   }
 
   /**
-   * Get the definition of the active theme.
+   * Get the definition of the theme.
    *
-   * @return array
+   * @param string $themeKey
+   *   Ex: 'greenwich', 'shoreditch'.
+   * @return array|NULL
    * @see CRM_Utils_Hook::themes
    */
-  public function getActive() {
+  public function get($themeKey) {
     $all = $this->getAll();
-    $themeKey = $this->getActiveThemeKey();
     return isset($all[$themeKey]) ? $all[$themeKey] : NULL;
   }
 
@@ -127,20 +140,43 @@ class Theme {
    *  - If that doesn't exist, check for the default theme.
    *  - If that doesn't exist, use the 'none' theme.
    *
-   * @param string $file
+   * @param string $active
+   *   Active theme key.
+   *   Ex: 'greenwich'.
+   * @param string $cssExt
+   *   Ex: 'civicrm'.
+   * @param string $cssFile
    *   Ex: 'css/bootstrap.css' or 'css/civicrm.css'.
    * @return array
    *   List of URLs to display.
    *   Ex: array(string $url)
    */
-  public function getUrls($file) {
-    $theme = $this->getActive();
-    if (!$theme) {
+  public function resolveUrls($active, $cssExt, $cssFile) {
+    $all = $this->getAll();
+    if (!isset($all[$active])) {
       return array();
     }
 
-    return Civi\Core\Resolver::singleton()
-      ->call($theme['url_callback'], array($theme, $file));
+    $cssId = "$cssExt:$cssFile";
+
+    foreach ($all[$active]['search_order'] as $themeKey) {
+      if ($themeKey === self::FALLBACK_THEME) {
+        $result = Civi\Core\Theme\Resolvers::fallback($this, $themeKey, $cssExt, $cssFile);
+      }
+      elseif (isset($all[$themeKey]['excludes']) && in_array($cssId, $all[$themeKey]['excludes'])) {
+        $result = array();
+      }
+      else {
+        $result = Civi\Core\Resolver::singleton()
+          ->call($all[$active]['url_callback'], array($this, $themeKey, $cssExt, $cssFile));
+      }
+
+      if ($result !== self::PASSTHRU) {
+        return $result;
+      }
+    }
+
+    throw new \RuntimeException("Failed to resolve URL. Theme metadata may be incomplete.");
   }
 
   /**
@@ -156,19 +192,22 @@ class Theme {
         'ext' => 'civicrm',
         'title' => 'System Default',
         'help' => ts('Determine a system default automatically'),
-        'url_callback' => '\Civi\Core\Theme\Formats::none',
+        // This is an alias. url_callback, search_order don't matter.
       ),
       'greenwich' => array(
         'ext' => 'civicrm',
         'title' => 'Greenwich',
         'help' => ts('CiviCRM 4.x look-and-feel'),
-        'url_callback' => '\Civi\Core\Theme\Formats::hierarchical',
       ),
       'none' => array(
         'ext' => 'civicrm',
         'title' => 'Empty Theme',
-        'help' => ts('Disable CiviCRM built-in CSS theming.'),
-        'url_callback' => '\Civi\Core\Theme\Formats::none',
+        'help' => ts('Disable CiviCRM built-in CSS libraries.'),
+        'search_order' => array('none', self::FALLBACK_THEME),
+        'excludes' => array(
+          "civicrm:css/civicrm.css",
+          "civicrm:css/bootstrap.css",
+        ),
       ),
     );
 
@@ -195,12 +234,12 @@ class Theme {
   protected function build($themeKey, $theme) {
     $defaults = array(
       'name' => $themeKey,
-      'url_callback' => '\Civi\Core\Theme\Formats::hierarchical',
-      'extends' => array(self::DEFAULT_THEME),
-      'base_dir' => Civi::resources()->getPath($theme['ext']),
-      'base_url' => Civi::resources()->getUrl($theme['ext']),
+      'url_callback' => '\Civi\Core\Theme\Resolvers::simple',
+      'search_order' => array($themeKey, self::FALLBACK_THEME),
     );
-    return array_merge($defaults, $theme);
+    $theme = array_merge($defaults, $theme);
+
+    return $theme;
   }
 
 }
