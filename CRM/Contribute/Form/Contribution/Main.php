@@ -291,14 +291,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->buildComponentForm($this->_id, $this);
 
-    if (!empty($this->_fields) && !empty($this->_values['custom_pre_id'])) {
-      $profileAddressFields = array();
-      foreach ($this->_fields as $key => $value) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array('uf_group_id' => $this->_values['custom_pre_id']));
-      }
-      $this->set('profileAddressFields', $profileAddressFields);
-    }
-
     // Build payment processor form
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
