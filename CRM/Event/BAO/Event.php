@@ -145,7 +145,8 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
       $prevEvent->id = $params['id'];
       $prevEvent->find(TRUE);
-      if ((date('Ymd', strtotime($prevEvent->start_date))) != (date('Ymd', strtotime($params['start_date'])))) {
+      if (date('m', strtotime($params['start_date']) != date('m')) &&
+        (date('Ymd', strtotime($prevEvent->start_date)) != date('Ymd', strtotime($params['start_date'])))) {
         self::updateDeferredTransactions($params);
       }
     }
