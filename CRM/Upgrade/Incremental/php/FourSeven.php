@@ -99,6 +99,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
       $postUpgradeMessage .= '<p>' . ts('The custom fatal error template setting has been removed.') . '</p>';
     }
+    if ($rev == '4.7.9') {
+      $postUpgradeMessage .= '<br /><br />' . ts("WARNING: To improve security, HTML snippets for profiles are no longer allowed to create or edit data by default. If you need to allow users to submit profiles using HTML snippets, you can enable by going to Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) and clicking to enable 'Override security by accepting unauthenticated posts from other sites?");
+    }
   }
 
   /**
