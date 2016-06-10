@@ -34,7 +34,7 @@ use Civi;
  * @package CiviCRM_Hook
  * @copyright CiviCRM LLC (c) 2004-2016
  */
-class Theme {
+class Themes {
 
   /**
    * The "default" theme adapts based on the latest recommendation from civicrm.org
@@ -161,7 +161,7 @@ class Theme {
 
     foreach ($all[$active]['search_order'] as $themeKey) {
       if ($themeKey === self::FALLBACK_THEME) {
-        $result = Civi\Core\Theme\Resolvers::fallback($this, $themeKey, $cssExt, $cssFile);
+        $result = Civi\Core\Themes\Resolvers::fallback($this, $themeKey, $cssExt, $cssFile);
       }
       elseif (isset($all[$themeKey]['excludes']) && in_array($cssId, $all[$themeKey]['excludes'])) {
         $result = array();
@@ -234,7 +234,7 @@ class Theme {
   protected function build($themeKey, $theme) {
     $defaults = array(
       'name' => $themeKey,
-      'url_callback' => '\Civi\Core\Theme\Resolvers::simple',
+      'url_callback' => '\Civi\Core\Themes\Resolvers::simple',
       'search_order' => array($themeKey, self::FALLBACK_THEME),
     );
     $theme = array_merge($defaults, $theme);

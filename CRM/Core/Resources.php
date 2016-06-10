@@ -411,8 +411,8 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    /** @var Civi\Core\Theme $theme */
-    $theme = Civi::service('theme');
+    /** @var Civi\Core\Themes $theme */
+    $theme = Civi::service('themes');
     foreach ($theme->resolveUrls($theme->getActiveThemeKey(), $ext, $file) as $url) {
       $this->addStyleUrl($url, $weight, $region);
     }

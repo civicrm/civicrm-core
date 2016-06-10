@@ -26,7 +26,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Core\Theme;
+namespace Civi\Core\Themes;
 
 use Civi;
 
@@ -45,7 +45,7 @@ class Resolvers {
    *
    * Simple themes may use the "search_order" to assimilate content from other themes.
    *
-   * @param \Civi\Core\Theme $themes
+   * @param \Civi\Core\Themes $themes
    *   The theming subsystem.
    * @param string $themeKey
    *   The active/desired theme key.
@@ -73,7 +73,7 @@ class Resolvers {
       return array($res->getUrl($theme['ext'], $file));
     }
     else {
-      return Civi\Core\Theme::PASSTHRU;
+      return Civi\Core\Themes::PASSTHRU;
     }
   }
 
@@ -81,7 +81,7 @@ class Resolvers {
    * The base handler falls back to loading files from the main application (rather than
    * using the theme).
    *
-   * @param \Civi\Core\Theme $themes
+   * @param \Civi\Core\Themes $themes
    *   The theming subsystem.
    * @param string $themeKey
    *   The active/desired theme key.
