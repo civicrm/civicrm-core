@@ -361,6 +361,41 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-18706 - Test Include/Exclude Activity Filters
+   */
+  public function testActivityFilters() {
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      $this->createFlatXMLDataSet(
+        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
+      )
+    );
+
+    global $_GET;
+    $_GET = array(
+      'cid' => 9,
+      'context' => 'activity',
+      'activity_type_id' => 1,
+      'is_unit_test' => 1,
+    );
+    $obj = new CRM_Activity_Page_AJAX();
+
+    $activities = $obj->getContactActivity();
+    // This should include activities of type Meeting only.
+    foreach ($activities['data'] as $key => $value) {
+      $this->assertEquals('Meeting', $value['activity_type']);
+    }
+    unset($_GET['activity_type_id']);
+
+    $_GET['activity_type_exclude_id'] = 1;
+    $activities = $obj->getContactActivity();
+    // None of the activities should be of type Meeting.
+    foreach ($activities['data'] as $key => $value) {
+      $this->assertNotEquals('Meeting', $value['activity_type']);
+    }
+  }
+
+  /**
    * Test getActivitiesCount BAO method.
    */
   public function testGetActivitiesCountforContactSummaryWithNoActivities() {
