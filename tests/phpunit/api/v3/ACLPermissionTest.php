@@ -148,6 +148,47 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure contact-related permissions don't prevent access to entities with no contact id
+   */
+  public function testRelatedEntityPermissionsWhenNull() {
+    $this->createLoggedInUser();
+    $disallowedContact = $this->individualCreate(array(), 0);
+    $this->allowedContactId = $this->individualCreate(array(), 1);
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlyOne'));
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $testEntities = array(
+      'Email' => array('email' => 'null@nothing', 'location_type_id' => 1),
+      'Phone' => array('phone' => '123456', 'location_type_id' => 1),
+      'Address' => array('street_address' => '123 Sesame St.', 'location_type_id' => 1),
+    );
+    foreach ($testEntities as $entity => $params) {
+      // Create one with no contact record
+      $result = $this->callAPISuccess($entity, 'create', $params + array('contact_id' => 'null'));
+      $nullItem = $result['id'];
+      $results = $this->callAPISuccess($entity, 'get', array('id' => $nullItem, 'contact_id' => array('IS NULL' => 1), 'check_permissions' => 1));
+      $this->assertEquals(1, $results['count']);
+
+      $params += array(
+        'contact_id' => $disallowedContact,
+        'check_permissions' => 1,
+      );
+      // We should be prevented from getting or creating entities for a contact we don't have permission for
+      $this->callAPIFailure($entity, 'create', $params);
+      $this->callAPISuccess($entity, 'create', array('check_permissions' => 0) + $params);
+      $results = $this->callAPISuccess($entity, 'get', array('contact_id' => $disallowedContact, 'check_permissions' => 1));
+      $this->assertEquals(0, $results['count']);
+
+      // We should be allowed to create and get for contacts we do have permission on
+      $params['contact_id'] = $this->allowedContactId;
+      $result = $this->callAPISuccess($entity, 'create', $params);
+      $contactItem = $result['id'];
+      $results = $this->callAPISuccess($entity, 'get', array('check_permissions' => 1, 'options' => array('limit' => 0)));
+      $this->assertArrayKeyExists($nullItem, $results['values']);
+      $this->assertArrayKeyExists($contactItem, $results['values']);
+    }
+  }
+
+  /**
    * Function tests all results are returned.
    */
   public function testContactGetAllResultsHook() {

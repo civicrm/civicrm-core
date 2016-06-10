@@ -2432,7 +2432,7 @@ SELECT contact_id
   }
 
   /**
-   * This returns the final permissioned query string for this entity
+   * Returns the array of permissioned query clauses for this entity
    *
    * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
    *
@@ -2445,17 +2445,22 @@ SELECT contact_id
       $tableAlias = $bao->tableName();
     }
     $clauses = array();
+    $fields = $bao->fields();
     foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
       $clauses[$field] = NULL;
       if ($vals) {
         $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+        // Non-required field may be null
+        if (empty($fields[$field]['required'])) {
+          $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR (" . $clauses[$field] . "))";
+        }
       }
     }
     return $clauses;
   }
 
   /**
-   * function to check valid db name containing only characters in [0-9,a-z,A-Z_]
+   * Check valid db name containing only characters in [0-9,a-z,A-Z_]
    *
    * @param $database
    *
