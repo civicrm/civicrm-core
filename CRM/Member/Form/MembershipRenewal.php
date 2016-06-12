@@ -609,7 +609,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $lineItem = array();
       $this->_params = $this->setPriceSetParameters($this->_params);
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $this->_params, $lineItem[$this->_priceSetId]
+        $this->_params, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId
       );
       //CRM-11529 for quick config backoffice transactions
       //when financial_type_id is passed in form, update the

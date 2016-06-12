@@ -323,14 +323,14 @@ AND li.entity_id = {$entityId}
    * @param array $params
    *   Reference to form values.
    * @param array $fields
-   *   Array of fields belonging.
-   *                          to the price set used for particular event
+   *   Array of fields belonging to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
    *   this is
    *                          lineItem array)
+   * @param string $amount_override
    */
-  public static function format($fid, $params, $fields, &$values) {
+  public static function format($fid, $params, $fields, &$values, $amount_override = NULL) {
     if (empty($params["price_{$fid}"])) {
       return;
     }
@@ -350,7 +350,7 @@ AND li.entity_id = {$entityId}
     }
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
-      $price = $options[$oid]['amount'];
+      $price = $amount_override === NULL ? $options[$oid]['amount'] : $amount_override;
 
       // lets clean the price in case it is not yet cleant
       // CRM-10974
