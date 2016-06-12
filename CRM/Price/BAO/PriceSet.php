@@ -747,13 +747,25 @@ WHERE  id = %1";
    *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
    *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
    */
-  public static function processAmount($fields, &$params, &$lineItem, $component = '') {
+  public static function processAmount($fields, &$params, &$lineItem, $component = '', $priceSetID = NULL) {
     // using price set
     $totalPrice = $totalTax = 0;
+    // CRM-18701 Sometimes the amount in the price set is overridden by the amount on the form.
+    // This is notably the case with memberships and we need to put this amount
+    // on the line item rather than the calculated amount.
+    // This seems to only affect radio link items as that is the use case for the 'quick config'
+    // set up (which allows a free form field).
+    $amount_override = NULL;
 
     if ($component) {
       $autoRenew = array();
       $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
+    }
+    if ($priceSetID) {
+      $priceFields = self::filterPriceFieldsFromParams($priceSetID, $params);
+      if (count($priceFields) == 1 && !empty($params['total_amount'])) {
+        $amount_override = $params['total_amount'];
+      }
     }
     foreach ($fields as $id => $field) {
       if (empty($params["price_{$id}"]) ||
@@ -793,7 +805,7 @@ WHERE  id = %1";
           $params["price_{$id}"] = array($params["price_{$id}"] => 1);
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
-          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
+          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
             $totalTax += $field['options'][$optionValueId]['tax_amount'];
