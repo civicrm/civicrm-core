@@ -277,7 +277,8 @@ class CRM_Member_BAO_Query {
               'In Progress',
               CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
             ),
-            "Integer");
+            "Integer"
+          );
           $query->_qill[$grouping][] = ts("Membership is Auto-Renew and In Progress");
         }
         elseif ($value == 3) {
@@ -289,7 +290,8 @@ class CRM_Member_BAO_Query {
               'Failed',
               CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
             ),
-            "Integer");
+            "Integer"
+          );
           $query->_qill[$grouping][] = ts("Membership is Auto-Renew and Failed");
         }
         elseif ($value == 4) {
