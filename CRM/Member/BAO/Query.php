@@ -307,7 +307,7 @@ class CRM_Member_BAO_Query {
         } 
         elseif ($value == 5) {
           $query->_where[$grouping][] = " civicrm_membership.contribution_recur_id IS NOT NULL";
-          $query->_where[$grouping][] = " ccr.end_date IS NOT NULL";
+          $query->_where[$grouping][] = " ccr.end_date IS NOT NULL AND ccr.end_date < NOW()";
           $query->_qill[$grouping][] = ts("Membership is Auto-Renew and Ended");
         }
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
@@ -423,7 +423,7 @@ class CRM_Member_BAO_Query {
         'membership_recur_id' => 1,
         'member_campaign_id' => 1,
         'member_is_override' => 1,
-        'member_auto_renew' => '1',
+        'member_auto_renew' => 1,
       );
 
       if ($includeCustomFields) {
