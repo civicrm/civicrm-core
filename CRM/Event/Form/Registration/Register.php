@@ -260,15 +260,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
     $this->buildCustom($this->_values['custom_post_id'], 'customPost');
 
-    if (!empty($this->_fields) && !empty($this->_values['custom_pre_id'])) {
-      $profileAddressFields = array();
-      foreach ($this->_fields as $key => $value) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array(
-          'uf_group_id' => $this->_values['custom_pre_id'],
-        ));
-      }
-      $this->set('profileAddressFields', $profileAddressFields);
-    }
+    // CRM-18399: used by template to pass pre profile id as a url arg
+    $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
 
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
