@@ -214,7 +214,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'name' => 'financial_type_id',
             'title' => ts('Line Item Financial Type'),
           ),
-        )
+        ),
       ),
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -268,7 +268,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'name' => 'financial_type_id',
             'title' => ts('Contribution Financial Type'),
           ),
-        )
+        ),
       ),
     );
 
@@ -304,12 +304,10 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
 
     if (!empty($rows)) {
-      if (sizeof($this->_params['fields']['line_total']) > 0) {
+      if (count($this->_params['fields']['line_total']) > 0) {
         $select = "
                    SELECT
                         SUM({$this->_aliases['civicrm_line_item']}.line_total ) as lineamount ";
-
-
         $sql = "{$select} {$this->_from} {$this->_where}";
         $dao = CRM_Core_DAO::executeQuery($sql);
         if ($dao->fetch()) {
@@ -320,12 +318,10 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           );
         }
       }
-      if (sizeof($this->_params['fields']['total_amount']) > 0 || sizeof($this->_params['fields']['line_total']) == 0) {
+      if (count($this->_params['fields']['total_amount']) > 0 || count($this->_params['fields']['line_total']) == 0) {
         $select = "
                    SELECT
                         SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
-
-
         $sql = "{$select} {$this->_from} {$this->_where}";
         $dao = CRM_Core_DAO::executeQuery($sql);
         if ($dao->fetch()) {
