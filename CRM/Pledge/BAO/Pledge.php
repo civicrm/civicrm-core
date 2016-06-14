@@ -1202,4 +1202,58 @@ SELECT  pledge.contact_id              as contact_id,
     return array_diff(array_flip($paymentStatus), self::getNonTransactionalStatus());
   }
 
+  /**
+   * Create recur record for pledge.
+   *
+   */
+  public static function createRecurRecord($pledge, $params, $form) {
+    $recurParams = array('contact_id' => $pledge->contact_id);
+    $recurParams['amount'] = $pledge->amount;
+    $recurParams['auto_renew'] = TRUE;
+    $recurParams['frequency_unit'] = $pledge->frequency_unit;
+    $recurParams['frequency_interval'] = $pledge->frequency_interval;
+    $recurParams['installments'] = $pledge->installments;
+    $recurParams['financial_type_id'] = $pledge->financial_type_id;
+    $recurParams['currency'] = $pledge->currency;
+
+    $recurParams['is_test'] = 0;
+    if (($form->_action & CRM_Core_Action::PREVIEW) ||
+      (isset($form->_mode) && ($form->_mode == 'test'))
+    ) {
+      $recurParams['is_test'] = 1;
+    }
+
+    $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
+    if (!empty($pledge->start_date)) {
+      $recurParams['start_date'] = $pledge->start_date;
+    }
+    $recurParams['invoice_id'] = CRM_Utils_Array::value('invoiceID', $params);
+    $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $recurParams['payment_processor_id'] = CRM_Utils_Array::value('payment_processor_id', $params);
+    $recurParams['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $params);
+    $recurParams['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params, $params['invoiceID']);
+    $recurParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
+
+    if (!empty($form->_values['is_monetary'])) {
+      $recurParams['payment_instrument_id'] = 1;
+    }
+
+    $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
+    if (is_a($recurring, 'CRM_Core_Error')) {
+      CRM_Core_Error::displaySessionError($recurring);
+      $urlString = 'civicrm/contribute/transact';
+      $urlParams = '_qf_Main_display=true';
+      if (get_class($form) == 'CRM_Contribute_Form_Contribution') {
+        $urlString = 'civicrm/contact/view/contribution';
+        $urlParams = "action=add&cid={$form->_contactID}";
+        if ($form->_mode) {
+          $urlParams .= "&mode={$form->_mode}";
+        }
+      }
+      CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
+    }
+
+    return $recurring->id;
+  }
+
 }

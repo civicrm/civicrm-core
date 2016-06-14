@@ -304,6 +304,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $form->addDate('start_date', ts('Payments Start'));
       if (CRM_Utils_Array::value('pledge_start_date', $pledgeBlock)) {
         $form->assign('start_date', $pledgeBlock['pledge_start_date']);
+        $form->setDefaults(array('start_date' => $pledgeBlock['pledge_start_date']));
       }
     }
   }

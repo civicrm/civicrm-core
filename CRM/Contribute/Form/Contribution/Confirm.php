@@ -948,6 +948,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
         $form->_params['pledge_id'] = $pledge->id;
 
+        // Create the recur record.
+        $recurringPledgeID = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params, $form);
+        if ($recurringPledgeID) {
+          $contribParams = array(
+            'id' => $contribution->id,
+            'contribution_recur_id' => $recurringPledgeID,
+          );
+          CRM_Contribute_BAO_Contribution::add($contribParams);
+        }
+
         //send acknowledgment email. only when pledge is created
         if ($pledge->id && $isEmailReceipt) {
           //build params to send acknowledgment.
