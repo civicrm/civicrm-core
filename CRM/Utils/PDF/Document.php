@@ -30,6 +30,9 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
+
+require_once 'TbsZip/tbszip.php';
+
 class CRM_Utils_PDF_Document {
 
   /**
@@ -70,6 +73,16 @@ class CRM_Utils_PDF_Document {
       $section = $phpWord->addSection($pageStyle + array('breakType' => 'nextPage'));
       \PhpOffice\PhpWord\Shared\Html::addHtml($section, $html);
     }
+
+    self::printDoc($phpWord, $ext, $fileName);
+  }
+
+  /**
+   * @param object|string $phpWord
+   * @param string $ext
+   * @param string $fileName
+   */
+  public static function printDoc($phpWord, $ext, $fileName) {
     $formats = array(
       'docx' => 'Word2007',
       'odt' => 'ODText',
@@ -78,9 +91,12 @@ class CRM_Utils_PDF_Document {
       'pdf' => 'PDF',
     );
 
+    if (realpath($phpWord)) {
+      $phpWord = \PhpOffice\PhpWord\IOFactory::load($phpWord, $formats[$ext]);
+    }
+
     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, $formats[$ext]);
 
-    // TODO: Split document generation and output into separate functions
     CRM_Utils_System::setHttpHeader('Content-Type', "application/$ext");
     CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     $objWriter->save("php://output");
@@ -122,7 +138,7 @@ class CRM_Utils_PDF_Document {
     $phpWord = \PhpOffice\PhpWord\IOFactory::load($path, $fileType);
     $phpWord->save($absPath, 'HTML');
 
-    // return the html content for tokenreplacment and eventually dused for document download
+    // return the html content for tokenreplacment and eventually used for document download
     if ($returnContent) {
       $filename = fopen($absPath, 'r');
       $content = fread($filename, filesize($absPath));
@@ -135,56 +151,86 @@ class CRM_Utils_PDF_Document {
 
   /**
    * Extract content of docx/odt file as text and later used for token replacement
-   * @param string $filePath Document file path
-   * @param string $type File type of document
+   * @param string $filePath  Document file path
+   * @param string $docType  File type of document
+   * @param bool $returnZipObj  Return clsTbsZip object along with content?
    *
-   * @return string
-   *   File content of document as text
+   * @return string|array
+   *   File content of document as text or array of content and clsTbsZip object
    */
-  public static function doc2Text($filePath, $type) {
-    $content = '';
-    $docType = array_search($type, CRM_Core_SelectValues::documentApplicationType());
+  public static function doc2Text($filePath, $docType, $returnZipObj = FALSE) {
+    $dataFile = ($docType == 'docx') ? 'word/document.xml' : 'content.xml';
 
-    // for reference on document entry type check http://phpword.readthedocs.io/en/latest/writersreaders.html
-    $dataFiles = array(
-      'odt' => array(
-        'content.xml',
-        'styles.xml',
-        'Pictures/',
-      ),
+    $zip = new clsTbsZip();
+    $zip->Open($filePath);
+    $content = $zip->FileRead($dataFile);
+
+    if ($returnZipObj) {
+      return array($content, $zip);
+    }
+
+    return $content;
+  }
+
+  /**
+   * Modify contents of docx/odt file(s) and later merged into one final document
+   *
+   * @param string $filePath Document file path
+   * @param array $contents content of formatted/token-replaced document
+   * @param string $docType Document type e.g. odt/docx
+   */
+  public static function printDocuments($filePath, $contents, $docType) {
+    $ooxmlMap = array(
       'docx' => array(
-        'word/document.xml',
-        'word/styles.xml',
-        'docProps/custom.xml',
-        'word/numbering.xml',
-        'word/settings.xml',
-        'word/webSettings.xml',
-        'word/fontTable.xml',
-        'word/theme/theme1.xml',
+        'dataFile' => 'word/document.xml',
+        'startTag' => '<w:body>',
+        // TODO need to provide proper ooxml tag for pagebreak
+        'pageBreak' => '<w:pgMar></w:pgMar>',
+        'endTag' => '</w:body></w:document>',
+      ),
+      'odt' => array(
+        'dataFile' => 'content.xml',
+        'startTag' => '<office:body>',
+        'pageBreak' => '<text:p text:style-name="Standard"></text:p>',
+        'endTag' => '</office:body></office:document-content>',
       ),
     );
 
-    $zip = zip_open($filePath);
+    $dataMap = $ooxmlMap[$docType];
+    list($finalContent, $zip) = self::doc2Text($filePath, $docType, TRUE);
 
-    if (!$zip || is_numeric($zip)) {
-      return $content;
-    }
-
-    while ($zip_entry = zip_read($zip)) {
-      if (zip_entry_open($zip, $zip_entry) == FALSE || !in_array(zip_entry_name($zip_entry), $dataFiles[$docType])) {
+    // token-replaced document contents of each contact will be merged into final document
+    foreach ($contents as $key => $content) {
+      if ($key == 0) {
+        $finalContent = $content;
         continue;
       }
-      $content .= zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
-      zip_entry_close($zip_entry);
+
+      // 1. fetch the start position of document body
+      // 2. later fetch only the body part starting from position $start
+      // 3. replace closing body tag with pageBreak
+      // 4. append the $content to the finalContent
+      $start = strpos($content, $dataMap['startTag']);
+      $content = substr($content, $start);
+      $content = str_replace($dataMap['startTag'], $dataMap['pageBreak'], $content);
+      $finalContent = str_replace($dataMap['endTag'], $content, $finalContent);
     }
 
-    zip_close($zip);
+    //replace the loaded document file content located at $filePath with $finaContent
+    $zip->FileReplace($dataMap['dataFile'], $finalContent, TBSZIP_STRING);
 
-    $content = str_replace('</w:r></w:p></w:tc><w:tc>', "&nbsp;&nbsp;", $content);
-    $content = str_replace('</w:r></w:p>', "\r\n", $content);
-    $striped_content = nl2br(strip_tags($content));
+    // get and path of civicrm upload directory and then construct the filepath of final document
+    $uploadDir = Civi::settings()->get('uploadDir');
+    $absPath = Civi::paths()->getPath($uploadDir) . "CiviLetter.$docType";
 
-    return array($striped_content, $docType);
+    // cleanup temporary document file created earlier if any
+    if (file_exists($absPath)) {
+      unlink($absPath);
+    }
+    // save the file document in civicrm upload directory, later used to download
+    $zip->Flush(TBSZIP_FILE, $absPath);
+
+    self::printDoc($absPath, $docType, "CiviLetter.$docType");
   }
 
 }
