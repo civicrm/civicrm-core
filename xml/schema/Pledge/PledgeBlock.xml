@@ -84,4 +84,15 @@
     <comment>Send additional reminder this many days after last one sent, up to maximum number of reminders.</comment>
     <add>2.1</add>
   </field>
+  <field>
+    <name>pledge_start_date</name>
+    <type>date</type>
+    <title>Pledge Start Date</title>
+    <required>true</required>
+    <comment>The date the first scheduled pledge occurs.</comment>
+    <add>4.7</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
 </table>

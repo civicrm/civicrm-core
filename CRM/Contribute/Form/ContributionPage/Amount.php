@@ -168,6 +168,7 @@ SELECT id
       $this->addElement('text', 'initial_reminder_day', ts('Send payment reminder'), array('size' => 3));
       $this->addElement('text', 'max_reminders', ts('Send up to'), array('size' => 3));
       $this->addElement('text', 'additional_reminder_day', ts('Send additional reminders'), array('size' => 3));
+      $this->addDate('pledge_start_date', ts('Payments Start'));
     }
 
     //add currency element.
@@ -712,6 +713,7 @@ SELECT id
               'max_reminders',
               'initial_reminder_day',
               'additional_reminder_day',
+              'pledge_start_date',
             );
             foreach ($pledgeBlock as $key) {
               $pledgeBlockParams[$key] = CRM_Utils_Array::value($key, $params);
@@ -719,6 +721,7 @@ SELECT id
             $pledgeBlockParams['is_pledge_interval'] = CRM_Utils_Array::value('is_pledge_interval',
               $params, FALSE
             );
+            $pledgeBlockParams['pledge_start_date'] = CRM_Utils_Date::processDate($params['pledge_start_date']);
             // create pledge block.
             CRM_Pledge_BAO_PledgeBlock::create($pledgeBlockParams);
           }

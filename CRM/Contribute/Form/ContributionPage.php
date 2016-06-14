@@ -293,9 +293,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         'max_reminders',
         'initial_reminder_day',
         'additional_reminder_day',
+        'pledge_start_date',
       );
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
+        if ($key == 'pledge_start_date') {
+          list($defaults['pledge_start_date'], $defaults['pledge_start_date_time']) = CRM_Utils_Date::setDateDefaults($pledgeBlockDefaults[$key]);
+        }
       }
       if (!empty($pledgeBlockDefaults['pledge_frequency_unit'])) {
         $defaults['pledge_frequency_unit'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,

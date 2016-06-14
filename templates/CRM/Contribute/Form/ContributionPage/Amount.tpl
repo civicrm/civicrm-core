@@ -152,6 +152,10 @@
                         <td>{$form.additional_reminder_day.html}
                             <span class="label">{ts}Days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
                     </tr>
+                    <tr class="crm-contribution-form-block-start_date"><th scope="row" class="label">{$form.pledge_start_date.label}</th>
+                        <td>{include file="CRM/common/jcalendar.tpl" elementName=pledge_start_date}<br />
+                            <span class="label">{ts}Date of first pledge payment.{/ts}</span></td>
+                    </tr>
                 </table>
                 </td>
             </tr>
