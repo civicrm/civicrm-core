@@ -202,6 +202,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
         'scheduled_date',
         'scheduled_amount',
         'currency',
+        'pledge_start_date',
       );
       CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id',
         $form->_values['pledge_id'], $allPayments, $returnProperties
@@ -300,6 +301,10 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
         }
       }
       $form->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits);
+      $form->addDate('start_date', ts('Payments Start'));
+      if (CRM_Utils_Array::value('pledge_start_date', $pledgeBlock)) {
+        $form->assign('start_date', $pledgeBlock['pledge_start_date']);
+      }
     }
   }
 
