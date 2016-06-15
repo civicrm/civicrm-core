@@ -198,6 +198,12 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
 
+    // CRM-16189
+    $this->assign('deferred_enabled', FALSE);
+    if (CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+      $this->assign('deferred_enabled', TRUE);
+    }
+
     $this->addFormRule(array('CRM_Event_Form_ManageEvent_EventInfo', 'formRule'));
 
     parent::buildQuickForm();

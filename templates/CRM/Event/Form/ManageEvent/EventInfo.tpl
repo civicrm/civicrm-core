@@ -172,6 +172,16 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
+    {/literal}{if $deferred_enabled}{literal}
+      var start_date_prev = "{/literal}{$form.start_date.value}{literal}";
+      $('input[type="submit"][value="Save"], input[type="submit"][value="Save and Done"]').click(function(event) {
+        var start_date_new = $('#start_date').val();
+        if (start_date_prev != start_date_new) {
+          if (!confirm("{/literal}{ts}Changing the start date will result in accounting changes for deferred transactions. Do you still wish to proceed?{/ts}{literal}"))
+            event.preventDefault();
+        }
+      });
+    {/literal}{/if}{literal}
     var $form = $('form.{/literal}{$form.formClass}{literal}');
     $('#template_id', $form).change(function() {
       $(this).closest('.crm-ajax-container, #crm-main-content-wrapper')
