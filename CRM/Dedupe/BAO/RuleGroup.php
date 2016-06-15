@@ -182,8 +182,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     // if there are no rules in this rule group
     // add an empty query fulfilling the pattern
     if (!$queries) {
-      $queries = array('SELECT 0 id1, 0 id2, 0 weight LIMIT 0');
       $this->noRules = TRUE;
+      return array();
     }
 
     return $queries;

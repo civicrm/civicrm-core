@@ -51,9 +51,15 @@ class CRM_Dedupe_Finder {
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
    *
+   * @param int $limit
+   *   Optional limit. This limits the number of contacts for which the code will
+   *   attempt to find matches.
+   *
    * @return array
    *   Array of (cid1, cid2, weight) dupe triples
-   * @throws \Exception
+   *
+   * @throws CiviCRM_API3_Exception
+   * @throws Exception
    */
   public static function dupes($rgid, $cids = array(), $checkPermissions = TRUE, $limit = NULL) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();

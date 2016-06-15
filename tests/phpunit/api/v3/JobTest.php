@@ -354,6 +354,47 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the batch merge does not fatal on an empty rule.
+   *
+   * @dataProvider getRuleSets
+   *
+   * @param string $contactType
+   * @param string $used
+   * @param bool $isReserved
+   * @param int $threshold
+   */
+  public function testBatchMergeEmptyRule($contactType, $used, $name, $isReserved, $threshold) {
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+      'contact_type' => $contactType,
+      'threshold' => $threshold,
+      'used' => $used,
+      'name' => $name,
+      'is_reserved' => $isReserved,
+    ));
+    $this->callAPISuccess('Job', 'process_batch_merge', array('rule_group_id' => $ruleGroup['id']));
+    $this->callAPISuccess('RuleGroup', 'delete', array('id' => $ruleGroup['id']));
+  }
+
+  /**
+   * Get the various rule combinations.
+   */
+  public function getRuleSets() {
+    $contactTypes = array('Individual', 'Organization', 'Household');
+    $useds = array('Unsupervised', 'General', 'Supervised');
+    $ruleGroups = array();
+    foreach ($contactTypes as $contactType) {
+      foreach ($useds as $used) {
+        $ruleGroups[] = array($contactType, $used, 'Bob', FALSE, 0);
+        $ruleGroups[] = array($contactType, $used, 'Bob', FALSE, 10);
+        $ruleGroups[] = array($contactType, $used, 'Bob', TRUE, 10);
+        $ruleGroups[] = array($contactType, $used, $contactType . $used, FALSE, 10);
+        $ruleGroups[] = array($contactType, $used, $contactType . $used, TRUE, 10);
+      }
+    }
+    return $ruleGroups;
+  }
+
+  /**
    * Test the batch merge does not create duplicate emails.
    *
    * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
