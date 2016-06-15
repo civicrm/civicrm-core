@@ -59,6 +59,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 0);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $limit = CRM_Utils_Request::retrieve('limit', 'Integer', $this);
 
     $session = CRM_Core_Session::singleton();
     $contactIds = $session->get('selectedSearchContactIds');
@@ -174,7 +175,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         if ($gid) {
           $foundDupes = $this->get("dedupe_dupes_$gid");
           if (!$foundDupes) {
-            $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid);
+            $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid, $limit);
           }
           $this->set("dedupe_dupes_$gid", $foundDupes);
         }
@@ -188,7 +189,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         else {
           $foundDupes = $this->get('dedupe_dupes');
           if (!$foundDupes) {
-            $foundDupes = CRM_Dedupe_Finder::dupes($rgid);
+            $foundDupes = CRM_Dedupe_Finder::dupes($rgid, array(), TRUE, $limit);
           }
           $this->set('dedupe_dupes', $foundDupes);
         }
@@ -225,8 +226,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           // (also, consider sorting by dupe count first)
           // lobo - change the sort to by threshold value
           // so the more likely dupes are sorted first
-          $session = CRM_Core_Session::singleton();
-          $userId = $session->get('userID');
+          $userId = CRM_Core_Session::singleton()->getLoggedInContactID();
           $mainContacts = $permission = array();
 
           foreach ($foundDupes as $dupes) {
