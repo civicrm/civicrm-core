@@ -55,12 +55,20 @@ class CRM_Dedupe_Finder {
    *   Array of (cid1, cid2, weight) dupe triples
    * @throws \Exception
    */
-  public static function dupes($rgid, $cids = array(), $checkPermissions = TRUE) {
+  public static function dupes($rgid, $cids = array(), $checkPermissions = TRUE, $limit = NULL) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
       CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
+    }
+    if (empty($rgBao->contactIds) && !empty($limit)) {
+      $limitedContacts = civicrm_api3('Contact', 'get', array(
+        'return' => 'id',
+        'contact_type' => $rgBao->contact_type,
+        'options' => array('limit' => $limit),
+      ));
+      $rgBao->contactIds = array_keys($limitedContacts['values']);
     }
 
     $rgBao->fillTable();
@@ -153,11 +161,12 @@ class CRM_Dedupe_Finder {
    * @param int $gid
    *   Contact group id (currently, works only with non-smart groups).
    *
+   * @param int $limit
    * @return array
    *   array of (cid1, cid2, weight) dupe triples
    */
-  public static function dupesInGroup($rgid, $gid) {
-    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid));
+  public static function dupesInGroup($rgid, $gid, $limit = NULL) {
+    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, $limit));
     if (!empty($cids)) {
       return self::dupes($rgid, $cids);
     }
