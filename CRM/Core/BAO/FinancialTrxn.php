@@ -560,4 +560,30 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
     return $trxn;
   }
 
+  /**
+   * get revenue amount for membership
+   *
+   * @param array $lineItem
+   *
+   * @return array
+   */
+  public static function getMembershipRevenueAmount($lineItem) {
+    $membershipDetail = civicrm_api3('Membership', 'getsingle', array(
+      'id' => $lineItem['entity_id'],
+    ));
+    $monthOfService = 12;
+    $startDateOfRevenue = $membershipDetail['start_date'];
+    $revenueAmount = array();
+    $typicalPayment = ROUND(($lineItem['line_totel'] / $monthOfService), 2);
+    for ($i = 0; $i < $monthOfService - 1; $i++) {
+      $revenueAmount[$i]['amount'] = $typicalPayment;
+      if ($i == 0) {
+        $revenueAmount[$i]['amount'] -= ($lineItem['line_totel'] - ($typicalPayment * $monthOfService));
+      }
+      $revenueAmount[$i]['revenue_date'] = $startDateOfRevenue;
+      $startDateOfRevenue = date('Ymd', strtotime('+1 month', strtotime($startDateOfRevenue)));
+    }
+    return $revenueAmount;
+  }
+
 }
