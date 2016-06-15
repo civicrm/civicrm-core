@@ -89,13 +89,21 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @return CRM_Financial_DAO_FinancialAccount
    */
-  public static function add(&$params, &$ids = array()) {
+  public static function add(&$params) {
     if (empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
       $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
       $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    }
+    if (!empty($params['financial_account_type_id'])
+      && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount(
+        CRM_Utils_Array::value('id', $params),
+        $params['financial_account_type_id']
+      )
+    ) {
+      throw new CRM_Core_Exception(ts('You cannot change the account type since this financial account refers to a financial item having an account type of Revenue/Liability.'));
     }
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
@@ -105,9 +113,21 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
 
     // action is taken depending upon the mode
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
+    if (!empty($params['id'])) {
+      $financialAccount->id = $params['id'];
+      $financialAccount->find(TRUE);
+    }
+
     $financialAccount->copyValues($params);
-    if (!empty($ids['contributionType'])) {
-      $financialAccount->id = CRM_Utils_Array::value('contributionType', $ids);
+    //CRM-16189
+    $accountType = CRM_Core_PseudoConstant::accountOptionValues(
+      'financial_account_type', 
+      NULL, 
+      " AND v.name IN ('Liability', 'Asset') "
+    );
+    if (!CRM_Utils_Array::value($financialAccount->financial_account_type_id, $accountType)) {
+      $financialAccount->opening_balance =
+        $financialAccount->current_period_opening_balance = '0.00';
     }
     $financialAccount->save();
     return $financialAccount;
