@@ -282,4 +282,24 @@ WHERE cft.id = %1
     return $financialAccountLinks;
   }
 
+  /**
+   * Get Deferred Financial type
+   *
+   * @return array
+   *
+   */
+  public static function getDeferredFinancialType() {
+    $deferredFinancialType = array();
+    $query = "SELECT ce.entity_id, cft.name FROM civicrm_entity_financial_account ce
+INNER JOIN civicrm_option_value cv ON ce.account_relationship = cv.value
+INNER JOIN civicrm_option_group cg ON cg.id= cv.option_group_id AND cg.name = 'account_relationship'
+INNER JOIN civicrm_financial_type cft ON ce.entity_id = cft.id
+WHERE `entity_table` = 'civicrm_financial_type' AND cv.name = 'Deferred Revenue Account is' AND cft.is_active = 1";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $deferredFinancialType[$dao->entity_id] = $dao->name;
+    }
+    return $deferredFinancialType;
+  }
+
 }
