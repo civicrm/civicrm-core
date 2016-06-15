@@ -521,6 +521,11 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         }
       }
     }
+    // CRM-16189
+    $errorMessage = CRM_Financial_BAO_FinancialAccount::validateFinancialType($values['financial_type_id']);
+    if ($errorMessage) {
+      $errors['financial_type_id'] = $errorMessage;
+    }
     return empty($errors) ? TRUE : $errors;
   }
 

@@ -285,7 +285,11 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     ) {
       $errors['count'] = ts('Participant count can not be greater than max participants.');
     }
-
+    // CRM-16189
+    $errorMessage = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_fid, 'PriceField');
+    if ($errorMessage) {
+      $errors['financial_type_id'] = $errorMessage;
+    }
     return empty($errors) ? TRUE : $errors;
   }
 

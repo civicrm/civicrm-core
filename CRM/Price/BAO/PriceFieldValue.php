@@ -61,6 +61,19 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
         self::updateAmountAndFeeLevel($id, $prevLabel, $params['label']);
       }
     }
+    // CRM-16189
+    $priceFieldID = CRM_Utils_Array::value('price_field_id', $params);
+    if (!$priceFieldID) {
+      $priceFieldID = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceFieldValue', $id, 'price_field_id');
+    }
+    $errorMessage = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
+      CRM_Utils_Array::value('financial_type_id', $params),
+      $priceFieldID,
+      'PriceField'
+    );
+    if ($errorMessage) {
+      throw new CRM_Core_Exception($errorMessage);
+    }
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
       $p = array(1 => array($params['price_field_id'], 'Integer'));
