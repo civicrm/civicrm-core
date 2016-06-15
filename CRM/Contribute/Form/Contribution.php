@@ -431,6 +431,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'receipt_date',
       'cancel_date',
       'thankyou_date',
+      'revenue_recognition_date',
     );
     foreach ($dates as $key) {
       if (!empty($defaults[$key])) {
@@ -748,6 +749,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $status,
       FALSE
     );
+
+    // CRM-16189, add Revenue Recognition Date
+    if (CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+      $this->addDate('revenue_recognition_date', ts('Revenue Recognition Date'), FALSE, array('formatType' => 'activityDate'));
+    }
 
     // add various dates
     $this->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
@@ -1636,10 +1642,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'receive_date',
         'receipt_date',
         'cancel_date',
+        'revenue_recognition_date',
       );
 
       foreach ($dates as $d) {
-        $params[$d] = CRM_Utils_Date::processDate($formValues[$d], $formValues[$d . '_time'], TRUE);
+        if (isset($formValues[$d])) {
+          $params[$d] = CRM_Utils_Date::processDate($formValues[$d], CRM_Utils_Array::value($d . '_time', $formValues), TRUE);
+        }
       }
 
       if (!empty($formValues['is_email_receipt'])) {
