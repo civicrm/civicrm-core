@@ -24,3 +24,37 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/Form/basicForm.tpl"}
+{literal}
+  <script type="text/javascript">
+    function checkPeriod() {
+      var speriod = cj('#prior_financial_period').val();
+      var hperiod = cj('input[name=prior_financial_period_hidden]').val();
+      if (((hperiod && speriod == '') || (hperiod && speriod != '')) && (speriod != hperiod)) {
+        if (confirm('Changing the Prior Financial Period may result in problems calculating closing account balances accurately and / or exporting of financial transactions. Do you want to proceed?')) {
+	  return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    cj(document).ready(function() {
+      showHideElement('deferred_revenue_enabled', 'default_invoice_page');
+      cj("#deferred_revenue_enabled").click(function() {
+        showHideElement('deferred_revenue_enabled', 'default_invoice_page');
+      });
+      showHideElement('financial_account_bal_enable', 'fiscalYearStart');
+      cj("#financial_account_bal_enable").click(function() {
+        showHideElement('financial_account_bal_enable', 'fiscalYearStart');
+      });
+      function showHideElement(checkEle, toHide) {
+        if (cj('#' + checkEle).prop('checked')) {
+          cj("tr.crm-preferences-form-block-" + toHide).show();
+        }
+        else {
+          cj("tr.crm-preferences-form-block-" + toHide).hide();
+        }
+      }
+    });
+  </script>
+{/literal}
