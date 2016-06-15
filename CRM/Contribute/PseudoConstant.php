@@ -102,6 +102,12 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $batch;
 
   /**
+   * Get values of CiviContribute Settings
+   * @var array
+   */
+  private static $contributeSettings;
+
+  /**
    * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all the financial types
@@ -438,6 +444,26 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       return $result;
     }
     return self::$batch;
+  }
+
+  /**
+   * Get values of CiviContribute Settings
+   * and check if its enabled or not
+   *
+   *
+   * @param string $name
+   * @return string
+   *
+   */
+  public static function checkContributeSettings($name = NULL) {
+    if (empty(self::$contributeSettings)) {
+      self::$contributeSettings = Civi::settings()->get('contribution_invoice_settings');
+    }
+
+    if ($name) {
+      return CRM_Utils_Array::value($name, self::$contributeSettings);
+    }
+    return self::$contributeSettings;
   }
 
 }
