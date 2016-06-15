@@ -338,4 +338,62 @@ LIMIT 1";
     return FALSE;
   }
 
+  /**
+   * Validate Financial Type has Deferred Revenue account relationship
+   * with Financial Account
+   *
+   * @param array $params
+   *
+   * @param int $contributionID
+   *
+   * @param obj $form
+   *
+   * @return string
+   *
+   */
+  public static function checkForValidFinancialType($params, $contributionID = NULL, $form = NULL) {
+    if (!CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+      return FALSE;
+    }
+    $recognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $params);
+    if (!(!CRM_Utils_System::isNull($recognitionDate)
+      || ($contributionID && $params['prevContribution']->revenue_recognition_date))
+    ) {
+      return FALSE;
+    }
+
+    $message = ts('Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+    $lineItems = CRM_Utils_Array::value('line_item', $params);
+    $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params);
+    if (!$financialTypeID) {
+      $financialTypeID = $params['prevContribution']->financial_type_id;
+    }
+    if (($contributionID || !empty($params['price_set_id'])) && empty($lineItems)) {
+      if (!$contributionID) {
+        CRM_Price_BAO_PriceSet::processAmount($form->_priceSet['fields'],
+        $params, $items);
+      }
+      else {
+        $items = CRM_Price_BAO_LineItem::getLineItems($contributionID, 'contribution', TRUE, TRUE, TRUE);
+      }
+      if (!empty($items)) {
+        $lineItems[] = $items;
+      }
+    }
+    $deferredFinancialType = self::getDeferredFinancialType();
+    if (!empty($lineItems)) {
+      foreach ($lineItems as $lineItem) {
+        foreach ($lineItem as $items) {
+          if (!array_key_exists($items['financial_type_id'], $deferredFinancialType)) {
+            return $message;
+          }
+        }
+      }
+    }
+    elseif (!array_key_exists($financialTypeID, $deferredFinancialType)) {
+      return $message;
+    }
+    return FALSE;
+  }
+
 }
