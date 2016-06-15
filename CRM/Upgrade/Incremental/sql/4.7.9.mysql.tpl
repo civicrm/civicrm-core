@@ -19,3 +19,6 @@ WHERE name = 'getting-started';
 ALTER TABLE civicrm_financial_account
  ADD `opening_balance` decimal(20,2) DEFAULT '0.00' COMMENT 'Contains the opening balance for this financial account',
  ADD `current_period_opening_balance` decimal(20,2) DEFAULT '0.00' COMMENT 'Contains the opening balance for the current period for this financial account';
+
+ALTER TABLE civicrm_contribution
+ADD `revenue_recognition_date` datetime DEFAULT NULL COMMENT 'Stores the date when revenue should be recognized.';
