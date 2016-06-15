@@ -139,17 +139,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       }
       $params['created_date'] = date('YmdHis');
     }
-    // CRM-18169 Check for start date change
-    if (!empty($params['id']) && CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
-      $prevEvent = new CRM_Event_DAO_Event();
-
-      $prevEvent->id = $params['id'];
-      $prevEvent->find(TRUE);
-      if (date('m', strtotime($params['start_date']) != date('m')) &&
-        (date('Ymd', strtotime($prevEvent->start_date)) != date('Ymd', strtotime($params['start_date'])))) {
-        self::updateDeferredTransactions($params);
-      }
-    }
 
     $event = self::add($params);
     CRM_Price_BAO_PriceSet::setPriceSets($params, $event, 'event');
@@ -2281,7 +2270,6 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     if (empty($event['id'])) {
       return;
     }
-    $status = CRM_Contribute_PseudoConstant::contributionStatus();
     $sql = "SELECT ft.*, cpp.contribution_id, eft.amount
       FROM civicrm_participant_payment cpp
       INNER JOIN civicrm_participant cp ON cp.id = cpp.participant_id
@@ -2299,37 +2287,43 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
     while ($dao->fetch()) {
       // Cancel the trxn.
-      $trxn = new CRM_Financial_DAO_FinancialTrxn();
-      $trxn->id = $dao->id;
-      $trxn->status_id = array_search('Cancelled', $status);
-      $trxn->save();
-
-      // Create new deferred transaction.
-      $newTrxn = new CRM_Financial_DAO_FinancialTrxn();
-      $newTrxn->from_financial_account_id = $dao->from_financial_account_id;
-      $newTrxn->to_financial_account_id = $dao->to_financial_account_id;
-      $newTrxn->trxn_date = date('Ymd', strtotime($event['start_date']));
-      $newTrxn->total_amount = $dao->total_amount;
-      $newTrxn->net_amount = $dao->net_amount;
-      $newTrxn->fee_amount = $dao->fee_amount;
-      $newTrxn->currency = $dao->currency;
-      $newTrxn->is_payment = $dao->is_payment;
-      $newTrxn->trxn_id = $dao->trxn_id;
-      $newTrxn->trxn_result_code = $dao->trxn_result_code;
-      $newTrxn->status_id = $dao->status_id;
-      $newTrxn->payment_processor_id = $dao->payment_processor_id;
-      $newTrxn->payment_instrument_id = $dao->payment_instrument_id;
-      $newTrxn->check_number = $dao->check_number;
-      $newTrxn->save();
+      $trxnParams = array(
+        'from_financial_account_id' => $dao->from_financial_account_id,
+        'to_financial_account_id' => $dao->to_financial_account_id,
+        'trxn_date' => date('Ymd'),
+        'total_amount' => -$dao->total_amount,
+        'net_amount' => $dao->net_amount,
+        'fee_amount' => $dao->fee_amount,
+        'currency' => $dao->currency,
+        'is_payment' => $dao->is_payment,
+        'trxn_id' => $dao->trxn_id,
+        'trxn_result_code' => $dao->trxn_result_code,
+        'status_id' => 'Cancelled',
+        'payment_processor_id' => $dao->payment_processor_id,
+        'payment_instrument_id' => $dao->payment_instrument_id,
+        'check_number' => $dao->check_number,
+      );
+      $trxn = civicrm_api3('FinancialTrxn', 'create', $trxnParams);
 
       // Add entity financial trxn.
       $entityParams = array(
         'entity_table' => 'civicrm_contribution',
-        'financial_trxn_id' => $newTrxn->id,
+        'financial_trxn_id' => $trxn['id'],
         'entity_id' => $dao->contribution_id,
-        'amount' => $dao->amount,
+        'amount' => -$dao->total_amount,
       );
-      CRM_Financial_BAO_FinancialItem::createEntityTrxn($entityParams);
+      civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
+
+      // Create new deferred transaction.
+      $trxnParams['trxn_date'] = date('Ymd', strtotime($event['start_date']));
+      $trxnParams['total_amount'] = $dao->total_amount;
+      $trxnParams['status_id'] = 'Completed';
+      $trxn = civicrm_api3('FinancialTrxn', 'create', $trxnParams);
+
+      // Add entity financial trxn.
+      $entityParams['financial_trxn_id'] = $trxn['id'];
+      $entityParams['amount'] = $dao->total_amount;
+      civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
     }
   }
 
