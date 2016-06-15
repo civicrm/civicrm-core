@@ -597,4 +597,77 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
     return $revenueAmount;
   }
 
+  /**
+   * create transaction for deferred revenue
+   *
+   * @param array $contributionParams
+   *
+   */
+  public static function createDeferredTrxn($contributionParams) {
+    if (empty($contributionParams['line_item'])) {
+      return FALSE;
+    }
+    $revenueRecognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $contributionParams);
+    if (empty($revenueRecognitionDate)) {
+      $revenueRecognitionDate = $contributionParams['prevContribution']->revenue_recognition_date;
+    }
+    if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
+      $trxnParams = array(
+        'contribution_id' => $params['contribution']->id,
+        'fee_amount' => '0.00',
+        'currency' => $params['contribution']->currency,
+        'trxn_id' => $params['contribution']->trxn_id,
+        'status_id' => $params['contribution']->contribution_status_id,
+        'payment_instrument_id' => $params['contribution']->payment_instrument_id,
+        'check_number' => $params['contribution']->check_number,
+        'is_payment' => 1,
+        'payment_processor_id' => CRM_Utils_Array::value('payment_processor', $contributionParams),
+      );
+
+      $deferredRevenues = array();
+      foreach ($contributionParams['line_item'] as $lineItem) {
+        foreach ($lineItem as $key => $item) {
+          if ($item['line_total'] <= 0) {
+            continue;
+          }
+          $deferredRevenues[$key] = $item;
+          if (in_array($item['entity_table'], array('civicrm_participant', 'civicrm_contribution'))) {
+            $deferredRevenues[$key]['revenue'][] = array(
+              'amount' => $item['line_total'],
+              'revenue_date' => $contribution->recognition_date,
+            );
+          }
+          else {
+            // for membership
+            $deferredRevenues[$key]['revenue'] = self::getMembershipRevenueAmount($item);
+          }
+        }
+      }
+      // TODO: Call hook to alter $deferredRevenues
+      foreach ($deferredRevenues as $key => $deferredRevenue) {
+        $results = civicrm_api3('EntityFinancialAccount', 'get', array(
+          'entity_table' => 'civicrm_financial_type',
+          'entity_id' => $deferredRevenue['financial_type_id'],
+          'account_relationship' => array('IN' => array('Income Account is', 'Deferred Revenue Account is')),
+        ));
+        if ($results['count'] != 2) {
+          continue;
+        }
+        $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
+        foreach($results['values'] as $result) {
+          if ($result['account_relationship'] == $accountRel) {
+            $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
+          }
+          else {
+            $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
+          }
+        }
+        foreach($deferredRevenue['revenue'] as $revenue) {
+          $trxnParams['total_amount'] =  $trxnParams['net_amount'] = $revenue['amount'];
+          $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
+        }
+      }
+    }
+  }
+
 }
