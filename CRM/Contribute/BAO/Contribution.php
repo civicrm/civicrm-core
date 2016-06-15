@@ -177,6 +177,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
 
+    // CRM-16189
+    $error = CRM_Financial_BAO_FinancialAccount::checkForValidFinancialType($params, $contributionID);
+    if ($error) {
+      throw new CRM_Core_Exception($error);
+    }
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
     }
