@@ -3955,14 +3955,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 
     $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $baseTrxnId = !empty($total['trxn_id']) ? $total['trxn_id'] : NULL;
-    $isBalance = NULL;
-    if ($baseTrxnId) {
-      $isBalance = TRUE;
-    }
-    else {
+    if (!$baseTrxnId) {
       $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
       $baseTrxnId = $baseTrxnId['financialTrxnId'];
-      $isBalance = FALSE;
     }
     if (!CRM_Utils_Array::value('total_amount', $total) || $usingLineTotal) {
       // for additional participants
@@ -4001,6 +3996,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $info['payLater'] = $contributionIsPayLater;
     $rows = array();
     if ($getTrxnInfo && $baseTrxnId) {
+      $arRelationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+      $arAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $arRelationTypeId);
       // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
       $sql = "
         SELECT GROUP_CONCAT(fa.`name`) as financial_account,
@@ -4011,21 +4008,20 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         FROM civicrm_contribution con
           LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
           INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
-            AND ft.to_financial_account_id != {$feeFinancialAccount}
+            AND ft.to_financial_account_id != %2
           INNER JOIN civicrm_entity_financial_trxn ef ON (ef.financial_trxn_id = ft.id AND ef.entity_table = 'civicrm_financial_item')
           LEFT JOIN civicrm_financial_item fi ON fi.id = ef.entity_id
           INNER JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
 
-        WHERE con.id = {$contributionId}
+        WHERE con.id = %1 AND ft.to_financial_account_id <> %3
         GROUP BY ft.id
       ";
-
-      // conditioned WHERE clause
-      if ($isBalance) {
-        // if balance trxn exists don't include details of it in transaction info
-        $sql .= " AND ft.id != {$baseTrxnId} ";
-      }
-      $resultDAO = CRM_Core_DAO::executeQuery($sql);
+      $queryParams = array(
+        1 => array($contributionId, 'Integer'),
+        2 => array($feeFinancialAccount, 'Integer'),
+        3 => array($arAccount, 'Integer'),
+      );
+      $resultDAO = CRM_Core_DAO::executeQuery($sql, $queryParams);
 
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
 
