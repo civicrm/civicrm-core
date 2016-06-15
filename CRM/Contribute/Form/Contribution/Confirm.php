@@ -949,13 +949,29 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $form->_params['pledge_id'] = $pledge->id;
 
         // Create the recur record.
-        $recurringPledgeID = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params, $form);
-        if ($recurringPledgeID) {
+        try {
+          $recurringPledge = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params, $form);
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          CRM_Core_Error::displaySessionError($recurringPledge);
+          $urlString = 'civicrm/contribute/transact';
+          $urlParams = '_qf_Main_display=true';
+          if (get_class($form) == 'CRM_Contribute_Form_Contribution') {
+            $urlString = 'civicrm/contact/view/contribution';
+            $urlParams = "action=add&cid={$form->_contactID}";
+            if ($form->_mode) {
+              $urlParams .= "&mode={$form->_mode}";
+            }
+          }
+          CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
+        }
+
+        if ($recurringPledge['id']) {
           $contribParams = array(
             'id' => $contribution->id,
-            'contribution_recur_id' => $recurringPledgeID,
+            'contribution_recur_id' => $recurringPledge['id'],
           );
-          CRM_Contribute_BAO_Contribution::add($contribParams);
+          civicrm_api3('Contribution', 'create', $contribParams);
         }
 
         //send acknowledgment email. only when pledge is created

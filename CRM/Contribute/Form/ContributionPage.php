@@ -297,7 +297,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       );
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
-        if ($key == 'pledge_start_date') {
+        if ($key == 'pledge_start_date' && CRM_Utils_Array::value($key, $pledgeBlockDefaults)) {
           list($defaults['pledge_start_date'], $defaults['pledge_start_date_time']) = CRM_Utils_Date::setDateDefaults($pledgeBlockDefaults[$key]);
         }
       }
