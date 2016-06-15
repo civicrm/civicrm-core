@@ -486,8 +486,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // The concept of contributeMode is deprecated.
     // the is_monetary concept probably should be too as it can be calculated from
     // the existence of 'amount' & seems fragile.
-    if ($this->_contributeMode == 'notify' || !$this->_values['is_monetary'] ||
-      $this->_amount <= 0.0 || $this->_params['is_pay_later'] ||
+    if ($this->_contributeMode == 'notify' ||
+      $this->_amount < 0.0 || $this->_params['is_pay_later'] ||
       ($this->_separateMembershipPayment && $this->_amount <= 0.0)
     ) {
       $contribButton = ts('Continue');
@@ -1501,6 +1501,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $numTerms, $membershipID, $pending,
           $contributionRecurID, $membershipSource, $isPayLater, $campaignId
         );
+
         $form->set('renewal_mode', $renewalMode);
         if (!empty($dates)) {
           $form->assign('mem_start_date', CRM_Utils_Date::customFormat($dates['start_date'], '%Y%m%d'));
@@ -1591,7 +1592,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //CRM-18071, where on selecting $0 free membership payment section got hidden and
       // also it reset any payment processor selection result into pending free membership
       // so its a kind of hack to complete free membership at this point since there is no $form->_paymentProcessor info
-      if (empty($form->_params['is_pay_later']) && !empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
+      if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
         $paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('payment_processor', $this->_values));
         if (empty($form->_paymentProcessor) && !empty($paymentProcessorIDs)) {
           $this->_paymentProcessor['id'] = $paymentProcessorIDs[0];
