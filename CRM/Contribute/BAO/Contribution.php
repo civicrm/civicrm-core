@@ -4841,6 +4841,9 @@ LIMIT 1;";
         'financial_trxn_id' => $ftId,
       );
       foreach ($lineItems as $key => $value) {
+        if ($value['qty'] == 0) {
+          continue;
+        }
         $paid = $value['line_total'] * ($trxnAmount / $contribution->total_amount);
         // Record Entity Financial Trxn
         $params['amount'] = round($paid, 2);
