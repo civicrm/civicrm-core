@@ -214,9 +214,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'dao' => 'CRM_Batch_DAO_Batch',
         'grouping' => 'contri-fields',
         'filters' => array(
-          'title' => array(
+          'id' => array(
             'title' => ts('Batch Title'),
-            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Batch_BAO_Batch::getAllBatchNames(),
+            'type' => CRM_Utils_Type::T_INT,
           ),
         ),
       ),
@@ -473,7 +475,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                             {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
-    if (!empty($this->_params['title_value'])) {
+    if (!empty($this->_params['id_value'])) {
       $this->_from .= "
                  LEFT JOIN civicrm_entity_financial_trxn eft
                         ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND

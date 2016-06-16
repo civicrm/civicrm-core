@@ -777,6 +777,24 @@ WHERE  {$where}
   }
 
   /**
+   * Get all batch names.
+   *
+   * @return array
+   *   array of batches
+   */
+  public static function getAllBatchNames() {
+    $query = 'SELECT id, title
+      FROM civicrm_batch';
+
+    $batches = array();
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $batches[$dao->id] = $dao->title;
+    }
+    return $batches;
+  }
+
+  /**
    * Function get batch statuses.
    *
    * @param string $batchIds
