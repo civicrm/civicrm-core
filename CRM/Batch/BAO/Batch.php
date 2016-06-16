@@ -763,28 +763,12 @@ WHERE  {$where}
    * @return array
    *   array of batches
    */
-  public static function getBatchNames($batchIds) {
-    $query = 'SELECT id, title
-      FROM civicrm_batch
-      WHERE id IN (' . $batchIds . ')';
-
-    $batches = array();
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $batches[$dao->id] = $dao->title;
-    }
-    return $batches;
-  }
-
-  /**
-   * Get all batch names.
-   *
-   * @return array
-   *   array of batches
-   */
-  public static function getAllBatchNames() {
+  public static function getBatchNames($batchIds = NULL) {
     $query = 'SELECT id, title
       FROM civicrm_batch';
+    if ($batchIds) {
+      $query .= ' WHERE id IN (' . $batchIds . ')';
+    }
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);

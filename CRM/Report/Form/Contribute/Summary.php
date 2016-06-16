@@ -217,7 +217,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'id' => array(
             'title' => ts('Batch Title'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Batch_BAO_Batch::getAllBatchNames(),
+            'options' => CRM_Batch_BAO_Batch::getBatchNames(),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
