@@ -129,4 +129,90 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals(count($pledgeId), 1, "Pledge was retrieved");
   }
 
+  /**
+   *  Test create recur record.
+   */
+  public function testCreateRecurRecord() {
+    //when user creating pledge record.
+    $contributionPageId = ContributionPage::create();
+    $processorId = $this->paymentProcessorAuthorizeNetCreate(array('is_test' => 0));
+    $contribution = $this->contributionCreate(array('contact_id' => $this->_contactId));
+    $pledgeParams = array(
+      'contact_id' => $this->_contactId,
+      'installment_amount' => 100,
+      'actual_amount' => 100,
+      'contribution_id' => $contribution,
+      'contribution_page_id' => $contributionPageId,
+      'financial_type_id' => 1,
+      'frequency_interval' => 1,
+      'installments' => 3,
+      'frequency_unit' => 'month',
+      'frequency_day' => intval(date("d")),
+      'start_date' => date("Ymd"),
+      'create_date' => date("Ymd"),
+      'scheduled_date' => date("Ymd"),
+      'status_id' => 1,
+      'max_reminders' => 1,
+      'initial_reminder_day' => 1,
+      'additional_reminder_day' => 1,
+      'original_installment_amount' => 100,
+    );
+
+    $pledge = CRM_Pledge_BAO_Pledge::create($pledgeParams);
+    $params = array(
+      'invoiceID' => '123456789',
+      'payment_processor_id' => $processorId,
+      'financial_type_id' => 1,
+    );
+    $recurRecord = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params, CRM_Core_DAO::$_nullObject);
+    $recur = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($this->_contactId);
+    foreach ($recurRecord['values'] as $key => $values) {
+      foreach ($values as $k => $value) {
+        if ($k == 'contact_id') {
+          $k = 'contactId';
+        }
+        if ($k == 'start_date') {
+          $recur[$key][$k] = date('YmdHis', strtotime($recur[$key][$k]));
+        }
+        if ($k == 'is_test') {
+          continue;
+        }
+        if (isset($recur[$key][$k])) {
+          $this->assertEquals($value, $recur[$key][$k], "Recur information does not match");
+        }
+      }
+    }
+  }
+
+  /**
+   *  Test pledge recur contribution.
+   */
+  public function testRecurPledge() {
+    $contributionPageId = ContributionPage::create();
+
+    $pledgeFrequencyUnit = array(
+      'week' => 1,
+      'month' => 1,
+      'year' => 1,
+    );
+
+    $params = array(
+      'entity_id' => $contributionPageId,
+      'entity_table' => 'civicrm_contribution_page',
+      'pledge_frequency_unit' => $pledgeFrequencyUnit,
+      'max_reminders' => 2,
+      'initial_reminder_day' => 2,
+      'additional_reminder_day' => 1,
+      'pledge_start_date' => date('Ymd'),
+    );
+
+    // check for add pledge block
+    $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::add($params);
+    foreach ($params as $param => $value) {
+      $this->assertEquals($value, $pledgeBlock->$param);
+    }
+
+    // FIXME: To add further test for payment and recur check
+  }
+
 }
