@@ -661,10 +661,6 @@ LIMIT {$offset}, {$rowCount}
     if ($rowCount < 0) {
       $rowCount = 0;
     }
-    $contactType = '';
-    if ($rgid) {
-      $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
-    }
 
     $whereClause = $orderByClause = '';
     $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
