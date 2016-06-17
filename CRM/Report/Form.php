@@ -2622,6 +2622,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->from();
     $this->customDataFrom();
     $this->where();
+    if (array_key_exists('civicrm_contribution', $this->getVar('_columns'))) {
+      $this->getPermissionedFTQuery($this);
+    }
     $this->groupBy();
     $this->orderBy();
 
