@@ -932,7 +932,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $pledgeParams['frequency_day'] = 1;
         }
         $pledgeParams['create_date'] = date("Ymd");
-        $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = CRM_Utils_Array::value('start_date', $params, date("Ymd"));
+        $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date("Ymd");
+        if (CRM_Utils_Array::value('start_date', $params)) {
+          $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = $params['start_date'];
+        }
         $pledgeParams['status_id'] = $contribution->contribution_status_id;
         $pledgeParams['max_reminders'] = $form->_values['max_reminders'];
         $pledgeParams['initial_reminder_day'] = $form->_values['initial_reminder_day'];
@@ -940,6 +943,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $pledgeParams['is_test'] = $contribution->is_test;
         $pledgeParams['acknowledge_date'] = date('Ymd');
         $pledgeParams['original_installment_amount'] = $pledgeParams['installment_amount'];
+        $params['payment_instrument_id'] = $contribution->payment_instrument_id;
 
         //inherit campaign from contirb page.
         $pledgeParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $contributionParams);
@@ -950,7 +954,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
         // Create the recur record.
         try {
-          $recurringPledge = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params, $form);
+          $recurringPledge = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params);
         }
         catch (CiviCRM_API3_Exception $e) {
           CRM_Core_Error::displaySessionError($recurringPledge);

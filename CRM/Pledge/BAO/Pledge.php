@@ -1206,7 +1206,7 @@ SELECT  pledge.contact_id              as contact_id,
    * Create recur record for pledge.
    *
    */
-  public static function createRecurRecord($pledge, $params, $form) {
+  public static function createRecurRecord($pledge, $params) {
     $recurParams = array('contact_id' => $pledge->contact_id);
     $recurParams['amount'] = $pledge->amount;
     $recurParams['auto_renew'] = TRUE;
@@ -1225,10 +1225,7 @@ SELECT  pledge.contact_id              as contact_id,
     $recurParams['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $params);
     $recurParams['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params, $params['invoiceID']);
     $recurParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
-
-    if (!empty($form->_values['is_monetary'])) {
-      $recurParams['payment_instrument_id'] = 1;
-    }
+    $recurParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params);
 
     $recurring = civicrm_api3('ContributionRecur', 'create', $recurParams);
     return $recurring;
