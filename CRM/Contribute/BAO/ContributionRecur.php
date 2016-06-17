@@ -596,7 +596,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         }
 
         foreach ($table as $tableName => $tableColumns) {
-          $insert = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
+          $insert = 'INSERT IGNORE INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
           $tableColumns[0] = $targetContributionId;
           $select = 'SELECT ' . implode(', ', $tableColumns);
           $from = ' FROM ' . $tableName;
