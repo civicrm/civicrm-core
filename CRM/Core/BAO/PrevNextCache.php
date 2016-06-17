@@ -601,4 +601,35 @@ WHERE  cacheKey LIKE %1
     return $params;
   }
 
+  /**
+   * Flip 2 contacts in the prevNext cache.
+   *
+   * @param array $prevNextId
+   * @param bool $onlySelected
+   *   Only flip those which have been marked as selected.
+   */
+  public static function flipPair(array $prevNextId, $onlySelected) {
+    $dao = new CRM_Core_DAO_PrevNextCache();
+    if ($onlySelected) {
+      $dao->is_selected = 1;
+    }
+    foreach ($prevNextId as $id) {
+      $dao->id = $id;
+      if ($dao->find(TRUE)) {
+        $originalData = unserialize($dao->data);
+        $srcFields = array('ID', 'Name');
+        $swapFields = array('srcID', 'srcName', 'dstID', 'dstName');
+        $data = array_diff_assoc($originalData, array_fill_keys($swapFields, 1));
+        foreach ($srcFields as $key) {
+          $data['src' . $key] = $originalData['dst' . $key];
+          $data['dst' . $key] = $originalData['src' . $key];
+        }
+        $dao->data = serialize($data);
+        $dao->entity_id1 = $data['srcID'];
+        $dao->entity_id2 = $data['dstID'];
+        $dao->save();
+      }
+    }
+  }
+
 }

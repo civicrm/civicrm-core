@@ -886,22 +886,16 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function flipDupePairs($prevNextId = NULL) {
     if (!$prevNextId) {
-      $prevNextId = $_REQUEST['pnid'];
+      // @todo figure out if this is always POST & specify that rather than inexact GET
+      $prevNextId = CRM_Utils_Request::retrieve('pnid', 'Integer');
     }
-    $query = "
-      UPDATE civicrm_prevnext_cache cpc
-      INNER JOIN civicrm_prevnext_cache old on cpc.id = old.id
-      SET cpc.entity_id1 = cpc.entity_id2, cpc.entity_id2 = old.entity_id1 ";
+
+    $onlySelected = FALSE;
     if (is_array($prevNextId) && !CRM_Utils_Array::crmIsEmptyArray($prevNextId)) {
-      CRM_Utils_Type::escapeAll($prevNextId, 'Positive');
-      $prevNextId = implode(', ', $prevNextId);
-      $query     .= "WHERE cpc.id IN ({$prevNextId}) AND cpc.is_selected = 1";
+      $onlySelected = TRUE;
     }
-    else {
-      $prevNextId = CRM_Utils_Type::escape($prevNextId, 'Positive');
-      $query     .= "WHERE cpc.id = $prevNextId";
-    }
-    CRM_Core_DAO::executeQuery($query);
+    $prevNextId = CRM_Utils_Type::escapeAll((array) $prevNextId, 'Positive');
+    CRM_Core_BAO_PrevNextCache::flipPair($prevNextId, $onlySelected);
     CRM_Utils_JSON::output();
   }
 
