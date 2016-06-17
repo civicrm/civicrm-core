@@ -431,7 +431,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'receipt_date',
       'cancel_date',
       'thankyou_date',
-      'revenue_recognition_date',
     );
     foreach ($dates as $key) {
       if (!empty($defaults[$key])) {
@@ -752,7 +751,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // CRM-16189, add Revenue Recognition Date
     if (CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
-      $this->addDate('revenue_recognition_date', ts('Revenue Recognition Date'), FALSE, array('formatType' => 'activityDate'));
+      $this->add('date', 'revenue_recognition_date', ts('Revenue Recognition Date'), CRM_Core_SelectValues::date(NULL, 'M Y', NULL, 5));
     }
 
     // add various dates
@@ -1004,7 +1003,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', array(1 => $fields['trxn_id']));
       }
     }
-
+    if (!empty($fields['revenue_recognition_date'])
+      && count(array_filter($fields['revenue_recognition_date'])) == 1
+    ) {
+      $errors['revenue_recognition_date'] = ts('Month and Year are required field for Revenue Recognition.');
+    }
     $errors = array_merge($errors, $softErrors);
     return $errors;
   }
@@ -1637,12 +1640,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($priceSetId) {
         $params['skipCleanMoney'] = 1;
       }
-
+      $params['revenue_recognition_date'] = NULL;
+      if (!empty($formValues['revenue_recognition_date'])
+        && count(array_filter($formValues['revenue_recognition_date'])) == 2
+      ) {
+        $params['revenue_recognition_date'] = CRM_Utils_Date::processDate(
+          '01-' . implode('-', $formValues['revenue_recognition_date'])
+        );
+      }
       $dates = array(
         'receive_date',
         'receipt_date',
         'cancel_date',
-        'revenue_recognition_date',
       );
 
       foreach ($dates as $d) {
