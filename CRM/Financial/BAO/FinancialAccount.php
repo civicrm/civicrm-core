@@ -446,8 +446,7 @@ LIMIT 1";
    */
   public static function validateTogglingDeferredRevenue() {
     $deferredFinancialType = self::getDeferredFinancialType();
-    $message = ' Please revise the error message to the following:
-Before Deferred Revenue can be enabled, a Deferred Revenue Account relationship must be defined for all financial types currently used for Memberships and Events, including
+    $message = ts('Before Deferred Revenue can be enabled, a Deferred Revenue Account relationship must be defined for all financial types currently used for Memberships and Events, including
 <ul>
 <li>those specified for each membership type at Admin > CiviMember > Membership Types, edit</li>
 <li>on the Fees tab when managing events</li>
@@ -456,7 +455,7 @@ Before Deferred Revenue can be enabled, a Deferred Revenue Account relationship 
 <li>as the financial type for a price set field with participant count > 0</li>
 <li>as the financial type for a price set field option with participant count > 0</li>
 </ul>
-In other words, please create deferred revenue accounts at Administer > CiviContribute > Financial Accounts, then configure them for the following financial types at Administer > CiviContribute > Financial Types, accounts:';
+In other words, please create deferred revenue accounts at Administer > CiviContribute > Financial Accounts, then configure them for the following financial types at Administer > CiviContribute > Financial Types, accounts:');
     $tables = array(
       'civicrm_membership_type',
       'civicrm_event',
