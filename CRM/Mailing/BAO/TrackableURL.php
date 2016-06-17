@@ -57,8 +57,8 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
     static $urlCache = array();
 
-    if (array_key_exists($url, $urlCache)) {
-      return $urlCache[$url] . "&qid=$queue_id";
+    if (array_key_exists($mailing_id . $url, $urlCache)) {
+      return $urlCache[$mailing_id . $url] . "&qid=$queue_id";
     }
 
     // hack for basic CRM-1014 and CRM-1151 and CRM-3492 compliance:
@@ -93,10 +93,10 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
       $tracker->free();
 
       $redirect = $config->userFrameworkResourceURL . "extern/url.php?u=$id";
-      $urlCache[$url] = $redirect;
+      $urlCache[$mailing_id . $url] = $redirect;
     }
 
-    $returnUrl = "{$urlCache[$url]}&qid={$queue_id}";
+    $returnUrl = "{$urlCache[$mailing_id . $url]}&qid={$queue_id}";
 
     if ($hrefExists) {
       $returnUrl = "href='{$returnUrl}'";
