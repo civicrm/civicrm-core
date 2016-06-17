@@ -441,7 +441,7 @@ class CRM_Core_I18n {
     &$array,
     $params = array()
   ) {
-    global $tsLocale;
+    $tsLocale = CRM_Core_I18n::getLocale();
 
     if ($tsLocale == 'en_US') {
       return;
@@ -615,7 +615,7 @@ class CRM_Core_I18n {
   public static function &singleton() {
     static $singleton = array();
 
-    global $tsLocale;
+    $tsLocale = CRM_Core_I18n::getLocale();
     if (!isset($singleton[$tsLocale])) {
       $singleton[$tsLocale] = new CRM_Core_I18n($tsLocale);
     }
@@ -632,7 +632,7 @@ class CRM_Core_I18n {
   public static function setLcTime() {
     static $locales = array();
 
-    global $tsLocale;
+    $tsLocale = CRM_Core_I18n::getLocale();
     if (!isset($locales[$tsLocale])) {
       // with the config being set to pl_PL: try pl_PL.UTF-8,
       // then pl_PL, if neither present fall back to C
@@ -663,11 +663,20 @@ class CRM_Core_I18n {
       ));
     }
     elseif ($language == 'current_site_language') {
-      global $tsLocale;
-      return $tsLocale;
+      return CRM_Core_I18n::getLocale();
     }
 
     return $language;
+  }
+
+  /**
+   * Get the current locale
+   *
+   * @return string
+   */
+  public static function getLocale() {
+    global $tsLocale;
+    return $tsLocale;
   }
 
 }
@@ -697,7 +706,7 @@ function ts($text, $params = array()) {
     $config = CRM_Core_Config::singleton();
   }
 
-  global $tsLocale;
+  $tsLocale = CRM_Core_I18n::getLocale();
   if (!$i18n or $locale != $tsLocale) {
     $i18n = CRM_Core_I18n::singleton();
     $locale = $tsLocale;
