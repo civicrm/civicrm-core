@@ -201,7 +201,12 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     if (CRM_Utils_Array::value('deferred_revenue_enabled', $values)) {
       $errorMessage = CRM_Financial_BAO_FinancialAccount::validateTogglingDeferredRevenue();
       if ($errorMessage) {
-        $errors['deferred_revenue_enabled'] = $errorMessage;
+        // Since the error msg is too long and
+        // takes the whole space to display inline
+        // therefore setting blank text to highlight the field
+        // setting actual error msg to _qf_default to show in pop-up screen
+        $errors['deferred_revenue_enabled'] = ' ';
+        $errors['_qf_default'] = $errorMessage;
       }
     }
     return $errors;
