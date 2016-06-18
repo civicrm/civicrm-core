@@ -63,6 +63,9 @@ INSERT INTO
 VALUES
 (@option_group_id_act, {localize}'{ts escape="sql"}Close Accounting Period{/ts}'{/localize}, @option_group_id_act_val+1, 'Close Accounting Period', NULL, 0, 0, @option_group_id_act_wt+1, {localize}'Close Accounting Period'{/localize}, 0, 1, 1, 2, NULL);
 
---CRM-
+--CRM-18651 Add in Data Type colum to option group table and set for some option groups
 ALTER TABLE civicrm_option_group
 ADD `data_type` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Data Type of Option Group.';
+UPDATE civicrm_option_group SET `data_type` = 'Integer'
+WHERE name in ('activity_type', 'gender', 'payment_instrument', 'participant_role', 'event_type',
+  'activity_status',);
