@@ -255,19 +255,20 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     // Nav records are expendable. https://forum.civicrm.org/index.php?topic=36933.0
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE contact_id IS NOT NULL AND name = "navigation"');
 
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP INDEX index_group_name');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP COLUMN group_name');
+
     // Handle Strange activity_tab_filter settings.
     CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_activity_setting LIKE civicrm_setting');
-    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_activity_setting DROP INDEX index_group_name');
-    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_activity_setting DROP COLUMN group_name');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_activity_setting ADD UNIQUE INDEX index_domain_contact_name (domain_id, contact_id, name)');
     CRM_Core_DAO::executeQuery('INSERT INTO civicrm_activity_setting (name, contact_id, domain_id, value)
-     SELECT DISTNCT name, contact_id, domain_id, value
+     SELECT DISTINCT name, contact_id, domain_id, value
      FROM civicrm_setting
      WHERE name = "activity_tab_filter"
      AND value is not NULL');
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "activity_tab_filter"');
 
-    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP INDEX index_group_name');
-    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP COLUMN group_name');
+
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting ADD UNIQUE INDEX index_domain_contact_name (domain_id, contact_id, name)');
     CRM_Core_DAO::executeQuery('INSERT INTO civicrm_setting (name, contact_id, domain_id, value, is_domain, created_id, created_date)
      SELECT name, contact_id, domain_id, value, 0, contact_id, %1
