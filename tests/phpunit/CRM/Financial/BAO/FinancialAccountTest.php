@@ -266,4 +266,52 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $this->assertFalse($message, "The financial account can be deleted. Failed asserting this was true.");
   }
 
+  /**
+   * Test for validating financial type has deferred revenue account relationship.
+   */
+  public function testcheckForValidFinancialType() {
+    Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
+    $params = array();
+    $valid = CRM_Financial_BAO_FinancialAccount::checkForValidFinancialType($params);
+    $this->assertFalse($valid, "This should have been false");
+    $cid = $this->individualCreate();
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 3,
+      'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
+      'line_items' => array(
+        array(
+          'line_item' => array(
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 16,
+              'label' => 'test 1',
+              'qty' => 1,
+              'unit_price' => 100,
+              'line_total' => 100,
+            ),
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 17,
+              'label' => 'Test 2',
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'financial_type_id' => 1,
+            ),
+          ),
+          'params' => array(),
+        ),
+      ),
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $valid = CRM_Financial_BAO_FinancialAccount::checkForValidFinancialType($params, $contribution->id);
+    $message = "Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts";
+    $this->assertEquals($valid, $message, "The messages do not match");
+  }
+
 }
