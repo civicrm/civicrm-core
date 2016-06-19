@@ -177,4 +177,41 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account is'));
   }
 
+  /**
+   * Test getting financial account relations for a given financial type.
+   */
+  public function testGetFinancialAccountRelations() {
+    $fAccounts = $rAccounts = array();
+    $relations = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
+    $links = array(
+      'Expense Account is' => 'Expenses',
+      'Accounts Receivable Account is' => 'Asset',
+      'Income Account is' => 'Revenue',
+      'Asset Account is' => 'Asset',
+      'Cost of Sales Account is' => 'Cost of Sales',
+      'Premiums Inventory Account is' => 'Asset',
+      'Discounts Account is' => 'Revenue',
+      'Sales Tax Account is' => 'Liability',
+      'Deferred Revenue Account is' => 'Liability',
+    );
+    $dao = CRM_Core_DAO::executeQuery("SELECT ov.value, ov.name
+      FROM civicrm_option_value ov
+      INNER JOIN civicrm_option_group og ON og.id = ov.option_group_id
+      AND og.name = 'financial_account_type'");
+    while ($dao->fetch()) {
+      $fAccounts[$dao->value] = $dao->name;
+    }
+    $dao = CRM_Core_DAO::executeQuery("SELECT ov.value, ov.name
+      FROM civicrm_option_value ov
+      INNER JOIN civicrm_option_group og ON og.id = ov.option_group_id
+      AND og.name = 'account_relationship'");
+    while ($dao->fetch()) {
+      $rAccounts[$dao->value] = $dao->name;
+    }
+    foreach ($links as $accountRelation => $accountType) {
+      $financialAccountLinks[array_search($accountRelation, $rAccounts)] = array_search($accountType, $fAccounts);
+    }
+    $this->assertTrue(($relations == $financialAccountLinks), "The two arrays are not the same");
+  }
+
 }
