@@ -211,10 +211,10 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         ),
       ),
       'civicrm_batch' => array(
-        'dao' => 'CRM_Batch_DAO_Batch',
+        'dao' => 'CRM_Batch_DAO_EntityBatch',
         'grouping' => 'contri-fields',
         'filters' => array(
-          'id' => array(
+          'batch_id' => array(
             'title' => ts('Batch Title'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Batch_BAO_Batch::getBatchNames(),
@@ -475,15 +475,14 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                             {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
-    if (!empty($this->_params['id_value'])) {
+    if (!empty($this->_params['batch_id_value'])) {
       $this->_from .= "
                  LEFT JOIN civicrm_entity_financial_trxn eft
                         ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
                            eft.entity_table = 'civicrm_contribution'
-                 LEFT JOIN civicrm_entity_batch eb
-                        ON eb.entity_id = eft.financial_trxn_id AND
-                           eb.entity_table = 'civicrm_financial_trxn'
-                 LEFT JOIN civicrm_batch {$this->_aliases['civicrm_batch']} ON {$this->_aliases['civicrm_batch']}.id = eb.batch_id\n";
+                 LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
+                        ON {$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id AND
+                           {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn'\n";
     }
     $this->getPermissionedFTQuery($this);
   }
@@ -558,33 +557,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           unset($this->_havingClauses[$key]);
         }
       }
-    }
-  }
-
-  public function where() {
-    parent::where();
-    $clauses = array();
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if ($fieldName == 'title') {
-            $clause = $this->whereClause($field,
-              CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
-              CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-              CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-              CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-            );
-          }
-
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
-    }
-    if (!empty($clauses)) {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
     }
   }
 
