@@ -385,6 +385,31 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     if ($this->_ssID && empty($_POST)) {
       $defaults = array_merge($defaults, CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID));
     }
+
+    /*
+     * CRM-18656 - reverse the normalisation of 'contact_taglist' done in
+     * self::normalizeFormValues(). Remove tagset tags from the default
+     * 'contact_tags' and put them in 'contact_taglist[N]' where N is the
+     * id of the tagset.
+     */
+    if (isset($defaults['contact_tags'])) {
+      foreach ($defaults['contact_tags'] as $key => $tagId) {
+        $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $tagId, 'parent_id');
+        $element = "contact_taglist[$parentId]";
+        if ($this->elementExists($element)) {
+          // This tag is a tagset
+          unset($defaults['contact_tags'][$key]);
+          if (!isset($defaults[$element])) {
+            $defaults[$element] = array();
+          }
+          $defaults[$element][] = $tagId;
+        }
+      }
+      if (empty($defaults['contact_tags'])) {
+        unset($defaults['contact_tags']);
+      }
+    }
+
     return $defaults;
   }
 
