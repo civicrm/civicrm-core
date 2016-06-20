@@ -1030,8 +1030,10 @@ class CRM_Utils_Array {
    * Convert array where key(s) holds the actual value and value(s) as 1 into array of actual values
    *  Ex: array('foobar' => 1, 4 => 1) formatted into array('foobar', 4)
    *
+   * @deprecated use convertCheckboxInputToArray instead (after testing)
+   * https://github.com/civicrm/civicrm-core/pull/8169
+   *
    * @param array $array
-   * @return void
    */
   public static function formatArrayKeys(&$array) {
     if (!is_array($array)) {
@@ -1048,6 +1050,30 @@ class CRM_Utils_Array {
     ) {
       $array = $keys;
     }
+  }
+
+  /**
+   * Convert the data format coming in from checkboxes to an array of values.
+   *
+   * The input format from check boxes looks like
+   *   array('value1' => 1, 'value2' => 1). This function converts those values to
+   *   array(''value1', 'value2).
+   *
+   * The function will only alter the array if all values are equal to 1.
+   *
+   * @param array $input
+   *
+   * @return array
+   */
+  public static function convertCheckboxFormatToArray($input) {
+    if (isset($input[0])) {
+      return $input;
+    }
+    $keys = array_keys($input, 1);
+    if ((count($keys) == count($input))) {
+      return $keys;
+    }
+    return $input;
   }
 
 }
