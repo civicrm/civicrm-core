@@ -9,3 +9,8 @@ WHERE name = 'Print PDF Letter' AND option_group_id = @option_group_id_act;
 
 -- CRM-18699 Fix Wake Island misspelling, was Wake Ialand
 UPDATE civicrm_state_province SET name="Wake Island" WHERE name="Wake Ialand";
+
+-- CRM-18960 Change title in Getting Started widget
+UPDATE civicrm_dashboard SET
+  {localize field="label"}label = '{ts escape="sql"}CiviCRM Resources{/ts}'{/localize}
+WHERE name = 'getting-started';
