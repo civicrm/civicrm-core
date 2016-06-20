@@ -210,6 +210,18 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_batch' => array(
+        'dao' => 'CRM_Batch_DAO_EntityBatch',
+        'grouping' => 'contri-fields',
+        'filters' => array(
+          'batch_id' => array(
+            'title' => ts('Batch Title'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Batch_BAO_Batch::getBatchNames(),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+        ),
+      ),
       'civicrm_contribution_soft' => array(
         'dao' => 'CRM_Contribute_DAO_ContributionSoft',
         'fields' => array(
@@ -462,6 +474,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                          ON {$this->_aliases['civicrm_contact']}.id =
                             {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
+    }
+    if (!empty($this->_params['batch_id_value'])) {
+      $this->_from .= "
+                 LEFT JOIN civicrm_entity_financial_trxn eft
+                        ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
+                           eft.entity_table = 'civicrm_contribution'
+                 LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
+                        ON {$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id AND
+                           {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn'\n";
     }
     $this->getPermissionedFTQuery($this);
   }
