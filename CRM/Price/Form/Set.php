@@ -103,11 +103,12 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       $errors['title'] = ts("Name cannot not start with a digit");
     }
     // CRM-16189
-    if (array_key_exists(CRM_Core_Component::getComponentID('CiviEvent'), $fields['extends'])
-      || array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $fields['extends'])
+    if (!empty($fields['extends'])
+      && (array_key_exists(CRM_Core_Component::getComponentID('CiviEvent'), $fields['extends'])
+        || array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $fields['extends']))
     ) {
       $errorMessage = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id']);
-     if ($errorMessage) {
+      if ($errorMessage) {
         $errors['financial_type_id'] = $errorMessage;
       }
     }

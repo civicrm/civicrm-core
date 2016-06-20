@@ -82,7 +82,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     if ($validatePriceSet) {
       $errorMessage = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
         CRM_Utils_Array::value('financial_type_id', $params),
-        $priceSetID                                                                       
+        $priceSetID
       );
       if ($errorMessage) {
         throw new CRM_Core_Exception($errorMessage);
