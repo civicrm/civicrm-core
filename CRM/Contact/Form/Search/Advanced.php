@@ -393,12 +393,8 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
      * id of the tagset.
      */
     if (isset($defaults['contact_tags'])) {
-      $tag = new CRM_Core_BAO_Tag();
       foreach ($defaults['contact_tags'] as $key => $tagId) {
-        $params = array('id' => $tagId);
-        $result = array();
-        $tag->retrieve($params, $result);
-        $parentId = $result['parent_id'];
+        $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $tagId, 'parent_id');
         $element = "contact_taglist[$parentId]";
         if ($this->elementExists($element)) {
           // This tag is a tagset
