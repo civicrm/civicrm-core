@@ -333,4 +333,46 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test Validate if Deferred Account is set for Financial Type.
+   */
+  public function testValidateTogglingDeferredRevenue() {
+    $orgContactID = $this->organizationCreate();
+
+    //create relationship
+    $params = array(
+      'name_a_b' => 'Relation 1',
+      'name_b_a' => 'Relation 2',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Organization',
+      'is_reserved' => 1,
+      'is_active' => 1,
+    );
+    $relationshipTypeId = $this->relationshipTypeCreate($params);
+    $ids = array();
+    $params = array(
+      'name' => 'test type',
+      'domain_id' => 1,
+      'description' => NULL,
+      'minimum_fee' => 10,
+      'duration_unit' => 'year',
+      'member_of_contact_id' => $orgContactID,
+      'relationship_type_id' => $relationshipTypeId,
+      'period_type' => 'fixed',
+      'duration_interval' => 1,
+      'financial_type_id' => 1,
+      'visibility' => 'Public',
+    );
+
+    CRM_Member_BAO_MembershipType::add($params, $ids);
+
+    $membership = $this->assertDBNotNull('CRM_Member_BAO_MembershipType', $orgContactID,
+      'name', 'member_of_contact_id',
+      'Database check on updated membership record.'
+    );
+    $error = CRM_Financial_BAO_FinancialAccount::validateTogglingDeferredRevenue();
+    $this->assertTrue(!empty($error), "Error message did not appear");
+    $this->membershipTypeDelete(array('id' => $membershipType->id));
+  }
+
 }
