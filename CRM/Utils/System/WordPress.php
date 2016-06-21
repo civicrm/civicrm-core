@@ -112,8 +112,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (CRM_Utils_System::isSSL()) {
       $cmsUrl = str_replace('http://', 'https://', $cmsUrl);
     }
-
-    $civiRelPath = CRM_Utils_File::relativize($civicrm_root, $cmsPath);
+    $civiRelPath = CRM_Utils_File::relativize(realpath($civicrm_root), realpath($cmsPath));
     $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
     return array(
       'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
@@ -212,8 +211,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     //this means wp function we are trying to use is not available,
     //so load bootStrap
+    // FIXME: Why bootstrap in url()? Generally want to define 1-2 strategic places to put bootstrap
     if (!function_exists('get_option')) {
-      $this->loadBootStrap(); // FIXME: Why bootstrap in url()? Generally want to define 1-2 strategic places to put bootstrap
+      $this->loadBootStrap();
     }
     if ($config->userFrameworkFrontend) {
       if (get_option('permalink_structure') != '') {
@@ -435,7 +435,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
       $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
       if ($name) {
-        $uid = wp_authenticate($name, $pass); // this returns a WP_User object if successful
+        $uid = wp_authenticate($name, $pass);
         if (!$uid) {
           if ($throwError) {
             echo '<br />Sorry, unrecognized username or password.';
