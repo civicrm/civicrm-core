@@ -85,22 +85,32 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGroupListWithFilter() {
     global $_GET;
-    $_GET = $this->_params;
+    $_GET = array(
+      'page' => 1,
+      'rp' => 50,
+      'offset' => 0,
+      'rowCount' => 50,
+      'sort' => NULL,
+      'parentsOnly' => FALSE,
+      'is_unit_test' => TRUE,
+    );
+    $this->groupCreate(array('title' => 'Active Group', 'is_active' => 1, 'name' => 'active-group'));
+    $this->groupCreate(array('title' => 'Disabled Group', 'is_active' => 0, 'name' => 'disabled-group'));
     $obj = new CRM_Group_Page_AJAX();
 
     //filter with title
-    $_GET['title'] = "not-me-active";
+    $_GET['title'] = "Active Group";
     $groups = $obj->getGroupList();
     $this->assertEquals(1, $groups['recordsTotal']);
-    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
+    $this->assertEquals('Active Group', $groups['data'][0]['title']);
     unset($_GET['title']);
 
     // check on status
     $_GET['status'] = 2;
     $groups = $obj->getGroupList();
-    $this->assertEquals(2, $groups['recordsTotal']);
-    $this->assertEquals('not-me-disabled', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][1]['title']);
+    foreach ($groups['data'] as $key => $val) {
+      $this->assertEquals('crm-entity disabled', $val['DT_RowClass']);
+    }
   }
 
   /**
