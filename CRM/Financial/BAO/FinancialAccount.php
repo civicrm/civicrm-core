@@ -254,7 +254,7 @@ WHERE cft.id = %1
    * @return array
    *
    */
-  public static function getfinancialAccountRelations($flip = FALSE, $id = NULL) {
+  public static function getfinancialAccountRelations($flip = FALSE) {
     $params = array('labelColumn' => 'name');
     $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
     $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
@@ -278,9 +278,6 @@ WHERE cft.id = %1
       foreach ($Links as $accountRelation => $accountType) {
         $financialAccountLinks[array_search($accountType, $financialAccountType)][] = array_search($accountRelation, $accountRelationships);
       }
-    }
-    if ($id) {
-      return CRM_Utils_Array::value($id, $financialAccountLinks);
     }
     return $financialAccountLinks;
   }
