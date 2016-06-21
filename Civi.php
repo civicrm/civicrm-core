@@ -105,6 +105,13 @@ class Civi {
   }
 
   /**
+   * @return \Symfony\Component\HttpFoundation\Request
+   */
+  public static function request() {
+    return Civi::service('request');
+  }
+
+  /**
    * Obtain the domain settings.
    *
    * @param int|null $domainID
