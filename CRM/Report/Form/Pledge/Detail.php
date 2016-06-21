@@ -293,8 +293,16 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
     //regenerate the from field without extra left join on pledge payments
     $this->_totalPaid = FALSE;
+
+    // CRM-18982 If total_paid column was shows, the above causes fatal error.
+    if (isset($this->_columnHeaders['civicrm_pledge_payment_total_paid'])) {
+      unset($this->_columnHeaders['civicrm_pledge_payment_total_paid']);
+    }
+
+    $this->select();
     $this->from();
     $this->customDataFrom();
+
     if (!$this->_having) {
       $totalAmount = $average = array();
       $count = 0;
