@@ -56,7 +56,7 @@
   </div>
 
   <div class="action-link">
-    <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">
+    <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{$browseUrl}' );return false;">
       <i class="crm-i fa-times-circle"></i>
       {ts}Mark this pair as not a duplicate.{/ts}
     </a>
