@@ -217,7 +217,7 @@ WHERE  cacheKey     = %3 AND
    *
    * @return array
    */
-  public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = array(), $orderByClause = '', $includeConflicts = TRUE) {
+  public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = array(), $orderByClause = '', $includeConflicts = TRUE, $params = array()) {
     $selectString = 'pn.*';
 
     if (!empty($select)) {
@@ -230,7 +230,7 @@ WHERE  cacheKey     = %3 AND
 
     $params = array(
       1 => array($cacheKey, 'String'),
-    );
+    ) + $params;
 
     if (!empty($whereClause)) {
       $whereClause = " AND " . $whereClause;
@@ -312,13 +312,15 @@ FROM   civicrm_prevnext_cache pn
 
   /**
    * @param $cacheKey
-   * @param NULL $join
-   * @param NULL $where
+   * @param string $join
+   * @param string $where
    * @param string $op
+   * @param array $params
+   *   Extra query params to parse into the query.
    *
    * @return int
    */
-  public static function getCount($cacheKey, $join = NULL, $where = NULL, $op = "=") {
+  public static function getCount($cacheKey, $join = NULL, $where = NULL, $op = "=", $params = array()) {
     $query = "
 SELECT COUNT(*) FROM civicrm_prevnext_cache pn
        {$join}
@@ -331,7 +333,7 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
     $params = array(
       1 => array($cacheKey, 'String'),
       2 => array("{$cacheKey}_conflicts", 'String'),
-    );
+    ) + $params;
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
   }
 
