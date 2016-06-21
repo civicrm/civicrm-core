@@ -184,35 +184,4 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     }
   }
 
-  /**
-   *  Test pledge recur contribution.
-   */
-  public function testRecurPledge() {
-    $contributionPageId = ContributionPage::create();
-
-    $pledgeFrequencyUnit = array(
-      'week' => 1,
-      'month' => 1,
-      'year' => 1,
-    );
-
-    $params = array(
-      'entity_id' => $contributionPageId,
-      'entity_table' => 'civicrm_contribution_page',
-      'pledge_frequency_unit' => $pledgeFrequencyUnit,
-      'max_reminders' => 2,
-      'initial_reminder_day' => 2,
-      'additional_reminder_day' => 1,
-      'pledge_start_date' => date('Ymd'),
-    );
-
-    // check for add pledge block
-    $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::add($params);
-    foreach ($params as $param => $value) {
-      $this->assertEquals($value, $pledgeBlock->$param);
-    }
-
-    // FIXME: To add further test for payment and recur check
-  }
-
 }
