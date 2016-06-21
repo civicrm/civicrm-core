@@ -1011,7 +1011,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // CRM-16189
     $errorMessage = CRM_Financial_BAO_FinancialAccount::checkForValidFinancialType($fields, $self->_id, $self);
     if ($errorMessage) {
-      $errors['financial_type_id'] = $errorMessage;
+      $errors['financial_type_id'] = ' ';
+      $errors['_qf_default'] = $errorMessage;
     }
     $errors = array_merge($errors, $softErrors);
     return $errors;
