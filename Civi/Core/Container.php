@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\HttpFoundation\Request;
 
 // TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
@@ -129,6 +130,12 @@ class Container {
       array()
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
+
+    $container->setDefinition('request', new Definition(
+      'Symfony\Component\HttpFoundation\Request',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createRequest');
 
     $container->setDefinition('dispatcher', new Definition(
       'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher',
@@ -321,6 +328,13 @@ class Container {
     ));
 
     return $kernel;
+  }
+
+  /**
+   * @return \Symfony\Component\HttpFoundation\Request
+   */
+  public function createRequest() {
+    return Request::createFromGlobals();
   }
 
   /**
