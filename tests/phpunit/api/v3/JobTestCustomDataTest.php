@@ -182,6 +182,75 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check we get a no conflict on the custom field & integer merges.
+   */
+  public function testBatchMergeIntCustomFieldNoConflict() {
+    $customGroup = $this->customGroupCreate();
+    $this->customGroupID = $customGroup['id'];
+    $customField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->customGroupID,
+      'data_type' => 'Integer',
+      'html_type' => 'Text',
+      'default_value' => '',
+    ));
+    $this->customFieldID = $customField['id'];
+    $customFieldLabel = 'custom_' . $this->customFieldID;
+    $contactID = $this->individualCreate(array());
+    $this->individualCreate(array($customFieldLabel => 20));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals(1, count($result['values']['merged']));
+    $this->assertEquals(0, count($result['values']['skipped']));
+    $contact = $this->callAPISuccess('Contact', 'getsingle', array('id' => $contactID, 'return' => $customFieldLabel));
+    $this->assertEquals(20, $contact[$customFieldLabel]);
+  }
+
+  /**
+   * Check we get a conflict on the integer custom field.
+   */
+  public function testBatchMergeIntCustomFieldConflict() {
+    $customGroup = $this->customGroupCreate();
+    $this->customGroupID = $customGroup['id'];
+    $customField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->customGroupID,
+      'data_type' => 'Integer',
+      'html_type' => 'Text',
+      'default_value' => '',
+    ));
+    $this->customFieldID = $customField['id'];
+    $customFieldLabel = 'custom_' . $this->customFieldID;
+    $contactID = $this->individualCreate(array($customFieldLabel => 20));
+    $this->individualCreate(array($customFieldLabel => 1));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals(0, count($result['values']['merged']));
+    $this->assertEquals(1, count($result['values']['skipped']));
+    $contact = $this->callAPISuccess('Contact', 'getsingle', array('id' => $contactID, 'return' => $customFieldLabel));
+    $this->assertEquals(20, $contact[$customFieldLabel]);
+  }
+
+  /**
+   * Check we get a conflict on the integer custom field when the conflicted field is 0.
+   */
+  public function testBatchMergeIntCustomFieldConflictZero() {
+    $customGroup = $this->customGroupCreate();
+    $this->customGroupID = $customGroup['id'];
+    $customField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->customGroupID,
+      'data_type' => 'Integer',
+      'html_type' => 'Text',
+      'default_value' => '',
+    ));
+    $this->customFieldID = $customField['id'];
+    $customFieldLabel = 'custom_' . $this->customFieldID;
+    $contactID = $this->individualCreate(array($customFieldLabel => 0));
+    $this->individualCreate(array($customFieldLabel => 20));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals(0, count($result['values']['merged']));
+    $this->assertEquals(1, count($result['values']['skipped']));
+    $contact = $this->callAPISuccess('Contact', 'getsingle', array('id' => $contactID, 'return' => $customFieldLabel));
+    $this->assertEquals(0, $contact[$customFieldLabel]);
+  }
+
+  /**
    * Using the api with check perms set to off, make sure custom data is merged.git
    *
    * Test CRM-18674 date custom field handling.
