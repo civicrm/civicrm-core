@@ -116,6 +116,13 @@
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
+<table class="form-layout-compressed">
+  <tr>
+    <td class="label-left">{$form.document_type.label}</td>
+    <td>{$form.document_type.html}</td>
+  </tr>
+</table>
+
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
 
 {literal}

@@ -222,7 +222,7 @@ class CRM_Core_Page_AJAX {
     $sortMapper = array();
     if (isset($_GET['columns'])) {
       foreach ($_GET['columns'] as $key => $value) {
-        $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnName');
+        $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnNameOrAlias');
       };
     }
 

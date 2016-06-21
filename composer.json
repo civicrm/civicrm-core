@@ -20,7 +20,8 @@
     "totten/ca-config": "~13.02",
     "civicrm/civicrm-cxn-rpc": "~0.15.12.04",
     "zetacomponents/base": "1.7.*",
-    "zetacomponents/mail": "dev-1.7-civi"
+    "zetacomponents/mail": "dev-1.7-civi",
+    "phpoffice/phpword": "^0.12.1"
   },
   "repositories": [
     {

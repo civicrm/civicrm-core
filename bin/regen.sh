@@ -39,6 +39,7 @@ echo "SELECT table_name FROM information_schema.TABLES  WHERE TABLE_SCHEMA='${DB
 $MYSQLCMD < civicrm.mysql
 $MYSQLCMD < civicrm_data.mysql
 $MYSQLCMD < civicrm_sample.mysql
+echo "DROP TABLE IF EXISTS zipcodes" | $MYSQLCMD
 $MYSQLCMD < zipcodes.mysql
 php GenerateData.php
 

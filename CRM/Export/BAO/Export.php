@@ -1346,7 +1346,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         // to accommodate different systems - CRM-13739
         static $notRealIDFields = NULL;
         if ($notRealIDFields == NULL) {
-          $notRealIDFields = array('trxn_id', 'componentpaymentfield_transaction_id');
+          $notRealIDFields = array('trxn_id', 'componentpaymentfield_transaction_id', 'phone_type_id');
         }
 
         if (in_array($fieldName, $notRealIDFields)) {

@@ -2663,7 +2663,7 @@ CREATE TABLE `civicrm_acl_cache` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique table ID',
      `contact_id` int unsigned    COMMENT 'Foreign Key to Contact',
      `acl_id` int unsigned NOT NULL   COMMENT 'Foreign Key to ACL',
-     `modified_date` timestamp    COMMENT 'When was this cache entry last modified' 
+     `modified_date` timestamp NULL   COMMENT 'When was this cache entry last modified' 
 ,
     PRIMARY KEY ( `id` )
  
