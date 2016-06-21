@@ -46,7 +46,7 @@ class Themes {
    * Fallback is a pseudotheme which can be included in "search_order".
    * It locates files in the core/extension (non-theme) codebase.
    */
-  const FALLBACK_THEME = '*fallback*';
+  const FALLBACK_THEME = '_fallback_';
 
   const PASSTHRU = 'PASSTHRU';
 
@@ -112,7 +112,7 @@ class Themes {
   }
 
   /**
-   * Get a list of available themes.
+   * Get a list of all known themes, including hidden base themes.
    *
    * @return array
    *   List of themes, keyed by name. Same format as CRM_Utils_Hook::themes(),
@@ -130,6 +130,27 @@ class Themes {
       }
     }
     return $this->themes;
+  }
+
+  /**
+   * Get a list of available themes, excluding hidden base themes.
+   *
+   * This is the same as getAll(), but abstract themes like "_fallback_"
+   * or "_newyork_base_" are omitted.
+   *
+   * @return array
+   *   List of themes, keyed by name. Same format as CRM_Utils_Hook::themes(),
+   *   but any default values are filled in.
+   * @see CRM_Utils_Hook::themes
+   */
+  public function getAvailable() {
+    $result = array();
+    foreach ($this->getAll() as $key => $theme) {
+      if ($key{0} !== '_') {
+        $result[$key] = $theme;
+      }
+    }
+    return $result;
   }
 
   /**
@@ -160,15 +181,12 @@ class Themes {
     $cssId = "$cssExt:$cssFile";
 
     foreach ($all[$active]['search_order'] as $themeKey) {
-      if ($themeKey === self::FALLBACK_THEME) {
-        $result = Civi\Core\Themes\Resolvers::fallback($this, $themeKey, $cssExt, $cssFile);
-      }
-      elseif (isset($all[$themeKey]['excludes']) && in_array($cssId, $all[$themeKey]['excludes'])) {
+      if (isset($all[$themeKey]['excludes']) && in_array($cssId, $all[$themeKey]['excludes'])) {
         $result = array();
       }
       else {
         $result = Civi\Core\Resolver::singleton()
-          ->call($all[$active]['url_callback'], array($this, $themeKey, $cssExt, $cssFile));
+          ->call($all[$themeKey]['url_callback'], array($this, $themeKey, $cssExt, $cssFile));
       }
 
       if ($result !== self::PASSTHRU) {
@@ -208,6 +226,12 @@ class Themes {
           "civicrm:css/civicrm.css",
           "civicrm:css/bootstrap.css",
         ),
+      ),
+      self::FALLBACK_THEME => array(
+        'ext' => 'civicrm',
+        'title' => 'Fallback (Abstract Base Theme)',
+        'url_callback' => '\Civi\Core\Themes\Resolvers::fallback',
+        'search_order' => array(self::FALLBACK_THEME),
       ),
     );
 

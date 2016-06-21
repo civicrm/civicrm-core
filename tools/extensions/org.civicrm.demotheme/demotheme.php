@@ -41,7 +41,7 @@ function demotheme_civicrm_themes(&$themes) {
   //    'title' => 'Demo Theme (blue version)',
   //    'help' => 'This is a demonstration theme (blue version)',
   //    'prefix' => 'blue/',
-  //    'search_order' => array('demotheme-blue', 'demotheme-base', '*fallback*'),
+  //    'search_order' => array('demotheme-blue', 'demotheme-base', '_fallback_'),
   //  );
 
   // -------------------------------------------------------------------------

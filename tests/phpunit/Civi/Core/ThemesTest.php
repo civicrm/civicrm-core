@@ -43,7 +43,7 @@ class ThemesTest extends \CiviUnitTestCase {
         'title' => 'Aqua Marine',
         'url_callback' => array(__CLASS__, 'fakeCallback'),
         'ext' => 'civicrm',
-        'search_order' => array('aquamarine', 'bluemarine', '*fallback*'),
+        'search_order' => array('aquamarine', 'bluemarine', '_fallback_'),
       ),
     );
 
@@ -184,6 +184,26 @@ class ThemesTest extends \CiviUnitTestCase {
     $map['bluemarine']['test.extension.uitest']['files/foo.css'] = array('http://example.com/blue/foobar/foo.css');
     $map['aquamarine']['civicrm']['css/civicrm.css'] = array('http://example.com/aqua/civicrm.css');
     return isset($map[$themeKey][$cssExt][$cssFile]) ? $map[$themeKey][$cssExt][$cssFile] : Themes::PASSTHRU;
+  }
+
+  public function testGetAll() {
+    $all = \Civi::service('themes')->getAll();
+    $this->assertTrue(isset($all['greenwich']));
+    $this->assertTrue(isset($all['_fallback_']));
+  }
+
+  public function testGetAvailable() {
+    $all = \Civi::service('themes')->getAvailable();
+    $this->assertTrue(isset($all['greenwich']));
+    $this->assertFalse(isset($all['_fallback_']));
+  }
+
+  public function testApiOptions() {
+    $result = $this->callAPISuccess('Setting', 'getoptions', array(
+      'field' => 'theme_backend',
+    ));
+    $this->assertTrue(isset($result['values']['greenwich']));
+    $this->assertFalse(isset($result['values']['_fallback_']));
   }
 
 }
