@@ -76,19 +76,7 @@
 {/if}
 
 {if $isShowLocation}
-{if $location.address.1.name}
-
-{$location.address.1.name}
-{/if}
-{if $location.address.1.street_address}{$location.address.1.street_address}
-{/if}
-{if $location.address.1.supplemental_address_1}{$location.address.1.supplemental_address_1}
-{/if}
-{if $location.address.1.supplemental_address_2}{$location.address.1.supplemental_address_2}
-{/if}
-{if $location.address.1.city}{$location.address.1.city}, {$location.address.1.state_province} {$location.address.1.postal_code}{if $location.address.1.postal_code_suffix} - {$location.address.1.postal_code_suffix}{/if}
-{/if}
-
+{$location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
 {if $location.phone.1.phone || $location.email.1.email}
