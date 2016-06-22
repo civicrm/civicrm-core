@@ -227,27 +227,26 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_reserved' => 0,
     );
 
-    $ids = array();
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $financialAccount = $this->callAPISuccess('FinancialAccount', 'create', $params);
     $params['name'] = 'test_financialType1';
-    $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
+    $financialType = $this->callAPISuccess('FinancialType', 'create', $params);
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Deferred Revenue Account is' "));
     $financialParams = array(
       'entity_table' => 'civicrm_financial_type',
-      'entity_id' => $financialType->id,
+      'entity_id' => $financialType['id'],
       'account_relationship' => $relationTypeId,
-      'financial_account_id' => $financialAccount->id,
+      'financial_account_id' => $financialAccount['id'],
     );
 
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
+    $this->callAPISuccess('EntityFinancialAccount', 'create', $financialParams);
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $financialAccount->id,
+      $financialAccount['id'],
       'entity_id',
       'financial_account_id',
       'Database check on added financial type record.'
     );
-    $this->assertEquals($result, $financialType->id, 'Verify Account Type');
+    $this->assertEquals($result, $financialType['id'], 'Verify Account Type');
     $financialTypes = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
     $this->assertTrue(array_key_exists($result, $financialTypes), "The financial type created does not have a deferred account relationship");
   }
