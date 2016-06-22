@@ -469,7 +469,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('start_date');
 
     // Clicking save.
-    $this->click("_qf_Membership_upload");
+    $this->clickLink("_qf_Membership_upload");
 
     // page was loaded
     $this->waitForTextPresent("Membership StandaloneAddTest Webtest");
