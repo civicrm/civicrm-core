@@ -2115,6 +2115,11 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       $contributionParams['contact_id'] = $templateContribution['contact_id'];
       $contributionParams['source'] = empty($templateContribution['source']) ? ts('Recurring contribution') : $templateContribution['source'];
 
+      //CRM-18805 -- Contribution page not recorded on recurring transactions, Recurring contribution payments 
+      //do not create CC or BCC emails or profile notifications 
+      if (isset($contribution->contribution_page_id)) //being safe here, not sure if we can ever arrive with this unset
+        $contributionParams['contribution_page_id'] = $contribution->contribution_page_id;
+      
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
       $contribution->id = $createContribution['id'];
       CRM_Contribute_BAO_ContributionRecur::copyCustomValues($contributionParams['contribution_recur_id'], $contribution->id);
