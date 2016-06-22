@@ -395,6 +395,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'bcc_receipt',
     'receipt_text',
     'payment_processor_id',
+    'contribution_page_id',  //CRM-18805: Allow fetching values for cc_receipt and bcc_receipt
   );
   foreach ($passThroughParams as $key) {
     if (isset($params[$key])) {
