@@ -140,6 +140,19 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Add actions menu to search results form.
+   *
+   * @param array $tasks
+   */
+  public function addTaskMenu($tasks) {
+    $taskMetaData = array();
+    foreach ($tasks as $key => $task) {
+      $taskMetaData[$key] = array('title' => $task);
+    }
+    parent::addTaskMenu($taskMetaData);
+  }
+
+  /**
    * Add the sort-name field to the form.
    *
    * There is a setting to determine whether email is included in the search & we look this up to determine
