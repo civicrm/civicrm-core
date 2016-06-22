@@ -5064,7 +5064,7 @@ LIMIT 1;";
 
   /**
    * CRM-18573
-   * Payment Instrument or Receive date cannot be null when 
+   * Payment Instrument or Receive date cannot be null when
    * contribution status is Completed/Partially paid/ Pending refund,
    * However it can be null for other status
    *
