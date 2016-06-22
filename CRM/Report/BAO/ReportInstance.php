@@ -346,4 +346,26 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
   }
 
+  /**
+   * Get the metadata of actions available for this entity.
+   */
+  public static function getActionMetadata() {
+    $actions = array(
+      'report_instance.html' => array('title' => ts('View results')),
+      'report_instance.save' => array('title' => ts('Update')),
+      'report_instance.copy' => array('title' => ts('Save a Copy')),
+      'report_instance.print' => array('title' => ts('Print Report'), 'icon' => 'fa-print'),
+      'report_instance.pdf' => array('title' => ts('Print to PDF')),
+      'report_instance.csv' => array('title' => ts('Export as CSV')),
+    );
+    if (CRM_Core_Permission::check('administer Reports')) {
+      $actions['report_instance.delete'] = array(
+        'title' => ts('Delete report'),
+        'icon' => 'fa-trash',
+        'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
+      );
+    }
+    return $actions;
+  }
+
 }

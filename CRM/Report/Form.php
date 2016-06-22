@@ -1515,40 +1515,15 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @return array
    */
   protected function getActions($instanceId) {
-    $actions = array(
-      'html' => $this->getResultsLabel(),
-      'save' => ts('Update'),
-      'copy' => ts('Save a Copy'),
-      'print' => ts('Print Report'),
-      'pdf' => ts('Print to PDF'),
-    );
+    $actions = CRM_Report_BAO_ReportInstance::getActionMetadata();
     if (empty($instanceId)) {
-      $actions['save'] = ts('Create Report');
+      $actions['report_instance.save']['title'] = ts('Create Report');
     }
 
-    if ($this->_outputMode || $this->_id) {
-      $actions['html'] = ts('Refresh Results');
-    }
+    $actions['report_instance.html']['title'] = $this->getResultsLabel();
 
-    if ($this->_csvSupported) {
-      $actions['csv'] = ts('Export as CSV');
-    }
-
-    if (!empty($this->_charts)) {
-      $this->assign('charts', $this->_charts);
-      if ($this->_format != '') {
-        $actions['tabular'] = ts('View as tabular data');
-      }
-      if ($this->_format != 'pieChart') {
-        $actions['pieChart'] = ts('View as pie chart');
-      }
-      if ($this->_format != 'barChart') {
-        $actions['barChart'] = ts('View as bar graph');
-      }
-    }
-
-    if (CRM_Core_Permission::check('administer Reports')) {
-      $actions['delete'] = ts('Delete report');
+    if (!$this->_csvSupported) {
+      unset($actions['report_instance.csv']);
     }
 
     return $actions;
@@ -4599,13 +4574,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   protected function setOutputMode() {
     $buttonName = $this->controller->getButtonName();
-    $this->_outputMode = CRM_Utils_Request::retrieve(
+    $this->_outputMode = str_replace('report_instance.', '' , CRM_Utils_Request::retrieve(
       'output',
       'String',
       CRM_Core_DAO::$_nullObject,
       FALSE,
       CRM_Utils_Array::value('task', $this->_params)
-    );
+    ));
 
     if ($buttonName) {
       if ($buttonName == $this->_instanceButtonName) {

@@ -2177,8 +2177,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addTaskMenu($tasks) {
     if (is_array($tasks) && !empty($tasks)) {
-      $tasks = array('' => ts('Actions')) + $tasks;
-      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions'));
+      $this->assign('taskMetaData', $tasks);
+      $select = $this->add('select', 'task', NULL, array('' => ts('Actions')), FALSE, array(
+        'class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions')
+      );
+      foreach ($tasks as $key => $task) {
+        $attributes = array();
+        if (isset($task['confirm_message'])) {
+          $attributes['data-confirm_message'] = $task['confirm_message'];
+        }
+        $select->addOption($task['title'], $key, $attributes);
+      }
       if (empty($this->_actionButtonName)) {
         $this->_actionButtonName = $this->getButtonName('next', 'action');
       }

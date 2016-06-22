@@ -134,12 +134,28 @@
       // When selecting a task
       .on('change', 'select#task', function() {
         var $form = $(this).closest('form'),
-          $go = $('input.crm-search-go-button', $form);
-        if (1) {
+        $go = $('input.crm-search-go-button', $form);
+        var $selectedOption = $(this).find(':selected');
+        if ($selectedOption.data('confirm_message')) {
+          var confirmed = false;
+          CRM.confirm({
+            title: $selectedOption.data('confirm_title') ? $selectedOption.data('confirm_title') : ts('Confirm action'),
+            message: '<table class="form-layout"><tr>' + $(title).html() + '</tr><tr>' + $selectedOption.data('confirm_message') + '</tr></table>',
+          })
+          .on('crmConfirm:yes', function() {
+            confirmed = true;
+            $go.click();
+          })
+          .on('crmConfirm:no', function() {
+            $('#task').val('').change();
+            return;
+          });
+        }
+        else if (!$(this).find(':selected').data('supports_modal')) {
           $go.click();
         }
         // The following code can load the task in a popup, however not all tasks function correctly with this
-        // So it's disabled pending a per-task opt-in mechanism
+        // So it's a per-task opt-in mechanism.
         else {
           var data = $form.serialize() + '&' + $go.attr('name') + '=' + $go.attr('value');
           var url = $form.attr('action');
