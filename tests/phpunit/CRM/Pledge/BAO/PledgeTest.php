@@ -165,6 +165,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
     );
     $recurRecord = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params, CRM_Core_DAO::$_nullObject);
+    $this->assertAPISuccess($recurRecord);
     $recur = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($this->_contactId);
     foreach ($recurRecord['values'] as $key => $values) {
       foreach ($values as $k => $value) {
