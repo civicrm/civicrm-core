@@ -63,5 +63,4 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     $this->assertTrue(($values === $options2), "The arrays retrieved should be the same and in the same order");
   }
 
-  
 }
