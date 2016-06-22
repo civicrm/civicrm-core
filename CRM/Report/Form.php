@@ -3231,9 +3231,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   public function compileContent() {
     $templateFile = $this->getHookedTemplateFileName();
-    return $this->_formValues['report_header'] .
+    return CRM_Utils_Array::value('report_header', $this->_formValues) .
     CRM_Core_Form::$_template->fetch($templateFile) .
-    $this->_formValues['report_footer'];
+    CRM_Utils_Array::value('report_footer', $this->_formValues);
   }
 
 
@@ -4573,7 +4573,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *   is that we might print a bar chart as a pdf.
    */
   protected function setOutputMode() {
-    $this->_outputMode = str_replace('report_instance.', '' , CRM_Utils_Request::retrieve(
+    $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
       'output',
       'String',
       CRM_Core_DAO::$_nullObject,
