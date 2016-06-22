@@ -14,3 +14,8 @@ UPDATE civicrm_state_province SET name="Wake Island" WHERE name="Wake Ialand";
 UPDATE civicrm_dashboard SET
   {localize field="label"}label = '{ts escape="sql"}CiviCRM Resources{/ts}'{/localize}
 WHERE name = 'getting-started';
+
+-- CRM-16189
+ALTER TABLE civicrm_financial_account
+ ADD `opening_balance` decimal(20,2) DEFAULT '0.00' COMMENT 'Contains the opening balance for this financial account',
+ ADD `current_period_opening_balance` decimal(20,2) DEFAULT '0.00' COMMENT 'Contains the opening balance for the current period for this financial account';
