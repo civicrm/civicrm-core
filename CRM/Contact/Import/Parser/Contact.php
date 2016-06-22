@@ -1899,7 +1899,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             unset($params[$key]);
           }
           else {
-            $params[$key] = CRM_Utils_String::strtoboolstr($val);
+            $params[$key] = empty($val) ? "" : CRM_Utils_String::strtoboolstr($val);
           }
         }
       }
