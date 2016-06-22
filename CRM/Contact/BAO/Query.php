@@ -1731,7 +1731,7 @@ class CRM_Contact_BAO_Query {
    * @param array $values
    * @param string $apiEntity
    */
-  public function whereClauseSingle(&$values, $apiEntity) {
+  public function whereClauseSingle(&$values, $apiEntity = NULL) {
     // do not process custom fields or prefixed contact ids or component params
     if (CRM_Core_BAO_CustomField::getKeyID($values[0]) ||
       (substr($values[0], 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) ||
@@ -1977,7 +1977,7 @@ class CRM_Contact_BAO_Query {
    *
    * @return string
    */
-  public function whereClause($apiEntity) {
+  public function whereClause($apiEntity = NULL) {
     $this->_where[0] = array();
     $this->_qill[0] = array();
 
@@ -3382,6 +3382,7 @@ WHERE  $smartGroupClause
    */
   protected function email(&$values, $apiEntity) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
+    $this->_tables['civicrm_email'] = $this->_whereTables['civicrm_email'] = 1;
 
     // CRM-18147: for Contact's GET API, email fieldname got appended with its entity as in {$apiEntiy}_{$name}
     // so following code is use build whereClause for contact's primart email id
@@ -3416,8 +3417,6 @@ WHERE  $smartGroupClause
       $this->_qill[$grouping][] = ts('Email') . " $op ";
       $this->_where[$grouping][] = self::buildClause('civicrm_email.email', $op, NULL, 'String');
     }
-
-    $this->_tables['civicrm_email'] = $this->_whereTables['civicrm_email'] = 1;
   }
 
   /**
