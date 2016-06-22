@@ -247,7 +247,7 @@ WHERE cft.id = %1
   }
 
   /**
-   * Get Financial Account type relations
+   * Get Financial Account type relations.
    *
    * @param $flip bool
    *
@@ -283,7 +283,7 @@ WHERE cft.id = %1
   }
 
   /**
-   * Get Deferred Financial type
+   * Get Deferred Financial type.
    *
    * @return array
    *
