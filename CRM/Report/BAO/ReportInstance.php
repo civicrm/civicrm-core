@@ -239,9 +239,17 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *   $results no of deleted Instance on success, false otherwise
    */
   public static function del($id = NULL) {
+    $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $id, 'navigation_id', 'id');
     $dao = new CRM_Report_DAO_ReportInstance();
     $dao->id = $id;
-    return $dao->delete();
+    $result = $dao->delete();
+
+    // Delete navigation if exists.
+    if ($navId) {
+      CRM_Core_BAO_Navigation::processDelete($navId);
+      CRM_Core_BAO_Navigation::resetNavigation();
+    }
+    return $result;
   }
 
   /**
@@ -314,6 +322,28 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Delete a report instance wrapped in handling for the form layer.
+   *
+   * @param int $instanceId
+   * @param string $bounceTo
+   *   Url to redirect the browser to on fail.
+   * @param string $successRedirect
+   */
+  public static function doFormDelete($instanceId, $bounceTo = 'civicrm/report/list?reset=1', $successRedirect = NULL) {
+    if (!CRM_Core_Permission::check('administer Reports')) {
+      $statusMessage = ts('You do not have permission to Delete Report.');
+      CRM_Core_Error::statusBounce($statusMessage, $bounceTo);
+    }
+
+    CRM_Report_BAO_ReportInstance::del($instanceId);
+
+    CRM_Core_Session::setStatus(ts('Selected report has been deleted.'), ts('Deleted'), 'success');
+    if ($successRedirect) {
+      CRM_Utils_System::redirect(CRM_Utils_System::url($successRedirect));
+    }
   }
 
 }
