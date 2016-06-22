@@ -104,9 +104,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     );
 
     foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
+      $this->assertElementContainsText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td", $value);
     }
   }
 

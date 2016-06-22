@@ -387,9 +387,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       if ($label == 'sort_name') {
         continue;
       }
-      $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
+      $this->assertElementContainsText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td", "{$value}");
     }
 
     // now find contact and go back to contact summary
