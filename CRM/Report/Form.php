@@ -1468,13 +1468,6 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->_actionButtonName = $this->getButtonName('submit');
     $this->addTaskMenu($this->getActions($this->_id));
 
-    if ($this->_id) {
-      $this->addElement('submit', $this->_createNewButtonName,
-        ts('Save a Copy') . '...');
-    }
-    $this->addElement('submit', $this->_instanceButtonName,
-      ts('Update Report'));
-
     $this->assign('instanceForm', $this->_instanceForm);
 
     // CRM-16274 Determine if user has 'edit all contacts' or equivalent
