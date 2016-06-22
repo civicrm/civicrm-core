@@ -5028,4 +5028,22 @@ LIMIT 1;";
     return $values;
   }
 
+  /**
+   * Get values of CiviContribute Settings
+   * and check if its enabled or not.
+   *
+   *
+   * @param string $name
+   * @return string
+   *
+   */
+  public static function checkContributeSettings($name = NULL) {
+    $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
+
+    if ($name) {
+      return CRM_Utils_Array::value($name, $contributeSettings);
+    }
+    return $contributeSettings;
+  }
+
 }
