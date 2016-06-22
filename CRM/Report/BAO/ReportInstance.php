@@ -348,21 +348,46 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
   /**
    * Get the metadata of actions available for this entity.
+   *
+   * The thinking here is to describe the various actions on the BAO and then functions
+   * can add a mix of actions from different BAO as appropriate. The crm.SearchForm.js code
+   * transforms the 'confirm_mesage' into a message that needs to be confirmed.
+   * confirm_refresh_fields need to be reviewed & potentially updated at the confirm stage.
+   *
+   * Ideas not yet implemented:
+   *  - supports_modal task can be loaded in a popup, theoretically worked, not attempted.
+   *  - class and or icon - per option icons or classes (I added these in addTaskMenu::addTaskMenu
+   *    but I didn't have the right classes). ie adding  'class' => 'crm-i fa-print' to print / class looked
+   *    wrong, but at the php level it worked https://github.com/civicrm/civicrm-core/pull/8529#issuecomment-227639091
+   *  - general script-add.
    */
   public static function getActionMetadata() {
     $actions = array(
       'report_instance.html' => array('title' => ts('View results')),
       'report_instance.save' => array('title' => ts('Update')),
-      'report_instance.copy' => array('title' => ts('Save a Copy')),
-      'report_instance.print' => array('title' => ts('Print Report'), 'icon' => 'fa-print'),
+      'report_instance.copy' => array(
+        'title' => ts('Save a Copy'),
+        'data' => array(
+          'is_confirm' => TRUE,
+          'confirm_title' => ts('Save a copy...'),
+          'confirm_refresh_fields' => json_encode(array(
+            'title' => array('selector' => '.crm-report-instanceForm-form-block-title', 'prepend' => ts('(Copy) ')),
+            'description' => array('selector' => '.crm-report-instanceForm-form-block-description', 'prepend' => ''),
+            'parent_id' => array('selector' => '.crm-report-instanceForm-form-block-parent_id', 'prepend' => ''),
+          )),
+        ),
+      ),
+      'report_instance.print' => array('title' => ts('Print Report')),
       'report_instance.pdf' => array('title' => ts('Print to PDF')),
       'report_instance.csv' => array('title' => ts('Export as CSV')),
     );
     if (CRM_Core_Permission::check('administer Reports')) {
       $actions['report_instance.delete'] = array(
         'title' => ts('Delete report'),
-        'icon' => 'fa-trash',
-        'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
+        'data' => array(
+          'is_confirm' => TRUE,
+          'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
+        ),
       );
     }
     return $actions;

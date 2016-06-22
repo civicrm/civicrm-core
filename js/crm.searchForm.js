@@ -132,18 +132,37 @@
         }
       })
       // When selecting a task
-      .on('change', 'select#task', function() {
+      .on('change', 'select#task', function(e) {
         var $form = $(this).closest('form'),
         $go = $('input.crm-search-go-button', $form);
         var $selectedOption = $(this).find(':selected');
-        if ($selectedOption.data('confirm_message')) {
+        if (!$selectedOption.val()) {
+          // do not blank refresh the empty option.
+          return;
+        }
+        if ($selectedOption.data('is_confirm')) {
           var confirmed = false;
+          var refresh_fields = $selectedOption.data('confirm_refresh_fields');
+          var $message = '<tr>' + (($selectedOption.data('confirm_message') !== undefined) ? $selectedOption.data('confirm_message') : '') + '</tr>';
+          if (refresh_fields === undefined) {
+            refresh_fields = {};
+          }
+          $.each(refresh_fields, function (refreshIndex, refreshValue) {
+            var $refresh_field = $(refreshValue.selector);
+            var prependText = (refreshValue.prepend !== undefined) ? refreshValue.prepend : '';
+            var existingInput = $refresh_field.find('input').val();
+            $message = $message + '<tr>' + $refresh_field.html().replace(existingInput, prependText + existingInput) + '</tr>';
+          });
+
           CRM.confirm({
             title: $selectedOption.data('confirm_title') ? $selectedOption.data('confirm_title') : ts('Confirm action'),
-            message: '<table class="form-layout"><tr>' + $(title).html() + '</tr><tr>' + $selectedOption.data('confirm_message') + '</tr></table>',
+            message: '<table class="form-layout">' + $message + '</table>'
           })
           .on('crmConfirm:yes', function() {
             confirmed = true;
+            $.each(refresh_fields, function (refreshIndex, refreshValue) {
+              $('#' + refreshIndex).val($('.crm-confirm #' + refreshIndex).val());
+            });
             $go.click();
           })
           .on('crmConfirm:no', function() {
