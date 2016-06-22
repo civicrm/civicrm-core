@@ -4581,6 +4581,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       FALSE,
       CRM_Utils_Array::value('task', $this->_params)
     ));
+    if (isset($this->_params['task'])) {
+      unset($this->_params['task']);
+    }
 
     if ($buttonName) {
       if ($buttonName == $this->_instanceButtonName) {
