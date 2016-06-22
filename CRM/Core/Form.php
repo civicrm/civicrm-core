@@ -2173,12 +2173,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add actions menu to results form.
    *
-   * @param $tasks
+   * @param array $tasks
    */
   public function addTaskMenu($tasks) {
     if (is_array($tasks) && !empty($tasks)) {
       $tasks = array('' => ts('Actions')) + $tasks;
-      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu huge crm-search-result-actions'));
+      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions'));
       if (empty($this->_actionButtonName)) {
         $this->_actionButtonName = $this->getButtonName('next', 'action');
       }
