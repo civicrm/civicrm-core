@@ -529,13 +529,18 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $selOrgMemType[$memberOfContactId][$key] = CRM_Utils_Array::value('name', $values);
         }
       }
+      $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
+      //CRM-18827 - override the default value if total_amount is submitted
+      if (!empty($this->_submitValues['total_amount'])) {
+        $totalAmount = $this->_submitValues['total_amount'];
+      }
       // build membership info array, which is used when membership type is selected to:
       // - set the payment information block
       // - set the max related block
       $allMembershipInfo[$key] = array(
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
-        'total_amount' => CRM_Utils_Money::format($values['minimum_fee'], NULL, '%a'),
-        'total_amount_numeric' => CRM_Utils_Array::value('minimum_fee', $values),
+        'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
+        'total_amount_numeric' => $totalAmount,
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $values),
         'has_related' => isset($values['relationship_type_id']),
         'max_related' => CRM_Utils_Array::value('max_related', $values),
