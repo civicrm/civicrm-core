@@ -397,8 +397,8 @@ LIMIT 1";
   }
 
   /**
-   * check if financial type has Deferred Revenue Account is relationship
-   * with Financial Account
+   * Check if financial type has Deferred Revenue Account is relationship
+   * with Financial Account.
    *
    * @param $financialTypeId Integer
    *
@@ -422,7 +422,7 @@ LIMIT 1";
         $params[1] = array('pf', 'Text');
         $params[3] = array(
          ' INNER JOIN civicrm_price_field pf ON pf.price_set_id = ps.id ',
-         'Text'
+         'Text',
         );
       }
       $extends = CRM_Core_DAO::singleValueQuery($query, $params);
