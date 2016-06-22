@@ -685,7 +685,7 @@ class CRM_Utils_System {
     if (is_array($value)) {
       // @todo Reuse of the $value variable = asking for trouble.
       foreach ($value as $key => $value) {
-        if (!self::isNull($value)) {
+        if (in_array($key, CRM_Core_DAO::acceptedSQLOperators(), TRUE) || !self::isNull($value)) {
           return FALSE;
         }
       }
