@@ -297,7 +297,8 @@ class CRM_Core_PseudoConstant {
           $params['labelColumn'] ? $params['labelColumn'] : 'label',
           $params['onlyActive'],
           $params['fresh'],
-          $params['keyColumn'] ? $params['keyColumn'] : 'value'
+          $params['keyColumn'] ? $params['keyColumn'] : 'value',
+          !empty($params['orderColumn']) ? $params['orderColumn'] : 'weight'
         );
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $options, $params);
         return $options;
