@@ -214,7 +214,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $this->assertTrue(($relations == $financialAccountLinks), "The two arrays are not the same");
   }
 
-  /*
+  /**
    * Test getting deferred financial type.
    */
   public function testGetDeferredFinancialType() {
