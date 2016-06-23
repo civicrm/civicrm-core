@@ -680,38 +680,40 @@ LIMIT {$offset}, {$rowCount}
     $where = array();
     $searchData = CRM_Utils_Array::value('search', $_REQUEST);
     $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
+    $searchData['regex'] = CRM_Utils_Type::escape($searchData['regex'], 'Boolean');
+    $sqlCmp = $searchData['regex'] ? "REGEXP '%s'" : " LIKE '%%%s%'";
 
     if (!empty($src) || !empty($searchData['value'])) {
       $src = $src ? $src : $searchData['value'];
-      $where[] = " cc1.display_name LIKE '%{$src}%'";
+      $where[] = sprintf(" cc1.display_name $sqlCmp", $src);
     }
     if (!empty($dst) || !empty($searchData['value'])) {
       $dst = $dst ? $dst : $searchData['value'];
-      $where[] = " cc2.display_name LIKE '%{$dst}%'";
+      $where[] = sprintf(" cc2.display_name $sqlCmp", $dst);
     }
     if (!empty($src_email) || !empty($searchData['value'])) {
       $src_email = $src_email ? $src_email : $searchData['value'];
-      $where[] = " (ce1.is_primary = 1 AND ce1.email LIKE '%{$src_email}%')";
+      $where[] = sprintf(" (ce1.is_primary = 1 AND ce1.email $sqlCmp)", $src_email);
     }
     if (!empty($dst_email) || !empty($searchData['value'])) {
       $dst_email = $dst_email ? $dst_email : $searchData['value'];
-      $where[] = " (ce2.is_primary = 1 AND ce2.email LIKE '%{$dst_email}%')";
+      $where[] = sprintf(" (ce2.is_primary = 1 AND ce2.email $sqlCmp)", $dst_email);
     }
     if (!empty($src_postcode) || !empty($searchData['value'])) {
       $src_postcode = $src_postcode ? $src_postcode : $searchData['value'];
-      $where[] = " (ca1.is_primary = 1 AND ca1.postal_code LIKE '%{$src_postcode}%')";
+      $where[] = sprintf(" (ca1.is_primary = 1 AND ca1.postal_code $sqlCmp)", $src_postcode);
     }
     if (!empty($dst_postcode) || !empty($searchData['value'])) {
       $dst_postcode = $dst_postcode ? $dst_postcode : $searchData['value'];
-      $where[] = " (ca2.is_primary = 1 AND ca2.postal_code LIKE '%{$dst_postcode}%')";
+      $where[] = sprintf(" (ca2.is_primary = 1 AND ca2.postal_code $sqlCmp)", $dst_postcode);
     }
     if (!empty($src_street) || !empty($searchData['value'])) {
       $src_street = $src_street ? $src_street : $searchData['value'];
-      $where[] = " (ca1.is_primary = 1 AND ca1.street_address LIKE '%{$src_street}%')";
+      $where[] = sprintf(" (ca1.is_primary = 1 AND ca1.street_address $sqlCmp)", $src_street);
     }
     if (!empty($dst_street) || !empty($searchData['value'])) {
       $dst_street = $dst_street ? $dst_street : $searchData['value'];
-      $where[] = " (ca2.is_primary = 1 AND ca2.street_address LIKE '%{$dst_street}%')";
+      $where[] = sprintf(" (ca2.is_primary = 1 AND ca2.street_address $sqlCmp)", $dst_street);
     }
     if (!empty($searchData['value'])) {
       $whereClause   = ' ( ' . implode(' OR ', $where) . ' ) ';
