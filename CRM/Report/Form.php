@@ -625,7 +625,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     // Special permissions check for private instance if it's not the current contact instance
-    if (!$this->_id ||
+    if ($this->_id &&
       (CRM_Report_BAO_ReportInstance::reportIsPrivate($this->_id) &&
       !CRM_Report_BAO_ReportInstance::contactIsOwner($this->_id))) {
       if (!CRM_Core_Permission::check('access all private reports')) {
