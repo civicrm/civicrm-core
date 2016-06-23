@@ -241,9 +241,9 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    */
   public function testDeleteWithWrongID() {
     $params = array(
-      'id' => 0,
+      'id' => 99999,
     );
-    $this->callAPIFailure('note', 'delete', $params, 'Mandatory key(s) missing from params array: id');
+    $this->callAPIFailure('note', 'delete', $params, 'Error while deleting Note');
   }
 
   /**

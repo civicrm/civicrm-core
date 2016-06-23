@@ -594,7 +594,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'time_stamp' => '20111111010101',
     );
     $this->callAPIFailure('mailing_event', 'confirm', $params,
-      'Confirmation failed'
+      'contact_id is not a valid integer'
     );
   }
 
