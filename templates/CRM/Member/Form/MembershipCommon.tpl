@@ -105,3 +105,29 @@
 
   <div class="spacer"></div>
 {/if}
+
+{if $accessContribution && $action != 2}
+  {literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      cj('#contribution_status_id').change(function() {
+        var statusId = cj(this).val();
+        var statusCheck = '{/literal}{$statusCheck}{literal}';
+	var formClass = '.{/literal}crm-{$formClass}-form-block-receive_date{literal}';
+        if (cj.inArray(statusId, statusCheck) > -1) {
+          cj(formClass + ' a.crm-clear-link').trigger('click');
+        }
+        else {
+          var date = new Date();
+          cj(formClass + ' .dateplugin').datepicker("setDate", date);
+	  cj('#receive_date_time').val(
+            date.getTime()
+          );
+	  cj('#receive_date_time').focus();
+	  cj('#receive_date_time').trigger('blur');
+        }
+      });
+    });  
+  </script>
+  {/literal}
+{/if}

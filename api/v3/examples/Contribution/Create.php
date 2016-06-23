@@ -55,7 +55,7 @@ function contribution_create_expectedresult() {
         'contact_id' => '1',
         'financial_type_id' => '1',
         'contribution_page_id' => '1',
-        'payment_instrument_id' => '4',
+        'payment_instrument_id' => '',
         'receive_date' => '20120511000000',
         'non_deductible_amount' => '',
         'total_amount' => '100',

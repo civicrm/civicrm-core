@@ -129,12 +129,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //set defaults in create mode
+    $isEmptyPaymentMethod = FALSE;
+    if (empty($params['payment_instrument_id'])) {
+      $isEmptyPaymentMethod = TRUE;
+    }
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
     }
-
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //if contribution is created with cancelled or refunded status, add credit note id
     if (!empty($params['contribution_status_id'])) {
       // @todo - should we include Chargeback? If so use self::isContributionStatusNegative($params['contribution_status_id'])
@@ -176,7 +179,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if ($contributionID && $setPrevContribution) {
       $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
-
+    // CRM-18573
+    self::alterInstrumentAndReceiveDate($params, $isEmptyPaymentMethod);
+    $errorMessage = CRM_Contribute_BAO_Contribution::checkPaymentInstrument($params);
+    if ($errorMessage) {
+      throw new CRM_Core_Exception($errorMessage);
+    }
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
     }
@@ -5026,6 +5034,67 @@ LIMIT 1;";
       }
     }
     return $values;
+  }
+
+  /**
+   * Validate if payment instrument is required
+   *
+   * @param array $params
+   *  array of order params.
+   *
+   * @return string
+   */
+  public static function checkPaymentInstrument($params) {
+    if (!empty($params['payment_instrument_id'])
+      || !CRM_Utils_Array::value('contribution_status_id', $params)
+      || (!array_key_exists('payment_instrument_id', $params)
+        && !empty($params['prevContribution'])
+        && !empty($params['prevContribution']->payment_instrument_id))
+    ) {
+      return FALSE;
+    }
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    if (in_array($status[$params['contribution_status_id']],
+      array('Completed', 'Partially paid', 'Pending refund'))
+    ) {
+      return ts('Payment Method is a required field.');
+    }
+    return FALSE;
+  }
+
+  /**
+   * CRM-18573
+   * Payment Instrument or Receive date cannot be null when
+   * contribution status is Completed/Partially paid/ Pending refund,
+   * However it can be null for other status
+   *
+   * @param array $params contribution params
+   * @param  bool $isEmptyPaymentMethod
+   *
+   */
+  public static function alterInstrumentAndReceiveDate(&$params, $isEmptyPaymentMethod) {
+    if (!empty($params['contribution_status_id'])) {
+      $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      if ($isEmptyPaymentMethod) {
+        if (!in_array($contributionStatus[$params['contribution_status_id']],
+          array('Completed', 'Partially paid', 'Pending refund'))
+        ) {
+          unset($params['payment_instrument_id']);
+        }
+        elseif (empty($params['payment_instrument_id']) && !empty($params['prevContribution'])
+          && empty($params['prevContribution']->payment_instrument_id)
+        ) {
+          $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+        }
+      }
+      if (empty($params['receive_date']) && !(!empty($params['prevContribution']) && !empty($params['prevContribution']->receive_date))
+        && !in_array($contributionStatus[$params['contribution_status_id']],
+          array('Failed', 'Pending')
+        )
+      ) {
+        $params['receive_date'] = date('YmdHis');
+      }
+    }
   }
 
 }
