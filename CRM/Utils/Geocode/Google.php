@@ -136,16 +136,68 @@ class CRM_Utils_Geocode_Google {
     }
 
     if (isset($xml->status)) {
-      if ($xml->status == 'OK' &&
-        is_a($xml->result->geometry->location,
-          'SimpleXMLElement'
-        )
-      ) {
-        $ret = $xml->result->geometry->location->children();
-        if ($ret->lat && $ret->lng) {
-          $values['geo_code_1'] = (float) $ret->lat;
-          $values['geo_code_2'] = (float) $ret->lng;
-          return TRUE;
+      if ($xml->status == 'OK') {
+
+        if (!empty($xml->result->address_component)) {
+          foreach($xml->result->address_component as $component) {
+            if ($component->type == 'postal_code') {
+              $ret_postal = $component->long_name;
+              break;
+            }
+          }
+          if (!empty($ret_postal)) {
+            $current_pc = CRM_Utils_Array::value('postal_code', $values);
+            $skip_postal = FALSE;
+
+            if ($current_pc) {
+              $current_pc_suffix = CRM_Utils_Array::value('postal_code_suffix', $values);
+              $current_pc_complete = $current_pc . $current_pc_suffix;
+              $new_pc_complete = preg_replace("/[+-]/", '', $ret_postal);
+
+              // if a postal code was already entered, don't change it, except to make it more precise
+              if (strpos($new_pc_complete, $current_pc_complete) !== 0) {
+                // Don't bother anonymous users with the message - they can't change a form they just submitted anyway
+                if (CRM_Utils_System::isUserLoggedIn()) {
+                  $msg = ts('The Google Geocoding system returned a different postal code (%1) than the one you entered (%2). If you want the Google value, please delete the current postal code and save again.', array(
+                    1 => $ret_postal,
+                    2 => $current_pc_suffix ? "$current_pc-$current_pc_suffix" : $current_pc,
+                  ));
+
+                  CRM_Core_Session::setStatus($msg, ts('Postal Code Mismatch'), 'error');
+                }
+                $skip_postal = TRUE;
+              }
+            }
+
+            if (!$skip_postal) {
+              $values['postal_code'] = $ret_postal;
+
+              /* the following logic to split the string was borrowed from
+              CRM/Core/BAO/Address.php -- CRM_Core_BAO_Address::fixAddress.
+              This is actually the function that calls the geocoding
+              script to begin with, but the postal code business takes
+              place before geocoding gets called.
+               */
+
+              if (preg_match('/^(\d{4,5})[+-](\d{4})$/',
+                $ret_postal,
+                $match
+              )
+              ) {
+                $values['postal_code'] = $match[1];
+                $values['postal_code_suffix'] = $match[2];
+              }
+            }
+          }
+        }
+
+        if (is_a($xml->result->geometry->location, 'SimpleXMLElement')) {
+          $ret = $xml->result->geometry->location->children();
+          if ($ret->lat && $ret->lng) {
+            $values['geo_code_1'] = (float) $ret->lat;
+            $values['geo_code_2'] = (float) $ret->lng;
+            return TRUE;
+          }
         }
       }
       elseif ($xml->status == 'OVER_QUERY_LIMIT') {
