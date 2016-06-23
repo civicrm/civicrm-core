@@ -134,12 +134,14 @@ function civicrm_api3_create_error($msg, $data = array()) {
 
   // we will show sql to privileged user only (not sure of a specific
   // security hole here but seems sensible - perhaps should apply to the trace as well?)
-  if (isset($data['sql']) && (CRM_Core_Permission::check('Administer CiviCRM') || CIVICRM_UF == 'UnitTests')) {
-    // Isn't this redundant?
-    $data['debug_information'] = $data['sql'];
-  }
-  else {
-    unset($data['sql']);
+  if (isset($data['sql'])) {
+    if (CRM_Core_Permission::check('Administer CiviCRM') || CIVICRM_UF == 'UnitTests') {
+      // Isn't this redundant?
+      $data['debug_information'] = $data['sql'];
+    }
+    else {
+      unset($data['sql']);
+    }
   }
   return $data;
 }

@@ -205,7 +205,7 @@ return array(
     ),
     'default' => 'null',
     'add' => '4.3',
-    'title' => 'Available States and Provinces',
+    'title' => 'Available States and Provinces (by Country)',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',

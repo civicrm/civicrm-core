@@ -470,9 +470,7 @@ class CiviContributeProcessor {
       }
     }
 
-    $contribution = &CRM_Contribute_BAO_Contribution::create($params,
-      CRM_Core_DAO::$_nullArray
-    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
     if (!$contribution->id) {
       return FALSE;
     }

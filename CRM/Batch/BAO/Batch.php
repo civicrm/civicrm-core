@@ -593,21 +593,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     else {
       CRM_Core_Error::fatal("Could not locate exporter: $exporterClass");
     }
-    switch (self::$_exportFormat) {
-      case 'CSV':
-        foreach ($batchIds as $batchId) {
-          $export[$batchId] = $exporter->generateExportQuery($batchId);
-        }
-        $exporter->makeCSV($export);
-        break;
-
-      case 'IIF':
-        foreach ($batchIds as $batchId) {
-          $export[$batchId] = $exporter->generateExportQuery($batchId);
-        }
-        $exporter->makeIIF($export);
-        break;
+    foreach ($batchIds as $batchId) {
+      $export[$batchId] = $exporter->generateExportQuery($batchId);
     }
+    $exporter->makeExport($export);
   }
 
   /**

@@ -79,6 +79,16 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
+   * @param null $fileName
+   */
+  public function output($fileName = NULL) {
+    $tplFile = $this->getHookedTemplateFileName();
+    $out = self::getTemplate()->fetch($tplFile);
+    $fileName = $this->putFile($out);
+    self::createActivityExport($this->_batchIds, $fileName);
+  }
+
+  /**
    * @param $out
    *
    * @return string
@@ -150,7 +160,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   /**
    * @param $export
    */
-  public function makeIIF($export) {
+  public function makeExport($export) {
     // Keep running list of accounts and contacts used in this batch, since we need to
     // include those in the output. Only want to include ones used in the batch, not everything in the db,
     // since would increase the chance of messing up user's existing Quickbooks entries.

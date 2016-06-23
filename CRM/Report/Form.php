@@ -624,6 +624,16 @@ class CRM_Report_Form extends CRM_Core_Form {
       }
     }
 
+    // Special permissions check for private instance if it's not the current contact instance
+    if (!$this->_id ||
+      (CRM_Report_BAO_ReportInstance::reportIsPrivate($this->_id) &&
+      !CRM_Report_BAO_ReportInstance::contactIsOwner($this->_id))) {
+      if (!CRM_Core_Permission::check('access all private reports')) {
+        $this->_instanceForm = FALSE;
+        $this->assign('criteriaForm', FALSE);
+      }
+    }
+
     $this->_instanceButtonName = $this->getButtonName('submit', 'save');
     $this->_createNewButtonName = $this->getButtonName('submit', 'next');
     $this->_printButtonName = $this->getButtonName('submit', 'print');
@@ -1331,7 +1341,10 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
     }
-    if (!empty($this->_options)) {
+    if (!empty($this->_options) &&
+        (!$this->_id
+          || ($this->_id && CRM_Report_BAO_ReportInstance::contactCanAdministerReport($this->_id)))
+    ) {
       $this->tabs['ReportOptions'] = array(
         'title' => ts('Display Options'),
         'tpl' => 'ReportOptions',
@@ -3637,7 +3650,7 @@ ORDER BY cg.weight, cf.weight";
     //CRM-18276 GROUP_CONCAT could be used with singleValueQuery and then exploded,
     //but by default that truncates to 1024 characters, which causes errors with installs with lots of custom field sets
     $customTables = array();
-    $customTablesDAO = CRM_Core_DAO::executeQuery("SELECT table_name FROM civicrm_custom_group", CRM_Core_DAO::$_nullArray);
+    $customTablesDAO = CRM_Core_DAO::executeQuery("SELECT table_name FROM civicrm_custom_group");
     while ($customTablesDAO->fetch()) {
       $customTables[] = $customTablesDAO->table_name;
     }
@@ -3979,17 +3992,35 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     );
 
     if ($filters) {
-      $addressFields['civicrm_address']['filters'] = array(
-        'street_number' => array(
-          'title' => ts('Street Number'),
-          'type' => 1,
-          'name' => 'street_number',
-        ),
-        'street_name' => array(
-          'title' => ts('Street Name'),
-          'name' => 'street_name',
-          'operator' => 'like',
-        ),
+      // Address filter depends on whether street address parsing is enabled.
+      // (CRM-18696)
+      $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'address_options'
+      );
+      if ($addressOptions['street_address_parsing']) {
+        $street_address_filters = array(
+          'street_number' => array(
+            'title' => ts('Street Number'),
+            'type' => 1,
+            'name' => 'street_number',
+          ),
+          'street_name' => array(
+            'title' => ts('Street Name'),
+            'name' => 'street_name',
+            'operator' => 'like',
+          ),
+        );
+      }
+      else {
+        $street_address_filters = array(
+          'street_address' => array(
+            'title' => ts('Street Address'),
+            'operator' => 'like',
+            'name' => 'street_address',
+          ),
+        );
+      }
+      $general_address_filters = array(
         'postal_code' => array(
           'title' => ts('Postal Code'),
           'type' => 1,
@@ -4023,6 +4054,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         ),
       );
     }
+    $addressFields['civicrm_address']['filters'] = array_merge(
+        $street_address_filters,
+        $general_address_filters);
 
     if ($orderBy) {
       $addressFields['civicrm_address']['order_bys'] = array(

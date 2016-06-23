@@ -112,7 +112,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
     if ($params['is_default']) {
       $query = "UPDATE civicrm_print_label SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     $printLabel->save();

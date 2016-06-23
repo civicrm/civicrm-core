@@ -579,4 +579,23 @@ MODIFY      {$columnName} varchar( $length )
     return FALSE;
   }
 
+  /**
+   * Check if the table has a specified column
+   *
+   * @param string $tableName
+   * @param string $columnName
+   *
+   * @return \CRM_Core_DAO|object
+   */
+  public static function checkIfFieldExists($tableName, $columnName) {
+    $result = CRM_Core_DAO::executeQuery(
+      "SHOW COLUMNS FROM $tableName LIKE %1",
+      array(1 => array($columnName, 'String'))
+    );
+    if ($result->fetch()) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }

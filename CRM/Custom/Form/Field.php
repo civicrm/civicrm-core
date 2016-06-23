@@ -964,7 +964,7 @@ SELECT id
   FROM civicrm_state_province
  WHERE LOWER(name) = '$fieldStateProvince'
     OR abbreviation = '$fieldStateProvince'";
-          $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          $dao = CRM_Core_DAO::executeQuery($query);
           if ($dao->fetch()) {
             $params['default_value'] = $dao->id;
           }
@@ -977,7 +977,7 @@ SELECT id
   FROM civicrm_country
  WHERE LOWER(name) = '$fieldCountry'
     OR iso_code = '$fieldCountry'";
-          $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          $dao = CRM_Core_DAO::executeQuery($query);
           if ($dao->fetch()) {
             $params['default_value'] = $dao->id;
           }

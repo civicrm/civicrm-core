@@ -672,6 +672,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             break;
           }
         }
+        // reset date filter on activity reports.
+        $url[] = "resetDateFilter=1";
         $url = implode('&', $url);
         $url = CRM_Report_Utils_Report::getNextUrl('activity', "reset=1&force=1&{$url}",
                  $this->_absoluteUrl,

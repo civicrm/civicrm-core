@@ -100,6 +100,10 @@
 
   $(function() {
     initForm();
+
+    // Focus first search field
+    $('.crm-form-text:input:visible:first', 'form.crm-search-form').focus();
+
     // Handle user interactions with search results
     $('#crm-container')
       // When toggling between "all records" and "selected records only"

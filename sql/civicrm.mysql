@@ -1135,7 +1135,9 @@ CREATE TABLE `civicrm_financial_account` (
      `tax_rate` decimal(10,8)    COMMENT 'The percentage of the total_amount that is due for this tax.',
      `is_reserved` tinyint    COMMENT 'Is this a predefined system object?',
      `is_active` tinyint    COMMENT 'Is this property active?',
-     `is_default` tinyint    COMMENT 'Is this account the default one (or default tax one) for its financial_account_type?' 
+     `is_default` tinyint    COMMENT 'Is this account the default one (or default tax one) for its financial_account_type?',
+     `opening_balance` decimal(20,2)   DEFAULT 0 COMMENT 'Contains the opening balance for this financial account',
+     `current_period_opening_balance` decimal(20,2)   DEFAULT 0 COMMENT 'Contains the opening balance for the current period for this financial account' 
 ,
     PRIMARY KEY ( `id` )
  
@@ -4550,7 +4552,8 @@ CREATE TABLE `civicrm_contribution` (
      `check_number` varchar(255)    ,
      `campaign_id` int unsigned    COMMENT 'The campaign for which this contribution has been triggered.',
      `creditnote_id` varchar(255)    COMMENT 'unique credit note id, system generated or passed in',
-     `tax_amount` decimal(20,2)    COMMENT 'Total tax amount of this contribution.' 
+     `tax_amount` decimal(20,2)    COMMENT 'Total tax amount of this contribution.',
+     `revenue_recognition_date` datetime    COMMENT 'Stores the date when revenue should be recognized.' 
 ,
     PRIMARY KEY ( `id` )
  

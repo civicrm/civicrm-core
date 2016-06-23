@@ -9,6 +9,9 @@
   width: 95%;
   height: 20em;
 }
+.crmMailing input.crm-form-date {
+  width: 10em;
+}
 
 .crmMailing-recip-est {
   background: #ee8;

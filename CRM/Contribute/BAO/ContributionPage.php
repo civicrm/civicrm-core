@@ -855,7 +855,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    * @return array|string
    */
   public static function formatModuleData($params, $setDefault = FALSE, $module) {
-    global $tsLocale;
+    $tsLocale = CRM_Core_I18n::getLocale();
     $config = CRM_Core_Config::singleton();
     $json = $jsonDecode = NULL;
     $domain = new CRM_Core_DAO_Domain();

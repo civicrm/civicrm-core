@@ -40,7 +40,7 @@ INSERT INTO `civicrm_dashboard`
     ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`)
     VALUES
     ( @domainID, 'blog', 'CiviCRM News', 'civicrm/dashlet/blog?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/blog?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
-    ( @domainID, 'getting-started', 'Getting Started', 'civicrm/dashlet/getting-started?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/getting-started?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
+    ( @domainID, 'getting-started', 'CiviCRM Resources', 'civicrm/dashlet/getting-started?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/getting-started?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
 
     ( @domainID, 'activity', 'Activities', 'civicrm/dashlet/activity?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 1, 'civicrm/dashlet/activity?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
     ( @domainID, 'myCases', 'My Cases', 'civicrm/dashlet/myCases?reset=1&snippet=5', 'access my cases and activities', NULL , 0, 0, 1, 2, 'civicrm/dashlet/myCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
@@ -314,7 +314,7 @@ VALUES
     ( @domainID, 'civicrm/admin/options/subtype?reset=1',   'Contact Types','Contact Types',                              'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/admin/setting/preferences/display?reset=1',   'Display Preferences', 'Display Preferences',     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/setting/search?reset=1',    'Search Preferences',    'Search Preferences',                'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 10 ),
-    ( @domainID, 'civicrm/admin/setting/preferences/date?reset=1', 'Date Preferences', 'Date Preferences', 'administer CiviCRM', '', @CustomizelastID, '1', NULL, 11 ), 
+    ( @domainID, 'civicrm/admin/setting/preferences/date?reset=1', 'Date Preferences', 'Date Preferences', 'administer CiviCRM', '', @CustomizelastID, '1', NULL, 11 ),
     ( @domainID, 'civicrm/admin/menu?reset=1',              'Navigation Menu', 'Navigation Menu',                         'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 12 ),
     ( @domainID, 'civicrm/admin/options/wordreplacements?reset=1','Word Replacements','Word Replacements',                'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 13 ),
     ( @domainID, 'civicrm/admin/options/custom_search?reset=1', 'Manage Custom Searches', 'Manage Custom Searches', 'administer CiviCRM', '', @CustomizelastID, '1', NULL, 14 );
@@ -546,8 +546,8 @@ VALUES
     ( @domainID, 'civicrm/report/list?reset=1',                            'All Reports',  'All Reports', 'access CiviReport',    '', @adminReportlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/report/template/list?reset=1',             'Create New Report from Template', 'Create New Report from Template', 'administer Reports', '', @adminReportlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/admin/report/options/report_template?reset=1',   'Manage Templates', 'Manage Templates', 'administer Reports',  '', @adminReportlastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/admin/report/register?reset=1',                  'Register Report',  'Register Report',  'administer Reports',  '', @adminReportlastID, '1', NULL, 4 );
-
+    ( @domainID, 'civicrm/admin/report/register?reset=1',                  'Register Report',  'Register Report',  'administer Reports',  '', @adminReportlastID, '1', NULL, 4 ),
+    ( @domainID, 'civicrm/report/list?myreports=1&reset=1',                'My Reports', 'My Reports', 'access CiviReport', '', @reportLastID, '1', 1, 15 );
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES

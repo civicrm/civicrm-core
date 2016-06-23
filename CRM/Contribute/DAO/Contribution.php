@@ -242,6 +242,12 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO {
    */
   public $tax_amount;
   /**
+   * Stores the date when revenue should be recognized.
+   *
+   * @var datetime
+   */
+  public $revenue_recognition_date;
+  /**
    * class constructor
    *
    * @return civicrm_contribution
@@ -709,6 +715,20 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO {
             'type' => 'Text',
           ) ,
         ) ,
+        'revenue_recognition_date' => array(
+          'name' => 'revenue_recognition_date',
+          'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+          'title' => ts('Revenue Recognition Date') ,
+          'description' => 'Stores the date when revenue should be recognized.',
+          'import' => true,
+          'where' => 'civicrm_contribution.revenue_recognition_date',
+          'headerPattern' => '/revenue(.?date)?/i',
+          'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ) ,
+        ) ,
       );
     }
     return self::$_fields;
@@ -750,6 +770,7 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO {
         'campaign_id' => 'contribution_campaign_id',
         'creditnote_id' => 'creditnote_id',
         'tax_amount' => 'tax_amount',
+        'revenue_recognition_date' => 'revenue_recognition_date',
       );
     }
     return self::$_fieldKeys;

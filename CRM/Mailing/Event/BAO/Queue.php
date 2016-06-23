@@ -293,7 +293,7 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
    AND civicrm_mailing_event_queue.email_id = civicrm_email.id
    AND civicrm_mailing_event_queue.id = " . CRM_Utils_Type::escape($queueID, 'Integer');
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $displayName = 'Unknown';
     $email = 'Unknown';

@@ -50,6 +50,10 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     $this->assign('cdType', FALSE);
     $this->assign('cgCount', $this->_groupCount);
 
+    $contactTypes = CRM_Contact_BAO_ContactType::contactTypeInfo();
+    if (array_key_exists($this->_type, $contactTypes)) {
+      $this->assign('contactId', $this->_entityId);
+    }
     if (!is_array($this->_subType) && strstr($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR)) {
       $this->_subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }

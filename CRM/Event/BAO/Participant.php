@@ -800,7 +800,7 @@ FROM   civicrm_participant
    LEFT JOIN civicrm_contact ON (civicrm_participant.contact_id = civicrm_contact.id)
 WHERE  civicrm_participant.id = {$participantId}
 ";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $details = array();
     while ($dao->fetch()) {
@@ -1037,6 +1037,38 @@ WHERE  civicrm_participant.id = {$participantId}
       $additionalParticipantIds[$dao->id] = $dao->id;
     }
     return $additionalParticipantIds;
+  }
+
+  /**
+   * Get the amount for the undiscounted version of the field.
+   *
+   * Note this function is part of the refactoring process rather than the best approach.
+   *
+   * @param int $eventID
+   * @param int $discountedPriceFieldOptionID
+   * @param string $feeLevel (deprecated)
+   *
+   * @return null|string
+   */
+  public static function getUnDiscountedAmountForEventPriceSetFieldValue($eventID, $discountedPriceFieldOptionID, $feeLevel) {
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID, NULL);
+    $params = array(
+      1 => array($priceSetId, 'Integer'),
+    );
+    if ($discountedPriceFieldOptionID) {
+      $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
+LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
+WHERE cpf.price_set_id = %1 AND cpfv.label = (SELECT label from civicrm_price_field_value WHERE id = %2)";
+      $params[2] = array($discountedPriceFieldOptionID, 'Integer');
+    }
+    else {
+      $feeLevel = current($feeLevel);
+      $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
+LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
+WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
+      $params[2] = array($feeLevel, 'String');
+    }
+    return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
   /**
@@ -1789,36 +1821,29 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param array $contributionParams
    *   Contribution params.
    *
-   * @param $feeLevel
-   *
+   * @param string $feeLevel (deprecated)
+   * @param int $discountedPriceFieldOptionID
+   *   ID of the civicrm_price_field_value field for the discount id.
    */
-  public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel) {
-    // CRM-11124
+  public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID) {
+    $financialTypeID = $contributionParams['contribution']->financial_type_id;
+    $total_amount = $contributionParams['total_amount'];
+
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
-      $feeLevel = current($feeLevel);
-      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID, NULL);
-      $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
-LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
-WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
-      $params = array(
-        1 => array($priceSetId, 'Integer'),
-        2 => array($feeLevel, 'String'),
-      );
-      $mainAmount = CRM_Core_DAO::singleValueQuery($query, $params);
+      $mainAmount = self::getUnDiscountedAmountForEventPriceSetFieldValue($eventID, $discountedPriceFieldOptionID, $feeLevel);
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Discounts Account is' "));
-      $contributionParams['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
-        $contributionParams['contribution']->financial_type_id, $relationTypeId);
-      if (!empty($contributionParams['trxnParams']['from_financial_account_id'])) {
-        $contributionParams['trxnParams']['total_amount'] = $mainAmount - $contributionParams['total_amount'];
-        $contributionParams['trxnParams']['payment_processor_id'] = NULL;
-        $contributionParams['trxnParams']['payment_instrument_id'] = NULL;
-        $contributionParams['trxnParams']['check_number'] = NULL;
-        $contributionParams['trxnParams']['trxn_id'] = NULL;
-        $contributionParams['trxnParams']['net_amount'] = NULL;
-        $contributionParams['trxnParams']['fee_amount'] = NULL;
-
-        CRM_Core_BAO_FinancialTrxn::create($contributionParams['trxnParams']);
+      $transactionParams['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
+        $financialTypeID, $relationTypeId);
+      if (!empty($transactionParams['trxnParams']['from_financial_account_id'])) {
+        $transactionParams['trxnParams']['total_amount'] = $mainAmount - $total_amount;
+        $transactionParams['trxnParams']['payment_processor_id'] = NULL;
+        $transactionParams['trxnParams']['payment_instrument_id'] = NULL;
+        $transactionParams['trxnParams']['check_number'] = NULL;
+        $transactionParams['trxnParams']['trxn_id'] = NULL;
+        $transactionParams['trxnParams']['net_amount'] = NULL;
+        $transactionParams['trxnParams']['fee_amount'] = NULL;
+        CRM_Core_BAO_FinancialTrxn::create($transactionParams);
       }
     }
   }

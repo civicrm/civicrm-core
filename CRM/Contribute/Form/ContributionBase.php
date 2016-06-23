@@ -622,17 +622,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         'financial_type' => 1,
       );
 
-      $fields = NULL;
-      if ($contactID && CRM_Core_BAO_UFGroup::filterUFGroups($id, $contactID)) {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
-          NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
-        );
-      }
-      else {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
-          NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
-        );
-      }
+      $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
+        NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
+      );
 
       if ($fields) {
         // unset any email-* fields since we already collect it, CRM-2888

@@ -1337,7 +1337,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
       $additionalWhere
       GROUP BY currency
       ";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     $count = 0;
     $amount = $average = array();
     while ($dao->fetch()) {
@@ -2070,10 +2070,12 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @param CRM_Contribute_BAO_Contribution $contribution
    * @param array $input
    * @param array $contributionParams
+   * @param int $paymentProcessorID
    *
    * @return array
+   * @throws CiviCRM_API3_Exception
    */
-  protected static function repeatTransaction(&$contribution, &$input, $contributionParams) {
+  protected static function repeatTransaction(&$contribution, &$input, $contributionParams, $paymentProcessorID) {
     if (!empty($contribution->id)) {
       return FALSE;
     }
@@ -2082,7 +2084,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if (!empty($input['amount'])) {
         $contribution->total_amount = $contributionParams['total_amount'] = $input['amount'];
       }
-      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionParams['contribution_recur_id']);
+
       if (!empty($contributionParams['contribution_recur_id'])) {
         $recurringContribution = civicrm_api3('ContributionRecur', 'getsingle', array(
           'id' => $contributionParams['contribution_recur_id'],
@@ -2096,7 +2098,12 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
           $contributionParams['financial_type_id'] = $recurringContribution['financial_type_id'];
         }
       }
-      $contributionParams['skipLineItem'] = TRUE;
+      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
+        $contributionParams['contribution_recur_id'],
+        array_intersect_key($contributionParams, array('total_amount' => TRUE, 'financial_type_id' => TRUE))
+      );
+      $input['line_item'] = $contributionParams['line_item'] = $templateContribution['line_item'];
+
       $contributionParams['status_id'] = 'Pending';
       if (isset($contributionParams['financial_type_id'])) {
         // Give precedence to passed in type.
@@ -2107,9 +2114,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
       $contributionParams['contact_id'] = $templateContribution['contact_id'];
       $contributionParams['source'] = empty($templateContribution['source']) ? ts('Recurring contribution') : $templateContribution['source'];
+
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
       $contribution->id = $createContribution['id'];
-      $input['line_item'] = CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($contribution->contribution_recur_id, $contribution);
       CRM_Contribute_BAO_ContributionRecur::copyCustomValues($contributionParams['contribution_recur_id'], $contribution->id);
       return TRUE;
     }
@@ -3112,6 +3119,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       elseif (!empty($params['payment_processor'])) {
         $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($params['payment_processor'], 'civicrm_payment_processor', 'financial_account_id');
+        $params['payment_instrument_id'] = civicrm_api3('PaymentProcessor', 'getvalue', array(
+          'id' => $params['payment_processor'],
+          'return' => 'payment_instrument_id',
+        ));
       }
       elseif (!empty($params['payment_instrument_id'])) {
         $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
@@ -3138,7 +3149,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'currency' => $params['contribution']->currency,
         'trxn_id' => $params['contribution']->trxn_id,
         'status_id' => $statusId,
-        'payment_instrument_id' => $params['contribution']->payment_instrument_id,
+        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, $params['contribution']->payment_instrument_id),
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
       if ($contributionStatus == 'Refunded' || $contributionStatus == 'Chargeback') {
@@ -4387,6 +4398,16 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
     $event = CRM_Utils_Array::value('event', $objects);
 
+    $paymentProcessorId = '';
+    if (isset($objects['paymentProcessor'])) {
+      if (is_array($objects['paymentProcessor'])) {
+        $paymentProcessorId = $objects['paymentProcessor']['id'];
+      }
+      else {
+        $paymentProcessorId = $objects['paymentProcessor']->id;
+      }
+    }
+
     $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
     $contributionParams = array_merge(array(
@@ -4394,6 +4415,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
+    $contributionParams['payment_processor'] = $input['payment_processor'] = $paymentProcessorId;
 
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
@@ -4404,7 +4426,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $contributionParams['receive_date'] = $changeDate;
     }
 
-    self::repeatTransaction($contribution, $input, $contributionParams);
+    self::repeatTransaction($contribution, $input, $contributionParams, $paymentProcessorId);
     $contributionParams['financial_type_id'] = $contribution->financial_type_id;
 
     if (is_numeric($memberships)) {
@@ -4530,58 +4552,30 @@ LIMIT 1;";
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
     }
 
-    $paymentProcessorId = '';
-    if (isset($objects['paymentProcessor'])) {
-      if (is_array($objects['paymentProcessor'])) {
-        $paymentProcessorId = $objects['paymentProcessor']['id'];
-      }
-      else {
-        $paymentProcessorId = $objects['paymentProcessor']->id;
-      }
-    }
-
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
       'labelColumn' => 'name',
       'flip' => 1,
     ));
-    if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
+    if (isset($input['prevContribution']) && (!$input['prevContribution']->is_pay_later && $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
       $input['payment_processor'] = $paymentProcessorId;
     }
 
     if (!empty($contribution->_relatedObjects['participant'])) {
       $input['contribution_mode'] = 'participant';
       $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
-      $input['skipLineItem'] = 1;
     }
     elseif (!empty($contribution->_relatedObjects['membership'])) {
-      $input['skipLineItem'] = TRUE;
       $input['contribution_mode'] = 'membership';
       $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
       $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $input);
       $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     }
-    $input['contribution_status_id'] = $contributionParams['contribution_status_id'];
-    $input['total_amount'] = $input['amount'];
-    $input['contribution'] = $contribution;
-    $input['financial_type_id'] = $contribution->financial_type_id;
-    //@todo writing a unit test I was unable to create a scenario where this line did not fatal on second
-    // and subsequent payments. In this case the line items are created at
-    // CRM_Contribute_BAO_ContributionRecur::addRecurLineItems
-    // and since the contribution is saved prior to this line there is always a contribution-id,
-    // however there is never a prevContribution (which appears to mean original contribution not previous
-    // contribution - or preUpdateContributionObject most accurately)
-    // so, this is always called & only appears to succeed when prevContribution exists - which appears
-    // to mean "are we updating an exisitng pending contribution"
-    //I was able to make the unit test complete as fataling here doesn't prevent
-    // the contribution being created - but activities would not be created or emails sent
-
-    CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
 
     CRM_Core_Error::debug_log_message("Contribution record updated successfully");
     $transaction->commit();
 
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution->id, $recurringContributionID,
-      $input['contribution_status_id'], $input['total_amount']);
+      $contributionParams['contribution_status_id'], $input['amount']);
 
     // create an activity record
     if ($input['component'] == 'contribute') {

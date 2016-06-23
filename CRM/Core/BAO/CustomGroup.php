@@ -405,6 +405,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'help_pre',
         'help_post',
         'collapse_display',
+        'style',
         'is_multiple',
         'extends',
         'extends_entity_column_id',
@@ -1821,7 +1822,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *
    * @return array
    */
-  public static function formatGroupTree(&$groupTree, $groupCount = 1, &$form) {
+  public static function formatGroupTree(&$groupTree, $groupCount = 1, &$form = NULL) {
     $formattedGroupTree = array();
     $uploadNames = array();
 
@@ -1837,6 +1838,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       $formattedGroupTree[$key]['help_post'] = CRM_Utils_Array::value('help_post', $value);
       $formattedGroupTree[$key]['collapse_display'] = CRM_Utils_Array::value('collapse_display', $value);
       $formattedGroupTree[$key]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $value);
+      $formattedGroupTree[$key]['style'] = CRM_Utils_Array::value('style', $value);
 
       // this params needed of bulding multiple values
       $formattedGroupTree[$key]['is_multiple'] = CRM_Utils_Array::value('is_multiple', $value);
@@ -1917,6 +1919,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
             $details[$groupID][$values['id']]['help_post'] = CRM_Utils_Array::value('help_post', $group);
             $details[$groupID][$values['id']]['collapse_display'] = CRM_Utils_Array::value('collapse_display', $group);
             $details[$groupID][$values['id']]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $group);
+            $details[$groupID][$values['id']]['style'] = CRM_Utils_Array::value('style', $group);
             $details[$groupID][$values['id']]['fields'][$k] = array(
               'field_title' => CRM_Utils_Array::value('label', $properties),
               'field_type' => CRM_Utils_Array::value('html_type', $properties),
@@ -1942,6 +1945,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           $details[$groupID][0]['help_post'] = CRM_Utils_Array::value('help_post', $group);
           $details[$groupID][0]['collapse_display'] = CRM_Utils_Array::value('collapse_display', $group);
           $details[$groupID][0]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $group);
+          $details[$groupID][0]['style'] = CRM_Utils_Array::value('style', $group);
           $details[$groupID][0]['fields'][$k] = array('field_title' => CRM_Utils_Array::value('label', $properties));
         }
       }

@@ -655,12 +655,15 @@ if (!CRM.vars) CRM.vars = {};
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
         copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
         $dateField.addClass('crm-form-' + type);
-        settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
-        settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
         if (hasDatepicker) {
+          settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
+          settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
           settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
           settings.changeMonth = _.includes(settings.dateFormat, 'm');
           settings.changeYear = _.includes(settings.dateFormat, 'y');
+          if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
+            settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
+          }
           $dateField.addClass('crm-form-date').datepicker(settings);
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');

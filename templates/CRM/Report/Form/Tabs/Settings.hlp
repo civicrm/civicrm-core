@@ -55,7 +55,7 @@
 {/htxt}
 {htxt id="id-report_perms"}
 {ts}You can control access to this report by selecting a 'Permission' from the list, or selecting one or more Roles. For example, you might select <em>access CiviContribute</em> for contribution reports (e.g. the same people who can see contribution data would also have access to the report). You can also prevent users from modifying the default report criteria and filters for reports by NOT giving them <em>access Report Criteria</em> permission. Those users will be able to run the report - but only with the criteria and filters that you've established for them.{/ts}
-{/htxt} 
+{/htxt}
 
 {htxt id="id-dash_avail-title"}
   {ts}Dashboard{/ts}
@@ -81,3 +81,11 @@
 {ts}Users with 'administer reserved reports' permission can mark a report instance as reserved, which prevents other users from accessing or modifying Report Criteria and Report Settings. This is particularly useful for report instances whose criteria affect the data available on non-report screens. For example, the display columns configured for the  Contact Logging Summary affect the columns shown under each contact's Change Log tab.{/ts}
 {/htxt}
 
+{htxt id="id-add_to_my_reports-title"}
+{ts}Add to My Reports{/ts}
+{/htxt}
+{htxt id="id-add_to_my_reports"}
+{ts}Selecting Yes will set the report to be visible only to the user
+  that clicked this option and saved the report settings form. If this is
+  enabled, the permissions configuration for this report will be disabled.{/ts}
+{/htxt}

@@ -116,6 +116,7 @@ class CRM_Logging_Reverter {
     foreach ($deletes as $table => $ids) {
       CRM_Core_DAO::executeQuery("DELETE FROM `$table` WHERE id IN (" . implode(', ', array_unique($ids)) . ')');
     }
+
     // revert updates by updating to previous values
     foreach ($reverts as $table => $row) {
       switch (TRUE) {
@@ -132,9 +133,17 @@ class CRM_Logging_Reverter {
               if (empty($value) and $value !== 0 and $value !== '0') {
                 $value = 'null';
               }
+              // Date reaches this point in ISO format (possibly) so strip out stuff
+              // if it does have hyphens of colons demarking the date & it regexes as being a date
+              // or datetime format.
+              if (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $value)) {
+                $value = str_replace('-', '', $value);
+                $value = str_replace(':', '', $value);
+              }
               $dao->$field = $value;
             }
             $changes['log_action'] == 'Delete' ? $dao->insert() : $dao->update();
+
             $dao->reset();
           }
           break;

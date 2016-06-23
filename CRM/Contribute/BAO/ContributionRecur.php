@@ -200,7 +200,7 @@ SELECT r.payment_processor_id
          WHERE contribution_recur_id IN ( {$recurID}) AND is_test = 0
          GROUP BY contribution_recur_id";
 
-    $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $res = CRM_Core_DAO::executeQuery($query);
 
     while ($res->fetch()) {
       $totalCount[$res->contribution_recur_id] = $res->commpleted;
@@ -450,11 +450,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * Later we might merge in data stored against the contribution recur record rather than just return the contribution.
    *
    * @param int $id
+   * @param array $overrides
+   *   Parameters that should be overriden. Add unit tests if using parameters other than total_amount & financial_type_id.
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getTemplateContribution($id) {
+  public static function getTemplateContribution($id, $overrides = array()) {
     $templateContribution = civicrm_api3('Contribution', 'get', array(
       'contribution_recur_id' => $id,
       'options' => array('limit' => 1, 'sort' => array('id DESC')),
@@ -462,7 +464,9 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       'contribution_test' => '',
     ));
     if ($templateContribution['count']) {
-      return $templateContribution['values'][0];
+      $result = array_merge($templateContribution['values'][0], $overrides);
+      $result['line_item'] = CRM_Contribute_BAO_ContributionRecur::calculateRecurLineItems($id, $result['total_amount'], $result['financial_type_id']);
+      return $result;
     }
     return array();
   }
@@ -592,13 +596,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         }
 
         foreach ($table as $tableName => $tableColumns) {
-          $insert = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
+          $insert = 'INSERT IGNORE INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
           $tableColumns[0] = $targetContributionId;
           $select = 'SELECT ' . implode(', ', $tableColumns);
           $from = ' FROM ' . $tableName;
           $where = " WHERE {$tableName}.entity_id = {$sourceContributionId}";
           $query = $insert . $select . $from . $where;
-          CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          CRM_Core_DAO::executeQuery($query);
         }
       }
     }
@@ -634,46 +638,31 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @return array
    */
   public static function addRecurLineItems($recurId, $contribution) {
-    $lineSets = array();
+    $foundLineItems = FALSE;
 
-    $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
-    if (count($lineItems) == 1) {
-      foreach ($lineItems as $index => $lineItem) {
-        if (isset($contribution->financial_type_id)) {
-          // CRM-17718 allow for possibility of changed financial type ID having been set prior to calling this.
-          $lineItems[$index]['financial_type_id'] = $contribution->financial_type_id;
-        }
-        if ($lineItem['line_total'] != $contribution->total_amount) {
-          // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
-          // if there is only one line item, and the UI should prevent this situation for those with more than one.
-          $lineItems[$index]['line_total'] = $contribution->total_amount;
-          $lineItems[$index]['unit_price'] = round($contribution->total_amount / $lineItems[$index]['qty'], 2);
-        }
-      }
-    }
-    if (!empty($lineItems)) {
-      foreach ($lineItems as $key => $value) {
-        $priceField = new CRM_Price_DAO_PriceField();
-        $priceField->id = $value['price_field_id'];
-        $priceField->find(TRUE);
-        $lineSets[$priceField->price_set_id][] = $value;
-
-        if ($value['entity_table'] == 'civicrm_membership') {
-          try {
-            civicrm_api3('membership_payment', 'create', array(
-              'membership_id' => $value['entity_id'],
-              'contribution_id' => $contribution->id,
-            ));
-          }
-          catch (CiviCRM_API3_Exception $e) {
-            // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
-            // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
+    $lineSets = self::calculateRecurLineItems($recurId, $contribution->total_amount, $contribution->financial_type_id);
+    foreach ($lineSets as $lineItems) {
+      if (!empty($lineItems)) {
+        foreach ($lineItems as $key => $value) {
+          if ($value['entity_table'] == 'civicrm_membership') {
+            try {
+              // @todo this should be done by virtue of editing the line item as this link
+              // is deprecated. This may be the case but needs testing.
+              civicrm_api3('membership_payment', 'create', array(
+                'membership_id' => $value['entity_id'],
+                'contribution_id' => $contribution->id,
+              ));
+            }
+            catch (CiviCRM_API3_Exception $e) {
+              // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
+              // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
+            }
           }
         }
+        $foundLineItems = TRUE;
       }
     }
-    else {
+    if (!$foundLineItems) {
       CRM_Price_BAO_LineItem::processPriceSet($contribution->id, $lineSets, $contribution);
     }
     return $lineSets;
@@ -899,6 +888,39 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Calculate line items for the relevant recurring calculation.
+   *
+   * @param int $recurId
+   * @param string $total_amount
+   * @param int $financial_type_id
+   *
+   * @return array
+   */
+  public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
+    $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
+    if (count($lineItems) == 1) {
+      foreach ($lineItems as $index => $lineItem) {
+        if ($financial_type_id) {
+          // CRM-17718 allow for possibility of changed financial type ID having been set prior to calling this.
+          $lineItem['financial_type_id'] = $financial_type_id;
+        }
+        if ($lineItem['line_total'] != $total_amount) {
+          // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
+          // if there is only one line item, and the UI should prevent this situation for those with more than one.
+          $lineItem['line_total'] = $total_amount;
+          $lineItem['unit_price'] = round($total_amount / $lineItem['qty'], 2);
+        }
+        $priceField = new CRM_Price_DAO_PriceField();
+        $priceField->id = $lineItem['price_field_id'];
+        $priceField->find(TRUE);
+        $lineSets[$priceField->price_set_id][] = $lineItem;
+      }
+    }
+    return $lineSets;
   }
 
 }

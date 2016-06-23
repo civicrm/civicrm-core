@@ -1797,7 +1797,7 @@ FROM civicrm_contact
 WHERE id IN ( {$contacts} )
 ";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     $currentEmployer = array();
     while ($dao->fetch()) {
       $currentEmployer[$dao->id]['org_id'] = $dao->employer_id;

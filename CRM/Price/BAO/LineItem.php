@@ -83,6 +83,15 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $lineItemBAO->copyValues($params);
 
     $return = $lineItemBAO->save();
+    if ($lineItemBAO->entity_table == 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+      $membershipPaymentParams = array(
+        'membership_id' => $lineItemBAO->entity_id,
+        'contribution_id' => $lineItemBAO->contribution_id,
+      );
+      if (!civicrm_api3('MembershipPayment', 'getcount', $membershipPaymentParams)) {
+        civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
+      }
+    }
 
     if ($id) {
       CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO);
@@ -315,21 +324,17 @@ AND li.entity_id = {$entityId}
    * @param array $params
    *   Reference to form values.
    * @param array $fields
-   *   Reference to array of fields belonging.
-   *                          to the price set used for particular event
+   *   Array of fields belonging to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
    *   this is
    *                          lineItem array)
-   *
-   * @return void
+   * @param string $amount_override
    */
-  public static function format($fid, &$params, &$fields, &$values) {
+  public static function format($fid, $params, $fields, &$values, $amount_override = NULL) {
     if (empty($params["price_{$fid}"])) {
       return;
     }
-
-    $optionIDs = implode(',', array_keys($params["price_{$fid}"]));
 
     //lets first check in fun parameter,
     //since user might modified w/ hooks.
@@ -346,7 +351,7 @@ AND li.entity_id = {$entityId}
     }
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
-      $price = $options[$oid]['amount'];
+      $price = $amount_override === NULL ? $options[$oid]['amount'] : $amount_override;
 
       // lets clean the price in case it is not yet cleant
       // CRM-10974
@@ -450,7 +455,7 @@ AND li.entity_id = {$entityId}
         $lineItems = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
           CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
-          if (isset($line['tax_amount'])) {
+          if (!empty($line['tax_amount'])) {
             CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails, TRUE);
           }
         }

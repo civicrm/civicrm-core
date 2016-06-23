@@ -246,4 +246,40 @@ WHERE cft.id = %1
     return Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId];
   }
 
+  /**
+   * Get Financial Account type relations
+   *
+   * @param $flip bool
+   *
+   * @return array
+   *
+   */
+  public static function getfinancialAccountRelations($flip = FALSE) {
+    $params = array('labelColumn' => 'name');
+    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
+    $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
+    $Links = array(
+      'Expense Account is' => 'Expenses',
+      'Accounts Receivable Account is' => 'Asset',
+      'Income Account is' => 'Revenue',
+      'Asset Account is' => 'Asset',
+      'Cost of Sales Account is' => 'Cost of Sales',
+      'Premiums Inventory Account is' => 'Asset',
+      'Discounts Account is' => 'Revenue',
+      'Sales Tax Account is' => 'Liability',
+      'Deferred Revenue Account is' => 'Liability',
+    );
+    if (!$flip) {
+      foreach ($Links as $accountRelation => $accountType) {
+        $financialAccountLinks[array_search($accountRelation, $accountRelationships)] = array_search($accountType, $financialAccountType);
+      }
+    }
+    else {
+      foreach ($Links as $accountRelation => $accountType) {
+        $financialAccountLinks[array_search($accountType, $financialAccountType)][] = array_search($accountRelation, $accountRelationships);
+      }
+    }
+    return $financialAccountLinks;
+  }
+
 }
