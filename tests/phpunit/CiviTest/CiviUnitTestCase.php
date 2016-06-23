@@ -967,7 +967,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       );
     }
     $result = $this->civicrm_api($entity, $action, $params);
-    $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success");
+    $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success", $expectedErrorMessage);
     return $result;
   }
 
