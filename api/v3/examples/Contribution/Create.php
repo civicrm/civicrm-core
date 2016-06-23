@@ -59,7 +59,7 @@ function contribution_create_expectedresult() {
         'receive_date' => '20120511000000',
         'non_deductible_amount' => '',
         'total_amount' => '100',
-        'fee_amount' => 0,
+        'fee_amount' => '0',
         'net_amount' => '100',
         'trxn_id' => '12345',
         'invoice_id' => '67890',
@@ -80,6 +80,7 @@ function contribution_create_expectedresult() {
         'creditnote_id' => '',
         'tax_amount' => '',
         'contribution_type_id' => '1',
+        'revenue_recognition_date' => '',
       ),
     ),
   );
