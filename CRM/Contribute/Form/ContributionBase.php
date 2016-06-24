@@ -293,7 +293,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $isPayLater = CRM_Utils_Array::value('is_pay_later', $this->_values);
 
       if ($isMonetary &&
-        (!$isPayLater || !empty($this->_values['payment_processor']))
+        (!$isPayLater && !empty($this->_values['payment_processor']))
       ) {
         $this->_paymentProcessorIDs = explode(
           CRM_Core_DAO::VALUE_SEPARATOR,
