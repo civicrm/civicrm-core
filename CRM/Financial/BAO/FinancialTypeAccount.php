@@ -300,7 +300,7 @@ WHERE cog.name = 'payment_instrument' ";
   /**
    * Validate account relationship with financial account type
    *
-   * @param $financialTypeAccount obj
+   * @param obj $financialTypeAccount of CRM_Financial_DAO_EntityFinancialAccount
    *
    * @return Bool
    */
