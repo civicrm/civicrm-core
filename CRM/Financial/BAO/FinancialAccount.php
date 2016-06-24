@@ -303,27 +303,34 @@ WHERE ce.entity_table = 'civicrm_financial_type' AND ce.account_relationship = %
   }
 
   /**
-   * check if financial account is referenced by financial item.
+   * Check if financial account is referenced by financial item.
    *
-   * @param $financialAccountId Integer
+   * @param int $financialAccountId
    *
-   * @param $financialAccountTypeID Integer
+   * @param int $financialAccountTypeID
    *
    * @return bool
    *
    */
   public static function validateFinancialAccount($financialAccountId, $financialAccountTypeID = NULL) {
-    if (!$financialAccountId) {
-      return FALSE;
-    }
     $sql = "SELECT f.financial_account_type_id FROM civicrm_financial_account f
 INNER JOIN civicrm_financial_item fi ON fi.financial_account_id = f.id
-INNER JOIN civicrm_option_value cv ON cv.value = f.financial_account_type_id AND cv.name IN ('Revenue', 'Liability')
-INNER JOIN civicrm_option_group cg ON cg.id = cv.option_group_id
-AND  cg.name = 'financial_account_type'
-WHERE f.id = %1
+WHERE f.id = %1 AND f.financial_account_type_id IN (%2)
 LIMIT 1";
-    $params = array(1 => array($financialAccountId, 'Integer'));
+    $params = array('labelColumn' => 'name');
+    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
+    $params = array(
+      1 => array($financialAccountId, 'Integer'),
+      2 => array(
+        implode(',',
+          array(
+            array_search('Revenue', $financialAccountType),
+            array_search('Liability', $financialAccountType),
+          )
+        ),
+        'Text'
+      ),
+    );
     $result = CRM_Core_DAO::singleValueQuery($sql, $params);
     if ($result && $result != $financialAccountTypeID) {
       return TRUE;
