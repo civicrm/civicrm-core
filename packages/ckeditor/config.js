@@ -36,7 +36,4 @@ CKEDITOR.editorConfig = function( config ) {
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
 
-        // Force the use of a simple ampersand so CiviCRM links don't break
-        config.forceSimpleAmpersand = true;
-        config.basicEntities = false;
 };
