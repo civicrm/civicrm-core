@@ -172,6 +172,7 @@
         }
         else if (!$(this).find(':selected').data('supports_modal')) {
           $go.click();
+          $('#task').val('').select2('val', '');
         }
         // The following code can load the task in a popup, however not all tasks function correctly with this
         // So it's a per-task opt-in mechanism.
