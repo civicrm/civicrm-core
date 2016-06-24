@@ -328,7 +328,7 @@ LIMIT 1";
             array_search('Liability', $financialAccountType),
           )
         ),
-        'Text'
+        'Text',
       ),
     );
     $result = CRM_Core_DAO::singleValueQuery($sql, $params);
