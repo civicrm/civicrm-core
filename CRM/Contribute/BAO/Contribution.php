@@ -5031,6 +5031,11 @@ LIMIT 1;";
   /**
    * Get values of CiviContribute Settings
    * and check if its enabled or not.
+   * Note: The CiviContribute settings are stored as single entry in civicrm_setting
+   * in serialized form. Usually this should be stored as flat settings for each form fields
+   * as per CiviCRM standards. Since this would take more effort to change the current behaviour of CiviContribute
+   * settings we will live with an inconsistency because it's too hard to change for now.
+   * https://github.com/civicrm/civicrm-core/pull/8562#issuecomment-227874245
    *
    *
    * @param string $name
