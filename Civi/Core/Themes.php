@@ -178,7 +178,7 @@ class Themes {
       return array();
     }
 
-    $cssId = "$cssExt:$cssFile";
+    $cssId = $this->cssId($cssExt, $cssFile);
 
     foreach ($all[$active]['search_order'] as $themeKey) {
       if (isset($all[$themeKey]['excludes']) && in_array($cssId, $all[$themeKey]['excludes'])) {
@@ -223,8 +223,8 @@ class Themes {
         'help' => ts('Disable CiviCRM built-in CSS libraries.'),
         'search_order' => array('none', self::FALLBACK_THEME),
         'excludes' => array(
-          "civicrm:css/civicrm.css",
-          "civicrm:css/bootstrap.css",
+          "css/civicrm.css",
+          "css/bootstrap.css",
         ),
       ),
       self::FALLBACK_THEME => array(
@@ -264,6 +264,15 @@ class Themes {
     $theme = array_merge($defaults, $theme);
 
     return $theme;
+  }
+
+  /**
+   * @param string $cssExt
+   * @param string $cssFile
+   * @return string
+   */
+  public function cssId($cssExt, $cssFile) {
+    return ($cssExt === 'civicrm') ? $cssFile : "$cssExt-$cssFile";
   }
 
 }

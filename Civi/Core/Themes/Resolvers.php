@@ -63,10 +63,7 @@ class Resolvers {
     if (isset($theme['prefix'])) {
       $file .= $theme['prefix'];
     }
-    if ($cssExt !== 'civicrm') {
-      $file .= $cssExt . '-';
-    }
-    $file .= $cssFile;
+    $file .= $themes->cssId($cssExt, $cssFile);
     $file = $res->filterMinify($theme['ext'], $file);
 
     if ($res->getPath($theme['ext'], $file)) {

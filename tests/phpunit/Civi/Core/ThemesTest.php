@@ -22,6 +22,7 @@ class ThemesTest extends \CiviUnitTestCase {
         'title' => 'Judy Garland',
         'ext' => 'civicrm',
         'prefix' => 'tests/phpunit/Civi/Core/Theme/judy/',
+        'excludes' => array('test.extension.uitest-files/ignoreme.css'),
       ),
     );
     $hookLiza = array(
@@ -74,6 +75,7 @@ class ThemesTest extends \CiviUnitTestCase {
         'civicrm-css/civicrm.css' => array("$civicrmBaseUrl/tests/phpunit/Civi/Core/Theme/judy/css/civicrm.css"),
         'civicrm-css/joomla.css' => array("$civicrmBaseUrl/css/joomla.css"),
         'test.extension.uitest-files/foo.css' => array("/tests/extensions/test.extension.uitest/files/foo.css"),
+        'test.extension.uitest-files/ignoreme.css' => array(), // excluded
       ),
     );
 
