@@ -400,15 +400,12 @@ LIMIT 1";
    * Check if financial type has Deferred Revenue Account is relationship
    * with Financial Account.
    *
-   * @param $financialTypeId Integer
+   * @param int $financialTypeId
    *
    * @return string
    *
    */
   public static function validateFinancialType($financialTypeId, $entityID = NULL, $entity = NULL) {
-    if (!$financialTypeId) {
-      return FALSE;
-    }
     if (!CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
       return FALSE;
     }
