@@ -1520,8 +1520,6 @@ class CRM_Report_Form extends CRM_Core_Form {
       $actions['report_instance.save']['title'] = ts('Create Report');
     }
 
-    $actions['report_instance.html']['title'] = $this->getResultsLabel();
-
     if (!$this->_csvSupported) {
       unset($actions['report_instance.csv']);
     }
@@ -4648,9 +4646,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
           ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id)
           AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-      if ($buttonName == $this->_createNewButtonName) {
-        $this->_outputMode = 'copy';
-      }
     }
   }
 

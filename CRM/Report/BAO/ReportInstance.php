@@ -363,8 +363,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    */
   public static function getActionMetadata() {
     $actions = array(
-      'report_instance.html' => array('title' => ts('View results')),
-      'report_instance.save' => array('title' => ts('Update')),
+      'report_instance.save' => array('title' => ts('Save')),
       'report_instance.copy' => array(
         'title' => ts('Save a Copy'),
         'data' => array(
