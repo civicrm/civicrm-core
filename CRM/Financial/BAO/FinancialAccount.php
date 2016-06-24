@@ -302,4 +302,40 @@ WHERE ce.entity_table = 'civicrm_financial_type' AND ce.account_relationship = %
     return $deferredFinancialType;
   }
 
+  /**
+   * Check if financial account is referenced by financial item.
+   *
+   * @param int $financialAccountId
+   *
+   * @param int $financialAccountTypeID
+   *
+   * @return bool
+   *
+   */
+  public static function validateFinancialAccount($financialAccountId, $financialAccountTypeID = NULL) {
+    $sql = "SELECT f.financial_account_type_id FROM civicrm_financial_account f
+INNER JOIN civicrm_financial_item fi ON fi.financial_account_id = f.id
+WHERE f.id = %1 AND f.financial_account_type_id IN (%2)
+LIMIT 1";
+    $params = array('labelColumn' => 'name');
+    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
+    $params = array(
+      1 => array($financialAccountId, 'Integer'),
+      2 => array(
+        implode(',',
+          array(
+            array_search('Revenue', $financialAccountType),
+            array_search('Liability', $financialAccountType),
+          )
+        ),
+        'Text',
+      ),
+    );
+    $result = CRM_Core_DAO::singleValueQuery($sql, $params);
+    if ($result && $result != $financialAccountTypeID) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
