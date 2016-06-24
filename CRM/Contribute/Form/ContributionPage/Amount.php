@@ -125,6 +125,24 @@ SELECT id
       );
       $this->addElement('checkbox', 'is_recur_interval', ts('Support recurring intervals'));
       $this->addElement('checkbox', 'is_recur_installments', ts('Offer installments'));
+      // CRM-18854
+      $this->addElement('checkbox', 'adjust_recur_start_date', ts('Adjust Recurring Start Date'), NULL,
+        array('onclick' => "showHideByValue('adjust_recur_start_date',true,'recurDefaults','table-row','radio',false);")
+      );
+      $this->addDate('pledge_calendar_date', ts('Specific Calendar Date'));
+      for ($i=1; $i<=31; $i++) {
+        $month[$i] = $i;
+        if ($i == 31) {
+          $month[$i] = $i . ' / Last day of month';
+        }
+      }
+      $this->add('select', 'pledge_calendar_month', ts('Specific Calendar Month'), $month);
+      $pledgeDefaults = array(
+        'contribution_date' => ts('Day of Contribution'),
+        'calendar_date' => ts('Specific Calendar Date'),
+        'calendar_month' => ts('Specific Calendar Month'),
+      );
+      $this->addRadio('pledge_default_toggle', ts('Recurring Contribution Start Date Default'), $pledgeDefaults, array('allowClear' => FALSE), '<br/><br/>');
     }
 
     // add pay later options
@@ -168,7 +186,6 @@ SELECT id
       $this->addElement('text', 'initial_reminder_day', ts('Send payment reminder'), array('size' => 3));
       $this->addElement('text', 'max_reminders', ts('Send up to'), array('size' => 3));
       $this->addElement('text', 'additional_reminder_day', ts('Send additional reminders'), array('size' => 3));
-      $this->addDate('pledge_start_date', ts('Payments Start'));
     }
 
     //add currency element.

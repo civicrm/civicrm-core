@@ -119,6 +119,7 @@
 
         </table>
     </div>
+    <span></span>
 
 
     <div id="amountFields">
@@ -152,9 +153,17 @@
                         <td>{$form.additional_reminder_day.html}
                             <span class="label">{ts}Days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
                     </tr>
-                    <tr class="crm-contribution-form-block-start_date"><th scope="row" class="label">{$form.pledge_start_date.label}</th>
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=pledge_start_date}<br />
-                            <span class="label">{ts}Date of first pledge payment.{/ts}</span></td>
+                    <tr class="crm-contribution-form-block-adjust_recur_start_date"><th scope="row" class="label">{$form.adjust_recur_start_date.label}</th>
+                        <td>{$form.adjust_recur_start_date.html}<br/>
+			  <div id="recurDefaults">
+                            <span class="description">{$form.pledge_default_toggle.label}</span>
+                            <table class="form-layout-compressed">
+                              <tr class="crm-contribution-form-block-day_of_contribution">
+                                <td>{$form.pledge_default_toggle.html}</td>
+                              </tr>
+                            </table>
+                          </div>
+                        </td>
                     </tr>
                 </table>
                 </td>
@@ -338,6 +347,16 @@
     trigger_field_id    ="is_recur"
     trigger_value       ="true"
     target_element_id   ="recurFields"
+    target_element_type ="table-row"
+    field_type          ="radio"
+    invert              = "false"
+}
+{/if}
+{if $form.adjust_recur_start_date}
+{include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="adjust_recur_start_date"
+    trigger_value       ="true"
+    target_element_id   ="recurDefaults"
     target_element_type ="table-row"
     field_type          ="radio"
     invert              = "false"

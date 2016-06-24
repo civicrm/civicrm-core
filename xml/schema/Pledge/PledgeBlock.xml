@@ -86,12 +86,26 @@
   </field>
   <field>
     <name>pledge_start_date</name>
-    <type>date</type>
+    <type>varchar</type>
+    <length>64</length>
     <title>Pledge Start Date</title>
     <comment>The date the first scheduled pledge occurs.</comment>
     <add>4.7</add>
-    <html>
-      <type>Select Date</type>
-    </html>
+  </field>
+  <field>
+    <name>is_pledge_start_date_visible</name>
+    <type>boolean</type>
+    <title>Show Recurring Donation Start Date?</title>
+    <default>0</default>
+    <comment>if true - recurring start date is shown</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>is_pledge_start_date_editable</name>
+    <type>boolean</type>
+    <title>Allow Edits to Recurring Donation Start Date?</title>
+    <default>0</default>
+    <comment>if true - recurring start date is editable</comment>
+    <add>4.7</add>
   </field>
 </table>
