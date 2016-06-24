@@ -87,7 +87,7 @@ class CRM_Case_Task {
           'result' => FALSE,
         ),
         5 => array(
-          'title' => ts('Print/Merge Document'),
+          'title' => ts('Print/merge Document'),
           'class' => 'CRM_Case_Form_Task_PrintMergeDoc',
           'result' => FALSE,
         ),
