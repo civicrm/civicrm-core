@@ -251,4 +251,19 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists($result, $financialTypes), "The financial type created does not have a deferred account relationship");
   }
 
+  /**
+   * Test getting financial account for a given financial Type with a particular relationship.
+   */
+  public function testValidateFinancialAccount() {
+    // Create a record with financial item having financial account as Event Fee.
+    $this->createParticipantWithContribution();
+    $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
+    $financialAccountId = array_search('Event Fee', $financialAccounts);
+    $message = CRM_Financial_BAO_FinancialAccount::validateFinancialAccount($financialAccountId);
+    $this->assertTrue($message, "The financial account cannot be deleted. Failed asserting this was true.");
+    $financialAccountId = array_search('Member Dues', $financialAccounts);
+    $message = CRM_Financial_BAO_FinancialAccount::validateFinancialAccount($financialAccountId);
+    $this->assertFalse($message, "The financial account can be deleted. Failed asserting this was true.");
+  }
+
 }
