@@ -302,7 +302,6 @@ WHERE cog.name = 'payment_instrument' ";
    *
    * @param obj $financialTypeAccount of CRM_Financial_DAO_EntityFinancialAccount
    *
-   * @return Bool
    */
   public static function validateRelationship($financialTypeAccount) {
     $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
