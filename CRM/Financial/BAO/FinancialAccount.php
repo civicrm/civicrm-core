@@ -351,7 +351,7 @@ LIMIT 1";
    * @return string
    *
    */
-  public static function checkForValidFinancialType($params, $contributionID = NULL, $form = NULL) {
+  public static function checkFinancialTypeHasDeferred($params, $contributionID = NULL, $form = NULL) {
     if (!CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
       return FALSE;
     }

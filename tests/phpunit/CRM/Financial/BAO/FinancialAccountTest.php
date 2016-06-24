@@ -269,10 +269,10 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * Test for validating financial type has deferred revenue account relationship.
    */
-  public function testcheckForValidFinancialType() {
+  public function testcheckFinancialTypeHasDeferred() {
     Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
     $params = array();
-    $valid = CRM_Financial_BAO_FinancialAccount::checkForValidFinancialType($params);
+    $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
     $this->assertFalse($valid, "This should have been false");
     $cid = $this->individualCreate();
     $params = array(
@@ -309,7 +309,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       ),
     );
     $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $valid = CRM_Financial_BAO_FinancialAccount::checkForValidFinancialType($params, $contribution->id);
+    $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contribution->id);
     $message = "Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts";
     $this->assertEquals($valid, $message, "The messages do not match");
   }
