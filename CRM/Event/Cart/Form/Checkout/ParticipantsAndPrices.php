@@ -208,6 +208,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
       $defaults += $form->setDefaultValues();
       //Set price defaults if any
       foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
+        $event_id = $event_in_cart->event_id;
         $price_set_id = CRM_Event_BAO_Event::usesPriceSet($event_in_cart->event_id);
         if ($price_set_id) {
           $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
