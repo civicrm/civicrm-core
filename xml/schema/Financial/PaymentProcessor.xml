@@ -185,6 +185,13 @@
     <add>1.8</add>
   </field>
   <field>
+    <name>future_start_date</name>
+    <title>Processor Supports Future Start date for Payments?</title>
+    <type>boolean</type>
+    <comment>Can process payments at a future start date</comment>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>payment_type</name>
     <title>Payment Type</title>
     <type>int unsigned</type>
