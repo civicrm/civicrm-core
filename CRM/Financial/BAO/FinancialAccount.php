@@ -352,7 +352,7 @@ LIMIT 1";
    *
    */
   public static function checkFinancialTypeHasDeferred($params, $contributionID = NULL, $form = NULL) {
-    if (!CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+    if (!CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
       return FALSE;
     }
     $recognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $params);
