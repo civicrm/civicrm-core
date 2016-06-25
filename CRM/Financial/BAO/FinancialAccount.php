@@ -406,7 +406,7 @@ LIMIT 1";
    *
    */
   public static function validateFinancialType($financialTypeId, $entityID = NULL, $entity = NULL) {
-    if (!CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+    if (!CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
       return FALSE;
     }
     if ($entityID) {
