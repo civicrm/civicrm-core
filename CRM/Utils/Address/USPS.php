@@ -61,7 +61,7 @@ class CRM_Utils_Address_USPS {
    */
   public static function checkAddress(&$values) {
     if (self::$_disabled) {
-      return;
+      return FALSE;
     }
     if (!isset($values['street_address']) ||
       (!isset($values['city']) &&
