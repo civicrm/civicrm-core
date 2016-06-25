@@ -159,8 +159,14 @@
 			  <div id="recurDefaults">
                             <span class="description">{$form.pledge_default_toggle.label}</span>
                             <table class="form-layout-compressed">
-                              <tr class="crm-contribution-form-block-day_of_contribution">
+                              <tr class="crm-contribution-form-block-date_of_recurring_contribution">
                                 <td>{$form.pledge_default_toggle.html}</td>
+                              </tr>
+                              <tr class="crm-contribution-form-block-is_pledge_start_date_visible">
+                                <td>{$form.is_pledge_start_date_visible.html}&nbsp;{$form.is_pledge_start_date_visible.label}</td>
+                              </tr>
+                              <tr class="crm-contribution-form-block-is_pledge_start_date_visible">
+                                <td>{$form.is_pledge_start_date_editable.html}&nbsp;{$form.is_pledge_start_date_editable.label}</td>
                               </tr>
                             </table>
                           </div>

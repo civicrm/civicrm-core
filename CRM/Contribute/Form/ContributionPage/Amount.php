@@ -519,6 +519,12 @@ SELECT id
       $params['pledge_start_date'] = '';
       $params['adjust_recur_start_date'] = 0;
     }
+    if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $params)) {
+      $params['is_pledge_start_date_visible'] = 0;
+    }
+    if (!CRM_Utils_Array::value('is_pledge_start_date_editable', $params)) {
+      $params['is_pledge_start_date_editable'] = 0;
+    }
 
     if (array_key_exists('payment_processor', $params) &&
       !CRM_Utils_System::isNull($params['payment_processor'])
@@ -752,6 +758,8 @@ SELECT id
               'initial_reminder_day',
               'additional_reminder_day',
               'pledge_start_date',
+              'is_pledge_start_date_visible',
+              'is_pledge_start_date_editable',
             );
             foreach ($pledgeBlock as $key) {
               $pledgeBlockParams[$key] = CRM_Utils_Array::value($key, $params);

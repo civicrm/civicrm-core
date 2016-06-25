@@ -301,10 +301,40 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
         }
       }
       $form->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits);
-      $form->addDate('start_date', ts('Payments Start'));
-      if (CRM_Utils_Array::value('pledge_start_date', $pledgeBlock)) {
-        $form->assign('start_date', $pledgeBlock['pledge_start_date']);
-        $form->setDefaults(array('start_date' => $pledgeBlock['pledge_start_date']));
+      // CRM-18854
+      if (CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
+        if (CRM_Utils_Array::value('pledge_start_date', $pledgeBlock)) {
+          $defaults = array();
+          $date = unserialize($pledgeBlock['pledge_start_date']);
+          list($field, $value) = each($date);
+          switch ($field) {
+            case 'contribution_date':
+            case 'calendar_date':
+              $form->addDate('start_date', ts('First installment payment'));
+              list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($value);
+              $form->assign('is_date', TRUE);
+              $paymentDate = $value;
+              break;
+            case 'calendar_month':
+              $month = CRM_Utils_Date::getCalendarDayOfMonth();
+              $form->add('select', 'start_date', ts('Day of month installments paid'), $month);
+              $paymentDate = CRM_Pledge_BAO_Pledge::getPaymentDate($value);
+              list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($paymentDate);
+              break;
+            default:
+              break;
+          }
+          $form->setDefaults($defaults);
+          $form->assign('start_date_display', $paymentDate);
+          $form->assign('start_date_editable', FALSE);
+          if (CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+            $form->assign('start_date_editable', TRUE);
+            if ($field == 'calendar_month') {
+              $form->assign('is_date', FALSE);
+              $form->setDefaults(array('start_date' => $value));
+            }
+          }
+        }
       }
     }
   }

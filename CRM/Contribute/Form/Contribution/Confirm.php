@@ -974,6 +974,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $contribParams = array(
             'id' => $contribution->id,
             'contribution_recur_id' => $recurringPledge['id'],
+            'contribution_status_id' => 'Pending',
           );
           civicrm_api3('Contribution', 'create', $contribParams);
         }

@@ -1231,4 +1231,33 @@ SELECT  pledge.contact_id              as contact_id,
     return $recurring;
   }
 
+  /**
+   * Get first payment date for pledge.
+   *
+   */
+  public static function getPaymentDate($day) {
+    if ($day == 31) {
+      // Find out if current month has 31 days, if not, set it to 30 (last day).
+      $t = date('t');
+      if ($t != $day) {
+        $day = $t;
+      }
+    }
+    $current = date('d');
+    switch (TRUE) {
+      case ($day == $current):
+        $date = date('m/d/Y');
+        break;
+      case ($day > $current):
+        $date = date('m/d/Y', mktime(0,0,0,date('m'),$day,date('Y')));
+        break;
+      case ($day < $current):
+        $date = date('m/d/Y', mktime(0,0,0,date('m', strtotime("+1 month")),$day,date('Y')));
+        break;
+      default:
+        break;
+    }
+    return $date;
+  }
+
 }
