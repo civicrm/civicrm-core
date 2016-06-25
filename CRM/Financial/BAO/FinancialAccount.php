@@ -418,8 +418,8 @@ LIMIT 1";
       if ($entity == 'PriceField') {
         $params[1] = array('pf', 'Text');
         $params[3] = array(
-         ' INNER JOIN civicrm_price_field pf ON pf.price_set_id = ps.id ',
-         'Text',
+          ' INNER JOIN civicrm_price_field pf ON pf.price_set_id = ps.id ',
+          'Text',
         );
       }
       $extends = CRM_Core_DAO::singleValueQuery($query, $params);
