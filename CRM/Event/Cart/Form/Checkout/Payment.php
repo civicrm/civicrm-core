@@ -265,11 +265,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
       $discountCode = $this->_price_values['discountcode'];
       if (!empty($discountCode)) {
-        $ret=$this->apply_discount($discountCode, $price_set_amount, $cost, $event_in_cart->event_id);
+        $ret = $this->apply_discount($discountCode, $price_set_amount, $cost, $event_in_cart->event_id);
         if ($ret == FALSE) {
           $cost = $event_price_values['amount'];
         }
-      } else {
+      }
+      else {
         $cost = $event_price_values['amount'];
       }
       // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
@@ -740,11 +741,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
-   * @param $discountCode
-   * @param array &$price_set_amount
-   * @param &$cost
+   * @param string $discountCode
+   * @param array $price_set_amount
+   * @param $cost
    */
-  protected function apply_discount($discountCode, &$price_set_amount, &$cost, &$event_id) {
+  protected function apply_discount($discountCode, &$price_set_amount, &$cost, $event_id) {
     //need better way to determine if cividiscount installed
     $autoDiscount = array();
     $sql = "select is_active from civicrm_extension where name like 'CiviDiscount%'";
@@ -756,13 +757,13 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
     $discounted_priceset_ids = _cividiscount_get_discounted_priceset_ids();
     $discounts = _cividiscount_get_discounts();
-    $events = array();
+
     $stat = FALSE;
     foreach ($discounts as $key => $discountValue) {
       if ($key == $discountCode) {
-        $events = CRM_Utils_Array::value('events',$discountValue);
-        $evt_ids = implode(",",$events);
-        if ($evt_ids == "0" || strpos($evt_ids, $event_id)){
+        $events = CRM_Utils_Array::value('events', $discountValue);
+        $evt_ids = implode(",", $events);
+        if ($evt_ids == "0" || strpos($evt_ids, $event_id)) {
           $event_match = TRUE;
         }
         //check priceset is_active
@@ -771,8 +772,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
           $diff1 = date_diff(date_create($today), date_create($discountValue['active_on']));
           if ($diff1->days > 0) {
             $active1 = TRUE;
-	  }
-        } else {
+          }
+        }
+        else {
           $active1 = TRUE;
         }
         if ($discountValue['expire_on'] != NULL) {
@@ -792,7 +794,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
             $price_set_amount[$key]['line_total'] = $discounted[0];
             $cost += $discounted[0];
             $price_set_amount[$key]['label'] = $discounted[1];
-	  } else {
+          }
+          else {
             $cost += $price['line_total'];
           }
         }
@@ -801,4 +804,5 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
     return $stat;
   }
+
 }
