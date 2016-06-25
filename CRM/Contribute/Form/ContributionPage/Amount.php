@@ -518,6 +518,8 @@ SELECT id
     else {
       $params['pledge_start_date'] = '';
       $params['adjust_recur_start_date'] = 0;
+      $params['is_pledge_start_date_visible'] = 0;
+      $params['is_pledge_start_date_editable'] = 0;
     }
     if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $params)) {
       $params['is_pledge_start_date_visible'] = 0;

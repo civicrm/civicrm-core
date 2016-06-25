@@ -1232,6 +1232,37 @@ SELECT  pledge.contact_id              as contact_id,
   }
 
   /**
+   * Get pledge start date.
+   *
+   * @return string
+   *   start date
+   */
+  public static function getPledgeStartDate($date, $pledgeBlock) {
+    $startDate = unserialize($pledgeBlock['pledge_start_date']);
+    list($field, $value) = each($startDate);
+    if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $plegeBlock)) {
+      return date('Ymd', strtotime($value));
+    }
+    if (!CRM_Utils_Array::value('is_pledge_start_date_editable', $plegeBlock)) {
+      return $date;
+    }
+    switch ($field) {
+      case 'contribution_date':
+      case 'calendar_date':
+        $date = date('Ymd', strtotime($date));
+        break;
+      case 'calendar_month':
+        $month = CRM_Utils_Date::getCalendarDayOfMonth();
+        $date = self::getPaymentDate($date);
+        $date = date('Ymd', strtotime($date));
+        break;
+      default:
+        break;
+    }
+    return $date;
+  }
+
+  /**
    * Get first payment date for pledge.
    *
    */
@@ -1249,10 +1280,10 @@ SELECT  pledge.contact_id              as contact_id,
         $date = date('m/d/Y');
         break;
       case ($day > $current):
-        $date = date('m/d/Y', mktime(0,0,0,date('m'),$day,date('Y')));
+        $date = date('m/d/Y', mktime(0, 0, 0, date('m'), $day, date('Y')));
         break;
       case ($day < $current):
-        $date = date('m/d/Y', mktime(0,0,0,date('m', strtotime("+1 month")),$day,date('Y')));
+        $date = date('m/d/Y', mktime(0, 0, 0, date('m', strtotime("+1 month")), $day, date('Y')));
         break;
       default:
         break;
