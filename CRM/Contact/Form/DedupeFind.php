@@ -51,7 +51,9 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
     $groupList = array('' => ts('- All Contacts -')) + CRM_Core_PseudoConstant::nestedGroup();
 
     $this->add('select', 'group_id', ts('Select Group'), $groupList, FALSE, array('class' => 'crm-select2 huge'));
-    $this->add('text', 'limit', ts('No of contacts to find matches for '));
+    if (Civi::settings()->get('dedupe_default_limit')) {
+      $this->add('text', 'limit', ts('No of contacts to find matches for '));
+    }
     $this->addButtons(array(
         array(
           'type' => 'next',
@@ -70,7 +72,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   }
 
   public function setDefaultValues() {
-    $this->_defaults['limit'] = 1000;
+    $this->_defaults['limit'] = Civi::settings()->get('dedupe_default_limit');
     return $this->_defaults;
   }
 
@@ -89,7 +91,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
       $url .= "&gid={$values['group_id']}";
     }
 
-    if ($values['limit']) {
+    if (!empty($values['limit'])) {
       $url .= '&limit=' . $values['limit'];
     }
 

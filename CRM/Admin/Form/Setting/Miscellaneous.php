@@ -52,6 +52,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'wkhtmltopdfPath' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recentItemsMaxCount' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recentItemsProviders' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'dedupe_default_limit' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   public $_uploadMaxSize;
@@ -60,10 +61,20 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
    * Basic setup.
    */
   public function preProcess() {
-    $config = CRM_Core_Config::singleton();
     $this->_uploadMaxSize = (int) ini_get('upload_max_filesize');
     // check for post max size
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
+    // This is a temp hack for the fact we really don't need to hard-code each setting in the tpl but
+    // we haven't worked through NOT doing that. These settings have been un-hardcoded.
+    $this->assign('pure_config_settings', array(
+      'empoweredBy',
+      'max_attachments',
+      'maxFileSize',
+      'secondDegRelPermissions',
+      'recentItemsMaxCount',
+      'recentItemsProviders',
+      'dedupe_default_limit',
+    ));
   }
 
   /**
