@@ -130,19 +130,16 @@ SELECT id
         array('onclick' => "showHideByValue('adjust_recur_start_date',true,'recurDefaults','table-row','radio',false);")
       );
       $this->addDate('pledge_calendar_date', ts('Specific Calendar Date'));
-      for ($i=1; $i<=31; $i++) {
-        $month[$i] = $i;
-        if ($i == 31) {
-          $month[$i] = $i . ' / Last day of month';
-        }
-      }
-      $this->add('select', 'pledge_calendar_month', ts('Specific Calendar Month'), $month);
+      $month = CRM_Utils_Date::getCalendarDayOfMonth();
+      $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month);
       $pledgeDefaults = array(
         'contribution_date' => ts('Day of Contribution'),
         'calendar_date' => ts('Specific Calendar Date'),
-        'calendar_month' => ts('Specific Calendar Month'),
+        'calendar_month' => ts('Specific day of Month'),
       );
       $this->addRadio('pledge_default_toggle', ts('Recurring Contribution Start Date Default'), $pledgeDefaults, array('allowClear' => FALSE), '<br/><br/>');
+      $this->addElement('checkbox', 'is_pledge_start_date_visible', ts('Show Recurring Donation Start Date?'), NULL);
+      $this->addElement('checkbox', 'is_pledge_start_date_editable', ts('Allow Edits to Recurring Donation Start date?'), NULL);
     }
 
     // add pay later options
