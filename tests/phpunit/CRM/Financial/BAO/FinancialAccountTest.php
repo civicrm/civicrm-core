@@ -267,7 +267,6 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-<<<<<<< HEAD
    * Test for validating financial type has deferred revenue account relationship.
    */
   public function testcheckFinancialTypeHasDeferred() {
