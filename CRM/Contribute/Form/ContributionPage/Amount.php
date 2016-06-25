@@ -499,6 +499,30 @@ SELECT id
       $params['is_recur_installments'] = CRM_Utils_Array::value('is_recur_installments', $params, FALSE);
     }
 
+    if (CRM_Utils_Array::value('adjust_recur_start_date', $params)) {
+      $fieldValue = '';
+      $pledgeDateFields = array(
+        'calendar_date' => 'pledge_calendar_date',
+        'calendar_month' => 'pledge_calendar_month',
+      );
+      if ($params['pledge_default_toggle'] == 'contribution_date') {
+        $fieldValue = serialize(array('contribution_date' => date('Ymd')));
+      }
+      else {
+        foreach ($pledgeDateFields as $key => $pledgeDateField) {
+          if (CRM_Utils_Array::value($pledgeDateField, $params) && $params['pledge_default_toggle'] == $key) {
+            $fieldValue = serialize(array($key => $params[$pledgeDateField]));
+            break;
+          }
+        }
+      }
+      $params['pledge_start_date'] = $fieldValue;
+    }
+    else {
+      $params['pledge_start_date'] = '';
+      $params['adjust_recur_start_date'] = 0;
+    }
+
     if (array_key_exists('payment_processor', $params) &&
       !CRM_Utils_System::isNull($params['payment_processor'])
     ) {
@@ -738,7 +762,9 @@ SELECT id
             $pledgeBlockParams['is_pledge_interval'] = CRM_Utils_Array::value('is_pledge_interval',
               $params, FALSE
             );
-            $pledgeBlockParams['pledge_start_date'] = CRM_Utils_Date::processDate($params['pledge_start_date']);
+            $pledgeBlockParams['pledge_start_date'] = CRM_Utils_Array::value('pledge_start_date',
+              $params, FALSE
+            );
             // create pledge block.
             CRM_Pledge_BAO_PledgeBlock::create($pledgeBlockParams);
           }

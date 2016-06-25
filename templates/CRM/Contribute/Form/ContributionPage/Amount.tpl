@@ -119,7 +119,8 @@
 
         </table>
     </div>
-    <span></span>
+    <span id="pledge_calendar_date_field">&nbsp;&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=pledge_calendar_date}</span>
+    <span id="pledge_calendar_month_field">&nbsp;&nbsp;{$form.pledge_calendar_month.html}<br/><span class="description">{ts}Recurring payment will be processed this day of the month following submission of this contribution page.{/ts}</span></span>
 
 
     <div id="amountFields">
@@ -204,9 +205,43 @@
       </div>
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
 {literal}
 <script type="text/javascript">
+   CRM.$(function($) {
+     var defId = $('input[name="pledge_default_toggle"][value="contribution_date"]').attr('id');
+     var calId = $('input[name="pledge_default_toggle"][value="calendar_date"]').attr('id');
+     var monId = $('input[name="pledge_default_toggle"][value="calendar_month"]').attr('id');
+
+     $("label[for='" + calId + "']").append($('#pledge_calendar_date_field'));
+     $("label[for='" + monId + "']").append($('#pledge_calendar_month_field'));
+
+     setDateDefaults();
+
+     $("#" + defId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', 'disabled');
+         $("#pledge_calendar_date").next('input').prop('disabled', 'disabled');
+       }
+     });
+
+     $("#" + calId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', false);
+         $("#pledge_calendar_date").next('input').prop('disabled', false);
+       }
+     });
+
+     $("#" + monId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', false);
+         $("#pledge_calendar_date").next('input').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', 'disabled');
+       }
+     });
+
+   });
    var paymentProcessorMapper = [];
      {/literal}
        {if $recurringPaymentProcessor}
@@ -338,6 +373,17 @@
             }
             cj( '#recurringContribution' ).hide( );
         }
+    }
+
+    function setDateDefaults() {
+     {/literal}{if !$pledge_calendar_date}{literal}
+       cj('#pledge_calendar_date').prop('disabled', 'disabled');
+       cj("#pledge_calendar_date").next('input').prop('disabled', 'disabled'); 
+     {/literal}{/if}
+
+     {if !$pledge_calendar_month}{literal}
+       cj('#pledge_calendar_month').prop('disabled', 'disabled');
+     {/literal}{/if}{literal}
     }
 
 </script>

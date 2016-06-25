@@ -298,7 +298,18 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
         if ($key == 'pledge_start_date' && CRM_Utils_Array::value($key, $pledgeBlockDefaults)) {
-          list($defaults['pledge_start_date'], $defaults['pledge_start_date_time']) = CRM_Utils_Date::setDateDefaults($pledgeBlockDefaults[$key]);
+          $defaultPledgeDate = unserialize($pledgeBlockDefaults['pledge_start_date']);
+          $pledgeDateFields = array(
+            'pledge_calendar_date' => 'calendar_date',
+            'pledge_calendar_month' => 'calendar_month',
+          );
+          $defaults['pledge_default_toggle'] = key($defaultPledgeDate);
+          foreach ($pledgeDateFields as $key => $value) {
+            if (array_key_exists($value, $defaultPledgeDate)) {
+              $defaults[$key] = reset($defaultPledgeDate);
+              $this->assign($key, reset($defaultPledgeDate));
+            }
+          }
         }
       }
       if (!empty($pledgeBlockDefaults['pledge_frequency_unit'])) {
