@@ -97,9 +97,10 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
     }
-    if (!empty($params['financial_account_type_id'])
+    if (!empty($params['id'])
+      && !empty($params['financial_account_type_id'])
       && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount(
-        CRM_Utils_Array::value('id', $params),
+        $params['id'],
         $params['financial_account_type_id']
       )
     ) {
