@@ -99,7 +99,7 @@ class CRM_Financial_Page_AJAX {
     }
     $params['orderColumn'] = 'label';
     $result = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
- 
+
     $elements = array(
       array(
         'name' => ts('- Select Financial Account Relationship -'),
