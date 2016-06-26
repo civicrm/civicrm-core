@@ -84,8 +84,6 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
    *
    * @return CRM_Financial_DAO_FinancialAccount
    */
@@ -122,13 +120,12 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
     $financialAccount->copyValues($params);
     //CRM-16189
     $accountType = CRM_Core_PseudoConstant::accountOptionValues(
-      'financial_account_type', 
-      NULL, 
+      'financial_account_type',
+      NULL,
       " AND v.name IN ('Liability', 'Asset') "
     );
     if (!CRM_Utils_Array::value($financialAccount->financial_account_type_id, $accountType)) {
-      $financialAccount->opening_balance =
-        $financialAccount->current_period_opening_balance = '0.00';
+      $financialAccount->opening_balance = $financialAccount->current_period_opening_balance = '0.00';
     }
     $financialAccount->save();
     return $financialAccount;

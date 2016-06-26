@@ -192,8 +192,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $defaults = parent::setDefaultValues();
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id');
-      $defaults['opening_balance'] =
-        $defaults['current_period_opening_balance'] = '0.00';
+      $defaults['opening_balance'] = $defaults['current_period_opening_balance'] = '0.00';
     }
     return $defaults;
   }
@@ -216,7 +215,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
       $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
       CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', array(1 => $financialAccount->name)), ts('Saved'), 'success');
-     
     }
   }
 
