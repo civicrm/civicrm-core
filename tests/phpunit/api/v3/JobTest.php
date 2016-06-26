@@ -354,6 +354,47 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the batch merge does not fatal on an empty rule.
+   *
+   * @dataProvider getRuleSets
+   *
+   * @param string $contactType
+   * @param string $used
+   * @param bool $isReserved
+   * @param int $threshold
+   */
+  public function testBatchMergeEmptyRule($contactType, $used, $name, $isReserved, $threshold) {
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+      'contact_type' => $contactType,
+      'threshold' => $threshold,
+      'used' => $used,
+      'name' => $name,
+      'is_reserved' => $isReserved,
+    ));
+    $this->callAPISuccess('Job', 'process_batch_merge', array('rule_group_id' => $ruleGroup['id']));
+    $this->callAPISuccess('RuleGroup', 'delete', array('id' => $ruleGroup['id']));
+  }
+
+  /**
+   * Get the various rule combinations.
+   */
+  public function getRuleSets() {
+    $contactTypes = array('Individual', 'Organization', 'Household');
+    $useds = array('Unsupervised', 'General', 'Supervised');
+    $ruleGroups = array();
+    foreach ($contactTypes as $contactType) {
+      foreach ($useds as $used) {
+        $ruleGroups[] = array($contactType, $used, 'Bob', FALSE, 0);
+        $ruleGroups[] = array($contactType, $used, 'Bob', FALSE, 10);
+        $ruleGroups[] = array($contactType, $used, 'Bob', TRUE, 10);
+        $ruleGroups[] = array($contactType, $used, $contactType . $used, FALSE, 10);
+        $ruleGroups[] = array($contactType, $used, $contactType . $used, TRUE, 10);
+      }
+    }
+    return $ruleGroups;
+  }
+
+  /**
    * Test the batch merge does not create duplicate emails.
    *
    * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
@@ -436,6 +477,42 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'contact_id' => array('IN' => array_keys($contacts['values'])),
     ), 5);
 
+  }
+
+  /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeWorksCheckPermissionsTrue($dataSet) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'administer CiviCRM');
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 1, 'mode' => $dataSet['mode']));
+    $this->assertEquals(0, count($result['values']['merged']), 'User does not have permission to any contacts, so no merging');
+    $this->assertEquals(0, count($result['values']['skipped']), 'User does not have permission to any contacts, so no skip visibility');
+  }
+
+  /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeWorksCheckPermissionsFalse($dataSet) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit my contact');
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => $dataSet['mode']));
+    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
+    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
   }
 
   /**
