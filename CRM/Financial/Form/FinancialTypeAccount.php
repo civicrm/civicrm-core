@@ -147,7 +147,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       $element = $this->add('select',
         'account_relationship',
         ts('Financial Account Relationship'),
-        array('select' => '- Select Financial Account Relationship -') + $AccountTypeRelationship,
+        array('select' => ts('- Select Financial Account Relationship -')) + $AccountTypeRelationship,
         TRUE
       );
     }
