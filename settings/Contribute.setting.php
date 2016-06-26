@@ -87,7 +87,7 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
- 'acl_financial_type' => array(
+  'acl_financial_type' => array(
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'acl_financial_type',

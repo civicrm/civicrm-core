@@ -170,7 +170,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     $this->addElement('hidden', 'prior_financial_period_hidden');
     parent::buildQuickForm();
     $this->addButtons(array(
-       array(
+        array(
           'type' => 'next',
           'name' => ts('Save'),
           'js' => array('onclick' => "return checkPeriod();"),
@@ -186,7 +186,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   }
 
   /**
-  * Global validation rules for the form.
+   * Global validation rules for the form.
    *
    * @param array $values
    *   posted values of the form
