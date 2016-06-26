@@ -546,8 +546,7 @@ VALUES
     ( @domainID, 'civicrm/report/list?reset=1',                            '{ts escape="sql" skip="true"}All Reports{/ts}',  'All Reports', 'access CiviReport',    '', @adminReportlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/report/template/list?reset=1',             '{ts escape="sql" skip="true"}Create New Report from Template{/ts}', 'Create New Report from Template', 'administer Reports', '', @adminReportlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/admin/report/options/report_template?reset=1',   '{ts escape="sql" skip="true"}Manage Templates{/ts}', 'Manage Templates', 'administer Reports',  '', @adminReportlastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/admin/report/register?reset=1',                  '{ts escape="sql" skip="true"}Register Report{/ts}',  'Register Report',  'administer Reports',  '', @adminReportlastID, '1', NULL, 4 ),
-    ( @domainID, 'civicrm/report/list?myreports=1&reset=1',                '{ts escape="sql" skip="true"}My Reports{/ts}', 'My Reports', 'access CiviReport', '', @reportLastID, '1', 1, 15 );
+    ( @domainID, 'civicrm/admin/report/register?reset=1',                  '{ts escape="sql" skip="true"}Register Report{/ts}',  'Register Report',  'administer Reports',  '', @adminReportlastID, '1', NULL, 4 );
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
@@ -622,7 +621,8 @@ VALUES
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, 'civicrm/report/list?reset=1', '{ts escape="sql" skip="true"}All Reports{/ts}', 'All Reports', 'access CiviReport', '', @reportlastID, '1', 1,    10 );
+    ( @domainID, 'civicrm/report/list?reset=1', '{ts escape="sql" skip="true"}All Reports{/ts}', 'All Reports', 'access CiviReport', '', @reportlastID, '1', 1,    10 ),
+( @domainID, 'civicrm/report/list?myreports=1&reset=1',                '{ts escape="sql" skip="true"}My Reports{/ts}', 'My Reports', 'access CiviReport', '', @reportlastID, '1', 1, 11);
 
 -- sample report instances
 
