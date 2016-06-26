@@ -436,7 +436,7 @@ LIMIT 1";
     }
     return FALSE;
   }
-  
+
   /**
    * Validate if Deferred Account is set for Financial Type
    * when Deferred Revenue is enabled
