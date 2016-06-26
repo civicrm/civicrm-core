@@ -661,59 +661,40 @@ LIMIT {$offset}, {$rowCount}
     if ($rowCount < 0) {
       $rowCount = 0;
     }
-    $contactType = '';
-    if ($rgid) {
-      $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
-    }
 
     $whereClause = $orderByClause = '';
     $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
     $searchRows       = array();
-    $selectorElements = array('is_selected', 'is_selected_input', 'src_image', 'src', 'src_email', 'src_street', 'src_postcode', 'dst_image', 'dst', 'dst_email', 'dst_street', 'dst_postcode', 'conflicts', 'weight', 'actions');
 
-    foreach ($_REQUEST['columns'] as $columnInfo) {
-      if (!empty($columnInfo['search']['value'])) {
-        ${$columnInfo['data']} = CRM_Utils_Type::escape($columnInfo['search']['value'], 'String');
-      }
-    }
+    $searchParams = self::getSearchOptionsFromRequest();
+    $queryParams = array();
+
     $join  = '';
     $where = array();
-    $searchData = CRM_Utils_Array::value('search', $_REQUEST);
-    $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
 
-    if (!empty($src) || !empty($searchData['value'])) {
-      $src = $src ? $src : $searchData['value'];
-      $where[] = " cc1.display_name LIKE '%{$src}%'";
+    $isOrQuery = self::isOrQuery();
+
+    $nextParamKey = 3;
+    $mappings = array(
+      'src' => 'cc1.display_name',
+      'dst' => 'cc2.display_name',
+      'src_email' => 'ce1.email',
+      'dst_email' => 'ce2.email',
+      'src_postcode' => 'ca1.postal_code',
+      'dst_postcode' => 'ca2.postal_code',
+      'src_street' => 'ca1.street',
+      'dst_street' => 'ca2.street',
+    );
+
+    foreach ($mappings as $key => $dbName) {
+      if (!empty($searchParams[$key])) {
+        $queryParams[$nextParamKey] = array('%' . $searchParams[$key] . '%', 'String');
+        $where[] = $dbName . " LIKE %{$nextParamKey} ";
+        $nextParamKey++;
+      }
     }
-    if (!empty($dst) || !empty($searchData['value'])) {
-      $dst = $dst ? $dst : $searchData['value'];
-      $where[] = " cc2.display_name LIKE '%{$dst}%'";
-    }
-    if (!empty($src_email) || !empty($searchData['value'])) {
-      $src_email = $src_email ? $src_email : $searchData['value'];
-      $where[] = " (ce1.is_primary = 1 AND ce1.email LIKE '%{$src_email}%')";
-    }
-    if (!empty($dst_email) || !empty($searchData['value'])) {
-      $dst_email = $dst_email ? $dst_email : $searchData['value'];
-      $where[] = " (ce2.is_primary = 1 AND ce2.email LIKE '%{$dst_email}%')";
-    }
-    if (!empty($src_postcode) || !empty($searchData['value'])) {
-      $src_postcode = $src_postcode ? $src_postcode : $searchData['value'];
-      $where[] = " (ca1.is_primary = 1 AND ca1.postal_code LIKE '%{$src_postcode}%')";
-    }
-    if (!empty($dst_postcode) || !empty($searchData['value'])) {
-      $dst_postcode = $dst_postcode ? $dst_postcode : $searchData['value'];
-      $where[] = " (ca2.is_primary = 1 AND ca2.postal_code LIKE '%{$dst_postcode}%')";
-    }
-    if (!empty($src_street) || !empty($searchData['value'])) {
-      $src_street = $src_street ? $src_street : $searchData['value'];
-      $where[] = " (ca1.is_primary = 1 AND ca1.street_address LIKE '%{$src_street}%')";
-    }
-    if (!empty($dst_street) || !empty($searchData['value'])) {
-      $dst_street = $dst_street ? $dst_street : $searchData['value'];
-      $where[] = " (ca2.is_primary = 1 AND ca2.street_address LIKE '%{$dst_street}%')";
-    }
-    if (!empty($searchData['value'])) {
+
+    if ($isOrQuery) {
       $whereClause   = ' ( ' . implode(' OR ', $where) . ' ) ';
     }
     else {
@@ -751,7 +732,7 @@ LIMIT {$offset}, {$rowCount}
       $join .= " LEFT JOIN civicrm_address ca1 ON (ca1.contact_id = pn.entity_id1 AND ca1.is_primary = 1 )";
       $join .= " LEFT JOIN civicrm_address ca2 ON (ca2.contact_id = pn.entity_id2 AND ca2.is_primary = 1 )";
     }
-    $iTotal = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, $join, $whereClause);
+    $iTotal = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, $join, $whereClause, '=', $queryParams);
     if (!empty($_REQUEST['order'])) {
       foreach ($_REQUEST['order'] as $orderInfo) {
         if (!empty($orderInfo['column'])) {
@@ -800,7 +781,7 @@ LIMIT {$offset}, {$rowCount}
       }
     }
 
-    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $whereClause, $offset, $rowCount, $select, $orderByClause);
+    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $whereClause, $offset, $rowCount, $select, $orderByClause, TRUE, $queryParams);
     $iFilteredTotal = CRM_Core_DAO::singleValueQuery("SELECT FOUND_ROWS()");
 
     $count = 0;
@@ -862,6 +843,62 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
+   * Get the searchable options from the request.
+   *
+   * @return array
+   */
+  public static function getSearchOptionsFromRequest() {
+    $searchParams = array();
+    $searchData = CRM_Utils_Array::value('search', $_REQUEST);
+    $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
+    $selectorElements = array(
+      'is_selected',
+      'is_selected_input',
+      'src_image',
+      'src',
+      'src_email',
+      'src_street',
+      'src_postcode',
+      'dst_image',
+      'dst',
+      'dst_email',
+      'dst_street',
+      'dst_postcode',
+      'conflicts',
+      'weight',
+      'actions',
+    );
+    $columns = $_REQUEST['columns'];
+
+    foreach ($columns as $column) {
+      if (!empty($column['search']['value']) && in_array($column['data'], $selectorElements)) {
+        $searchParams[$column['data']] = CRM_Utils_Type::escape($column['search']['value'], 'String');
+      }
+      elseif (!empty($searchData['value'])) {
+        $searchParams[$column['data']] = $searchData['value'];
+      }
+    }
+    return $searchParams;
+  }
+
+  /**
+   * Is the query an OR query.
+   *
+   * If a generic search value is passed in - ie. $_REQUEST['search']['value'] = 'abc'
+   * then all fields are searched for this.
+   *
+   * It is unclear if there is any code that still passes this in or whether is is just legacy. It
+   * could cause a server-killing query on a large site so it probably is NOT in use if we haven't
+   * had complaints.
+   *
+   * @return bool
+   */
+  public static function isOrQuery() {
+    $searchData = CRM_Utils_Array::value('search', $_REQUEST);
+    return !empty($searchData['value']);
+  }
+
+  /**
    * Retrieve a PDF Page Format for the PDF Letter form.
    */
   public function pdfFormat() {
@@ -890,22 +927,16 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function flipDupePairs($prevNextId = NULL) {
     if (!$prevNextId) {
-      $prevNextId = $_REQUEST['pnid'];
+      // @todo figure out if this is always POST & specify that rather than inexact GET
+      $prevNextId = CRM_Utils_Request::retrieve('pnid', 'Integer');
     }
-    $query = "
-      UPDATE civicrm_prevnext_cache cpc
-      INNER JOIN civicrm_prevnext_cache old on cpc.id = old.id
-      SET cpc.entity_id1 = cpc.entity_id2, cpc.entity_id2 = old.entity_id1 ";
+
+    $onlySelected = FALSE;
     if (is_array($prevNextId) && !CRM_Utils_Array::crmIsEmptyArray($prevNextId)) {
-      CRM_Utils_Type::escapeAll($prevNextId, 'Positive');
-      $prevNextId = implode(', ', $prevNextId);
-      $query     .= "WHERE cpc.id IN ({$prevNextId}) AND cpc.is_selected = 1";
+      $onlySelected = TRUE;
     }
-    else {
-      $prevNextId = CRM_Utils_Type::escape($prevNextId, 'Positive');
-      $query     .= "WHERE cpc.id = $prevNextId";
-    }
-    CRM_Core_DAO::executeQuery($query);
+    $prevNextId = CRM_Utils_Type::escapeAll((array) $prevNextId, 'Positive');
+    CRM_Core_BAO_PrevNextCache::flipPair($prevNextId, $onlySelected);
     CRM_Utils_JSON::output();
   }
 

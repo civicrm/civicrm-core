@@ -95,6 +95,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       )
     );
 
+    $descriptions = array();
     foreach ($this->_settings as $setting => $group) {
       $settingMetaData = civicrm_api('setting', 'getfields', array('version' => 3, 'name' => $setting));
       $props = $settingMetaData['values'][$setting];
@@ -135,6 +136,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
         else {
           $this->$add($setting, ts($props['title']));
         }
+        // Migrate to using an array as easier in smart...
+        $descriptions[$setting] = ts($props['description']);
         $this->assign("{$setting}_description", ts($props['description']));
         if ($setting == 'max_attachments') {
           //temp hack @todo fix to get from metadata
@@ -147,6 +150,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       }
     }
+    $this->assign('setting_descriptions', $descriptions);
   }
 
   /**

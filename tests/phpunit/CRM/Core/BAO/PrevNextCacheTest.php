@@ -26,62 +26,40 @@
  */
 
 /**
- * This api exposes CiviCRM rule_groups.
- *
- * RuleGroups are used to group dedupe critieria.
- *
- * @package CiviCRM_APIv3
+ * Class CRM_Core_BAO_PrevNextCacheTest
+ * @group headless
  */
+class CRM_Core_BAO_PrevNextCacheTest extends CiviUnitTestCase {
 
-/**
- * Create or update a rule_group.
- *
- * @param array $params
- *   Array per getfields metadata.
- *
- * @return array
- *   API result array
- */
-function civicrm_api3_rule_group_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
+  public function testFlipData() {
+    $dao = new CRM_Core_BAO_PrevNextCache();
+    $dao->entity_id1 = 1;
+    $dao->entity_id2 = 2;
+    $dao->data = serialize(array(
+      'srcID' => 1,
+      'srcName' => 'Ms. Meliissa Mouse II',
+      'dstID' => 2,
+      'dstName' => 'Mr. Maurice Mouse II',
+      'weight' => 20,
+      'canMerge' => TRUE,
+    ));
+    $dao->save();
+    $dao = new CRM_Core_BAO_PrevNextCache();
+    $dao->id = 1;
+    CRM_Core_BAO_PrevNextCache::flipPair(array(1), 0);
+    $dao->find(TRUE);
+    $this->assertEquals(2, $dao->entity_id1);
+    $this->assertEquals(1, $dao->entity_id2);
+    $this->assertEquals(serialize(array(
+      'srcName' => 'Mr. Maurice Mouse II',
+      'dstID' => 1,
+      'dstName' => 'Ms. Meliissa Mouse II',
+      'weight' => 20,
+      'canMerge' => TRUE,
+      'srcID' => 2,
+    )), $dao->data);
 
-/**
- * Specify Meta data for create.
- *
- * Note that this data is retrievable via the getfields function
- * and is used for pre-filling defaults and ensuring mandatory requirements are met.
- *
- * @param array $params
- */
-function _civicrm_api3_rule_group_create_spec(&$params) {
-  $params['contact_type']['api.required'] = TRUE;
-  $params['threshold']['api.required'] = TRUE;
-  $params['used']['api.required'] = TRUE;
-  $params['name']['api.required'] = TRUE;
-}
+    $this->quickCleanup(array('civicrm_prevnext_cache'));
+  }
 
-/**
- * Delete an existing RuleGroup.
- *
- * @param array $params
- *
- * @return array
- *   API result array
- */
-function civicrm_api3_rule_group_delete($params) {
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
-
-/**
- * Get a RuleGroup.
- *
- * @param array $params
- *   Array per getfields metadata.
- *
- * @return array
- *   API result array
- */
-function civicrm_api3_rule_group_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
