@@ -1009,7 +1009,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $errors['revenue_recognition_date'] = ts('Month and Year are required field for Revenue Recognition.');
     }
     // CRM-16189
-    $errorMessage = CRM_Financial_BAO_FinancialAccount::checkForValidFinancialType($fields, $self->_id, $self);
+    $errorMessage = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($fields, $self->_id, $self);
     if ($errorMessage) {
       $errors['financial_type_id'] = ' ';
       $errors['_qf_default'] = $errorMessage;

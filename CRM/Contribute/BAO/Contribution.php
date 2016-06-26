@@ -178,7 +178,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     // CRM-16189
-    $error = CRM_Financial_BAO_FinancialAccount::checkForValidFinancialType($params, $contributionID);
+    $error = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contributionID);
     if ($error) {
       throw new CRM_Core_Exception($error);
     }
