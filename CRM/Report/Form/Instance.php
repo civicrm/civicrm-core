@@ -228,7 +228,7 @@ class CRM_Report_Form_Instance {
       $defaults['permission'] = $permissions['CiviReport: access CiviReport'];
     }
 
-    $config = CRM_Core_Config::singleton();
+    $userFrameworkResourceURL = CRM_Core_Config::singleton()->userFrameworkResourceURL;
 
     // Add a special region for the default HTML header of printed reports.  It
     // won't affect reports with customized headers, just ones with the default.
@@ -239,12 +239,12 @@ class CRM_Report_Form_Instance {
   <head>
     <title>CiviCRM Report</title>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-    <style type=\"text/css\">@import url({$config->userFrameworkResourceURL}css/print.css);</style>
+    <style type=\"text/css\">@import url({$userFrameworkResourceURL}css/print.css);</style>
     {$htmlHeader}
   </head>
   <body><div id=\"crm-container\">";
 
-    $defaults['report_footer'] = $report_footer = "<p><img src=\"{$config->userFrameworkResourceURL}i/powered_by.png\" /></p></div></body>
+    $defaults['report_footer'] = $report_footer = "<p><img src=\"{$userFrameworkResourceURL}i/powered_by.png\" /></p></div></body>
 </html>
 ";
 
@@ -358,6 +358,7 @@ class CRM_Report_Form_Instance {
       'report_header',
       'report_footer',
       'grouprole',
+      'task',
     );
     foreach ($unsetFields as $field) {
       unset($formValues[$field]);
