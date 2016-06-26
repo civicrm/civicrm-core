@@ -712,6 +712,9 @@ class CRM_Utils_REST {
       $session = CRM_Core_Session::singleton();
       $session->set('ufID', $uid);
       $session->set('userID', $contact_id);
+      CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+        array(1 => array($contact_id, 'Integer'))
+      );
       return NULL;
     }
     else {
