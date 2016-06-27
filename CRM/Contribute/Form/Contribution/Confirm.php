@@ -935,7 +935,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date("Ymd");
         $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($contribution->contribution_page_id);
         if (CRM_Utils_Array::value('start_date', $params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
-          $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($params['start_date'], $pledgeBlock);
+          $pledgeStartDate = CRM_Utils_Array::value('start_date', $params, NULL);
+          $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
         }
         $pledgeParams['status_id'] = $contribution->contribution_status_id;
         $pledgeParams['max_reminders'] = $form->_values['max_reminders'];
@@ -1962,6 +1963,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // fix currency ID
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
+    // CRM-18854
+    if (CRM_Utils_Array::value('adjust_recur_start_date', $this->_values)) {
+      $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
+      if (CRM_Utils_Array::value('start_date', $this->_params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
+        $pledgeStartDate = CRM_Utils_Array::value('start_date', $this->_params, NULL);
+        $this->_params['receive_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
+      }
+    }
+
     //carry payment processor id.
     if (CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
       $this->_params['payment_processor_id'] = $this->_paymentProcessor['id'];
@@ -2348,6 +2358,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             'payment_processor_id' => $this->_paymentProcessor['id'],
             'is_transactional' => FALSE,
             'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+            'receive_date' => CRM_Utils_Array::value('receive_date', $result),
           )
         );
       }
