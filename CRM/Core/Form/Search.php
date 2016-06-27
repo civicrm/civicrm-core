@@ -119,8 +119,6 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
 
     $this->addClass('crm-search-form');
 
-    // for backwards compatibility we pass an argument to addTaskMenu even though
-    // it could just as well access $this->_taskList internally
     $tasks = $this->buildTaskList();
     $this->addTaskMenu($tasks);
   }
@@ -147,17 +145,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @param array $tasks
    */
   public function addTaskMenu($tasks) {
-    if (is_array($tasks) && !empty($tasks)) {
-      $tasks = array('' => ts('Actions')) + $tasks;
-      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions'));
-      $this->add('submit', $this->_actionButtonName, ts('Go'), array('class' => 'hiddenElement crm-search-go-button'));
-
-      // Radio to choose "All items" or "Selected items only"
-      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
-      $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
-      $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
+    $taskMetaData = array();
+    foreach ($tasks as $key => $task) {
+      $taskMetaData[$key] = array('title' => $task);
     }
+    parent::addTaskMenu($taskMetaData);
   }
 
   /**

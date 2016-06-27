@@ -1558,8 +1558,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
  * Validate fields being passed into API.
  *
  * This function relies on the getFields function working accurately
- * for the given API. If error mode is set to TRUE then it will also check
- * foreign keys
+ * for the given API.
  *
  * As of writing only date was implemented.
  *
@@ -1569,12 +1568,10 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
  *   -.
  * @param array $fields
  *   Response from getfields all variables are the same as per civicrm_api.
- * @param bool $errorMode
- *   ErrorMode do intensive post fail checks?.
  *
  * @throws Exception
  */
-function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $errorMode = FALSE) {
+function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
   //CRM-15792 handle datetime for custom fields below code handles chain api call
   $chainApikeys = array_flip(preg_grep("/^api./", array_keys($params)));
   if (!empty($chainApikeys) && is_array($chainApikeys)) {
@@ -1630,21 +1627,38 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
         }
         break;
     }
+  }
+}
 
-    // intensive checks - usually only called after DB level fail
-    if (!empty($errorMode) && strtolower($action) == 'create') {
-      if (!empty($fieldInfo['FKClassName'])) {
-        if (!empty($fieldValue)) {
-          _civicrm_api3_validate_constraint($params, $fieldName, $fieldInfo);
-        }
-        elseif (!empty($fieldInfo['required'])) {
-          throw new Exception("DB Constraint Violation - possibly $fieldName should possibly be marked as mandatory for this API. If so, please raise a bug report.");
-        }
+/**
+ * Validate foreign key values of fields being passed into API.
+ *
+ * This function relies on the getFields function working accurately
+ * for the given API.
+ *
+ * @param string $entity
+ * @param string $action
+ * @param array $params
+ *
+ * @param array $fields
+ *   Response from getfields all variables are the same as per civicrm_api.
+ *
+ * @throws Exception
+ */
+function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields) {
+  // intensive checks - usually only called after DB level fail
+  foreach ($fields as $fieldName => $fieldInfo) {
+    if (!empty($fieldInfo['FKClassName'])) {
+      if (!empty($params[$fieldName])) {
+        _civicrm_api3_validate_constraint($params[$fieldName], $fieldName, $fieldInfo);
       }
-      if (!empty($fieldInfo['api.unique'])) {
-        $params['entity'] = $entity;
-        _civicrm_api3_validate_unique_key($params, $fieldName);
+      elseif (!empty($fieldInfo['required'])) {
+        throw new Exception("DB Constraint Violation - possibly $fieldName should possibly be marked as mandatory for this API. If so, please raise a bug report.");
       }
+    }
+    if (!empty($fieldInfo['api.unique'])) {
+      $params['entity'] = $entity;
+      _civicrm_api3_validate_unique_key($params, $fieldName);
     }
   }
 }

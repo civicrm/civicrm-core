@@ -247,7 +247,7 @@ WHERE cft.id = %1
   }
 
   /**
-   * Get Financial Account type relations
+   * Get Financial Account type relations.
    *
    * @param $flip bool
    *
@@ -280,6 +280,120 @@ WHERE cft.id = %1
       }
     }
     return $financialAccountLinks;
+  }
+
+  /**
+   * Get Deferred Financial type.
+   *
+   * @return array
+   *
+   */
+  public static function getDeferredFinancialType() {
+    $deferredFinancialType = array();
+    $query = "SELECT ce.entity_id, cft.name FROM civicrm_entity_financial_account ce
+INNER JOIN civicrm_financial_type cft ON ce.entity_id = cft.id
+WHERE ce.entity_table = 'civicrm_financial_type' AND ce.account_relationship = %1 AND cft.is_active = 1";
+    $deferredAccountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Deferred Revenue Account is' "));
+    $queryParams = array(1 => array($deferredAccountRel, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    while ($dao->fetch()) {
+      $deferredFinancialType[$dao->entity_id] = $dao->name;
+    }
+    return $deferredFinancialType;
+  }
+
+  /**
+   * Check if financial account is referenced by financial item.
+   *
+   * @param int $financialAccountId
+   *
+   * @param int $financialAccountTypeID
+   *
+   * @return bool
+   *
+   */
+  public static function validateFinancialAccount($financialAccountId, $financialAccountTypeID = NULL) {
+    $sql = "SELECT f.financial_account_type_id FROM civicrm_financial_account f
+INNER JOIN civicrm_financial_item fi ON fi.financial_account_id = f.id
+WHERE f.id = %1 AND f.financial_account_type_id IN (%2)
+LIMIT 1";
+    $params = array('labelColumn' => 'name');
+    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
+    $params = array(
+      1 => array($financialAccountId, 'Integer'),
+      2 => array(
+        implode(',',
+          array(
+            array_search('Revenue', $financialAccountType),
+            array_search('Liability', $financialAccountType),
+          )
+        ),
+        'Text',
+      ),
+    );
+    $result = CRM_Core_DAO::singleValueQuery($sql, $params);
+    if ($result && $result != $financialAccountTypeID) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Validate Financial Type has Deferred Revenue account relationship
+   * with Financial Account
+   *
+   * @param array $params
+   *
+   * @param int $contributionID
+   *
+   * @param obj $form
+   *
+   * @return string
+   *
+   */
+  public static function checkFinancialTypeHasDeferred($params, $contributionID = NULL, $form = NULL) {
+    if (!CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      return FALSE;
+    }
+    $recognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $params);
+    if (!(!CRM_Utils_System::isNull($recognitionDate)
+      || ($contributionID && $params['prevContribution']->revenue_recognition_date))
+    ) {
+      return FALSE;
+    }
+
+    $message = ts('Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+    $lineItems = CRM_Utils_Array::value('line_item', $params);
+    $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params);
+    if (!$financialTypeID) {
+      $financialTypeID = $params['prevContribution']->financial_type_id;
+    }
+    if (($contributionID || !empty($params['price_set_id'])) && empty($lineItems)) {
+      if (!$contributionID) {
+        CRM_Price_BAO_PriceSet::processAmount($form->_priceSet['fields'],
+        $params, $items);
+      }
+      else {
+        $items = CRM_Price_BAO_LineItem::getLineItems($contributionID, 'contribution', TRUE, TRUE, TRUE);
+      }
+      if (!empty($items)) {
+        $lineItems[] = $items;
+      }
+    }
+    $deferredFinancialType = self::getDeferredFinancialType();
+    if (!empty($lineItems)) {
+      foreach ($lineItems as $lineItem) {
+        foreach ($lineItem as $items) {
+          if (!array_key_exists($items['financial_type_id'], $deferredFinancialType)) {
+            return $message;
+          }
+        }
+      }
+    }
+    elseif (!array_key_exists($financialTypeID, $deferredFinancialType)) {
+      return $message;
+    }
+    return FALSE;
   }
 
 }

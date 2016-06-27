@@ -468,8 +468,17 @@ AND    $cond
       $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;
     }
 
-    $result = array();
+    $result = $sortedResult = array();
     foreach ($select as $tableName => $clauses) {
+      if (!empty($DTparams['sort'])) {
+        $query = CRM_Core_DAO::executeQuery("SELECT id FROM {$tableName} WHERE entity_id = {$entityID}");
+        $count = 1;
+        while ($query->fetch()) {
+          $sortedResult["{$query->id}"] = $count;
+          $count++;
+        }
+      }
+
       $query = "SELECT SQL_CALC_FOUND_ROWS id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
       $dao = CRM_Core_DAO::executeQuery($query);
       if (!empty($DTparams)) {
@@ -491,6 +500,9 @@ AND    $cond
           }
         }
       }
+    }
+    if (!empty($DTparams)) {
+      return array($result, $sortedResult);
     }
     return $result;
   }

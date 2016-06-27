@@ -477,12 +477,13 @@ function civicrm_api3_job_process_respondent($params) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_job_process_batch_merge($params) {
-  $rule_group_id = CRM_Utils_Array::value('rgid', $params);
+  $rule_group_id = CRM_Utils_Array::value('rule_group_id', $params);
   if (!$rule_group_id) {
     $rule_group_id = civicrm_api3('RuleGroup', 'getvalue', array(
       'contact_type' => 'Individual',
       'used' => 'Unsupervised',
       'return' => 'id',
+      'options' => array('limit' => 1),
     ));
   }
   $gid = CRM_Utils_Array::value('gid', $params);
@@ -490,7 +491,7 @@ function civicrm_api3_job_process_batch_merge($params) {
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
   $autoFlip = CRM_Utils_Array::value('auto_flip', $params, TRUE);
 
-  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, $autoFlip, 1, 2, CRM_Utils_Array::value('criteria', $params, array()));
+  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, $autoFlip, 1, 2, CRM_Utils_Array::value('criteria', $params, array()), CRM_Utils_Array::value('check_permissions', $params));
 
   return civicrm_api3_create_success($result, $params);
 }
@@ -501,9 +502,10 @@ function civicrm_api3_job_process_batch_merge($params) {
  * @param $params
  */
 function _civicrm_api3_job_process_batch_merge_spec(&$params) {
-  $params['rgid'] = array(
+  $params['rule_group_id'] = array(
     'title' => 'Dedupe rule group id, defaults to Contact Unsupervised rule',
     'type' => CRM_Utils_Type::T_INT,
+    'api.aliases' => array('rgid'),
   );
   $params['gid'] = array(
     'title' => 'group id',

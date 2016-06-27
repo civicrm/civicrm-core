@@ -173,7 +173,7 @@ $('#civicrm-menu').ready(function() {
       label = $selection.parent().text(),
       value = $selection.val();
     // These fields are not supported by advanced search
-    if (value === 'first_name' || value === 'last_name') {
+    if (!value || value === 'first_name' || value === 'last_name') {
       value = 'sort_name';
     }
     $('#sort_name_navigation').attr({name: value, placeholder: label});

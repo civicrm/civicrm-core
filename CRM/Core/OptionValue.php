@@ -280,8 +280,7 @@ class CRM_Core_OptionValue {
    * @param string $mode
    * @param string $contactType
    *
-   * @return bool
-   *   true if object exists
+   * @return array
    */
   public static function getFields($mode = '', $contactType = 'Individual') {
     $key = "$mode $contactType";

@@ -193,14 +193,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @param int $groupID
    * @param bool $useCache
+   * @param int $limit
+   *   Number to limit to (or 0 for unlimited).
    *
    * @return array
    *   this array contains the list of members for this group id
    */
-  public static function &getMember($groupID, $useCache = TRUE) {
+  public static function getMember($groupID, $useCache = TRUE, $limit = 0) {
     $params = array(array('group', '=', $groupID, 0, 0));
     $returnProperties = array('contact_id');
-    list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, $useCache);
+    list($contacts) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $limit, $useCache);
 
     $aMembers = array();
     foreach ($contacts as $contact) {
