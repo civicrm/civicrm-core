@@ -1240,10 +1240,10 @@ SELECT  pledge.contact_id              as contact_id,
   public static function getPledgeStartDate($date, $pledgeBlock) {
     $startDate = unserialize($pledgeBlock['pledge_start_date']);
     list($field, $value) = each($startDate);
-    if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $plegeBlock)) {
+    if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
       return date('Ymd', strtotime($value));
     }
-    if (!CRM_Utils_Array::value('is_pledge_start_date_editable', $plegeBlock)) {
+    if (!CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
       return $date;
     }
     switch ($field) {
