@@ -314,4 +314,23 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $this->assertEquals($valid, $message, "The messages do not match");
   }
 
+  /**
+   * Test if financial type has Deferred Revenue Account is relationship with Financial Account.
+   *
+   */
+  public function testValidateFinancialType() {
+    Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
+    $deferred = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
+    $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+    foreach ($financialTypes as $key => $value) {
+      $validate = CRM_Financial_BAO_FinancialAccount::validateFinancialType($key);
+      if (array_key_exists($key, $deferred)) {
+        $this->assertFalse($validate, "This should not have thrown an error.");
+      }
+      else {
+        $this->assertEquals($validate, TRUE);
+      }
+    }
+  }
+
 }
