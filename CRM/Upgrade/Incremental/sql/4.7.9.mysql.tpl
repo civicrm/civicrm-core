@@ -53,3 +53,9 @@ INSERT INTO `civicrm_entity_financial_account`
 VALUES
   ('civicrm_financial_type', @financial_type_id_ef, @option_value_rel_id_dr, @financial_account_id_dref),
   ('civicrm_financial_type', @financial_type_id_md, @option_value_rel_id_dr, @financial_account_id_drmd);
+
+-- CRM-18854
+ALTER TABLE civicrm_pledge_block ADD pledge_start_date varchar(64) NULL DEFAULT NULL COMMENT 'The date that the first scheduled pledge occurs.';
+ALTER TABLE civicrm_pledge_block ADD is_pledge_start_date_visible TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'If true - recurring start date is shown.';
+ALTER TABLE civicrm_pledge_block ADD is_pledge_start_date_editable TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'If true - recurring start date is editable.';
+ALTER TABLE civicrm_contribution_page ADD adjust_recur_start_date TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'If true - user is able to adjust payment start date.' AFTER is_recur_installments;

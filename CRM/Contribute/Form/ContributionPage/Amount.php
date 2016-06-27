@@ -87,22 +87,28 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
     $this->addElement('checkbox', 'is_monetary', ts('Execute real-time monetary transactions'));
 
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
-    $recurringPaymentProcessor = array();
+    $paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('live');
+    $recurringPaymentProcessor = $futurePaymentProcessor = $paymentProcessor = array();
 
-    if (!empty($paymentProcessor)) {
-      $paymentProcessorIds = implode(',', array_keys($paymentProcessor));
-      $query = "
-SELECT id
-  FROM civicrm_payment_processor
- WHERE id IN ({$paymentProcessorIds})
-   AND is_recur = 1";
-      $dao = CRM_Core_DAO::executeQuery($query);
-      while ($dao->fetch()) {
-        $recurringPaymentProcessor[] = $dao->id;
+    if (!empty($paymentProcessors)) {
+      foreach ($paymentProcessors as $id => $processor) {
+        if ($processor['name'] != 'pay_later') {
+          $paymentProcessor[$id] = $processor['name'];
+        }
+        if (CRM_Utils_Array::value('is_recur', $processor)) {
+          $recurringPaymentProcessor[] = $id;
+        }
+        if (CRM_Utils_Array::value('object', $processor) && $processor['object']->supports('FutureRecurStartDate')) {
+          $futurePaymentProcessor[] = $id;
+        }
       }
     }
-    $this->assign('recurringPaymentProcessor', $recurringPaymentProcessor);
+    if (count($recurringPaymentProcessor)) {
+      $this->assign('recurringPaymentProcessor', $recurringPaymentProcessor);
+    }
+    if (count($futurePaymentProcessor)) {
+      $this->assign('futurePaymentProcessor', $futurePaymentProcessor);
+    }
     if (count($paymentProcessor)) {
       $this->assign('paymentProcessor', $paymentProcessor);
     }
@@ -125,21 +131,6 @@ SELECT id
       );
       $this->addElement('checkbox', 'is_recur_interval', ts('Support recurring intervals'));
       $this->addElement('checkbox', 'is_recur_installments', ts('Offer installments'));
-      // CRM-18854
-      $this->addElement('checkbox', 'adjust_recur_start_date', ts('Adjust Recurring Start Date'), NULL,
-        array('onclick' => "showHideByValue('adjust_recur_start_date',true,'recurDefaults','table-row','radio',false);")
-      );
-      $this->addDate('pledge_calendar_date', ts('Specific Calendar Date'));
-      $month = CRM_Utils_Date::getCalendarDayOfMonth();
-      $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month);
-      $pledgeDefaults = array(
-        'contribution_date' => ts('Day of Contribution'),
-        'calendar_date' => ts('Specific Calendar Date'),
-        'calendar_month' => ts('Specific day of Month'),
-      );
-      $this->addRadio('pledge_default_toggle', ts('Recurring Contribution Start Date Default'), $pledgeDefaults, array('allowClear' => FALSE), '<br/><br/>');
-      $this->addElement('checkbox', 'is_pledge_start_date_visible', ts('Show Recurring Donation Start Date?'), NULL);
-      $this->addElement('checkbox', 'is_pledge_start_date_editable', ts('Allow Edits to Recurring Donation Start date?'), NULL);
     }
 
     // add pay later options
@@ -183,6 +174,23 @@ SELECT id
       $this->addElement('text', 'initial_reminder_day', ts('Send payment reminder'), array('size' => 3));
       $this->addElement('text', 'max_reminders', ts('Send up to'), array('size' => 3));
       $this->addElement('text', 'additional_reminder_day', ts('Send additional reminders'), array('size' => 3));
+      if (!empty($futurePaymentProcessor)) {
+        // CRM-18854
+        $this->addElement('checkbox', 'adjust_recur_start_date', ts('Adjust Recurring Start Date'), NULL,
+          array('onclick' => "showHideByValue('adjust_recur_start_date',true,'recurDefaults','table-row','radio',false);")
+        );
+        $this->addDate('pledge_calendar_date', ts('Specific Calendar Date'));
+        $month = CRM_Utils_Date::getCalendarDayOfMonth();
+        $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month);
+        $pledgeDefaults = array(
+          'contribution_date' => ts('Day of Contribution'),
+          'calendar_date' => ts('Specific Calendar Date'),
+          'calendar_month' => ts('Specific day of Month'),
+        );
+        $this->addRadio('pledge_default_toggle', ts('Recurring Contribution Start Date Default'), $pledgeDefaults, array('allowClear' => FALSE), '<br/><br/>');
+        $this->addElement('checkbox', 'is_pledge_start_date_visible', ts('Show Recurring Donation Start Date?'), NULL);
+        $this->addElement('checkbox', 'is_pledge_start_date_editable', ts('Allow Edits to Recurring Donation Start date?'), NULL);
+      }
     }
 
     //add currency element.
@@ -332,6 +340,13 @@ SELECT id
         elseif (count(array_filter($membershipTypes)) != 0) {
           $errors['is_recur'] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page.');
         }
+      }
+    }
+
+    // CRM-18854 Check if recurring start date is in the future.
+    if (CRM_Utils_Array::value('pledge_calendar_date', $fields)) {
+      if (date('Ymd') > date('Ymd', strtotime($fields['pledge_calendar_date']))) {
+        $errors['pledge_calendar_date'] = ts('The recurring start date cannot be prior to the current date.');
       }
     }
 

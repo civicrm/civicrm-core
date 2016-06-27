@@ -119,8 +119,10 @@
 
         </table>
     </div>
+{if $futurePaymentProcessor}
     <span id="pledge_calendar_date_field">&nbsp;&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=pledge_calendar_date}</span>
     <span id="pledge_calendar_month_field">&nbsp;&nbsp;{$form.pledge_calendar_month.html}<br/><span class="description">{ts}Recurring payment will be processed this day of the month following submission of this contribution page.{/ts}</span></span>
+{/if}
 
 
     <div id="amountFields">
@@ -154,7 +156,8 @@
                         <td>{$form.additional_reminder_day.html}
                             <span class="label">{ts}Days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
                     </tr>
-                    <tr class="crm-contribution-form-block-adjust_recur_start_date"><th scope="row" class="label">{$form.adjust_recur_start_date.label}</th>
+                {if $futurePaymentProcessor}
+                    <tr id="adjustRecurringFields" class="crm-contribution-form-block-adjust_recur_start_date"><th scope="row" class="label">{$form.adjust_recur_start_date.label}</th>
                         <td>{$form.adjust_recur_start_date.html}<br/>
 			  <div id="recurDefaults">
                             <span class="description">{$form.pledge_default_toggle.label}</span>
@@ -172,6 +175,7 @@
                           </div>
                         </td>
                     </tr>
+                {/if}
                 </table>
                 </td>
             </tr>
@@ -213,6 +217,13 @@
 </div>
 {literal}
 <script type="text/javascript">
+
+   var futurePaymentProcessorMapper = [];
+   {/literal}{if $futurePaymentProcessor}
+   {foreach from=$futurePaymentProcessor item="futurePaymentProcessor" key="index"}{literal}
+     futurePaymentProcessorMapper[{/literal}{$index}{literal}] = '{/literal}{$futurePaymentProcessor}{literal}';
+   {/literal}{/foreach}
+   {literal}
    CRM.$(function($) {
      var defId = $('input[name="pledge_default_toggle"][value="contribution_date"]').attr('id');
      var calId = $('input[name="pledge_default_toggle"][value="calendar_date"]').attr('id');
@@ -247,7 +258,10 @@
        }
      });
 
+
    });
+{/literal}{/if}{literal}
+
    var paymentProcessorMapper = [];
      {/literal}
        {if $recurringPaymentProcessor}
@@ -271,8 +285,10 @@
         // show/hide recurring block
         $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').change(function(){
             showRecurring( checked_payment_processors() );
+            showAdjustRecurring( checked_payment_processors() );
         });
         showRecurring( checked_payment_processors() );
+        showAdjustRecurring( checked_payment_processors() );
     });
   var element_other_amount = document.getElementsByName('is_allow_other_amount');
     if (! element_other_amount[0].checked) {
@@ -381,6 +397,26 @@
         }
     }
 
+    function showAdjustRecurring( paymentProcessorIds ) {
+        var display = true;
+        cj.each(paymentProcessorIds, function(k, id){
+            if( cj.inArray(id, futurePaymentProcessorMapper) == -1 ) {
+                display = false;
+            }
+        });
+
+        if(display) {
+            cj( '#adjustRecurringFields' ).show( );
+        } else {
+            if ( cj( '#adjust_recur_start_date' ).prop('checked' ) ) {
+                cj( '#adjust_recur_start_date' ).prop('checked', false);
+                cj( '#recurDefaults' ).hide( );
+            }
+            cj( '#adjustRecurringFields' ).hide( );
+        }
+    }
+
+{/literal}{if $futurePaymentProcessor}{literal}
     function setDateDefaults() {
      {/literal}{if !$pledge_calendar_date}{literal}
        cj('#pledge_calendar_date').prop('disabled', 'disabled');
@@ -391,6 +427,7 @@
        cj('#pledge_calendar_month').prop('disabled', 'disabled');
      {/literal}{/if}{literal}
     }
+{/literal}{/if}{literal}
 
 </script>
 {/literal}

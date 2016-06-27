@@ -10,6 +10,3 @@ UPDATE civicrm_payment_processor pp, civicrm_payment_processor_type ppt SET pp.i
 -- CRM-17815
 {include file='../CRM/Upgrade/4.7.beta8.msg_template/civicrm_msg_template.tpl'}
 
--- CRM-18854
-ALTER TABLE civicrm_pledge_block ADD pledge_start_date DATE NULL DEFAULT NULL AFTER additional_reminder_day;
-

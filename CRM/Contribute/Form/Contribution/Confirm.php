@@ -931,8 +931,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         else {
           $pledgeParams['frequency_day'] = 1;
         }
-        $pledgeParams['create_date'] = date("Ymd");
-        $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date("Ymd");
+        $pledgeParams['create_date'] = $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date("Ymd");
         $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($contribution->contribution_page_id);
         if (CRM_Utils_Array::value('start_date', $params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
           $pledgeStartDate = CRM_Utils_Array::value('start_date', $params, NULL);
@@ -945,7 +944,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $pledgeParams['is_test'] = $contribution->is_test;
         $pledgeParams['acknowledge_date'] = date('Ymd');
         $pledgeParams['original_installment_amount'] = $pledgeParams['installment_amount'];
-        $params['payment_instrument_id'] = $contribution->payment_instrument_id;
 
         //inherit campaign from contirb page.
         $pledgeParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $contributionParams);
@@ -953,33 +951,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $pledge = CRM_Pledge_BAO_Pledge::create($pledgeParams);
 
         $form->_params['pledge_id'] = $pledge->id;
-
-        // Create the recur record.
-        try {
-          $recurringPledge = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params);
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          CRM_Core_Error::displaySessionError($recurringPledge);
-          $urlString = 'civicrm/contribute/transact';
-          $urlParams = '_qf_Main_display=true';
-          if (get_class($form) == 'CRM_Contribute_Form_Contribution') {
-            $urlString = 'civicrm/contact/view/contribution';
-            $urlParams = "action=add&cid={$form->_contactID}";
-            if ($form->_mode) {
-              $urlParams .= "&mode={$form->_mode}";
-            }
-          }
-          CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
-        }
-
-        if ($recurringPledge['id']) {
-          $contribParams = array(
-            'id' => $contribution->id,
-            'contribution_recur_id' => $recurringPledge['id'],
-            'contribution_status_id' => 'Pending',
-          );
-          civicrm_api3('Contribution', 'create', $contribParams);
-        }
 
         //send acknowledgment email. only when pledge is created
         if ($pledge->id && $isEmailReceipt) {
@@ -1969,6 +1940,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (CRM_Utils_Array::value('start_date', $this->_params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
         $pledgeStartDate = CRM_Utils_Array::value('start_date', $this->_params, NULL);
         $this->_params['receive_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
+        $recurParams = CRM_Pledge_BAO_Pledge::buildRecurParams($this->_params);
+        $this->_params = array_merge($this->_params, $recurParams);
+        $this->_values = array_merge($this->_values, $recurParams);
       }
     }
 

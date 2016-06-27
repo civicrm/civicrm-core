@@ -1203,32 +1203,20 @@ SELECT  pledge.contact_id              as contact_id,
   }
 
   /**
-   * Create recur record for pledge.
-   *
+   * Create array for recur record for pledge.
+   * @return array
+   *   params for recur record
    */
-  public static function createRecurRecord($pledge, $params) {
-    $recurParams = array('contact_id' => $pledge->contact_id);
-    $recurParams['amount'] = $pledge->amount;
-    $recurParams['auto_renew'] = TRUE;
-    $recurParams['frequency_unit'] = $pledge->frequency_unit;
-    $recurParams['frequency_interval'] = $pledge->frequency_interval;
-    $recurParams['installments'] = $pledge->installments;
-    $recurParams['financial_type_id'] = $pledge->financial_type_id;
-    $recurParams['currency'] = $pledge->currency;
-
-    if (!empty($pledge->start_date)) {
-      $recurParams['start_date'] = $pledge->start_date;
-    }
-    $recurParams['invoice_id'] = CRM_Utils_Array::value('invoiceID', $params);
-    $recurParams['contribution_status_id'] = "Pending";
-    $recurParams['payment_processor_id'] = CRM_Utils_Array::value('payment_processor_id', $params);
-    $recurParams['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $params);
-    $recurParams['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params, $params['invoiceID']);
-    $recurParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
-    $recurParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params);
-
-    $recurring = civicrm_api3('ContributionRecur', 'create', $recurParams);
-    return $recurring;
+  public static function buildRecurParams($params) {
+    $recurParams = array(
+      'is_recur' => TRUE,
+      'auto_renew' => TRUE,
+      'frequency_unit' => $params['pledge_frequency_unit'],
+      'frequency_interval' => $params['pledge_frequency_interval'],
+      'installments' => $params['pledge_installments'],
+      'start_date' => $params['receive_date'],
+    );
+    return $recurParams;
   }
 
   /**
@@ -1251,13 +1239,15 @@ SELECT  pledge.contact_id              as contact_id,
       case 'calendar_date':
         $date = date('Ymd', strtotime($date));
         break;
+
       case 'calendar_month':
-        $month = CRM_Utils_Date::getCalendarDayOfMonth();
         $date = self::getPaymentDate($date);
         $date = date('Ymd', strtotime($date));
         break;
+
       default:
         break;
+
     }
     return $date;
   }
@@ -1279,14 +1269,18 @@ SELECT  pledge.contact_id              as contact_id,
       case ($day == $current):
         $date = date('m/d/Y');
         break;
+
       case ($day > $current):
         $date = date('m/d/Y', mktime(0, 0, 0, date('m'), $day, date('Y')));
         break;
+
       case ($day < $current):
         $date = date('m/d/Y', mktime(0, 0, 0, date('m', strtotime("+1 month")), $day, date('Y')));
         break;
+
       default:
         break;
+
     }
     return $date;
   }

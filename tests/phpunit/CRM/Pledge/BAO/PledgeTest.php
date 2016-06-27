@@ -130,59 +130,31 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test create recur record.
+   *  Test build recur params.
    */
-  public function testCreateRecurRecord() {
-    //when user creating pledge record.
-    $contributionPageId = ContributionPage::create();
-    $processorId = $this->paymentProcessorAuthorizeNetCreate(array('is_test' => 0));
-    $contribution = $this->contributionCreate(array('contact_id' => $this->_contactId));
-    $pledgeParams = array(
-      'contact_id' => $this->_contactId,
-      'installment_amount' => 100,
-      'actual_amount' => 100,
-      'contribution_id' => $contribution,
-      'contribution_page_id' => $contributionPageId,
-      'financial_type_id' => 1,
-      'frequency_interval' => 1,
-      'installments' => 3,
-      'frequency_unit' => 'month',
-      'frequency_day' => intval(date("d")),
-      'start_date' => date("Ymd"),
-      'create_date' => date("Ymd"),
-      'scheduled_date' => date("Ymd"),
-      'status_id' => 1,
-      'max_reminders' => 1,
-      'initial_reminder_day' => 1,
-      'additional_reminder_day' => 1,
-      'original_installment_amount' => 100,
+  public function testGetPledgeStartDate() {
+    $startDate = serialize(array('calendar_month' => 6));
+
+    $params = array(
+      'pledge_start_date' => $startDate,
+      'is_pledge_start_date_editable' => TRUE,
+      'is_pledge_start_date_visible' => TRUE,
     );
 
-    $pledge = CRM_Pledge_BAO_Pledge::create($pledgeParams);
+    // Try with relative date
+    $date = CRM_Pledge_BAO_Pledge::getPledgeStartDate(6, $params);
+    $paymentDate = CRM_Pledge_BAO_Pledge::getPaymentDate(6);
+
+    $this->assertEquals(date('m/d/Y', strtotime($date)), $paymentDate, "The two dates do not match");
+
+    // Try with fixed date
     $params = array(
-      'invoiceID' => '123456789',
-      'payment_processor_id' => $processorId,
-      'financial_type_id' => 1,
+      'pledge_start_date' => serialize(array('contribution_date' => '2016-06-10')),
+      'is_pledge_start_date_visible' => FALSE,
     );
-    $recurRecord = CRM_Pledge_BAO_Pledge::createRecurRecord($pledge, $params, CRM_Core_DAO::$_nullObject);
-    $this->assertAPISuccess($recurRecord);
-    $recur = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($this->_contactId);
-    foreach ($recurRecord['values'] as $key => $values) {
-      foreach ($values as $k => $value) {
-        if ($k == 'contact_id') {
-          $k = 'contactId';
-        }
-        if ($k == 'start_date') {
-          $recur[$key][$k] = date('YmdHis', strtotime($recur[$key][$k]));
-        }
-        if ($k == 'is_test') {
-          continue;
-        }
-        if (isset($recur[$key][$k])) {
-          $this->assertEquals($value, $recur[$key][$k], "Recur information does not match");
-        }
-      }
-    }
+
+    $date = CRM_Pledge_BAO_Pledge::getPledgeStartDate($date, $params);
+    $this->assertEquals($date, '20160610', "The two dates do not match");
   }
 
 }

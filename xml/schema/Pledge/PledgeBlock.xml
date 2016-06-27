@@ -97,7 +97,8 @@
     <type>boolean</type>
     <title>Show Recurring Donation Start Date?</title>
     <default>0</default>
-    <comment>if true - recurring start date is shown</comment>
+    <required>true</required>
+    <comment>If true - recurring start date is shown.</comment>
     <add>4.7</add>
   </field>
   <field>
@@ -105,7 +106,8 @@
     <type>boolean</type>
     <title>Allow Edits to Recurring Donation Start Date?</title>
     <default>0</default>
-    <comment>if true - recurring start date is editable</comment>
+    <required>true</required>
+    <comment>If true - recurring start date is editable.</comment>
     <add>4.7</add>
   </field>
 </table>
