@@ -328,7 +328,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
         $this->assertFalse($validate, "This should not have thrown an error.");
       }
       else {
-        $this->assertEquals($validate, "Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts");
+        $this->assertEquals($validate, TRUE);
       }
     }
   }
