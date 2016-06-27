@@ -97,7 +97,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     // total amount
     $this->type("total_amount", "100");
     // revenue recognition date (CRM-16189)
-    if (CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
       $this->webtestFillDate('revenue_recognition_date', 'now+4');
     }
 
