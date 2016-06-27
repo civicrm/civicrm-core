@@ -396,4 +396,45 @@ LIMIT 1";
     return FALSE;
   }
 
+  /**
+   * Check if financial type has Deferred Revenue Account is relationship
+   * with Financial Account.
+   *
+   * @param int $financialTypeId
+   *
+   * @return bool
+   *
+   */
+  public static function validateFinancialType($financialTypeId, $entityID = NULL, $entity = NULL) {
+    if (!CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      return FALSE;
+    }
+    if ($entityID) {
+      $query = ' SELECT ps.extends FROM civicrm_price_set ps %3 WHERE %1.id = %2';
+      $params = array(
+        1 => array('ps', 'Text'),
+        2 => array($entityID, 'Integer'),
+      );
+      if ($entity == 'PriceField') {
+        $params[1] = array('pf', 'Text');
+        $params[3] = array(
+          ' INNER JOIN civicrm_price_field pf ON pf.price_set_id = ps.id ',
+          'Text',
+        );
+      }
+      $extends = CRM_Core_DAO::singleValueQuery($query, $params);
+      $extends = explode('', $extends);
+      if (!(in_array(CRM_Core_Component::getComponentID('CiviEvent'), $extends)
+        || in_array(CRM_Core_Component::getComponentID('CiviMember'), $extends))
+      ) {
+        return FALSE;
+      }
+    }
+    $deferredFinancialType = self::getDeferredFinancialType();
+    if (!array_key_exists($financialTypeId, $deferredFinancialType)) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
