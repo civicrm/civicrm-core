@@ -1389,11 +1389,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
 
     $text = &$activityParams['sms_text_message'];
 
-    // CRM-4575
-    // token replacement of addressee/email/postal greetings
-    // get the tokens added in subject and message
-    $messageToken = CRM_Utils_Token::getTokens($text);
-
     // Create the meta level record first ( sms activity )
     $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
       'SMS',
@@ -1416,28 +1411,29 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activity = self::create($activityParams);
     $activityID = $activity->id;
 
+    // Check if this SMS message contains any tokens to be replaced. 
     $returnProperties = array();
-
+    $messageToken = CRM_Utils_Token::getTokens($text);
     if (isset($messageToken['contact'])) {
       foreach ($messageToken['contact'] as $key => $value) {
         $returnProperties[$value] = 1;
       }
-    }
 
-    // call token hook
-    $tokens = array();
-    CRM_Utils_Hook::tokens($tokens);
-    $categories = array_keys($tokens);
+      // get token details for contacts, call only if tokens are used
+      $details = array();
+      if (!empty($returnProperties)) {
+        list($details) = CRM_Utils_Token::getTokenDetails($contactIds,
+          $returnProperties,
+          NULL, NULL, FALSE,
+          $messageToken,
+          'CRM_Activity_BAO_Activity'
+        );
+      }
 
-    // get token details for contacts, call only if tokens are used
-    $details = array();
-    if (!empty($returnProperties) || !empty($tokens)) {
-      list($details) = CRM_Utils_Token::getTokenDetails($contactIds,
-        $returnProperties,
-        NULL, NULL, FALSE,
-        $messageToken,
-        'CRM_Activity_BAO_Activity'
-      );
+      // In order to fill tokens, we neet $categories (used below) 
+      $tokens = array();
+      CRM_Utils_Hook::tokens($tokens);
+      $categories = array_keys($tokens);
     }
 
     $success = 0;
@@ -1446,15 +1442,10 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
 
-      if (!empty($details) && is_array($details["{$contactId}"])) {
-        // unset phone from details since it always returns primary number
-        unset($details["{$contactId}"]['phone']);
-        unset($details["{$contactId}"]['phone_type_id']);
-        $values = array_merge($values, $details["{$contactId}"]);
+      if (isset($messageToken['contact'])) {
+        $text = CRM_Utils_Token::replaceContactTokens($text, $values, FALSE, $messageToken, FALSE, $escapeSmarty);
+        $text = CRM_Utils_Token::replaceHookTokens($text, $values, $categories, FALSE, $escapeSmarty);
       }
-
-      $tokenText = CRM_Utils_Token::replaceContactTokens($text, $values, FALSE, $messageToken, FALSE, $escapeSmarty);
-      $tokenText = CRM_Utils_Token::replaceHookTokens($tokenText, $values, $categories, FALSE, $escapeSmarty);
 
       // Only send if the phone is of type mobile
       $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
@@ -1462,17 +1453,17 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
         $smsParams['To'] = $values['phone'];
       }
       else {
+        // Setting this to empty ensure we trigger an error when trying to send SMS.
         $smsParams['To'] = '';
       }
 
       $sendResult = self::sendSMSMessage(
         $contactId,
-        $tokenText,
+        $text,
         $smsParams,
         $activityID,
         $userID
       );
-
       if (PEAR::isError($sendResult)) {
         // Collect all of the PEAR_Error objects
         $errMsgs[] = $sendResult;
