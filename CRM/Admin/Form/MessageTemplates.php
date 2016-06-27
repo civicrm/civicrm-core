@@ -39,8 +39,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   // which (and whether) mailing workflow this template belongs to
   protected $_workflow_id = NULL;
 
-  // document ID set during loading default values and later used in formRule
-  protected $_document_id = NULL;
+  // Is document file is already loaded as default value?
+  protected $_is_document = FALSE;
 
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -65,6 +65,9 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     if (empty($defaults['pdf_format_id'])) {
       $defaults['pdf_format_id'] = 'null';
     }
+    if (empty($defaults['file_type'])) {
+      $defaults['file_type'] = 0;
+    }
 
     $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $defaults);
     $this->assign('workflow_id', $this->_workflow_id);
@@ -88,11 +91,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
       $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $this->_id, TRUE);
       if (!empty($documentInfo)) {
-        foreach ($documentInfo as &$info) {
-          $defaults['file_type'] = array_search($info['mime_type'], CRM_Core_SelectValues::documentApplicationType());
-          $info['mime_type'] = $defaults['file_type'];
-          $this->_document_id = $info['fileID'];
-        }
+        $defaults['file_type'] = 1;
+        $this->_is_document = TRUE;
         $this->assign('attachment', $documentInfo);
       }
 
@@ -169,7 +169,9 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     $this->applyFilter('__ALL__', 'trim');
     $this->add('text', 'msg_title', ts('Message Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_title'), TRUE);
 
-    $this->add('select', 'file_type', ts('File Type'), CRM_Core_SelectValues::documentFormat());
+    $options = array(ts('Compose On-screen'), ts('Upload Document'));
+    $this->addRadio('file_type', ts('Source'), $options);
+
     $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=60');
     $this->addUploadElement("file_id");
 
@@ -241,21 +243,9 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     $errors = array();
 
     //empty file upload validation for odt/docx template
-    if (empty($files['file_id']['tmp_name']) && in_array($params['file_type'], array('odt', 'docx'))) {
+    if (empty($files['file_id']['tmp_name']) && !empty($params['file_type']) && !$self->_is_document) {
       //On edit page of docx/odt message template if user changes file type but forgot to upload document
-      if (!empty($self->_document_id)) {
-        $fileDAO = new CRM_Core_DAO_File();
-        $fileDAO->id = $self->_document_id;
-        if ($fileDAO->find(TRUE) &&
-          $fileDAO->mime_type != CRM_Utils_Array::value($params['file_type'], CRM_Core_SelectValues::documentApplicationType())
-        ) {
-          $errors['file_id'] = ts('Please upload document');
-        }
-      }
-      else {
-        $errors['file_id'] = ts('Please upload document');
-      }
-
+      $errors['file_id'] = ts('Please upload document');
     }
 
     return $errors;
@@ -282,7 +272,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
         $params['id'] = $this->_id;
       }
 
-      if (in_array($params['file_type'], array('odt', 'docx'))) {
+      if (!empty($params['file_type'])) {
         unset($params['msg_html']);
         unset($params['msg_text']);
         CRM_Utils_File::formatFile($params, 'file_id');

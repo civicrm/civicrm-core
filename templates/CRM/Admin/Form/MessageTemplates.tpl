@@ -158,28 +158,20 @@
         mimeType = $('a.delete-attachment').data('mimetype');
       }
 
-      $('#file_type').on('change', function(){
-        toggleByFileType(this.value);
+      showHideUpload($("input[id$='_file_type']:checked").val());
+      $("input[id$='_file_type']").on('click', function(){
+        showHideUpload(this.value);
       });
-      toggleByFileType($('#file_type').val());
-
-      function toggleByFileType(type) {
-        var show = (type == 'odt' || type == 'docx') ? false : true;
+      function showHideUpload(type) {
+        var show = (type == 1) ? false : true;
         $("#msg_html").toggle(show);
         $("#msg_text, #pdf_format").toggle(show);
         $("#file_id").parent().parent().toggle(!show);
 
         // auto file type validation
-        if (!show) {
-          var validType = (type == 'odt') ? 'application/vnd.oasis.opendocument.text' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        if (type) {
+          var validType = 'application/vnd.oasis.opendocument.text, application/vnd.openxmlformats-officedocument.wordprocessingml.document';
           $("#file_id").attr('accept', validType);
-        }
-
-        // when you change file type other than the type of default uploaded document
-        if (mimeType) {
-          var hide = (mimeType != type) ? true : false;
-          $("#file_id").toggle(hide);
-          $('.crm-attachment-wrapper').toggle(!hide);
         }
       }
     });

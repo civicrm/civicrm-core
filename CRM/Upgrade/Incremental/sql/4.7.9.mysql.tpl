@@ -7,15 +7,6 @@ UPDATE civicrm_option_value SET
   {localize field="description"}description = '{ts escape="sql"}Export letters and other printable documents.{/ts}'{/localize}
 WHERE name = 'Print PDF Letter' AND option_group_id = @option_group_id_act;
 
--- CRM-17608 Merge to DOCx or ODT template
-SELECT @option_group_id_ext := max(id) from civicrm_option_group where name = 'safe_file_extension';
-SELECT @option_group_id_ext_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_ext;
-SELECT @option_group_id_ext_val := MAX(CAST( `value` AS UNSIGNED )) FROM civicrm_option_value WHERE option_group_id = @option_group_id_ext;
-INSERT INTO
-   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`)
-VALUES
-(@option_group_id_ext, {localize}'{ts escape="sql"}odt{/ts}'{/localize}, @option_group_id_ext_val+1, 'odt', NULL, 0, 0, @option_group_id_ext_wt+1, 0, 1, 1);
-
 -- CRM-18699 Fix Wake Island misspelling, was Wake Ialand
 UPDATE civicrm_state_province SET name="Wake Island" WHERE name="Wake Ialand";
 
