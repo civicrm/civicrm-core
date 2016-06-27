@@ -2517,7 +2517,12 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $activity['source_contact_name'] = $values['source_contact_name'];
         }
         elseif ($values['source_contact_id']) {
-          $activity['source_contact_name'] = CRM_Utils_System::href($values['source_contact_name'],
+          $srcTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
+            CRM_Contact_BAO_Contact::getContactType($values['source_contact_id']),
+            FALSE,
+            $values['source_contact_id']
+          );
+          $activity['source_contact_name'] = $srcTypeImage . CRM_Utils_System::href($values['source_contact_name'],
             'civicrm/contact/view', "reset=1&cid={$values['source_contact_id']}");
         }
         else {
@@ -2536,7 +2541,12 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
           $activity['target_contact_name'] = '';
           foreach ($values['target_contact_name'] as $tcID => $tcName) {
-            $activity['target_contact_name'] .= CRM_Utils_System::href($tcName,
+            $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
+              CRM_Contact_BAO_Contact::getContactType($tcID),
+              FALSE,
+              $tcID
+            );
+            $activity['target_contact_name'] .= $targetTypeImage . CRM_Utils_System::href($tcName,
               'civicrm/contact/view', "reset=1&cid={$tcID}");
           }
 
@@ -2557,7 +2567,12 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $activity['assignee_contact_name'] = '';
           foreach ($values['assignee_contact_name'] as $acID => $acName) {
             if ($acID && $count < 5) {
-              $activity['assignee_contact_name'] .= CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
+              $assigneeTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
+                CRM_Contact_BAO_Contact::getContactType($acID),
+                FALSE,
+                $acID
+              );
+              $activity['assignee_contact_name'] .= $assigneeTypeImage . CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
               $count++;
               if ($count) {
                 $activity['assignee_contact_name'] .= ";&nbsp;";
