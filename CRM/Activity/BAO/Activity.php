@@ -1447,9 +1447,9 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       $contactId = $values['contact_id'];
 
       if (!empty($details) && is_array($details["{$contactId}"])) {
-        // unset email from details since it always returns primary email address
-        unset($details["{$contactId}"]['email']);
-        unset($details["{$contactId}"]['email_id']);
+        // unset phone from details since it always returns primary number
+        unset($details["{$contactId}"]['phone']);
+        unset($details["{$contactId}"]['phone_type_id']);
         $values = array_merge($values, $details["{$contactId}"]);
       }
 
