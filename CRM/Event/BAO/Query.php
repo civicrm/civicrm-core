@@ -414,7 +414,7 @@ class CRM_Event_BAO_Query {
         }
         if (!strstr($op, 'NULL') && !strstr($op, 'EMPTY') && !strstr($op, 'LIKE')) {
           $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
-          $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:cntrl:]]*";
+          $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', (array) $value) . "([[:cntrl:]]|$)";
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.$name", $regexOp, $regexp, 'String');
         }
         else {
