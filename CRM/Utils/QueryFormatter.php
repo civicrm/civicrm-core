@@ -319,7 +319,16 @@ class CRM_Utils_QueryFormatter {
    * @return array
    */
   protected function parseWords($text) {
-    return explode(' ', preg_replace('/[ \r\n\t]+/', ' ', trim($text)));
+    //NYSS 9692 special handling for emails
+    if (preg_match('/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/', $text)) {
+      $parts = explode('@', $text);
+      $parts[1] = stristr($parts[1], '.', TRUE);
+      $text = implode(' ', $parts);
+    }
+    //CRM_Core_Error::debug_var('parseWords $text', $text);
+
+    //NYSS also replace other occurrences of @
+    return explode(' ', preg_replace('/[ \r\n\t\@]+/', ' ', trim($text)));
   }
 
   /**
