@@ -40,9 +40,24 @@
  * or in vain.
  */
 class CRM_Utils_QueryFormatter {
+  /**
+   * Generate queries using SQL LIKE expressions.
+   */
   const LANG_SQL_LIKE = 'like';
+
+  /**
+   * Generate queries using MySQL FTS expressions.
+   */
   const LANG_SQL_FTS = 'fts';
+
+  /**
+   * Generate queries using MySQL's boolean FTS expressions.
+   */
   const LANG_SQL_FTSBOOL = 'ftsbool';
+
+  /**
+   * Generate queries using Solr expressions.
+   */
   const LANG_SOLR = 'solr';
 
   /**
@@ -325,7 +340,6 @@ class CRM_Utils_QueryFormatter {
       $parts[1] = stristr($parts[1], '.', TRUE);
       $text = implode(' ', $parts);
     }
-    //CRM_Core_Error::debug_var('parseWords $text', $text);
 
     //NYSS also replace other occurrences of @
     return explode(' ', preg_replace('/[ \r\n\t\@]+/', ' ', trim($text)));
