@@ -520,7 +520,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
                         AND     $edTable.id IS null
                         AND     $ebTable.id IS null
                         AND    contact_a.is_opt_out = 0 
-                        $aclWhere";
+                        $aclWhere
+                    ORDER BY    $contactTable.contact_type";
 
     if ($mailing->sms_provider_id) {
       $query = "
