@@ -919,7 +919,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   public function getTestRecipients($testParams) {
     $creatorID = NULL;
     if (!empty($this->id)) {
-      $creatorID = CRM_Core_DAO('CRM_Mailing_DAO_Mailing', $this->id, 'created_id');
+      $creatorID = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->id, 'created_id');
     }
     list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($creatorID);
 
