@@ -16,6 +16,45 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
     $cases = array();
 
     $cases[] = array(
+      'someone@example.com',
+      CRM_Utils_QueryFormatter::LANG_SQL_LIKE,
+      CRM_Utils_QueryFormatter::MODE_NONE,
+      '%someone@example.com%',
+    );
+    $cases[] = array(
+      'someone@example.com',
+      CRM_Utils_QueryFormatter::LANG_SQL_FTS,
+      CRM_Utils_QueryFormatter::MODE_NONE,
+      'someone@example.com',
+    );
+    $cases[] = array(
+      'someone@example.com',
+      CRM_Utils_QueryFormatter::LANG_SQL_FTS,
+      CRM_Utils_QueryFormatter::MODE_PHRASE,
+      '"someone@example.com"',
+    );
+    $cases[] = array(
+      'someone@example.com',
+      CRM_Utils_QueryFormatter::LANG_SQL_FTS,
+      CRM_Utils_QueryFormatter::MODE_WILDPHRASE,
+      '"*someone@example.com*"',
+    );
+    $cases[] = array(
+      'someone@example.com',
+      CRM_Utils_QueryFormatter::LANG_SQL_FTS,
+      CRM_Utils_QueryFormatter::MODE_WILDWORDS,
+      '*someone* *example*',
+      // Hmm, this seems suspicious... drops ".com".
+    );
+    $cases[] = array(
+      'someone@example.com',
+      CRM_Utils_QueryFormatter::LANG_SQL_FTS,
+      CRM_Utils_QueryFormatter::MODE_WILDWORDS_SUFFIX,
+      'someone* example*',
+      // Hmm, this seems suspicious... is `example` a distinct word in mysql lexer?
+    );
+
+    $cases[] = array(
       'first second',
       CRM_Utils_QueryFormatter::LANG_SQL_LIKE,
       CRM_Utils_QueryFormatter::MODE_NONE,
