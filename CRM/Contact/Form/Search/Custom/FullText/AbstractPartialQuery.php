@@ -260,6 +260,10 @@ GROUP BY {$tableValues['id']}
    *   SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
    */
   public function matchText($table, $fullTextFields, $queryText) {
+    if ($queryText === '*' || $queryText === '%' || empty($queryText)) {
+      return '(1)';
+    }
+
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
 
     if (strpos($table, ' ') === FALSE) {
