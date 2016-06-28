@@ -320,6 +320,30 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
     $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
     $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
+    $result = $this->callAPISuccess('Contact', 'get', array('contact_sub_type' => 'Student', 'sequential' => 1, 'is_deceased' => array('IN' => array(0, 1))));
+    $this->assertEquals(count($dataSet['expected']), $result['count']);
+    foreach ($dataSet['expected'] as $index => $contact) {
+      foreach ($contact as $key => $value) {
+        $this->assertEquals($value, $result['values'][$index][$key]);
+      }
+    }
+  }
+
+  /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeConflictOnDeceased($dataSet) {
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
+    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
+    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
     $result = $this->callAPISuccess('Contact', 'get', array('contact_sub_type' => 'Student', 'sequential' => 1));
     $this->assertEquals(count($dataSet['expected']), $result['count']);
     foreach ($dataSet['expected'] as $index => $contact) {
@@ -638,6 +662,94 @@ class api_v3_JobTest extends CiviUnitTestCase {
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'street_address' => 'big house',
+            ),
+          ),
+        ),
+      ),
+      array(
+        array(
+          'mode' => 'safe',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'is_deceased' => 1,
+            ),
+          ),
+          'skipped' => 1,
+          'merged' => 0,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'is_deceased' => 0,
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'is_deceased' => 1,
+            ),
+          ),
+        ),
+      ),
+      array(
+        array(
+          'mode' => 'safe',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+              'is_deceased' => 1,
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+            ),
+          ),
+          'skipped' => 1,
+          'merged' => 0,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'is_deceased' => 1,
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'is_deceased' => 0,
             ),
           ),
         ),
