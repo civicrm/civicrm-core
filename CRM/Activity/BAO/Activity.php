@@ -2546,12 +2546,12 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
               FALSE,
               $tcID
             );
-            $activity['target_contact_name'] .= $targetTypeImage . CRM_Utils_System::href($tcName,
-              'civicrm/contact/view', "reset=1&cid={$tcID}");
+            $targetLink = CRM_Utils_System::href($tcName, 'civicrm/contact/view', "reset=1&cid={$tcID}");
+            $activity['target_contact_name'] .= "<div>$targetTypeImage  $targetLink</div>";
           }
 
           if ($extraCount = $values['target_contact_counter'] - 1) {
-            $activity['target_contact_name'] .= ";<br />" . "(" . ts('%1 more', array(1 => $extraCount)) . ")";
+            $activity['target_contact_name'] .= "<div>" . "(" . ts('%1 more', array(1 => $extraCount)) . ")</div>";
           }
         }
         elseif (!$values['target_contact_name']) {
@@ -2572,11 +2572,13 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
                 FALSE,
                 $acID
               );
-              $activity['assignee_contact_name'] .= $assigneeTypeImage . CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
+              $assigneeLink = CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
+              $activity['assignee_contact_name'] .= "<div>$assigneeTypeImage $assigneeLink";
               $count++;
               if ($count) {
-                $activity['assignee_contact_name'] .= ";&nbsp;";
+                $activity['assignee_contact_name'] .= ";";
               }
+              $activity['assignee_contact_name'] .= "</div> ";
 
               if ($count == 4) {
                 $activity['assignee_contact_name'] .= "(" . ts('more') . ")";
