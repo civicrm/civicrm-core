@@ -361,6 +361,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * Factory method to instantiate a new object from a table name.
    *
    * @param string $table
+   *
+   * @return DataObject|PEAR_Error
    */
   public function factory($table = '') {
     if (!isset(self::$_factory)) {
@@ -730,8 +732,6 @@ class CRM_Core_DAO extends DB_DataObject {
   public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
     $object = new $daoName();
     $object->$fieldName = $value;
-
-    $config = CRM_Core_Config::singleton();
 
     if ($object->find(TRUE)) {
       return ($daoID && $object->id == $daoID) ? TRUE : FALSE;
@@ -1183,9 +1183,14 @@ FROM   civicrm_domain
    *
    * @param string $query query to be executed
    *
+   * @param array $params
+   * @param bool $abort
+   * @param null $daoName
+   * @param bool $freeDAO
+   * @param bool $i18nRewrite
+   * @param bool $trapException
+   *
    * @return Object CRM_Core_DAO object that points to an unbuffered result set
-   * @static
-   * @access public
    */
   static public function executeUnbufferedQuery(
     $query,
@@ -1272,7 +1277,7 @@ FROM   civicrm_domain
     }
 
     if ($trapException) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      CRM_Core_TemporaryErrorScope::ignoreException();
     }
 
     $result = $dao->query($queryStr, $i18nRewrite);
@@ -1638,9 +1643,12 @@ SELECT contact_id
   }
 
   /**
+   * Escape a string for security purposes.
+   *
    * @param $string
    *
    * @return string
+   * @throws CRM_Core_Exception
    */
   public static function escapeString($string) {
     static $_dao = NULL;
@@ -1894,7 +1902,7 @@ SELECT contact_id
     // test for create view and trigger permissions and if allowed, add the option to go multilingual
     // and logging
     // I'm not sure why we use the getStaticProperty for an error, rather than checking for DB_Error
-    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+    CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
     if ($view) {
       $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');

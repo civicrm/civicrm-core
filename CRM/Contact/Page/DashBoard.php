@@ -48,8 +48,7 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $resetCache = CRM_Utils_Request::retrieve('resetCache', 'Positive', CRM_Core_DAO::$_nullObject);
 
     CRM_Utils_System::setTitle(ts('CiviCRM Home'));
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
 
     if ($resetCache) {
       CRM_Core_BAO_Dashboard::resetDashletCache($contactID);
