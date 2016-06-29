@@ -210,6 +210,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('Upgrade mailing foreign key constraints', 'upgradeMailingFKs');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_9($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Upgrade Add Help Pre and Post Fields to price value table', 'addHelpPreAndHelpPostFieldsPriceFieldValue');
+  }
+
   /*
    * Important! All upgrade functions MUST call the 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -616,6 +626,42 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'is_active' => TRUE,
       'filter' => 1,
     ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-12252 Add Help Pre and Help Post Fields for Price Field Value Table.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addHelpPreAndHelpPostFieldsPriceFieldValue(CRM_Queue_TaskContext $ctx) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      foreach ($locales as $locale) {
+        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', 'help_pre_' . $locale)) {
+          CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_price_field_value`
+            ADD COLUMN `help_pre_' . $locale . '` text COLLATE utf8_unicode_ci COMMENT "Price field option pre help text."');
+        }
+        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', 'help_post_' . $locale)) {
+          CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_price_field_value`
+            ADD COLUMN `help_post_' . $locale . '` text COLLATE utf8_unicode_ci COMMENT "Price field option post help text."');
+        }
+      }
+    }
+    else {
+      if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', 'help_pre')) {
+        CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_price_field_value`
+          ADD COLUMN `help_pre` text COLLATE utf8_unicode_ci COMMENT "Price field option pre help text."');
+      }
+      if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', 'help_post')) {
+        CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_price_field_value`
+          ADD COLUMN `help_post` text COLLATE utf8_unicode_ci COMMENT "Price field option post help text."');
+      }
+    }
     return TRUE;
   }
 
