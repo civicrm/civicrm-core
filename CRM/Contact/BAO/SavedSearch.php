@@ -128,7 +128,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         if (in_array($element, $specialFields)) {
           $element = str_replace('member_membership_type_id', 'membership_type_id', $element);
           $element = str_replace('member_status_id', 'membership_status_id', $element);
-          CRM_Contact_BAO_Query::legacyConvertFormValues($element, $value);
+          // CRM_Contact_BAO_Query::legacyConvertFormValues skips ones that we (still) need.
+          CRM_Utils_Array::formatArrayKeys($value);
           $result[$element] = $value;
         }
         // As per the OK (Operator as Key) value format, value array may contain key
