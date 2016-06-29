@@ -62,6 +62,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'fixed_period_start_day' => '301',
       // Ie. 11 Nov.
       'fixed_period_rollover_day' => '1111',
+      'name' => 'Another one',
     ));
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
 
@@ -531,7 +532,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $OrganizationMembershipID,
       'max_related' => 3,
     );
-    $this->contactMembershipCreate($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
     // Check that the employee inherited the membership
     $params = array(
@@ -1398,7 +1399,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testGetOptionsMembershipTypeID() {
     $options = $this->callAPISuccess('Membership', 'getoptions', array('field' => 'membership_type_id'));
-    $this->assertEquals('General', array_pop($options['values']));
+    $this->assertEquals('Another one', array_pop($options['values']));
     $this->assertEquals('General', array_pop($options['values']));
     $this->assertEquals(NULL, array_pop($options['values']));
   }
