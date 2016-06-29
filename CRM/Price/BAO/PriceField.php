@@ -375,11 +375,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         foreach ($customOption as $opId => $opt) {
           $taxAmount = CRM_Utils_Array::value('tax_amount', $opt);
           if ($field->is_display_amounts) {
-            $opt['label'] = !empty($opt['label']) ? $opt['label'] . '&nbsp;-&nbsp;' : '';
+            $opt['label'] = !empty($opt['label']) ? $opt['label'] . '<span class="crm-price-amount-label-separator">&nbsp;-&nbsp;</span>' : '';
             $pre_help = isset($opt['help_pre']) ?
-              '<span class="crm-price-amount-help-pre">' . $opt['help_pre'] . '</span>: ' : '';
+              '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span>: ' : '';
             $post_help = isset($opt['help_post']) ?
-              ': <span class="crm-price-amount-help-post">' . $opt['help_post'] . '</span>' : '';
+              ': <span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>' : '';
             if (isset($taxAmount) && $invoicing) {
               if ($displayOpt == 'Do_not_show') {
                 $opt['label'] = $pre_help . '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span>' . $post_help;
