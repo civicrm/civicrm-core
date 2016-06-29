@@ -309,8 +309,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     );
 
     //Checking for Note added in the table for relative participant.
-    $session = CRM_Core_Session::singleton();
-    $id = $session->get('userID');
+    $id = CRM_Core_Session::singleton()->getLoggedInContactID();
     if (!$id) {
       $id = $this->_contactId;
     }

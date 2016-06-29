@@ -95,7 +95,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
     // Allow to edit own custom data CRM-5518.
     $editOwnCustomData = FALSE;
-    if ($session->get('userID') == $this->_contactId) {
+    if (CRM_Core_Session::singleton()->getLoggedInContactID() == $this->_contactId) {
       $editOwnCustomData = TRUE;
     }
     $this->assign('editOwnCustomData', $editOwnCustomData);
