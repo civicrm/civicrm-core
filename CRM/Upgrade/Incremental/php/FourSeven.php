@@ -642,15 +642,16 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       foreach ($locales as $locale) {
-        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists("civicrm_price_field_value_{$locale}", "help_pre_{$locale}")) {
+        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists("civicrm_price_field_value", "help_pre_{$locale}")) {
           CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
             ADD COLUMN `help_pre_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option pre help text.'", array(), TRUE, NULL, FALSE, FALSE);
         }
-        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists("civicrm_price_field_value_{$locale}", "help_post_{$locale}")) {
+        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists("civicrm_price_field_value", "help_post_{$locale}")) {
           CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
             ADD COLUMN `help_post_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option post help text.'", array(), TRUE, NULL, FALSE, FALSE);
         }
       }
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
     }
     else {
       if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', 'help_pre')) {
