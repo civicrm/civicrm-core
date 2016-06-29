@@ -215,9 +215,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @param string $rev
    */
-  public function upgrade_4_7_9($rev) {
+  public function upgrade_4_7_10($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask('Upgrade Add Help Pre and Post Fields to price value table', 'addHelpPreAndHelpPostFieldsPriceFieldValue');
+    $this->addTask(ts('Upgrade Add Help Pre and Post Fields to price value table'), 'addHelpPreAndHelpPostFieldsPriceFieldValue');
   }
 
   /*
@@ -642,11 +642,11 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       foreach ($locales as $locale) {
-        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', "help_pre_{$locale}")) {
+        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists("civicrm_price_field_value_{$locale}", "help_pre_{$locale}")) {
           CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
             ADD COLUMN `help_pre_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option pre help text.'", array(), TRUE, NULL, FALSE, FALSE);
         }
-        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', "help_post_{$locale}")) {
+        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists("civicrm_price_field_value_{$locale}", "help_post_{$locale}")) {
           CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
             ADD COLUMN `help_post_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option post help text.'", array(), TRUE, NULL, FALSE, FALSE);
         }
