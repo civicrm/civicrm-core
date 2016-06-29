@@ -68,6 +68,32 @@
     <add>3.3</add>
   </field>
   <field>
+    <name>help_pre</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Price field option pre help text.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>help_post</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Price field option post field help.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>amount</name>
     <type>varchar</type>
     <title>Amount</title>
