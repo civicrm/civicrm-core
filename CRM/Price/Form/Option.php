@@ -216,6 +216,8 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $this->addRule('amount', ts('Please enter a monetary value for this field.'), 'money');
 
       $this->add('textarea', 'description', ts('Description'));
+      $this->add('textarea', 'help_pre', ts('Pre Option Help'), NULL, TRUE);
+      $this->add('textarea', 'help_post', ts('Post Option Help'), NULL, TRUE);
 
       // weight
       $this->add('text', 'weight', ts('Order'), NULL, TRUE);
