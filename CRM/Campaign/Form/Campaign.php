@@ -309,14 +309,14 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $params['id'] = $this->_campaignId;
     }
     else {
-      $params['created_id'] = $session->get('userID');
+      $params['created_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
       $params['created_date'] = date('YmdHis');
     }
     // format params
     $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
     $params['end_date'] = CRM_Utils_Date::processDate($params['end_date'], $params['end_date_time'], TRUE);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['last_modified_id'] = $session->get('userID');
+    $params['last_modified_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
     $params['last_modified_date'] = date('YmdHis');
 
     if (is_array($params['includeGroups'])) {

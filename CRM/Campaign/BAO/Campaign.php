@@ -52,8 +52,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
     if (!(CRM_Utils_Array::value('id', $params))) {
 
       if (!(CRM_Utils_Array::value('created_id', $params))) {
-        $session = CRM_Core_Session::singleton();
-        $params['created_id'] = $session->get('userID');
+        $params['created_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
       }
 
       if (!(CRM_Utils_Array::value('created_date', $params))) {

@@ -327,7 +327,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $session = CRM_Core_Session::singleton();
     if ($newLocale && $session->get('userID')) {
       $ufm = new CRM_Core_DAO_UFMatch();
-      $ufm->contact_id = $session->get('userID');
+      $ufm->contact_id = CRM_Core_Session::singleton()->getLoggedInContactID();
       if ($newLocale && $ufm->find(TRUE)) {
         $ufm->language = $newLocale;
         $ufm->save();

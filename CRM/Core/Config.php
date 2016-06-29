@@ -224,7 +224,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     $session = CRM_Core_Session::singleton();
 
     // for logging purposes, pass the userID to the db
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
     if ($userID) {
       CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
         array(1 => array($userID, 'Integer'))

@@ -175,7 +175,6 @@ abstract class CRM_Financial_BAO_ExportFormat {
    * @throws CRM_Core_Exception
    */
   public static function createActivityExport($batchIds, $fileName) {
-    $session = CRM_Core_Session::singleton();
     $values = array();
     $params = array('id' => $batchIds);
     CRM_Batch_BAO_Batch::retrieve($params, $values);
@@ -204,9 +203,9 @@ abstract class CRM_Financial_BAO_ExportFormat {
       'subject' => $subject,
       'status_id' => 2,
       'activity_date_time' => date('YmdHis'),
-      'source_contact_id' => $session->get('userID'),
+      'source_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
       'source_record_id' => $values['id'],
-      'target_contact_id' => $session->get('userID'),
+      'target_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
       'details' => $details,
       'attachFile_1' => array(
         'uri' => $fileName,

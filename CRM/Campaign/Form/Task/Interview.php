@@ -565,8 +565,7 @@ WHERE {$clause}
 
   public function getVoterIds() {
     if (!$this->_interviewerId) {
-      $session = CRM_Core_Session::singleton();
-      $this->_interviewerId = $session->get('userID');
+      $this->_interviewerId = CRM_Core_Session::singleton()->getLoggedInContactID();
     }
     if (!$this->_surveyId) {
       // use default survey id

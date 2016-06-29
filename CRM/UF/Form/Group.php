@@ -347,7 +347,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
       elseif ($this->_action & CRM_Core_Action::ADD) {
         $session = CRM_Core_Session::singleton();
-        $params['created_id'] = $session->get('userID');
+        $params['created_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
         $params['created_date'] = date('YmdHis');
       }
 

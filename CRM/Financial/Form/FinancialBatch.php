@@ -206,7 +206,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
     // store the submitted values in an array
     $params['modified_date'] = date('YmdHis');
-    $params['modified_id'] = $session->get('userID');
+    $params['modified_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
     if (!empty($params['created_date'])) {
       $params['created_date'] = CRM_Utils_Date::processDate($params['created_date']);
     }
@@ -216,7 +216,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       $params['mode_id'] = CRM_Utils_Array::key('Manual Batch', $batchMode);
       $params['status_id'] = CRM_Utils_Array::key('Open', $batchStatus);
       $params['created_date'] = date('YmdHis');
-      $params['created_id'] = $session->get('userID');
+      $params['created_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
       $details = "{$params['title']} batch has been created by this contact.";
       $activityTypeName = 'Create Batch';
     }
@@ -239,8 +239,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       'status_id' => 2,
       'priority_id' => 2,
       'activity_date_time' => date('YmdHis'),
-      'source_contact_id' => $session->get('userID'),
-      'source_contact_qid' => $session->get('userID'),
+      'source_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
+      'source_contact_qid' => CRM_Core_Session::singleton()->getLoggedInContactID(),
       'details' => $details,
     );
 
