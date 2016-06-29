@@ -320,10 +320,18 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
     $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
     $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
-    $result = $this->callAPISuccess('Contact', 'get', array('contact_sub_type' => 'Student', 'sequential' => 1));
+    $result = $this->callAPISuccess('Contact', 'get', array(
+      'contact_sub_type' => 'Student',
+      'sequential' => 1,
+      'options' => array('sort' => 'id ASC'),
+    ));
     $this->assertEquals(count($dataSet['expected']), $result['count']);
     foreach ($dataSet['expected'] as $index => $contact) {
       foreach ($contact as $key => $value) {
+        // Handle the fact it's in a different field in the return value.
+        if ($key == 'gender_id') {
+          $key = 'gender';
+        }
         $this->assertEquals($value, $result['values'][$index][$key]);
       }
     }
@@ -643,6 +651,42 @@ class api_v3_JobTest extends CiviUnitTestCase {
         ),
       ),
     );
+
+    $conflictPairs = array(
+      'first_name' => 'Dianna',
+      'last_name' => 'McAndrew',
+      'middle_name' => 'Prancer',
+      'birth_date' => '2015-12-25',
+      'gender_id' => 'Female',
+      'job_title' => 'Thriller',
+    );
+
+    foreach ($conflictPairs as $key => $value) {
+      $contactParams = array(
+        'first_name' => 'Michael',
+        'middle_name' => 'Dancer',
+        'last_name' => 'Jackson',
+        'birth_date' => '2015-02-25',
+        'email' => 'michael@neverland.com',
+        'contact_type' => 'Individual',
+        'contact_sub_type' => array('Student'),
+        'gender_id' => 'Male',
+        'job_title' => 'Entertainer',
+      );
+      $contact2 = $contactParams;
+
+      $contact2[$key] = $value;
+      $data[$key . '_conflict'] = array(
+        array(
+          'mode' => 'safe',
+          'contacts' => array($contactParams, $contact2),
+          'skipped' => 1,
+          'merged' => 0,
+          'expected' => array($contactParams, $contact2),
+        ),
+      );
+    }
+
     return $data;
   }
 
