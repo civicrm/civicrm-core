@@ -53,18 +53,3 @@ INSERT INTO `civicrm_entity_financial_account`
 VALUES
   ('civicrm_financial_type', @financial_type_id_ef, @option_value_rel_id_dr, @financial_account_id_dref),
   ('civicrm_financial_type', @financial_type_id_md, @option_value_rel_id_dr, @financial_account_id_drmd);
-
---CRM-12252 Add in help_pre and help_post colmns to price field value table
-{if $multilingual}
-  {foreach from=$locales item=locale}
-    ALTER TABLE `civicrm_price_field_value`
-    ADD COLUMN `help_pre_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option pre help text.';
-    ALTER TABLE `civicrm_price_field_value`
-    ADD `help_post_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option post field help.';
-  {/foreach}
-{else}
-  ALTER TABLE `civicrm_price_field_value`
-  ADD COLUMN `help_pre` text COLLATE utf8_unicode_ci COMMENT 'Price field option pre help text.';
-  ALTER TABLE `civicrm_price_field_value`
-  ADD `help_post` text COLLATE utf8_unicode_ci COMMENT 'Price field option post field help.';
-{/if}
