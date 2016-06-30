@@ -2468,7 +2468,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
     $params['caseId'] = NULL;
     $context = CRM_Utils_Array::value('context', $params);
-    $showContactOverlay = !CRM_Utils_String::startsWith($context,"dashlet");
+    $showContactOverlay = !CRM_Utils_String::startsWith($context, "dashlet");
 
     // Get contact activities.
     $activities = CRM_Activity_BAO_Activity::getActivities($params);
