@@ -89,7 +89,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     // test utf-8 string, CRM-18997
     $input = 'Registro de eventos on-line: Taller: "Onboarding - Cómo integrar exitosamente a los nuevos talentos dentro de su organización - Formación práctica."';
     $maxLen = 128;
-    $this->assertEquals(true, mb_check_encoding(CRM_Utils_String::ellipsify($input, $maxLen), 'UTF-8'));
+    $this->assertEquals(TRUE, mb_check_encoding(CRM_Utils_String::ellipsify($input, $maxLen), 'UTF-8'));
   }
 
   public function testRandom() {
