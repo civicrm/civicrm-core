@@ -2878,11 +2878,11 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Where / qill clause for groups
+   * Where / qill clause for groups.
    *
    * @param $values
    */
-  public function group(&$values) {
+  public function group($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     // If the $value is in OK (operator as key) array format we need to extract the key as operator and value first
@@ -2910,7 +2910,7 @@ class CRM_Contact_BAO_Query {
     }
 
     $groupIds = NULL;
-    $names = array();
+
     $isSmart = FALSE;
     $isNotOp = ($op == 'NOT IN' || $op == '!=');
 

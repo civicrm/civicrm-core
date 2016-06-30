@@ -1788,6 +1788,25 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $result['id'];
   }
 
+  /**
+   * Create a smart group.
+   *
+   * By default it will be a group of households.
+   *
+   * @param array $smartGroupParams
+   * @param array $groupParams
+   * @return int
+   */
+  public function smartGroupCreate($smartGroupParams = array(), $groupParams = array()) {
+    $smartGroupParams = array_merge(array(
+      'formValues' => array('contact_type' => array('IN' => array('Household'))),
+    ),
+    $smartGroupParams);
+    $savedSearch = CRM_Contact_BAO_SavedSearch::create($smartGroupParams);
+
+    $groupParams['saved_search_id'] = $savedSearch->id;
+    return $this->groupCreate($groupParams);
+  }
 
   /**
    * Function to add a Group.
