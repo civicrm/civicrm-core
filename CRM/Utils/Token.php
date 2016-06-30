@@ -89,7 +89,7 @@ class CRM_Utils_Token {
     //for replacing header and footer components
     'transaction' => array(
       'header' => 'T_Header',
-      'footer'=> 'T_Footer',
+      'footer' => 'T_Footer',
     ),
   );
 
@@ -250,7 +250,6 @@ class CRM_Utils_Token {
     $escapeSmarty = FALSE
   ) {
     $key = 'domain';
-//    echo $domain;
     if (
       !$knownTokens || empty($knownTokens[$key])
     ) {
@@ -1433,7 +1432,7 @@ class CRM_Utils_Token {
     $contactId = NULL,
     $className = NULL,
     $escapeSmarty = FALSE
-  ){
+  ) {
 
     if (!$contactDetails && !$contactId) {
       return;
@@ -1915,10 +1914,10 @@ class CRM_Utils_Token {
     return $output;
   }
 
-  /*
+  /**
    * Replace all Template Tokens
    *
-   * @param string str
+   * @param string $str
    *    The string with tokens to be replaced
    * @param bool $html
    *    Replace token with HTML or plain text
@@ -1934,10 +1933,10 @@ class CRM_Utils_Token {
     $html = FALSE,
     $knownTokens = NULL,
     $escapeSmarty = FALSE
-  ){
+  ) {
     $key = 'transaction';
     //if tokens are not known at all, return the str as it is
-    if(!$knownTokens || empty($knownTokens[$key])){
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
     $str = preg_replace_callback(
@@ -1963,17 +1962,17 @@ class CRM_Utils_Token {
     // called only when we find a token in the string
     $value = '';
 
-    if(!array_key_exists($token, self::$_tokens['transaction'])) {
-        $value = "{transaction.$token}";
+    if (!array_key_exists($token, self::$_tokens['transaction'])) {
+      $value = "{transaction.$token}";
     }
     else {
       $component = new CRM_Mailing_BAO_Component();
       $component->is_default = 1;
       $component->is_active = 1;
       //find the header/footer component from DB and replace the token with the html/text.
-      $component->component_type =self::$_tokens['transaction'][$token];
+      $component->component_type = self::$_tokens['transaction'][$token];
       $component->find(TRUE);
-      if(!empty($component)) {
+      if (!empty($component)) {
         $html = $component->body_html;
         if ($component->body_text) {
           $text = $component->body_text;
@@ -1989,7 +1988,7 @@ class CRM_Utils_Token {
           $value = $text;
         }
       }
-      else{
+      else {
         $value = '';
       }
     }
@@ -1997,5 +1996,7 @@ class CRM_Utils_Token {
       $value = self::tokenEscapeSmarty($value);
     }
     return $value;
+
   }
+
 }

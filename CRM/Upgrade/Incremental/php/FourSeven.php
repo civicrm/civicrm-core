@@ -150,6 +150,15 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @param string $rev
    */
+  public function upgrade_4_7_beta9($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
   public function upgrade_4_7_1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add Index to civicrm_contribution creditnote_id field', 'addIndexContributionCreditNoteID');
