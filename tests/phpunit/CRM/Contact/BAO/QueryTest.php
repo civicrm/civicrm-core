@@ -275,4 +275,30 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Test the group contact clause does not contain an OR.
+   *
+   * The search should return 3 contacts - 2 households in the smart group of
+   * Contact Type = Household and one Individual hard-added to it. The
+   * Household that meets both criteria should be returned once.
+   */
+  public function testGroupClause() {
+    $this->householdCreate();
+    $householdID = $this->householdCreate();
+    $individualID = $this->individualCreate();
+    $groupID = $this->smartGroupCreate();
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $individualID, 'status' => 'Added'));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $householdID, 'status' => 'Added'));
+
+    $query = new CRM_Contact_BAO_Query(
+      array(array('group', 'IN', array($groupID), 0, 0)),
+      array('contact_id')
+    );
+
+    $sql = $query->query();
+    $queryString = implode(' ', $sql);
+    $dao = CRM_Core_DAO::executeQuery($queryString);
+    $this->assertEquals(3, $dao->N);
+  }
+
 }
