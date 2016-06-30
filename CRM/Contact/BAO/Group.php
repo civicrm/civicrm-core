@@ -460,7 +460,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     if (!empty($params['organization_id'])) {
-      $groupOrg = array();
       $groupOrg = $params;
       $groupOrg['group_id'] = $group->id;
       CRM_Contact_BAO_GroupOrganization::add($groupOrg);

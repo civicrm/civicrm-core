@@ -290,6 +290,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $individualID, 'status' => 'Added'));
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $householdID, 'status' => 'Added'));
 
+    // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
+    CRM_Contact_BAO_GroupContactCache::remove($groupID, FALSE);
     $query = new CRM_Contact_BAO_Query(
       array(array('group', 'IN', array($groupID), 0, 0)),
       array('contact_id')
@@ -299,6 +301,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $queryString = implode(' ', $sql);
     $dao = CRM_Core_DAO::executeQuery($queryString);
     $this->assertEquals(3, $dao->N);
+    $this->assertFalse(strstr(implode(' ', $sql), ' OR '));
   }
 
 }

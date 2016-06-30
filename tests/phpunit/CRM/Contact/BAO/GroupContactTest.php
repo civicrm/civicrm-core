@@ -110,7 +110,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'title' => 'Child Group',
       'description' => 'Child Group',
       'visibility' => 'User and User Admin Only',
-      'parents' => $parentGroup->id,
+      'parents' => $parentGroup['id'],
       'is_active' => 1,
     );
     $childGroup = $this->callAPISuccess('Group', 'create', $groupParams2);
@@ -119,7 +119,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $parentContactParams = array(
       'first_name' => 'Parent1 Fname',
       'last_name' => 'Parent1 Lname',
-      'group' => array($parentGroup->id => 1),
+      'group' => array($parentGroup['id'] => 1),
     );
     $parentContact = Contact::createIndividual($parentContactParams);
 
@@ -127,13 +127,13 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $childContactParams = array(
       'first_name' => 'Child1 Fname',
       'last_name' => 'Child2 Lname',
-      'group' => array($childGroup->id => 1),
+      'group' => array($childGroup['id'] => 1),
     );
     $childContact = Contact::createIndividual($childContactParams);
 
     // Check if searching by parent group  returns both parent and child group contacts
     $searchParams = array(
-      'group' => $parentGroup->id,
+      'group' => $parentGroup['id'],
     );
     $result = $this->callAPISuccess('contact', 'get', $searchParams);
     $validContactIds = array($parentContact, $childContact);
@@ -146,7 +146,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
     // Check if searching by child group returns just child group contacts
     $searchParams = array(
-      'group' => $childGroup->id,
+      'group' => $childGroup['id'],
     );
     $result = $this->callAPISuccess('contact', 'get', $searchParams);
     $validChildContactIds = array($childContact);

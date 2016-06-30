@@ -586,7 +586,10 @@ class CRM_Contact_BAO_Query {
       if (!array_key_exists($value[0], $this->_paramLookup)) {
         $this->_paramLookup[$value[0]] = array();
       }
-      $this->_paramLookup[$value[0]][] = $value;
+      if ($value[0] !== 'group') {
+        // Just trying to unravel how group interacts here! This whole function is wieid.
+        $this->_paramLookup[$value[0]][] = $value;
+      }
     }
   }
 
@@ -2911,7 +2914,6 @@ class CRM_Contact_BAO_Query {
 
     $groupIds = NULL;
 
-    $isSmart = FALSE;
     $isNotOp = ($op == 'NOT IN' || $op == '!=');
 
     $statii = array();
@@ -2929,7 +2931,8 @@ class CRM_Contact_BAO_Query {
       $statii[] = '"Added"';
     }
 
-    $skipGroup = FALSE;
+    $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
+    $isSmart = (!$ssClause) ? FALSE : TRUE;
     if (!is_array($value) &&
       count($statii) == 1 &&
       $statii[0] == '"Added"' &&
@@ -2939,9 +2942,6 @@ class CRM_Contact_BAO_Query {
         $isSmart = TRUE;
       }
     }
-
-    $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
-    $isSmart = (!$ssClause) ? FALSE : $isSmart;
     $groupClause = NULL;
 
     if (!$isSmart) {
@@ -3037,6 +3037,9 @@ WHERE  $smartGroupClause
       if (!$this->_smartGroupCache || $group->cache_date == NULL) {
         CRM_Contact_BAO_GroupContactCache::load($group);
       }
+    }
+    if ($group->N == 0) {
+      return NULL;
     }
 
     if (!$tableAlias) {
