@@ -345,7 +345,12 @@ SELECT f.id, f.label, f.data_type,
                   $op = key($value);
                   $value = $value[$op];
                 }
-                $value = implode(',', (array) $value);
+                // CRM-19006: escape characters like comma, | before building regex pattern
+                $value = (array) $value;
+                foreach ($value as $key => $val) {
+                  $value[$key] = str_replace(array('|', '[', ']', ','), array('\|', '\[', '\]', '[:comma:]'), $val);
+                }
+                $value = implode(',', $value);
               }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
@@ -353,8 +358,7 @@ SELECT f.id, f.label, f.data_type,
                 $sp = CRM_Core_DAO::VALUE_SEPARATOR;
                 if (strstr($op, 'IN')) {
                   $value = str_replace(",", "$sp|$sp", $value);
-                  $value = str_replace('(', '[[.left-parenthesis.]]', $value);
-                  $value = str_replace(')', '[[.right-parenthesis.]]', $value);
+                  $value = str_replace(array('[:comma:]', '(', ')'), array(',', '[[.left-parenthesis.]]', '[[.right-parenthesis.]]'), $value);
                 }
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
                 $value = $sp . $value . $sp;
