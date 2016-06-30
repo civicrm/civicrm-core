@@ -29,16 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * This file is for civievent search
+ * Form for participant search.
  */
 class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
