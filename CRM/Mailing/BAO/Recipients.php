@@ -137,4 +137,26 @@ SET mr.mailing_id = $newMailingID
     }
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function addSelectWhereClause() {
+    $clauses = array(
+      // Append ACL clauses while fetching recipient count or list when check_permissions is TRUE
+      'contact_id' => array(),
+    );
+
+    // TODO: For now we are using logged ib contact ID as it is not possible to
+    // fetch creator id of the mail  for building ACL clauses
+    $contactID = CRM_Core_Session::getLoggedInContactID();
+    list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($contactID);
+
+    if (!CRM_Utils_System::isNull($aclWhere)) {
+      $clauses['contact_id'][] = " IN (SELECT contact_a.id FROM civicrm_contact contact_a $aclJoin WHERE ( 1 ) $aclWhere ) ";
+    }
+
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
 }
