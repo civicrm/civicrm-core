@@ -292,16 +292,27 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
     CRM_Contact_BAO_GroupContactCache::remove($groupID, FALSE);
-    $query = new CRM_Contact_BAO_Query(
+
+    $sql = CRM_Contact_BAO_Query::getQuery(
       array(array('group', 'IN', array($groupID), 0, 0)),
       array('contact_id')
     );
 
-    $sql = $query->query();
-    $queryString = implode(' ', $sql);
-    $dao = CRM_Core_DAO::executeQuery($queryString);
+    $dao = CRM_Core_DAO::executeQuery($sql);
     $this->assertEquals(3, $dao->N);
-    $this->assertFalse(strstr(implode(' ', $sql), ' OR '));
+    $this->assertFalse(strstr($sql, ' OR '));
+
+    $sql = CRM_Contact_BAO_Query::getQuery(
+      array(array('group', 'IN', array($groupID), 0, 0)),
+      array('contact_id' => 1, 'group' => 1)
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->assertEquals(3, $dao->N);
+    $this->assertFalse(strstr($sql, ' OR '), 'Query does not include or');
+    while ($dao->fetch()) {
+      $this->assertTrue(($dao->groups == $groupID || $dao->groups == ',' . $groupID), $dao->groups . ' includes ' . $groupID);
+    }
   }
 
 }
