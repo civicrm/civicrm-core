@@ -309,6 +309,12 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
           list($field, $value) = each($date);
           switch ($field) {
             case 'contribution_date':
+              $form->addDate('start_date', ts('First installment payment'));
+              $paymentDate = $value = date('d/m/Y');
+              list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($value);
+              $form->assign('is_date', TRUE);
+              break;
+
             case 'calendar_date':
               $form->addDate('start_date', ts('First installment payment'));
               list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($value);
