@@ -62,10 +62,11 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
       $this->_batchStatus = $batchStatuses[$this->_batchStatusId];
       $this->assign('statusID', $this->_batchStatusId);
       $this->assign('batchStatus', $this->_batchStatus);
-      $this->assign('validStatus', FALSE);
+      $validStatus = FALSE;
       if (in_array($this->_batchStatus, array('Open', 'Reopened'))) {
-        $this->assign('validStatus', TRUE);
+        $validStatus = TRUE;
       }
+      $this->assign('validStatus', $validStatus);
 
       $batchTitle = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'title');
       CRM_Utils_System::setTitle(ts('Accounting Batch - %1', array(1 => $batchTitle)));
