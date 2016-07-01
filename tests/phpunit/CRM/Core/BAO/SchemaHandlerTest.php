@@ -148,4 +148,20 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test to see if we can drop foreign key
+   *
+   */
+  public function testSafeDropForeignKey() {
+    $tests = array('FK_civicrm_mailing_recipients_email_id', 'FK_civicrm_mailing_recipients_id');
+    foreach ($tests as $test) {
+      if ($test == 'FK_civicrm_mailing_recipients_id') {
+        $this->assertFalse(CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', $test));
+      }
+      else {
+        $this->assertTrue(CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', $test));
+      }
+    }
+  }
+
 }
