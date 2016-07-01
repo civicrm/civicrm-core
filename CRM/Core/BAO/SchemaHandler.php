@@ -624,8 +624,9 @@ MODIFY      {$columnName} varchar( $length )
 
     if ($dao->fetch()) {
       CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", array());
+      return TRUE;
     }
-
+    return FALSE;
   }
 
 }
