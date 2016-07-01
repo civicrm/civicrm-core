@@ -2468,6 +2468,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
     $params['caseId'] = NULL;
     $context = CRM_Utils_Array::value('context', $params);
+    $showContactOverlay = !CRM_Utils_String::startsWith($context, "dashlet");
 
     // Get contact activities.
     $activities = CRM_Activity_BAO_Activity::getActivities($params);
@@ -2517,7 +2518,14 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $activity['source_contact_name'] = $values['source_contact_name'];
         }
         elseif ($values['source_contact_id']) {
-          $activity['source_contact_name'] = CRM_Utils_System::href($values['source_contact_name'],
+          $srcTypeImage = "";
+          if ($showContactOverlay) {
+            $srcTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
+              CRM_Contact_BAO_Contact::getContactType($values['source_contact_id']),
+              FALSE,
+              $values['source_contact_id']);
+          }
+          $activity['source_contact_name'] = $srcTypeImage . CRM_Utils_System::href($values['source_contact_name'],
             'civicrm/contact/view', "reset=1&cid={$values['source_contact_id']}");
         }
         else {
@@ -2536,12 +2544,19 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
           $activity['target_contact_name'] = '';
           foreach ($values['target_contact_name'] as $tcID => $tcName) {
-            $activity['target_contact_name'] .= CRM_Utils_System::href($tcName,
-              'civicrm/contact/view', "reset=1&cid={$tcID}");
+            $targetTypeImage = "";
+            if ($showContactOverlay) {
+              $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
+                CRM_Contact_BAO_Contact::getContactType($tcID),
+                FALSE,
+                $tcID);
+            }
+            $targetLink = CRM_Utils_System::href($tcName, 'civicrm/contact/view', "reset=1&cid={$tcID}");
+            $activity['target_contact_name'] .= "<div>$targetTypeImage  $targetLink</div>";
           }
 
           if ($extraCount = $values['target_contact_counter'] - 1) {
-            $activity['target_contact_name'] .= ";<br />" . "(" . ts('%1 more', array(1 => $extraCount)) . ")";
+            $activity['target_contact_name'] .= "<div>" . "(" . ts('%1 more', array(1 => $extraCount)) . ")</div>";
           }
         }
         elseif (!$values['target_contact_name']) {
@@ -2557,11 +2572,20 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $activity['assignee_contact_name'] = '';
           foreach ($values['assignee_contact_name'] as $acID => $acName) {
             if ($acID && $count < 5) {
-              $activity['assignee_contact_name'] .= CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
+              $assigneeTypeImage = "";
+              if ($showContactOverlay) {
+                $assigneeTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
+                  CRM_Contact_BAO_Contact::getContactType($acID),
+                  FALSE,
+                  $acID);
+              }
+              $assigneeLink = CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
+              $activity['assignee_contact_name'] .= "<div>$assigneeTypeImage $assigneeLink";
               $count++;
               if ($count) {
-                $activity['assignee_contact_name'] .= ";&nbsp;";
+                $activity['assignee_contact_name'] .= ";";
               }
+              $activity['assignee_contact_name'] .= "</div> ";
 
               if ($count == 4) {
                 $activity['assignee_contact_name'] .= "(" . ts('more') . ")";
