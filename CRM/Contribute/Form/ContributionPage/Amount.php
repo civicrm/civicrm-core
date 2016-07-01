@@ -518,12 +518,12 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         'calendar_month' => 'pledge_calendar_month',
       );
       if ($params['pledge_default_toggle'] == 'contribution_date') {
-        $fieldValue = serialize(array('contribution_date' => date('Ymd')));
+        $fieldValue = json_encode(array('contribution_date' => date('Ymd')));
       }
       else {
         foreach ($pledgeDateFields as $key => $pledgeDateField) {
           if (CRM_Utils_Array::value($pledgeDateField, $params) && $params['pledge_default_toggle'] == $key) {
-            $fieldValue = serialize(array($key => $params[$pledgeDateField]));
+            $fieldValue = json_encode(array($key => $params[$pledgeDateField]));
             break;
           }
         }

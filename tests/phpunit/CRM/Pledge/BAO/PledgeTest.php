@@ -133,7 +133,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
    *  Test build recur params.
    */
   public function testGetPledgeStartDate() {
-    $startDate = serialize(array('calendar_month' => 6));
+    $startDate = json_encode(array('calendar_month' => 6));
 
     $params = array(
       'pledge_start_date' => $startDate,
@@ -149,7 +149,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
     // Try with fixed date
     $params = array(
-      'pledge_start_date' => serialize(array('contribution_date' => '2016-06-10')),
+      'pledge_start_date' => json_encode(array('contribution_date' => '2016-06-10')),
       'is_pledge_start_date_visible' => FALSE,
     );
 

@@ -305,7 +305,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       if (CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
         if (CRM_Utils_Array::value('pledge_start_date', $pledgeBlock)) {
           $defaults = array();
-          $date = unserialize($pledgeBlock['pledge_start_date']);
+          $date = (array) json_decode($pledgeBlock['pledge_start_date']);
           list($field, $value) = each($date);
           switch ($field) {
             case 'contribution_date':
