@@ -110,21 +110,19 @@
 {if $form.opening_balance}
 {literal}
   <script type="text/javascript">
-    cj(document).ready(function() {
-      cj('#financial_account_type_id').change(function() {
-        showHideElement();
-      });
+    CRM.$(function($) {
+      $('#financial_account_type_id').on('change', showHideElement);
       showHideElement();
       function showHideElement() {
-        var financialAccountType = cj('#financial_account_type_id').val();
+        var financialAccountType = $('#financial_account_type_id').val();
         var financialAccountTypes = '{/literal}{$limitedAccount}{literal}';
-	if (cj.inArray(financialAccountType, financialAccountTypes) > -1) {
-	  cj('tr.crm-contribution-form-block-current_period_opening_balance').show();
-	  cj('tr.crm-contribution-form-block-opening_balance').show();
+	if ($.inArray(financialAccountType, financialAccountTypes) > -1) {
+	  $('tr.crm-contribution-form-block-current_period_opening_balance').show();
+	  $('tr.crm-contribution-form-block-opening_balance').show();
 	}
 	else {
-	  cj('tr.crm-contribution-form-block-current_period_opening_balance').hide();
-	  cj('tr.crm-contribution-form-block-opening_balance').hide();
+	  $('tr.crm-contribution-form-block-current_period_opening_balance').hide();
+	  $('tr.crm-contribution-form-block-opening_balance').hide();
 	}
       }
     });
