@@ -872,9 +872,20 @@ class CRM_Contact_BAO_Query {
         }
         elseif ($name === 'groups') {
           $this->_useGroupBy = TRUE;
-          $this->_select[$name] = "GROUP_CONCAT(DISTINCT(civicrm_group.title)) as groups";
+          // Duplicates will be created here but better to sort them out in php land.
+          $this->_select[$name] = "
+            CONCAT_WS(',',
+            GROUP_CONCAT(DISTINCT IF(civicrm_group_contact.status = 'Added', civicrm_group_contact.group_id, '')),
+            GROUP_CONCAT(DISTINCT civicrm_group_contact_cache.group_id)
+          )
+          as groups";
           $this->_element[$name] = 1;
-          $this->_tables['civicrm_group'] = 1;
+          $this->_tables['civicrm_group_contact'] = 1;
+          $this->_tables['civicrm_group_contact_cache'] = 1;
+          $this->_pseudoConstantsSelect["{$name}"] = array(
+            'pseudoField' => "groups",
+            'idCol' => "groups",
+          );
         }
         elseif ($name === 'notes') {
           // if note field is subject then return subject else body of the note
@@ -1370,6 +1381,7 @@ class CRM_Contact_BAO_Query {
           $this->_paramLookup['group'][0][1] = key($value);
         }
 
+        // Presumably the lines below come into manage groups screen.
         // make sure there is only one element
         // this is used when we are running under smog and need to know
         // how the contact was added (CRM-1203)
@@ -2517,16 +2529,6 @@ class CRM_Contact_BAO_Query {
       );
     }
 
-    // add group_contact and group_contact_cache table if group table is present
-    if (!empty($tables['civicrm_group'])) {
-      if (empty($tables['civicrm_group_contact'])) {
-        $tables['civicrm_group_contact'] = " LEFT JOIN civicrm_group_contact ON civicrm_group_contact.contact_id = contact_a.id AND civicrm_group_contact.status = 'Added' ";
-      }
-      if (empty($tables['civicrm_group_contact_cache'])) {
-        $tables['civicrm_group_contact_cache'] = " LEFT JOIN civicrm_group_contact_cache ON civicrm_group_contact_cache.contact_id = contact_a.id ";
-      }
-    }
-
     // add group_contact and group table is subscription history is present
     if (!empty($tables['civicrm_subscription_history']) && empty($tables['civicrm_group'])) {
       $tables = array_merge(array(
@@ -2641,7 +2643,7 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_group':
-          $from .= " $side JOIN civicrm_group ON (civicrm_group.id = civicrm_group_contact.group_id OR civicrm_group.id = civicrm_group_contact_cache.group_id) ";
+          $from .= " $side JOIN civicrm_group ON civicrm_group.id = civicrm_group_contact.group_id ";
           continue;
 
         case 'civicrm_group_contact':
@@ -4259,8 +4261,9 @@ civicrm_relationship.is_permission_a_b = 0
   public static function getQuery($params = NULL, $returnProperties = NULL, $count = FALSE) {
     $query = new CRM_Contact_BAO_Query($params, $returnProperties);
     list($select, $from, $where, $having) = $query->query();
+    $groupBy = ($query->_useGroupBy) ? 'GROUP BY contact_a.id' : '';
 
-    return "$select $from $where $having";
+    return "$select $from $where $groupBy $having";
   }
 
   /**
@@ -5687,6 +5690,10 @@ AND   displayRelType.is_active = 1
 
       if (is_object($dao) && property_exists($dao, $value['idCol'])) {
         $val = $dao->$value['idCol'];
+        if ($key == 'groups') {
+          $dao->groups = $this->convertGroupIDStringToLabelString($dao, $val);
+          return;
+        }
 
         if (CRM_Utils_System::isNull($val)) {
           $dao->$key = NULL;
@@ -6067,6 +6074,30 @@ AND   displayRelType.is_active = 1
       return array($order, $additionalFromClause);
     }
     return array($order, $additionalFromClause);
+  }
+
+  /**
+   * Convert a string of group IDs to a string of group labels.
+   *
+   * The original string may include duplicates and groups the user does not have
+   * permission to see.
+   *
+   * @param CRM_Core_DAO $dao
+   * @param string $val
+   *
+   * @return string
+   */
+  public function convertGroupIDStringToLabelString(&$dao, $val) {
+    $groupIDs = explode(',', $val);
+
+    // The pseudoConstant function does not actually cache.
+    static $allGroups;
+    if (!$allGroups) {
+      $allGroups = CRM_Core_PseudoConstant::group();
+    }
+    // Note that groups that the user does not have permission to will be excluded (good).
+    $groups = array_intersect_key($allGroups, array_flip($groupIDs));
+    return implode(', ', $groups);
   }
 
 }
