@@ -43,10 +43,10 @@
           $("tr.crm-preferences-form-block-" + toHide).hide();
         }
       }
-
+      $('input[name=_qf_Contribute_next]').on('click', checkPeriod);
       function checkPeriod() {
         var speriod = $('#prior_financial_period').val();
-      	var hperiod = $('input[name=prior_financial_period_hidden]').val();
+      	var hperiod = '{/literal}{$priorFinancialPeriod}{literal}';
       	if (((hperiod && speriod == '') || (hperiod && speriod != '')) && (speriod != hperiod)) {
           if (confirm('Changing the Prior Financial Period may result in problems calculating closing account balances accurately and / or exporting of financial transactions. Do you want to proceed?')) {
 	    return true;

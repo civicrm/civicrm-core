@@ -167,21 +167,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
       $htmlFields[$setting] = ts($props['description']);
     }
     $this->assign('htmlFields', $htmlFields);
-    $this->addElement('hidden', 'prior_financial_period_hidden');
     parent::buildQuickForm();
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'js' => array('onclick' => "return checkPeriod();"),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
     $this->addFormRule(array('CRM_Admin_Form_Preferences_Contribute', 'formRule'), $this);
   }
 
@@ -232,7 +218,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     }
     $defaults['fiscalYearStart'] = Civi::settings()->get('fiscalYearStart');
     $period = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
-    $defaults['prior_financial_period_hidden'] = $period;
+    $this->assign('priorFinancialPeriod', $period);
     return $defaults;
   }
 
