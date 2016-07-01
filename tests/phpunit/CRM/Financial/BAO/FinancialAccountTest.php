@@ -362,9 +362,10 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'duration_interval' => 1,
       'financial_type_id' => 1,
       'visibility' => 'Public',
+      'is_active' => 1,
     );
 
-    CRM_Member_BAO_MembershipType::add($params, $ids);
+    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
 
     $membership = $this->assertDBNotNull('CRM_Member_BAO_MembershipType', $orgContactID,
       'name', 'member_of_contact_id',
