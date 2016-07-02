@@ -3354,8 +3354,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (empty($params['skipLineItem'])) {
       CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
     }
-    //CRM-16189
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params);
 
     // create batch entry if batch_id is passed and
     // ensure no batch entry is been made on 'Pending' or 'Failed' contribution, CRM-16611
