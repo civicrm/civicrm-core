@@ -152,6 +152,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', array('id' => $contributionID, 'return' => 'contribution_status_id'));
     }
 
+    if (!$contributionID
+      && CRM_Utils_Array::value('membership_id', $params)
+      && CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')
+    ) {
+      $memberStartDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['membership_id'], 'start_date');
+      if ($memberStartDate) {
+        $params['revenue_recognition_date'] = date('Ymd', strtotime($memberStartDate));
+      }
+    }
     self::calculateMissingAmountParams($params, $contributionID);
 
     if (!empty($params['payment_instrument_id'])) {
