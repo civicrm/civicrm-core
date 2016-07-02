@@ -48,11 +48,8 @@
         var speriod = $('#prior_financial_period').val();
       	var hperiod = '{/literal}{$priorFinancialPeriod}{literal}';
       	if (((hperiod && speriod == '') || (hperiod && speriod != '')) && (speriod != hperiod)) {
-          if (confirm('Changing the Prior Financial Period may result in problems calculating closing account balances accurately and / or exporting of financial transactions. Do you want to proceed?')) {
-	    return true;
-          } else {
-            return false;
-          }
+	  var msg = '{/literal}{ts}Changing the Prior Financial Period may result in problems calculating closing account balances accurately and / or exporting of financial transactions. Do you want to proceed?{/ts}{literal}';
+          return confirm(msg);
         }
       }
     });
