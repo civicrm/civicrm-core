@@ -460,7 +460,7 @@ AND li.entity_id = {$entityId}
           }
         }
       }
-    }    
+    }
     if (!$update && $contributionDetails) {
       CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItem, $contributionDetails);
     }
