@@ -35,9 +35,15 @@
 class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
 
   /**
+   * Holds Deferred Financial Account
+   */
+  protected $_deferredFinancialAccount = array();
+
+  /**
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
+    $this->_deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getAllDeferredFinancialAccount();
     $this->_columns = array(
       'civicrm_financial_account' => array(
         'dao' => 'CRM_Financial_DAO_FinancialAccount',
@@ -46,7 +52,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
           'id' => array(
             'title' => ts('Deferred Financial Account'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialAccount::getAllDeferredFinancialAccount(),
+            'options' => $this->_deferredFinancialAccount,
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
@@ -69,9 +75,10 @@ financial_account_revenue.name revenue_account,
 financial_account_revenue.id revenue_account_id,
 financial_account_revenue.accounting_code revenue_account_code,
 financial_item.status_id,
-contribution.contribution_status_id,
+financial_item.id item_id,
+financial_trxn_contribution_1.status_id,
 contribution.receive_date,
-contribution.total_amount,
+financial_trxn_contribution_1.total_amount,
 contribution.id contribution_id,
 contribution.contact_id,
 contact.display_name,
@@ -105,6 +112,8 @@ INNER JOIN civicrm_financial_trxn financial_trxn
   ON financial_trxn.from_financial_account_id = financial_account_deferred_civireport.id AND financial_trxn.id =  entity_financial_trxn_item.financial_trxn_id 
 INNER JOIN civicrm_entity_financial_trxn financial_trxn_contribution
   ON financial_trxn_contribution.financial_trxn_id = financial_trxn.id AND financial_trxn_contribution.entity_table = 'civicrm_contribution'
+INNER JOIN civicrm_entity_financial_trxn entity_financial_trxn_contribution ON entity_financial_trxn_contribution.entity_id = financial_item.id and entity_financial_trxn_contribution.entity_table = 'civicrm_financial_item'  
+INNER JOIN civicrm_financial_trxn financial_trxn_contribution_1 ON financial_trxn_contribution_1.id = entity_financial_trxn_contribution.financial_trxn_id AND (financial_trxn_contribution_1.from_financial_account_id NOT IN (" . implode(',' , array_keys($this->_deferredFinancialAccount)) . ") OR financial_trxn_contribution_1.from_financial_account_id IS NULL)
 INNER JOIN civicrm_contribution contribution 
   ON contribution.id = financial_trxn_contribution.entity_id
 INNER JOIN civicrm_contact contact 
@@ -206,8 +215,8 @@ LEFT JOIN civicrm_event event ON participant.event_id = event.id
       if (empty($rows[$arraykey])) {
         $rows[$arraykey]['label'] = "Deferred Revenue Account: {$dao->deferred_account} ({$dao->deferred_account_code}), Revenue Account: {$dao->revenue_account} {$dao->revenue_account_code}";
       }
-      $rows[$arraykey]['rows'][$dao->contribution_id] = array(
-        'Transaction' => $statuses[$dao->contribution_status_id],
+      $rows[$arraykey]['rows'][$dao->item_id] = array(
+        'Transaction' => $statuses[$dao->status_id],
         'Date of Transaction' => CRM_Utils_Date::customFormat($dao->receive_date, $dateFormat),
         'Amount' => CRM_Utils_Money::format($dao->total_amount),
         'Contribution ID' => $dao->contribution_id,
@@ -222,7 +231,7 @@ LEFT JOIN civicrm_event event ON participant.event_id = event.id
       $trxnAmount = explode(',', $dao->trxn_amount);
       foreach ($trxnDate as $key => $date) {
         $keyDate = date('M, Y', strtotime($date));
-        $rows[$arraykey]['rows'][$dao->contribution_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$key]);
+        $rows[$arraykey]['rows'][$dao->item_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$key]);
         $dateColumn[date('Ymd', strtotime($date))] = 1;
       }
     }
