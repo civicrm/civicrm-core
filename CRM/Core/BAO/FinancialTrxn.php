@@ -603,7 +603,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
    *
    * @param array $lineItems
    *
-   * @param array $contributionParams
+   * @param array $contributionDetails
    *
    * @param bool $update
    *
@@ -619,7 +619,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       if (!$update
         && (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Completed'
-          || (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Pending' 
+          || (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Pending'
             && $contributionDetails->is_pay_later)
           )
       ) {
@@ -649,7 +649,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
           if ($context == 'changeFinancialType') {
             $deferredRevenues[$key]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $item['id'], 'financial_type_id');
           }
-          if (in_array($item['entity_table'], 
+          if (in_array($item['entity_table'],
             array('civicrm_participant', 'civicrm_contribution'))
           ) {
             $deferredRevenues[$key]['revenue'][] = array(
@@ -674,7 +674,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
         if ($results['count'] != 2) {
           continue;
         }
-        foreach($results['values'] as $result) {
+        foreach ($results['values'] as $result) {
           if ($result['account_relationship'] == $accountRel) {
             $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
           }
@@ -682,7 +682,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
             $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
           }
         }
-        foreach($deferredRevenue['revenue'] as $revenue) {
+        foreach ($deferredRevenue['revenue'] as $revenue) {
           $trxnParams['total_amount'] = $trxnParams['net_amount'] = $revenue['amount'];
           $trxnParams['trxn_date'] = CRM_Utils_Date::isoToMysql($revenue['revenue_date']);
           $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
