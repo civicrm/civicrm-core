@@ -253,6 +253,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       'check_permissions',
       'options',
       'prettyprint',
+      // CRM-18347: ignore params unintentionally passed by API explorer on WP
+      'page',
+      'noheader',
+      // CRM-18347: ignore params unintentionally passed by wp CLI tool
+      '',
     );
     $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
     $getFieldsParams = array('version' => 3);
