@@ -154,14 +154,19 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *   array of category id's the contact belongs to.
    *
    */
-  public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE, $whereClause = '') {
+  public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE, $whereClause = '', $fromAccountID = NULL) {
     $ids = array('entityFinancialTrxnId' => NULL, 'financialTrxnId' => NULL);
 
+    $params = array(1 => array($entity_id, 'Integer'));
     $condition = "";
     if (!$newTrxn) {
       $condition = " AND ((ceft1.entity_table IS NOT NULL) OR (cft.payment_instrument_id IS NOT NULL AND ceft1.entity_table IS NULL)) ";
     }
 
+    if ($fromAccountID) {
+      $condition .= " AND (cft.from_financial_account_id <> %2 OR cft.from_financial_account_id IS NULL)";
+      $params[2] = array($fromAccountID, 'Integer');
+    }
     if ($orderBy) {
       $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
     }
@@ -178,7 +183,6 @@ WHERE ceft.entity_id = %1 AND (cfi.entity_table <> 'civicrm_financial_trxn' or c
 ORDER BY cft.id {$orderBy}
 LIMIT 1;";
 
-    $params = array(1 => array($entity_id, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
       $ids['entityFinancialTrxnId'] = $dao->id;
