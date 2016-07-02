@@ -235,8 +235,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   name => value array of the fields to be set (with extraneous removed)
    */
   public static function validateSettingsInput($params, &$fields, $createMode = TRUE) {
-    $group = CRM_Utils_Array::value('group', $params);
-
     $ignoredParams = array(
       'version',
       'id',
