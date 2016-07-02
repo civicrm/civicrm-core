@@ -409,9 +409,9 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       }
       else {
         // CRM-16189
-        $errorMessage = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_sid);
-        if ($errorMessage) {
-          $errors['financial_type_id'] = $errorMessage;
+        $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_sid);
+        if ($isError) {
+          $errors['financial_type_id'] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
         }
       }
     }
@@ -531,9 +531,9 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
           $_flagOption = $_emptyRow = 0;
           // CRM-16189
-          $errorMessage = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['option_financial_type_id'][$index], $form->_fid, 'PriceField');
-          if ($errorMessage) {
-            $errors["option_financial_type_id[{$index}]"] = $errorMessage;
+          $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['option_financial_type_id'][$index], $form->_fid, 'PriceField');
+          if ($isError) {
+            $errors["option_financial_type_id[{$index}]"] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
           }
         }
 

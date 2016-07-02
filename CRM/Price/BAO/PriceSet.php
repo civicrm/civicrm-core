@@ -80,12 +80,12 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     }
     // CRM-16189
     if ($validatePriceSet) {
-      $errorMessage = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
+      $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
         CRM_Utils_Array::value('financial_type_id', $params),
         $priceSetID
       );
-      if ($errorMessage) {
-        throw new CRM_Core_Exception($errorMessage);
+      if ($isError) {
+        throw new CRM_Core_Exception(ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts'));
       }
     }
     $priceSetBAO = new CRM_Price_BAO_PriceSet();
