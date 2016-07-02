@@ -585,14 +585,14 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
 
     $monthOfService = (($endYear - $startYear) * 12) + ($endMonth - $startMonth);
     $startDateOfRevenue = $membershipDetail['start_date'];
-    $typicalPayment = ROUND(($lineItem['line_total'] / $monthOfService), 2);
+    $typicalPayment = round(($lineItem['line_total'] / $monthOfService), 2);
     for ($i = 0; $i <= $monthOfService - 1; $i++) {
       $revenueAmount[$i]['amount'] = $typicalPayment;
       if ($i == 0) {
         $revenueAmount[$i]['amount'] -= (($typicalPayment * $monthOfService) - $lineItem['line_total']);
       }
       $revenueAmount[$i]['revenue_date'] = $startDateOfRevenue;
-      $startDateOfRevenue = date('Y-m', strtotime('+1 month', strtotime($startDateOfRevenue))). '-01';
+      $startDateOfRevenue = date('Y-m', strtotime('+1 month', strtotime($startDateOfRevenue))) . '-01';
     }
     return $revenueAmount;
   }
