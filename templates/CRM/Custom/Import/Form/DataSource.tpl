@@ -67,8 +67,9 @@
               <td><span>{$form.multipleCustomData.html}</span> </td>
   </tr>
   <tr class="crm-custom-import-uploadfile-from-block-contactType">
-              <td class="label">{$form.contactType.label}</td>
-             <td>{$form.contactType.html}<br />
+       <td class="label">{$form.contactType.label}</td>
+             <td>{$form.contactType.html} {help id='contact-type' file='CRM/Contact/Import/Form/DataSource'}&nbsp;&nbsp;&nbsp;
+               <span id="contact-subtype">{$form.contactSubType.label}&nbsp;&nbsp;&nbsp;{$form.contactSubType.html} {help id='contact-sub-type' file='CRM/Contact/Import/Form/DataSource'}</span></td>
                 <span class="description">
                 {ts}Select 'Individual' if you are importing custom data for individual persons.{/ts}
                 {ts}Select 'Organization' or 'Household' if you are importing custom data . (NOTE: Some built-in contact types may not be enabled for your site.){/ts}
@@ -95,5 +96,42 @@
         </tr>
     </table>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  {literal}
+    <script type="text/javascript">
+      CRM.$(function($) {
+         buildSubTypes();
+      });
+
+      function buildSubTypes( )
+      {
+        element = cj('input[name="contactType"]:checked').val( );
+        var postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0 }"{literal};
+        var param = 'parentId='+ element;
+        cj.ajax({ type: "POST", url: postUrl, data: param, async: false, dataType: 'json',
+
+                        success: function(subtype){
+                                                   if ( subtype.length == 0 ) {
+                                                      cj("#contactSubType").empty();
+                                                      cj("#contact-subtype").hide();
+                                                   } else {
+                                                       cj("#contact-subtype").show();
+                                                       cj("#contactSubType").empty();
+
+                                                       cj("#contactSubType").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
+                                                       for ( var key in  subtype ) {
+                                                           // stick these new options in the subtype select
+                                                           cj("#contactSubType").append("<option value="+key+">"+subtype[key]+" </option>");
+                                                       }
+                                                   }
+
+
+                                                 }
+  });
+
+      }
+
+
+    </script>
+  {/literal}
   </div>
  </div>

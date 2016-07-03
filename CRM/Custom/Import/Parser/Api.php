@@ -35,6 +35,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $this->_fields = array_merge(array(
         'do_not_import' => array('title' => ts('- do not import -')),
         'contact_id' => array('title' => ts('Contact ID')),
+        'contact_sub_type' => array('title' => ts('Contact Sub Type')),
       ), $importableFields);
   }
 
