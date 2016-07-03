@@ -92,7 +92,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
     if (!empty($paymentProcessors)) {
       foreach ($paymentProcessors as $id => $processor) {
-        if ($processor['name'] != 'pay_later') {
+        if ($id != 0) {
           $paymentProcessor[$id] = $processor['name'];
         }
         if (CRM_Utils_Array::value('is_recur', $processor)) {
