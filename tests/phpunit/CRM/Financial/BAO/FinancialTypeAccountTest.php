@@ -171,6 +171,8 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
    *
    * @param string $relationType
    *
+   * @return array
+   *   obj CRM_Financial_DAO_FinancialAccount, obj CRM_Financial_DAO_FinancialType, obj CRM_Financial_DAO_EntityFinancialAccount
    */
   public function createFinancialAccount($financialAccountType, $relationType = NULL) {
     $params = array('labelColumn' => 'name');
