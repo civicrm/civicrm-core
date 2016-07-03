@@ -1109,6 +1109,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
     }
+    $form->_params['contributionRecurID'] = $recurring->id;
 
     return $recurring->id;
   }
@@ -1951,7 +1952,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->_params['receive_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
         $recurParams = CRM_Pledge_BAO_Pledge::buildRecurParams($this->_params);
         $this->_params = array_merge($this->_params, $recurParams);
-        $this->_values = array_merge($this->_values, $recurParams);
       }
     }
 
