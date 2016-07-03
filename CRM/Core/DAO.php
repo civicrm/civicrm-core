@@ -729,14 +729,18 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $fieldName
    *   The name of the field in the DAO.
    *
+   * @param string $domainID
+   *   The id of the domain.  Object exists only for the given domain.
+   *
    * @return bool
    *   true if object exists
    */
-  public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
+  public static function objectExists($value, $daoName, $daoID, $fieldName = 'name', $domainID = NULL) {
     $object = new $daoName();
     $object->$fieldName = $value;
-
-    $config = CRM_Core_Config::singleton();
+    if ($domainID) {
+      $object->domain_id = $domainID;
+    }
 
     if ($object->find(TRUE)) {
       return ($daoID && $object->id == $daoID) ? TRUE : FALSE;
