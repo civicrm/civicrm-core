@@ -86,13 +86,12 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       $financialTypeAccount->entity_table = $params['entity_table'];
       $financialTypeAccount->find(TRUE);
     }
-    else {
-      $financialTypeAccount->id = CRM_Utils_Array::value('entityFinancialAccount', $ids);
-    }
     if (!empty($ids['entityFinancialAccount'])) {
       $financialTypeAccount->id = $ids['entityFinancialAccount'];
+      $financialTypeAccount->find(TRUE);
     }
     $financialTypeAccount->copyValues($params);
+    self::validateRelationship($financialTypeAccount);
     $financialTypeAccount->save();
     return $financialTypeAccount;
   }
@@ -247,7 +246,7 @@ WHERE cog.name = 'payment_instrument' ";
         'account_type_code' => 'INC',
         'is_active' => 1,
       );
-      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, CRM_Core_DAO::$_nullArray);
+      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
     }
     else {
       $existingFinancialAccount[$dao->financial_account_type_id] = $dao->id;
