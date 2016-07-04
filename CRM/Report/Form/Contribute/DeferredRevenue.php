@@ -113,7 +113,7 @@ INNER JOIN civicrm_financial_trxn financial_trxn
 INNER JOIN civicrm_entity_financial_trxn financial_trxn_contribution
   ON financial_trxn_contribution.financial_trxn_id = financial_trxn.id AND financial_trxn_contribution.entity_table = 'civicrm_contribution'
 INNER JOIN civicrm_entity_financial_trxn entity_financial_trxn_contribution ON entity_financial_trxn_contribution.entity_id = financial_item.id and entity_financial_trxn_contribution.entity_table = 'civicrm_financial_item'  
-INNER JOIN civicrm_financial_trxn financial_trxn_contribution_1 ON financial_trxn_contribution_1.id = entity_financial_trxn_contribution.financial_trxn_id AND (financial_trxn_contribution_1.from_financial_account_id NOT IN (" . implode(',' , array_keys($this->_deferredFinancialAccount)) . ") OR financial_trxn_contribution_1.from_financial_account_id IS NULL)
+INNER JOIN civicrm_financial_trxn financial_trxn_contribution_1 ON financial_trxn_contribution_1.id = entity_financial_trxn_contribution.financial_trxn_id AND (financial_trxn_contribution_1.from_financial_account_id NOT IN (" . implode(',', array_keys($this->_deferredFinancialAccount)) . ") OR financial_trxn_contribution_1.from_financial_account_id IS NULL)
 INNER JOIN civicrm_contribution contribution 
   ON contribution.id = financial_trxn_contribution.entity_id
 INNER JOIN civicrm_contact contact 
