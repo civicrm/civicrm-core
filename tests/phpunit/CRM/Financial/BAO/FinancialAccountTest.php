@@ -348,9 +348,12 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
 
+  /**
+   * Test testGetAllDeferredFinancialAccount.
+   */
   public function testGetAllDeferredFinancialAccount() {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getAllDeferredFinancialAccount();
-    // The two deferred financial accounts which are created by default. 
+    // The two deferred financial accounts which are created by default.
     $expected = array(
       "Deferred Revenue - Event Fee",
       "Deferred Revenue - Member Dues",
@@ -362,7 +365,10 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $this->assertEquals(array_count_values($expected), array_count_values($financialAccount), "The two arrays are not the same");
   }
 
-  function _createDeferredFinancialAccount() {
+  /**
+   * Helper function to create deferred financial account.
+   */
+  public function _createDeferredFinancialAccount() {
     $params = array(
       'name' => 'TestFinancialAccount_1',
       'accounting_code' => 4800,
