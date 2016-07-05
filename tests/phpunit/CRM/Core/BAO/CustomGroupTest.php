@@ -480,13 +480,13 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * Test getActiveGroups() with Invalid Params()
    */
   public function testGetActiveGroupsWithInvalidParams() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups('ABC', 'civicrm/contact/view/cd', $contactId);
     $this->assertEquals(empty($activeGroups), TRUE, 'Check that Emprt params are retreived');
   }
 
   public function testGetActiveGroups() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $customGrouptitle = 'Test Custom Group';
     $groupParams = array(
       'title' => $customGrouptitle,

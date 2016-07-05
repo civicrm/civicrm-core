@@ -48,7 +48,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'last_name' => 'Grant',
       'contact_type' => 'Individual',
     );
-    $this->individual = Contact::create($params);
+    $this->individual = $this->individualCreate($params);
 
     $params = array(
       'first_name' => 'Bill',
@@ -56,7 +56,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->student,
     );
-    $this->indivi_student = Contact::create($params);
+    $this->indivi_student = $this->individualCreate($params);
 
     $params = array(
       'first_name' => 'Alen',
@@ -64,20 +64,20 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->parent,
     );
-    $this->indivi_parent = Contact::create($params);
+    $this->indivi_parent = $this->individualCreate($params);
 
     $params = array(
       'organization_name' => 'Compumentor',
       'contact_type' => 'Organization',
     );
-    $this->organization = Contact::create($params);
+    $this->organization = $this->organizationCreate($params);
 
     $params = array(
       'organization_name' => 'Conservation Corp',
       'contact_type' => 'Organization',
       'contact_sub_type' => $this->sponsor,
     );
-    $this->organization_sponsor = Contact::create($params);
+    $this->organization_sponsor = $this->organizationCreate($params);
   }
 
   public function tearDown() {

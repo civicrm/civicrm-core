@@ -122,7 +122,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'last_name' => 'Parent1 Lname',
       'group' => array($parentGroup->id => 1),
     );
-    $parentContact = Contact::createIndividual($parentContactParams);
+    $parentContact = $this->individualCreate($parentContactParams);
 
     // create a contact within child dgroup
     $childContactParams = array(
@@ -130,7 +130,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'last_name' => 'Child2 Lname',
       'group' => array($childGroup->id => 1),
     );
-    $childContact = Contact::createIndividual($childContactParams);
+    $childContact = $this->individualCreate($childContactParams);
 
     // Check if searching by parent group  returns both parent and child group contacts
     $searchParams = array(

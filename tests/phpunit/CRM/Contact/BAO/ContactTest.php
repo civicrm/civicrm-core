@@ -1506,7 +1506,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $test = $this;
     $this->_testTimestamps(array(
       'INSERT' => function ($contactId) use ($test, $customGroup, $customField) {
-        $result = civicrm_api3('contact', 'create', array(
+        civicrm_api3('contact', 'create', array(
           'contact_id' => $contactId,
           'custom_' . $customField['id'] => 'test-1',
         ));
@@ -1524,8 +1524,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
         );
       },
     ));
-
-    Custom::deleteGroup($customGroup);
+    $this->quickCleanup(array('civicrm_contact'), TRUE);
   }
 
   /**
@@ -1539,7 +1538,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    */
   public function _testTimestamps($callbacks) {
     CRM_Core_DAO::triggerRebuild();
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $origTimestamps = CRM_Contact_BAO_Contact::getTimestamps($contactId);
     $this->assertRegexp('/^\d\d\d\d-\d\d-\d\d /', $origTimestamps['created_date']);
