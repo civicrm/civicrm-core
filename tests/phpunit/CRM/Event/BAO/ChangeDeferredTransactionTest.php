@@ -70,7 +70,7 @@ class CRM_Event_BAO_ChangeDeferredTransactionTest extends CiviUnitTestCase {
     $finAcc = new CRM_Financial_DAO_FinancialAccount();
     $finAcc->name = "Deferred Revenue - Event Fee";
     $finAcc->find(TRUE);
-    
+
     $this->assertEquals($dao->from_financial_account_id, $finAcc->id, 'Financial Account is not of type Deferred');
     $this->assertEquals($dao->status_id, 3, 'Status must be of type Cancelled');
 
@@ -91,7 +91,7 @@ class CRM_Event_BAO_ChangeDeferredTransactionTest extends CiviUnitTestCase {
     );
     $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
     $dao->fetch();
-    
+
     $this->assertEquals($dao->from_financial_account_id, $finAcc->id, 'Financial Account is not of type Deferred');
     $this->assertEquals($dao->status_id, 1, 'Status must be of type Completed');
     $this->assertEquals(date('Ymd', strtotime($dao->trxn_date)), date('Ymd', strtotime('+2 month')), 'Trxn dates do not match');
