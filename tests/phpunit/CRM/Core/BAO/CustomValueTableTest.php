@@ -16,7 +16,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    */
   public function testStoreCountry() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
     $customGroup = Custom::createGroup($params, 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
@@ -51,7 +51,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    */
   public function atestStoreFile() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
     $customGroup = Custom::createGroup($params, 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
@@ -86,7 +86,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    */
   public function testStoreStateProvince() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
     $customGroup = Custom::createGroup($params, 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
@@ -120,7 +120,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    */
   public function testStoreDate() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
     $customGroup = Custom::createGroup($params, 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
@@ -155,7 +155,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    */
   public function testStoreRichTextEditor() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
     $customGroup = Custom::createGroup($params, 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
@@ -191,7 +191,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   public function testgetEntityValues() {
 
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
     $customGroup = Custom::createGroup($params, 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
@@ -228,7 +228,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
   public function testCustomGroupMultiple() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
     $customGroup = Custom::createGroup($params, 'Individual');
 
     $fields = array(

@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/Contact.php';
-
 /**
  * Class CRM_Activity_BAO_ActivityTest
  * @group headless

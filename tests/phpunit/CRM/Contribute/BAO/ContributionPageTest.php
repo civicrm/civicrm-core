@@ -72,7 +72,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
     $this->assertNotNull($contributionpage->id);
     $this->assertType('int', $contributionpage->id);
-    ContributionPage::delete($contributionpage->id);
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $contributionpage->id));
   }
 
   /**
@@ -91,7 +91,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $is_active = 1;
     $pageActive = CRM_Contribute_BAO_ContributionPage::setIsActive($id, $is_active);
     $this->assertEquals($pageActive, TRUE, 'Verify financial types record deletion.');
-    ContributionPage::delete($contributionpage->id);
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $contributionpage->id));
   }
 
   /**
@@ -114,7 +114,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($params['title'], $values['title'], 'Verify contribution title.');
     $this->assertEquals($this->_financialTypeID, $values['financial_type_id'], 'Verify financial types id.');
     $this->assertEquals(1, $values['is_active'], 'Verify contribution is_active value.');
-    ContributionPage::delete($contributionpage->id);
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $contributionpage->id));
   }
 
   /**
@@ -144,8 +144,8 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $copycontributionpage = CRM_Contribute_BAO_ContributionPage::copy($contributionpage->id);
     $this->assertEquals($copycontributionpage->financial_type_id, $this->_financialTypeID, 'Check for Financial type id.');
     $this->assertEquals($copycontributionpage->goal_amount, 400, 'Check for goal amount.');
-    ContributionPage::delete($contributionpage->id);
-    ContributionPage::delete($copycontributionpage->id);
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $contributionpage->id));
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $copycontributionpage->id));
   }
 
 }

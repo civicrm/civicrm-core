@@ -257,20 +257,20 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       )),
     );
     $contacts = array(
-      'alice' => Contact::createIndividual(array(
+      'alice' => $this->individualCreate(array(
         'first_name' => 'Alice',
         'last_name' => 'Albertson',
         'custom_' . $fields['countryA']->id => $countriesByName['ANDORRA'],
         'custom_' . $fields['countryB']->id => $countriesByName['BARBADOS'],
       )),
-      'bob' => Contact::createIndividual(array(
+      'bob' => $this->individualCreate(array(
         'first_name' => 'Bob',
         'last_name' => 'Roberts',
         'custom_' . $fields['countryA']->id => $countriesByName['AUSTRIA'],
         'custom_' . $fields['countryB']->id => $countriesByName['BERMUDA'],
         'custom_' . $fields['countryC']->id => $countriesByName['CHAD'],
       )),
-      'carol' => Contact::createIndividual(array(
+      'carol' => $this->individualCreate(array(
         'first_name' => 'Carol',
         'last_name' => 'Carolson',
         'custom_' . $fields['countryC']->id => $countriesByName['CAMBODIA'],
