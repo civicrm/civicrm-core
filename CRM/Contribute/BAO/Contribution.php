@@ -454,7 +454,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return CRM_Contribute_BAO_Contribution
    */
   public static function create(&$params, $ids = array()) {
-    $dateFields = array('receive_date', 'cancel_date', 'receipt_date', 'thankyou_date');
+    $dateFields = array('receive_date', 'cancel_date', 'receipt_date', 'thankyou_date', 'revenue_recognition_date');
     foreach ($dateFields as $df) {
       if (isset($params[$df])) {
         $params[$df] = CRM_Utils_Date::isoToMysql($params[$df]);
