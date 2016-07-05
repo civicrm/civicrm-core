@@ -216,7 +216,7 @@ LEFT JOIN civicrm_event event ON participant.event_id = event.id
         $rows[$arraykey]['label'] = "Deferred Revenue Account: {$dao->deferred_account} ({$dao->deferred_account_code}), Revenue Account: {$dao->revenue_account} {$dao->revenue_account_code}";
       }
       $rows[$arraykey]['rows'][$dao->item_id] = array(
-        'Transaction' => $statuses[$dao->status_id],       
+        'Transaction' => $statuses[$dao->status_id],
         'Date of Transaction' => CRM_Utils_Date::customFormat($dao->transaction_date, $dateFormat),
         'Amount' => CRM_Utils_Money::format($dao->total_amount),
         'Contribution ID' => $dao->contribution_id,
