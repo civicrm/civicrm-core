@@ -21,7 +21,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test case for create() method.
    */
   public function testCreate() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -61,12 +61,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * getContactActivity() method get activities detail for given target contact id.
    */
   public function testGetContactActivity() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -76,7 +76,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_date_time' => date('Ymd'),
     );
 
-    CRM_Activity_BAO_Activity::create($params);
+    $this->callAPISuccess('Activity', 'create', $params);
 
     $activityId = $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting',
       'id',
@@ -98,12 +98,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *                              and set defaults.
    */
   public function testRetrieve() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -146,12 +146,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * deleteActivity($params) method deletes activity for given params.
    */
   public function testDeleteActivity() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -194,12 +194,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * deleteActivityTarget($activityId) method deletes activity target for given activity id.
    */
   public function testDeleteActivityTarget() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -236,12 +236,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * deleteActivityAssignment($activityId) method deletes activity assignment for given activity id.
    */
   public function testDeleteActivityAssignment() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $assigneeContactId = Contact::createIndividual($params);
+    $assigneeContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
