@@ -47,6 +47,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST['sEcho'] = 1;
     $_REQUEST['entityID'] = $batch['id'];
     $_REQUEST['return'] = TRUE;
+    $_REQUEST['statusID'] = '1';
     $json = CRM_Financial_Page_AJAX::getFinancialTransactionsList();
     $json = str_replace(rtrim(CIVICRM_UF_BASEURL, '/'), 'http://FIX ME', $json);
     $this->assertEquals($json, '{"sEcho": 1, "iTotalRecords": 1, "iTotalDisplayRecords": 1, "aaData": [ ["","<a href=\"/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4\" class=\"crm-summary-link\"><div'
