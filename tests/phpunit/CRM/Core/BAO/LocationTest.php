@@ -65,7 +65,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   public function testCreateWithMissingParams() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'contact_id' => $contactId,
       'street_address' => 'Saint Helier St',
@@ -87,7 +87,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
    * without civicrm_loc_block entry
    */
   public function testCreateWithoutLocBlock() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     //create various element of location block
     //like address, phone, email, openid, im.

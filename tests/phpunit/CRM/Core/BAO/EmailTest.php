@@ -17,7 +17,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    * Add() method (create and update modes)
    */
   public function testAdd() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array();
     $params = array(
@@ -57,7 +57,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    * HoldEmail() method (set and reset on_hold condition)
    */
   public function testHoldEmail() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'email' => 'jane.doe@example.com',
@@ -132,12 +132,12 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $contactParams = array(
       'first_name' => 'Alan',
       'last_name' => 'Smith',
-      'email-1' => 'alan.smith1@example.com',
-      'email-2' => 'alan.smith2@example.com',
-      'email-3' => 'alan.smith3@example.com',
+      'email' => 'alan.smith1@example.com',
+      'api.email.create.0' => array('email' => 'alan.smith2@example.com', 'location_type_id' => 'Home'),
+      'api.email.create.1' => array('email' => 'alan.smith3@example.com', 'location_type_id' => 'Main'),
     );
 
-    $contactId = Contact::createIndividual($contactParams);
+    $contactId = $this->individualCreate($contactParams);
 
     $emails = CRM_Core_BAO_Email::allEmails($contactId);
 

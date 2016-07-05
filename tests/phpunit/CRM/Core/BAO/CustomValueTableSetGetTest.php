@@ -15,7 +15,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
    */
   public function testSetGetValuesDate() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
 
     //create Custom Group
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
@@ -114,7 +114,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
    */
   public function testSetGetValuesYesNoRadio() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
 
     //create Custom Group
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
