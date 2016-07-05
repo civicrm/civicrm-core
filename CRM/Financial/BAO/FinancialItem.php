@@ -275,4 +275,26 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
     return FALSE;
   }
 
+  /**
+   * Get last financial item data.
+   *
+   * @param int $entityId
+   *
+   * @param string $entityTable
+   *
+   * @return object CRM_Core_DAO
+   */
+  public static function getPreviousFinancialItem($entityId, $entityTable = 'civicrm_line_item') {
+    $queryParams = array(
+      1 => array($entityId, 'Integer'),
+      2 => array($entityTable, 'String'),
+    );
+    $query = 'SELECT id, description, status_id, financial_account_id 
+      FROM civicrm_financial_item
+      WHERE entity_id = %1 AND entity_table = %2 ORDER BY id DESC LIMIT 1';
+    $prevFinancialItem = CRM_Core_DAO::executeQuery($query, $queryParams);
+    $prevFinancialItem->fetch();
+    return $prevFinancialItem;
+  }
+
 }
