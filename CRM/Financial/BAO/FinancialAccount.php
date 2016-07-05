@@ -366,7 +366,7 @@ LIMIT 1";
    *
    * @param obj $form
    *
-   * @return string
+   * @return bool
    *
    */
   public static function checkFinancialTypeHasDeferred($params, $contributionID = NULL, $form = NULL) {
@@ -380,7 +380,6 @@ LIMIT 1";
       return FALSE;
     }
 
-    $message = ts('Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
     $lineItems = CRM_Utils_Array::value('line_item', $params);
     $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params);
     if (!$financialTypeID) {
@@ -403,13 +402,13 @@ LIMIT 1";
       foreach ($lineItems as $lineItem) {
         foreach ($lineItem as $items) {
           if (!array_key_exists($items['financial_type_id'], $deferredFinancialType)) {
-            return $message;
+            return TRUE;
           }
         }
       }
     }
     elseif (!array_key_exists($financialTypeID, $deferredFinancialType)) {
-      return $message;
+      return TRUE;
     }
     return FALSE;
   }
