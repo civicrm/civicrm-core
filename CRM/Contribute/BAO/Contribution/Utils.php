@@ -122,7 +122,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       if ($contribution && $form->_values['is_recur'] && $contribution->contribution_recur_id
       ) {
-        $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
+        $form->_params['contributionRecurID'] = $contribution->contribution_recur_id;
       }
 
       $paymentParams['qfKey'] = $form->controller->_key;

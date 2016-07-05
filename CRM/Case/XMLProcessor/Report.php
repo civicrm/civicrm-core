@@ -881,20 +881,20 @@ LIMIT  1
           $report->_redactionStringRules[CRM_Utils_Array::value('display_name', $client)] = $report->_redactionStringRules[CRM_Utils_Array::value('sort_name', $client)];
         }
         $client['sort_name'] = $report->redact(CRM_Utils_Array::value('sort_name', $client), TRUE, $report->_redactionStringRules);
-        if (!empty(CRM_Utils_Array::value('email', $client)) &&
-          !array_key_exists(CRM_Utils_Array::value('email', $client), $report->_redactionStringRules)
+        if (!empty($client['email']) &&
+          !array_key_exists($client['email'], $report->_redactionStringRules)
         ) {
           $report->_redactionStringRules = CRM_Utils_Array::crmArrayMerge($report->_redactionStringRules,
-            array(CRM_Utils_Array::value('email', $client) => 'email_' . rand(10000, 100000))
+            array($client['email'] => 'email_' . rand(10000, 100000))
           );
         }
         $client['email'] = $report->redact(CRM_Utils_Array::value('email', $client), TRUE, $report->_redactionStringRules);
 
-        if (!empty(CRM_Utils_Array::value('phone', $client)) &&
-          !array_key_exists(CRM_Utils_Array::value('phone', $client), $report->_redactionStringRules)
+        if (!empty($client['phone']) &&
+          !array_key_exists($client['phone'], $report->_redactionStringRules)
         ) {
           $report->_redactionStringRules = CRM_Utils_Array::crmArrayMerge($report->_redactionStringRules,
-            array(CRM_Utils_Array::value('phone', $client) => 'phone_' . rand(10000, 100000))
+            array($client['phone'] => 'phone_' . rand(10000, 100000))
           );
         }
         $client['phone'] = $report->redact(CRM_Utils_Array::value('phone', $client), TRUE, $report->_redactionStringRules);
