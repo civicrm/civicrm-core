@@ -229,7 +229,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    * Check method testcheckPermissionedLineItems()
    */
   public function testcheckPermissionedLineItems() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 4);
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
