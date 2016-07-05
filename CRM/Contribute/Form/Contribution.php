@@ -1009,10 +1009,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $errors['revenue_recognition_date'] = ts('Month and Year are required field for Revenue Recognition.');
     }
     // CRM-16189
-    $errorMessage = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($fields, $self->_id, $self);
-    if ($errorMessage) {
+    if (CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($fields, $self->_id, $self)) {
       $errors['financial_type_id'] = ' ';
-      $errors['_qf_default'] = $errorMessage;
+      $errors['_qf_default'] = ts('Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
     }
     $errors = array_merge($errors, $softErrors);
     return $errors;

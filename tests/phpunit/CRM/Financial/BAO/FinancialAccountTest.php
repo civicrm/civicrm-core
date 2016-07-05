@@ -282,8 +282,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     );
     $contribution = CRM_Contribute_BAO_Contribution::create($params);
     $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contribution->id);
-    $message = "Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts";
-    $this->assertEquals($valid, $message, "The messages do not match");
+    $this->assertTrue($valid, "This should have been true.");
   }
 
   /**
