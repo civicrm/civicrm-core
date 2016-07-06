@@ -1387,20 +1387,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return array
    *   Array of contribution page
    */
-  public function contributionPageCreate($params) {
-    $this->_pageParams = array(
+  public function contributionPageCreate($params = array()) {
+    $this->_pageParams = array_merge(array(
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
       'financial_account_id' => 1,
-      'payment_processor' => $params['processor_id'],
       'is_active' => 1,
       'is_allow_other_amount' => 1,
       'min_amount' => 10,
       'max_amount' => 1000,
-    );
-    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
-    return $contributionPage;
+    ), $params);
+    return $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
   }
 
   /**

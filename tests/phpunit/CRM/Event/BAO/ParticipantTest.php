@@ -234,7 +234,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
 
     //Creating 3 new participants
     for ($i = 0; $i < 3; $i++) {
-      $partiId[] = Participant::create($this->_contactId, $this->_eventId);
+      $partiId[] = $this->participantCreate(array('contact_id' => $this->_contactId, 'event_id' => $this->_eventId));
     }
 
     $params = array('event_id' => $this->_eventId, 'contact_id' => $this->_contactId);
@@ -316,7 +316,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     }
 
     //Deleting the Participant created by create function in this function
-    $deleteParticipant = CRM_Event_BAO_Participant::deleteParticipant($participant->id);
+    CRM_Event_BAO_Participant::deleteParticipant($participant->id);
     $this->assertDBNull('CRM_Event_DAO_Participant', $this->_contactId, 'id',
       'contact_id', 'Check DB for deleted participant. Should be NULL.'
     );
