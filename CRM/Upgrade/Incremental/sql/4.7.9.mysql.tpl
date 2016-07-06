@@ -39,14 +39,14 @@ SELECT @domainContactId := contact_id from civicrm_domain where id = {$domainID}
 INSERT IGNORE INTO
   `civicrm_financial_account` (`name`, `contact_id`, `financial_account_type_id`, `description`, `accounting_code`, `account_type_code`, `is_reserved`, `is_active`, `is_deductible`, `is_default`)
 VALUES
-  ('{ts escape="sql"}Deferred Revenue - Event Fee{/ts}', @domainContactId, @opLiability, 'Event revenue to be recognized in future months when the events occur', '2730', 'OCLIAB', 0, 1, 0, 0),
-  ('{ts escape="sql"}Deferred Revenue - Member Dues{/ts}', @domainContactId, @opLiability, 'Membership revenue to be recognized in future months', '2740', 'OCLIAB', 0, 1, 0, 0);
+  ('Deferred Revenue - Event Fee', @domainContactId, @opLiability, 'Event revenue to be recognized in future months when the events occur', '2730', 'OCLIAB', 0, 1, 0, 0),
+  ('Deferred Revenue - Member Dues', @domainContactId, @opLiability, 'Membership revenue to be recognized in future months', '2740', 'OCLIAB', 0, 1, 0, 0);
 
-SELECT @financial_account_id_dref := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Deferred Revenue - Event Fee{/ts}';
-SELECT @financial_account_id_drmd := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Deferred Revenue - Member Dues{/ts}';
+SELECT @financial_account_id_dref := max(id) FROM civicrm_financial_account WHERE name = 'Deferred Revenue - Event Fee';
+SELECT @financial_account_id_drmd := max(id) FROM civicrm_financial_account WHERE name = 'Deferred Revenue - Member Dues';
 SELECT @option_value_rel_id_dr := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Deferred Revenue Account is';
-SELECT @financial_type_id_md := max(id) FROM civicrm_financial_type WHERE name = '{ts escape="sql"}Member Dues{/ts}';
-SELECT @financial_type_id_ef := max(id) FROM civicrm_financial_type WHERE name = '{ts escape="sql"}Event Fee{/ts}';
+SELECT @financial_type_id_md := max(id) FROM civicrm_financial_type WHERE name = 'Member Dues';
+SELECT @financial_type_id_ef := max(id) FROM civicrm_financial_type WHERE name = 'Event Fee';
 
 INSERT INTO `civicrm_entity_financial_account`
   (entity_table, entity_id, account_relationship, financial_account_id)
