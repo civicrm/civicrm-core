@@ -95,8 +95,6 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
    *   The uploaded files if any.
    * @param $self
    *
-   * @return bool|array
-   *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
   }
