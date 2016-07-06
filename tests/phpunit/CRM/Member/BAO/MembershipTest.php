@@ -413,37 +413,27 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
 
   /**
-   * Take sort name of contact during
-   * Update multiple memberships
+   * Checkup sort name function.
    */
-  public function testsortName() {
-    $contactId = Contact::createIndividual();
+  public function testSortName() {
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
+      'join_date' => '2006-01-21',
+      'start_date' => '2006-01-21',
+      'end_date' => '2006-12-21',
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     );
-    $ids = array();
 
-    CRM_Member_BAO_Membership::create($params, $ids);
+    $membership = $this->callAPISuccess('Membership', 'create', $params);
 
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    $this->assertEquals('Anderson, Anthony', CRM_Member_BAO_Membership::sortName($membership['id']));
 
-    CRM_Member_BAO_Membership::sortName($membershipId);
-
-    $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $contactId, 'sort_name', 'id', 'Doe, John',
-      'Database check for sort name record.'
-    );
-
-    $this->membershipDelete($membershipId);
+    $this->membershipDelete($membership['id']);
     $this->contactDelete($contactId);
   }
 
@@ -451,7 +441,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Delete related memberships.
    */
   public function testdeleteRelatedMemberships() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -481,7 +471,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Renew membership with change in membership type.
    */
   public function testRenewMembership() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
     $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
     $params = array(
@@ -548,7 +538,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    */
   public function testStaleMembership() {
     $statusId = 3;
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
     $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
     $params = array(

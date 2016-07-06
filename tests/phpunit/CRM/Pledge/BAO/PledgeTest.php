@@ -39,7 +39,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->_contactId = Contact::createIndividual();
+    $this->_contactId = $this->individualCreate();
   }
 
   /**
