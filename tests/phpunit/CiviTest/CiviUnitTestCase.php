@@ -3308,8 +3308,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   protected function createParticipantWithContribution() {
     // creating price set, price field
-    $this->_contactId = Contact::createIndividual();
-    $this->_eventId = Event::create($this->_contactId);
+    $this->_contactId = $this->individualCreate();
+    $event = $this->eventCreate();
+    $this->_eventId = $event['id'];
     $eventParams = array(
       'id' => $this->_eventId,
       'financial_type_id' => 4,

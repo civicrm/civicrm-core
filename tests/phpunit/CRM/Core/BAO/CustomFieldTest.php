@@ -1,6 +1,5 @@
 <?php
 
-require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
 
 /**
