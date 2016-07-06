@@ -450,16 +450,23 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->assign('additionalParticipants', CRM_Event_BAO_Participant::getAdditionalParticipants($this->_id));
       }
 
-      // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
-      if (!empty($defaults[$this->_id]['participant_registered_by_id'])) {
-        $registered_by_contact_id = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-          $defaults[$this->_id]['participant_registered_by_id'],
-          'contact_id', 'id'
-        );
-        $this->assign('participant_registered_by_id', $defaults[$this->_id]['participant_registered_by_id']);
-        $this->assign('registered_by_contact_id', $registered_by_contact_id);
-        $this->assign('registered_by_display_name', CRM_Contact_BAO_Contact::displayName($registered_by_contact_id));
-      }
+    }
+
+    // CRM-19047: Set the default 'Registered by' if pre-populated from URL
+    if ($this->_action & CRM_Core_Action::ADD) {
+      $defaults[$this->_id]['participant_registered_by_id'] = CRM_Utils_Request::retrieve('rbid', 'Positive', $this);
+    }
+
+    // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
+    // Or if they are being registered to someone via the back-office (CRM-19047)
+    if (!empty($defaults[$this->_id]['participant_registered_by_id'])) {
+      $registered_by_contact_id = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+        $defaults[$this->_id]['participant_registered_by_id'],
+        'contact_id', 'id'
+      );
+      $this->assign('participant_registered_by_id', $defaults[$this->_id]['participant_registered_by_id']);
+      $this->assign('registered_by_contact_id', $registered_by_contact_id);
+      $this->assign('registered_by_display_name', CRM_Contact_BAO_Contact::displayName($registered_by_contact_id));
     }
 
     if ($this->_action & (CRM_Core_Action::VIEW | CRM_Core_Action::BROWSE)) {
@@ -652,6 +659,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $element = $this->addEntityRef('event_id', ts('Event'), $eventFieldParams, TRUE);
+
+    // CRM-19047: Freeze event selection when using a default 'registered by'
+    // and then set the hidden field
+    if (CRM_Utils_Request::retrieve('rbid', 'Positive', $this)) {
+      $element->freeze();
+      $this->add('hidden', 'participant_registered_by_id');
+    }
 
     //frozen the field fix for CRM-4171
     if ($this->_action & CRM_Core_Action::UPDATE && $this->_id) {

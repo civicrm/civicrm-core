@@ -60,13 +60,19 @@
           <td><a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$registered_by_contact_id&action=view"}" title="{ts}view primary participant{/ts}">{$registered_by_display_name}</a></td>
       </tr>
   {/if}
-  {if $additionalParticipants} {* Display others registered by this participant *}
+  {* Display others registered by this participant, and a button to add more *}
+  {if $additionalParticipants or !$registered_by_id}
         <tr class="crm-event-participantview-form-block-additionalParticipants">
             <td class="label">{ts}Also Registered by this Participant{/ts}</td>
             <td>
-                {foreach from=$additionalParticipants key=apName item=apURL}
-                    <a href="{$apURL}" title="{ts}view additional participant{/ts}">{$apName}</a><br />
-                {/foreach}
+                {if $additionalParticipants}
+                    {foreach from=$additionalParticipants key=apName item=apURL}
+                       <a href="{$apURL}" title="{ts}view additional participant{/ts}">{$apName}</a><br />
+                    {/foreach}
+                {/if}
+                {if !$registered_by_id}
+                  <a class="action-item crm-hover-button" href="{crmURL p='civicrm/participant/add' q="reset=1&action=add&context=standalone&eid=$event_id&rbid=$id"}" title="{ts}Add participant{/ts}"><i class="crm-i fa-plus"></i> {ts}Add participant{/ts}</a><br />
+                {/if}
             </td>
         </tr>
   {/if}
