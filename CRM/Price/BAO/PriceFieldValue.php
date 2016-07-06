@@ -61,6 +61,19 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
         self::updateAmountAndFeeLevel($id, $prevLabel, $params['label']);
       }
     }
+    // CRM-16189
+    $priceFieldID = CRM_Utils_Array::value('price_field_id', $params);
+    if (!$priceFieldID) {
+      $priceFieldID = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceFieldValue', $id, 'price_field_id');
+    }
+    $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
+      CRM_Utils_Array::value('financial_type_id', $params),
+      $priceFieldID,
+      'PriceField'
+    );
+    if ($isError) {
+      throw new CRM_Core_Exception(ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts'));
+    }
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
       $p = array(1 => array($params['price_field_id'], 'Integer'));
