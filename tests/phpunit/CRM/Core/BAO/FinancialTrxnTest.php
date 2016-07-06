@@ -165,7 +165,6 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $lineItems[1][$lineItemId]['financial_item_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_item WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemId}");
     // Get financial trxns for contribution
     $trxn = $this->callAPISuccess("FinancialTrxn", "get", array());
-    $this->assertEquals($trxn['count'], 1);
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime('2016-01-20')));
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contribution);
     $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('id' => array("NOT IN" => array($trxn['id']))));
