@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/ContributionPage.php';
 require_once 'CiviTest/Custom.php';
 require_once 'CiviTest/PaypalPro.php';
 
