@@ -36,9 +36,9 @@ class CRM_Core_BAO_PrevNextCacheTest extends CiviUnitTestCase {
     $dao->entity_id1 = 1;
     $dao->entity_id2 = 2;
     $dao->data = serialize(array(
-      'srcID' => 1,
+      'srcID' => 2,
       'srcName' => 'Ms. Meliissa Mouse II',
-      'dstID' => 2,
+      'dstID' => 1,
       'dstName' => 'Mr. Maurice Mouse II',
       'weight' => 20,
       'canMerge' => TRUE,
@@ -51,12 +51,12 @@ class CRM_Core_BAO_PrevNextCacheTest extends CiviUnitTestCase {
     $this->assertEquals(2, $dao->entity_id1);
     $this->assertEquals(1, $dao->entity_id2);
     $this->assertEquals(serialize(array(
+      'srcID' => 1,
       'srcName' => 'Mr. Maurice Mouse II',
-      'dstID' => 1,
       'dstName' => 'Ms. Meliissa Mouse II',
       'weight' => 20,
       'canMerge' => TRUE,
-      'srcID' => 2,
+      'dstID' => 2,
     )), $dao->data);
 
     $this->quickCleanup(array('civicrm_prevnext_cache'));

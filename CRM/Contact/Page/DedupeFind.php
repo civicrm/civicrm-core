@@ -256,10 +256,10 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
             $canMerge = TRUE;
 
             $mainContacts[] = $row = array(
-              'srcID' => $srcID,
-              'srcName' => $displayNames[$srcID],
-              'dstID' => $dstID,
-              'dstName' => $displayNames[$dstID],
+              'srcID' => $dstID,
+              'srcName' => $displayNames[$dstID],
+              'dstID' => $srcID,
+              'dstName' => $displayNames[$srcID],
               'weight' => $dupes[2],
               'canMerge' => $canMerge,
             );

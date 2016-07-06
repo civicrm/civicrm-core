@@ -627,8 +627,8 @@ WHERE  cacheKey LIKE %1
           $data['dst' . $key] = $originalData['src' . $key];
         }
         $dao->data = serialize($data);
-        $dao->entity_id1 = $data['srcID'];
-        $dao->entity_id2 = $data['dstID'];
+        $dao->entity_id1 = $data['dstID'];// entity ID1 / to be preserved / MainID
+        $dao->entity_id2 = $data['srcID'];// entity ID 2 / duplicate / OtherID
         $dao->save();
       }
     }
