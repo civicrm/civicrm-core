@@ -70,7 +70,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   public function testCreate() {
 
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -125,7 +125,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $last_month = $now - (30 * 24 * 60 * 60);
     $year_from_last_month = $last_month + (365 * 24 * 60 * 60);
 
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -176,7 +176,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testRetrieve() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -204,7 +204,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testActiveMembers() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -264,7 +264,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testDeleteMembership() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -291,7 +291,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testGetContactMembership() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -324,7 +324,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * page id from the membership record
    */
   public function testgetContributionPageId() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -354,7 +354,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * type.
    */
   public function testgetMembershipStarts() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -385,7 +385,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * optionally for a specified date.
    */
   public function testGetMembershipCount() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,

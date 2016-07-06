@@ -79,7 +79,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *  Test add()
    */
   public function testadd() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -107,7 +107,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *  Test del()
    */
   public function testdel() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -136,7 +136,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *  Test resetmodified()
    */
   public function testresetmodifiedId() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
