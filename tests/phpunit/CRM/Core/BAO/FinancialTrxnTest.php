@@ -138,7 +138,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $cid,
       'receive_date' => '2016-01-20',
-      'total_amount' => 100,
+      'total_amount' => 622,
       'financial_type_id' => 4,
       'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
       'line_items' => array(
@@ -164,10 +164,10 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $lineItemId = key($lineItems[1]);
     $lineItems[1][$lineItemId]['financial_item_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_item WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemId}");
     // Get financial trxns for contribution
-    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array());
+    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622));
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime('2016-01-20')));
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contribution);
-    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('id' => array("NOT IN" => array($trxn['id']))));
+    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622, 'id' => array("NOT IN" => array($trxn['id']))));
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
   }
 
