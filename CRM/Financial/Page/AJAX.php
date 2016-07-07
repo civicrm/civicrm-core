@@ -235,7 +235,14 @@ class CRM_Financial_Page_AJAX {
             $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params, $ids));
           }
           if ($updated) {
-            $response = array('status' => 'record-updated-success');
+            $redirectStatus = $updated->status_id;
+            if ($batchStatus[$updated->status_id] == "Reopened") {
+              $redirectStatus = array_search("Open", $batchStatus);
+            }
+            $response = array(
+              'status' => 'record-updated-success',
+              'status_id' => $redirectStatus,
+            );
           }
         }
       }
@@ -347,6 +354,10 @@ class CRM_Financial_Page_AJAX {
       }
     }
     $financialitems = array();
+    if ($statusID) {
+      $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name', 'condition' => " v.value={$statusID}"));
+      $batchStatus = $batchStatuses[$statusID];
+    }
     while ($financialItem->fetch()) {
       $row[$financialItem->id] = array();
       foreach ($columnHeader as $columnKey => $columnValue) {
@@ -376,7 +387,7 @@ class CRM_Financial_Page_AJAX {
           $row[$financialItem->id][$columnKey] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $financialItem->$columnKey);
         }
       }
-      if ($statusID == CRM_Core_OptionGroup::getValue('batch_status', 'Open')) {
+      if (isset($batchStatus) && in_array($batchStatus, array('Open', 'Reopened'))) {
         if (isset($notPresent)) {
           $js = "enableActions('x')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" . $financialItem->id . "' name='mark_x_" . $financialItem->id . "' value='1' onclick={$js}></input>";
