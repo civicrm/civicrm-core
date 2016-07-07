@@ -667,36 +667,6 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
   }
 
   /**
-   * Remove a foreign key from a table if it exists
-   *
-   * @param $table_name
-   * @param $constraint_name
-   */
-  public function safeRemoveFK($table_name, $constraint_name) {
-
-    $config = CRM_Core_Config::singleton();
-    $dbUf = DB::parseDSN($config->dsn);
-    $query = "
-      SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-      WHERE TABLE_SCHEMA = %1
-      AND TABLE_NAME = %2
-      AND CONSTRAINT_NAME = %3
-      AND CONSTRAINT_TYPE = 'FOREIGN KEY'
-    ";
-    $params = array(
-      1 => array($dbUf['database'], 'String'),
-      2 => array($table_name, 'String'),
-      3 => array($constraint_name, 'String'),
-    );
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    if ($dao->fetch()) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", array());
-    }
-
-  }
-
-  /**
    * CRM-18345 Don't delete mailing data on email/phone deletion
    * Implemented here in CRM-18526
    *
@@ -707,10 +677,10 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
   public function upgradeMailingFKs(CRM_Queue_TaskContext $ctx) {
 
     // Safely drop the foreign keys
-    self::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_email_id');
-    self::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_phone_id');
-    self::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id');
-    self::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_phone_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_email_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_phone_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_phone_id');
 
     // Set up the new foreign keys
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
