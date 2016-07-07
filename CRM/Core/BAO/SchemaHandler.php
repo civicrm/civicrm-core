@@ -598,4 +598,35 @@ MODIFY      {$columnName} varchar( $length )
     return FALSE;
   }
 
+  /**
+   * Remove a foreign key from a table if it exists
+   *
+   * @param $table_name
+   * @param $constraint_name
+   */
+  public static function safeRemoveFK($table_name, $constraint_name) {
+
+    $config = CRM_Core_Config::singleton();
+    $dbUf = DB::parseDSN($config->dsn);
+    $query = "
+      SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+      WHERE TABLE_SCHEMA = %1
+      AND TABLE_NAME = %2
+      AND CONSTRAINT_NAME = %3
+      AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+    ";
+    $params = array(
+      1 => array($dbUf['database'], 'String'),
+      2 => array($table_name, 'String'),
+      3 => array($constraint_name, 'String'),
+    );
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+    if ($dao->fetch()) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", array());
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
