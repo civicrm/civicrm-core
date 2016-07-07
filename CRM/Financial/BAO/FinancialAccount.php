@@ -124,7 +124,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       NULL,
       " AND v.name IN ('Liability', 'Asset') "
     );
-    if (!CRM_Utils_Array::value($financialAccount->financial_account_type_id, $accountType)) {
+    if (empty($params['id']) && !CRM_Utils_Array::value($financialAccount->financial_account_type_id, $accountType)) {
       $financialAccount->opening_balance = $financialAccount->current_period_opening_balance = '0.00';
     }
     $financialAccount->save();
