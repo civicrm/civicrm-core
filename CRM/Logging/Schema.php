@@ -753,8 +753,8 @@ COLS;
    * Predicate whether logging is enabled.
    */
   public function isEnabled() {
-    if (CRM_Core_Config::singleton()->logging) {
-      return $this->tablesExist() and $this->triggersExist();
+    if (\Civi::settings()->get('logging')) {
+      return ($this->tablesExist() && (\Civi::settings()->get('logging_no_trigger_permission') || $this->triggersExist()));
     }
     return FALSE;
   }
