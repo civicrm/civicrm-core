@@ -14,7 +14,7 @@ DELETE FROM civicrm_state_province WHERE name = 'Fernando de Noronha';
 ALTER TABLE civicrm_address CHANGE `postal_code` `postal_code` varchar(64) ;
 
 -- CRM-16189
-SELECT @contributionNavId := id, @domainID := domain_id FROM civicrm_navigation name = 'Contributions';
+SELECT @contributionNavId := id, @domainID := domain_id FROM civicrm_navigation WHERE name = 'Contributions';
 SELECT @navMaxWeight := MAX(ROUND(weight))+1 from civicrm_navigation WHERE parent_id = @contributionNavId;
 
 UPDATE civicrm_navigation SET has_separator = 1 WHERE name = 'Manage Price Sets' AND parent_id = @contributionNavId;
