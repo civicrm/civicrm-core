@@ -249,9 +249,9 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $cid = $this->individualCreate();
     $params = array(
       'contact_id' => $cid,
-      'receive_date' => '2010-01-20',
+      'receive_date' => '2016-01-20',
       'total_amount' => 100,
-      'financial_type_id' => 3,
+      'financial_type_id' => 4,
       'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
       'line_items' => array(
         array(
@@ -273,7 +273,6 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
               'qty' => 1,
               'unit_price' => 200,
               'line_total' => 200,
-              'financial_type_id' => 1,
             ),
           ),
           'params' => array(),
