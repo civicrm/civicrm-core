@@ -561,7 +561,6 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
   }
 
   /**
-<<<<<<< HEAD
    * Get revenue amount for membership.
    *
    * @param array $lineItem
