@@ -240,8 +240,9 @@ CRM.$(function($) {
       function(response) {
         //this is custom status set when record update success.
         if (response.status == 'record-updated-success') {
+	  //Redirect CRM-18169
+          window.location.href = CRM.url('civicrm/financial/financialbatches', 'reset=1&batchStatus=' + response.status_id);
           CRM.alert(listRecords(records), op == 'delete' ? {/literal}'{ts escape="js"}Deleted{/ts}' : '{ts escape="js"}Updated{/ts}'{literal}, 'success');
-          batchSelector.fnDraw();
         }
         else {
           CRM.alert({/literal}'{ts escape="js"}An error occurred while processing your request.{/ts}', $("#batch_update option[value=" + op + "]").text() + ' {ts escape="js"}Error{/ts}'{literal}, 'error');
