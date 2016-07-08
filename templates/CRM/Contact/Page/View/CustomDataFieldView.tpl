@@ -50,6 +50,8 @@
             </div>
           {elseif $element.field_data_type EQ 'Memo'}
             <div class="crm-content crm-custom-data">{$element.field_value|nl2br}</div>
+          {elseif $element.field_data_type EQ 'Money'}
+            <div class="crm-content crm-custom-data">{$element.field_value|crmMoney}</div>
           {else}
             <div class="crm-content crm-custom-data">{$element.field_value}</div>
           {/if}
