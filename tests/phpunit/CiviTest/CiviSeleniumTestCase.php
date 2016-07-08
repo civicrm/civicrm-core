@@ -1132,7 +1132,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $isConfirmEnabled = TRUE,
     $financialType = 'Donation',
     $fixedAmount = TRUE,
-    $membershipsRequired = TRUE
+    $membershipsRequired = TRUE,
+    $isPledgeStart = FALSE
   ) {
     if (!$hash) {
       $hash = substr(sha1(rand()), 0, 7);
@@ -1226,6 +1227,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $this->type('initial_reminder_day', 3);
         $this->type('max_reminders', 2);
         $this->type('additional_reminder_day', 1);
+        if ($isPledgeStart) {
+          $this->webtestFillDate('pledge_start_date', '+1 month');
+        }
       }
       elseif ($recurring) {
         $this->click('is_recur');

@@ -120,11 +120,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $paymentParams['contributionTypeID'] = $contributionTypeId;
       $paymentParams['item_name'] = $form->_params['description'];
 
-      if ($contribution && $form->_values['is_recur'] && $contribution->contribution_recur_id
-      ) {
-        $form->_params['contributionRecurID'] = $contribution->contribution_recur_id;
-      }
-
       $paymentParams['qfKey'] = $form->controller->_key;
       if ($component == 'membership') {
         return array('contribution' => $contribution);

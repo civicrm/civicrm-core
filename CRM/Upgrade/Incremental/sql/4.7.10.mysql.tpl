@@ -6,3 +6,9 @@ INSERT INTO
    civicrm_option_value (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, {localize field='description'}description{/localize}, is_optgroup, is_reserved, is_active, component_id, visibility_id)
 VALUES
    (@option_group_id_report, {localize}'{ts escape="sql"}{/ts}'{/localize}, 'contribute/tiralBalance', 'CRM_Report_Form_Contribute_DeferredRevenue', NULL, 0, NULL, @option_group_id_report_wt+1, {localize}'{ts escape="sql"}Deferred Revenue Details Report{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL);
+
+-- CRM-18854
+ALTER TABLE civicrm_pledge_block ADD pledge_start_date varchar(64) NULL DEFAULT NULL COMMENT 'The date that the first scheduled pledge occurs.';
+ALTER TABLE civicrm_pledge_block ADD is_pledge_start_date_visible TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'If true - recurring start date is shown.';
+ALTER TABLE civicrm_pledge_block ADD is_pledge_start_date_editable TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'If true - recurring start date is editable.';
+ALTER TABLE civicrm_contribution_page ADD adjust_recur_start_date TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'If true - user is able to adjust payment start date.' AFTER is_recur_installments;
