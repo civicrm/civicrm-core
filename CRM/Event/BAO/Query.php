@@ -368,6 +368,7 @@ class CRM_Event_BAO_Query {
       case 'participant_fee_amount':
       case 'participant_fee_level':
       case 'participant_campaign_id':
+      case 'participant_registered_by_id':
 
         $qillName = $name;
         if (in_array($name, array(
@@ -379,6 +380,7 @@ class CRM_Event_BAO_Query {
           'participant_fee_level',
           'participant_is_pay_later',
           'participant_campaign_id',
+          'participant_registered_by_id',
         ))
         ) {
           $name = str_replace('participant_', '', $name);
