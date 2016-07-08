@@ -372,9 +372,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     if ($eWayTrxnReference_IN != $eWayTrxnReference_OUT) {
       // return self::errorExit( 9009, "Error: Unique Trxn code was not returned by eWAY Gateway. This is extremely unusual! Please contact the administrator of this site immediately with details of this transaction.");
 
-      self::send_alert_email($eWAYResponse->TransactionNumber(),
-        $eWayTrxnReference_OUT, $eWayTrxnReference_IN, $requestxml, $responseData
-      );
     }
 
     /*
@@ -481,64 +478,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     else {
       return NULL;
     }
-  }
-
-  /**
-   * @param $p_eWAY_tran_num
-   * @param $p_trxn_out
-   * @param $p_trxn_back
-   * @param $p_request
-   * @param $p_response
-   */
-  public function send_alert_email($p_eWAY_tran_num, $p_trxn_out, $p_trxn_back, $p_request, $p_response) {
-    // Initialization call is required to use CiviCRM APIs.
-    civicrm_initialize(TRUE);
-
-    list($fromName, $fromEmail) = CRM_Core_BAO_Domain::getNameAndEmail();
-    $from = "$fromName <$fromEmail>";
-
-    $toName = 'Support at eWAY';
-    $toEmail = 'Support@eWAY.com.au';
-
-    $subject = "ALERT: Unique Trxn Number Failure : eWAY Transaction # = [" . $p_eWAY_tran_num . "]";
-
-    $message = "
-TRXN sent out with request   = '$p_trxn_out'.
-TRXN sent back with response = '$p_trxn_back'.
-
-This is a ['$this->_mode'] transaction.
-
-
-Request XML =
----------------------------------------------------------------------------
-$p_request
----------------------------------------------------------------------------
-
-
-Response XML =
----------------------------------------------------------------------------
-$p_response
----------------------------------------------------------------------------
-
-
-Regards
-
-The CiviCRM eWAY Payment Processor Module
-";
-    //$cc       = 'Name@Domain';
-
-    // create the params array
-    $params = array();
-
-    $params['groupName'] = 'eWay Email Sender';
-    $params['from'] = $from;
-    $params['toName'] = $toName;
-    $params['toEmail'] = $toEmail;
-    $params['subject'] = $subject;
-    $params['cc'] = $cc;
-    $params['text'] = $message;
-
-    CRM_Utils_Mail::send($params);
   }
 
 }
