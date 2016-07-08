@@ -1560,11 +1560,13 @@ class CRM_Contact_BAO_Query {
     $legacyElements = array(
       'activity_type_id',
       'location_type',
+      'membership_type_id',
+      'membership_status_id',
     );
     if (in_array($id, $legacyElements) && is_array($values)) {
       // prior to 4.6, formValues for some attributes (e.g. group, tag) are stored in array(id1 => 1, id2 => 1),
       // as per the recent Search fixes $values need to be in standard array(id1, id2) format
-      CRM_Utils_Array::formatArrayKeys($values);
+      $values = CRM_Utils_Array::convertCheckboxFormatToArray($values);
     }
   }
 
