@@ -61,7 +61,7 @@
       </tr>
   {/if}
   {* Display others registered by this participant, and a button to add more *}
-  {if $additionalParticipants or !$registered_by_id}
+  {if $additionalParticipants or (!$registered_by_id and !$is_monetary)}
         <tr class="crm-event-participantview-form-block-additionalParticipants">
             <td class="label">{ts}Also Registered by this Participant{/ts}</td>
             <td>
@@ -70,7 +70,7 @@
                        <a href="{$apURL}" title="{ts}view additional participant{/ts}">{$apName}</a><br />
                     {/foreach}
                 {/if}
-                {if !$registered_by_id}
+                {if !$registered_by_id and !$is_monetary}
                   <a class="action-item crm-hover-button" href="{crmURL p='civicrm/participant/add' q="reset=1&action=add&context=standalone&eid=$event_id&rbid=$id"}" title="{ts}Add participant{/ts}"><i class="crm-i fa-plus"></i> {ts}Add participant{/ts}</a><br />
                 {/if}
             </td>
