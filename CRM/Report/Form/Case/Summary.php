@@ -265,7 +265,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
     else {
       $this->_from = "
-            FROM civicrm_contact $c, civicrm_case $cc
+            FROM civicrm_case $cc
 inner join civicrm_case_contact $ccc on ${ccc}.case_id = ${cc}.id
 inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
 ";
@@ -332,7 +332,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_c2']}.id";
+    $this->_groupBy = "";
   }
 
   public function postProcess() {
