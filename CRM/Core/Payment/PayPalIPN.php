@@ -71,8 +71,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       FALSE
     );
     if ($abort && $value === NULL) {
-      CRM_Core_Error::debug_log_message("Could not find an entry for $name in $location");
-      echo "Failure: Missing Parameter<p>" . $name;
+      CRM_Core_Error::debug_log_message("Could not find an entry for $name");
+      echo "Failure: Missing Parameter<p>" . CRM_Utils_Type::escape($name, 'String');
       exit();
     }
     return $value;
