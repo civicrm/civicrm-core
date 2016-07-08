@@ -337,10 +337,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $params['pending_reason'] = $result['pendingreason'];
     if (!empty($params['is_recur'])) {
       // See comment block.
-      $result['payment_status_id'] = array_search('Pending', $statuses);
+      $params['payment_status_id'] = array_search('Pending', $statuses);
     }
     else {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $params['payment_status_id'] = array_search('Completed', $statuses);
     }
     return $params;
   }
