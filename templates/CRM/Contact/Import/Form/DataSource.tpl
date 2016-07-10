@@ -98,6 +98,14 @@
       &nbsp;&nbsp;&nbsp;<span class="description">{ts}Select Saved Mapping or Leave blank to create a new One.{/ts}</span></td>
          </tr>
         { /if}
+
+        {if $form.disableUSPS}
+         <tr  class="crm-import-datasource-form-block-disableUSPS">
+              <td class="label"></td>
+              <td>{$form.disableUSPS.html} <label for="disableUSPS">{$form.disableUSPS.label}</label></td>
+         </tr>
+
+        {/if}
  </table>
   </div>
 
