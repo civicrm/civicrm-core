@@ -222,26 +222,31 @@
               <td>{$form.contact_id.html}</td>
             </tr>
           {/if}
-          {if $action EQ 2}
-            {if $additionalParticipants} {* Display others registered by this participant *}
-              <tr class="crm-participant-form-block-additionalParticipants">
-                <td class="label"><label>{ts}Also Registered by this Participant{/ts}</label></td>
-                <td>
-                  {foreach from=$additionalParticipants key=apName item=apURL}
-                    <a href="{$apURL}" title="{ts}view additional participant{/ts}">{$apName}</a><br />
-                  {/foreach}
-                </td>
-              </tr>
-            {/if}
-            {if $registered_by_contact_id}
-              <tr class="crm-participant-form-block-registered-by">
-                <td class="label"><label>{ts}Registered By{/ts}</label></td>
-                <td class="view-value">
+          {* Display others registered by this participant *}
+          {if $action EQ 2 and $additionalParticipants}
+            <tr class="crm-participant-form-block-additionalParticipants">
+              <td class="label"><label>{ts}Also Registered by this Participant{/ts}</label></td>
+              <td>
+                {foreach from=$additionalParticipants key=apName item=apURL}
+                  <a href="{$apURL}" title="{ts}view additional participant{/ts}">{$apName}</a><br />
+                {/foreach}
+              </td>
+            </tr>
+          {/if}
+          {* Display the 'lead booker' for this participant *}
+          {if $registered_by_contact_id}
+            <tr class="crm-participant-form-block-registered-by">
+              <td class="label"><label>{ts}Registered By{/ts}</label></td>
+              <td class="view-value">
+                {if $action EQ 2}
                   <a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$registered_by_contact_id&action=view"}"
                      title="{ts}view primary participant{/ts}">{$registered_by_display_name}</a>
-                </td>
-              </tr>
-            {/if}
+                {else}
+                  {$registered_by_display_name}
+                  {$form.participant_registered_by_id.html}
+                {/if}
+              </td>
+            </tr>
           {/if}
           {if $participantMode}
             <tr class="crm-participant-form-block-payment_processor_id">

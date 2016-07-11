@@ -167,6 +167,9 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     $this->assign($values[$participantID]);
 
+    // CRM-19047: Allow additional participant registration for free events only
+    $this->assign('is_monetary', CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values[$participantID]['event_id'], 'is_monetary'));
+
     // add viewed participant to recent items list
     $url = CRM_Utils_System::url('civicrm/contact/view/participant',
       "action=view&reset=1&id={$values[$participantID]['id']}&cid={$values[$participantID]['contact_id']}&context=home"
