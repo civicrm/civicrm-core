@@ -331,7 +331,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
              LEFT JOIN civicrm_membership_payment cmp
                  ON {$this->_aliases['civicrm_membership']}.id = cmp.membership_id
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                 ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
+                 ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id
+             JOIN (SELECT MAX(id) id, contact_id  
+                FROM civicrm_contribution  WHERE civicrm_contribution.financial_type_id = 2
+                GROUP BY contact_id) civicrm_contribution_2 ON contribution_civireport.id = civicrm_contribution_2.id 
+                     AND contribution_civireport.contact_id = civicrm_contribution_2.contact_id\n";
     }
   }
 
