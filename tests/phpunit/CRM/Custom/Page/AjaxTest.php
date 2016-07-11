@@ -32,10 +32,13 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
     $customParams = array(
       "custom_{$customFields[0]}_-1" => "test value {$customFields[0]} one",
       "custom_{$customFields[0]}_-2" => "test value {$customFields[0]} two",
+      "custom_{$customFields[0]}_-3" => "test value {$customFields[0]} three",
       "custom_{$customFields[1]}_-1" => "test value {$customFields[1]} one",
       "custom_{$customFields[1]}_-2" => "test value {$customFields[1]} two",
+      "custom_{$customFields[1]}_-3" => "test value {$customFields[1]} three",
       "custom_{$customFields[2]}_-1" => "test value {$customFields[2]} one",
       "custom_{$customFields[2]}_-2" => "test value {$customFields[2]} two",
+      "custom_{$customFields[2]}_-3" => "test value {$customFields[2]} three",
     );
     CRM_Core_BAO_CustomValueTable::postProcess($customParams, "civicrm_contact", $contactId, NULL);
 
@@ -62,27 +65,32 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
     );
     $sortedRecords = CRM_Custom_Page_AJAX::getMultiRecordFieldList();
 
-    $this->assertEquals(2, $sortedRecords['recordsTotal']);
-    $this->assertEquals(2, $multiRecordFields['recordsTotal']);
+    $this->assertEquals(3, $sortedRecords['recordsTotal']);
+    $this->assertEquals(3, $multiRecordFields['recordsTotal']);
     foreach ($customFields as $fieldId) {
       $columnName = "field_{$fieldId}{$ids['custom_group_id']}_{$fieldId}";
       $this->assertEquals("test value {$fieldId} one", $multiRecordFields['data'][0][$columnName]['data']);
       $this->assertEquals("test value {$fieldId} two", $multiRecordFields['data'][1][$columnName]['data']);
+      $this->assertEquals("test value {$fieldId} three", $multiRecordFields['data'][2][$columnName]['data']);
 
       // this should be sorted in descending order.
       $this->assertEquals("test value {$fieldId} two", $sortedRecords['data'][0][$columnName]['data']);
-      $this->assertEquals("test value {$fieldId} one", $sortedRecords['data'][1][$columnName]['data']);
+      $this->assertEquals("test value {$fieldId} three", $sortedRecords['data'][1][$columnName]['data']);
+      $this->assertEquals("test value {$fieldId} one", $sortedRecords['data'][2][$columnName]['data']);
     }
 
-    //check the links
     $sorted = FALSE;
+    // sorted order result should be two, three, one
+    $sortedCount = array(1 => 2, 2 => 3, 3 => 1);
     foreach (array($multiRecordFields, $sortedRecords) as $records) {
       $count = 1;
-      //check links for result sorted in descending order
-      if ($sorted) {
-        $count = 2;
-      }
       foreach ($records['data'] as $key => $val) {
+        //check links for result sorted in descending order
+        if ($sorted) {
+          $initialCount = $count;
+          $count = $sortedCount[$count];
+        }
+        // extract view, edit, copy links and assert the recId, cgcount.
         preg_match_all('!https?://\S+!', $val['action'], $matches);
         foreach ($matches[0] as $match) {
           $parts = parse_url($match);
@@ -99,18 +107,15 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
               break;
 
             case 'copy':
-              $this->assertEquals(3, $query['cgcount']);
+              $this->assertEquals(4, $query['cgcount']);
               break;
           }
         }
+        if (!empty($initialCount)) {
+          $count = $initialCount;
+        }
 
-        //decrement the count as we're sorting in descending order.
-        if ($sorted) {
-          $count--;
-        }
-        else {
-          $count++;
-        }
+        $count++;
       }
       $sorted = TRUE;
     }
