@@ -2258,7 +2258,7 @@ class CRM_Contact_BAO_Query {
           $fieldName = "LOWER(contact_a.{$fieldName})";
         }
         else {
-          if ($op != 'IN' && !is_numeric($value)) {
+          if ($op != 'IN' && !is_numeric($value) && !is_array($value)) {
             $fieldName = "LOWER({$field['where']})";
           }
           else {
