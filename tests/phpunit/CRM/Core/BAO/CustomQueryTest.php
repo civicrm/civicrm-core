@@ -121,11 +121,6 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
         "civicrm_value_testsearchcus_1." . strtolower($type) . "_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
         $queryObj->_where[0][0]
       );
-      //CRM-18471 - display qill as '$ amount' for money
-      if ($type == 'Money') {
-        $from = "$ $from";
-        $to = "$ $to";
-      }
       $this->assertEquals($queryObj->_qill[0][0], "$type field BETWEEN $from, $to");
     }
   }
@@ -155,7 +150,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $customFieldName = 'custom_' . $customField['id'];
 
       $expectedValue = ($isDate) ? '"20150606235959"' : (($type == 'Money') ? $data : "\"$data\"");
-      $expectedQillValue = ($isDate) ? "'June 6th, 2015 11:59 PM'" : (($type == 'Money') ? "$ $data" : $data);
+      $expectedQillValue = ($isDate) ? "'June 6th, 2015 11:59 PM'" : $data;
 
       // Assigning the relevant form value to be within a custom key is normally done in
       // build field params. It would be better if it were all done in convertFormValues
