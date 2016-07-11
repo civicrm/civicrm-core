@@ -698,14 +698,20 @@ abstract class CRM_Utils_System_Base {
       $tzObj = new DateTimeZone($timezone);
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
-
+      // CRM-15656 - Joomla time zones
+      /*
+       * We may still want to change the time even if the offset is zero.
       if (empty($tz)) {
-        return FALSE;
+      return FALSE;
       }
+       *
+       */
 
       $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
 
-      if ($timeZoneOffset > 0) {
+      if ($tz >= 0) {
+        // $tz is a number, not a string, so it is better to test it.
+        // CRM-15656 - 00:00 needs a plus sign
         $timeZoneOffset = '+' . $timeZoneOffset;
       }
       return $timeZoneOffset;
