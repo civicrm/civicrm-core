@@ -3517,6 +3517,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     $params['entity_id'] = $trxn->id;
+    $updateLineItems = array();
     if ($context != 'changePaymentInstrument') {
       $itemParams['entity_table'] = 'civicrm_line_item';
       $trxnIds['id'] = $params['entity_id'];
