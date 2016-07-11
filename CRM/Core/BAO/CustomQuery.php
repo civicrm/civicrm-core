@@ -348,7 +348,7 @@ SELECT f.id, f.label, f.data_type,
                 // CRM-19006: escape characters like comma, | before building regex pattern
                 $value = (array) $value;
                 foreach ($value as $key => $val) {
-                  $value[$key] = str_replace(array('|', '[', ']', ','), array('\|', '\[', '\]', '[:comma:]'), $val);
+                  $value[$key] = str_replace(array('|', '[', ']', ','), array('[:spearator:]', '\[', '\]', '[:comma:]'), $val);
                 }
                 $value = implode(',', $value);
               }
@@ -364,10 +364,12 @@ SELECT f.id, f.label, f.data_type,
                 $value = $sp . $value . $sp;
                 if (!$wildcard) {
                   foreach (explode("|", $value) as $val) {
+                    $val = str_replace('[:separator:]', '\|', $val);
                     $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $val, 'String');
                   }
                 }
                 else {
+                  $value = str_replace('[:separator:]', '\|', $value);
                   $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
                 }
               }

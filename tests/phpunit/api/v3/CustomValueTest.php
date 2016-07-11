@@ -44,7 +44,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $dataValues = array(
       'integer' => array(1, 2, 3),
       'number' => array(10.11, 20.22, 30.33),
-      'string' => array(substr(sha1(rand()), 0, 4), substr(sha1(rand()), 0, 3), substr(sha1(rand()), 0, 2)),
+      'string' => array(substr(sha1(rand()), 0, 4) . '(', substr(sha1(rand()), 0, 3) . '|', substr(sha1(rand()), 0, 2) . ','),
       // 'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
       // This does not work in the test at the moment due to caching issues.
       //'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
