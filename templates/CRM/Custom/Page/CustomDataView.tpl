@@ -74,7 +74,11 @@
                     {else}
                       <td class="label">{$element.field_title}</td>
                       {if $element.field_data_type == 'Money'}
-                        <td class="html-adjust">{$element.field_value}</td>
+                        {if $element.field_type == 'Text'}
+                          <td class="html-adjust">{$element.field_value|crmMoney}</td>
+                        {else}
+                          <td class="html-adjust">{$element.field_value}</td>
+                        {/if}
                       {else}
                         <td class="html-adjust">
                           {if $element.contact_ref_id}
@@ -127,7 +131,11 @@
             </div>
           {else}
             {if $element.field_data_type == 'Money'}
-                <div class="content">{if $element.field_value}{$element.field_value}{else}<br/>{/if}</div>
+              {if $element.field_type == 'Text'}
+                 <div class="content">{if $element.field_value}{$element.field_value|crmMoney}{else}<br/>{/if}</div>
+              {else}
+                 <div class="content">{if $element.field_value}{$element.field_value}{else}<br/>{/if}</div>
+              {/if}
             {else}
               <div class="content">
                 {if $element.contact_ref_id}
