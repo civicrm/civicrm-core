@@ -1011,7 +1011,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['id'] = $contribID;
     }
 
-    if (CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
       $eventStartDate = CRM_Utils_Array::value(
         'start_date',
         CRM_Utils_Array::value(

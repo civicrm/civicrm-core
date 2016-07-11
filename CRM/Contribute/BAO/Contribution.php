@@ -154,7 +154,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     if (!$contributionID
       && CRM_Utils_Array::value('membership_id', $params)
-      && CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')
+      && self::checkContributeSettings('deferred_revenue_enabled')
     ) {
       $memberStartDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['membership_id'], 'start_date');
       if ($memberStartDate) {
