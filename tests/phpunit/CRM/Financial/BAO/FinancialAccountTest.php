@@ -264,6 +264,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
               'qty' => 1,
               'unit_price' => 100,
               'line_total' => 100,
+              'financial_type_id' => 4,
             ),
             array(
               'entity_table' => 'civicrm_contribution',
@@ -273,14 +274,22 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
               'qty' => 1,
               'unit_price' => 200,
               'line_total' => 200,
+              'financial_type_id' => 4,
             ),
           ),
-          'params' => array(),
         ),
       ),
     );
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contribution->id);
+    $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
+    $this->assertFalse($valid, "This should have been false");
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+      'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
+    );
+    $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
     $this->assertTrue($valid, "This should have been true.");
   }
 
