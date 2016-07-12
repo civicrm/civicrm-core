@@ -52,7 +52,7 @@
         <tr>
            <td class="label-left">{$form.file_type.label}</td>
             <td>{$form.file_type.html}
-                <br /><span class="description html-adjust">{ts}Choose the file type{/ts}</span>
+                <br /><span class="description html-adjust">{ts}Compose a message on-screen for general use in emails or document output, or upload a pre-composed document for mail-merge.{/ts}</span>
             </td>
         </tr>
         <tr>
@@ -78,7 +78,7 @@
                    {include file="CRM/Form/attachmentjs.tpl" context='MessageTemplate'}
                  {/foreach}
               {/if}
-                <br /><span class="description html-adjust">{ts}Upload the document file{/ts}</span>
+                <br /><span class="description html-adjust">{ts}Upload the document in .docx or .odt format.{/ts}</span>
             </td>
         </tr>
         <tr>
