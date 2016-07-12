@@ -339,6 +339,8 @@ SELECT f.id, f.label, f.data_type,
                 else {
                   $value = CRM_Utils_Type::escape($value, 'Integer');
                 }
+                $value = str_replace(array('[', ']', ','), array('\[', '\]', '[:comma:]'), $value);
+                $value = str_replace('|', '[:separator:]', $value);
               }
               elseif ($isSerialized) {
                 if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
@@ -357,10 +359,9 @@ SELECT f.id, f.label, f.data_type,
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
               if ($isSerialized && !CRM_Utils_System::isNull($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
                 $sp = CRM_Core_DAO::VALUE_SEPARATOR;
-                if (strstr($op, 'IN')) {
-                  $value = str_replace(",", "$sp|$sp", $value);
-                  $value = str_replace(array('[:comma:]', '(', ')'), array(',', '[[.left-parenthesis.]]', '[[.right-parenthesis.]]'), $value);
-                }
+                $value = str_replace(",", "$sp|$sp", $value);
+                $value = str_replace(array('[:comma:]', '(', ')'), array(',', '[[.left-parenthesis.]]', '[[.right-parenthesis.]]'), $value);
+
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
                 $value = $sp . $value . $sp;
                 if (!$wildcard) {
