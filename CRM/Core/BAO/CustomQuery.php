@@ -348,7 +348,8 @@ SELECT f.id, f.label, f.data_type,
                 // CRM-19006: escape characters like comma, | before building regex pattern
                 $value = (array) $value;
                 foreach ($value as $key => $val) {
-                  $value[$key] = str_replace(array('|', '[', ']', ','), array('[:spearator:]', '\[', '\]', '[:comma:]'), $val);
+                  $value[$key] = str_replace(array('[', ']', ','), array('\[', '\]', '[:comma:]'), $val);
+                  $value[$key] = str_replace('|', '[:separator:]', $value[$key]);
                 }
                 $value = implode(',', $value);
               }
