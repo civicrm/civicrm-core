@@ -284,17 +284,17 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     $this->assertEquals(array(
       0 => array(
-        'srcID' => $this->contacts[0]['id'],
+        'srcID' => $this->contacts[1]['id'],
         'srcName' => 'Mr. Mickey Mouse II',
-        'dstID' => $this->contacts[1]['id'],
+        'dstID' => $this->contacts[0]['id'],
         'dstName' => 'Mr. Mickey Mouse II',
         'weight' => 20,
         'canMerge' => TRUE,
       ),
       1 => array(
-        'srcID' => $this->contacts[2]['id'],
+        'srcID' => $this->contacts[3]['id'],
         'srcName' => 'Mr. Minnie Mouse II',
-        'dstID' => $this->contacts[3]['id'],
+        'dstID' => $this->contacts[2]['id'],
         'dstName' => 'Mr. Minnie Mouse II',
         'weight' => 20,
         'canMerge' => TRUE,
