@@ -93,4 +93,23 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($contributionRecur['id'], CRM_Core_DAO::$_nullObject);
   }
 
+  /**
+   * Test checking if contribution recurr object can allow for changes to financial types.
+   *
+   */
+  public function testSupportFinancialTypeChange() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
+    $contribution = $this->callAPISuccess('contribution', 'create', array(
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'recieve_date' => 'yesterday',
+    ));
+    $this->assertTrue(CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($contributionRecur['id']));
+  }
+
 }
