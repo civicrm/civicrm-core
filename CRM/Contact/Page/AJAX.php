@@ -777,6 +777,7 @@ LIMIT {$offset}, {$rowCount}
           break;
 
         default:
+          $orderByClause = " ORDER BY cc1.display_name ASC";
           break;
       }
     }

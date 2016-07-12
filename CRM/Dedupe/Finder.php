@@ -383,6 +383,7 @@ class CRM_Dedupe_Finder {
     foreach ($foundDupes as $dupes) {
       $srcID = $dupes[1];
       $dstID = $dupes[0];
+      // The logged in user should never be the src (ie. the contact to be removed).
       if ($srcID == $userId) {
         $srcID = $dstID;
         $dstID = $userId;
