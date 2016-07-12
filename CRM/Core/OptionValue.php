@@ -64,13 +64,16 @@ class CRM_Core_OptionValue {
    * @param  array     $groupParams   Array containing group fields whose option-values is to retrieved.
    * @param  string    $orderBy       for orderBy clause
    * @param  array     $links         has links like edit, delete, disable ..etc
+   * @param  bool      $skipEmptyComponents
+   *                                  whether to skip OptionValue rows with empty Component name
+   *                                  (i.e. when Extension providing the Component is disabled)
    *
    * @return array of option-values
    *
    * @access public
    * @static
    */
-  static function getRows($groupParams, $links, $orderBy = 'weight') {
+  static function getRows($groupParams, $links, $orderBy = 'weight', $skipEmptyComponents = TRUE) {
     $optionValue = array();
 
     $optionGroupID = NULL;
@@ -118,6 +121,13 @@ class CRM_Core_OptionValue {
     while ($dao->fetch()) {
       $optionValue[$dao->id] = array();
       CRM_Core_DAO::storeValues($dao, $optionValue[$dao->id]);
+      if (!empty($optionValue[$dao->id]['component_id']) &&
+        empty($componentNames[$optionValue[$dao->id]['component_id']]) &&
+        $skipEmptyComponents
+      ) {
+        unset($optionValue[$dao->id]);
+        continue;
+      }
       // form all action links
       $action = array_sum(array_keys($links));
 
