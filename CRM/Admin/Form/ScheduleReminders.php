@@ -165,11 +165,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     //reminder_interval
     $this->add('select', 'start_action_offset', ts('When'), $numericOptions);
-    $isActive = ts('Send email');
+    $isActive = ts('Is active');
+    $sendEmail = ts('Send Email');
     $recordActivity = ts('Record activity for automated email');
     if ($providersCount) {
       $this->assign('sms', $providersCount);
-      $isActive = ts('Send email or SMS');
+      $sendEmail = ts('Send email or SMS');
       $recordActivity = ts('Record activity for automated email or SMS');
       $options = CRM_Core_OptionGroup::values('msg_mode');
       $this->add('select', 'mode', ts('Send as'), $options);
@@ -281,8 +282,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('text', 'subject', ts('Subject'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_ActionSchedule', 'subject')
     );
+	$this->addRule('subject', ts('This field is required'), 'required');
 
-    $this->add('checkbox', 'is_active', $isActive);
+    $this->add('hidden', 'is_active', $isActive);
+    $this->add('checkbox', 'send_email', $sendEmail);
 
     $this->addFormRule(array('CRM_Admin_Form_ScheduleReminders', 'formRule'), $this);
 
