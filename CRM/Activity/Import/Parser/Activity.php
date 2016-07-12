@@ -200,7 +200,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
     if (!isset($params['source_contact_id'])) {
-      $params['source_contact_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
+      $params['source_contact_id'] = $session->getLoggedInContactID();
     }
     foreach ($params as $key => $val) {
       if ($key == 'activity_date_time') {

@@ -209,10 +209,7 @@ class CRM_ACL_API {
       return NULL;
     }
     if (!$contactID) {
-      $contactID = NULL;
-      if (CRM_Core_Session::singleton()->getLoggedInContactID()) {
-        $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
-      }
+      $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     }
 
     $key = "{$tableName}_{$type}_{$contactID}";
