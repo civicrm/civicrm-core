@@ -3517,11 +3517,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     $params['entity_id'] = $trxn->id;
-    $updateLineItems = array();
     if ($context != 'changePaymentInstrument') {
       $itemParams['entity_table'] = 'civicrm_line_item';
       $trxnIds['id'] = $params['entity_id'];
-      $updateLineItems = $params['line_item'];
       foreach ($params['line_item'] as $fieldId => $fields) {
         foreach ($fields as $fieldValueId => $fieldValues) {
           $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($fieldValues['id']);
@@ -3562,8 +3560,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'entity_id' => $fieldValues['id'],
           );
           $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
-          $updateLineItems[$fieldId][$fieldValueId]['line_total'] = $amount;
-          $updateLineItems[$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
+          $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $amount;
+          $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
           if ($fieldValues['tax_amount']) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
@@ -3586,7 +3584,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
     }
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($updateLineItems, $params['contribution'], TRUE, $context);
+    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
   }
 
   /**

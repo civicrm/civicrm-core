@@ -645,7 +645,8 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
           continue;
         }
         foreach ($lineItem as $key => $item) {
-          if ($item['line_total'] <= 0 && !$update) {
+          $lineTotal = !empty($item['deferred_line_total']) ? $item['deferred_line_total'] : $item['line_total'];
+          if ($lineTotal <= 0 && !$update) {
             continue;
           }
           $deferredRevenues[$key] = $item;
@@ -656,12 +657,13 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
             array('civicrm_participant', 'civicrm_contribution'))
           ) {
             $deferredRevenues[$key]['revenue'][] = array(
-              'amount' => $item['line_total'],
+              'amount' => $lineTotal,
               'revenue_date' => $revenueRecognitionDate,
             );
           }
           else {
             // for membership
+            $item['line_total'] = $lineTotal;
             $deferredRevenues[$key]['revenue'] = self::getMembershipRevenueAmount($item);
           }
         }
