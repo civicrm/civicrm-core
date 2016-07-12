@@ -389,10 +389,10 @@ class CRM_Dedupe_Finder {
       }
 
       $mainContacts[] = $row = array(
-        'srcID' => $srcID,
-        'srcName' => $displayNames[$srcID],
         'dstID' => $dstID,
         'dstName' => $displayNames[$dstID],
+        'srcID' => $srcID,
+        'srcName' => $displayNames[$srcID],
         'weight' => $dupes[2],
         'canMerge' => TRUE,
       );
