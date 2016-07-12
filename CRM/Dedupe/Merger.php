@@ -755,12 +755,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
         $mainId = $dupes['dstID'];
         $otherId = $dupes['srcID'];
-        $isAutoFlip = CRM_Utils_Array::value('auto_flip', $dupes, $autoFlip);
-        // if we can, make sure that $mainId is the one with lower id number
-        if ($isAutoFlip && ($mainId > $otherId)) {
-          $mainId = $dupes['srcID'];
-          $otherId = $dupes['dstID'];
-        }
+
         if (!$mainId || !$otherId) {
           // return error
           return FALSE;
