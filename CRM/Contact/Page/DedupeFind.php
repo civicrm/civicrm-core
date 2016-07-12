@@ -207,12 +207,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           CRM_Utils_System::redirect($url);
         }
         else {
-          // FIXME: sort the contacts; $displayName
-          // is already sort_name-sorted, so use that
-          // (also, consider sorting by dupe count first)
-          // lobo - change the sort to by threshold value
-          // so the more likely dupes are sorted first
-
           $mainContacts = CRM_Dedupe_Finder::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
 
           if ($cid) {
