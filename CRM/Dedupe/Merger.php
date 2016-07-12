@@ -706,7 +706,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $msg = "{$stats['merged']} " . ts('Contact(s) were merged.');
     }
     if (!empty($stats['skipped'])) {
-      $msg .= $stats['skipped'] . ts('Contact(s) were skipped.');
+      $msg .= $stats['skipped'] . ts(' Contact(s) were skipped.');
     }
     return $msg;
   }
