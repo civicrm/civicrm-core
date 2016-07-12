@@ -372,9 +372,8 @@ class CRM_Dedupe_Finder {
       $cids[$dupe[1]] = 1;
     }
     $cidString = implode(', ', array_keys($cids));
-    $sql = "SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name";
-    $dao = new CRM_Core_DAO();
-    $dao->query($sql);
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name");
     $displayNames = array();
     while ($dao->fetch()) {
       $displayNames[$dao->id] = $dao->display_name;
@@ -382,11 +381,11 @@ class CRM_Dedupe_Finder {
 
     $userId = CRM_Core_Session::singleton()->getLoggedInContactID();
     foreach ($foundDupes as $dupes) {
-      $srcID = $dupes[0];
-      $dstID = $dupes[1];
-      if ($dstID == $userId) {
-        $srcID = $dupes[1];
-        $dstID = $dupes[0];
+      $srcID = $dupes[1];
+      $dstID = $dupes[0];
+      if ($srcID == $userId) {
+        $srcID = $dstID;
+        $dstID = $userId;
       }
 
       $mainContacts[] = $row = array(
@@ -399,7 +398,7 @@ class CRM_Dedupe_Finder {
       );
 
       $data = CRM_Core_DAO::escapeString(serialize($row));
-      $values[] = " ( 'civicrm_contact', $srcID, $dstID, '$cacheKeyString', '$data' ) ";
+      $values[] = " ( 'civicrm_contact', $dstID, $srcID, '$cacheKeyString', '$data' ) ";
     }
     CRM_Core_BAO_PrevNextCache::setItem($values);
     return $mainContacts;
