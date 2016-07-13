@@ -150,7 +150,8 @@ CRM.$(function($) {
     $('.crm-document-accordion').hide();
     $('#document_file').on('change', function() {
       if (this.value) {
-        $('.crm-html_email-accordion, .crm-document-accordion').toggle(false);
+        $('.crm-html_email-accordion, .crm-document-accordion').hide();
+        cj('#document_type').closest('tr').hide();
         $('#template').val('');
       }
     });
