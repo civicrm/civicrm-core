@@ -3,6 +3,7 @@
 -- Host: 127.0.0.1    Database: 47democivi_u3rht
 -- ------------------------------------------------------
 -- Server version	5.7.13-0ubuntu0.16.04.2
+-- Server version	5.7.12-0ubuntu1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
