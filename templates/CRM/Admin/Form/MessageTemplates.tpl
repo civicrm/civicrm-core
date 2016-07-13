@@ -158,7 +158,7 @@
         mimeType = $('a.delete-attachment').data('mimetype');
       }
 
-      showHideUpload($("input[id$='_file_type']:checked").val());
+      showHideUpload($("input[id$='_file_type']").val());
       $("input[id$='_file_type']").on('click', function(){
         showHideUpload(this.value);
       });

@@ -170,7 +170,10 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     $this->add('text', 'msg_title', ts('Message Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_title'), TRUE);
 
     $options = array(ts('Compose On-screen'), ts('Upload Document'));
-    $this->addRadio('file_type', ts('Source'), $options);
+    $element = $this->addRadio('file_type', ts('Source'), $options);
+    if ($this->_id) {
+      $element->freeze();
+    }
 
     $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=60');
     $this->addUploadElement("file_id");
