@@ -278,8 +278,15 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
       'civicrm_event' => array(
         'dao' => 'CRM_Event_DAO_Event',
         'fields' => array(
-          'event_type_id' => array('title' => ts('Event Type')),
-          'event_start_date' => array('title' => ts('Event Start Date')),
+          'event_type_id' => array(
+            'title' => ts('Event Type'),
+          ),
+          'event_start_date' => array(
+            'title' => ts('Event Start Date'),
+          ),
+          'event_end_date' => array(
+            'title' => ts('Event End Date'),
+          ),
         ),
         'grouping' => 'event-fields',
         'filters' => array(
@@ -292,6 +299,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
           'event_start_date' => array(
             'title' => ts('Event Start Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'event_end_date' => array(
+            'title' => ts('Event End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
