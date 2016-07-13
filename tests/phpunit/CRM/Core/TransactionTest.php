@@ -362,7 +362,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     if ($insert == 'sql-insert') {
       $r = CRM_Core_DAO::executeQuery("INSERT INTO civicrm_contact(first_name,last_name) VALUES ('ff', 'll')");
-      $cid = mysql_insert_id();
+      $cid = mysqli_insert_id($r->getConnection()->connection);
     }
     elseif ($insert == 'bao-create') {
       $params = array(
