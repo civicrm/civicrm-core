@@ -215,6 +215,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }

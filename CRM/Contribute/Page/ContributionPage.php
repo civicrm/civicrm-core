@@ -675,7 +675,7 @@ WHERE $whereClause";
 SELECT DISTINCT UPPER(LEFT(title, 1)) as sort_name
 FROM civicrm_contribution_page
 WHERE $whereClause
-ORDER BY LEFT(title, 1)
+ORDER BY UPPER(LEFT(title, 1))
 ";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 

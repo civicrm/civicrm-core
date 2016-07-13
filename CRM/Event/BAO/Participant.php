@@ -1931,7 +1931,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
   SELECT fi.*, SUM(fi.amount) as differenceAmt, price_field_value_id, financial_type_id, tax_amount
     FROM civicrm_financial_item fi LEFT JOIN civicrm_line_item li ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId})
-GROUP BY li.entity_table, li.entity_id, price_field_value_id
+GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
 ";
       $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
       $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId, 'DESC', TRUE);

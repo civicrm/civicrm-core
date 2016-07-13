@@ -4334,7 +4334,7 @@ civicrm_relationship.is_permission_a_b = 0
 
     // add group by
     if ($query->_useGroupBy) {
-      $sql .= ' GROUP BY contact_a.id';
+      $sql .= self::getGroupByFromSelectColumns($query->_select, 'contact_a.id');
     }
     if (!empty($sort)) {
       $sort = CRM_Utils_Type::escape($sort, 'String');
@@ -4521,6 +4521,59 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
+   * Include Select columns in groupBy clause.
+   *
+   * @param array $selectClauses
+   * @param array $groupBy - Columns already included in GROUP By clause.
+   *
+   * @return string
+   */
+  public static function getGroupByFromSelectColumns($selectClauses, $groupBy = NULL) {
+    $groupBy = (array) $groupBy;
+    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
+
+    //return if ONLY_FULL_GROUP_BY is not enabled.
+    if (!version_compare($mysqlVersion, '5.7', '<') && !empty($sqlMode) && in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
+      $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+      foreach ($selectClauses as $key => $val) {
+        $aliasArray = preg_split('/ as /i', $val);
+        // if more than 1 alias we need to split by ','.
+        if (count($aliasArray) > 2) {
+          $aliasArray = preg_split('/,/', $val);
+          foreach ($aliasArray as $key => $value) {
+            $alias = current(preg_split('/ as /i', $value));
+            if (!in_array($alias, $groupBy) && preg_match($regexToExclude, trim($alias)) !== 1) {
+              $groupBy[] = $alias;
+            }
+          }
+        }
+        else {
+          list($selectColumn, $alias) = array_pad($aliasArray, 2, NULL);
+          $dateRegex = '/^(DATE_FORMAT|DATE_ADD|CASE)/i';
+          $tableName = current(explode('.', $selectColumn));
+          $primaryKey = "{$tableName}.id";
+          // exclude columns which are already included in groupBy and aggregate functions from select
+          // CRM-18439 - Also exclude the columns which are functionally dependent on columns in $groupBy (MySQL 5.7+)
+          if (!in_array($selectColumn, $groupBy) && !in_array($primaryKey, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
+            if (!empty($alias) && preg_match($dateRegex, trim($selectColumn))) {
+              $groupBy[] = $alias;
+            }
+            else {
+              $groupBy[] = $selectColumn;
+            }
+          }
+        }
+      }
+    }
+
+    if (!empty($groupBy)) {
+      return " GROUP BY " . implode(', ', $groupBy);
+    }
+    return '';
+  }
+
+  /**
    * Create and query the db for an contact search.
    *
    * @param int $offset
@@ -4580,16 +4633,20 @@ civicrm_relationship.is_permission_a_b = 0
     }
 
     // building the query string
-    $groupBy = NULL;
+    $groupBy = $groupByCol = NULL;
     if (!$count) {
       if (isset($this->_groupByComponentClause)) {
         $groupBy = $this->_groupByComponentClause;
+        $groupCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
+        $groupByCol = explode(', ', $groupCols);
       }
       elseif ($this->_useGroupBy) {
+        $groupByCol = 'contact_a.id';
         $groupBy = ' GROUP BY contact_a.id';
       }
     }
     if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
+      $groupByCol = 'civicrm_activity.id';
       $groupBy = 'GROUP BY civicrm_activity.id ';
     }
 
@@ -4611,6 +4668,10 @@ civicrm_relationship.is_permission_a_b = 0
     $this->includePseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
+
+    if (!empty($groupByCol)) {
+      $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
+    }
 
     if ($additionalWhereClause) {
       $where = $where . ' AND ' . $additionalWhereClause;
@@ -4669,7 +4730,8 @@ civicrm_relationship.is_permission_a_b = 0
     list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
-    $groupBy = " GROUP BY contact_a.id";
+    $groupByCol = array('contact_a.id', 'pnc.id');
+    $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
     $limit = " LIMIT $offset, $rowCount";
     $query = "$select $from $where $groupBy $order $limit";
 
@@ -4749,7 +4811,6 @@ civicrm_relationship.is_permission_a_b = 0
 SELECT COUNT( conts.total_amount ) as total_count,
        SUM(   conts.total_amount ) as total_amount,
        AVG(   conts.total_amount ) as total_avg,
-       conts.total_amount          as amount,
        conts.currency              as currency";
     if ($this->_permissionWhereClause) {
       $where .= " AND " . $this->_permissionWhereClause;
@@ -4793,9 +4854,12 @@ SELECT COUNT( conts.total_amount ) as total_count,
 
     $orderBy = 'ORDER BY civicrm_contribution_total_amount_count DESC';
     $groupBy = 'GROUP BY currency, civicrm_contribution.total_amount';
-    $modeSQL = "$select, conts.civicrm_contribution_total_amount_count as civicrm_contribution_total_amount_count FROM ($innerQuery
-    $groupBy $orderBy) as conts
-    GROUP BY currency";
+    $modeSQL = "$select, SUBSTRING_INDEX(GROUP_CONCAT(conts.total_amount
+      ORDER BY conts.civicrm_contribution_total_amount_count DESC SEPARATOR ';'), ';', 1) as amount,
+      MAX(conts.civicrm_contribution_total_amount_count) as civicrm_contribution_total_amount_count
+      FROM ($innerQuery
+      $groupBy $orderBy) as conts
+      GROUP BY currency";
 
     $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
 

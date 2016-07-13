@@ -357,6 +357,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     //total_amount was affected by sum as it is considered as one of the stat field
     //so it is been replaced with correct alias, CRM-13833
     $this->_select = str_replace("sum({$this->_aliases['civicrm_contribution']}.total_amount)", "{$this->_aliases['civicrm_contribution']}.total_amount", $this->_select);
+    $this->_selectClauses = str_replace("sum({$this->_aliases['civicrm_contribution']}.total_amount)", "{$this->_aliases['civicrm_contribution']}.total_amount", $this->_selectClauses);
   }
 
   public function orderBy() {
@@ -456,7 +457,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.id ";
+    $groupBy = array("{$this->_aliases['civicrm_contact']}.id", "{$this->_aliases['civicrm_contribution']}.id");
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   /**
@@ -592,6 +594,9 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     $select = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_select);
     $select = str_ireplace("'Contribution' as", "'Soft Credit' as", $select);
+    if (!empty($this->_groupBy)) {
+      $this->_groupBy .= ', contribution_soft_civireport.amount';
+    }
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
     $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy}";
     $tempQuery = 'CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 AS ' . $sql;
@@ -878,6 +883,8 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
+      $this->_select = "SELECT " . implode(", ", $ifnulls);
+      $this->appendSelect($ifnulls, $sectionAliases);
 
       /* Group (un-limited) report by all aliases and get counts. This might
        * be done more efficiently when the contents of $sql are known, ie. by
@@ -893,9 +900,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         $showsumcontribs = TRUE;
       }
 
-      $query = "select "
-        . implode(", ", $ifnulls)
-        .
+      $query = $this->_select .
         "$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by " .
         implode(", ", $sectionAliases);
       // initialize array of total counts
