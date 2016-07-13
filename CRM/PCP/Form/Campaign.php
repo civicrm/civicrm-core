@@ -242,7 +242,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     $params['id'] = $this->_pageId;
 
-    $pcp = CRM_PCP_BAO_PCP::add($params, FALSE);
+    $pcp = CRM_PCP_BAO_PCP::create($params);
 
     // add attachments as needed
     CRM_Core_BAO_File::formatAttachment($params,
