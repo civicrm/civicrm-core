@@ -50,20 +50,11 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    * Add or update either a Personal Campaign Page OR a PCP Block.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param bool $pcpBlock
-   *   If true, create or update PCPBlock, else PCP.
+   *   Values to create the pcp.
    *
    * @return object
    */
-  public static function add(&$params, $pcpBlock = TRUE) {
-    if ($pcpBlock) {
-      // action is taken depending upon the mode
-      $dao = new CRM_PCP_DAO_PCPBlock();
-      $dao->copyValues($params);
-      $dao->save();
-      return $dao;
-    }
+  public static function create($params) {
 
     $dao = new CRM_PCP_DAO_PCP();
     $dao->copyValues($params);
@@ -76,8 +67,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
 
     // set currency for CRM-1496
     if (!isset($dao->currency)) {
-      $config = &CRM_Core_Config::singleton();
-      $dao->currency = $config->defaultCurrency;
+      $dao->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
     $dao->save();
