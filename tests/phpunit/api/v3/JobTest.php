@@ -338,6 +338,19 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the organization will not be matched to an individual.
+   */
+  public function testBatchMergeWillNotMergeOrganizationToIndividual() {
+    $individual = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'organization_name' => 'Anon', 'email' => 'anonymous@hacker.com'));
+    $organization = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Organization', 'organization_name' => 'Anon', 'email' => 'anonymous@hacker.com'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'aggressive'));
+    $this->assertEquals(0, count($result['values']['skipped']));
+    $this->assertEquals(0, count($result['values']['merged']));
+    $this->callAPISuccessGetSingle('Contact', array('id' => $individual['id']));
+    $this->callAPISuccessGetSingle('Contact', array('id' => $organization['id']));
+  }
+
+  /**
    * Test the batch merge does not create duplicate emails.
    *
    * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
