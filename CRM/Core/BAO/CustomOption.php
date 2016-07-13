@@ -81,7 +81,7 @@ class CRM_Core_BAO_CustomOption {
 
     $optionValues = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $fieldID, array(), $inactiveNeeded ? 'get' : 'create');
 
-    foreach ($optionValues as $value => $label) {
+    foreach ((array) $optionValues as $value => $label) {
       $options[] = array(
         'label' => $label,
         'value' => $value,
