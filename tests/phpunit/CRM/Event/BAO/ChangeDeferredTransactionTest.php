@@ -33,7 +33,7 @@ class CRM_Event_BAO_ChangeDeferredTransactionTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->_contactId = Contact::createIndividual();
+    $this->_contactId = $this->individualCreate();
   }
 
   /**

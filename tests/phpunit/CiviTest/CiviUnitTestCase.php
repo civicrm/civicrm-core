@@ -3369,7 +3369,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'contribution_mode' => 'participant',
       'participant_id' => $participant['id'],
     );
-    if (CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
       $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime('+1 month'));
     }
     if ($isPartial) {
