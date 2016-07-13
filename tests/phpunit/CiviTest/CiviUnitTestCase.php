@@ -2074,6 +2074,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $customField = $this->customFieldCreate(array(
       'custom_group_id' => $ids['custom_group_id'],
       'label' => 'field_1' . $ids['custom_group_id'],
+      'in_selector' => 1,
     ));
 
     $ids['custom_field_id'][] = $customField['id'];
@@ -2082,6 +2083,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'custom_group_id' => $ids['custom_group_id'],
       'default_value' => '',
       'label' => 'field_2' . $ids['custom_group_id'],
+      'in_selector' => 1,
     ));
     $ids['custom_field_id'][] = $customField['id'];
 
@@ -2089,6 +2091,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'custom_group_id' => $ids['custom_group_id'],
       'default_value' => '',
       'label' => 'field_3' . $ids['custom_group_id'],
+      'in_selector' => 1,
     ));
     $ids['custom_field_id'][] = $customField['id'];
 
