@@ -74,7 +74,7 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
        __FUNCTION__,
        ts('The Following Option Values contain value fields that do not match the Data Type of the Option Group</p>
         <p><table><tbody><th>Option Group</th><th>Option Value</th></tbody><tbody>') .
-        explode('\n', $strings) . ts('</tbody></table></p>'),
+        explode('\n' , $strings) . ts('</tbody></table></p>'),
         ts('Option Values with problematic Values'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-server'
