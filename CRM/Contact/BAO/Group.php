@@ -382,6 +382,22 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $params['modified_id'] = $cid;
     }
 
+    // CRM-19068.
+    // Validate parents parameter when creating group.
+    if (isset($params['parents'])) {
+      if (is_array($params['parents'])) {
+        foreach ($params['parents'] as $parent => $dc) {
+          if (!CRM_Utils_Type::validate('integer', $parent, FALSE)) {
+            unset($params['parents'][$parent]);
+          }
+        }
+      }
+      else {
+        if (!CRM_Utils_Type::validate('integer', $params['parents'], FALSE)) {
+          unset($params['parents']);
+        }
+      }
+    }
     $group = new CRM_Contact_BAO_Group();
     $group->copyValues($params);
     //@todo very hacky fix for the fact this function wants to receive 'parents' as an array further down but
@@ -437,8 +453,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       if (!empty($params['parents'])) {
         foreach ($params['parents'] as $parentId => $dnc) {
-          if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
-            CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
+          if (CRM_Utils_Type::validate('Integer', $parentId, FALSE)) {
+            if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
+              CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
+            }
           }
         }
       }
