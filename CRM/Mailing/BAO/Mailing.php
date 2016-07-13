@@ -1763,7 +1763,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $job->is_test = 0;
 
       if (!$job->find(TRUE)) {
-        $job->scheduled_date = $params['scheduled_date'];
+        // Don't schedule job until we populate the recipients.
+        $job->scheduled_date = NULL;
         $job->save();
       }
 
@@ -1773,6 +1774,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $mode = $mailing->sms_provider_id ? 'sms' : NULL;
         self::getRecipients($job->id, $mailing->id, TRUE, $mailing->dedupe_email, $mode);
       }
+      // Schedule the job now that it has recipients.
+      $job->scheduled_date = $params['scheduled_date'];
+      $job->save();
     }
 
     return $mailing;
