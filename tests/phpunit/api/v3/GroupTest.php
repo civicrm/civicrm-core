@@ -180,6 +180,8 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_active' => 1,
       'parents' => "(SELECT api_key FROM civicrm_contact where id = 1)",
     );
+    $this->callAPIFailure('group', 'create', $params);
+    unset($params['parents']);
     $this->callAPISuccess('group', 'create', $params);
     $group1 = $this->callAPISuccess('group', 'get', array(
       'title' => 'Test illegal Group',
@@ -190,6 +192,8 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params['parents'] = array();
     $params['parents'][$this->_groupID] = 'test Group';
     $params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"] = "Test";
+    $group2 = $this->callAPIFailure('group', 'create', $params);
+    unset($params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"]);
     $group2 = $this->callAPISuccess('group', 'create', $params);
     $this->assertEquals(count($group2['values'][$group2['id']]['parents']), 1);
   }
