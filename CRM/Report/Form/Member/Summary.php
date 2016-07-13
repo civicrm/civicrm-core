@@ -363,13 +363,14 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
                 !empty($this->_params['group_bys_freq'][$fieldName])
               ) {
 
-                $append = "YEAR({$field['dbAlias']}),";
+                $append = "YEAR({$field['dbAlias']})";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
                   array('year')
                 )) {
                   $append = '';
                 }
-                $this->_groupBy[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                $this->_groupBy[] = $append;
+                $this->_groupBy[] = "{$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
                 $append = TRUE;
               }
               else {
@@ -381,8 +382,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       }
 
       $this->_rollup = ' WITH ROLLUP';
-      $this->appendSelect($this->_selectClauses, $this->_groupBy);
-      $this->_groupBy = 'GROUP BY ' . implode(', ', $this->_groupBy) .
+      $this->appendSelect($this->_selectClauses, array_filter($this->_groupBy));
+      $this->_groupBy = 'GROUP BY ' . implode(', ', array_filter($this->_groupBy)) .
         " {$this->_rollup} ";
     }
     else {
