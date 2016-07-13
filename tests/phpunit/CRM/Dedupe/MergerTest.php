@@ -284,19 +284,111 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     $this->assertEquals(array(
       0 => array(
-        'srcID' => $this->contacts[0]['id'],
+        'srcID' => $this->contacts[1]['id'],
         'srcName' => 'Mr. Mickey Mouse II',
-        'dstID' => $this->contacts[1]['id'],
+        'dstID' => $this->contacts[0]['id'],
         'dstName' => 'Mr. Mickey Mouse II',
         'weight' => 20,
         'canMerge' => TRUE,
       ),
       1 => array(
-        'srcID' => $this->contacts[2]['id'],
+        'srcID' => $this->contacts[3]['id'],
         'srcName' => 'Mr. Minnie Mouse II',
-        'dstID' => $this->contacts[3]['id'],
+        'dstID' => $this->contacts[2]['id'],
         'dstName' => 'Mr. Minnie Mouse II',
         'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+  }
+
+  /**
+   * Test function that gets organization pairs.
+   *
+   * Note the rule will match on organization_name OR email - hence lots of matches.
+   */
+  public function testGetOrganizationMatches() {
+    $this->setupMatchData();
+    $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', array('contact_type' => 'Organization', 'used' => 'Supervised'));
+
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      $ruleGroups['id'],
+      NULL,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[5]['id'],
+        'srcName' => 'Walt Disney Ltd',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+      1 => array(
+        'srcID' => $this->contacts[7]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[6]['id'],
+        'dstName' => 'Walt Disney',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+      2 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+      3 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[5]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+  }
+
+  /**
+   *  Test function that gets organization duplicate pairs.
+   */
+  public function testGetOrganizationMatchesInGroup() {
+    $this->setupMatchData();
+    $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', array('contact_type' => 'Organization', 'used' => 'Supervised'));
+
+    $groupID = $this->groupCreate(array('title' => 'she-mice'));
+
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[4]['id']));
+
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      $ruleGroups['id'],
+      $groupID,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[5]['id'],
+        'srcName' => 'Walt Disney Ltd',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+      1 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
         'canMerge' => TRUE,
       ),
     ), $pairs);
@@ -363,6 +455,28 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     );
     foreach ($fixtures as $fixture) {
       $contactID = $this->individualCreate($fixture);
+      $this->contacts[] = array_merge($fixture, array('id' => $contactID));
+    }
+    $organizationFixtures = array(
+      array(
+        'organization_name' => 'Walt Disney Ltd',
+        'email' => 'walt@disney.com',
+      ),
+      array(
+        'organization_name' => 'Walt Disney Ltd',
+        'email' => 'walt@disney.com',
+      ),
+      array(
+        'organization_name' => 'Walt Disney',
+        'email' => 'walt@disney.com',
+      ),
+      array(
+        'organization_name' => 'Walt Disney',
+        'email' => 'walter@disney.com',
+      ),
+    );
+    foreach ($organizationFixtures as $fixture) {
+      $contactID = $this->organizationCreate($fixture);
       $this->contacts[] = array_merge($fixture, array('id' => $contactID));
     }
   }
