@@ -311,6 +311,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -395,9 +396,10 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   public function groupBy() {
     $this->assign('chartSupported', TRUE);
-    $this->_groupBy = "Group BY {$this->_aliases['civicrm_contribution']}.contact_id, " .
-      self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
-        '.receive_date') . " "  . " " . $this->_rollup;
+    $fiscalYearOffset = self::fiscalYearOffset("{$this->_aliases['civicrm_contribution']}.receive_date");
+    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contribution']}.contact_id, {$fiscalYearOffset}";
+    $this->appendSelect($this->_selectClauses, array("{$this->_aliases['civicrm_contribution']}.contact_id", $fiscalYearOffset));
+    $this->_groupBy .= " {$this->_rollup}";
   }
 
   /**

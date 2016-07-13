@@ -425,6 +425,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
         $this->_columnHeaders["blank_{$i}"]['title'] = "_ _ _ _";
       }
     }
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -474,7 +475,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     // user doesn't select a column to group by, we should group by participant id.
     parent::groupBy();
     if (empty($this->_groupBy)) {
-      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id";
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_participant']}.id");
     }
   }
 

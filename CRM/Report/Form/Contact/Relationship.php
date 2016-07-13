@@ -321,6 +321,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -559,12 +560,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
 
     if (!empty($groupBy)) {
-      $this->_groupBy = " GROUP BY  " . implode(', ', $groupBy) .
-        " ,  {$this->_aliases['civicrm_relationship']}.id ";
+      $groupBy[] = "{$this->_aliases['civicrm_relationship']}.id";
     }
     else {
-      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_relationship']}.id ";
+      $groupBy = array("{$this->_aliases['civicrm_relationship']}.id");
     }
+
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {

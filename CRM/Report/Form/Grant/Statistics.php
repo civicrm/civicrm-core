@@ -234,6 +234,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -318,14 +319,14 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
             if (!empty($this->_params['fields'][$fieldName])) {
-              $this->_groupBy[] = $field['dbAlias'];
+              $groupBy[] = $field['dbAlias'];
             }
           }
         }
       }
     }
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy = " GROUP BY " . implode(', ', $this->_groupBy);
+    if (!empty($groupBy)) {
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
   }
 

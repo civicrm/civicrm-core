@@ -280,7 +280,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
     $select = $from = $where = '';
 
-    $select = 'SELECT DISTINCT civicrm_group.id, civicrm_group.title ';
+    $select = 'SELECT civicrm_group.id, civicrm_group.title ';
     $from = ' FROM civicrm_group ';
     $where = " WHERE civicrm_group.is_active = 1 ";
     if ($contactId) {
@@ -292,9 +292,10 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     if ($visibility) {
       $where .= " AND civicrm_group.visibility != 'User and User Admin Only'";
     }
+    $groupBy = " GROUP BY civicrm_group.id";
 
     $orderby = " ORDER BY civicrm_group.name";
-    $sql = $select . $from . $where . $orderby;
+    $sql = $select . $from . $where . $groupBy . $orderby;
 
     $group->query($sql);
 
