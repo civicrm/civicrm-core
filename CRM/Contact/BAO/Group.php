@@ -392,13 +392,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (isset($params['parents'])) {
       if (is_array($params['parents'])) {
         foreach ($params['parents'] as $parent => $dc) {
-          if (!CRM_Utils_Type::validate('integer', $parent, FALSE)) {
+          if (!CRM_Utils_Type::validate($parent, 'Integer', FALSE)) {
             unset($params['parents'][$parent]);
           }
         }
       }
       else {
-        if (!CRM_Utils_Type::validate('integer', $params['parents'], FALSE)) {
+        if (!CRM_Utils_Type::validate($params['parents'], 'Integer', FALSE)) {
           unset($params['parents']);
         }
       }
@@ -460,7 +460,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       if (!empty($params['parents'])) {
         foreach ($params['parents'] as $parentId => $dnc) {
-          if (CRM_Utils_Type::validate('Integer', $parentId, FALSE)) {
+          if (CRM_Utils_Type::validate($parentId, 'Integer', FALSE)) {
             if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
               CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
             }
