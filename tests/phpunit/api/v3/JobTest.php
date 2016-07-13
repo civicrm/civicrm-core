@@ -46,9 +46,18 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
   public $_entity = 'Job';
   public $_params = array();
+  /**
+   * Created membership type.
+   *
+   * Must be created outside the transaction due to it breaking the transaction.
+   *
+   * @var
+   */
+  public $membershipTypeID;
 
   public function setUp() {
     parent::setUp();
+    $this->membershipTypeID = $this->membershipTypeCreate(array('name' => 'General'));
     $this->useTransaction(TRUE);
     $this->_params = array(
       'sequential' => 1,
@@ -60,6 +69,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
+  }
+
+  public function tearDown() {
+    parent::tearDown();
+    $this->membershipTypeDelete(array('id' => $this->membershipTypeID));
   }
 
   /**
@@ -334,6 +348,93 @@ class api_v3_JobTest extends CiviUnitTestCase {
         }
         $this->assertEquals($value, $result['values'][$index][$key]);
       }
+    }
+  }
+
+  /**
+   * Check that the merge carries across various related entities.
+   *
+   * Note the group combinations & expected results:
+   */
+  public function testBatchMergeWithAssets() {
+    $contactID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
+    $this->contributionCreate(array('contact_id' => $contactID));
+    $this->contributionCreate(array('contact_id' => $contact2ID, 'invoice_id' => '2', 'trxn_id' => 2));
+    $this->contactMembershipCreate(array('contact_id' => $contactID));
+    $this->contactMembershipCreate(array('contact_id' => $contact2ID));
+    $this->activityCreate(array('source_contact_id' => $contactID, 'target_contact_id' => $contactID, 'assignee_contact_id' => $contactID));
+    $this->activityCreate(array('source_contact_id' => $contact2ID, 'target_contact_id' => $contact2ID, 'assignee_contact_id' => $contact2ID));
+    $this->tagCreate(array('name' => 'Tall'));
+    $this->tagCreate(array('name' => 'Short'));
+    $this->entityTagAdd(array('contact_id' => $contactID, 'tag_id' => 'Tall'));
+    $this->entityTagAdd(array('contact_id' => $contact2ID, 'tag_id' => 'Short'));
+    $this->entityTagAdd(array('contact_id' => $contact2ID, 'tag_id' => 'Tall'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
+    $this->assertEquals(0, count($result['values']['skipped']));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $contactID), 2);
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $contact2ID), 0);
+    $this->callAPISuccessGetCount('FinancialItem', array('contact_id' => $contactID), 2);
+    $this->callAPISuccessGetCount('FinancialItem', array('contact_id' => $contact2ID), 0);
+    $this->callAPISuccessGetCount('Membership', array('contact_id' => $contactID), 2);
+    $this->callAPISuccessGetCount('Membership', array('contact_id' => $contact2ID), 0);
+    $this->callAPISuccessGetCount('EntityTag', array('contact_id' => $contactID), 2);
+    $this->callAPISuccessGetCount('EntityTag', array('contact_id' => $contact2ID), 0);
+    // 12 activities is one for each contribution (2), one for each membership (+2 = 4)
+    // 3 for each of the added activities as there are 3 roles (+6 = 10
+    // 2 for the (source & target) contact merged activity (+2 = 12)
+    $this->callAPISuccessGetCount('ActivityContact', array('contact_id' => $contactID), 12);
+    // 2 for the connection to the deleted by merge activity (source & target)
+    $this->callAPISuccessGetCount('ActivityContact', array('contact_id' => $contact2ID), 2);
+  }
+
+  /**
+   * Check that the merge carries across various related entities.
+   *
+   * Note the group combinations 'expected' results:
+   *
+   * Group 0  Added  null  Added
+   * Group 1  Added  Added  Added
+   * Group 2  Added  Removed  ****  Added
+   * Group 3  Removed  null  **** null
+   * Group 4  Removed  Added  **** Added
+   * Group 5  Removed  Removed **** null
+   * Group 6  null  Added  Added
+   * Group 7  null  Removed  **** null
+   *
+   * The ones with **** are the ones where I think a case could be made to change the behaviour.
+   */
+  public function testBatchMergeMergesGroups() {
+    $contactID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
+    $groups = array();
+    for ($i = 0; $i < 8; $i++) {
+      $groups[] = $this->groupCreate(array('name' => 'mergeGroup' . $i, 'title' => 'merge group' . $i));
+    }
+
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[0]));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[1]));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[2]));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[3], 'status' => 'Removed'));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[4], 'status' => 'Removed'));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[5], 'status' => 'Removed'));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[1]));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[2], 'status' => 'Removed'));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[4]));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[5], 'status' => 'Removed'));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[6]));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[7], 'status' => 'Removed'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
+    $this->assertEquals(0, count($result['values']['skipped']));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $groupResult = $this->callAPISuccess('GroupContact', 'get', array());
+    $this->assertEquals(5, $groupResult['count']);
+    $expectedGroups = array($groups[0], $groups[1], $groups[2], $groups[4], $groups[6]);
+    foreach ($groupResult['values'] as $groupValues) {
+      $this->assertEquals($contactID, $groupValues['contact_id']);
+      $this->assertEquals('Added', $groupValues['status']);
+      $this->assertTrue(in_array($groupValues['group_id'], $expectedGroups));
     }
   }
 
