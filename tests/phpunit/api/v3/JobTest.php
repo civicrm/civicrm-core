@@ -376,6 +376,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+<<<<<<< HEAD
    * Check that the merge carries across various related entities.
    *
    * Note the group combinations & expected results:
@@ -434,31 +435,177 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $contact2ID = $this->individualCreate();
     $groups = array();
     for ($i = 0; $i < 8; $i++) {
-      $groups[] = $this->groupCreate(array('name' => 'mergeGroup' . $i, 'title' => 'merge group' . $i));
+      $groups[] = $this->groupCreate(array(
+        'name' => 'mergeGroup' . $i,
+        'title' => 'merge group' . $i,
+      ));
     }
 
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[0]));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[1]));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[2]));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[3], 'status' => 'Removed'));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[4], 'status' => 'Removed'));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contactID, 'group_id' => $groups[5], 'status' => 'Removed'));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[1]));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[2], 'status' => 'Removed'));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[4]));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[5], 'status' => 'Removed'));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[6]));
-    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $contact2ID, 'group_id' => $groups[7], 'status' => 'Removed'));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contactID,
+      'group_id' => $groups[0],
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contactID,
+      'group_id' => $groups[1],
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contactID,
+      'group_id' => $groups[2],
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contactID,
+      'group_id' => $groups[3],
+      'status' => 'Removed',
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contactID,
+      'group_id' => $groups[4],
+      'status' => 'Removed',
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contactID,
+      'group_id' => $groups[5],
+      'status' => 'Removed',
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contact2ID,
+      'group_id' => $groups[1],
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contact2ID,
+      'group_id' => $groups[2],
+      'status' => 'Removed',
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contact2ID,
+      'group_id' => $groups[4],
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contact2ID,
+      'group_id' => $groups[5],
+      'status' => 'Removed',
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contact2ID,
+      'group_id' => $groups[6],
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'contact_id' => $contact2ID,
+      'group_id' => $groups[7],
+      'status' => 'Removed',
+    ));
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
     $this->assertEquals(0, count($result['values']['skipped']));
     $this->assertEquals(1, count($result['values']['merged']));
     $groupResult = $this->callAPISuccess('GroupContact', 'get', array());
     $this->assertEquals(5, $groupResult['count']);
-    $expectedGroups = array($groups[0], $groups[1], $groups[2], $groups[4], $groups[6]);
+    $expectedGroups = array(
+      $groups[0],
+      $groups[1],
+      $groups[2],
+      $groups[4],
+      $groups[6],
+    );
     foreach ($groupResult['values'] as $groupValues) {
       $this->assertEquals($contactID, $groupValues['contact_id']);
       $this->assertEquals('Added', $groupValues['status']);
       $this->assertTrue(in_array($groupValues['group_id'], $expectedGroups));
+
+    }
+  }
+
+  /**
+   * Test the decisions made for addresses when merging.
+   *
+   * @dataProvider getMergeAddresses
+   *
+   * Scenarios:
+   * (the ones with **** could be disputed as whether it is the best outcome).
+   *   'matching_primary' - Primary matches, including location_type_id. One contact has an additional address.
+   *     - result - primary is the shared one. Additional address is retained.
+   *   'matching_primary_reverse' - Primary matches, including location_type_id. Keep both. (opposite order)
+   *     - result - primary is the shared one. Additional address is retained.
+   *   'only_one_has_address' - Only one contact has addresses (retain)
+   *      - the (only) address is retained
+   *   'only_one_has_address_reverse'
+   *     - the (only) address is retained
+   *   **** 'different_primaries_with_different_location_type' Primaries are different but do not clash due to diff type
+   *     - result - both addresses kept. The one from the kept (lowest ID) contact is primary
+   *   **** 'different_primaries_with_different_location_type_reverse' Primaries are different but do not clash due to diff type
+   *     - result - both addresses kept. The one from the kept (lowest ID) contact is primary
+   *   **** 'different_primaries_location_match_only_one_address' per previous but a second address matches the primary but is not primary
+   *      - result - both addresses kept. The one from the kept (lowest ID) contact is primary
+   *   **** 'different_primaries_location_match_only_one_address_reverse' per previous but a second address matches the primary but is not primary
+   *      - result - both addresses kept. The one from the kept (lowest ID) contact is primary
+   *   **** 'same_primaries_different_location' Primary addresses are the same but have different location type IDs
+   *     - result primary kept with the lowest ID.
+   *   **** 'same_primaries_different_location_reverse' Primary addresses are the same but have different location type IDs
+   *     - result primary kept with the lowest ID.
+   *
+   * @param array $dataSet
+   */
+  public function testBatchMergesAddresses($dataSet) {
+    $contactID1 = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    foreach ($dataSet['contact_1'] as $address) {
+      $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID1), $address));
+    }
+    foreach ($dataSet['contact_2'] as $address) {
+      $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID2), $address));
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $addresses = $this->callAPISuccess('Address', 'get', array('contact_id' => $contactID1, 'sequential' => 1));
+    $this->assertEquals(count($dataSet['expected']), $addresses['count']);
+    $locationTypes = $this->callAPISuccess('Address', 'getoptions', array('field' => 'location_type_id'));
+    foreach ($dataSet['expected'] as $index => $expectedAddress) {
+      foreach ($expectedAddress as $key => $value) {
+        if ($key == 'location_type_id') {
+          $this->assertEquals($locationTypes['values'][$addresses['values'][$index][$key]], $value);
+        }
+        else {
+          $this->assertEquals($addresses['values'][$index][$key], $value);
+        }
+      }
+    }
+  }
+
+  /**
+   * Test altering the address decision by hook.
+   *
+   * @dataProvider getMergeAddresses
+   *
+   * @param array $dataSet
+   */
+  public function testBatchMergesAddressesHook($dataSet) {
+    $contactID1 = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    $this->contributionCreate(array('contact_id' => $contactID1, 'receive_date' => '2010-01-01', 'invoice_id' => 1, 'trxn_id' => 1));
+    $this->contributionCreate(array('contact_id' => $contactID2, 'receive_date' => '2012-01-01', 'invoice_id' => 2, 'trxn_id' => 2));
+    foreach ($dataSet['contact_1'] as $address) {
+      $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID1), $address));
+    }
+    foreach ($dataSet['contact_2'] as $address) {
+      $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID2), $address));
+    }
+    $this->hookClass->setHook('civicrm_merge', array($this, 'hookMostRecentDonor'));
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $addresses = $this->callAPISuccess('Address', 'get', array('contact_id' => $contactID1, 'sequential' => 1));
+    $this->assertEquals(count($dataSet['expected_hook']), $addresses['count']);
+    $locationTypes = $this->callAPISuccess('Address', 'getoptions', array('field' => 'location_type_id'));
+    foreach ($dataSet['expected_hook'] as $index => $expectedAddress) {
+      foreach ($expectedAddress as $key => $value) {
+        if ($key == 'location_type_id') {
+          $this->assertEquals($locationTypes['values'][$addresses['values'][$index][$key]], $value);
+        }
+        else {
+          $this->assertEquals($addresses['values'][$index][$key], $value);
+        }
+      }
     }
   }
 
@@ -466,13 +613,229 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test the organization will not be matched to an individual.
    */
   public function testBatchMergeWillNotMergeOrganizationToIndividual() {
-    $individual = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'organization_name' => 'Anon', 'email' => 'anonymous@hacker.com'));
-    $organization = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Organization', 'organization_name' => 'Anon', 'email' => 'anonymous@hacker.com'));
+    $individual = $this->callAPISuccess('Contact', 'create', array(
+      'contact_type' => 'Individual',
+      'organization_name' => 'Anon',
+      'email' => 'anonymous@hacker.com',
+    ));
+    $organization = $this->callAPISuccess('Contact', 'create', array(
+      'contact_type' => 'Organization',
+      'organization_name' => 'Anon',
+      'email' => 'anonymous@hacker.com',
+    ));
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'aggressive'));
     $this->assertEquals(0, count($result['values']['skipped']));
-    $this->assertEquals(0, count($result['values']['merged']));
+    $this->assertEquals(0, ¬count($result['values']['merged']));
     $this->callAPISuccessGetSingle('Contact', array('id' => $individual['id']));
     $this->callAPISuccessGetSingle('Contact', array('id' => $organization['id']));
+
+  }
+
+  /**
+   * Implement merge hook, prioritising address details of most recent donor.
+   *
+   * @param string $type
+   * @param array $data
+   * @param int $mainId
+   * @param int $otherId
+   * @param array $tables
+   */
+  public function hookMostRecentDonor($type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL) {
+    if ($type != 'batch') {
+      return;
+    }
+    $data = $data;
+  }
+
+  /**
+   * Get address combinations for the merge test.
+   *
+   * @return array
+   */
+  public function getMergeAddresses() {
+    $address1 = array('street_address' => 'Buckingham Palace', 'city' => 'London');
+    $address2 = array('street_address' => 'The Doghouse', 'supplemental_address_1' => 'under the blanket');
+    $data = array(
+      array(
+        'matching_primary' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+        ),
+      ),
+      array(
+        'matching_primary_reverse' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+          ),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+        ),
+      ),
+      array(
+        'only_one_has_address' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'contact_2' => array(),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+        ),
+      ),
+      array(
+        'only_one_has_address_reverse' => array(
+          'contact_1' => array(),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+        ),
+      ),
+      array(
+        'different_primaries_with_different_location_type' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+          ),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
+          ),
+        ),
+      ),
+      array(
+        'different_primaries_with_different_location_type_reverse' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
+          ),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
+          ),
+        ),
+      ),
+      array(
+        'different_primaries_location_match_only_one_address' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
+
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
+          ),
+        ),
+      ),
+      array(
+        'different_primaries_location_match_only_one_address_reverse' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
+          ),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+          ),
+        ),
+      ),
+      array(
+        'same_primaries_different_location' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+          ),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address1),
+
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address1),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address1),
+          ),
+        ),
+      ),
+      array(
+        'same_primaries_different_location_reverse' => array(
+          'contact_1' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address1),
+          ),
+          'contact_2' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+          ),
+          'expected' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address1),
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
+          ),
+        ),
+      ),
+    );
+    return $data;
   }
 
   /**
