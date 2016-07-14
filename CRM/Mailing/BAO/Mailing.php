@@ -1746,7 +1746,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $job->is_test = 0;
 
       if (!$job->find(TRUE)) {
-        $job->scheduled_date = $params['scheduled_date'];
+        // Don't schedule job until we populate the recipients.
+        $job->scheduled_date = NULL;
         $job->save();
       }
 
@@ -1754,6 +1755,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if (empty($params['_skip_evil_bao_auto_recipients_'])) {
         self::getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, $mailing->dedupe_email);
       }
+      // Schedule the job now that it has recipients.
+      $job->scheduled_date = $params['scheduled_date'];
+      $job->save();
     }
 
     return $mailing;
