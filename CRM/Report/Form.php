@@ -4602,6 +4602,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *   is that we might print a bar chart as a pdf.
    */
   protected function setOutputMode() {
+    $buttonName = $this->controller->getButtonName();
     $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
       'output',
       'String',
@@ -4611,6 +4612,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     ));
     if (isset($this->_params['task'])) {
       unset($this->_params['task']);
+    }
+    if ($this->_groupButtonName == $buttonName) {
+      $this->_outputMode = 'group';
     }
   }
 
