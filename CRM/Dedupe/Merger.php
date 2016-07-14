@@ -885,29 +885,24 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             isset($migrationInfo['main_details']['location_blocks']['address']) &&
             !empty($migrationInfo['main_details']['location_blocks']['address'])
           ) {
-            $otherAddresses = $migrationInfo['other_details']['location_blocks']['address'];
-            $otherAddressLookup = array();
-            foreach ($otherAddresses as $otherAddressIndex => $otherAddress) {
-              $otherAddressLookup[$otherAddress['location_type_id']] = $otherAddressIndex;
-            }
-            // Look for this LocTypeId in the results
-            // @todo This can be streamlined using array_column() in PHP 5.5+
-            foreach ($migrationInfo['main_details']['location_blocks']['address'] as $addressKey => $addressRecord) {
-              $otherAddressIndex = CRM_Utils_Array::value($addressRecord['location_type_id'], $otherAddressLookup);
-              $hasMatchingAddress = FALSE;
-              foreach ($otherAddresses as $otherAddress) {
-                if (self::addressIsSame($addressRecord, $otherAddress)) {
-                  $hasMatchingAddress = TRUE;
-                }
-              }
-              if ($hasMatchingAddress) {
+
+            // Load the address we're inspecting from the 'other' contact
+            $addressRecord = $migrationInfo['other_details']['location_blocks']['address'][$fieldCount];
+            $addressRecordLocTypeId = CRM_Utils_Array::value('location_type_id', $addressRecord);
+
+            // If it exists on the 'main' contact already, skip it. Otherwise
+            // if the location type exists already, log a conflict.
+            foreach ($migrationInfo['main_details']['location_blocks']['address'] as $mainAddressKey => $mainAddressRecord) {
+              if (self::addressIsSame($addressRecord, $mainAddressRecord)) {
                 unset($migrationInfo[$key]);
+                break;
               }
-              elseif (!empty($otherAddresses[$otherAddressIndex]) && !self::addressIsSame($addressRecord, $otherAddresses[$otherAddressIndex])) {
+              elseif ($addressRecordLocTypeId == $mainAddressRecord['location_type_id']) {
                 $conflicts[$key] = NULL;
                 break;
               }
             }
+
           }
         }
         // For other locations, don't merge/add if the values are the same
