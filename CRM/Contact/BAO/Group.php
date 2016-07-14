@@ -346,7 +346,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @return CRM_Contact_BAO_Group|NULL
    *   The new group BAO (if created)
    */
-  public static function &create(&$params) {
+  public static function create(&$params) {
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Group', $params['id'], $params);
@@ -460,7 +460,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     if (!empty($params['organization_id'])) {
-      $groupOrg = array();
       $groupOrg = $params;
       $groupOrg['group_id'] = $group->id;
       CRM_Contact_BAO_GroupOrganization::add($groupOrg);

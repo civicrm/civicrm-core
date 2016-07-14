@@ -275,4 +275,44 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Test the group contact clause does not contain an OR.
+   *
+   * The search should return 3 contacts - 2 households in the smart group of
+   * Contact Type = Household and one Individual hard-added to it. The
+   * Household that meets both criteria should be returned once.
+   */
+  public function testGroupClause() {
+    $this->householdCreate();
+    $householdID = $this->householdCreate();
+    $individualID = $this->individualCreate();
+    $groupID = $this->smartGroupCreate();
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $individualID, 'status' => 'Added'));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $householdID, 'status' => 'Added'));
+
+    // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
+    CRM_Contact_BAO_GroupContactCache::remove($groupID, FALSE);
+
+    $sql = CRM_Contact_BAO_Query::getQuery(
+      array(array('group', 'IN', array($groupID), 0, 0)),
+      array('contact_id')
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->assertEquals(3, $dao->N);
+    $this->assertFalse(strstr($sql, ' OR '));
+
+    $sql = CRM_Contact_BAO_Query::getQuery(
+      array(array('group', 'IN', array($groupID), 0, 0)),
+      array('contact_id' => 1, 'group' => 1)
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->assertEquals(3, $dao->N);
+    $this->assertFalse(strstr($sql, ' OR '), 'Query does not include or');
+    while ($dao->fetch()) {
+      $this->assertTrue(($dao->groups == $groupID || $dao->groups == ',' . $groupID), $dao->groups . ' includes ' . $groupID);
+    }
+  }
+
 }
