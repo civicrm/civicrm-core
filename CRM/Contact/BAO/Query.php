@@ -3761,6 +3761,13 @@ WHERE  $smartGroupClause
   public function stateProvince(&$values, $status = NULL) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
+    // CRM-19081 support legacy search builder state_province field.
+    if (!CRM_Utils_Type::validate($value, 'Integer', FALSE)) {
+      $states = civicrm_api3('Address', 'getoptions', array(
+        'field' => 'state_province_id',
+      ));
+      $value = array_search($value, $states['values']) ? array_search($value, $states['values']) : $value;
+    }
     $stateClause = self::buildClause('civicrm_address.state_province_id', $op, $value, 'Positive');
     $this->_tables['civicrm_address'] = 1;
     $this->_whereTables['civicrm_address'] = 1;
