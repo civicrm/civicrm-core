@@ -35,6 +35,22 @@ require_once 'TbsZip/tbszip.php';
 
 class CRM_Utils_PDF_Document {
 
+  public static $ooxmlMap = array(
+    'docx' => array(
+      'dataFile' => 'word/document.xml',
+      'startTag' => '<w:body>',
+      // TODO need to provide proper ooxml tag for pagebreak
+      'pageBreak' => '<w:pgMar></w:pgMar>',
+      'endTag' => '</w:body></w:document>',
+    ),
+    'odt' => array(
+      'dataFile' => 'content.xml',
+      'startTag' => '<office:body>',
+      'pageBreak' => '<text:p text:style-name="Standard"></text:p>',
+      'endTag' => '</office:body></office:document-content>',
+    ),
+  );
+
   /**
    * @param array $pages
    * @param string $fileName
@@ -150,56 +166,40 @@ class CRM_Utils_PDF_Document {
   }
 
   /**
-   * Extract content of docx/odt file as text and later used for token replacement
+   * Extract content of docx/odt file
+   *
    * @param string $filePath  Document file path
    * @param string $docType  File type of document
-   * @param bool $returnZipObj  Return clsTbsZip object along with content?
    *
-   * @return string|array
-   *   File content of document as text or array of content and clsTbsZip object
+   * @return array
+   *   [string, clsTbsZip]
    */
-  public static function doc2Text($filePath, $docType, $returnZipObj = FALSE) {
-    $dataFile = ($docType == 'docx') ? 'word/document.xml' : 'content.xml';
+  public static function unzipDoc($filePath, $docType) {
+    $dataFile = SELF::$ooxmlMap[$docType]['dataFile'];
 
     $zip = new clsTbsZip();
     $zip->Open($filePath);
     $content = $zip->FileRead($dataFile);
 
-    if ($returnZipObj) {
-      return array($content, $zip);
-    }
-
-    return $content;
+    return array($content, $zip);
   }
 
   /**
    * Modify contents of docx/odt file(s) and later merged into one final document
    *
-   * @param string $filePath Document file path
-   * @param array $contents content of formatted/token-replaced document
-   * @param string $docType Document type e.g. odt/docx
+   * @param string $filePath
+   *   Document file path
+   * @param array $contents
+   *   Content of formatted/token-replaced document
+   * @param string $docType
+   *   Document type e.g. odt/docx
+   * @param clsTbsZip $zip
+   *   Zip archive
    */
-  public static function printDocuments($filePath, $contents, $docType) {
-    $ooxmlMap = array(
-      'docx' => array(
-        'dataFile' => 'word/document.xml',
-        'startTag' => '<w:body>',
-        // TODO need to provide proper ooxml tag for pagebreak
-        'pageBreak' => '<w:pgMar></w:pgMar>',
-        'endTag' => '</w:body></w:document>',
-      ),
-      'odt' => array(
-        'dataFile' => 'content.xml',
-        'startTag' => '<office:body>',
-        'pageBreak' => '<text:p text:style-name="Standard"></text:p>',
-        'endTag' => '</office:body></office:document-content>',
-      ),
-    );
+  public static function printDocuments($filePath, $contents, $docType, $zip) {
+    $dataMap = SELF::$ooxmlMap[$docType];
 
-    $dataMap = $ooxmlMap[$docType];
-
-    /* @var clsTbsZip $zip */
-    list($finalContent, $zip) = self::doc2Text($filePath, $docType, TRUE);
+    $finalContent = $zip->FileRead($dataMap['dataFile']);
 
     // token-replaced document contents of each contact will be merged into final document
     foreach ($contents as $key => $content) {

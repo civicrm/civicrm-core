@@ -349,7 +349,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
 
     if (!empty($formValues['document_file_path'])) {
-      $html_message = CRM_Utils_PDF_Document::doc2Text($formValues['document_file_path'], $formValues['document_type']);
+      list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
     }
 
     foreach ($form->_contactIds as $item => $contactId) {
@@ -391,7 +391,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
-      CRM_Utils_PDF_Document::printDocuments($formValues['document_file_path'], $html, $type);
+      CRM_Utils_PDF_Document::printDocuments($formValues['document_file_path'], $html, $type, $zip);
     }
     else {
       CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
