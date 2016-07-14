@@ -101,7 +101,6 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'title' => 'Parent Group',
       'description' => 'Parent Group',
       'visibility' => 'User and User Admin Only',
-      'parents' => '',
       'is_active' => 1,
     );
     $parentGroup = CRM_Contact_BAO_Group::create($groupParams1);
