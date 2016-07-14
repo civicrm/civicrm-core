@@ -197,6 +197,8 @@ class CRM_Utils_PDF_Document {
     );
 
     $dataMap = $ooxmlMap[$docType];
+
+    /* @var clsTbsZip $zip */
     list($finalContent, $zip) = self::doc2Text($filePath, $docType, TRUE);
 
     // token-replaced document contents of each contact will be merged into final document
@@ -216,21 +218,11 @@ class CRM_Utils_PDF_Document {
       $finalContent = str_replace($dataMap['endTag'], $content, $finalContent);
     }
 
-    //replace the loaded document file content located at $filePath with $finaContent
+    // Replace the loaded document file content located at $filePath with $finaContent
     $zip->FileReplace($dataMap['dataFile'], $finalContent, TBSZIP_STRING);
 
-    // get and path of civicrm upload directory and then construct the filepath of final document
-    $uploadDir = Civi::settings()->get('uploadDir');
-    $absPath = Civi::paths()->getPath($uploadDir) . "CiviLetter.$docType";
-
-    // cleanup temporary document file created earlier if any
-    if (file_exists($absPath)) {
-      unlink($absPath);
-    }
-    // save the file document in civicrm upload directory, later used to download
-    $zip->Flush(TBSZIP_FILE, $absPath);
-
-    self::printDoc($absPath, $docType, "CiviLetter.$docType");
+    $fileName = pathinfo($filePath, PATHINFO_FILENAME) . '.' . $docType;
+    $zip->Flush(TBSZIP_DOWNLOAD, $fileName);
   }
 
 }
