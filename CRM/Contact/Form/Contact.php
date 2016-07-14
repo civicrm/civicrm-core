@@ -312,13 +312,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $this->assign('contactType', $this->_contactType);
     $this->assign('contactSubType', $this->_contactSubType);
 
-    //build contact subtype form element, CRM-6864
-    $buildContactSubType = TRUE;
-    if ($this->_contactSubType && ($this->_action & CRM_Core_Action::ADD)) {
-      $buildContactSubType = FALSE;
-    }
-    $this->assign('buildContactSubType', $buildContactSubType);
-
     // get the location blocks.
     $this->_blocks = $this->get('blocks');
     if (CRM_Utils_System::isNull($this->_blocks)) {
