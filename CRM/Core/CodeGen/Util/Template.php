@@ -6,14 +6,17 @@
 class CRM_Core_CodeGen_Util_Template {
   protected $filetype;
 
+  protected $dbDsn;
+
   protected $smarty;
   protected $beautifier;
 
   /**
    * @param string $filetype
    */
-  public function __construct($filetype) {
+  public function __construct($filetype, $dbDsn = "mysql://username:password@localhost/database") {
     $this->filetype = $filetype;
+    $this->dbDsn = $dbDsn;
 
     $this->smarty = CRM_Core_CodeGen_Util_Smarty::singleton()->getSmarty();
 
@@ -35,6 +38,10 @@ class CRM_Core_CodeGen_Util_Template {
       $this->beautifier->setIndentChar(' ');
       $this->beautifier->setIndentNumber(2);
       $this->beautifier->setNewLine("\n");
+    }
+    if ($this->filetype === 'sql') {
+      // localization needs a database connection.
+      $this->assign('dbDsn', $this->dbDsn);
     }
   }
 

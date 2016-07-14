@@ -26,6 +26,11 @@ class CRM_Core_CodeGen_Main {
   var $digest;
 
   /**
+   * @var string|NULL authentication credentials, for connecting to the database during character type conversions, and escaping.
+   */
+  var $dbDsn;
+
+  /**
    * @param $CoreDAOCodePath
    * @param $sqlCodePath
    * @param $phpCodePath
@@ -35,13 +40,15 @@ class CRM_Core_CodeGen_Main {
    * @param $argVersion
    * @param $schemaPath
    * @param $digestPath
+   * @param $dbDsn
    */
-  public function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
+  public function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath, $dbDsn) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
     $this->phpCodePath = $phpCodePath;
     $this->tplCodePath = $tplCodePath;
     $this->digestPath = $digestPath;
+    $this->dbDsn = $dbDsn;
     $this->digest = NULL;
 
     // default cms is 'drupal', if not specified

@@ -51,8 +51,14 @@
  *   the string, translated by gettext
  */
 function smarty_block_ts($params, $text, &$smarty) {
+  static $i18n = NULL;
   if (!isset($params['domain'])) {
     $params['domain'] = $smarty->get_template_vars('extensionKey');
+  }
+
+  if(!$i18n) {
+    $i18n = CRM_Core_I18n::singleton();
+    $i18n->dbDsn=$smarty->get_template_vars('dbDsn');
   }
   return ts($text, $params);
 }
