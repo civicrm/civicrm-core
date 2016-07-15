@@ -131,38 +131,25 @@ class CRM_Utils_PDF_Document {
   /**
    * @param array $path  docx/odt file path
    * @param string $type  File type
-   * @param bool $returnContent extract content of docx/odt file as a text, later used for token replacement
+   * @param bool $returnHTMLBody extract entire or only HTNL body content of docx/odt file,
+   *   later used for token replacement or preview
    *
-   * @return string
-   *    Return filepath of created html copy of document OR extracted content of document
+   * @return string|array
+   *    Return extracted content of document in HTML
    */
-  public static function docReader($path, $type, $returnContent = FALSE) {
-    // get path of civicrm upload directory which is used for temporary file storage
-    $uploadDir = Civi::settings()->get('uploadDir');
-
-    // build the path of of new html file
-    $pathInfo = pathinfo($path);
-    $newFile = $pathInfo['filename'] . ".html";
-    $absPath = Civi::paths()->getPath($uploadDir) . $newFile;
-
-    // cleanup temporary html file created for preview
-    if (file_exists($absPath)) {
-      unlink($absPath);
-    }
+  public static function docReader($path, $type, $returnHTMLBody = FALSE) {
 
     $fileType = ($type == 'docx') ? 'Word2007' : 'ODText';
     $phpWord = \PhpOffice\PhpWord\IOFactory::load($path, $fileType);
-    $phpWord->save($absPath, 'HTML');
+    $phpWordHTML = new \PhpOffice\PhpWord\Writer\HTML($phpWord);
 
-    // return the html content for tokenreplacment and eventually used for document download
-    if ($returnContent) {
-      $filename = fopen($absPath, 'r');
-      $content = fread($filename, filesize($absPath));
-      fclose($filename);
-      return array($content, array_search($type, CRM_Core_SelectValues::documentApplicationType()));
+    //return only the HTML body later used for preview
+    if ($returnHTMLBody) {
+      return $phpWordHTML->getWriterPart('Body')->write();
     }
 
-    return \Civi::paths()->getUrl($uploadDir) . $newFile;
+    // return the html content for tokenreplacment and eventually used for document download
+    return array($phpWordHTML->getContent(), array_search($type, CRM_Core_SelectValues::documentApplicationType()));
   }
 
   /**
