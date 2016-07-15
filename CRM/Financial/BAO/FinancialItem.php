@@ -108,7 +108,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
     }
     else {
-      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
+      $accountRelName = 'Income Account is';
+      if (property_exists($contribution, 'revenue_recognition_date') && !CRM_Utils_System::isNull($contribution->revenue_recognition_date)) {
+        $accountRelName = 'Deferred Revenue Account is';
+      }
+      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '{$accountRelName}' "));
     }
     if ($lineItem->financial_type_id) {
       $searchParams = array(
@@ -125,8 +129,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
       $trxnId['id'] = $trxn['financialTrxnId'];
     }
-
-    return self::create($params, NULL, $trxnId);
+    $financialItem = self::create($params, NULL, $trxnId);
+    return $financialItem;
   }
 
   /**
