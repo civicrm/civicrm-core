@@ -140,7 +140,6 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'receive_date' => '2016-01-20',
       'total_amount' => 622,
       'financial_type_id' => 4,
-      'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
       'line_items' => array(
         array(
           'line_item' => array(
@@ -166,6 +165,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     // Get financial trxns for contribution
     $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622));
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime('2016-01-20')));
+    $contribution->revenue_recognition_date = date('Ymd', strtotime("+1 month"));
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contribution);
     $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622, 'id' => array("NOT IN" => array($trxn['id']))));
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
