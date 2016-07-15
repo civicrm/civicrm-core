@@ -302,8 +302,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     elseif (!empty($formValues['document_file'])) {
       list($html_message, $formValues['document_type']) = CRM_Utils_PDF_Document::docReader($formValues['document_file']['name'], $formValues['document_file']['type']);
       $formValues['document_file_path'] = $formValues['document_file']['name'];
-      // Fixme: this shouldn't be necessary but the above docReader function is giving blank output for docx files
-      list($html_message) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
     }
 
     if (!empty($formValues['update_format'])) {
