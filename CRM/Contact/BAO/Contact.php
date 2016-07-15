@@ -2239,12 +2239,7 @@ ORDER BY civicrm_email.is_primary DESC";
           else {
             $type = $data['contact_type'];
             if (!empty($data['contact_sub_type'])) {
-              $type = $data['contact_sub_type'];
-              $type = CRM_Utils_Array::explodePadded($type);
-              // generally a contact even if, has multiple subtypes the parent-type is going to be one only
-              // and since formatCustomField() would be interested in parent type, lets consider only one subtype
-              // as the results going to be same.
-              $type = $type[0];
+              $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
             }
           }
 
