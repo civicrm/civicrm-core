@@ -140,7 +140,7 @@ function selectValue( val, prefix) {
   var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0 }"{literal};
 
   cj.post( dataUrl, {tid: val}, function( data ) {
-    var hide = (data.document_path && isPDF) ? false : true;
+    var hide = (data.document_body && isPDF) ? false : true;
     cj('.crm-html_email-accordion, .crm-pdf-format-accordion').toggle(hide);
     cj('.crm-document-accordion').toggle(!hide);
 
@@ -153,7 +153,7 @@ function selectValue( val, prefix) {
 
     if (!hide) {
       cj("#subject").val( data.subject );
-      document.getElementById("document-preview").innerHTML='<object type="text/html" data='+ data.document_path +' width="680" height="400" style="background:white;"></object>';
+      cj("#document-preview").html(data.document_body).parent().css({'background': 'white'});
       return;
     }
 
