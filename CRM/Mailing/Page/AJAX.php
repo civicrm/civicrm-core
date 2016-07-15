@@ -56,9 +56,7 @@ class CRM_Mailing_Page_AJAX {
 
     $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $templateId);
     foreach ((array) $documentInfo as $info) {
-      $messages['file_type'] = array_search($info['mime_type'], CRM_Core_SelectValues::documentApplicationType());
-      $messages['document_body'] = CRM_Utils_PDF_Document::docReader($info['fullPath'], $messages['file_type'], TRUE);
-      $messages['mime_type'] = $info['mime_type'];
+      list($messages['document_body']) = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
     }
 
     CRM_Utils_JSON::output($messages);

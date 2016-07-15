@@ -131,25 +131,19 @@ class CRM_Utils_PDF_Document {
   /**
    * @param array $path  docx/odt file path
    * @param string $type  File type
-   * @param bool $returnHTMLBody extract entire or only HTNL body content of docx/odt file,
-   *   later used for token replacement or preview
    *
-   * @return string|array
-   *    Return extracted content of document in HTML
+   * @return array
+   *    Return extracted content of document in HTML and document type
    */
-  public static function docReader($path, $type, $returnHTMLBody = FALSE) {
-
+  public static function docReader($path, $type) {
+    $type = array_search($type, CRM_Core_SelectValues::documentApplicationType());
     $fileType = ($type == 'docx') ? 'Word2007' : 'ODText';
+
     $phpWord = \PhpOffice\PhpWord\IOFactory::load($path, $fileType);
     $phpWordHTML = new \PhpOffice\PhpWord\Writer\HTML($phpWord);
 
-    //return only the HTML body later used for preview
-    if ($returnHTMLBody) {
-      return $phpWordHTML->getWriterPart('Body')->write();
-    }
-
     // return the html content for tokenreplacment and eventually used for document download
-    return array($phpWordHTML->getContent(), array_search($type, CRM_Core_SelectValues::documentApplicationType()));
+    return array($phpWordHTML->getWriterPart('Body')->write(), $type);
   }
 
   /**
