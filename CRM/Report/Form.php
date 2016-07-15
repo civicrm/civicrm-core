@@ -2517,7 +2517,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   public function processReportMode() {
     $this->setOutputMode();
 
-    $buttonName = $this->controller->getButtonName();
     $this->_sendmail
       = CRM_Utils_Request::retrieve(
         'sendmail',
@@ -4602,7 +4601,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *   is that we might print a bar chart as a pdf.
    */
   protected function setOutputMode() {
-    $buttonName = $this->controller->getButtonName();
     $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
       'output',
       'String',
@@ -4610,11 +4608,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       FALSE,
       CRM_Utils_Array::value('task', $this->_params)
     ));
+    // if contacts are added to group
+    if (!empty($this->_params['groups']) && empty($this->_outputMode)) {
+      $this->_outputMode = 'group';
+    }
     if (isset($this->_params['task'])) {
       unset($this->_params['task']);
-    }
-    if ($this->_groupButtonName == $buttonName) {
-      $this->_outputMode = 'group';
     }
   }
 
