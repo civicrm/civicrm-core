@@ -48,12 +48,12 @@
 </table>
 {/if}
 
-<div class="crm-accordion-wrapper collapsed">
+<div class="crm-accordion-wrapper collapsed crm-pdf-format-accordion">
     <div class="crm-accordion-header">
         {$form.pdf_format_header.html}
     </div>
     <div class="crm-accordion-body">
-      <div class="crm-block crm-form-block crm-pdf-format-form-block">
+      <div class="crm-block crm-form-block">
     <table class="form-layout-compressed">
       <tr>
         <td class="label-left">{$form.format_id.label} {help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
@@ -94,7 +94,7 @@
 
 <div class="crm-accordion-wrapper crm-document-accordion ">
   <div class="crm-accordion-header">
-    {$form.html_message.label}
+    {ts}Preview Document{/ts}
   </div><!-- /.crm-accordion-header -->
   <div class="crm-accordion-body">
     <div id='document-preview'></div>
@@ -150,7 +150,7 @@ CRM.$(function($) {
     $('.crm-document-accordion').hide();
     $('#document_file').on('change', function() {
       if (this.value) {
-        $('.crm-html_email-accordion, .crm-document-accordion').hide();
+        $('.crm-html_email-accordion, .crm-document-accordion, .crm-pdf-format-accordion').hide();
         cj('#document_type').closest('tr').hide();
         $('#template').val('');
       }
