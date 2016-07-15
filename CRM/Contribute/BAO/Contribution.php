@@ -4816,9 +4816,10 @@ LIMIT 1;";
    *
    * @param array $lineItems
    * @param array $contributions
+   * @param array $previousContributionId
    *
    */
-  public static function addPayments($lineItems, $contributions) {
+  public static function addPayments($lineItems, $contributions, $previousContributionId = NULL) {
     // get financial trxn which is a payment
     $ftSql = "SELECT ft.id, ft.total_amount
       FROM civicrm_financial_trxn ft
@@ -4828,9 +4829,13 @@ LIMIT 1;";
       FROM civicrm_financial_item fi
       INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
       WHERE li.contribution_id = %1";
-
+    $contributionStatus = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+    ));
     foreach ($contributions as $k => $contribution) {
-      if ($contribution->contribution_status_id != CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name')) {
+      if (!($contributionStatus[$contribution->contribution_status_id] == 'Partially paid'
+        || CRM_Utils_Array::value($previousContributionId, $contributionStatus) == 'Partially paid')
+      ) {
         continue;
       }
       $ftDao = CRM_Core_DAO::executeQuery($ftSql, array(1 => array($contribution->id, 'Integer')));
