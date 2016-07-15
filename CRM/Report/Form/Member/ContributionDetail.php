@@ -235,7 +235,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
         'grouping' => 'contri-fields',
         'fields' => array(
           'batch_id' => array(
-            'name' => 'id',
+            'name' => 'batch_id',
             'title' => ts('Batch Name'),
           ),
         ),
