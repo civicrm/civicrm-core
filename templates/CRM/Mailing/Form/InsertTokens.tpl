@@ -141,8 +141,9 @@ function selectValue( val, prefix) {
 
   cj.post( dataUrl, {tid: val}, function( data ) {
     var hide = (data.document_path && isPDF) ? false : true;
-    cj('.crm-html_email-accordion').toggle(hide);
+    cj('.crm-html_email-accordion, .crm-pdf-format-accordion').toggle(hide);
     cj('.crm-document-accordion').toggle(!hide);
+
     cj('#document_type').closest('tr').toggle(hide);
 
     // Unset any uploaded document when any template is chosen
