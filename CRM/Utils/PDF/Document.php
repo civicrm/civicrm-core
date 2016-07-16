@@ -39,8 +39,7 @@ class CRM_Utils_PDF_Document {
     'docx' => array(
       'dataFile' => 'word/document.xml',
       'startTag' => '<w:body>',
-      // TODO need to provide proper ooxml tag for pagebreak
-      'pageBreak' => '<w:pgMar></w:pgMar>',
+      'pageBreak' => '<w:p><w:pPr><w:pStyle w:val="Normal"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr></w:r><w:r><w:br w:type="page"/></w:r></w:p>',
       'endTag' => '</w:body></w:document>',
     ),
     'odt' => array(
@@ -176,8 +175,12 @@ class CRM_Utils_PDF_Document {
    *   Document type e.g. odt/docx
    * @param clsTbsZip $zip
    *   Zip archive
+   * @param bool $returnFinalContent
+   *   Return the content of file document as a string used in unit test
+   *
+   * @return string
    */
-  public static function printDocuments($filePath, $contents, $docType, $zip) {
+  public static function printDocuments($filePath, $contents, $docType, $zip, $returnFinalContent = FALSE) {
     $dataMap = SELF::$ooxmlMap[$docType];
 
     $finalContent = $zip->FileRead($dataMap['dataFile']);
@@ -197,6 +200,10 @@ class CRM_Utils_PDF_Document {
       $content = substr($content, $start);
       $content = str_replace($dataMap['startTag'], $dataMap['pageBreak'], $content);
       $finalContent = str_replace($dataMap['endTag'], $content, $finalContent);
+    }
+
+    if ($returnFinalContent) {
+      return $finalContent;
     }
 
     // Replace the loaded document file content located at $filePath with $finaContent

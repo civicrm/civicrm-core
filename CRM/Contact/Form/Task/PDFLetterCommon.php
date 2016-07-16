@@ -248,15 +248,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * Part of the post process which prepare and extract information from the template.
    *
    *
-   * @param CRM_Core_Form $form
+   * @param array $formValues
    *
    * @return array
    *   [$categories, $html_message, $messageToken, $returnProperties]
    */
-  static protected function processMessageTemplate(&$form) {
-    $formValues = $form->controller->exportValues($form->getName());
-
-    $html_message = $formValues['html_message'];
+  public static function processMessageTemplate($formValues) {
+    $html_message = CRM_Utils_Array::value('html_message', $formValues);
 
     // process message template
     if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
@@ -335,7 +333,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    */
   public static function postProcess(&$form) {
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
+    $formValues = $form->controller->exportValues($form->getName());
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
     $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
