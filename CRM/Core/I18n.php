@@ -348,15 +348,17 @@ class CRM_Core_I18n {
 
     // do all wildcard translations first
 
-    if (!isset(Civi::$statics[__CLASS__]) || !array_key_exists($this->locale, Civi::$statics[__CLASS__])) {
+    // FIXME: Is there a constant we can reference instead of hardcoding en_US?
+    $replacementsLocale = $this->locale ? $this->locale : 'en_US';
+    if (!isset(Civi::$statics[__CLASS__]) || !array_key_exists($replacementsLocale, Civi::$statics[__CLASS__])) {
       if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
-        Civi::$statics[__CLASS__][$this->locale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($this->locale);
+        Civi::$statics[__CLASS__][$replacementsLocale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($replacementsLocale);
       }
       else {
-        Civi::$statics[__CLASS__][$this->locale] = array();
+        Civi::$statics[__CLASS__][$replacementsLocale] = array();
       }
     }
-    $stringTable = Civi::$statics[__CLASS__][$this->locale];
+    $stringTable = Civi::$statics[__CLASS__][$replacementsLocale];
 
     $exactMatch = FALSE;
     if (isset($stringTable['enabled']['exactMatch'])) {
