@@ -205,27 +205,31 @@ class CRM_Dedupe_Merger {
    * Refer to CRM-17454 for information on the danger of querying the information
    * schema to derive this.
    *
-   * @todo create an 'entity hook' to allow entities to be registered to CiviCRM
-   * including all info that is normally in the DAO.
+   * This function calls the merge hook but the entityTypes hook is the recommended
+   * way to add tables to this result.
    */
   public static function cidRefs() {
-    $cidRefs = array();
+    if (isset(\Civi::$statics[__CLASS__]) && isset(\Civi::$statics[__CLASS__]['contact_references'])) {
+      return \Civi::$statics[__CLASS__]['contact_references'];
+    }
+    $contactReferences = array();
     $coreReferences = CRM_Core_DAO::getReferencesToTable('civicrm_contact');
     foreach ($coreReferences as $coreReference) {
       if (!is_a($coreReference, 'CRM_Core_Reference_Dynamic')) {
-        $cidRefs[$coreReference->getReferenceTable()][] = $coreReference->getReferenceKey();
+        $contactReferences[$coreReference->getReferenceTable()][] = $coreReference->getReferenceKey();
       }
     }
-    self::addCustomTablesExtendingContactsToCidRefs($cidRefs);
+    self::addCustomTablesExtendingContactsToCidRefs($contactReferences);
 
     // FixME for time being adding below line statically as no Foreign key constraint defined for table 'civicrm_entity_tag'
-    $cidRefs['civicrm_entity_tag'][] = 'entity_id';
+    $contactReferences['civicrm_entity_tag'][] = 'entity_id';
 
     // Allow hook_civicrm_merge() to adjust $cidRefs.
-    // @todo consider adding a way to register entities and have them
-    // automatically added to this list.
-    CRM_Utils_Hook::merge('cidRefs', $cidRefs);
-    return $cidRefs;
+    // Note that if entities are registered using the entityTypes hook there
+    // is no need to use this hook.
+    CRM_Utils_Hook::merge('cidRefs', $contactReferences);
+    \Civi::$statics[__CLASS__]['contact_references'] = $contactReferences;
+    return \Civi::$statics[__CLASS__]['contact_references'];
   }
 
   /**
