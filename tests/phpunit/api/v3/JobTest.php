@@ -248,7 +248,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
             'contact_id' => $contactID,
             'membership_type_id' => $membershipTypeID,
             'join_date' => 'now',
-            'start_date' => '+ 1 hour',
+            'start_date' => '+ 1 day',
           )
         );
       }
@@ -259,9 +259,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'entity_value' => $membershipTypeID,
       'mapping_id' => 4,
       'start_action_date' => 'membership_start_date',
-      'start_action_offset' => 0,
+      'start_action_offset' => 1,
       'start_action_condition' => 'before',
-      'start_action_unit' => 'hour',
+      'start_action_unit' => 'day',
       'group_id' => $groupID,
       'limit_to' => TRUE,
     ));
