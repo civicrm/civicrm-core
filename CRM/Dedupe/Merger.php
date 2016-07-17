@@ -1070,6 +1070,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function getRowsElementsAndInfo($mainId, $otherId, $checkPermissions = TRUE) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
+    $fields = CRM_Contact_DAO_Contact::fields();
 
     // Fetch contacts
     foreach (array('main' => $mainId, 'other' => $otherId) as $moniker => $cid) {
@@ -1080,46 +1081,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       );
       $result = civicrm_api('contact', 'get', $params);
 
-      if (empty($result['values'][$cid]['contact_type'])) {
-        return FALSE;
-      }
-
       // CRM-18480: Cancel the process if the contact is already deleted
       if (isset($result['values'][$cid]['contact_is_deleted']) && !empty($result['values'][$cid]['contact_is_deleted'])) {
         throw new CRM_Core_Exception(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(1 => $moniker, 2 => $cid)));
       }
 
       $$moniker = $result['values'][$cid];
-    }
-
-    $fields = CRM_Contact_DAO_Contact::fields();
-
-    // FIXME: there must be a better way
-    foreach (array('main', 'other') as $moniker) {
-      $contact = &$$moniker;
-      $preferred_communication_method = CRM_Utils_array::value('preferred_communication_method', $contact);
-      $value = empty($preferred_communication_method) ? array() : $preferred_communication_method;
-      $specialValues[$moniker] = array(
-        'preferred_communication_method' => $value,
-        'communication_style_id' => $value,
-      );
-
-      if (!empty($contact['preferred_communication_method'])) {
-        // api 3 returns pref_comm_method as an array, which breaks the lookup; so we reconstruct
-        $prefCommList = is_array($specialValues[$moniker]['preferred_communication_method']) ? implode(CRM_Core_DAO::VALUE_SEPARATOR, $specialValues[$moniker]['preferred_communication_method']) : $specialValues[$moniker]['preferred_communication_method'];
-        $specialValues[$moniker]['preferred_communication_method'] = CRM_Core_DAO::VALUE_SEPARATOR . $prefCommList . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
-      $names = array(
-        'preferred_communication_method' => array(
-          'newName' => 'preferred_communication_method_display',
-          'groupName' => 'preferred_communication_method',
-        ),
-      );
-      CRM_Core_OptionGroup::lookupValues($specialValues[$moniker], $names);
-
-      if (!empty($contact['communication_style'])) {
-        $specialValues[$moniker]['communication_style_id_display'] = $contact['communication_style'];
-      }
+      $specialValues[$moniker] = self::getSpecialValues($result['values'][$cid]);
     }
 
     static $optionValueFields = array();
@@ -2102,6 +2070,39 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $cacheKeyString .= '_0';
     }
     return $cacheKeyString;
+  }
+
+  /**
+   * @param $moniker
+   * @param $contact
+   * @return array
+   *   $specialValues
+   */
+  public static function getSpecialValues($contact) {
+    $preferred_communication_method = CRM_Utils_array::value('preferred_communication_method', $contact);
+    $value = empty($preferred_communication_method) ? array() : $preferred_communication_method;
+    $specialValues = array(
+      'preferred_communication_method' => $value,
+      'communication_style_id' => $value,
+    );
+
+    if (!empty($contact['preferred_communication_method'])) {
+      // api 3 returns pref_comm_method as an array, which breaks the lookup; so we reconstruct
+      $prefCommList = is_array($specialValues['preferred_communication_method']) ? implode(CRM_Core_DAO::VALUE_SEPARATOR, $specialValues['preferred_communication_method']) : $specialValues['preferred_communication_method'];
+      $specialValues['preferred_communication_method'] = CRM_Core_DAO::VALUE_SEPARATOR . $prefCommList . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
+    $names = array(
+      'preferred_communication_method' => array(
+        'newName' => 'preferred_communication_method_display',
+        'groupName' => 'preferred_communication_method',
+      ),
+    );
+    CRM_Core_OptionGroup::lookupValues($specialValues, $names);
+
+    if (!empty($contact['communication_style'])) {
+      $specialValues['communication_style_id_display'] = $contact['communication_style'];
+    }
+    return $specialValues;
   }
 
 }
