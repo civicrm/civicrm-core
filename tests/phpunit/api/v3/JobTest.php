@@ -334,10 +334,18 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
     $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
     $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
-    $result = $this->callAPISuccess('Contact', 'get', array('contact_sub_type' => 'Student', 'sequential' => 1, 'is_deceased' => array('IN' => array(0, 1))));
+    $result = $this->callAPISuccess('Contact', 'get', array(
+      'contact_sub_type' => 'Student',
+      'sequential' => 1,
+      'is_deceased' => array('IN' => array(0, 1)),
+      'options' => array('sort' => 'id ASC'),
+    ));
     $this->assertEquals(count($dataSet['expected']), $result['count']);
     foreach ($dataSet['expected'] as $index => $contact) {
       foreach ($contact as $key => $value) {
+        if ($key == 'gender_id') {
+          $key = 'gender';
+        }
         $this->assertEquals($value, $result['values'][$index][$key]);
       }
     }
@@ -590,7 +598,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     foreach ($dataSet['contact_2'] as $address) {
       $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID2), $address));
     }
-    $this->hookClass->setHook('civicrm_merge', array($this, 'hookMostRecentDonor'));
+    $this->hookClass->setHook('civicrm_alterLocationMergeData', array($this, 'hookMostRecentDonor'));
 
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
     $this->assertEquals(1, count($result['values']['merged']));
@@ -603,7 +611,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
           $this->assertEquals($locationTypes['values'][$addresses['values'][$index][$key]], $value);
         }
         else {
-          $this->assertEquals($addresses['values'][$index][$key], $value);
+          $this->assertEquals($addresses['values'][$index][$key], $value, 'Unexpected value for ' . $key);
         }
       }
     }
@@ -632,19 +640,78 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Implement merge hook, prioritising address details of most recent donor.
+   * Test hook allowing modification of the data calculated for merging locations.
    *
-   * @param string $type
-   * @param array $data
+   * We are testing a nuanced real life situation where the address data of the
+   * most recent donor gets priority - resulting in the primary address being set
+   * to the primary address of the most recent donor and address data on a per
+   * location type basis also being set to the most recent donor. Hook also excludes
+   * a fully matching address with a different location.
+   *
+   * This has been added to the test suite to ensure the code supports more this
+   * type of intervention.
+   *
+   * @param array $blocksDAO
+   *   Array of location DAO to be saved. These are arrays in 2 keys 'update' & 'delete'.
    * @param int $mainId
+   *   Contact_id of the contact that survives the merge.
    * @param int $otherId
-   * @param array $tables
+   *   Contact_id of the contact that will be absorbed and deleted.
+   * @param array $migrationInfo
+   *   Calculated migration info, informational only.
+   *
+   * @return mixed
    */
-  public function hookMostRecentDonor($type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL) {
-    if ($type != 'batch') {
-      return;
+  public function hookMostRecentDonor(&$blocksDAO, $mainId, $otherId, $migrationInfo) {
+
+    $lastDonorID = $this->callAPISuccessGetValue('Contribution', array(
+      'return' => 'contact_id',
+      'contact_id' => array('IN' => array($mainId, $otherId)),
+      'options' => array('sort' => 'receive_date DESC', 'limit' => 1),
+    ));
+    // Since the last donor is not the main ID we are prioritising info from the last donor.
+    // In the test this should always be true - but keep the check in case
+    // something changes that we need to detect.
+    if ($lastDonorID != $mainId) {
+      foreach ($migrationInfo['other_details']['location_blocks'] as $blockType => $blocks) {
+        foreach ($blocks as $block) {
+          if ($block['is_primary']) {
+            $primaryAddressID = $block['id'];
+            if (!empty($migrationInfo['main_details']['location_blocks'][$blockType])) {
+              foreach ($migrationInfo['main_details']['location_blocks'][$blockType] as $mainBlock) {
+                if (empty($blocksDAO[$blockType]['update'][$block['id']]) && $mainBlock['location_type_id'] == $block['location_type_id']) {
+                  // This was an address match - we just need to check the is_primary
+                  // is true on the matching kept address.
+                  $primaryAddressID = $mainBlock['id'];
+                  $blocksDAO[$blockType]['update'][$primaryAddressID] = _civicrm_api3_load_DAO($blockType);
+                  $blocksDAO[$blockType]['update'][$primaryAddressID]->id = $primaryAddressID;
+                }
+                $mainLocationTypeID = $mainBlock['location_type_id'];
+                // We also want to be more ruthless about removing matching addresses.
+                unset($mainBlock['location_type_id']);
+                if (CRM_Dedupe_Merger::addressIsSame($block, $mainBlock)
+                  && (!isset($blocksDAO[$blockType]['update']) || !isset($blocksDAO[$blockType]['update'][$mainBlock['id']]))
+                  && (!isset($blocksDAO[$blockType]['delete']) || !isset($blocksDAO[$blockType]['delete'][$mainBlock['id']]))
+                ) {
+                  $blocksDAO[$blockType]['delete'][$mainBlock['id']] = _civicrm_api3_load_DAO($blockType);
+                  $blocksDAO[$blockType]['delete'][$mainBlock['id']]->id = $mainBlock['id'];
+                }
+                // Arguably the right way to handle this is just to set is_primary for the primary
+                // and for the merge fn to call something like BAO::add & hooks to work etc.
+                // if that happens though this should keep working...
+                elseif ($mainBlock['is_primary'] && $mainLocationTypeID != $block['location_type_id']) {
+                  $blocksDAO['address']['update'][$mainBlock['id']] = _civicrm_api3_load_DAO($blockType);
+                  $blocksDAO['address']['update'][$mainBlock['id']]->is_primary = 0;
+                  $blocksDAO['address']['update'][$mainBlock['id']]->id = $mainBlock['id'];
+                }
+
+              }
+              $blocksDAO[$blockType]['update'][$primaryAddressID]->is_primary = 1;
+            }
+          }
+        }
+      }
     }
-    $data = $data;
   }
 
   /**
@@ -757,6 +824,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
           'expected' => array(
             array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
             array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
+          ),
+          'expected_hook' => array(
+            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
+            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
           ),
         ),
       ),
