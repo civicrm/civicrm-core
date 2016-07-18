@@ -1070,33 +1070,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function getRowsElementsAndInfo($mainId, $otherId, $checkPermissions = TRUE) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
-    $fields = CRM_Contact_DAO_Contact::fields();
+    $fields = self::getMergeFieldsMetadata();
 
-    // Fetch contacts
-    foreach (array('main' => $mainId, 'other' => $otherId) as $moniker => $cid) {
-      $params = array(
-        'contact_id' => $cid,
-        'version' => 3,
-        'return' => array_merge(array('display_name'), self::getContactFields()),
-      );
-      $result = civicrm_api('contact', 'get', $params);
-
-      // CRM-18480: Cancel the process if the contact is already deleted
-      if (isset($result['values'][$cid]['contact_is_deleted']) && !empty($result['values'][$cid]['contact_is_deleted'])) {
-        throw new CRM_Core_Exception(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(1 => $moniker, 2 => $cid)));
-      }
-
-      $$moniker = $result['values'][$cid];
-      $specialValues[$moniker] = self::getSpecialValues($result['values'][$cid]);
-    }
-
-    static $optionValueFields = array();
-    if (empty($optionValueFields)) {
-      $optionValueFields = CRM_Core_OptionValue::getFields();
-    }
-    foreach ($optionValueFields as $field => $params) {
-      $fields[$field]['title'] = $params['title'];
-    }
+    $main = self::getMergeContactDetails($mainId, 'main');
+    $other = self::getMergeContactDetails($otherId, 'main');
+    $specialValues['main'] = self::getSpecialValues($main);
+    $specialValues['other'] = self::getSpecialValues($other);
 
     $compareFields = self::retrieveFields($main, $other);
 
@@ -1131,15 +1110,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $label = ts('[x]');
           }
         }
-        elseif ($field == 'individual_prefix' || $field == 'prefix_id') {
+        elseif ($field == 'prefix_id') {
           $label = CRM_Utils_Array::value('individual_prefix', $contact);
-          $value = CRM_Utils_Array::value('prefix_id', $contact);
-          $field = 'prefix_id';
         }
-        elseif ($field == 'individual_suffix' || $field == 'suffix_id') {
+        elseif ($field == 'suffix_id') {
           $label = CRM_Utils_Array::value('individual_suffix', $contact);
-          $value = CRM_Utils_Array::value('suffix_id', $contact);
-          $field = 'suffix_id';
         }
         elseif ($field == 'gender_id' && !empty($value)) {
           $genderOptions = civicrm_api3('contact', 'getoptions', array('field' => 'gender_id'));
@@ -2103,6 +2078,59 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $specialValues['communication_style_id_display'] = $contact['communication_style'];
     }
     return $specialValues;
+  }
+
+  /**
+   * Get the metadata for the merge fields.
+   *
+   * This is basically the contact metadata, augmented with fields to
+   * represent email greeting, postal greeting & addressee.
+   *
+   * @return array
+   */
+  public static function getMergeFieldsMetadata() {
+    if (isset(\Civi::$statics[__CLASS__]) && isset(\Civi::$statics[__CLASS__]['merge_fields_metadata'])) {
+      return \Civi::$statics[__CLASS__]['merge_fields_metadata'];
+    }
+    $fields = CRM_Contact_DAO_Contact::fields();
+    static $optionValueFields = array();
+    if (empty($optionValueFields)) {
+      $optionValueFields = CRM_Core_OptionValue::getFields();
+    }
+    foreach ($optionValueFields as $field => $params) {
+      $fields[$field]['title'] = $params['title'];
+    }
+    \Civi::$statics[__CLASS__]['merge_fields_metadata'] = $fields;
+    return \Civi::$statics[__CLASS__]['merge_fields_metadata'];
+  }
+
+  /**
+   * Get the details of the contact to be merged.
+   *
+   * @param int $contact_id
+   * @param string $moniker
+   *
+   * @return array
+   *
+   * @throws CRM_Core_Exception
+   */
+  public static function getMergeContactDetails($contact_id, $moniker) {
+    $params = array(
+      'contact_id' => $contact_id,
+      'version' => 3,
+      'return' => array_merge(array('display_name'), self::getContactFields()),
+    );
+    $result = civicrm_api('contact', 'get', $params);
+
+    // CRM-18480: Cancel the process if the contact is already deleted
+    if (isset($result['values'][$contact_id]['contact_is_deleted']) && !empty($result['values'][$contact_id]['contact_is_deleted'])) {
+      throw new CRM_Core_Exception(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(
+        1 => $moniker,
+        2 => $contact_id,
+      )));
+    }
+
+    return $result['values'][$contact_id];
   }
 
 }
