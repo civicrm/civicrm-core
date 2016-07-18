@@ -959,7 +959,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return bool
    */
-  static protected function addressIsSame($mainAddress, $comparisonAddress) {
+  static public function addressIsSame($mainAddress, $comparisonAddress) {
     $keysToIgnore = array('id', 'is_primary', 'is_billing', 'manual_geo_code', 'contact_id');
     foreach ($comparisonAddress as $field => $value) {
       if (in_array($field, $keysToIgnore)) {
@@ -1491,7 +1491,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $relTables = CRM_Dedupe_Merger::relTables();
-    $moveTables = $locBlocks = $tableOperations = array();
+    $moveTables = $locationMigrationInfo = $tableOperations = array();
     foreach ($migrationInfo as $key => $value) {
       if ($value == $qfZeroBug) {
         $value = '0';
@@ -1505,23 +1505,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       // Set up initial information for handling migration of location blocks
       elseif (substr($key, 0, 14) == 'move_location_' and $value != NULL) {
-        $locField = explode('_', $key);
-        $fieldName = $locField[2];
-        $fieldCount = $locField[3];
-
-        // Set up the operation type (add/overwrite)
-        // Ignore operation for websites
-        // @todo Tidy this up
-        $operation = 0;
-        if ($fieldName != 'website') {
-          $operation = CRM_Utils_Array::value('operation', $migrationInfo['location_blocks'][$fieldName][$fieldCount]);
-        }
-        // default operation is overwrite.
-        if (!$operation) {
-          $operation = 2;
-        }
-        $locBlocks[$fieldName][$fieldCount]['operation'] = $operation;
-
+        $locationMigrationInfo[$key] = $value;
       }
 
       elseif (substr($key, 0, 15) == 'move_rel_table_' and $value == '1') {
@@ -1535,83 +1519,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
       }
     }
-
-    // **** Do location related migration.
-    // @todo Handle OpenID (not currently in API).
-    if (!empty($locBlocks)) {
-
-      $locationBlocks = self::getLocationBlockInfo();
-
-      $primaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mainId, array('is_primary' => 1));
-      $billingBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mainId, array('is_billing' => 1));
-
-      foreach ($locBlocks as $name => $block) {
-        if (!is_array($block) || CRM_Utils_System::isNull($block)) {
-          continue;
-        }
-        $daoName = 'CRM_Core_DAO_' . $locationBlocks[$name]['label'];
-        $primaryDAOId = (array_key_exists($name, $primaryBlockIds)) ? array_pop($primaryBlockIds[$name]) : NULL;
-        $billingDAOId = (array_key_exists($name, $billingBlockIds)) ? array_pop($billingBlockIds[$name]) : NULL;
-
-        foreach ($block as $blkCount => $values) {
-
-          // For the block which belongs to other-contact, link the location block to main-contact
-          $otherBlockDAO = new $daoName();
-          $otherBlockDAO->contact_id = $mainId;
-
-          // Get the ID of this block on the 'other' contact, otherwise skip
-          $otherBlockId = CRM_Utils_Array::value('id', $migrationInfo['other_details']['location_blocks'][$name][$blkCount]);
-          if (!$otherBlockId) {
-            continue;
-          }
-          $otherBlockDAO->id = $otherBlockId;
-
-          // Add/update location and type information from the form, if applicable
-          if ($locationBlocks[$name]['hasLocation']) {
-            $locTypeId = CRM_Utils_Array::value('locTypeId', $migrationInfo['location_blocks'][$name][$blkCount]);
-            $otherBlockDAO->location_type_id = $locTypeId;
-          }
-          if ($locationBlocks[$name]['hasType']) {
-            $typeTypeId = CRM_Utils_Array::value('typeTypeId', $migrationInfo['location_blocks'][$name][$blkCount]);
-            $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
-          }
-
-          // Get main block ID
-          $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location_blocks'][$name][$blkCount], 0);
-
-          // if main contact already has primary & billing, set the flags to 0.
-          if ($primaryDAOId) {
-            $otherBlockDAO->is_primary = 0;
-          }
-          if ($billingDAOId) {
-            $otherBlockDAO->is_billing = 0;
-          }
-
-          $operation = CRM_Utils_Array::value('operation', $values, 2);
-          // overwrite - need to delete block which belongs to main-contact.
-          if (!empty($mainBlockId) && ($operation == 2)) {
-            $deleteDAO = new $daoName();
-            $deleteDAO->id = $mainBlockId;
-            $deleteDAO->find(TRUE);
-
-            // if we about to delete a primary / billing block, set the flags for new block
-            // that we going to assign to main-contact
-            if ($primaryDAOId && ($primaryDAOId == $deleteDAO->id)) {
-              $otherBlockDAO->is_primary = 1;
-            }
-            if ($billingDAOId && ($billingDAOId == $deleteDAO->id)) {
-              $otherBlockDAO->is_billing = 1;
-            }
-
-            $deleteDAO->delete();
-            $deleteDAO->free();
-          }
-
-          $otherBlockDAO->update();
-          $otherBlockDAO->free();
-        }
-      }
-    }
+    self::mergeLocations($mainId, $otherId, $locationMigrationInfo, $migrationInfo);
 
     // **** Do tables related migrations
     if (!empty($moveTables)) {
@@ -2131,6 +2039,138 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     return $result['values'][$contact_id];
+  }
+
+  /**
+   * Merge location.
+   *
+   * Based on the data in the $locationMigrationInfo merge the locations for 2 contacts.
+   *
+   * The data is in the format received from the merge form (which is a fairly confusing format).
+   *
+   * It is converted into an array of DAOs which is passed to the alterLocationMergeData hook
+   * before saving or deleting the DAOs. A new hook is added to allow these to be altered after they have
+   * been calculated and before saving because
+   * - the existing format & hook combo is so confusing it is hard for developers to change & inherently fragile
+   * - passing to a hook right before save means calculations only have to be done once
+   * - the existing pattern of passing dissimilar data to the same (merge) hook with a different 'type' is just
+   *  ugly.
+   *
+   * The use of the new hook is tested, including the fact it is called before contributions are merged, as this
+   * is likely to be siginificant data in merge hooks.
+   *
+   * @param int $mainId
+   * @param int $otherId
+   * @param array $locationMigrationInfo
+   *   Portion of the migration_info that holds location migration information.
+   *
+   * @param array $migrationInfo
+   *   Migration info for the merge. This is passed to the hook as informational only.
+   */
+  public static function mergeLocations($mainId, $otherId, $locationMigrationInfo, $migrationInfo) {
+    foreach ($locationMigrationInfo as $key => $value) {
+      $locField = explode('_', $key);
+      $fieldName = $locField[2];
+      $fieldCount = $locField[3];
+
+      // Set up the operation type (add/overwrite)
+      // Ignore operation for websites
+      // @todo Tidy this up
+      $operation = 0;
+      if ($fieldName != 'website') {
+        $operation = CRM_Utils_Array::value('operation', $migrationInfo['location_blocks'][$fieldName][$fieldCount]);
+      }
+      // default operation is overwrite.
+      if (!$operation) {
+        $operation = 2;
+      }
+      $locBlocks[$fieldName][$fieldCount]['operation'] = $operation;
+    }
+    $blocksDAO = array();
+
+    // @todo Handle OpenID (not currently in API).
+    if (!empty($locBlocks)) {
+      $locationBlocks = self::getLocationBlockInfo();
+
+      $primaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mainId, array('is_primary' => 1));
+      $billingBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mainId, array('is_billing' => 1));
+
+      foreach ($locBlocks as $name => $block) {
+        $blocksDAO[$name] = array('delete' => array(), 'update' => array());
+        if (!is_array($block) || CRM_Utils_System::isNull($block)) {
+          continue;
+        }
+        $daoName = 'CRM_Core_DAO_' . $locationBlocks[$name]['label'];
+        $primaryDAOId = (array_key_exists($name, $primaryBlockIds)) ? array_pop($primaryBlockIds[$name]) : NULL;
+        $billingDAOId = (array_key_exists($name, $billingBlockIds)) ? array_pop($billingBlockIds[$name]) : NULL;
+
+        foreach ($block as $blkCount => $values) {
+          $otherBlockId = CRM_Utils_Array::value('id', $migrationInfo['other_details']['location_blocks'][$name][$blkCount]);
+          $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location_blocks'][$name][$blkCount], 0);
+          if (!$otherBlockId) {
+            continue;
+          }
+
+          // For the block which belongs to other-contact, link the location block to main-contact
+          $otherBlockDAO = new $daoName();
+          $otherBlockDAO->contact_id = $mainId;
+
+          // Get the ID of this block on the 'other' contact, otherwise skip
+          $otherBlockDAO->id = $otherBlockId;
+
+          // Add/update location and type information from the form, if applicable
+          if ($locationBlocks[$name]['hasLocation']) {
+            $locTypeId = CRM_Utils_Array::value('locTypeId', $migrationInfo['location_blocks'][$name][$blkCount]);
+            $otherBlockDAO->location_type_id = $locTypeId;
+          }
+          if ($locationBlocks[$name]['hasType']) {
+            $typeTypeId = CRM_Utils_Array::value('typeTypeId', $migrationInfo['location_blocks'][$name][$blkCount]);
+            $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
+          }
+
+          // if main contact already has primary & billing, set the flags to 0.
+          if ($primaryDAOId) {
+            $otherBlockDAO->is_primary = 0;
+          }
+          if ($billingDAOId) {
+            $otherBlockDAO->is_billing = 0;
+          }
+
+          $operation = CRM_Utils_Array::value('operation', $values, 2);
+          // overwrite - need to delete block which belongs to main-contact.
+          if (!empty($mainBlockId) && ($operation == 2)) {
+            $deleteDAO = new $daoName();
+            $deleteDAO->id = $mainBlockId;
+            $deleteDAO->find(TRUE);
+
+            // if we about to delete a primary / billing block, set the flags for new block
+            // that we going to assign to main-contact
+            if ($primaryDAOId && ($primaryDAOId == $deleteDAO->id)) {
+              $otherBlockDAO->is_primary = 1;
+            }
+            if ($billingDAOId && ($billingDAOId == $deleteDAO->id)) {
+              $otherBlockDAO->is_billing = 1;
+            }
+            $blocksDAO[$name]['delete'][$deleteDAO->id] = $deleteDAO;
+          }
+          $blocksDAO[$name]['update'][$otherBlockDAO->id] = $otherBlockDAO;
+        }
+      }
+    }
+
+    CRM_Utils_Hook::alterLocationMergeData($blocksDAO, $mainId, $otherId, $migrationInfo);
+    foreach ($blocksDAO as $blockDAOs) {
+      if (!empty($blockDAOs['update'])) {
+        foreach ($blockDAOs['update'] as $blockDAO) {
+          $blockDAO->save();
+        }
+      }
+      if (!empty($blockDAOs['delete'])) {
+        foreach ($blockDAOs['delete'] as $blockDAO) {
+          $blockDAO->delete();
+        }
+      }
+    }
   }
 
 }
