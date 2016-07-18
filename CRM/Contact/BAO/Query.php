@@ -2159,8 +2159,7 @@ class CRM_Contact_BAO_Query {
       );
     }
     elseif ($name === 'is_deceased') {
-      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $value);
-      $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
+      $this->setQillAndWhere($name, $op, $value, $grouping, $field);
       self::$_openedPanes[ts('Demographics')] = TRUE;
     }
     elseif ($name === 'created_date' || $name === 'modified_date' || $name === 'deceased_date' || $name === 'birth_date') {
@@ -2237,14 +2236,12 @@ class CRM_Contact_BAO_Query {
         $value = self::getWildCardedValue($wildcard, $op, $value);
       }
 
-      $wc = 'civicrm_website.url';
-      $this->_where[$grouping][] = $d = self::buildClause($wc, $op, $value);
+      $this->_where[$grouping][] = $d = self::buildClause('civicrm_website.url', $op, $value);
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
+      $this->setQillAndWhere('is_deleted', $op, $value, $grouping, $field);
     }
     elseif ($name === 'contact_is_deleted') {
-      $this->_where[$grouping][] = self::buildClause("contact_a.is_deleted", $op, $value);
-      list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
-      $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
+      $this->setQillAndWhere('is_deleted', $op, $value, $grouping, $field);
     }
     elseif (!empty($field['where'])) {
       $type = NULL;
@@ -6162,6 +6159,29 @@ AND   displayRelType.is_active = 1
     // Note that groups that the user does not have permission to will be excluded (good).
     $groups = array_intersect_key($allGroups, array_flip($groupIDs));
     return implode(', ', $groups);
+
+  }
+
+  /**
+   * Set the qill and where properties for a field.
+   *
+   * This function is intended as a short-term function to encourage refactoring
+   * & re-use - but really we should just have less special-casing.
+   *
+   * @param string $name
+   * @param string $op
+   * @param string|array $value
+   * @param string $grouping
+   * @param string $field
+   */
+  public function setQillAndWhere($name, $op, $value, $grouping, $field) {
+    $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $value);
+    list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
+    $this->_qill[$grouping][] = ts("%1 %2 %3", array(
+      1 => $field['title'],
+      2 => $qillop,
+      3 => $qillVal,
+    ));
   }
 
 }
