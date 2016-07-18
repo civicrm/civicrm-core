@@ -359,7 +359,7 @@ class CRM_Contact_Import_ImportJob {
 
     if ($newGroupName) {
       /* Create a new group */
-
+      $newGroupType = isset($newGroupType) ? $newGroupType : array();
       $gParams = array(
         'title' => $newGroupName,
         'description' => $newGroupDesc,
