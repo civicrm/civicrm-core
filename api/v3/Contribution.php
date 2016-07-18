@@ -630,6 +630,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   if (!empty($params['trxn_date'])) {
     $input['trxn_date'] = $params['trxn_date'];
   }
+  if (!empty($params['receive_date'])) {
+    $input['receive_date'] = $params['receive_date'];
+  }
   if (empty($contribution->contribution_page_id)) {
     static $domainFromName;
     static $domainFromEmail;

@@ -57,7 +57,7 @@ INNER JOIN civicrm_contact ct ON ( cc.contact_id = ct.id)
 LEFT  JOIN civicrm_option_value ov ON (cs.status_id = ov.value AND ov.option_group_id = {$statusId} )
 WHERE cs.id IN ( {$caseIDs} )";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $rows[] = array(
         'display_name' => $dao->display_name,

@@ -115,7 +115,11 @@ class CRM_Utils_Geocode_Google {
       $add .= '+' . urlencode(str_replace('', '+', $values['country']));
     }
 
-    $query = 'http://' . self::$_server . self::$_uri . $add;
+    if (!empty($config->geoAPIKey)) {
+      $add .= '&key=' . urlencode($config->geoAPIKey);
+    }
+
+    $query = 'https://' . self::$_server . self::$_uri . $add;
 
     require_once 'HTTP/Request.php';
     $request = new HTTP_Request($query);
@@ -124,6 +128,7 @@ class CRM_Utils_Geocode_Google {
 
     libxml_use_internal_errors(TRUE);
     $xml = @simplexml_load_string($string);
+    CRM_Utils_Hook::geocoderFormat('Google', $values, $xml);
     if ($xml === FALSE) {
       // account blocked maybe?
       CRM_Core_Error::debug_var('Geocoding failed.  Message from Google:', $string);

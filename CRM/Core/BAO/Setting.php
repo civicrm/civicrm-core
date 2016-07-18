@@ -235,8 +235,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   name => value array of the fields to be set (with extraneous removed)
    */
   public static function validateSettingsInput($params, &$fields, $createMode = TRUE) {
-    $group = CRM_Utils_Array::value('group', $params);
-
     $ignoredParams = array(
       'version',
       'id',
@@ -255,6 +253,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       'check_permissions',
       'options',
       'prettyprint',
+      // CRM-18347: ignore params unintentionally passed by API explorer on WP
+      'page',
+      'noheader',
+      // CRM-18347: ignore params unintentionally passed by wp CLI tool
+      '',
     );
     $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
     $getFieldsParams = array('version' => 3);

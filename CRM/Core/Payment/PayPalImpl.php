@@ -337,10 +337,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $params['pending_reason'] = $result['pendingreason'];
     if (!empty($params['is_recur'])) {
       // See comment block.
-      $result['payment_status_id'] = array_search('Pending', $statuses);
+      $params['payment_status_id'] = array_search('Pending', $statuses);
     }
     else {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $params['payment_status_id'] = array_search('Completed', $statuses);
     }
     return $params;
   }
@@ -980,7 +980,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     //setting the curl parameters.
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_VERBOSE, 1);
+    curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
     //turning off the server and peer verification(TrustManager Concept).
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));

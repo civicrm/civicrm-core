@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviReportTestCase.php';
-
 /**
  *  Test report outcome
  *

@@ -864,6 +864,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->add('text', $elementName . '_to', ts('To'), $field->attributes);
         }
         else {
+          if ($field->text_length) {
+            $field->attributes .= ' maxlength=' . $field->text_length;
+            if ($field->text_length < 20) {
+              $field->attributes .= ' size=' . $field->text_length;
+            }
+          }
           $element = $qf->add('text', $elementName, $label,
             $field->attributes,
             $useRequired && !$search
@@ -898,10 +904,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Select Date':
         $attr = array('data-crm-custom' => $dataCrmCustomVal);
+        //CRM-18379: Fix for date range of 'Select Date' custom field when include in profile.
+        $minYear = isset($field->start_date_years) ? (date('Y') - $field->start_date_years) : NULL;
+        $maxYear = isset($field->end_date_years) ? (date('Y') + $field->end_date_years) : NULL;
+
         $params = array(
           'date' => $field->date_format,
-          'minDate' => isset($field->start_date_years) ? (date('Y') - $field->start_date_years) . '-01-01' : NULL,
-          'maxDate' => isset($field->end_date_years) ? (date('Y') + $field->end_date_years) . '-01-01' : NULL,
+          'minDate' => isset($minYear) ? $minYear . '-01-01' : NULL,
+          //CRM-18487 - max date should be the last date of the year.
+          'maxDate' => isset($maxYear) ? $maxYear . '-12-31' : NULL,
           'time' => $field->time_format ? $field->time_format * 12 : FALSE,
         );
         if ($field->is_search_range && $search) {
@@ -1002,7 +1013,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($field->text_length) {
           $attributes['maxlength'] = $field->text_length;
         }
-        $element = $qf->add('wysiwyg', $elementName, $label, $attributes, $search);
+        $element = $qf->add('wysiwyg', $elementName, $label, $attributes, $useRequired && !$search);
         break;
 
       case 'Autocomplete-Select':
@@ -1244,6 +1255,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'TextArea':
         $display = nl2br($display);
+        break;
+
+      case 'Text':
+        if ($field['data_type'] == 'Money' && isset($value)) {
+          //$value can also be an array(while using IN operator from search builder or api).
+          foreach ((array) $value as $val) {
+            $disp[] = CRM_Utils_Money::format($val, NULL, NULL, TRUE);
+          }
+          $display = implode(', ', $disp);
+        }
         break;
     }
     return $display;
@@ -1662,7 +1683,7 @@ SELECT $columnName
 
       $fileDAO->uri = $filename;
       $fileDAO->mime_type = $mimeType;
-      $fileDAO->upload_date = date('Ymdhis');
+      $fileDAO->upload_date = date('YmdHis');
       $fileDAO->save();
       $fileId = $fileDAO->id;
       $value = $filename;

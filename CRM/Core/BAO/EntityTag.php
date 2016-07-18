@@ -116,8 +116,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $entityTag->delete();
 
     //invoke post hook on entityTag
-    $object = array(0 => array(0 => $params['entity_id']), 1 => $params['entity_table']);
-    CRM_Utils_Hook::post('delete', 'EntityTag', $params['tag_id'], $object);
+    if (!empty($params['tag_id'])) {
+      $object = array(0 => array(0 => $params['entity_id']), 1 => $params['entity_table']);
+      CRM_Utils_Hook::post('delete', 'EntityTag', $params['tag_id'], $object);
+    }
   }
 
   /**
@@ -166,9 +168,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $object = array($entityIdsAdded, $entityTable);
     CRM_Utils_Hook::post('create', 'EntityTag', $tagId, $object);
 
-    // reset the group contact cache for all groups
-    // if tags are being used in a smart group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     return array(count($entityIds), $numEntitiesAdded, $numEntitiesNotAdded);
   }
@@ -242,9 +242,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $object = array($entityIdsRemoved, $entityTable);
     CRM_Utils_Hook::post('delete', 'EntityTag', $tagId, $object);
 
-    // reset the group contact cache for all groups
-    // if tags are being used in a smart group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     return array(count($entityIds), $numEntitiesRemoved, $numEntitiesNotRemoved);
   }

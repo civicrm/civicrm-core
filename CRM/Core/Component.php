@@ -95,7 +95,11 @@ class CRM_Core_Component {
       $cr->find(FALSE);
       while ($cr->fetch()) {
         $infoClass = $cr->namespace . '_' . self::COMPONENT_INFO_CLASS;
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php';
+        $infoClassFile = str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php';
+        if (!CRM_Utils_File::isIncludable($infoClassFile)) {
+          continue;
+        }
+        require_once $infoClassFile;
         $infoObject = new $infoClass($cr->name, $cr->namespace, $cr->id);
         if ($infoObject->info['name'] !== $cr->name) {
           CRM_Core_Error::fatal("There is a discrepancy between name in component registry and in info file ({$cr->name}).");

@@ -80,7 +80,7 @@
         fname += subName;
       }
 
-      CRM.loadPage(dataUrl, {target: fname});
+      return CRM.loadPage(dataUrl, {target: fname});
     };
   })(CRM.$);
 </script>

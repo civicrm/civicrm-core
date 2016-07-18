@@ -323,6 +323,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       unset($select['joinDate']);
       unset($this->_columnHeaders["civicrm_membership_member_join_date"]);
     }
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -362,13 +363,14 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
                 !empty($this->_params['group_bys_freq'][$fieldName])
               ) {
 
-                $append = "YEAR({$field['dbAlias']}),";
+                $append = "YEAR({$field['dbAlias']})";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
                   array('year')
                 )) {
                   $append = '';
                 }
-                $this->_groupBy[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                $this->_groupBy[] = $append;
+                $this->_groupBy[] = "{$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
                 $append = TRUE;
               }
               else {
@@ -380,11 +382,12 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       }
 
       $this->_rollup = ' WITH ROLLUP';
-      $this->_groupBy = 'GROUP BY ' . implode(', ', $this->_groupBy) .
+      $this->appendSelect($this->_selectClauses, array_filter($this->_groupBy));
+      $this->_groupBy = 'GROUP BY ' . implode(', ', array_filter($this->_groupBy)) .
         " {$this->_rollup} ";
     }
     else {
-      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_membership']}.join_date";
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_membership']}.join_date");
     }
   }
 

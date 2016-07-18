@@ -1,6 +1,6 @@
 <!--
 Controller: EditMailingCtrl
-Required vars: mailing
+Required vars: mailing, attachments
 -->
 <div>
   <div class="crm-block" ng-form="reviewForm" crm-ui-id-scope>
@@ -24,18 +24,18 @@ Required vars: mailing
       <div crm-ui-field="{title: ts('Content')}">
         <span ng-show="mailing.body_html"><a crm-icon="fa-television" class="crm-hover-button action-item" ng-click="previewMailing(mailing, 'html')">{{ts('HTML')}}</a></span>
         <span ng-show="mailing.body_html || mailing.body_text"><a crm-icon="fa-file-text-o" class="crm-hover-button action-item" ng-click="previewMailing(mailing, 'text')">{{ts('Plain Text')}}</a></span>
-        <!-- TODO: attachments -->
       </div>
-      <div crm-ui-field="{title: ts('Attachments')}" ng-show="attachments.files.length > 0 || attachments.uploader.queue.length > 0">
+      <div crm-ui-field="{title: ts('Attachments')}">
         <div ng-repeat="file in attachments.files">
           <a ng-href="{{file.url}}" target="_blank">{{file.name}}</a>
         </div>
         <div ng-repeat="item in attachments.uploader.queue">
           {{item.file.name}}
         </div>
+        <div ng-show="!attachments.files.length && !attachments.uploader.queue.length"><em>{{ts('None')}}</em></div>
       </div>
       <div crm-ui-field="{title: ts('Tracking')}">
-        <span crm-mailing-review-bool crm-on="mailing.url_tracking=='1'" crm-title="ts('Click Throughs')"></span>
+        <span crm-mailing-review-bool crm-on="mailing.url_tracking=='1'" crm-title="ts('Click-Throughs')"></span>
         <span crm-mailing-review-bool crm-on="mailing.open_tracking=='1'" crm-title="ts('Opens')"></span>
       </div>
       <div crm-ui-field="{title: ts('Responding')}">

@@ -44,6 +44,12 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
    */
   protected $_batchStatusId;
 
+  /**
+   * Batch status name.
+   * @string
+   */
+  protected $_batchStatus;
+
   public function preProcess() {
     // This reuses some styles from search forms
     CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
@@ -52,7 +58,15 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
       $this->_batchStatusId = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
+      $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name', 'condition' => " v.value={$this->_batchStatusId}"));
+      $this->_batchStatus = $batchStatuses[$this->_batchStatusId];
       $this->assign('statusID', $this->_batchStatusId);
+      $this->assign('batchStatus', $this->_batchStatus);
+      $validStatus = FALSE;
+      if (in_array($this->_batchStatus, array('Open', 'Reopened'))) {
+        $validStatus = TRUE;
+      }
+      $this->assign('validStatus', $validStatus);
 
       $batchTitle = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'title');
       CRM_Utils_System::setTitle(ts('Accounting Batch - %1', array(1 => $batchTitle)));
@@ -76,12 +90,12 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_batchStatusId == 2) {
+    if ($this->_batchStatus == 'Closed') {
       $this->add('submit', 'export_batch', ts('Export Batch'));
     }
 
-    // do not build rest of form unless it is open batch
-    if ($this->_batchStatusId != 1) {
+    // do not build rest of form unless it is open/reopened batch
+    if (!in_array($this->_batchStatus, array('Open', 'Reopened'))) {
       return;
     }
 
@@ -158,8 +172,8 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   }
 
   public function setDefaultValues() {
-    // do not setdefault unless it is open batch
-    if ($this->_batchStatusId != 1) {
+    // do not setdefault unless it is open/reopened batch
+    if (!in_array($this->_batchStatus, array('Open', 'Reopened'))) {
       return;
     }
     if (isset(self::$_entityID)) {

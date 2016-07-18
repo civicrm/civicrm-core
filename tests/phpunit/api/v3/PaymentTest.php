@@ -310,7 +310,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $payment['id'],
       'check_permissions' => TRUE,
     );
-    $payment = $this->callAPIFailure('payment', 'cancel', $cancelParams, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and edit contributions');
+    $payment = $this->callAPIFailure('payment', 'cancel', $cancelParams, 'API permission check failed for Payment/cancel call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
 
@@ -346,7 +346,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $payment['id'],
       'check_permissions' => TRUE,
     );
-    $payment = $this->callAPIFailure('payment', 'delete', $deleteParams, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and delete in CiviContribute');
+    $payment = $this->callAPIFailure('payment', 'delete', $deleteParams, 'API permission check failed for Payment/delete call; insufficient permission: require access CiviCRM and access CiviContribute and delete in CiviContribute');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'delete in CiviContribute');
     $this->callAPIAndDocument('payment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
@@ -402,7 +402,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $payment['id'],
       'check_permissions' => TRUE,
     );
-    $payment = $this->callAPIFailure('payment', 'create', $params, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and edit contributions');
+    $payment = $this->callAPIFailure('payment', 'create', $params, 'API permission check failed for Payment/create call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');

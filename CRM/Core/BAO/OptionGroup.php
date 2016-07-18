@@ -141,4 +141,30 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
     return $optionGroup->name;
   }
 
+  /**
+   * Ensure an option group exists.
+   *
+   * This function is intended to be called from the upgrade script to ensure
+   * that an option group exists, without hitting an error if it already exists.
+   *
+   * This is sympathetic to sites who might pre-add it.
+   *
+   * @param array $params
+   *
+   * @return int
+   *   ID of the option group.
+   */
+  public static function ensureOptionGroupExists($params) {
+    $existingValues = civicrm_api3('OptionGroup', 'get', array(
+      'name' => $params['name'],
+    ));
+    if (!$existingValues['count']) {
+      $result = civicrm_api3('OptionGroup', 'create', $params);
+      return $result['id'];
+    }
+    else {
+      return $existingValues['id'];
+    }
+  }
+
 }

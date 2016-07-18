@@ -505,7 +505,6 @@ WHERE  civicrm_pledge.id = %2
    * will be the 15th of the relevant month. Then to calculate the payments you can use intervalAdd ie.
    * CRM_Utils_Date::intervalAdd( $params['frequency_unit'], $i * ($params['frequency_interval']) , calculateBaseScheduledDate( &$params )))
    *
-   *
    * @param array $params
    *
    * @return array
@@ -521,9 +520,12 @@ WHERE  civicrm_pledge.id = %2
     // frequency day is not applicable for daily installments
     if ($params['frequency_unit'] != 'day' && $params['frequency_unit'] != 'year') {
       if ($params['frequency_unit'] != 'week') {
-
-        // for month use day of next month as next payment date
+        // CRM-18316: To calculate pledge scheduled dates at the end of a month.
         $date['day'] = $params['frequency_day'];
+        $lastDayOfMonth = date('t', mktime(0, 0, 0, $date['month'], 1, $date['year']));
+        if ($lastDayOfMonth < $date['day']) {
+          $date['day'] = $lastDayOfMonth;
+        }
       }
       elseif ($params['frequency_unit'] == 'week') {
 
@@ -559,13 +561,32 @@ WHERE  civicrm_pledge.id = %2
    *   formatted date
    */
   public static function calculateNextScheduledDate(&$params, $paymentNo, $basePaymentDate = NULL) {
+    $interval = $paymentNo * ($params['frequency_interval']);
     if (!$basePaymentDate) {
       $basePaymentDate = self::calculateBaseScheduleDate($params);
     }
+
+    //CRM-18316 - change $basePaymentDate for the end dates of the month eg: 29, 30 or 31.
+    if ($params['frequency_unit'] == 'month' && in_array($params['frequency_day'], array(29, 30, 31))) {
+      $frequency = $params['frequency_day'];
+      extract(date_parse($basePaymentDate));
+      $lastDayOfMonth = date('t', mktime($hour, $minute, $second, $month + $interval, 1, $year));
+      // Take the last day in case the current month is Feb or frequency_day is set to 31.
+      if (in_array($lastDayOfMonth, array(28, 29)) || $frequency == 31) {
+        $frequency = 0;
+        $interval++;
+      }
+      $basePaymentDate = array(
+        'M' => $month,
+        'd' => $frequency,
+        'Y' => $year,
+      );
+    }
+
     return CRM_Utils_Date::format(
       CRM_Utils_Date::intervalAdd(
         $params['frequency_unit'],
-        $paymentNo * ($params['frequency_interval']),
+        $interval,
         $basePaymentDate
       )
     );

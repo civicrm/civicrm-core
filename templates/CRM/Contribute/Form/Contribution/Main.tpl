@@ -112,6 +112,17 @@
           {/if}
           {$form.pledge_frequency_unit.html}<span id="pledge_installments_num">&nbsp;{ts}for{/ts}&nbsp;{$form.pledge_installments.html}&nbsp;{ts}installments.{/ts}</span>
         </div>
+	<div class="clear"></div>
+	{if $start_date_editable}
+          {if $is_date}
+	    <div class="label">{$form.start_date.label}</div><div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
+	  {else}
+            <div class="label">{$form.start_date.label}</div><div class="content">{$form.start_date.html}</div>
+	  {/if}
+        {else}
+          <div class="label">{$form.start_date.label}</div>
+          <div class="content">{$start_date_display|date_format}</div>
+        {/if}
         <div class="clear"></div>
       </div>
       {/if}
@@ -300,32 +311,6 @@
   {/if}
 
   {literal}
-  if ({/literal}"{$form.is_recur}"{literal}) {
-    if (document.getElementsByName("is_recur")[0].checked == true) {
-      window.onload = function() {
-        enablePeriod();
-      }
-    }
-  }
-
-  function enablePeriod ( ) {
-    var frqInt  = {/literal}"{$form.frequency_interval}"{literal};
-    if ( document.getElementsByName("is_recur")[0].checked == true ) {
-      //get back to auto renew settings.
-      var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
-      if ( allowAutoRenew && cj("#auto_renew") ) {
-        showHideAutoRenew( null );
-      }
-    }
-    else {
-      //disabled auto renew settings.
-    var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
-      if ( allowAutoRenew && cj("#auto_renew") ) {
-        cj("#auto_renew").prop('checked', false );
-        cj('#allow_auto_renew').hide( );
-      }
-    }
-  }
 
   cj('input[name="soft_credit_type_id"]').on('change', function() {
     enableHonorType();
@@ -342,16 +327,22 @@
   }
 
   cj('input[id="is_recur"]').on('change', function() {
-    showRecurHelp();
+    toggleRecur();
   });
 
-  function showRecurHelp( ) {
-    var showHelp = cj('input[id="is_recur"]:checked');
-    if ( showHelp.val() > 0) {
+  function toggleRecur( ) {
+    var isRecur = cj('input[id="is_recur"]:checked');
+    var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
+    if ( allowAutoRenew && cj("#auto_renew") ) {
+      showHideAutoRenew( null );
+    }
+    if (isRecur.val() > 0) {
       cj('#recurHelp').show();
+      cj('#amount_sum_label').text(ts('Regular amount'));
     }
     else {
       cj('#recurHelp').hide();
+      cj('#amount_sum_label').text(ts('Total amount'));
     }
   }
 
@@ -381,7 +372,7 @@
 
   CRM.$(function($) {
     enableHonorType();
-    showRecurHelp();
+    toggleRecur();
     skipPaymentMethod();
   });
 

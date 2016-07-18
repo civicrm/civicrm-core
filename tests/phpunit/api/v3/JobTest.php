@@ -88,7 +88,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
-    $result = $this->callAPIFailure('job', 'create', $params);
+    $this->callAPIFailure('job', 'create', $params);
   }
 
   /**
@@ -294,6 +294,356 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
+  }
+
+  /**
+   * Test the batch merge function.
+   *
+   * We are just checking it returns without error here.
+   */
+  public function testBatchMerge() {
+    $this->callAPISuccess('Job', 'process_batch_merge', array());
+  }
+
+  /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeWorks($dataSet) {
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
+    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
+    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
+    $result = $this->callAPISuccess('Contact', 'get', array('contact_sub_type' => 'Student', 'sequential' => 1));
+    $this->assertEquals(count($dataSet['expected']), $result['count']);
+    foreach ($dataSet['expected'] as $index => $contact) {
+      foreach ($contact as $key => $value) {
+        $this->assertEquals($value, $result['values'][$index][$key]);
+      }
+    }
+  }
+
+  /**
+   * Test the batch merge does not create duplicate emails.
+   *
+   * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
+   */
+  public function testBatchMergeEmailHandling() {
+    for ($x = 0; $x <= 4; $x++) {
+      $id = $this->individualCreate(array('email' => 'batman@gotham.met'));
+    }
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals(4, count($result['values']['merged']));
+    $this->callAPISuccessGetCount('Contact', array('email' => 'batman@gotham.met'), 1);
+    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 1));
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'batman@gotham.met',
+      'contact_id' => array('IN' => array_keys($contacts['values'])),
+    ), 1);
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'batman@gotham.met',
+      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
+    ), 4);
+  }
+
+  /**
+   * Test the batch merge does not fatal on an empty rule.
+   *
+   * @dataProvider getRuleSets
+   *
+   * @param string $contactType
+   * @param string $used
+   * @param bool $isReserved
+   * @param int $threshold
+   */
+  public function testBatchMergeEmptyRule($contactType, $used, $name, $isReserved, $threshold) {
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+      'contact_type' => $contactType,
+      'threshold' => $threshold,
+      'used' => $used,
+      'name' => $name,
+      'is_reserved' => $isReserved,
+    ));
+    $this->callAPISuccess('Job', 'process_batch_merge', array('rule_group_id' => $ruleGroup['id']));
+    $this->callAPISuccess('RuleGroup', 'delete', array('id' => $ruleGroup['id']));
+  }
+
+  /**
+   * Get the various rule combinations.
+   */
+  public function getRuleSets() {
+    $contactTypes = array('Individual', 'Organization', 'Household');
+    $useds = array('Unsupervised', 'General', 'Supervised');
+    $ruleGroups = array();
+    foreach ($contactTypes as $contactType) {
+      foreach ($useds as $used) {
+        $ruleGroups[] = array($contactType, $used, 'Bob', FALSE, 0);
+        $ruleGroups[] = array($contactType, $used, 'Bob', FALSE, 10);
+        $ruleGroups[] = array($contactType, $used, 'Bob', TRUE, 10);
+        $ruleGroups[] = array($contactType, $used, $contactType . $used, FALSE, 10);
+        $ruleGroups[] = array($contactType, $used, $contactType . $used, TRUE, 10);
+      }
+    }
+    return $ruleGroups;
+  }
+
+  /**
+   * Test the batch merge does not create duplicate emails.
+   *
+   * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
+   */
+  public function testBatchMergeMatchingAddress() {
+    for ($x = 0; $x <= 2; $x++) {
+      $this->individualCreate(array(
+        'api.address.create' => array(
+          'location_type_id' => 'Home',
+          'street_address' => 'Appt 115, The Batcave',
+          'city' => 'Gotham',
+          'postal_code' => 'Nananananana',
+        ),
+      ));
+    }
+    // Different location type, still merge, identical.
+    $this->individualCreate(array(
+      'api.address.create' => array(
+        'location_type_id' => 'Main',
+        'street_address' => 'Appt 115, The Batcave',
+        'city' => 'Gotham',
+        'postal_code' => 'Nananananana',
+      ),
+    ));
+
+    $this->individualCreate(array(
+      'api.address.create' => array(
+        'location_type_id' => 'Home',
+        'street_address' => 'Appt 115, The Batcave',
+        'city' => 'Gotham',
+        'postal_code' => 'Batman',
+      ),
+    ));
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals(3, count($result['values']['merged']));
+    $this->assertEquals(1, count($result['values']['skipped']));
+    $this->callAPISuccessGetCount('Contact', array('street_address' => 'Appt 115, The Batcave'), 2);
+    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 1));
+    $this->callAPISuccessGetCount('Address', array(
+      'street_address' => 'Appt 115, The Batcave',
+      'contact_id' => array('IN' => array_keys($contacts['values'])),
+    ), 3);
+
+    $this->callAPISuccessGetCount('Address', array(
+      'street_address' => 'Appt 115, The Batcave',
+      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
+    ), 2);
+  }
+
+  /**
+   * Test the batch merge by id range.
+   *
+   * We have 2 sets of 5 matches & set the merge only to merge the lower set.
+   */
+  public function testBatchMergeIDRange() {
+    for ($x = 0; $x <= 4; $x++) {
+      $id = $this->individualCreate(array('email' => 'batman@gotham.met'));
+    }
+    for ($x = 0; $x <= 4; $x++) {
+      $this->individualCreate(array('email' => 'robin@gotham.met'));
+    }
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('criteria' => array('contact' => array('id' => array('<' => $id)))));
+    $this->assertEquals(4, count($result['values']['merged']));
+    $this->callAPISuccessGetCount('Contact', array('email' => 'batman@gotham.met'), 1);
+    $this->callAPISuccessGetCount('Contact', array('email' => 'robin@gotham.met'), 5);
+    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'batman@gotham.met',
+      'contact_id' => array('IN' => array_keys($contacts['values'])),
+    ), 1);
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'batman@gotham.met',
+      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
+    ), 1);
+    $this->callAPISuccessGetCount('Email', array(
+      'email' => 'robin@gotham.met',
+      'contact_id' => array('IN' => array_keys($contacts['values'])),
+    ), 5);
+
+  }
+
+  /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeWorksCheckPermissionsTrue($dataSet) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'administer CiviCRM');
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 1, 'mode' => $dataSet['mode']));
+    $this->assertEquals(0, count($result['values']['merged']), 'User does not have permission to any contacts, so no merging');
+    $this->assertEquals(0, count($result['values']['skipped']), 'User does not have permission to any contacts, so no skip visibility');
+  }
+
+  /**
+   * Test the batch merge function actually works!
+   *
+   * @dataProvider getMergeSets
+   *
+   * @param $dataSet
+   */
+  public function testBatchMergeWorksCheckPermissionsFalse($dataSet) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit my contact');
+    foreach ($dataSet['contacts'] as $params) {
+      $this->callAPISuccess('Contact', 'create', $params);
+    }
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => $dataSet['mode']));
+    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
+    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
+  }
+
+  /**
+   * Get data for batch merge.
+   */
+  public function getMergeSets() {
+    $data = array(
+      array(
+        array(
+          'mode' => 'safe',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+            ),
+          ),
+          'skipped' => 0,
+          'merged' => 1,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+            ),
+          ),
+        ),
+      ),
+      array(
+        array(
+          'mode' => 'safe',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'bigger house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+          ),
+          'skipped' => 1,
+          'merged' => 0,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'street_address' => 'big house',
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'street_address' => 'bigger house',
+            ),
+          ),
+        ),
+      ),
+      array(
+        array(
+          'mode' => 'aggressive',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'big house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Address.create' => array(
+                'street_address' => 'bigger house',
+                'location_type_id' => 'Home',
+              ),
+            ),
+          ),
+          'skipped' => 0,
+          'merged' => 1,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'street_address' => 'big house',
+            ),
+          ),
+        ),
+      ),
+    );
+    return $data;
   }
 
   /**

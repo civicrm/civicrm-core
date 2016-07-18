@@ -59,8 +59,8 @@
 
 {if $SMSTask}
     <tr class="crm-contactPhone-form-block-template">
-        <td class="label">{$form.template.label}</td>
-        <td>{$form.template.html}</td>
+        <td class="label">{$form.SMStemplate.label}</td>
+        <td>{$form.SMStemplate.html}</td>
     </tr>
 {/if}
 

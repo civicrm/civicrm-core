@@ -99,9 +99,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $params['discountAmount'] = $this->_params[0]['discountAmount'];
           $params['discountMessage'] = $this->_params[0]['discountMessage'];
         }
-        if (!empty($this->_params[0]['amount_priceset_level_radio'])) {
-          $params['amount_priceset_level_radio'] = $this->_params[0]['amount_priceset_level_radio'];
-        }
+
         $params['amount_level'] = $this->_params[0]['amount_level'];
         $params['currencyID'] = $this->_params[0]['currencyID'];
 
@@ -1013,6 +1011,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['id'] = $contribID;
     }
 
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      $eventStartDate = CRM_Utils_Array::value(
+        'start_date',
+        CRM_Utils_Array::value(
+          'event',
+          $form->_values
+        )
+      );
+      if ($eventStartDate) {
+        $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
+      }
+    }
     //create an contribution address
     // The concept of contributeMode is deprecated. Elsewhere we use the function processBillingAddress() - although
     // currently that is only inherited by back-office forms.
@@ -1025,7 +1035,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, CRM_Utils_Array::value('amount_priceset_level_radio', $params, NULL));
+    CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
     // process soft credit / pcp pages
     if (!empty($params['pcp_made_through_id'])) {
@@ -1041,6 +1051,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Fix the Location Fields.
    *
+   * @todo Reconcile with the contribution method formatParamsForPaymentProcessor
+   * rather than adding different logic to check when to keep the billing
+   * fields. There might be a difference in handling guest/multiple
+   * participants though.
+   *
    * @param array $params
    * @param array $fields
    * @param CRM_Core_Form $form
@@ -1052,6 +1067,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
+    // If there's no 'first_name' in the profile then overwrite the names from
+    // the billing fields (if they are set)
     if (is_array($fields)) {
       if (!array_key_exists('first_name', $fields)) {
         $nameFields = array('first_name', 'middle_name', 'last_name');
@@ -1065,11 +1082,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    // also add location name to the array
-    if ($form->_values['event']['is_monetary']) {
+    // Add the billing names to the billing address, if a billing name is set
+    if (!empty($params['billing_first_name'])) {
       $params["address_name-{$form->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
       $fields["address_name-{$form->_bltID}"] = 1;
     }
+
     $fields["email-{$form->_bltID}"] = 1;
     $fields['email-Primary'] = 1;
 

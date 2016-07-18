@@ -15,25 +15,26 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
    */
   public function testSetGetValuesDate() {
     $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
 
     //create Custom Group
-    $customGroup = Custom::createGroup($params, 'Individual', TRUE);
+    $customGroup = $this->customGroupCreate(array('is_multiple' => 1));
 
     //create Custom Field of data type Date
     $fields = array(
-      'groupId' => $customGroup->id,
-      'dataType' => 'Date',
-      'htmlType' => 'Select Date',
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'Date',
+      'html_type' => 'Select Date',
+      'default_value' => '',
     );
-    $customField = Custom::createField($params, $fields);
+    $customField = $this->customFieldCreate($fields);
 
     // Retrieve the field ID for sample custom field 'test_Date'
     $params = array('label' => 'test_Date');
     $field = array();
 
     CRM_Core_BAO_CustomField::retrieve($params, $field);
-    $fieldID = $field['id'];
+    $fieldID = $customField['id'];
 
     // Set test_Date to a valid date value
     $date = '20080608000000';
@@ -65,10 +66,10 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'custom_' . $fieldID => $badDate,
     );
 
-    $errorScope = CRM_Core_TemporaryErrorScope::useException();
+    CRM_Core_TemporaryErrorScope::useException();
     $message = NULL;
     try {
-      $result = CRM_Core_BAO_CustomValueTable::setValues($params);
+      CRM_Core_BAO_CustomValueTable::setValues($params);
     }
     catch (Exception $e) {
       $message = $e->getMessage();
@@ -104,28 +105,27 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     $this->assertEquals($values['is_error'], 0, 'Verify that is_error = 0 (success).');
 
     // Cleanup
-    Custom::deleteField($customField);
-    Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->customFieldDelete($customField);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
   /**
    * Test setValues() and getValues() methods with custom field YesNo(Boolean) Radio
    */
   public function testSetGetValuesYesNoRadio() {
-    $params = array();
-    $contactID = Contact::createIndividual();
+    $contactID = $this->individualCreate();
 
-    //create Custom Group
-    $customGroup = Custom::createGroup($params, 'Individual', TRUE);
+    $customGroup = $this->customGroupCreate(array('is_multiple' => 1));
 
     //create Custom Field of type YesNo(Boolean) Radio
     $fields = array(
-      'groupId' => $customGroup->id,
-      'dataType' => 'Boolean',
-      'htmlType' => 'Radio',
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'Boolean',
+      'html_type' => 'Radio',
+      'default_value' => '',
     );
-    $customField = Custom::createField($params, $fields);
+    $customField = $this->customFieldCreate($fields);
 
     // Retrieve the field ID for sample custom field 'test_Boolean'
     $params = array('label' => 'test_Boolean');
@@ -134,7 +134,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     //get field Id
     CRM_Core_BAO_CustomField::retrieve($params, $field);
 
-    $fieldID = $field['id'];
+    $fieldID = $customField['id'];
 
     // valid boolean value '1' for Boolean Radio
     $yesNo = '1';
@@ -147,7 +147,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     $this->assertEquals($result['is_error'], 0, 'Verify that is_error = 0 (success).');
 
     // Check that the YesNo radio value is stored
-    $values = array();
     $params = array(
       'entityID' => $contactID,
       'custom_' . $fieldID => 1,
@@ -166,10 +165,10 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'custom_' . $fieldID => $badYesNo,
     );
 
-    $errorScope = CRM_Core_TemporaryErrorScope::useException();
+    CRM_Core_TemporaryErrorScope::useException();
     $message = NULL;
     try {
-      $result = CRM_Core_BAO_CustomValueTable::setValues($params);
+      CRM_Core_BAO_CustomValueTable::setValues($params);
     }
     catch (Exception $e) {
       $message = $e->getMessage();
@@ -190,9 +189,9 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     );
 
     // Cleanup
-    Custom::deleteField($customField);
-    Custom::deleteGroup($customGroup);
-    Contact::delete($contactID);
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
 }

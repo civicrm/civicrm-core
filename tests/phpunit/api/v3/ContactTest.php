@@ -116,6 +116,46 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test for international string acceptance (CRM-10210).
+   *
+   * @dataProvider getInternationalStrings
+   *
+   * @param string $string
+   *   String to be tested.
+   *
+   * @throws \Exception
+   */
+  public function testInternationalStrings($string) {
+    $this->callAPISuccess('Contact', 'create', array_merge(
+      $this->_params,
+      array('first_name' => $string)
+    ));
+    $result = $this->callAPISuccessGetSingle('Contact', array('first_name' => $string));
+    $this->assertEquals($string, $result['first_name']);
+
+    $organizationParams = array(
+      'organization_name' => $string,
+      'contact_type' => 'Organization',
+    );
+
+    $this->callAPISuccess('Contact', 'create', $organizationParams);
+    $result = $this->callAPISuccessGetSingle('Contact', $organizationParams);
+    $this->assertEquals($string, $result['organization_name']);
+  }
+
+  /**
+   * Get international string data for testing against api calls.
+   */
+  public function getInternationalStrings() {
+    $invocations = array();
+    $invocations[] = array('Scarabée');
+    $invocations[] = array('Iñtërnâtiônàlizætiøn');
+    $invocations[] = array('これは日本語のテキストです。読めますか');
+    $invocations[] = array('देखें हिन्दी कैसी नजर आती है। अरे वाह ये तो नजर आती है।');
+    return $invocations;
+  }
+
+  /**
    * Test civicrm_contact_create.
    *
    * Verify that preferred language can be set.
@@ -217,21 +257,39 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Verify that attempt to create individual contact with only an email succeeds.
    */
   public function testCreateEmailIndividual() {
-
+    $primaryEmail = 'man3@yahoo.com';
+    $notPrimaryEmail = 'man4@yahoo.com';
     $params = array(
-      'email' => 'man3@yahoo.com',
+      'email' => $primaryEmail,
       'contact_type' => 'Individual',
       'location_type_id' => 1,
     );
 
-    $contact = $this->callAPISuccess('contact', 'create', $params);
+    $contact1 = $this->callAPISuccess('contact', 'create', $params);
 
-    $this->assertEquals(3, $contact['id']);
-    $email = $this->callAPISuccess('email', 'get', array('contact_id' => $contact['id']));
-    $this->assertEquals(1, $email['count']);
-    $this->assertEquals('man3@yahoo.com', $email['values'][$email['id']]['email']);
+    $this->assertEquals(3, $contact1['id']);
+    $email1 = $this->callAPISuccess('email', 'get', array('contact_id' => $contact1['id']));
+    $this->assertEquals(1, $email1['count']);
+    $this->assertEquals($primaryEmail, $email1['values'][$email1['id']]['email']);
 
-    $this->callAPISuccess('contact', 'delete', $contact);
+    $email2 = $this->callAPISuccess('email', 'create', array('contact_id' => $contact1['id'], 'is_primary' => 0, 'email' => $notPrimaryEmail));
+
+    // Case 1: Check with criteria primary 'email' => array('IS NOT NULL' => 1)
+    $result = $this->callAPISuccess('contact', 'get', array('email' => array('IS NOT NULL' => 1)));
+    $primaryEmailContactIds = array_keys($result['values']);
+    $this->assertEquals($primaryEmail, $email1['values'][$email1['id']]['email']);
+
+    // Case 2: Check with criteria primary 'email' => array('<>' => '')
+    $result = $this->callAPISuccess('contact', 'get', array('email' => array('<>' => '')));
+    $primaryEmailContactIds = array_keys($result['values']);
+    $this->assertEquals($primaryEmail, $email1['values'][$email1['id']]['email']);
+
+    // Case 3: Check with email_id='primary email id'
+    $result = $this->callAPISuccess('contact', 'get', array('email_id' => $email1['id']));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($contact1['id'], $result['id']);
+
+    $this->callAPISuccess('contact', 'delete', $contact1);
   }
 
   /**
@@ -860,20 +918,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that address name is returned if required.
+   * Check that address name, ID is returned if required.
    */
-  public function testGetReturnAddressName() {
+  public function testGetReturnAddress() {
     $contactID = $this->individualCreate();
-    $this->callAPISuccess('address', 'create', array(
+    $result = $this->callAPISuccess('address', 'create', array(
       'contact_id' => $contactID,
       'address_name' => 'My house',
       'location_type_id' => 'Home',
       'street_address' => '1 my road',
     ));
+    $addressID = $result['id'];
+
     $result = $this->callAPISuccessGetSingle('contact', array(
-      'return' => 'address_name, street_address',
+      'return' => 'address_name, street_address, address_id',
       'id' => $contactID,
     ));
+    $this->assertEquals($addressID, $result['address_id']);
     $this->assertEquals('1 my road', $result['street_address']);
     $this->assertEquals('My house', $result['address_name']);
 

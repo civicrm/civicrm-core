@@ -205,6 +205,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select);
   }
@@ -304,7 +305,8 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   public function groupBy() {
     $this->assign('chartSupported', TRUE);
     $this->_rollup = " WITH ROLLUP";
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_event']}.id  {$this->_rollup}";
+    $this->appendSelect($this->_selectClauses, "{$this->_aliases['civicrm_event']}.id");
+    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_event']}.id {$this->_rollup}";
   }
 
   public function postProcess() {

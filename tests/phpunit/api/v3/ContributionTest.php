@@ -541,6 +541,22 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test retrieval by total_amount works.
+   *
+   * @throws Exception
+   */
+  public function testGetContributionByTotalAmount() {
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, array('total_amount' => '5')));
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, array('total_amount' => '10')));
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => 10), 1);
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => array('>' => 6)), 1);
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => array('>' => 0)), 2);
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => array('>' => -5)), 2);
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => array('<' => 0)), 0);
+    $this->callAPISuccessGetCount('Contribution', array(), 2);
+  }
+
+  /**
    * Create test with unique field name on source.
    */
   public function testCreateContributionSource() {
@@ -1594,11 +1610,128 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'amount:::100.00',
       'currency:::USD',
       'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
-      'receipt_date:::' . date('Ymd'),
+      "receipt_date:::\n",
       'contributeMode:::notify',
       'title:::Contribution',
       'displayName:::Mr. Anthony Anderson II',
     ));
+    $mut->stop();
+    $this->revertTemplateToReservedTemplate();
+  }
+
+  /**
+   * Test to ensure mail is sent on chosing pay later
+   */
+  public function testpayLater() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->swapMessageTemplateForTestTemplate();
+    $this->createLoggedInUser();
+
+    // create contribution page first
+    $contributionPageParams = array(
+      'title' => 'Help Support CiviCRM!',
+      'financial_type_id' => 1,
+      'is_monetary' => TRUE,
+      'is_pay_later' => 1,
+      'is_quick_config' => TRUE,
+      'pay_later_text' => 'I will send payment by check',
+      'pay_later_receipt' => 'This is a pay later reciept',
+      'is_allow_other_amount' => 1,
+      'min_amount' => 10.00,
+      'max_amount' => 10000.00,
+      'goal_amount' => 100000.00,
+      'is_email_receipt' => 1,
+      'is_active' => 1,
+      'amount_block_is_active' => 1,
+      'currency' => 'USD',
+      'is_billing_required' => 0,
+    );
+    $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', $contributionPageParams);
+
+    // submit form values
+    $priceSet = $this->callAPISuccess('price_set', 'getsingle', array('name' => 'default_contribution_amount'));
+    $params = array(
+      'id' => $contributionPageResult['id'],
+      'contact_id' => $this->_individualId,
+      'email-5' => 'anthony_anderson@civicrm.org',
+      'payment_processor_id' => 0,
+      'amount' => 100.00,
+      'tax_amount' => '',
+      'currencyID' => 'USD',
+      'is_pay_later' => 1,
+      'invoiceID' => 'f28e1ddc86f8c4a0ff5bcf46393e4bc8',
+      'is_quick_config' => 1,
+      'description' => 'Online Contribution: Help Support CiviCRM!',
+      'price_set_id' => $priceSet['id'],
+    );
+    $this->callAPISuccess('contribution_page', 'submit', $params);
+
+    $mut->checkMailLog(array(
+      'is_pay_later:::1',
+      'email:::anthony_anderson@civicrm.org',
+      'pay_later_receipt:::' . $contributionPageParams['pay_later_receipt'],
+      'displayName:::Mr. Anthony Anderson II',
+      'contributionPageId:::' . $contributionPageResult['id'],
+      'title:::' . $contributionPageParams['title'],
+      'amount:::' . $params['amount'],
+    ));
+    $mut->stop();
+    $this->revertTemplateToReservedTemplate();
+  }
+
+
+  /**
+   * Test to check whether contact billing address is used when no contribution address
+   */
+  public function testBillingAddress() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->swapMessageTemplateForTestTemplate();
+    $this->createLoggedInUser();
+
+    //Scenario 1: When Contact don't have any address
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+    $mut->checkMailLog(array(
+      'address:::',
+    ));
+
+    // Scenario 2: Contribution using address
+    $address = $this->callAPISuccess('address', 'create', array(
+      'street_address' => 'contribution billing st',
+      'location_type_id' => 2,
+      'contact_id' => $this->_params['contact_id'],
+    ));
+    $params = array_merge($this->_params, array(
+      'contribution_status_id' => 2,
+      'address_id' => $address['id'],
+      )
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+    $mut->checkMailLog(array(
+      'address:::contribution billing st',
+    ));
+
+    // Scenario 3: Contribution wtth no address but contact has a billing address
+    $this->callAPISuccess('address', 'create', array(
+      'id' => $address['id'],
+      'street_address' => 'is billing st',
+      'contact_id' => $this->_params['contact_id'],
+    ));
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+    $mut->checkMailLog(array(
+      'address:::is billing st',
+    ));
+
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
   }
@@ -1660,7 +1793,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     unset($lineItem1['values'][0]['id'], $lineItem1['values'][0]['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
-
+    $this->_checkFinancialRecords(array('id' => $originalContribution['id'] + 1), 'online');
     $this->quickCleanUpFinancialEntities();
   }
 
@@ -1991,6 +2124,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-14151 - Test completing a transaction via the API.
    */
   public function testCompleteTransactionWithReceiptDateSet() {
+    $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'receipt_date' => 'now'));
@@ -2001,9 +2135,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
     $mut->checkMailLog(array(
       'Receipt - Contribution',
-      'Please print this confirmation for your records.',
+      'receipt_date:::' . date('Ymd'),
     ));
     $mut->stop();
+    $this->revertTemplateToReservedTemplate();
   }
 
 
@@ -2127,7 +2262,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog(array(
       'amount:::500.00',
       'receive_date:::20130201000000',
-      'receipt_date:::201',
+      "receipt_date:::\n",
     ));
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
@@ -2670,102 +2805,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, CRM_Core_DAO::$_nullArray);
     $this->assertNotEmpty($optionValue['values'][$optionValue['id']]['value']);
     return $optionValue['values'][$optionValue['id']]['value'];
-  }
-
-  /**
-   * @param array $params
-   * @param $context
-   */
-  public function _checkFinancialRecords($params, $context) {
-    $entityParams = array(
-      'entity_id' => $params['id'],
-      'entity_table' => 'civicrm_contribution',
-    );
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $params['id']));
-    $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
-    if ($context == 'pending') {
-      $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
-      $this->assertNull($trxn, 'No Trxn to be created until IPN callback');
-      return;
-    }
-    $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
-    $trxnParams = array(
-      'id' => $trxn['financial_trxn_id'],
-    );
-    if ($context != 'online' && $context != 'payLater') {
-      $compareParams = array(
-        'to_financial_account_id' => 6,
-        'total_amount' => 100,
-        'status_id' => 1,
-      );
-    }
-    if ($context == 'feeAmount') {
-      $compareParams['fee_amount'] = 50;
-    }
-    elseif ($context == 'online') {
-      $compareParams = array(
-        'to_financial_account_id' => 12,
-        'total_amount' => 100,
-        'status_id' => 1,
-      );
-    }
-    elseif ($context == 'payLater') {
-      $compareParams = array(
-        'to_financial_account_id' => 7,
-        'total_amount' => 100,
-        'status_id' => 2,
-      );
-    }
-    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
-    $entityParams = array(
-      'financial_trxn_id' => $trxn['financial_trxn_id'],
-      'entity_table' => 'civicrm_financial_item',
-    );
-    $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
-    $fitemParams = array(
-      'id' => $entityTrxn['entity_id'],
-    );
-    $compareParams = array(
-      'amount' => 100,
-      'status_id' => 1,
-      'financial_account_id' => 1,
-    );
-    if ($context == 'payLater') {
-      $compareParams = array(
-        'amount' => 100,
-        'status_id' => 3,
-        'financial_account_id' => 1,
-      );
-    }
-    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
-    if ($context == 'feeAmount') {
-      $maxParams = array(
-        'entity_id' => $params['id'],
-        'entity_table' => 'civicrm_contribution',
-      );
-      $maxTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($maxParams, TRUE));
-      $trxnParams = array(
-        'id' => $maxTrxn['financial_trxn_id'],
-      );
-      $compareParams = array(
-        'to_financial_account_id' => 5,
-        'from_financial_account_id' => 6,
-        'total_amount' => 50,
-        'status_id' => 1,
-      );
-      $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['id'], 'DESC');
-      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
-      $fitemParams = array(
-        'entity_id' => $trxnId['financialTrxnId'],
-        'entity_table' => 'civicrm_financial_trxn',
-      );
-      $compareParams = array(
-        'amount' => 50,
-        'status_id' => 1,
-        'financial_account_id' => 5,
-      );
-      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
-    }
   }
 
   /**

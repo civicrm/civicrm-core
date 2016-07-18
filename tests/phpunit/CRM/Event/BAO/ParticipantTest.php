@@ -33,8 +33,9 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->_contactId = Contact::createIndividual();
-    $this->_eventId = Event::create($this->_contactId);
+    $this->_contactId = $this->individualCreate();
+    $event = $this->eventCreate();
+    $this->_eventId = $event['id'];
   }
 
   /**
@@ -80,15 +81,15 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'id', 3, 'Check DB for updated status id  of the participant'
     );
 
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
    * GetValues() method (fetch value of participant)
    */
   public function testgetValuesWithValidParams() {
-    $participantId = Participant::create($this->_contactId, $this->_eventId);
+    $participantId = $this->participantCreate(array('contact_id' => $this->_contactId, 'event_id' => $this->_eventId));
     $params = array('id' => $participantId);
     $values = $ids = array();
 
@@ -100,10 +101,10 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'is_test' => 0,
       'is_pay_later' => 0,
       'event_id' => $this->_eventId,
-      'register_date' => date('Y-m-d') . " 00:00:00",
+      'register_date' => '2007-02-19 00:00:00',
       'role_id' => 1,
-      'status_id' => 1,
-      'source' => 'Event_' . $this->_eventId,
+      'status_id' => 2,
+      'source' => 'Wimbeldon',
       'contact_id' => $this->_contactId,
       'id' => $participantId,
       'campaign_id' => NULL,
@@ -115,7 +116,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'discount_amount' => NULL,
       'cart_id' => NULL,
       'must_wait' => NULL,
-      'transferred_to_contact_id' => NULL, //CRM-16761
+      'transferred_to_contact_id' => NULL,
     );
 
     foreach ($compareValues as $key => $value) {
@@ -124,9 +125,9 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       }
     }
 
-    Participant::delete($participantId);
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->participantDelete($participantId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
@@ -134,12 +135,12 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
    */
   public function testgetValuesWithoutValidParams() {
     $params = $values = $ids = array();
-    $participantId = Participant::create($this->_contactId, $this->_eventId);
+    $this->participantCreate(array('contact_id' => $this->_contactId, 'event_id' => $this->_eventId));
     $fetchParticipant = CRM_Event_BAO_Participant::getValues($params, $values, $ids);
     $this->assertNull($fetchParticipant);
 
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
@@ -152,14 +153,14 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     );
     CRM_Event_BAO_Event::add($eventParams);
 
-    $participantId = Participant::create($this->_contactId, $this->_eventId);
+    $participantId = $this->participantCreate(array('contact_id' => $this->_contactId, 'event_id' => $this->_eventId));
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId);
 
-    $this->assertEquals($eventFull, 'This event is full.', 'Checking if Event is full.');
+    $this->assertEquals($eventFull, 'Sorry! We are already full', 'Checking if Event is full.');
 
-    Participant::delete($participantId);
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->participantDelete($participantId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
@@ -169,26 +170,26 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $importableFields = CRM_Event_BAO_Participant::importableFields();
     $this->assertNotEquals(count($importableFields), 0, 'Checking array not to be empty.');
 
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
    * ParticipantDetails() method ( Checking the Participant Details )
    */
   public function testparticipantDetails() {
-    $participantId = Participant::create($this->_contactId, $this->_eventId);
-    $params = array('name' => 'Doe, John', 'title' => 'Test Event');
+    $participant = $this->callAPISuccess('Participant', 'create', array('contact_id' => $this->_contactId, 'event_id' => $this->_eventId));
+    $params = array('name' => 'Anderson, Anthony', 'title' => 'Annual CiviCRM meet');
 
-    $participantDetails = CRM_Event_BAO_Participant::participantDetails($participantId);
+    $participantDetails = CRM_Event_BAO_Participant::participantDetails($participant['id']);
 
     $this->assertEquals(count($participantDetails), 3, 'Equating the array contains.');
     $this->assertEquals($participantDetails['name'], $params['name'], 'Checking Name of Participant.');
     $this->assertEquals($participantDetails['title'], $params['title'], 'Checking Event Title in which participant is enroled.');
 
-    Participant::delete($participantId);
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->participantDelete($participant['id']);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
@@ -218,11 +219,11 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'id', $this->_contactId, 'Check DB for contact of the participant'
     );
 
-    $deleteParticipant = CRM_Event_BAO_Participant::deleteParticipant($participant->id);
+    CRM_Event_BAO_Participant::deleteParticipant($participant->id);
     $this->assertDBNull('CRM_Event_BAO_Participant', $participant->id, 'contact_id', 'id', 'Check DB for deleted Participant.');
 
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
@@ -233,11 +234,11 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
 
     //Creating 3 new participants
     for ($i = 0; $i < 3; $i++) {
-      $partiId[] = Participant::create($this->_contactId, $this->_eventId);
+      $partiId[] = $this->participantCreate(array('contact_id' => $this->_contactId, 'event_id' => $this->_eventId));
     }
 
     $params = array('event_id' => $this->_eventId, 'contact_id' => $this->_contactId);
-    $checkDuplicate = CRM_Event_BAO_Participant::checkDuplicate($params, $duplicate);
+    CRM_Event_BAO_Participant::checkDuplicate($params, $duplicate);
 
     $this->assertEquals(count($duplicate), 3, 'Equating the array contains with duplicate array.');
 
@@ -248,11 +249,11 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
 
     //Deleting all participant
     for ($i = 0; $i < 3; $i++) {
-      $partidel[] = Participant::delete($partiId[$i]);
+      $partidel[] = $this->participantDelete($partiId[$i]);
     }
 
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
@@ -315,13 +316,13 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     }
 
     //Deleting the Participant created by create function in this function
-    $deleteParticipant = CRM_Event_BAO_Participant::deleteParticipant($participant->id);
+    CRM_Event_BAO_Participant::deleteParticipant($participant->id);
     $this->assertDBNull('CRM_Event_DAO_Participant', $this->_contactId, 'id',
       'contact_id', 'Check DB for deleted participant. Should be NULL.'
     );
 
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
@@ -331,8 +332,8 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $exportableFields = CRM_Event_BAO_Participant::exportableFields();
     $this->assertNotEquals(count($exportableFields), 0, 'Checking array not to be empty.');
 
-    Contact::delete($this->_contactId);
-    Event::delete($this->_eventId);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($this->_eventId);
   }
 
   /**
@@ -411,19 +412,19 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       CRM_Event_BAO_Participant::fixEventLevel($values[$participant->id]['fee_level']);
     }
 
-    $deletePricefield = CRM_Price_BAO_PriceField::deleteField($pricefield->id);
+    CRM_Price_BAO_PriceField::deleteField($pricefield->id);
     $this->assertDBNull('CRM_Price_BAO_PriceField', $pricefield->id, 'name',
       'id', 'Check DB for non-existence of Price Field.'
     );
 
-    $deletePriceset = CRM_Price_BAO_PriceSet::deleteSet($priceset->id);
+    CRM_Price_BAO_PriceSet::deleteSet($priceset->id);
     $this->assertDBNull('CRM_Price_BAO_PriceSet', $priceset->id, 'title',
       'id', 'Check DB for non-existence of Price Set.'
     );
 
-    Participant::delete($participant->id);
-    Contact::delete($this->_contactId);
-    Event::delete($eventId);
+    $this->participantDelete($participant->id);
+    $this->contactDelete($this->_contactId);
+    $this->eventDelete($eventId);
   }
 
 }

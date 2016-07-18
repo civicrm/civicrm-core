@@ -210,6 +210,18 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_batch' => array(
+        'dao' => 'CRM_Batch_DAO_EntityBatch',
+        'grouping' => 'contri-fields',
+        'filters' => array(
+          'batch_id' => array(
+            'title' => ts('Batch Title'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Batch_BAO_Batch::getBatches(),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+        ),
+      ),
       'civicrm_contribution_soft' => array(
         'dao' => 'CRM_Contribute_DAO_ContributionSoft',
         'fields' => array(
@@ -387,6 +399,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       }
     }
 
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -463,6 +476,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                             {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
+    if (!empty($this->_params['batch_id_value'])) {
+      $this->_from .= "
+                 LEFT JOIN civicrm_entity_financial_trxn eft
+                        ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
+                           eft.entity_table = 'civicrm_contribution'
+                 LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
+                        ON {$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id AND
+                           {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn'\n";
+    }
     $this->getPermissionedFTQuery($this);
   }
 
@@ -487,7 +509,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 !empty($this->_params['group_bys_freq'][$fieldName])
               ) {
 
-                $append = "YEAR({$field['dbAlias']}),";
+                $append = "YEAR({$field['dbAlias']});;";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
                   array('year')
                 )) {
@@ -515,12 +537,24 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
-      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy) .
-        " {$this->_rollup} ";
+      $groupBy = array();
+      foreach ($this->_groupBy as $key => $val) {
+        if (strpos($val, ';;') !== FALSE) {
+          $groupBy = array_merge($groupBy, explode(';;', $val));
+        }
+        else {
+          $groupBy[] = $this->_groupBy[$key];
+        }
+      }
+      $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
     }
     else {
+      $groupBy = "{$this->_aliases['civicrm_contact']}.id";
       $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id";
     }
+    $this->_groupBy .= $this->_rollup;
+    // append select with ANY_VALUE() keyword
+    $this->appendSelect($this->_selectClauses, $groupBy);
   }
 
   /**
@@ -589,8 +623,10 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     $groupBy = "\n{$group}, {$this->_aliases['civicrm_contribution']}.total_amount";
     $orderBy = "\nORDER BY civicrm_contribution_total_amount_count DESC";
-    $modeSQL = "SELECT civicrm_contribution_total_amount_count, amount, currency
-    FROM (SELECT {$this->_aliases['civicrm_contribution']}.total_amount as amount,
+    $modeSQL = "SELECT MAX(civicrm_contribution_total_amount_count) as civicrm_contribution_total_amount_count,
+      SUBSTRING_INDEX(GROUP_CONCAT(amount ORDER BY mode.civicrm_contribution_total_amount_count DESC SEPARATOR ';'), ';', 1) as amount,
+      currency
+      FROM (SELECT {$this->_aliases['civicrm_contribution']}.total_amount as amount,
     {$contriQuery} {$groupBy} {$orderBy}) as mode GROUP BY currency";
 
     $mode = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);

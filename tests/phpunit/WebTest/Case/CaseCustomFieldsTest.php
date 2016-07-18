@@ -78,7 +78,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $testUserLastName = "Testuserlast";
     $this->type("first_name", $testUserFirstName);
     $this->type("last_name", $testUserLastName);
-    $this->clickLink("_qf_Edit_next", "profilewrap4");
+    $this->clickLink("_qf_Edit_next", "profilewrap4", FALSE);
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
@@ -114,11 +114,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->type("{$cusId_1}", $custFname);
     $this->type("{$cusId_2}", $custMname);
     $this->type("{$cusId_3}", $custLname);
-    $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
+    $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom", FALSE);
 
     // Is status message correct?
     $this->checkCRMAlert("Case opened successfully.");
-    $this->clickLink("_qf_CaseView_cancel-bottom");
+    $this->click("_qf_CaseView_cancel-bottom");
     $this->openCiviPage('case', 'reset=1', "xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
     $this->clickPopupLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
 
@@ -135,6 +135,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       "Priority" => "Normal",
     );
     $this->webtestVerifyTabularData($openCaseData);
+    $this->waitForElementPresent("xpath=//span[@class='ui-button-icon-primary ui-icon fa-times']");
     $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon fa-times']");
 
     // verify if custom data is present
@@ -325,7 +326,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $testUserLastName = "Testuserlast";
     $this->type("first_name", $testUserFirstName);
     $this->type("last_name", $testUserLastName);
-    $this->clickLink("_qf_Edit_next", "profilewrap4");
+    $this->clickLink("_qf_Edit_next", "profilewrap4", FALSE);
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
@@ -358,11 +359,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->type("duration", "20");
     $this->type("{$cusId_1}", $custFname);
     $this->type("{$cusId_2}", $custLname);
-    $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
+    $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom", FALSE);
 
     // Is status message correct?
     $this->checkCRMAlert("Case opened successfully.");
-    $this->clickLink("_qf_CaseView_cancel-bottom");
+    $this->click("_qf_CaseView_cancel-bottom");
 
     $this->openCiviPage('case', 'reset=1');
     $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
@@ -389,7 +390,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
-    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[text()='Manage']", "css=#{$customGrp1} .crm-accordion-header");
+    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[text()='Manage']", "css=#{$customGrp1} .crm-accordion-header", FALSE);
 
     $this->click("css=#{$customGrp1} .crm-accordion-header");
 

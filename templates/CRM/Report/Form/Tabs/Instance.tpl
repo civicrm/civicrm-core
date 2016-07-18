@@ -88,6 +88,12 @@
         <td>{$form.grouprole.html|crmAddClass:huge}</td>
       </tr>
     {/if}
+    <tr class="crm-report-instanceForm-form-block-add-to-my-reports">
+      <td class="report-label">{$form.add_to_my_reports.label} {help id="id-add_to_my_reports" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td>{$form.add_to_my_reports.html}
+        <span class="description">{ts}If set to Yes, this report will appear in the My Reports section of the reports listing page and will only be visible by you.{/ts}</span>
+      </td>
+    </tr>
     <tr class="crm-report-instanceForm-form-block-isReserved">
       <td class="report-label">{$form.is_reserved.label} {help id="id-is_reserved" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
       <td>{$form.is_reserved.html}
@@ -130,53 +136,3 @@
     showHideByValue('is_navigation','','navigation_menu','table-row','radio',false);
   </script>
 {/if}
-
-{literal}
-<script type="text/javascript">
-  CRM.$(function($) {
-    var confirmed = false,
-      formName = {/literal}"{$form.formName}"{literal};
-    $('#_qf_' + formName + '_submit_next, #_qf_' + formName + '_submit_save').click(function() {
-      if ($('#is_navigation').prop('checked') && $('#parent_id').val() == '') {
-        var confirmMsg = {/literal}'{ts escape="js"}You have chosen to include this report in the Navigation Menu without selecting a Parent Menu item from the dropdown. This will add the report to the top level menu bar. Are you sure you want to continue?{/ts}'{literal}
-        return confirm(confirmMsg);
-      }
-    });
-    // Pop-up confirmation when clicking "Save a copy" (submit_next) or "Create Report" (submit_save)
-    var saveAction = $('#_qf_' + formName + '_submit_next').length ? 'next' : 'save';
-    $('#_qf_' + formName + '_submit_' + saveAction).click(function(e) {
-      if (!confirmed) {
-        var $button = $(this),
-          title = 'tr.crm-report-instanceForm-form-block-title',
-          description = 'tr.crm-report-instanceForm-form-block-description';
-        $(title).find($("input[id='title']")).attr('value', $("input[id='title']").val());
-        $(description).find($("input[id='description']")).attr('value', $("input[id='description']").val());
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        CRM.confirm({
-          title: $(this).attr('value'),
-          message: '<table class="form-layout"><tr>' + $(title).html() + '</tr><tr>' + $(description).html() + '</tr></table>',
-          open: function() {
-            var $name = $('[name=title]', this);
-            if (saveAction == 'next') {
-              $name.val('' + $name.val() + ' ' + {/literal}'{ts escape='js'}(copy){/ts}'{literal})
-            }
-          }
-        })
-          .on('crmConfirm:yes', function() {
-            confirmed = true;
-            $('[name=title]', '#' + formName).val($('[name=title]', this).val());
-            $('[name=description]', '#' + formName).val($('[name=description]', this).val());
-            $button.click();
-          })
-          .on('crmConfirm:no', function() {
-            $popUpTitle = $("div.crm-confirm-dialog input[id='title']")
-            $popUpDescription = $("div.crm-confirm-dialog input[id='description']")
-            $(title).find($("input[id='title']")).val($popUpTitle.val());
-            $(description).find($("input[id='description']")).val($popUpDescription.val());
-          });
-      }
-    });
-  });
-</script>
-{/literal}

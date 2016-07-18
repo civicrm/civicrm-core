@@ -193,14 +193,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @param int $groupID
    * @param bool $useCache
+   * @param int $limit
+   *   Number to limit to (or 0 for unlimited).
    *
    * @return array
    *   this array contains the list of members for this group id
    */
-  public static function &getMember($groupID, $useCache = TRUE) {
+  public static function getMember($groupID, $useCache = TRUE, $limit = 0) {
     $params = array(array('group', '=', $groupID, 0, 0));
     $returnProperties = array('contact_id');
-    list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, $useCache);
+    list($contacts) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $limit, $useCache);
 
     $aMembers = array();
     foreach ($contacts as $contact) {
@@ -344,7 +346,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @return CRM_Contact_BAO_Group|NULL
    *   The new group BAO (if created)
    */
-  public static function &create(&$params) {
+  public static function create(&$params) {
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Group', $params['id'], $params);
@@ -458,7 +460,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     if (!empty($params['organization_id'])) {
-      $groupOrg = array();
       $groupOrg = $params;
       $groupOrg['group_id'] = $group->id;
       CRM_Contact_BAO_GroupOrganization::add($groupOrg);
@@ -606,15 +607,20 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   public static function getPermissionClause($force = FALSE) {
     static $clause = 1;
     static $retrieved = FALSE;
-    if ((!$retrieved || $force) && !CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
-      //get the allowed groups for the current user
-      $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
-      if (!empty($groups)) {
-        $groupList = implode(', ', array_values($groups));
-        $clause = "groups.id IN ( $groupList ) ";
+    if (!$retrieved || $force) {
+      if (CRM_Core_Permission::check('view all contacts') || CRM_Core_Permission::check('edit all contacts')) {
+        $clause = 1;
       }
       else {
-        $clause = '1 = 0';
+        //get the allowed groups for the current user
+        $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
+        if (!empty($groups)) {
+          $groupList = implode(', ', array_values($groups));
+          $clause = "groups.id IN ( $groupList ) ";
+        }
+        else {
+          $clause = '1 = 0';
+        }
       }
     }
     $retrieved = TRUE;
@@ -847,7 +853,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           ON createdBy.id = groups.created_id
         {$from}
         WHERE $whereClause {$where}
-        GROUP BY groups.id
         {$orderBy}
         {$limit}";
 

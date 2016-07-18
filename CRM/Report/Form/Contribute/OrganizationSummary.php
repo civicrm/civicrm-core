@@ -247,6 +247,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -328,7 +329,13 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_relationship']}.$this->orgContact, {$this->_aliases['civicrm_relationship']}.$this->otherContact , {$this->_aliases['civicrm_contribution']}.id, {$this->_aliases['civicrm_relationship']}.relationship_type_id ";
+    $groupBy = array(
+      "{$this->_aliases['civicrm_relationship']}.$this->orgContact",
+      "{$this->_aliases['civicrm_relationship']}.$this->otherContact",
+      "{$this->_aliases['civicrm_contribution']}.id",
+      "{$this->_aliases['civicrm_relationship']}.relationship_type_id",
+    );
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {

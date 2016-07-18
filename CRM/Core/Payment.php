@@ -83,13 +83,25 @@ abstract class CRM_Core_Payment {
   protected $_paymentProcessor;
 
   /**
-   * Base url of the calling form.
-   *
-   * This is used for processors that need to return the browser back to the CiviCRM site.
+   * Base url of the calling form (offsite processors).
    *
    * @var string
    */
   protected $baseReturnUrl;
+
+  /**
+   * Return url upon success (offsite processors).
+   *
+   * @var string
+   */
+  protected $successUrl;
+
+  /**
+   * Return url upon failure (offsite processors).
+   *
+   * @var string
+   */
+  protected $cancelUrl;
 
   /**
    * The profile configured to show on the billing form.
@@ -108,13 +120,39 @@ abstract class CRM_Core_Payment {
   protected $billingProfile;
 
   /**
-   * Set Base return URL.
+   * Set base return path (offsite processors).
+   *
+   * This is only useful with an internal civicrm form.
    *
    * @param string $url
-   *   Url of site to return browser to.
+   *   Internal civicrm path.
    */
   public function setBaseReturnUrl($url) {
     $this->baseReturnUrl = $url;
+  }
+
+  /**
+   * Set success return URL (offsite processors).
+   *
+   * This overrides $baseReturnUrl
+   *
+   * @param string $url
+   *   Full url of site to return browser to upon success.
+   */
+  public function setSuccessUrl($url) {
+    $this->successUrl = $url;
+  }
+
+  /**
+   * Set cancel return URL (offsite processors).
+   *
+   * This overrides $baseReturnUrl
+   *
+   * @param string $url
+   *   Full url of site to return browser to upon failure.
+   */
+  public function setCancelUrl($url) {
+    $this->cancelUrl = $url;
   }
 
   /**
@@ -827,6 +865,10 @@ abstract class CRM_Core_Payment {
    * @return string cancel url
    */
   public function getCancelUrl($qfKey, $participantID) {
+    if (isset($this->cancelUrl)) {
+      return $this->cancelUrl;
+    }
+
     if ($this->_component == 'event') {
       return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
         'reset' => 1,
@@ -854,6 +896,10 @@ abstract class CRM_Core_Payment {
    * @return string
    */
   protected function getReturnSuccessUrl($qfKey) {
+    if (isset($this->successUrl)) {
+      return $this->successUrl;
+    }
+
     return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
       '_qf_ThankYou_display' => 1,
       'qfKey' => $qfKey,
@@ -873,6 +919,10 @@ abstract class CRM_Core_Payment {
    *   URL for a failing transactor to be redirected to.
    */
   protected function getReturnFailUrl($key, $participantID = NULL, $eventID = NULL) {
+    if (isset($this->cancelUrl)) {
+      return $this->cancelUrl;
+    }
+
     $test = $this->_is_test ? '&action=preview' : '';
     if ($this->_component == "event") {
       return CRM_Utils_System::url('civicrm/event/register',
@@ -1333,6 +1383,15 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    * @return bool
    */
   public function supportsEditRecurringContribution() {
+    return FALSE;
+  }
+
+  /**
+   * Should a receipt be sent out for a pending payment.
+   *
+   * e.g for traditional pay later & ones with a delayed settlement a pending receipt makes sense.
+   */
+  public function isSendReceiptForPending() {
     return FALSE;
   }
 

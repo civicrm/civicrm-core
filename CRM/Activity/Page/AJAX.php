@@ -37,27 +37,23 @@
  */
 class CRM_Activity_Page_AJAX {
   public static function getCaseActivity() {
-    $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
-    $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    $userID = CRM_Utils_Type::escape($_GET['userID'], 'Integer');
-    $context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
+    // Should those params be passed through the validateParams method?
+    $caseID = CRM_Utils_Type::validate($_GET['caseID'], 'Integer');
+    $contactID = CRM_Utils_Type::validate($_GET['cid'], 'Integer');
+    $userID = CRM_Utils_Type::validate($_GET['userID'], 'Integer');
+    $context = CRM_Utils_Type::validate(CRM_Utils_Array::value('context', $_GET), 'String');
 
-    $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
-    };
+    $optionalParameters = array(
+      'source_contact_id' => 'Integer',
+      'status_id' => 'Integer',
+      'activity_deleted' => 'Boolean',
+      'activity_type_id' => 'Integer',
+      'activity_date_low' => 'Date',
+      'activity_date_high' => 'Date',
+    );
 
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
-
-    $params = $_GET;
-    if ($sort && $sortOrder) {
-      $params['sortBy'] = $sort . ' ' . $sortOrder;
-    }
-    $params['page'] = ($offset / $rowCount) + 1;
-    $params['rp'] = $rowCount;
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $params += CRM_Core_Page_AJAX::validateParams(array(), $optionalParameters);
 
     // get the activities related to given case
     $activities = CRM_Case_BAO_Case::getCaseActivity($caseID, $params, $contactID, $context, $userID);
@@ -66,31 +62,15 @@ class CRM_Activity_Page_AJAX {
   }
 
   public static function getCaseGlobalRelationships() {
-    $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
-    };
-
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
-
-    $params = $_GET;
-
-    // CRM-14466 initialize variable to avoid php notice.
-    $sortSQL = "";
-    if ($sort && $sortOrder) {
-      $sortSQL = $sort . ' ' . $sortOrder;
-    }
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
     // get the activities related to given case
     $globalGroupInfo = array();
 
     // get the total row count
-    $relGlobalTotalCount = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, NULL, FALSE, TRUE, NULL, NULL);
+    CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, NULL, FALSE, TRUE, NULL, NULL);
     // limit the rows
-    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, $sortSQL, $showLinks = TRUE, FALSE, $offset, $rowCount);
+    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, $params['sortBy'], $showLinks = TRUE, FALSE, $params['offset'], $params['rp']);
 
     $relationships = array();
     // after sort we can update username fields to be a url
@@ -103,12 +83,10 @@ class CRM_Activity_Page_AJAX {
       array_push($relationships, $relationship);
     }
 
-    $params['total'] = count($relationships);
-
     $globalRelationshipsDT = array();
     $globalRelationshipsDT['data'] = $relationships;
-    $globalRelationshipsDT['recordsTotal'] = $params['total'];
-    $globalRelationshipsDT['recordsFiltered'] = $params['total'];
+    $globalRelationshipsDT['recordsTotal'] = count($relationships);
+    $globalRelationshipsDT['recordsFiltered'] = count($relationships);
 
     CRM_Utils_JSON::output($globalRelationshipsDT);
   }
@@ -117,17 +95,7 @@ class CRM_Activity_Page_AJAX {
     $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
-    $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
-    };
-
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
-
-    $params = $_GET;
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
     // Retrieve ALL client relationships
     $relClient = CRM_Contact_BAO_Relationship::getRelationship($contactID,
@@ -148,9 +116,9 @@ class CRM_Activity_Page_AJAX {
 
     // sort clientRelationships array using jquery call params
     foreach ($clientRelationships as $key => $row) {
-      $sortArray[$key] = $row[$sort];
+      $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
     }
-    $sort_type = "SORT_" . strtoupper($sortOrder);
+    $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
     array_multisort($sortArray, constant($sort_type), $clientRelationships);
 
     $relationships = array();
@@ -166,12 +134,10 @@ class CRM_Activity_Page_AJAX {
       array_push($relationships, $relationship);
     }
 
-    $params['total'] = count($relationships);
-
     $clientRelationshipsDT = array();
     $clientRelationshipsDT['data'] = $relationships;
-    $clientRelationshipsDT['recordsTotal'] = $params['total'];
-    $clientRelationshipsDT['recordsFiltered'] = $params['total'];
+    $clientRelationshipsDT['recordsTotal'] = count($relationships);
+    $clientRelationshipsDT['recordsFiltered'] = count($relationships);
 
     CRM_Utils_JSON::output($clientRelationshipsDT);
   }
@@ -181,17 +147,7 @@ class CRM_Activity_Page_AJAX {
     $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
-    $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
-    };
-
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
-
-    $params = $_GET;
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
     $caseTypeName = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
@@ -241,9 +197,9 @@ class CRM_Activity_Page_AJAX {
 
     // sort clientRelationships array using jquery call params
     foreach ($caseRelationships as $key => $row) {
-      $sortArray[$key] = $row[$sort];
+      $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
     }
-    $sort_type = "SORT_" . strtoupper($sortOrder);
+    $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
     array_multisort($sortArray, constant($sort_type), $caseRelationships);
 
     $relationships = array();
@@ -434,32 +390,30 @@ class CRM_Activity_Page_AJAX {
   }
 
   public static function getContactActivity() {
-    $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    $context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
+    $requiredParameters = array(
+      'cid' => 'Integer',
+    );
 
-    $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
-    };
+    $optionalParameters = array(
+      'context' => 'String',
+      'activity_type_id' => 'Integer',
+      'activity_type_exclude_id' => 'Integer',
+    );
 
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
 
-    $params = $_GET;
-    if ($sort && $sortOrder) {
-      $params['sortBy'] = $sort . ' ' . $sortOrder;
-    }
-
-    $params['page'] = ($offset / $rowCount) + 1;
-    $params['rp'] = $rowCount;
-
-    $params['contact_id'] = $contactID;
-    $params['context'] = $context;
+    // To be consistent, the cid parameter should be renamed to contact_id in
+    // the template file, see templates/CRM/Activity/Selector/Selector.tpl
+    $params['contact_id'] = $params['cid'];
+    unset($params['cid']);
 
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
+
+    if (!empty($_GET['is_unit_test'])) {
+      return $activities;
+    }
 
     foreach ($activities['data'] as $key => $value) {
       // Check if recurring activity.

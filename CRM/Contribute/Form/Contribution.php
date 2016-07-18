@@ -749,6 +749,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       FALSE
     );
 
+    // CRM-16189, add Revenue Recognition Date
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      $this->add('date', 'revenue_recognition_date', ts('Revenue Recognition Date'), CRM_Core_SelectValues::date(NULL, 'M Y', NULL, 5));
+    }
+
     // add various dates
     $this->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
@@ -998,7 +1003,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', array(1 => $fields['trxn_id']));
       }
     }
-
+    if (!empty($fields['revenue_recognition_date'])
+      && count(array_filter($fields['revenue_recognition_date'])) == 1
+    ) {
+      $errors['revenue_recognition_date'] = ts('Month and Year are required field for Revenue Recognition.');
+    }
     $errors = array_merge($errors, $softErrors);
     return $errors;
   }
@@ -1631,7 +1640,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($priceSetId) {
         $params['skipCleanMoney'] = 1;
       }
-
+      $params['revenue_recognition_date'] = NULL;
+      if (!empty($formValues['revenue_recognition_date'])
+        && count(array_filter($formValues['revenue_recognition_date'])) == 2
+      ) {
+        $params['revenue_recognition_date'] = CRM_Utils_Date::processDate(
+          '01-' . implode('-', $formValues['revenue_recognition_date'])
+        );
+      }
       $dates = array(
         'receive_date',
         'receipt_date',
@@ -1639,7 +1655,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
 
       foreach ($dates as $d) {
-        $params[$d] = CRM_Utils_Date::processDate($formValues[$d], $formValues[$d . '_time'], TRUE);
+        if (isset($formValues[$d])) {
+          $params[$d] = CRM_Utils_Date::processDate($formValues[$d], CRM_Utils_Array::value($d . '_time', $formValues), TRUE);
+        }
       }
 
       if (!empty($formValues['is_email_receipt'])) {

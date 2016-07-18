@@ -91,6 +91,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'System',
       'Setting',
       'Payment',
+      'Logging',
     );
     $this->toBeImplemented['create'] = array(
       'Cxn',
@@ -108,6 +109,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Payment',
       'Order',
       'SavedSearch', //work fine in local
+      'Logging',
     );
     $this->toBeImplemented['delete'] = array(
       'Cxn',
@@ -343,6 +345,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomValue',
       'Setting',
       'User',
+      'Logging',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -391,6 +394,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Extension',
       'ReportTemplate',
       'System',
+      'Logging',
     );
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -464,6 +468,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingContact',
       'SystemLog',
       //skip this because it doesn't make sense to update logs,
+      'Logging',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -894,6 +899,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     for ($i = 0; $i < 30; $i++) {
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
       $ids[] = $baoObj->id;
+      $baoObj->free();
     }
 
     // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
@@ -940,6 +946,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       for ($i = 0; $i < 3 - $totalEntities; $i++) {
         $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
         $ids[] = $baoObj->id;
+        $baoObj->free();
       }
       $totalEntities = 3;
     }

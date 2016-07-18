@@ -39,13 +39,15 @@ echo "SELECT table_name FROM information_schema.TABLES  WHERE TABLE_SCHEMA='${DB
 $MYSQLCMD < civicrm.mysql
 $MYSQLCMD < civicrm_data.mysql
 $MYSQLCMD < civicrm_sample.mysql
+echo "DROP TABLE IF EXISTS zipcodes" | $MYSQLCMD
 $MYSQLCMD < zipcodes.mysql
+
+## For first boot on fresh DB, boot CMS before CRM.
+cms_eval 'civicrm_initialize();'
+
 php GenerateData.php
 
-# run the cli script to build the menu and the triggers
-cd $CIVISOURCEDIR
-"$PHP5PATH"php bin/cli.php -e System -a flush --triggers 1 --session 1
-
+## Prune local data
 $MYSQLCMD -e "DROP TABLE zipcodes; DROP TABLE IF EXISTS civicrm_install_canary; UPDATE civicrm_domain SET config_backend = NULL; DELETE FROM civicrm_extension; DELETE FROM civicrm_cache; DELETE FROM civicrm_setting;"
 TABLENAMES=$( echo "show tables like 'civicrm_%'" | $MYSQLCMD | grep ^civicrm_ | xargs )
 

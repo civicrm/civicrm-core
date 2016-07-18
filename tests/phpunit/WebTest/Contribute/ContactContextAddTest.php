@@ -159,9 +159,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       'Check Number' => 'check #1041',
     );
     foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
+      $this->assertElementContainsText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td", $value);
     }
 
     // check values of contribution record in the DB
@@ -189,7 +187,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       1 => "{$firstName} Anderson",
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody//tr/td[$value]", preg_quote($label));
+      $this->assertElementContainsText("xpath=id('Search')/div[2]/table[2]/tbody//tr/td[$value]", $label);
     }
   }
 

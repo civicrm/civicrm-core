@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $form->assign('message', $messageText);
     $form->assign('messageSubject', $messageSubject);
-    CRM_Utils_System::setTitle('Create Printable Letters (PDF)');
+    CRM_Utils_System::setTitle('Print/Merge Document');
   }
 
   /**
@@ -64,7 +64,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   public static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
     // put contact display name in title for single contact mode
-    CRM_Utils_System::setTitle(ts('Create Printable Letter (PDF) for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
+    CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
   }
 
   /**
@@ -167,14 +167,17 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $form->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
     $form->assign('totalSelectedContacts', count($form->_contactIds));
 
+    $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
+
     CRM_Mailing_BAO_Mailing::commonCompose($form);
 
     $buttons = array();
     if ($form->get('action') != CRM_Core_Action::VIEW) {
       $buttons[] = array(
         'type' => 'submit',
-        'name' => $form->_single ? ts('Make PDF') : ts('Make PDFs'),
+        'name' => ts('Download Document'),
         'isDefault' => TRUE,
+        'icon' => 'fa-download',
       );
       $buttons[] = array(
         'type' => 'submit',
@@ -281,7 +284,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       else {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = NULL WHERE id = {$formValues['template']}";
       }
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
     if (!empty($formValues['update_format'])) {
       $bao = new CRM_Core_BAO_PdfFormat();
@@ -322,6 +325,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
+    $html = array();
 
     foreach ($form->_contactIds as $item => $contactId) {
       $params = array('contact_id' => $contactId);
@@ -360,7 +364,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       self::createActivities($form, $html_message, $form->_contactIds);
     }
 
-    CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+    $type = $formValues['document_type'];
+
+    if ($type == 'pdf') {
+      CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+    }
+    else {
+      CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
+    }
 
     $form->postProcessHook();
 

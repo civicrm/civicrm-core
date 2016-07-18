@@ -174,7 +174,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'title' => ts('Frequency Unit'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('recur_frequency_units'),
-            'type' => CRM_Utils_Type::T_INT,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'frequency_interval' => array(
             'title' => ts('Frequency Interval'),
@@ -253,7 +253,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY " . $this->_aliases['civicrm_contribution_recur'] . ".id";
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_contribution_recur']}.id");
   }
 
   public function where() {

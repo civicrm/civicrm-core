@@ -151,6 +151,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add Index to civicrm_contribution creditnote_id field', 'addIndexContributionCreditNoteID');
   }
 
@@ -160,6 +161,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_2($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Fix Index on civicrm_financial_item combined entity_id + entity_table', 'addCombinedIndexFinancialItemEntityIDEntityType');
     $this->addTask('enable financial account relationships for chargeback & refund', 'addRefundAndChargeBackAccountsIfNotExist');
     $this->addTask('Add Index to civicrm_contribution.source', 'addIndexContributionSource');
@@ -171,6 +173,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_3($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add Index to civicrm_contribution.total_amount', 'addIndexContributionAmount');
   }
 
@@ -180,8 +183,58 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_4($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add Contact Deleted by Merge Activity Type', 'addDeletedByMergeActivityType');
   }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_7($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    // https://issues.civicrm.org/jira/browse/CRM-18006
+    if (CRM_Core_DAO::checkTableExists('civicrm_install_canary')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_install_canary ENGINE=InnoDB');
+    }
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_8($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Upgrade mailing foreign key constraints', 'upgradeMailingFKs');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_10($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Upgrade Add Help Pre and Post Fields to price value table'), 'addHelpPreAndHelpPostFieldsPriceFieldValue');
+  }
+
+  /*
+   * Important! All upgrade functions MUST call the 'runSql' task.
+   * Uncomment and use the following template for a new upgrade version
+   * (change the x in the function name):
+   */
+
+  //  /**
+  //   * Upgrade function.
+  //   *
+  //   * @param string $rev
+  //   */
+  //  public function upgrade_4_7_x($rev) {
+  //    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  //    // Additional tasks here...
+  //  }
 
   /**
    * CRM-16354
@@ -214,7 +267,26 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP INDEX index_group_name');
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP COLUMN group_name');
+
+    // Handle Strange activity_tab_filter settings.
+    CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_activity_setting LIKE civicrm_setting');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_activity_setting ADD UNIQUE INDEX index_domain_contact_name (domain_id, contact_id, name)');
+    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_activity_setting (name, contact_id, domain_id, value)
+     SELECT DISTINCT name, contact_id, domain_id, value
+     FROM civicrm_setting
+     WHERE name = "activity_tab_filter"
+     AND value is not NULL');
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "activity_tab_filter"');
+
+    $date = CRM_Utils_Time::getTime('Y-m-d H:i:s');
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting ADD UNIQUE INDEX index_domain_contact_name (domain_id, contact_id, name)');
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_setting (name, contact_id, domain_id, value, is_domain, created_id, created_date)
+     SELECT name, contact_id, domain_id, value, 0, contact_id,'$date'
+     FROM civicrm_activity_setting
+     WHERE name = 'activity_tab_filter'
+     AND value is not NULL"
+    );
+    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_activity_setting');
 
     $domainDao = CRM_Core_DAO::executeQuery('SELECT id, config_backend FROM civicrm_domain');
     while ($domainDao->fetch()) {
@@ -554,6 +626,103 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'is_active' => TRUE,
       'filter' => 1,
     ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-12252 Add Help Pre and Help Post Fields for Price Field Value Table.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addHelpPreAndHelpPostFieldsPriceFieldValue(CRM_Queue_TaskContext $ctx) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      foreach ($locales as $locale) {
+        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists("civicrm_price_field_value", "help_pre_{$locale}")) {
+          CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
+            ADD COLUMN `help_pre_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option pre help text.'", array(), TRUE, NULL, FALSE, FALSE);
+        }
+        if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists("civicrm_price_field_value", "help_post_{$locale}")) {
+          CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
+            ADD COLUMN `help_post_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option post help text.'", array(), TRUE, NULL, FALSE, FALSE);
+        }
+      }
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+    }
+    else {
+      if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', 'help_pre')) {
+        CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
+          ADD COLUMN `help_pre` text COLLATE utf8_unicode_ci COMMENT 'Price field option pre help text.'");
+      }
+      if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', 'help_post')) {
+        CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
+          ADD COLUMN `help_post` text COLLATE utf8_unicode_ci COMMENT 'Price field option post help text.'");
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * CRM-18345 Don't delete mailing data on email/phone deletion
+   * Implemented here in CRM-18526
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function upgradeMailingFKs(CRM_Queue_TaskContext $ctx) {
+
+    // Safely drop the foreign keys
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_email_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_phone_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_phone_id');
+
+    // Set up the new foreign keys
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_mailing_event_queue`
+        ADD CONSTRAINT `FK_civicrm_mailing_event_queue_email_id`
+        FOREIGN KEY (`email_id`)
+        REFERENCES `civicrm_email`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_mailing_event_queue`
+        ADD CONSTRAINT `FK_civicrm_mailing_event_queue_phone_id`
+        FOREIGN KEY (`phone_id`)
+        REFERENCES `civicrm_phone`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_mailing_recipients`
+        ADD CONSTRAINT `FK_civicrm_mailing_recipients_email_id`
+        FOREIGN KEY (`email_id`)
+        REFERENCES `civicrm_email`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_mailing_recipients`
+        ADD CONSTRAINT `FK_civicrm_mailing_recipients_phone_id`
+        FOREIGN KEY (`phone_id`)
+        REFERENCES `civicrm_phone`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+
     return TRUE;
   }
 

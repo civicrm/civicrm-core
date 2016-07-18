@@ -54,8 +54,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   );
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
@@ -253,7 +252,8 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   public function groupBy() {
     parent::groupBy();
     if (empty($this->_groupBy) && $this->_totalPaid) {
-      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_pledge']}.id, {$this->_aliases['civicrm_pledge']}.currency";
+      $groupBy = array("{$this->_aliases['civicrm_pledge']}.id", "{$this->_aliases['civicrm_pledge']}.currency");
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
   }
 
@@ -293,6 +293,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     //regenerate the from field without extra left join on pledge payments
+    $totalPaid = $this->_totalPaid;
     $this->_totalPaid = FALSE;
     $this->from();
     $this->customDataFrom();
@@ -340,6 +341,11 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           'type' => CRM_Utils_Type::T_INT,
         );
       }
+    }
+    // reset from clause
+    if ($totalPaid) {
+      $this->_totalPaid = TRUE;
+      $this->from();
     }
     return $statistics;
   }
@@ -462,11 +468,10 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     if (!empty($display)) {
       $statusId = array_keys(CRM_Core_PseudoConstant::accountOptionValues("contribution_status", NULL, " AND v.name IN  ('Pending', 'Overdue')"));
       $statusId = implode(',', $statusId);
+      $select = "payment.pledge_id, payment.scheduled_amount, pledge.contact_id";
       $sqlPayment = "
                  SELECT min(payment.scheduled_date) as scheduled_date,
-                        payment.pledge_id,
-                        payment.scheduled_amount,
-                        pledge.contact_id
+                        {$select}
 
                   FROM civicrm_pledge_payment payment
                        LEFT JOIN civicrm_pledge pledge
@@ -474,7 +479,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
 
                   WHERE payment.status_id IN ({$statusId})
 
-                  GROUP BY payment.pledge_id";
+                  GROUP BY {$select}";
 
       $daoPayment = CRM_Core_DAO::executeQuery($sqlPayment);
 

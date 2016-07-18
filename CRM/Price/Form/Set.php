@@ -102,6 +102,16 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     if ($asciiValue >= 48 && $asciiValue <= 57) {
       $errors['title'] = ts("Name cannot not start with a digit");
     }
+    // CRM-16189
+    if (!empty($fields['extends'])
+      && (array_key_exists(CRM_Core_Component::getComponentID('CiviEvent'), $fields['extends'])
+        || array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $fields['extends']))
+    ) {
+      $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id']);
+      if ($isError) {
+        $errors['financial_type_id'] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+      }
+    }
     return empty($errors) ? TRUE : $errors;
   }
 

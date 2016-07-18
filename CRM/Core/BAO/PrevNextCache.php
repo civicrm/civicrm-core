@@ -198,18 +198,28 @@ WHERE  cacheKey     = %3 AND
   /**
    * Retrieve from prev-next cache.
    *
+   * This function is used from a variety of merge related functions, although
+   * it would probably be good to converge on calling CRM_Dedupe_Merger::getDuplicatePairs.
+   *
+   * We seem to currently be storing stats in this table too & they might make more sense in
+   * the main cache table.
+   *
    * @param string $cacheKey
    * @param string $join
-   * @param string $where
+   * @param string $whereClause
    * @param int $offset
    * @param int $rowCount
-   *
    * @param array $select
+   * @param string $orderByClause
+   * @param bool $includeConflicts
+   *   Should we return rows that have already been idenfified as having a conflict.
+   *   When this is TRUE you should be careful you do not set up a loop.
    *
    * @return array
    */
-  public static function retrieve($cacheKey, $join = NULL, $where = NULL, $offset = 0, $rowCount = 0, $select = array()) {
+  public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = array(), $orderByClause = '', $includeConflicts = TRUE, $params = array()) {
     $selectString = 'pn.*';
+
     if (!empty($select)) {
       $aliasArray = array();
       foreach ($select as $column => $alias) {
@@ -217,20 +227,29 @@ WHERE  cacheKey     = %3 AND
       }
       $selectString .= " , " . implode(' , ', $aliasArray);
     }
+
+    $params = array(
+      1 => array($cacheKey, 'String'),
+    ) + $params;
+
+    if (!empty($whereClause)) {
+      $whereClause = " AND " . $whereClause;
+    }
+    if ($includeConflicts) {
+      $where = ' WHERE (pn.cacheKey = %1 OR pn.cacheKey = %2)' . $whereClause;
+      $params[2] = array("{$cacheKey}_conflicts", 'String');
+    }
+    else {
+      $where = ' WHERE (pn.cacheKey = %1)' . $whereClause;
+    }
+
     $query = "
 SELECT SQL_CALC_FOUND_ROWS {$selectString}
 FROM   civicrm_prevnext_cache pn
        {$join}
-WHERE  (pn.cacheKey = %1 OR pn.cacheKey = %2)
+       $where
+       $orderByClause
 ";
-    $params = array(
-      1 => array($cacheKey, 'String'),
-      2 => array("{$cacheKey}_conflicts", 'String'),
-    );
-
-    if ($where) {
-      $query .= " AND {$where}";
-    }
 
     if ($rowCount) {
       $offset = CRM_Utils_Type::escape($offset, 'Int');
@@ -293,13 +312,15 @@ WHERE  (pn.cacheKey = %1 OR pn.cacheKey = %2)
 
   /**
    * @param $cacheKey
-   * @param NULL $join
-   * @param NULL $where
+   * @param string $join
+   * @param string $where
    * @param string $op
+   * @param array $params
+   *   Extra query params to parse into the query.
    *
    * @return int
    */
-  public static function getCount($cacheKey, $join = NULL, $where = NULL, $op = "=") {
+  public static function getCount($cacheKey, $join = NULL, $where = NULL, $op = "=", $params = array()) {
     $query = "
 SELECT COUNT(*) FROM civicrm_prevnext_cache pn
        {$join}
@@ -312,23 +333,29 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
     $params = array(
       1 => array($cacheKey, 'String'),
       2 => array("{$cacheKey}_conflicts", 'String'),
-    );
+    ) + $params;
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
   }
 
   /**
+   * Repopulate the cache of merge prospects.
+   *
    * @param int $rgid
    * @param int $gid
    * @param NULL $cacheKeyString
+   * @param array $criteria
+   *   Additional criteria to filter by.
+   *
+   * @param bool $checkPermissions
+   *   Respect logged in user's permissions.
    *
    * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL) {
+  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions) {
     if (!$cacheKeyString && $rgid) {
-      $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
-      $cacheKeyString = "merge {$contactType}";
-      $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
-      $cacheKeyString .= $gid ? "_{$gid}" : '_0';
+      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
     }
 
     if (!$cacheKeyString) {
@@ -348,47 +375,16 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
       $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid);
     }
     elseif ($rgid) {
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid);
+      $contactIDs = array();
+      if (!empty($criteria)) {
+        $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
+        $contactIDs = array_keys($contacts['values']);
+      }
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions);
     }
 
     if (!empty($foundDupes)) {
-      $cids = $displayNames = $values = array();
-      foreach ($foundDupes as $dupe) {
-        $cids[$dupe[0]] = 1;
-        $cids[$dupe[1]] = 1;
-      }
-      $cidString = implode(', ', array_keys($cids));
-      $sql = "SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name";
-      $dao = new CRM_Core_DAO();
-      $dao->query($sql);
-      while ($dao->fetch()) {
-        $displayNames[$dao->id] = $dao->display_name;
-      }
-
-      $session = CRM_Core_Session::singleton();
-      $userId = $session->get('userID');
-
-      foreach ($foundDupes as $dupes) {
-        $srcID = $dupes[0];
-        $dstID = $dupes[1];
-        if ($dstID == $userId) {
-          $srcID = $dupes[1];
-          $dstID = $dupes[0];
-        }
-
-        $row = array(
-          'srcID' => $srcID,
-          'srcName' => $displayNames[$srcID],
-          'dstID' => $dstID,
-          'dstName' => $displayNames[$dstID],
-          'weight' => $dupes[2],
-          'canMerge' => TRUE,
-        );
-
-        $data = CRM_Core_DAO::escapeString(serialize($row));
-        $values[] = " ( 'civicrm_contact', $srcID, $dstID, '$cacheKeyString', '$data' ) ";
-      }
-      self::setItem($values);
+      CRM_Dedupe_Finder::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
     }
   }
 
@@ -569,6 +565,37 @@ WHERE  cacheKey LIKE %1
     $params['offset'] = $offset;
     $params['rowCount1'] = $rowCount;
     return $params;
+  }
+
+  /**
+   * Flip 2 contacts in the prevNext cache.
+   *
+   * @param array $prevNextId
+   * @param bool $onlySelected
+   *   Only flip those which have been marked as selected.
+   */
+  public static function flipPair(array $prevNextId, $onlySelected) {
+    $dao = new CRM_Core_DAO_PrevNextCache();
+    if ($onlySelected) {
+      $dao->is_selected = 1;
+    }
+    foreach ($prevNextId as $id) {
+      $dao->id = $id;
+      if ($dao->find(TRUE)) {
+        $originalData = unserialize($dao->data);
+        $srcFields = array('ID', 'Name');
+        $swapFields = array('srcID', 'srcName', 'dstID', 'dstName');
+        $data = array_diff_assoc($originalData, array_fill_keys($swapFields, 1));
+        foreach ($srcFields as $key) {
+          $data['src' . $key] = $originalData['dst' . $key];
+          $data['dst' . $key] = $originalData['src' . $key];
+        }
+        $dao->data = serialize($data);
+        $dao->entity_id1 = $data['dstID'];
+        $dao->entity_id2 = $data['srcID'];
+        $dao->save();
+      }
+    }
   }
 
 }

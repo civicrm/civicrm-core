@@ -87,22 +87,28 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
     $this->addElement('checkbox', 'is_monetary', ts('Execute real-time monetary transactions'));
 
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
-    $recurringPaymentProcessor = array();
+    $paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('live');
+    $recurringPaymentProcessor = $futurePaymentProcessor = $paymentProcessor = array();
 
-    if (!empty($paymentProcessor)) {
-      $paymentProcessorIds = implode(',', array_keys($paymentProcessor));
-      $query = "
-SELECT id
-  FROM civicrm_payment_processor
- WHERE id IN ({$paymentProcessorIds})
-   AND is_recur = 1";
-      $dao = CRM_Core_DAO::executeQuery($query);
-      while ($dao->fetch()) {
-        $recurringPaymentProcessor[] = $dao->id;
+    if (!empty($paymentProcessors)) {
+      foreach ($paymentProcessors as $id => $processor) {
+        if ($id != 0) {
+          $paymentProcessor[$id] = $processor['name'];
+        }
+        if (CRM_Utils_Array::value('is_recur', $processor)) {
+          $recurringPaymentProcessor[] = $id;
+        }
+        if (CRM_Utils_Array::value('object', $processor) && $processor['object']->supports('FutureRecurStartDate')) {
+          $futurePaymentProcessor[] = $id;
+        }
       }
     }
-    $this->assign('recurringPaymentProcessor', $recurringPaymentProcessor);
+    if (count($recurringPaymentProcessor)) {
+      $this->assign('recurringPaymentProcessor', $recurringPaymentProcessor);
+    }
+    if (count($futurePaymentProcessor)) {
+      $this->assign('futurePaymentProcessor', $futurePaymentProcessor);
+    }
     if (count($paymentProcessor)) {
       $this->assign('paymentProcessor', $paymentProcessor);
     }
@@ -168,6 +174,23 @@ SELECT id
       $this->addElement('text', 'initial_reminder_day', ts('Send payment reminder'), array('size' => 3));
       $this->addElement('text', 'max_reminders', ts('Send up to'), array('size' => 3));
       $this->addElement('text', 'additional_reminder_day', ts('Send additional reminders'), array('size' => 3));
+      if (!empty($futurePaymentProcessor)) {
+        // CRM-18854
+        $this->addElement('checkbox', 'adjust_recur_start_date', ts('Adjust Recurring Start Date'), NULL,
+          array('onclick' => "showHideByValue('adjust_recur_start_date',true,'recurDefaults','table-row','radio',false);")
+        );
+        $this->addDate('pledge_calendar_date', ts('Specific Calendar Date'));
+        $month = CRM_Utils_Date::getCalendarDayOfMonth();
+        $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month);
+        $pledgeDefaults = array(
+          'contribution_date' => ts('Day of Contribution'),
+          'calendar_date' => ts('Specific Calendar Date'),
+          'calendar_month' => ts('Specific day of Month'),
+        );
+        $this->addRadio('pledge_default_toggle', ts('Recurring Contribution Start Date Default'), $pledgeDefaults, array('allowClear' => FALSE), '<br/><br/>');
+        $this->addElement('checkbox', 'is_pledge_start_date_visible', ts('Show Recurring Donation Start Date?'), NULL);
+        $this->addElement('checkbox', 'is_pledge_start_date_editable', ts('Allow Edits to Recurring Donation Start date?'), NULL);
+      }
     }
 
     //add currency element.
@@ -317,6 +340,13 @@ SELECT id
         elseif (count(array_filter($membershipTypes)) != 0) {
           $errors['is_recur'] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page.');
         }
+      }
+    }
+
+    // CRM-18854 Check if recurring start date is in the future.
+    if (CRM_Utils_Array::value('pledge_calendar_date', $fields)) {
+      if (date('Ymd') > date('Ymd', strtotime($fields['pledge_calendar_date']))) {
+        $errors['pledge_calendar_date'] = ts('The recurring start date cannot be prior to the current date.');
       }
     }
 
@@ -479,6 +509,38 @@ SELECT id
       );
       $params['is_recur_interval'] = CRM_Utils_Array::value('is_recur_interval', $params, FALSE);
       $params['is_recur_installments'] = CRM_Utils_Array::value('is_recur_installments', $params, FALSE);
+    }
+
+    if (CRM_Utils_Array::value('adjust_recur_start_date', $params)) {
+      $fieldValue = '';
+      $pledgeDateFields = array(
+        'calendar_date' => 'pledge_calendar_date',
+        'calendar_month' => 'pledge_calendar_month',
+      );
+      if ($params['pledge_default_toggle'] == 'contribution_date') {
+        $fieldValue = json_encode(array('contribution_date' => date('Ymd')));
+      }
+      else {
+        foreach ($pledgeDateFields as $key => $pledgeDateField) {
+          if (CRM_Utils_Array::value($pledgeDateField, $params) && $params['pledge_default_toggle'] == $key) {
+            $fieldValue = json_encode(array($key => $params[$pledgeDateField]));
+            break;
+          }
+        }
+      }
+      $params['pledge_start_date'] = $fieldValue;
+    }
+    else {
+      $params['pledge_start_date'] = '';
+      $params['adjust_recur_start_date'] = 0;
+      $params['is_pledge_start_date_visible'] = 0;
+      $params['is_pledge_start_date_editable'] = 0;
+    }
+    if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $params)) {
+      $params['is_pledge_start_date_visible'] = 0;
+    }
+    if (!CRM_Utils_Array::value('is_pledge_start_date_editable', $params)) {
+      $params['is_pledge_start_date_editable'] = 0;
     }
 
     if (array_key_exists('payment_processor', $params) &&
@@ -712,11 +774,17 @@ SELECT id
               'max_reminders',
               'initial_reminder_day',
               'additional_reminder_day',
+              'pledge_start_date',
+              'is_pledge_start_date_visible',
+              'is_pledge_start_date_editable',
             );
             foreach ($pledgeBlock as $key) {
               $pledgeBlockParams[$key] = CRM_Utils_Array::value($key, $params);
             }
             $pledgeBlockParams['is_pledge_interval'] = CRM_Utils_Array::value('is_pledge_interval',
+              $params, FALSE
+            );
+            $pledgeBlockParams['pledge_start_date'] = CRM_Utils_Array::value('pledge_start_date',
               $params, FALSE
             );
             // create pledge block.

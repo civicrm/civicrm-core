@@ -99,7 +99,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test Get Order api for participant contribution.
    */
   public function testGetOrderParticipant() {
-    $contribution = $this->addOrder(FALSE, 100);
+    $this->addOrder(FALSE, 100);
     list($items, $contribution) = $this->createParticipantWithContribution();
 
     $params = array(
@@ -115,7 +115,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to assert db values
+   * Function to assert db values.
    */
   public function checkPaymentResult($results, $expectedResult, $lineItems = NULL) {
     foreach ($expectedResult[$results['id']] as $key => $value) {
@@ -132,7 +132,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * add order
+   * Add order.
    *
    * @param bool $isPriceSet
    * @param float $amount
@@ -140,7 +140,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function addOrder($isPriceSet, $amount = 300, $extraParams = array()) {
+  public function addOrder($isPriceSet, $amount = 300.00, $extraParams = array()) {
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -204,11 +204,9 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test create order api for membership
    */
   public function testAddOrderForMembership() {
-    require_once 'CiviTest/Membership.php';
-    $membership = new Membership();
-    $membershipType = $membership->createMembershipType();
-    $membershipType1 = $membership->createMembershipType();
-    $membershipType = $membershipTypes = array($membershipType->id, $membershipType1->id);
+    $membershipType = $this->membershipTypeCreate();
+    $membershipType1 = $this->membershipTypeCreate();
+    $membershipType = $membershipTypes = array($membershipType, $membershipType1);
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -298,9 +296,9 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   /**
    * Test create order api for participant
    */
-  public function testAddOrderForPariticipant() {
-    require_once 'CiviTest/Event.php';
-    $this->_eventId = Event::create($this->_individualId);
+  public function testAddOrderForParticipant() {
+    $event = $this->eventCreate();
+    $this->_eventId = $event['id'];
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -485,7 +483,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test cancel order api
    */
   public function testCancelWithParticipant() {
-    $this->_eventId = Event::create($this->_individualId);
+    $event = $this->eventCreate();
+    $this->_eventId = $event['id'];
     $eventParams = array(
       'id' => $this->_eventId,
       'financial_type_id' => 4,

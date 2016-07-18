@@ -37,7 +37,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    */
   protected $_paymentProcessorID;
   protected $currency;
-  protected $_values = array();
+  public $_values = array();
 
   /**
    * @var array
@@ -48,6 +48,9 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    */
   public function preProcess() {
     parent::preProcess();
+
+    $this->_values['custom_pre_id'] = CRM_Utils_Request::retrieve('pre_profile_id', 'Integer', $this);
+
     $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
       TRUE);
     $this->currency = CRM_Utils_Request::retrieve('currency', 'String', CRM_Core_DAO::$_nullObject,

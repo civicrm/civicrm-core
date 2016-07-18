@@ -229,10 +229,33 @@ function _civicrm_api3_activity_create_spec(&$params) {
  * @param array $params
  *   Array per getfields documentation.
  *
- * @return array
+ * @return array API result array
  *   API result array
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_activity_get($params) {
+  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
+    // In absence of view all activities permission it's possible to see a specific activity by ACL.
+    // Note still allowing view all activities to override ACLs is based on the 'don't change too much
+    // if you are not sure principle' and it could be argued that the ACLs should always be applied.
+    if (empty($params['id']) || !empty($params['contact_id'])) {
+      // We fall back to the original blunt permissions if we don't have an id to check or we are about
+      // to go to the weird place that the legacy 'contact_id' parameter takes us to.
+      throw new \Civi\API\Exception\UnauthorizedException(
+        "Cannot access activities. Required permission: 'view all activities''"
+      );
+    }
+
+    if (!CRM_Activity_BAO_Activity::checkPermission($params['id'], CRM_Core_Action::VIEW)) {
+      throw new \Civi\API\Exception\UnauthorizedException(
+        'You do not have permission to view this activity'
+      );
+    }
+  }
+
   if (!empty($params['contact_id'])) {
     $activities = CRM_Activity_BAO_Activity::getContactActivity($params['contact_id']);
     // BAO function doesn't actually return a contact ID - hack api for now & add to test so when api re-write

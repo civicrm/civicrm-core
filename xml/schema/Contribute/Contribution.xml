@@ -248,7 +248,7 @@
       <table>civicrm_currency</table>
       <keyColumn>name</keyColumn>
       <labelColumn>full_name</labelColumn>
-      <nameColumn>numeric_code</nameColumn>
+      <nameColumn>name</nameColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
@@ -499,4 +499,16 @@
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <field>
+    <name>revenue_recognition_date</name>
+    <type>datetime</type>
+    <import>true</import>
+    <headerPattern>/revenue(.?date)?/i</headerPattern>
+    <dataPattern>/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/</dataPattern>
+    <comment>Stores the date when revenue should be recognized.</comment>
+    <html>
+      <type>Select Date</type>
+    </html>
+    <add>4.7</add>
+  </field>
 </table>

@@ -1837,25 +1837,6 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Get the time in UTC for the current time. You can optionally send an offset from the current time if needed
-   *
-   * @param int $offset
-   *   the offset from the current time in seconds.
-   *
-   * @return string
-   *   the time in UTC
-   */
-  public static function getUTCTime($offset = 0) {
-    $originalTimezone = date_default_timezone_get();
-    date_default_timezone_set('UTC');
-    $time = time() + $offset;
-    $now = date('YmdHis', $time);
-    date_default_timezone_set($originalTimezone);
-    return $now;
-  }
-
-
-  /**
    * @param $date
    * @param $dateType
    *
@@ -1903,6 +1884,22 @@ class CRM_Utils_Date {
     }
 
     return $formattedDate;
+  }
+
+  /**
+   * Function to return days of the month.
+   *
+   * @return array
+   */
+  public static function getCalendarDayOfMonth() {
+    $month = array();
+    for ($i = 1; $i <= 31; $i++) {
+      $month[$i] = $i;
+      if ($i == 31) {
+        $month[$i] = $i . ' / Last day of month';
+      }
+    }
+    return $month;
   }
 
 }

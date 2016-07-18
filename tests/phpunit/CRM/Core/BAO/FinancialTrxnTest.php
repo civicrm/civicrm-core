@@ -129,4 +129,46 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals('250.00', $totalPaymentAmount, 'Amount does not match.');
   }
 
+  /**
+   * Test for createDeferredTrxn().
+   */
+  public function testCreateDeferredTrxn() {
+    Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
+    $cid = $this->individualCreate();
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 622,
+      'financial_type_id' => 4,
+      'line_items' => array(
+        array(
+          'line_item' => array(
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 16,
+              'label' => 'test 1',
+              'qty' => 1,
+              'unit_price' => 100,
+              'line_total' => 100,
+              'financial_type_id' => 4,
+            ),
+          ),
+          'params' => array(),
+        ),
+      ),
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $lineItems[1] = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution->id);
+    $lineItemId = key($lineItems[1]);
+    $lineItems[1][$lineItemId]['financial_item_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_item WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemId}");
+    // Get financial trxns for contribution
+    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622));
+    $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime('2016-01-20')));
+    $contribution->revenue_recognition_date = date('Ymd', strtotime("+1 month"));
+    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contribution);
+    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622, 'id' => array("NOT IN" => array($trxn['id']))));
+    $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
+  }
+
 }

@@ -61,28 +61,8 @@ class CRM_Mailing_Page_AJAX {
    * Retrieve contact mailings.
    */
   public static function getContactMailings() {
-    $contactID = CRM_Utils_Type::escape($_GET['contact_id'], 'Integer');
-
-    $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
-    };
-
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
-
-    $params = $_GET;
-    if ($sort && $sortOrder) {
-      $params['sortBy'] = $sort . ' ' . $sortOrder;
-    }
-
-    $params['page'] = ($offset / $rowCount) + 1;
-    $params['rp'] = $rowCount;
-
-    $params['contact_id'] = $contactID;
-    $params['context'] = $context;
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $params += CRM_Core_Page_AJAX::validateParams(array('contact_id' => 'Integer'));
 
     // get the contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailingSelector($params);
