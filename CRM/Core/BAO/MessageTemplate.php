@@ -340,7 +340,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     );
     $params = array_merge($defaults, $params);
 
-    CRM_Utils_Hook::alterMailParams($params);
+    CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
 
     if ((!$params['groupName'] ||
         !$params['valueName']
