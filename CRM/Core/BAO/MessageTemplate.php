@@ -339,7 +339,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'PDFFilename' => NULL,
     );
     $params = array_merge($defaults, $params);
-
+    CRM_Utils_Hook::alterMailParams($params);
     if ((!$params['groupName'] ||
         !$params['valueName']
       ) &&
@@ -384,7 +384,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $html = $dao->html;
     $format = $dao->format;
     $dao->free();
-
+    CRM_Utils_Hook::alterMailContent($dao);
     // add the test banner (if requested)
     if ($params['isTest']) {
       $query = "SELECT msg_subject subject, msg_text text, msg_html html
