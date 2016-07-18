@@ -49,6 +49,7 @@ class CRM_Contact_Import_ImportJob {
   protected $_dedupe;
   protected $_newGroupName;
   protected $_newGroupDesc;
+  protected $_newGroupType;
   protected $_groups;
   protected $_allGroups;
   protected $_newTagName;
@@ -316,7 +317,8 @@ class CRM_Contact_Import_ImportJob {
     if ($this->_newGroupName || count($this->_groups)) {
       $groupAdditions = $this->_addImportedContactsToNewGroup($contactIds,
         $this->_newGroupName,
-        $this->_newGroupDesc
+        $this->_newGroupDesc,
+        $this->_newGroupType
       );
       if ($form) {
         $form->set('groupAdditions', $groupAdditions);
@@ -350,7 +352,7 @@ class CRM_Contact_Import_ImportJob {
    */
   private function _addImportedContactsToNewGroup(
     $contactIds,
-    $newGroupName, $newGroupDesc
+    $newGroupName, $newGroupDesc, $newGroupType
   ) {
 
     $newGroupId = NULL;
@@ -361,6 +363,7 @@ class CRM_Contact_Import_ImportJob {
       $gParams = array(
         'title' => $newGroupName,
         'description' => $newGroupDesc,
+        'group_type' => $newGroupType,
         'is_active' => TRUE,
       );
       $group = CRM_Contact_BAO_Group::create($gParams);
