@@ -155,7 +155,7 @@ class CRM_Utils_PDF_Document {
    *   [string, clsTbsZip]
    */
   public static function unzipDoc($filePath, $docType) {
-    $dataFile = SELF::$ooxmlMap[$docType]['dataFile'];
+    $dataFile = self::$ooxmlMap[$docType]['dataFile'];
 
     $zip = new clsTbsZip();
     $zip->Open($filePath);
@@ -181,7 +181,7 @@ class CRM_Utils_PDF_Document {
    * @return string
    */
   public static function printDocuments($filePath, $contents, $docType, $zip, $returnFinalContent = FALSE) {
-    $dataMap = SELF::$ooxmlMap[$docType];
+    $dataMap = self::$ooxmlMap[$docType];
 
     $finalContent = $zip->FileRead($dataMap['dataFile']);
 
