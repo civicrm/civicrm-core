@@ -673,6 +673,7 @@ VALUES
   (@option_group_id_sfe, 'ppt',  11, 'ppt',   NULL, 0, 0, 11, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_sfe, 'docx', 12, 'docx',  NULL, 0, 0, 12, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_sfe, 'xlsx', 13, 'xlsx',  NULL, 0, 0, 13, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_sfe, 'odt',  14, 'odt',   NULL, 0, 0, 14, NULL, 0, 0, 1, NULL, NULL),
 
   (@option_group_id_we, '{ts escape="sql"}Textarea{/ts}', 1, 'Textarea', NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_we, 'CKEditor', 2, 'CKEditor', NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),

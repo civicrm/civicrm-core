@@ -86,9 +86,29 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MessageTemplate', CRM_Utils_Array::value('id', $params), $params);
 
+    if (!empty($params['file_id']) && is_array($params['file_id']) && count($params['file_id'])) {
+      $fileParams = $params['file_id'];
+      unset($params['file_id']);
+    }
+
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->copyValues($params);
     $messageTemplates->save();
+
+    if (!empty($fileParams)) {
+      $params['file_id'] = $fileParams;
+      CRM_Core_BAO_File::filePostProcess(
+        $params['file_id']['location'],
+        NULL,
+        'civicrm_msg_template',
+        $messageTemplates->id,
+        NULL,
+        TRUE,
+        $params['file_id'],
+        'file_id',
+        $params['file_id']['type']
+      );
+    }
 
     CRM_Utils_Hook::post($hook, 'MessageTemplate', $messageTemplates->id, $messageTemplates);
     return $messageTemplates;
