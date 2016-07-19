@@ -200,7 +200,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     // CRM-16189
     $this->assign('deferred_enabled', FALSE);
-    if (CRM_Contribute_PseudoConstant::checkContributeSettings('deferred_revenue_enabled')) {
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
       $this->assign('deferred_enabled', TRUE);
     }
 
