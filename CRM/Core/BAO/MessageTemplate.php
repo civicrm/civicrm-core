@@ -489,11 +489,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $smarty->assign($name, $value);
     }
     foreach (array(
-               'subject',
-               'text',
-               'html',
-             ) as $elem) {
-      $$elem = $smarty->fetch("string:{$$elem}");
+      'subject',
+      'text',
+      'html',
+    ) as $elem) {
+      $mailContent[$elem] = $smarty->fetch("string:{$mailContent[$elem]}");
     }
 
     // send the template, honouring the target user’s preferences (if any)
