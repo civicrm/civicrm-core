@@ -350,6 +350,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
 
     foreach ($form->_contactIds as $item => $contactId) {
+      $caseId = NULL;
       $params = array('contact_id' => $contactId);
 
       list($contact) = CRM_Utils_Token::getTokenDetails($params,
@@ -368,7 +369,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
       $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact[$contactId], TRUE, $messageToken);
       if (!empty($form->_caseId)) {
-        $tokenHtml = CRM_Utils_Token::replaceCaseTokens($form->_caseId, $html_message, $messageToken);
+        $caseId = $form->_caseId;
+      }
+      if (empty($caseId) && !empty($form->_caseIds[$item])) {
+        $caseId = $form->_caseIds[$item];
+      }
+      if ($caseId) {
+        $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenHtml, $messageToken);
       }
       $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact[$contactId], $categories, TRUE);
 
