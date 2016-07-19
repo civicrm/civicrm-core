@@ -27,24 +27,24 @@
 {if $form.template.html}
 <table class="form-layout-compressed">
     <tr>
-      <td class="label-left">{$form.template.label}</td>
-      <td>{$form.template.html}</td>
-    </tr>
-    <tr>
-      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<sub>OR</sub></td>
-    </tr>
-    <tr>
-      <td class="label-left">{$form.document_file.label}</td>
-      <td>{$form.document_file.html}<br/><br/></td>
+      <td class="label-left">
+        {$form.template.label}
+        {help id="template" title=$form.template.label file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
+      </td>
+      <td>
+        {$form.template.html} {ts}OR{/ts} {$form.document_file.html}
+      </td>
     </tr>
     <tr>
       <td class="label-left">{$form.subject.label}</td>
       <td>{$form.subject.html}</td>
     </tr>
+    {if $form.campaign_id}
     <tr>
       <td class="label-left">{$form.campaign_id.label}</td>
       <td>{$form.campaign_id.html}</td>
     </tr>
+    {/if}
 </table>
 {/if}
 
