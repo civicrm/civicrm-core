@@ -98,7 +98,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     if (empty($params)) {
       return NULL;
     }
-    $values['group']['data'] = &CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'],
+    $values['group']['data'] = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'],
       'Added',
       3
     );
