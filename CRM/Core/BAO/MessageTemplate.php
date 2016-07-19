@@ -411,7 +411,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $domain = CRM_Core_BAO_Domain::getDomain();
     $hookTokens = array();
     $mailing = new CRM_Mailing_BAO_Mailing();
-    $mailing->subject = $mailingContent['subject'];
+    $mailing->subject = $mailContent['subject'];
     $mailing->body_text = $mailContent['text'];
     $mailing->body_html = $mailContent['html'];
     $tokens = $mailing->getTokens();
@@ -456,12 +456,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $contact = $contact[$contactID];
     }
 
-    $mailingContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailingContent['subject'], $domain, FALSE, $tokens['text'], TRUE);
+    $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['text'], TRUE);
     $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], TRUE);
     $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], TRUE);
 
     if ($contactID) {
-      $mailingContent['subject'] = CRM_Utils_Token::replaceContactTokens($mailingContent['subject'], $contact, FALSE, $tokens['text'], FALSE, TRUE);
+      $mailContent['subject'] = CRM_Utils_Token::replaceContactTokens($mailContent['subject'], $contact, FALSE, $tokens['text'], FALSE, TRUE);
       $mailContent['text'] = CRM_Utils_Token::replaceContactTokens($mailContent['text'], $contact, FALSE, $tokens['text'], FALSE, TRUE);
       $mailContent['html'] = CRM_Utils_Token::replaceContactTokens($mailContent['html'], $contact, FALSE, $tokens['html'], FALSE, TRUE);
 
@@ -475,13 +475,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       );
       $contact = $contactArray[$contactID];
 
-      $mailingContent['subject'] = CRM_Utils_Token::replaceHookTokens($mailingContent['subject'], $contact, $categories, TRUE);
+      $mailContent['subject'] = CRM_Utils_Token::replaceHookTokens($mailContent['subject'], $contact, $categories, TRUE);
       $mailContent['text'] = CRM_Utils_Token::replaceHookTokens($mailContent['text'], $contact, $categories, TRUE);
       $mailContent['html'] = CRM_Utils_Token::replaceHookTokens($mailContent['html'], $contact, $categories, TRUE);
     }
 
     // strip whitespace from ends and turn into a single line
-    $mailingContent['subject'] = "{strip}{$mailingContent['subject']}{/strip}";
+    $mailContent['subject'] = "{strip}{$mailContent['subject']}{/strip}";
 
     // parse the three elements with Smarty
     $smarty = CRM_Core_Smarty::singleton();
@@ -500,7 +500,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $sent = FALSE;
 
     // create the params array
-    $params['subject'] = $mailingContent['subject'];
+    $params['subject'] = $mailContent['subject'];
     $params['text'] = $mailContent['text'];
     $params['html'] = $mailContent['html'];
 
@@ -548,7 +548,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
     }
 
-    return array($sent, $mailingContent['subject'], $mailContent['text'], $mailContent['html']);
+    return array($sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']);
   }
 
 }
