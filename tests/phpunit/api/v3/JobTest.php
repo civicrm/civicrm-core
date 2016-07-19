@@ -526,7 +526,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test the decisions made for addresses when merging.
    *
-   * @dataProvider getMergeAddresses
+   * @dataProvider getMergeLocationData
    *
    * Scenarios:
    * (the ones with **** could be disputed as whether it is the best outcome).
@@ -538,18 +538,18 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *      - the (only) address is retained
    *   'only_one_has_address_reverse'
    *     - the (only) address is retained
-   *   **** 'different_primaries_with_different_location_type' Primaries are different but do not clash due to diff type
+   *   'different_primaries_with_different_location_type' Primaries are different but do not clash due to diff type
    *     - result - both addresses kept. The one from the kept (lowest ID) contact is primary
-   *   **** 'different_primaries_with_different_location_type_reverse' Primaries are different but do not clash due to diff type
+   *   'different_primaries_with_different_location_type_reverse' Primaries are different but do not clash due to diff type
    *     - result - both addresses kept. The one from the kept (lowest ID) contact is primary
-   *   **** 'different_primaries_location_match_only_one_address' per previous but a second address matches the primary but is not primary
+   *   'different_primaries_location_match_only_one_address' per previous but a second address matches the primary but is not primary
    *      - result - both addresses kept. The one from the kept (lowest ID) contact is primary
-   *   **** 'different_primaries_location_match_only_one_address_reverse' per previous but a second address matches the primary but is not primary
+   *   'different_primaries_location_match_only_one_address_reverse' per previous but a second address matches the primary but is not primary
    *      - result - both addresses kept. The one from the kept (lowest ID) contact is primary
-   *   **** 'same_primaries_different_location' Primary addresses are the same but have different location type IDs
-   *     - result primary kept with the lowest ID.
-   *   **** 'same_primaries_different_location_reverse' Primary addresses are the same but have different location type IDs
-   *     - result primary kept with the lowest ID.
+   *  'same_primaries_different_location' Primary addresses are the same but have different location type IDs
+   *    - result primary kept with the lowest ID. Other address retained too (to preserve location type info).
+   *  'same_primaries_different_location_reverse' Primary addresses are the same but have different location type IDs
+   *    - result primary kept with the lowest ID. Other address retained too (to preserve location type info).
    *
    * @param array $dataSet
    */
@@ -557,17 +557,17 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $contactID1 = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     foreach ($dataSet['contact_1'] as $address) {
-      $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID1), $address));
+      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(array('contact_id' => $contactID1), $address));
     }
     foreach ($dataSet['contact_2'] as $address) {
-      $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID2), $address));
+      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(array('contact_id' => $contactID2), $address));
     }
 
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
     $this->assertEquals(1, count($result['values']['merged']));
-    $addresses = $this->callAPISuccess('Address', 'get', array('contact_id' => $contactID1, 'sequential' => 1));
+    $addresses = $this->callAPISuccess($dataSet['entity'], 'get', array('contact_id' => $contactID1, 'sequential' => 1));
     $this->assertEquals(count($dataSet['expected']), $addresses['count']);
-    $locationTypes = $this->callAPISuccess('Address', 'getoptions', array('field' => 'location_type_id'));
+    $locationTypes = $this->callAPISuccess($dataSet['entity'], 'getoptions', array('field' => 'location_type_id'));
     foreach ($dataSet['expected'] as $index => $expectedAddress) {
       foreach ($expectedAddress as $key => $value) {
         if ($key == 'location_type_id') {
@@ -583,7 +583,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test altering the address decision by hook.
    *
-   * @dataProvider getMergeAddresses
+   * @dataProvider getMergeLocationData
    *
    * @param array $dataSet
    */
@@ -719,193 +719,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getMergeAddresses() {
+  public function getMergeLocationData() {
     $address1 = array('street_address' => 'Buckingham Palace', 'city' => 'London');
     $address2 = array('street_address' => 'The Doghouse', 'supplemental_address_1' => 'under the blanket');
-    $data = array(
-      array(
-        'matching_primary' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-        ),
-      ),
-      array(
-        'matching_primary_reverse' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-        ),
-      ),
-      array(
-        'only_one_has_address' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'contact_2' => array(),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-        ),
-      ),
-      array(
-        'only_one_has_address_reverse' => array(
-          'contact_1' => array(),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-        ),
-      ),
-      array(
-        'different_primaries_with_different_location_type' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
-          ),
-        ),
-      ),
-      array(
-        'different_primaries_with_different_location_type_reverse' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
-          ),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-        ),
-      ),
-      array(
-        'different_primaries_location_match_only_one_address' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
-
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
-          ),
-        ),
-      ),
-      array(
-        'different_primaries_location_match_only_one_address_reverse' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
-          ),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address2),
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address2),
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-        ),
-      ),
-      array(
-        'same_primaries_different_location' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address1),
-
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 0), $address1),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address1),
-          ),
-        ),
-      ),
-      array(
-        'same_primaries_different_location_reverse' => array(
-          'contact_1' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address1),
-          ),
-          'contact_2' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-          'expected' => array(
-            array_merge(array('location_type_id' => 'Work', 'is_primary' => 1), $address1),
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 0), $address1),
-          ),
-          'expected_hook' => array(
-            array_merge(array('location_type_id' => 'Home', 'is_primary' => 1), $address1),
-          ),
-        ),
-      ),
-    );
+    $data = $this->getMergeLocations($address1, $address2, 'Address');
+    $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345', 'phone_type_id' => 1), array('phone' => '678910', 'phone_type_id' => 1), 'Phone'));
+    $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345'), array('phone' => '678910'), 'Phone'));
     return $data;
   }
 
@@ -1366,6 +1185,399 @@ class api_v3_JobTest extends CiviUnitTestCase {
     else {
       $params['description'] = 'Go Go you good thing';
     }
+  }
+
+  /**
+   * Get the location data set.
+   *
+   * @param array $locationParams1
+   * @param array $locationParams2
+   * @param string $entity
+   *
+   * @return array
+   */
+  public function getMergeLocations($locationParams1, $locationParams2, $entity) {
+    $data = array(
+      array(
+        'matching_primary' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+        ),
+      ),
+      array(
+        'matching_primary_reverse' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+        ),
+      ),
+      array(
+        'only_one_has_address' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'contact_2' => array(),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+        ),
+      ),
+      array(
+        'only_one_has_address_reverse' => array(
+          'entity' => $entity,
+          'contact_1' => array(),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+        ),
+      ),
+      array(
+        'different_primaries_with_different_location_type' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams2),
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 0,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams2),
+          ),
+        ),
+      ),
+      array(
+        'different_primaries_with_different_location_type_reverse' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams2),
+          ),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams2),
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 0,
+            ), $locationParams1),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+        ),
+      ),
+      array(
+        'different_primaries_location_match_only_one_address' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams2),
+
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 0,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams2),
+          ),
+        ),
+      ),
+      array(
+        'different_primaries_location_match_only_one_address_reverse' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams2),
+          ),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams2),
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 0,
+            ), $locationParams1),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+        ),
+      ),
+      array(
+        'same_primaries_different_location' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams1),
+
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams1),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+        ),
+      ),
+      array(
+        'same_primaries_different_location_reverse' => array(
+          'entity' => $entity,
+          'contact_1' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+          'contact_2' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+          'expected' => array(
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 0,
+            ), $locationParams1),
+          ),
+          'expected_hook' => array(
+            array_merge(array(
+              'location_type_id' => 'Home',
+              'is_primary' => 1,
+            ), $locationParams1),
+          ),
+        ),
+      ),
+    );
+    return $data;
   }
 
 }

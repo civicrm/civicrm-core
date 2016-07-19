@@ -884,33 +884,31 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $fieldCount = $locField[3];
 
         // Rule: Catch address conflicts (same address type on both contacts)
-        if ($fieldName == 'address') {
-          if (
-            isset($migrationInfo['main_details']['location_blocks']['address']) &&
-            !empty($migrationInfo['main_details']['location_blocks']['address'])
-          ) {
+        if (
+          isset($migrationInfo['main_details']['location_blocks'][$fieldName]) &&
+          !empty($migrationInfo['main_details']['location_blocks'][$fieldName])
+        ) {
 
-            // Load the address we're inspecting from the 'other' contact
-            $addressRecord = $migrationInfo['other_details']['location_blocks']['address'][$fieldCount];
-            $addressRecordLocTypeId = CRM_Utils_Array::value('location_type_id', $addressRecord);
+          // Load the address we're inspecting from the 'other' contact
+          $addressRecord = $migrationInfo['other_details']['location_blocks'][$fieldName][$fieldCount];
+          $addressRecordLocTypeId = CRM_Utils_Array::value('location_type_id', $addressRecord);
 
-            // If it exists on the 'main' contact already, skip it. Otherwise
-            // if the location type exists already, log a conflict.
-            foreach ($migrationInfo['main_details']['location_blocks']['address'] as $mainAddressKey => $mainAddressRecord) {
-              if (self::addressIsSame($addressRecord, $mainAddressRecord)) {
-                unset($migrationInfo[$key]);
-                break;
-              }
-              elseif ($addressRecordLocTypeId == $mainAddressRecord['location_type_id']) {
-                $conflicts[$key] = NULL;
-                break;
-              }
+          // If it exists on the 'main' contact already, skip it. Otherwise
+          // if the location type exists already, log a conflict.
+          foreach ($migrationInfo['main_details']['location_blocks'][$fieldName] as $mainAddressKey => $mainAddressRecord) {
+            if (self::addressIsSame($addressRecord, $mainAddressRecord)) {
+              unset($migrationInfo[$key]);
+              break;
             }
-
+            elseif ($addressRecordLocTypeId == $mainAddressRecord['location_type_id']) {
+              $conflicts[$key] = NULL;
+              break;
+            }
           }
         }
+
         // For other locations, don't merge/add if the values are the same
-        elseif ($migrationInfo['rows'][$key]['main'] == $migrationInfo['rows'][$key]['other']) {
+        elseif (CRM_Utils_Array::value('main', $migrationInfo['rows'][$key]) == $migrationInfo['rows'][$key]['other']) {
           unset($migrationInfo[$key]);
         }
       }
@@ -1214,7 +1212,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           $lookupType = FALSE;
           if ($blockInfo['hasType']) {
-            $lookupType = $value[$blockInfo['hasType']];
+            $lookupType = CRM_Utils_Array::value($blockInfo['hasType'], $value);
           }
 
           // Hold ID of main contact's matching block
@@ -1306,11 +1304,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               $js = array('onChange' => "mergeBlock('$blockName', this, $count, 'typeTypeId' );");
             }
 
-            $thisTypeId = $value[$blockInfo['hasType']];
+            $thisTypeId = CRM_Utils_Array::value($blockInfo['hasType'], $value);
 
             // Put this field's location type at the top of the list
             $tmpIdList = $typeOptions['values'];
-            $defaultTypeId = array($thisTypeId => $tmpIdList[$thisTypeId]);
+            $defaultTypeId = array($thisTypeId => CRM_Utils_Array::value($thisTypeId, $tmpIdList));
             unset($tmpIdList[$thisTypeId]);
 
             // Add the element
