@@ -108,7 +108,7 @@ class CRM_Utils_VersionCheck {
 
     // Poor-man's cron fallback if scheduled job is enabled but has failed to run
     $expiryTime = time() - self::CACHEFILE_EXPIRE;
-    if (!empty($this->cronJob['is_active']) &&
+    if (empty($this->cronJob['is_active']) &&
       (!$this->isInfoAvailable || filemtime($this->cacheFile) < $expiryTime)
     ) {
       // First try updating the files modification time, for 2 reasons:
