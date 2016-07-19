@@ -124,7 +124,7 @@
         }
       },
       "language": {
-        "zeroRecords": ZeroRecordText 
+        "zeroRecords": ZeroRecordText
       },
       "drawCallback": function(settings) {
         //Add data attributes to cells
@@ -142,8 +142,8 @@
         //Reload table after draw
         $(settings.nTable).trigger('crmLoad');
         if (parentsOnly) {
-          $('tbody tr.crm-group-parent', settings.nTable).each( function() {
-            $(this).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
+          $('tbody tr.crm-group-parent td:first', settings.nTable).each( function() {
+            $(this).prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}').find('div').css({'display': 'inline'});
           });
         }
       }
@@ -201,7 +201,7 @@
         // child rows for this parent have already been retrieved so just show them
         $('.parent_is_' + parent_id ).show();
       } else {
-        //FIXME Is it possible to replace all this with a datatables call? 
+        //FIXME Is it possible to replace all this with a datatables call?
         $.ajax( {
             "dataType": 'json',
             "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
