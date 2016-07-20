@@ -368,6 +368,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
             $params['group_type']
           ) . CRM_Core_DAO::VALUE_SEPARATOR;
       }
+      else {
+        $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['group_type'] . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
     }
     else {
       $params['group_type'] = NULL;
