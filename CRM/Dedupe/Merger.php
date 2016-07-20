@@ -1729,8 +1729,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // CRM-15681 merge sub_types
-    if ($other_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['other_details'])) {
-      if ($main_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['main_details'])) {
+    if ($other_sub_types = CRM_Utils_Array::value('contact_sub_type', $migrationInfo['other_details'])) {
+      if ($main_sub_types = CRM_Utils_Array::value('contact_sub_type', $migrationInfo['main_details'])) {
         $submitted['contact_sub_type'] = array_unique(array_merge($main_sub_types, $other_sub_types));
       }
       else {
@@ -1959,7 +1959,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   $specialValues
    */
   public static function getSpecialValues($contact) {
-    $preferred_communication_method = CRM_Utils_array::value('preferred_communication_method', $contact);
+    $preferred_communication_method = CRM_Utils_Array::value('preferred_communication_method', $contact);
     $value = empty($preferred_communication_method) ? array() : $preferred_communication_method;
     $specialValues = array(
       'preferred_communication_method' => $value,
