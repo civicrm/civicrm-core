@@ -67,7 +67,7 @@ class CRM_Utils_Mail_Incoming {
       return self::formatMail($part, $attachments);
     }
 
-    if ($part instanceof ezcMailText) {
+    if ($part instanceof ezcMailText || !$part) {
       return self::formatMailText($part, $attachments);
     }
 
