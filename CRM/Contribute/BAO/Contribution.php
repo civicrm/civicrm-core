@@ -4816,10 +4816,10 @@ LIMIT 1;";
    *
    * @param array $lineItems
    * @param array $contributions
-   * @param array $previousContributionId
+   * @param array $contributionStatusId
    *
    */
-  public static function addPayments($lineItems, $contributions, $previousContributionId = NULL) {
+  public static function addPayments($lineItems, $contributions, $contributionStatusId = NULL) {
     // get financial trxn which is a payment
     $ftSql = "SELECT ft.id, ft.total_amount
       FROM civicrm_financial_trxn ft
@@ -4834,7 +4834,7 @@ LIMIT 1;";
     ));
     foreach ($contributions as $k => $contribution) {
       if (!($contributionStatus[$contribution->contribution_status_id] == 'Partially paid'
-        || CRM_Utils_Array::value($previousContributionId, $contributionStatus) == 'Partially paid')
+        || CRM_Utils_Array::value($contributionStatusId, $contributionStatus) == 'Partially paid')
       ) {
         continue;
       }
