@@ -896,7 +896,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // If it exists on the 'main' contact already, skip it. Otherwise
           // if the location type exists already, log a conflict.
           foreach ($migrationInfo['main_details']['location_blocks'][$fieldName] as $mainAddressKey => $mainAddressRecord) {
-            if (self::addressIsSame($addressRecord, $mainAddressRecord)) {
+            if (self::locationIsSame($addressRecord, $mainAddressRecord)) {
               unset($migrationInfo[$key]);
               break;
             }
@@ -957,7 +957,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return bool
    */
-  static public function addressIsSame($mainAddress, $comparisonAddress) {
+  static public function locationIsSame($mainAddress, $comparisonAddress) {
     $keysToIgnore = array('id', 'is_primary', 'is_billing', 'manual_geo_code', 'contact_id');
     foreach ($comparisonAddress as $field => $value) {
       if (in_array($field, $keysToIgnore)) {
@@ -1954,8 +1954,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * @param $moniker
-   * @param $contact
+   * @param array $contact
    * @return array
    *   $specialValues
    */
