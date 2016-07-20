@@ -37,6 +37,13 @@
 class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'OptionGroup';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
