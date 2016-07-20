@@ -732,12 +732,12 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    * @return bool
    */
   public static function alterIndexAndTypeForImageURL() {
-    $dao = CRM_Core_DAO::executeQuery("SHOW INDEX FROM civicrm_contact WHERE KEY_NAME = 'index_image_url'");
-    if ($dao->N) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_contact` DROP INDEX `index_image_url`");
-    }
+    $length = array();
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'index_image_url');
     CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_contact` CHANGE `image_URL` `image_URL` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'optional URL for preferred image (photo, logo, etc.) to display for this contact.'");
-    CRM_Core_DAO::executeQuery("CREATE INDEX `index_image_url` ON `civicrm_contact` ( image_URL(128) )");
+
+    $length['civicrm_contact']['image_URL'] = 128;
+    CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('image_URL')), 'index', $length);
 
     return TRUE;
   }
