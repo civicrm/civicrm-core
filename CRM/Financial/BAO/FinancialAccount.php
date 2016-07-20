@@ -361,10 +361,13 @@ LIMIT 1";
    * with Financial Account
    *
    * @param array $params
+   *   Holds submitted formvalues and params from api for updating/adding contribution
    *
    * @param int $contributionID
+   *   Contribution ID
    *
    * @param obj $form
+   *   Holds form object of CRM_Contribute_Form_Contribution
    *
    * @return bool
    *
@@ -375,7 +378,7 @@ LIMIT 1";
     }
     $recognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $params);
     if (!(!CRM_Utils_System::isNull($recognitionDate)
-      || ($contributionID && $params['prevContribution']->revenue_recognition_date))
+      || ($contributionID && !CRM_Utils_System::isNull($params['prevContribution']->revenue_recognition_date)))
     ) {
       return FALSE;
     }
