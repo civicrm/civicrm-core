@@ -383,13 +383,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
     else {
       $defaults = array();
+      $contribution = civicrm_api3('Contribution', 'getsingle', array(
+        'return' => array("contribution_status_id"),
+        'id' => $this->_contributionId,
+      ));
+      $contributionStatusId = CRM_Utils_Array::value('contribution_status_id', $contribution);
       $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
       // Fetch the contribution & do proportional line item assignment
       $params = array('id' => $this->_contributionId);
       $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_contributionId);
       if (!empty($lineItems)) {
-        CRM_Contribute_BAO_Contribution::addPayments($lineItems, array($contribution));
+        CRM_Contribute_BAO_Contribution::addPayments($lineItems, array($contribution), $contributionStatusId);
       }
 
       // email sending
