@@ -597,7 +597,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     foreach ($vvalue as $vkey => $vval) {
       foreach ($selectedContacts as $dnt => $val) {
-        if (array_key_exists($val, $params) && !CRM_Utils_array::crmIsEmptyArray($params[$val])) {
+        if (array_key_exists($val, $params) && !CRM_Utils_Array::crmIsEmptyArray($params[$val])) {
           if ($val == 'contact_check') {
             $mailStatus = ts("A copy of the activity has also been sent to selected contacts(s).");
           }

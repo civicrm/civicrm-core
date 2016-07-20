@@ -479,7 +479,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     if (!empty($params['target_contact_id'])) {
-      if (is_array($params['target_contact_id']) && !CRM_Utils_array::crmIsEmptyArray($params['target_contact_id'])) {
+      if (is_array($params['target_contact_id']) && !CRM_Utils_Array::crmIsEmptyArray($params['target_contact_id'])) {
         $msgs[] = "target=" . implode(',', $params['target_contact_id']);
         // take only first target
         // will be used for recently viewed display
