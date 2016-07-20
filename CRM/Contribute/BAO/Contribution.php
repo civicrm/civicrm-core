@@ -4827,7 +4827,10 @@ LIMIT 1;";
     elseif ($event) {
       return ts('Online Event Registration') . ': ' . $event->title;
     }
-    return 'recurring contribution';
+    elseif (!empty($contribution->contribution_recur_id)) {
+      return 'recurring contribution';
+    }
+    return '';
   }
 
   /**

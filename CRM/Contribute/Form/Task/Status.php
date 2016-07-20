@@ -83,6 +83,13 @@ AND    {$this->_componentClause}";
   }
 
   /**
+   * Sets contribution Ids for unit test.
+   */
+  public function setContributionIds($contributionIds) {
+    $this->_contributionIds = $contributionIds;
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -209,19 +216,30 @@ AND    co.id IN ( $contribIDs )";
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $statusID = CRM_Utils_Array::value('contribution_status_id', $params);
 
+    // submit the form with values.
+    self::processForm($this, $params);
+
+    CRM_Core_Session::setStatus(ts('Contribution status has been updated for selected record(s).'), ts('Status Updated'), 'success');
+  }
+
+  /**
+   * Process the form with submitted params.
+   * Also supports unit test.
+   */
+  public static function processForm($form, $params) {
+    $statusID = CRM_Utils_Array::value('contribution_status_id', $params);
     $baseIPN = new CRM_Core_Payment_BaseIPN();
 
     $transaction = new CRM_Core_Transaction();
 
     // get the missing pieces for each contribution
-    $contribIDs = implode(',', $this->_contributionIds);
+    $contribIDs = implode(',', $form->_contributionIds);
     $details = self::getDetails($contribIDs);
     $template = CRM_Core_Smarty::singleton();
 
     // for each contribution id, we just call the baseIPN stuff
-    foreach ($this->_rows as $row) {
+    foreach ($form->_rows as $row) {
       $input = $ids = $objects = array();
       $input['component'] = $details[$row['contribution_id']]['component'];
 
@@ -277,7 +295,7 @@ AND    co.id IN ( $contribIDs )";
       else {
         $input['trxn_id'] = $contribution->invoice_id;
       }
-      $input['trxn_date'] = CRM_Utils_Date::processDate($params["trxn_date_{$row['contribution_id']}"]);
+      $input['trxn_date'] = CRM_Utils_Date::processDate($params["trxn_date_{$row['contribution_id']}"], date('H:i:s'));
 
       // @todo calling baseIPN like this is a pattern in it's last gasps. Call contribute.completetransaction api.
       $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
@@ -285,8 +303,6 @@ AND    co.id IN ( $contribIDs )";
       // reset template values before processing next transactions
       $template->clearTemplateVars();
     }
-
-    CRM_Core_Session::setStatus(ts('Contribution status has been updated for selected record(s).'), ts('Status Updated'), 'success');
   }
 
   /**
