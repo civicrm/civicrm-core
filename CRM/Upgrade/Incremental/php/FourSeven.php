@@ -218,6 +218,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_10($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Upgrade Add Help Pre and Post Fields to price value table'), 'addHelpPreAndHelpPostFieldsPriceFieldValue');
+    $this->addTask(ts('Alter index and type for image URL'), 'alterIndexAndTypeForImageURL');
   }
 
   /*
@@ -722,6 +723,21 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     ");
 
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+
+    return TRUE;
+  }
+
+  /**
+   * CRM-19100 - Alter Index and Type for Image URL
+   * @return bool
+   */
+  public static function alterIndexAndTypeForImageURL() {
+    $length = array();
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'index_image_url');
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_contact` CHANGE `image_URL` `image_URL` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'optional URL for preferred image (photo, logo, etc.) to display for this contact.'");
+
+    $length['civicrm_contact']['image_URL'] = 128;
+    CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('image_URL')), 'index', $length);
 
     return TRUE;
   }
