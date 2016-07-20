@@ -376,11 +376,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
 
-    $optionGroup = civicrm_api3('OptionGroup', 'get', array(
-      'sequential' => 1,
-      'name' => $self->_gName,
-    ));
-    $dataType = CRM_Core_BAO_OptionGroup::getDataType($optionGroup['id']);
+    $optionGroup = $this->getOptionGroupDataType($self->_gName);
     if ($dataType) {
       $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
       if (!$validate) {
@@ -390,6 +386,23 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
     return $errors;
+  }
+
+  /**
+   * Get the DataType for a specified Option Group.
+   *
+   * @param string $optionGroupname name of the option group
+   *
+   * @return string|bool
+   */
+  public static function getOptionGroupDataType($optionGroupName) {
+    $optionGroup = civicrm_api3('OptionGroup', 'get', array(
+      'sequential' => 1,
+      'name' => $optionGroupName,
+    ));
+
+    $dataType = CRM_Core_BAO_OptionGroup::getDataType($optionGroup['id']);
+    return $dataType;
   }
 
   /**

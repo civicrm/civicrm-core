@@ -63,4 +63,33 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     $this->assertTrue(($values === $options2), "The arrays retrieved should be the same and in the same order");
   }
 
+  /**
+   * optionGroupTests
+   *
+   * @return array
+   */
+  public function optionGroupTests() {
+    $tests = array();
+    $tests[] = array('event_type', 'Integer');
+    $tests[] = array('addressee', 'null');
+    $tests[] = array('activity_status', 'Integer');
+    return $tests;
+  }
+
+  /**
+   * Test Returning DataType of Option Group
+   *
+   *
+   * @dataProvider optionGroupTests
+   */
+  public function testsOptionGroupDataType($optionGroup, $expectedDataType) {
+    $dataType = CRM_Admin_Form_Options::getOptionGroupDataType($optionGroup);
+    if ($expectedDataType == 'null') {
+      $this->assertNull($dataType);
+    }
+    else {
+      $this->assertEquals($dataType, $expectedDataType);
+    }
+  }
+
 }
