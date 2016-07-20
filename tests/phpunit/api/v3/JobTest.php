@@ -384,7 +384,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-<<<<<<< HEAD
    * Check that the merge carries across various related entities.
    *
    * Note the group combinations & expected results:
@@ -566,7 +565,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
     $this->assertEquals(1, count($result['values']['merged']));
     $addresses = $this->callAPISuccess($dataSet['entity'], 'get', array('contact_id' => $contactID1, 'sequential' => 1));
-    $this->assertEquals(count($dataSet['expected']), $addresses['count']);
+    $this->assertEquals(count($dataSet['expected']), $addresses['count'], "Did not get the expected result for " . $dataSet['entity'] . (!empty($dataSet['description']) ? " on dataset {$dataSet['description']}" : ''));
     $locationTypes = $this->callAPISuccess($dataSet['entity'], 'getoptions', array('field' => 'location_type_id'));
     foreach ($dataSet['expected'] as $index => $expectedAddress) {
       foreach ($expectedAddress as $key => $value) {
@@ -574,7 +573,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
           $this->assertEquals($locationTypes['values'][$addresses['values'][$index][$key]], $value);
         }
         else {
-          $this->assertEquals($addresses['values'][$index][$key], $value);
+          $this->assertEquals($addresses['values'][$index][$key], $value, "mismatch on $key" . (!empty($dataSet['description']) ? " on dataset {$dataSet['description']}" : ''));
         }
       }
     }
@@ -593,25 +592,25 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->contributionCreate(array('contact_id' => $contactID1, 'receive_date' => '2010-01-01', 'invoice_id' => 1, 'trxn_id' => 1));
     $this->contributionCreate(array('contact_id' => $contactID2, 'receive_date' => '2012-01-01', 'invoice_id' => 2, 'trxn_id' => 2));
     foreach ($dataSet['contact_1'] as $address) {
-      $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID1), $address));
+      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(array('contact_id' => $contactID1), $address));
     }
     foreach ($dataSet['contact_2'] as $address) {
-      $this->callAPISuccess('Address', 'create', array_merge(array('contact_id' => $contactID2), $address));
+      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(array('contact_id' => $contactID2), $address));
     }
     $this->hookClass->setHook('civicrm_alterLocationMergeData', array($this, 'hookMostRecentDonor'));
 
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
     $this->assertEquals(1, count($result['values']['merged']));
-    $addresses = $this->callAPISuccess('Address', 'get', array('contact_id' => $contactID1, 'sequential' => 1));
+    $addresses = $this->callAPISuccess($dataSet['entity'], 'get', array('contact_id' => $contactID1, 'sequential' => 1));
     $this->assertEquals(count($dataSet['expected_hook']), $addresses['count']);
-    $locationTypes = $this->callAPISuccess('Address', 'getoptions', array('field' => 'location_type_id'));
+    $locationTypes = $this->callAPISuccess($dataSet['entity'], 'getoptions', array('field' => 'location_type_id'));
     foreach ($dataSet['expected_hook'] as $index => $expectedAddress) {
       foreach ($expectedAddress as $key => $value) {
         if ($key == 'location_type_id') {
           $this->assertEquals($locationTypes['values'][$addresses['values'][$index][$key]], $value);
         }
         else {
-          $this->assertEquals($addresses['values'][$index][$key], $value, 'Unexpected value for ' . $key);
+          $this->assertEquals($value, $addresses['values'][$index][$key], $dataSet['entity'] . ': Unexpected value for ' . $key . (!empty($dataSet['description']) ? " on dataset {$dataSet['description']}" : ''));
         }
       }
     }
@@ -689,7 +688,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
                 $mainLocationTypeID = $mainBlock['location_type_id'];
                 // We also want to be more ruthless about removing matching addresses.
                 unset($mainBlock['location_type_id']);
-                if (CRM_Dedupe_Merger::addressIsSame($block, $mainBlock)
+                if (CRM_Dedupe_Merger::locationIsSame($block, $mainBlock)
                   && (!isset($blocksDAO[$blockType]['update']) || !isset($blocksDAO[$blockType]['update'][$mainBlock['id']]))
                   && (!isset($blocksDAO[$blockType]['delete']) || !isset($blocksDAO[$blockType]['delete'][$mainBlock['id']]))
                 ) {
@@ -725,7 +724,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $data = $this->getMergeLocations($address1, $address2, 'Address');
     $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345', 'phone_type_id' => 1), array('phone' => '678910', 'phone_type_id' => 1), 'Phone'));
     $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345'), array('phone' => '678910'), 'Phone'));
+    $data = array_merge($data, $this->getMergeLocations(array('email' => 'mini@me.com'), array('email' => 'mini@me.org'), 'Email', array(array(
+      'email' => 'anthony_anderson@civicrm.org',
+      'location_type_id' => 'Home',
+    ))));
     return $data;
+
   }
 
   /**
@@ -1003,6 +1007,96 @@ class api_v3_JobTest extends CiviUnitTestCase {
       ),
       array(
         array(
+          'mode' => 'safe',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Email.create' => array(
+                'email' => 'big.slog@work.co.nz',
+                'location_type_id' => 'Work',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Email.create' => array(
+                'email' => 'big.slog@work.com',
+                'location_type_id' => 'Work',
+              ),
+            ),
+          ),
+          'skipped' => 1,
+          'merged' => 0,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+            ),
+          ),
+        ),
+      ),
+      array(
+        array(
+          'mode' => 'safe',
+          'contacts' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Phone.create' => array(
+                'phone' => '123456',
+                'location_type_id' => 'Work',
+              ),
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+              'contact_sub_type' => 'Student',
+              'api.Phone.create' => array(
+                'phone' => '23456',
+                'location_type_id' => 'Work',
+              ),
+            ),
+          ),
+          'skipped' => 1,
+          'merged' => 0,
+          'expected' => array(
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+            ),
+            array(
+              'first_name' => 'Michael',
+              'last_name' => 'Jackson',
+              'email' => 'michael@neverland.com',
+              'contact_type' => 'Individual',
+            ),
+          ),
+        ),
+      ),
+      array(
+        array(
           'mode' => 'aggressive',
           'contacts' => array(
             array(
@@ -1196,14 +1290,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getMergeLocations($locationParams1, $locationParams2, $entity) {
+  public function getMergeLocations($locationParams1, $locationParams2, $entity, $additionalExpected = array()) {
     $data = array(
       array(
         'matching_primary' => array(
           'entity' => $entity,
           'contact_1' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
@@ -1213,30 +1307,30 @@ class api_v3_JobTest extends CiviUnitTestCase {
           ),
           'contact_2' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
-              'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
-              'location_type_id' => 'Work',
-              'is_primary' => 0,
-            ), $locationParams2),
-          ),
-          'expected_hook' => array(
-            array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
-          ),
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
+            array_merge(array(
+              'location_type_id' => 'Main',
+              'is_primary' => 1,
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          )),
         ),
       ),
       array(
@@ -1244,13 +1338,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
           'entity' => $entity,
           'contact_1' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
           ),
           'contact_2' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
@@ -1258,26 +1352,26 @@ class api_v3_JobTest extends CiviUnitTestCase {
               'is_primary' => 0,
             ), $locationParams2),
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
-          ),
-          'expected_hook' => array(
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
-          ),
+          )),
         ),
       ),
       array(
@@ -1285,7 +1379,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
           'entity' => $entity,
           'contact_1' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
@@ -1294,35 +1388,38 @@ class api_v3_JobTest extends CiviUnitTestCase {
             ), $locationParams2),
           ),
           'contact_2' => array(),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
-          ),
-          'expected_hook' => array(
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
-              'is_primary' => 1,
+              'location_type_id' => 'Main',
+              // When dealing with email we don't have a clean slate - the existing
+              // primary will be primary.
+              'is_primary' => ($entity == 'Email' ? 0 : 1),
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
-          ),
+          )),
         ),
       ),
       array(
         'only_one_has_address_reverse' => array(
+          'description' => 'The destination contact does not have an address. secondary contact should be merged in.',
           'entity' => $entity,
           'contact_1' => array(),
           'contact_2' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
@@ -1330,34 +1427,37 @@ class api_v3_JobTest extends CiviUnitTestCase {
               'is_primary' => 0,
             ), $locationParams2),
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
+              // When dealing with email we don't have a clean slate - the existing
+              // primary will be primary.
+              'is_primary' => ($entity == 'Email' ? 0 : 1),
+            ), $locationParams1),
+            array_merge(array(
+              'location_type_id' => 'Work',
+              'is_primary' => 0,
+            ), $locationParams2),
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
+            array_merge(array(
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
-          ),
-          'expected_hook' => array(
-            array_merge(array(
-              'location_type_id' => 'Home',
-              'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
-              'location_type_id' => 'Work',
-              'is_primary' => 0,
-            ), $locationParams2),
-          ),
+          )),
         ),
       ),
       array(
         'different_primaries_with_different_location_type' => array(
+          'description' => 'Primaries are different with different location. Keep both addresses. Set primary to be that of lower id',
           'entity' => $entity,
           'contact_1' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
           ),
@@ -1367,26 +1467,26 @@ class api_v3_JobTest extends CiviUnitTestCase {
               'is_primary' => 1,
             ), $locationParams2),
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
-          ),
-          'expected_hook' => array(
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 0,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 1,
             ), $locationParams2),
-          ),
+          )),
         ),
       ),
       array(
@@ -1400,30 +1500,30 @@ class api_v3_JobTest extends CiviUnitTestCase {
           ),
           'contact_2' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 1,
             ), $locationParams2),
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 0,
             ), $locationParams1),
-          ),
-          'expected_hook' => array(
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
-          ),
+          )),
         ),
       ),
       array(
@@ -1431,7 +1531,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
           'entity' => $entity,
           'contact_1' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
@@ -1446,26 +1546,26 @@ class api_v3_JobTest extends CiviUnitTestCase {
             ), $locationParams2),
 
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
-          ),
-          'expected_hook' => array(
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 0,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 1,
             ), $locationParams2),
-          ),
+          )),
         ),
       ),
       array(
@@ -1479,7 +1579,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
           ),
           'contact_2' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
@@ -1487,26 +1587,26 @@ class api_v3_JobTest extends CiviUnitTestCase {
               'is_primary' => 0,
             ), $locationParams2),
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 1,
             ), $locationParams2),
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 0,
             ), $locationParams1),
-          ),
-          'expected_hook' => array(
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams2),
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
-          ),
+          )),
         ),
       ),
       array(
@@ -1514,7 +1614,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
           'entity' => $entity,
           'contact_1' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
           ),
@@ -1525,22 +1625,22 @@ class api_v3_JobTest extends CiviUnitTestCase {
             ), $locationParams1),
 
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 0,
             ), $locationParams1),
-          ),
-          'expected_hook' => array(
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 1,
             ), $locationParams1),
-          ),
+          )),
         ),
       ),
       array(
@@ -1554,26 +1654,26 @@ class api_v3_JobTest extends CiviUnitTestCase {
           ),
           'contact_2' => array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
           ),
-          'expected' => array(
+          'expected' => array_merge($additionalExpected, array(
             array_merge(array(
               'location_type_id' => 'Work',
               'is_primary' => 1,
             ), $locationParams1),
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 0,
             ), $locationParams1),
-          ),
-          'expected_hook' => array(
+          )),
+          'expected_hook' => array_merge($additionalExpected, array(
             array_merge(array(
-              'location_type_id' => 'Home',
+              'location_type_id' => 'Main',
               'is_primary' => 1,
             ), $locationParams1),
-          ),
+          )),
         ),
       ),
     );
