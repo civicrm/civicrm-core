@@ -2244,7 +2244,9 @@ ORDER BY civicrm_email.is_primary DESC";
             $value,
             $type,
             $valueId,
-            $contactID
+            $contactID,
+            FALSE,
+            FALSE
           );
         }
         elseif ($key == 'edit') {
