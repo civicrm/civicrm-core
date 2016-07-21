@@ -391,9 +391,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   /**
    * Get the DataType for a specified Option Group.
    *
-   * @param string $optionGroupname name of the option group
+   * @param string $optionGroupName name of the option group
    *
-   * @return string|bool
+   * @return string|null
    */
   public static function getOptionGroupDataType($optionGroupName) {
     $optionGroup = civicrm_api3('OptionGroup', 'get', array(
