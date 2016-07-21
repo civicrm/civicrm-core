@@ -182,7 +182,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
         'null_merges_with_set_reverse' => array(
           'mode' => 'safe',
           'contacts' => array(
-              array('black'),
+            array('black'),
             NULL,
           ),
           'skipped' => 0,
@@ -363,20 +363,24 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   /**
    * Using the api with check perms set to off, make sure custom data is merged.
    *
-   * Test CRM-18674 date custom field handling.
+   * Test CRM-19113 custom data lost when permissions in play.
    */
   public function testBatchMergeIntCustomFieldNoConflictAndNoCheckPerms() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit my contact');
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_cache");
     CRM_Utils_System::flushCache();
     $customFieldLabel = 'custom_' . $this->customIntFieldID;
-    $contactID = $this->individualCreate();
-    $this->individualCreate(array($customFieldLabel => 1));
+    $contactID = $this->individualCreate(array('custom_' . $this->customBoolFieldID => 1));
+    $this->individualCreate(array($customFieldLabel => 1, 'custom_' . $this->customBoolFieldID => 1));
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0));
     $this->assertEquals(1, count($result['values']['merged']));
     $this->assertEquals(0, count($result['values']['skipped']));
-    $contact = $this->callAPISuccess('Contact', 'getsingle', array('id' => $contactID, 'return' => $customFieldLabel));
+    $contact = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $contactID,
+      'return' => array($customFieldLabel, 'custom_' . $this->customBoolFieldID),
+    ));
     $this->assertEquals(1, $contact[$customFieldLabel]);
+    $this->assertEquals(1, $contact['custom_' . $this->customBoolFieldID]);
   }
 
   /**
