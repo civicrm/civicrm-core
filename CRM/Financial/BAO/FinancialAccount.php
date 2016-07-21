@@ -358,21 +358,21 @@ LIMIT 1";
 
   /**
    * Validate Financial Type has Deferred Revenue account relationship
-   * with Financial Account
+   * with Financial Account.
    *
    * @param array $params
-   *   Holds submitted formvalues and params from api for updating/adding contribution
+   *   Holds submitted formvalues and params from api for updating/adding contribution.
    *
    * @param int $contributionID
    *   Contribution ID
    *
-   * @param obj $form
-   *   Holds form object of CRM_Contribute_Form_Contribution
+   * @param array $priceSetFields
+   *   Array of price fields of a price set.
    *
    * @return bool
    *
    */
-  public static function checkFinancialTypeHasDeferred($params, $contributionID = NULL, $form = NULL) {
+  public static function checkFinancialTypeHasDeferred($params, $contributionID = NULL, $priceSetFields = NULL) {
     if (!CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
       return FALSE;
     }
@@ -390,7 +390,7 @@ LIMIT 1";
     }
     if (($contributionID || !empty($params['price_set_id'])) && empty($lineItems)) {
       if (!$contributionID) {
-        CRM_Price_BAO_PriceSet::processAmount($form->_priceSet['fields'],
+        CRM_Price_BAO_PriceSet::processAmount($priceSetFields,
         $params, $items);
       }
       else {
@@ -421,6 +421,13 @@ LIMIT 1";
    * with Financial Account.
    *
    * @param int $financialTypeId
+   *   Financial Type Id.
+   *
+   * @param int $entityID
+   *   Holds id for PriceSet/PriceField/PriceFieldValue.
+   *
+   * @param string $entity
+   *   Entity like PriceSet/PriceField/PriceFieldValue.
    *
    * @return bool
    *
