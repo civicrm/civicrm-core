@@ -2050,11 +2050,7 @@ ORDER BY civicrm_email.is_primary DESC";
     $primaryPhoneLoc = NULL;
     $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
-      $locTypeId = $typeId = NULL;
       list($fieldName, $locTypeId, $typeId) = CRM_Utils_System::explode('-', $key, 3);
-
-      //store original location type id
-      $actualLocTypeId = $locTypeId;
 
       if ($locTypeId == 'Primary') {
         if ($contactID) {
