@@ -21,10 +21,3 @@ INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`)
 VALUES
    (@option_group_id_ext, {localize}'{ts escape="sql"}odt{/ts}'{/localize}, @option_group_id_ext_val+1, 'odt', NULL, 0, 0, @option_group_id_ext_wt+1, 0, 1, 1);
-
---CRM-18651 Add in Data Type colum to option group table and set for some option groups
-ALTER TABLE civicrm_option_group
-ADD `data_type` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Data Type of Option Group.';
-UPDATE civicrm_option_group SET `data_type` = 'Integer'
-WHERE name in ('activity_type', 'gender', 'payment_instrument', 'participant_role', 'event_type',
-  'activity_status',);
