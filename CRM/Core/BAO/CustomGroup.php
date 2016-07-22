@@ -1832,10 +1832,12 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
     $formattedGroupTree = array();
     $uploadNames = $formValues = array();
 
-    // JSON encoded submitted form values passed via URL
-    $submittedValues = CRM_Utils_Request::retrieve('post', 'String');
-    if (!empty($submittedValues)) {
-      $submittedValues = json_decode($submittedValues, TRUE);
+    // retrieve qf key from url
+    $qfKey = CRM_Utils_Request::retrieve('qf', 'String');
+
+    // fetch submitted custom field values later use to set as a default values
+    if ($qfKey) {
+      $submittedValues = CRM_Core_BAO_Cache::getItem('custom data', $qfKey);
     }
 
     foreach ($groupTree as $key => $value) {
@@ -1863,11 +1865,11 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       // add field information
       foreach ($value['fields'] as $k => $properties) {
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
-        if (isset($submittedValues[$properties['element_name']])) {
-          $properties['element_value'] = $submittedValues[$properties['element_name']];
-        }
-        elseif ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
+        if ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
           $formValues[$properties['element_name']] = $value;
+        }
+        elseif (isset($submittedValues[$properties['element_name']])) {
+          $properties['element_value'] = $submittedValues[$properties['element_name']];
         }
         if (isset($properties['customValue']) &&
           !CRM_Utils_System::isNull($properties['customValue']) &&
@@ -1892,7 +1894,9 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
     if ($form) {
       if (count($formValues)) {
-        $form->assign('submittedValues', json_encode($formValues));
+        $qf = $form->get('qfKey');
+        $form->assign('qfKey', $qf);
+        CRM_Core_BAO_Cache::setItem($formValues, 'custom data', $qf);
       }
 
       // hack for field type File
