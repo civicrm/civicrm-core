@@ -311,7 +311,7 @@ WHERE  contribution_id = {$id}
    *
    * @return null|string
    */
-  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {
+  public static function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {
     $statusMsg = NULL;
     if (!$contributionId || !$statusId) {
       return $statusMsg;
