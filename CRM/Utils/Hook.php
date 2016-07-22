@@ -2100,12 +2100,17 @@ abstract class CRM_Utils_Hook {
    *
    * @param array $deferredRevenues
    *
+   * @param array $contributionDetails
+   *
+   * @param bool $update
+   *
+   * @param string $context
+   *
    * @return mixed
    */
-  public static function alterDeferredRevenueItems(&$deferredRevenues) {
-    return self::singleton()->invoke(1, $deferredRevenues, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_alterDeferredRevenueItems'
+  public static function alterDeferredRevenueItems(&$deferredRevenues, $contributionDetails, $update, $context) {
+    return self::singleton()->invoke(4, $deferredRevenues, $contributionDetails, $update, $context,
+      self::$_nullObject, self::$_nullObject, 'civicrm_alterDeferredRevenueItems'
     );
   }
 
