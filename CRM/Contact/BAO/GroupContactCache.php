@@ -712,6 +712,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
 
       $childrenIDs = explode(',', $group->children);
       foreach ($childrenIDs as $childID) {
+        $childID = str_replace('children_', '', $childID);
         $contactIDs = CRM_Contact_BAO_Group::getMember($childID, FALSE);
         //Unset each contact that is removed from the parent group
         foreach ($removed_contacts as $removed_contact) {
