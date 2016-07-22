@@ -127,6 +127,33 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test Group create with Group Type
+   */
+  public function testgroupCreateWithGroupType() {
+    $params = array(
+      'name' => 'Test Group type',
+      'title' => 'Test Group Type',
+      'description' => 'Test Group with Group Type',
+      'is_active' => 1,
+      'visibility' => 'Public Pages',
+      'group_type' => array(1, 2),
+    );
+
+    $result = $this->callAPISuccess('Group', 'create', $params);
+    $group = $result['values'][$result['id']];
+    $this->assertEquals($group['name'], "Test Group type");
+    $this->assertEquals($group['is_active'], 1);
+    $this->assertEquals($group['group_type'], $params['group_type']);
+    $this->groupDelete($result['id']);
+
+    //assert single value for group_type
+    $params['group_type'] = 2;
+    $result = $this->callAPISuccess('Group', 'create', $params);
+    $group = $result["values"][$result['id']];
+    $this->assertEquals($group['group_type'], array($params['group_type']));
+  }
+
   public function testGetNonExistingGroup() {
     $params = array();
     $params['title'] = 'No such group Exist';
