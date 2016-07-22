@@ -141,6 +141,19 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   *  Delete Multiple payments for one pledge.
+   */
+  public function testDeletePledgePayments() {
+    $contactId = $this->individualCreate();
+    $pledgeId = $this->pledgeCreate(array('contact_id' => $contactId));
+    CRM_Pledge_BAO_PledgePayment::deletePayments($pledgeId);
+
+    // No payments should be retrieved
+    $pledgePayment = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
+    $this->assertEquals(count($pledgePayment), 0, "Checking for empty array");
+  }
+
+  /**
    *  Pass Null Id for a payment deletion for one pledge.
    */
   public function testDeletePledgePaymentsNullId() {
