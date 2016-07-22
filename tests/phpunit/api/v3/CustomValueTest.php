@@ -48,8 +48,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'integer' => array(1, 2, 3),
       'number' => array(10.11, 20.22, 30.33),
       'string' => array(substr(sha1(rand()), 0, 4), substr(sha1(rand()), 0, 3), substr(sha1(rand()), 0, 2)),
-      'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
-      'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
+      // 'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
+      // This does not work in the test at the moment due to caching issues.
+      //'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
       'date' => NULL,
       'contact' => NULL,
       'boolean' => NULL,
@@ -95,17 +96,18 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
     $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
     $count = 0;
+    $optionSupportingHTMLTypes = array('Select', 'Radio', 'CheckBox', 'AdvMulti-Select', 'Autocomplete-Select', 'Multi-Select');
 
     foreach ($customFieldDataType as $dataType => $label) {
       switch ($dataType) {
+        // case 'Country':
+        // case 'StateProvince':
         case 'String':
         case 'Link':
         case 'Int':
         case 'Float':
         case 'Money':
         case 'Date':
-        case 'Country':
-        case 'StateProvince':
         case 'Boolean':
 
           //Based on the custom field data-type choose desired SQL operators(to test with) and basic $type
@@ -138,6 +140,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
           //Create custom field of $dataType and html-type $html
           foreach ($dataToHtmlTypes[$count] as $html) {
+            // per CRM-18568 the like operator does not currently work for fields with options.
+            // the LIKE operator could potentially bypass ACLs (as could IS NOT NULL) and some thought needs to be given
+            // to it.
+            if (in_array($html, $optionSupportingHTMLTypes)) {
+              $validSQLOperators = array_diff($validSQLOperators, array('LIKE', 'NOT LIKE'));
+            }
             $params = array(
               'custom_group_id' => $this->ids[$type]['custom_group_id'],
               'label' => "$dataType - $html",
@@ -156,7 +164,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           break;
 
         default:
-          // skipping File data-type
+          // skipping File data-type & state province due to caching issues
           $count++;
           break;
       }
@@ -174,7 +182,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $contactId = $result['id'];
 
     $count = rand(1, 2);
-    $seperator = CRM_Core_DAO::VALUE_SEPARATOR;
+
     if ($isSerialized) {
       $selectedValue = $this->optionGroup[$type]['values'];
       $notselectedValue = $selectedValue[$count];
