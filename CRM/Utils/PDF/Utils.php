@@ -29,6 +29,8 @@
 define("DOMPDF_ENABLE_REMOTE", TRUE);
 define('DOMPDF_ENABLE_AUTOLOAD', FALSE);
 
+use Dompdf\Dompdf;
+
 /**
  *
  * @package CRM
@@ -198,8 +200,6 @@ class CRM_Utils_PDF_Utils {
    * @return string
    */
   public static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
-    require_once 'vendor/dompdf/dompdf/dompdf_config.inc.php';
-
     $dompdf = new DOMPDF();
     $dompdf->set_paper($paper_size, $orientation);
     $dompdf->load_html($html);
