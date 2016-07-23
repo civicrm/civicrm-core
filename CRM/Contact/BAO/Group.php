@@ -1323,4 +1323,20 @@ WHERE {$whereClause}";
     return CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
   }
 
+  /**
+   * Assign Test Value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'children' || $fieldName = 'parents') {
+      $this->{$fieldName} = "NULL";
+    }
+    else {
+      parent::assignTestValues($fieldaName, $fieldDef, $counter);
+    }
+  }
+
 }
