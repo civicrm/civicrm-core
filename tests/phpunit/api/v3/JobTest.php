@@ -632,7 +632,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ));
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'aggressive'));
     $this->assertEquals(0, count($result['values']['skipped']));
-    $this->assertEquals(0, ¬count($result['values']['merged']));
+    $this->assertEquals(0, count($result['values']['merged']));
     $this->callAPISuccessGetSingle('Contact', array('id' => $individual['id']));
     $this->callAPISuccessGetSingle('Contact', array('id' => $organization['id']));
 
