@@ -95,6 +95,14 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       CRM_Utils_Hook::pre('create', 'Event', NULL, $params);
     }
 
+    // CRM-16189
+    $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
+      CRM_Utils_Array::value('financial_type_id', $params)
+    );
+    if ($isError) {
+      throw new CRM_Core_Exception(ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts'));
+    }
+
     $event = new CRM_Event_DAO_Event();
 
     $event->copyValues($params);
@@ -408,7 +416,6 @@ WHERE      civicrm_event.is_active = 1 AND
            ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0) AND
            civicrm_event.start_date >= DATE_SUB( NOW(), INTERVAL 7 day )
            $validEventIDs
-GROUP BY   civicrm_event.id
 ORDER BY   civicrm_event.start_date ASC
 $event_summary_limit
 ";

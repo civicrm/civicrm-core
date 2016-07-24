@@ -362,6 +362,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       }
     }
 
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
     //print_r($this->_select);
   }
@@ -391,7 +392,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     if ($this->isTableSelected('civicrm_mailing_group')) {
       $this->_from .= "
         LEFT JOIN civicrm_mailing_group {$this->_aliases['civicrm_mailing_group']}
-	  ON {$this->_aliases['civicrm_mailing_group']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id";
+    ON {$this->_aliases['civicrm_mailing_group']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id";
     }
     if ($this->campaignEnabled) {
       $this->_from .= "
@@ -458,7 +459,11 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_mailing']}.id";
+    $groupBy = array(
+      "{$this->_aliases['civicrm_mailing']}.id",
+      "{$this->_aliases['civicrm_mailing_job']}.end_date",
+    );
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {

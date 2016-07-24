@@ -262,9 +262,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
       $DTparams = !empty($this->_DTparams) ? $this->_DTparams : NULL;
       // commonly used for both views i.e profile listing view (profileDataView) and custom data listing view (customDataView)
-      list($result, $sortedResult) = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_contactId, NULL, $fieldIDs, TRUE, $DTparams);
+      $result = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_contactId, NULL, $fieldIDs, TRUE, $DTparams);
       $resultCount = !empty($result['count']) ? $result['count'] : count($result);
+      $sortedResult = !empty($result['sortedResult']) ? $result['sortedResult'] : array();
       unset($result['count']);
+      unset($result['sortedResult']);
 
       if ($this->_pageViewType == 'profileDataView') {
         if (!empty($fieldIDs)) {

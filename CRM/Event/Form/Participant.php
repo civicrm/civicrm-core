@@ -942,6 +942,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contributionParams = array();
       $lineItem = array();
       $additionalParticipantDetails = array();
+      if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+        $eventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'start_date');
+        if ($eventStartDate) {
+          $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
+        }
+      }
       if (($this->_id && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId) {
         $participantBAO = new CRM_Event_BAO_Participant();
         $participantBAO->id = $this->_id;

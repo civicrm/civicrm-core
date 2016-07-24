@@ -694,7 +694,7 @@ CREATE TABLE `civicrm_contact` (
      `display_name` varchar(128)    COMMENT 'Formatted name representing preferred format for display/print/other output.',
      `nick_name` varchar(128)    COMMENT 'Nickname.',
      `legal_name` varchar(128)    COMMENT 'Legal Name.',
-     `image_URL` varchar(512)    COMMENT 'optional URL for preferred image (photo, logo, etc.) to display for this contact.',
+     `image_URL` text    COMMENT 'optional URL for preferred image (photo, logo, etc.) to display for this contact.',
      `preferred_communication_method` varchar(255)    COMMENT 'What is the preferred mode of communication.',
      `preferred_language` varchar(5)    COMMENT 'Which language is preferred for communication. FK to languages in civicrm_option_value.',
      `preferred_mail_format` varchar(8)   DEFAULT "Both" COMMENT 'What is the preferred mode of sending an email.',
@@ -1660,7 +1660,10 @@ CREATE TABLE `civicrm_pledge_block` (
      `is_pledge_interval` tinyint   DEFAULT 0 COMMENT 'Is frequency interval exposed on the contribution form.',
      `max_reminders` int unsigned   DEFAULT 1 COMMENT 'The maximum number of payment reminders to send for any given payment.',
      `initial_reminder_day` int unsigned   DEFAULT 5 COMMENT 'Send initial reminder this many days prior to the payment due date.',
-     `additional_reminder_day` int unsigned   DEFAULT 5 COMMENT 'Send additional reminder this many days after last one sent, up to maximum number of reminders.' 
+     `additional_reminder_day` int unsigned   DEFAULT 5 COMMENT 'Send additional reminder this many days after last one sent, up to maximum number of reminders.',
+     `pledge_start_date` varchar(64)    COMMENT 'The date the first scheduled pledge occurs.',
+     `is_pledge_start_date_visible` tinyint NOT NULL  DEFAULT 0 COMMENT 'If true - recurring start date is shown.',
+     `is_pledge_start_date_editable` tinyint NOT NULL  DEFAULT 0 COMMENT 'If true - recurring start date is editable.' 
 ,
     PRIMARY KEY ( `id` )
  
@@ -3223,6 +3226,7 @@ CREATE TABLE `civicrm_contribution_page` (
      `recur_frequency_unit` varchar(128)    COMMENT 'Supported recurring frequency units.',
      `is_recur_interval` tinyint   DEFAULT 0 COMMENT 'if true - supports recurring intervals',
      `is_recur_installments` tinyint   DEFAULT 0 COMMENT 'if true - asks user for recurring installments',
+     `adjust_recur_start_date` tinyint   DEFAULT 0 COMMENT 'if true - user is able to adjust payment start date',
      `is_pay_later` tinyint   DEFAULT 0 COMMENT 'if true - allows the user to send payment directly to the org later',
      `pay_later_text` text    COMMENT 'The text displayed to the user in the main form',
      `pay_later_receipt` text    COMMENT 'The receipt sent to the user instead of the normal receipt text',
@@ -4356,6 +4360,8 @@ CREATE TABLE `civicrm_price_field_value` (
      `name` varchar(255)    COMMENT 'Price field option name',
      `label` varchar(255)    COMMENT 'Price field option label',
      `description` text   DEFAULT NULL COMMENT '>Price field option description.',
+     `help_pre` text   DEFAULT NULL COMMENT 'Price field option pre help text.',
+     `help_post` text   DEFAULT NULL COMMENT 'Price field option post field help.',
      `amount` varchar(512) NOT NULL   COMMENT 'Price field option amount',
      `count` int unsigned   DEFAULT NULL COMMENT 'Number of participants per field option',
      `max_value` int unsigned   DEFAULT NULL COMMENT 'Max number of participants per field options',

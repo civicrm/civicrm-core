@@ -777,12 +777,13 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       $fromClause = implode(' ', $from);
       $selectClause = implode(', ', $select);
       $whereClause = "{$compTable}.id IN (" . implode(',', $componentIds) . ')';
+      $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, array("{$compTable}.id", 'contact.id'));
 
       $query = "
   SELECT  contact.id as contactId, $compTable.id as componentId, $selectClause
     FROM  $compTable as $compTable $fromClause
    WHERE  $whereClause
-Group By  componentId";
+   {$groupBy}";
 
       $contact = CRM_Core_DAO::executeQuery($query);
       while ($contact->fetch()) {

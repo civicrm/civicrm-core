@@ -156,7 +156,8 @@ VALUES
     ( @domainID, 'civicrm/admin/pcp?reset=1&page_type=contribute',          'Personal Campaign Pages',    'Personal Campaign Pages',   'access CiviContribute,administer CiviCRM', 'AND',  @contributionlastID, '1', NULL, 11 ),
     ( @domainID, 'civicrm/admin/contribute/managePremiums?reset=1',         'Premiums (Thank-you Gifts)', 'Premiums',                  'access CiviContribute,administer CiviCRM', 'AND',  @contributionlastID, '1', 1,    12 ),
     ( @domainID, 'civicrm/admin/price?reset=1&action=add',                  'New Price Set',              'New Price Set',             'access CiviContribute,administer CiviCRM', 'AND',  @contributionlastID, '1', NULL, 13 ),
-    ( @domainID, 'civicrm/admin/price?reset=1',                             'Manage Price Sets',          'Manage Price Sets',         'access CiviContribute,administer CiviCRM', 'AND',  @contributionlastID, '1', NULL, 14 ),
+    ( @domainID, 'civicrm/admin/price?reset=1',                             'Manage Price Sets',          'Manage Price Sets',         'access CiviContribute,administer CiviCRM', 'AND',  @contributionlastID, '1', 1, 14 ),
+    ( @domainID, 'civicrm/admin/contribute/closeaccperiod?reset=1',         'Close Accounting Period',    'Close Accounting Period',   'access CiviContribute,administer CiviCRM,administer Accounting', 'AND',  @contributionlastID, '1', NULL, 15 ),
 
     ( @domainID, 'civicrm/financial/batch?reset=1&action=add',                             'New Batch',          'New Batch',         'create manual batch', 'AND',  @financialTransactionID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/financial/financialbatches?reset=1&batchStatus=1', 'Open Batches',          'Open Batches',         'view own manual batches,view all manual batches', 'OR',  @financialTransactionID, '1', NULL, 2 ),

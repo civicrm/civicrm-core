@@ -152,6 +152,12 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
    */
   public $is_recur_installments;
   /**
+   * if true - user is able to adjust payment start date
+   *
+   * @var boolean
+   */
+  public $adjust_recur_start_date;
+  /**
    * if true - allows the user to send payment directly to the org later
    *
    * @var boolean
@@ -478,6 +484,12 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'title' => ts('Recurring Installments?') ,
           'description' => 'if true - asks user for recurring installments',
         ) ,
+        'adjust_recur_start_date' => array(
+          'name' => 'adjust_recur_start_date',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Adjust Recurring Start Date') ,
+          'description' => 'if true - user is able to adjust payment start date',
+        ) ,
         'is_pay_later' => array(
           'name' => 'is_pay_later',
           'type' => CRM_Utils_Type::T_BOOLEAN,
@@ -764,6 +776,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
         'recur_frequency_unit' => 'recur_frequency_unit',
         'is_recur_interval' => 'is_recur_interval',
         'is_recur_installments' => 'is_recur_installments',
+        'adjust_recur_start_date' => 'adjust_recur_start_date',
         'is_pay_later' => 'is_pay_later',
         'pay_later_text' => 'pay_later_text',
         'pay_later_receipt' => 'pay_later_receipt',

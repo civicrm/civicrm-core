@@ -167,7 +167,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
   /**
    * optional URL for preferred image (photo, logo, etc.) to display for this contact.
    *
-   * @var string
+   * @var text
    */
   public $image_URL;
   /**
@@ -647,11 +647,9 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
         ) ,
         'image_URL' => array(
           'name' => 'image_URL',
-          'type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Image Url') ,
           'description' => 'optional URL for preferred image (photo, logo, etc.) to display for this contact.',
-          'maxlength' => 512,
-          'size' => 30,
           'import' => true,
           'where' => 'civicrm_contact.image_URL',
           'headerPattern' => '',

@@ -246,6 +246,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -321,7 +322,12 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_employer']}.id,{$this->_aliases['civicrm_contact']}.id";
+    $groupBy = array(
+      "{$this->_aliases['civicrm_employer']}.id",
+      "{$this->_aliases['civicrm_contact']}.id",
+    );
+
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {

@@ -378,7 +378,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause(array('c1', 'c2'));
         $this->_aclWhere = $this->_aclWhere ? "AND {$this->_aclWhere}" : '';
       }
-      $query = "SELECT dedupe.id1, dedupe.id2, dedupe.weight
+      $query = "SELECT IF(dedupe.id1 < dedupe.id2, dedupe.id1, dedupe.id2) as id1,
+                IF(dedupe.id1 < dedupe.id2, dedupe.id2, dedupe.id1) as id2, dedupe.weight
                 FROM dedupe JOIN civicrm_contact c1 ON dedupe.id1 = c1.id
                             JOIN civicrm_contact c2 ON dedupe.id2 = c2.id {$this->_aclFrom}
                        LEFT JOIN civicrm_dedupe_exception exc ON dedupe.id1 = exc.contact_id1 AND dedupe.id2 = exc.contact_id2

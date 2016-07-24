@@ -84,18 +84,25 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
    *
    * @return CRM_Financial_DAO_FinancialAccount
    */
-  public static function add(&$params, &$ids = array()) {
+  public static function add(&$params) {
     if (empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
       $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
       $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    }
+    if (!empty($params['id'])
+      && !empty($params['financial_account_type_id'])
+      && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount(
+        $params['id'],
+        $params['financial_account_type_id']
+      )
+    ) {
+      throw new CRM_Core_Exception(ts('You cannot change the account type since this financial account refers to a financial item having an account type of Revenue/Liability.'));
     }
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
@@ -105,9 +112,20 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
 
     // action is taken depending upon the mode
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
+    if (!empty($params['id'])) {
+      $financialAccount->id = $params['id'];
+      $financialAccount->find(TRUE);
+    }
+
     $financialAccount->copyValues($params);
-    if (!empty($ids['contributionType'])) {
-      $financialAccount->id = CRM_Utils_Array::value('contributionType', $ids);
+    //CRM-16189
+    $accountType = CRM_Core_PseudoConstant::accountOptionValues(
+      'financial_account_type',
+      NULL,
+      " AND v.name IN ('Liability', 'Asset') "
+    );
+    if (empty($params['id']) && !CRM_Utils_Array::value($financialAccount->financial_account_type_id, $accountType)) {
+      $financialAccount->opening_balance = $financialAccount->current_period_opening_balance = '0.00';
     }
     $financialAccount->save();
     return $financialAccount;
@@ -394,6 +412,128 @@ LIMIT 1";
       return $message;
     }
     return FALSE;
+  }
+
+  /**
+   * Check if financial type has Deferred Revenue Account is relationship
+   * with Financial Account.
+   *
+   * @param int $financialTypeId
+   *
+   * @return bool
+   *
+   */
+  public static function validateFinancialType($financialTypeId, $entityID = NULL, $entity = NULL) {
+    if (!CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      return FALSE;
+    }
+    if ($entityID) {
+      $query = ' SELECT ps.extends FROM civicrm_price_set ps %3 WHERE %1.id = %2';
+      $params = array(
+        1 => array('ps', 'Text'),
+        2 => array($entityID, 'Integer'),
+      );
+      if ($entity == 'PriceField') {
+        $params[1] = array('pf', 'Text');
+        $params[3] = array(
+          ' INNER JOIN civicrm_price_field pf ON pf.price_set_id = ps.id ',
+          'Text',
+        );
+      }
+      $extends = CRM_Core_DAO::singleValueQuery($query, $params);
+      $extends = explode('', $extends);
+      if (!(in_array(CRM_Core_Component::getComponentID('CiviEvent'), $extends)
+        || in_array(CRM_Core_Component::getComponentID('CiviMember'), $extends))
+      ) {
+        return FALSE;
+      }
+    }
+    $deferredFinancialType = self::getDeferredFinancialType();
+    if (!array_key_exists($financialTypeId, $deferredFinancialType)) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Validate if Deferred Account is set for Financial Type
+   * when Deferred Revenue is enabled
+   *
+   * @return string
+   *
+   */
+  public static function validateTogglingDeferredRevenue() {
+    $deferredFinancialType = self::getDeferredFinancialType();
+    $message = ts('Before Deferred Revenue can be enabled, a Deferred Revenue Account relationship must be defined for all financial types currently used for Memberships and Events, including
+<ul>
+<li>those specified for each membership type at Admin > CiviMember > Membership Types, edit</li>
+<li>on the Fees tab when managing events</li>
+<li>the default financial type associated with a membership or event price set</li>
+<li>the financial type for a membership price set field option when the membership type is non-blank</li>
+<li>as the financial type for a price set field with participant count > 0</li>
+<li>as the financial type for a price set field option with participant count > 0</li>
+</ul>
+In other words, please create deferred revenue accounts at Administer > CiviContribute > Financial Accounts, then configure them for the following financial types at Administer > CiviContribute > Financial Types, accounts:');
+    $tables = array(
+      'civicrm_membership_type',
+      'civicrm_event',
+      'civicrm_price_set',
+      'civicrm_price_field_value',
+    );
+    $params[2] = array('', 'Text');
+    if (!empty($deferredFinancialType)) {
+      $params[2] = array(' AND financial_type_id NOT IN (' . implode(',', array_keys($deferredFinancialType)) . ') ', 'Text');
+    }
+    $query_1 = 'SELECT %5.id FROM %4 WHERE %5.is_active = 1';
+    $query_2 = $query_1 . ' %2';
+    foreach ($tables as $table) {
+      $params[4] = array($table, 'Text');
+      $params[5] = array($table, 'Text');
+      $dao = CRM_Core_DAO::executeQuery($query_1, $params);
+      if ($dao->N) {
+        if (in_array($table, array('civicrm_price_set', 'civicrm_price_field_value'))) {
+          $query_2 .= " AND civicrm_price_set.name NOT IN ('default_contribution_amount', 'default_membership_type_amount') AND (civicrm_price_set.extends LIKE '%1%' OR civicrm_price_set.extends like '3')";
+          if ($table == 'civicrm_price_field_value') {
+            $string = $table . ' INNER JOIN civicrm_price_field ON civicrm_price_field.id = civicrm_price_field_value.price_field_id INNER JOIN civicrm_price_set ON civicrm_price_set.id = civicrm_price_field.price_set_id ';
+            $params[4] = array($string, 'Text');
+            $params[2][0] = str_replace('financial_type_id', "{$table}.financial_type_id", $params[2][0]);
+          }
+        }
+        $dao = CRM_Core_DAO::executeQuery($query_2, $params);
+        if ($dao->N) {
+          $message .= '<ul>';
+          $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+          $financialTypes = array_diff_key($financialTypes, $deferredFinancialType);
+          foreach ($financialTypes as $financialType) {
+            $message .= "<li>{$financialType}</li>";
+          }
+          $message .= '</ul>';
+          return $message;
+        }
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Retrieve all Deferred Financial Accounts.
+   *
+   *
+   * @return array of Deferred Financial Account
+   *
+   */
+  public static function getAllDeferredFinancialAccount() {
+    $query = "SELECT cfa.id, cfa.name FROM civicrm_entity_financial_account ce
+INNER JOIN civicrm_financial_account cfa ON ce.financial_account_id = cfa.id
+WHERE `entity_table` = 'civicrm_financial_type' AND cfa.is_active = 1 AND ce.account_relationship = %1 GROUP BY cfa.id";
+    $deferredAccountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Deferred Revenue Account is' "));
+    $queryParams = array(1 => array($deferredAccountRel, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    $financialAccount = array();
+    while ($dao->fetch()) {
+      $financialAccount[$dao->id] = $dao->name;
+    }
+    return $financialAccount;
   }
 
 }

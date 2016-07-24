@@ -550,6 +550,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
+    $this->appendSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
     $this->assign('chartSupported', TRUE);
   }
 
@@ -686,7 +687,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->limit();
     }
 
-    $sql = "{$this->_select} {$this->_from} {$this->_where} $limitFilter {$this->_groupBy} {$this->_having} {$this->_rollup}";
+    $sql = "{$this->_select} {$this->_from} {$this->_where} {$limitFilter} {$this->_groupBy} {$this->_having} {$this->_rollup}";
 
     if (!empty($this->_orderByArray)) {
       $this->_orderBy = str_replace('contact_civireport.', 'civicrm_contact_', "ORDER BY ISNULL(civicrm_contribution_contact_id), " . implode(', ', $this->_orderByArray));

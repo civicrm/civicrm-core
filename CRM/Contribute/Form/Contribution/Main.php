@@ -880,10 +880,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           if (CRM_Utils_Array::value('pledge_installments', $fields) == NULL) {
             $errors['pledge_installments'] = ts('Pledge Installments is required field.');
           }
-          elseif (CRM_Utils_array::value('pledge_installments', $fields) == 1) {
+          elseif (CRM_Utils_Array::value('pledge_installments', $fields) == 1) {
             $errors['pledge_installments'] = ts('Pledges consist of multiple scheduled payments. Select one-time contribution if you want to make your gift in a single payment.');
           }
-          elseif (CRM_Utils_array::value('pledge_installments', $fields) == 0) {
+          elseif (CRM_Utils_Array::value('pledge_installments', $fields) == 0) {
             $errors['pledge_installments'] = ts('Pledge Installments field must be > 1.');
           }
         }
@@ -896,7 +896,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           if (CRM_Utils_Array::value('pledge_frequency_interval', $fields) == NULL) {
             $errors['pledge_frequency_interval'] = ts('Pledge Frequency Interval. is required field.');
           }
-          elseif (CRM_Utils_array::value('pledge_frequency_interval', $fields) == 0) {
+          elseif (CRM_Utils_Array::value('pledge_frequency_interval', $fields) == 0) {
             $errors['pledge_frequency_interval'] = ts('Pledge frequency interval field must be > 0');
           }
         }

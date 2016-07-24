@@ -767,44 +767,19 @@ HTACCESS;
     return TRUE;
   }
 
-  /**
-   * Return formatted file URL, like for image file return image url with image icon
-   *
-   * @param string $path
-   *   Absoulte file path
-   * @param string $fileType
-   * @param string $url
-   *   File preview link e.g. https://example.com/civicrm/file?reset=1&filename=image.png&mime-type=image/png
-   *
-   * @return string $url
-   */
-  public static function getFileURL($path, $fileType, $url = NULL) {
-    if (empty($path) || empty($fileType)) {
-      return '';
-    }
-    elseif (empty($url)) {
-      $fileName = basename($path);
-      $url = CRM_Utils_System::url('civicrm/file', "reset=1&filename={$fileName}&mime-type={$fileType}");
-    }
-    switch ($fileType) {
-      case 'image/jpeg':
-      case 'image/pjpeg':
-      case 'image/gif':
-      case 'image/x-png':
-      case 'image/png':
-        list($imageWidth, $imageHeight) = getimagesize($path);
-        list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
-        $url = "<a href=\"$url\" class='crm-image-popup'>
-          <img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/>
-          </a>";
-        break;
-
-      default:
-        $url = sprintf('<a href="%s">%s</a>', $url, basename($path));
-        break;
+  public static function formatFile(&$param, $fileName, $extraParams = array()) {
+    if (empty($param[$fileName])) {
+      return;
     }
 
-    return $url;
+    $fileParams = array(
+      'uri' => $param[$fileName]['name'],
+      'type' => $param[$fileName]['type'],
+      'location' => $param[$fileName]['name'],
+      'upload_date' => date('YmdHis'),
+    ) + $extraParams;
+
+    $param[$fileName] = $fileParams;
   }
 
 }

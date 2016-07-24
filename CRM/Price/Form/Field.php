@@ -399,15 +399,21 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
      *  Incomplete row checking is also required.
      */
     if (($form->_action & CRM_Core_Action::ADD || $form->_action & CRM_Core_Action::UPDATE) &&
-      $fields['html_type'] == 'Text' && $fields['price'] == NULL
+      $fields['html_type'] == 'Text'
     ) {
-      $errors['price'] = ts('Price is a required field');
-    }
-
-    if (($form->_action & CRM_Core_Action::ADD || $form->_action & CRM_Core_Action::UPDATE) &&
-      $fields['html_type'] == 'Text' && $fields['financial_type_id'] == ''
-    ) {
-      $errors['financial_type_id'] = ts('Financial Type is a required field');
+      if ($fields['price'] == NULL) {
+        $errors['price'] = ts('Price is a required field');
+      }
+      if ($fields['financial_type_id'] == '') {
+        $errors['financial_type_id'] = ts('Financial Type is a required field');
+      }
+      else {
+        // CRM-16189
+        $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_sid);
+        if ($isError) {
+          $errors['financial_type_id'] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+        }
+      }
     }
 
     //avoid the same price field label in Within PriceSet
@@ -524,6 +530,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           }
 
           $_flagOption = $_emptyRow = 0;
+          // CRM-16189
+          $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['option_financial_type_id'][$index], $form->_fid, 'PriceField');
+          if ($isError) {
+            $errors["option_financial_type_id[{$index}]"] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+          }
         }
 
         if (!empty($memTypesIDS)) {

@@ -598,7 +598,7 @@ LEFT JOIN civicrm_mailing_job ON (civicrm_mailing_job.mailing_id = civicrm_maili
 LEFT JOIN civicrm_contact createdContact ON ( civicrm_mailing.created_id = createdContact.id )
 LEFT JOIN civicrm_contact scheduledContact ON ( civicrm_mailing.scheduled_id = scheduledContact.id )
 WHERE $whereClause
-ORDER BY LEFT(name, 1)
+ORDER BY UPPER(LEFT(name, 1))
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);

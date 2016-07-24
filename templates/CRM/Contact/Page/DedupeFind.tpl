@@ -98,16 +98,16 @@
     <thead>
       <tr class="columnheader">
         <th data-data="is_selected_input" class="crm-dedupe-selection"><input type="checkbox" value="0" name="pnid_all" class="crm-dedupe-select-all"></th>
-        <th data-data="src_image"    class="crm-empty">&nbsp;</th>
-        <th data-data="src"          class="crm-contact">{ts}Contact{/ts} 1</th>
         <th data-data="dst_image"    class="crm-empty">&nbsp;</th>
-        <th data-data="dst"          class="crm-contact-duplicate">{ts}Contact{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th data-data="src_email"    class="crm-contact">{ts}Email{/ts} 1</th>
-        <th data-data="dst_email"    class="crm-contact-duplicate">{ts}Email{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th data-data="src_street"   class="crm-contact">{ts}Street Address{/ts} 1</th>
-        <th data-data="dst_street"   class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th data-data="src_postcode" class="crm-contact">{ts}Postcode{/ts} 1</th>
-        <th data-data="dst_postcode" class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="dst"          class="crm-contact">{ts}Contact{/ts} 1</th>
+        <th data-data="src_image"    class="crm-empty">&nbsp;</th>
+        <th data-data="src"          class="crm-contact-duplicate">{ts}Contact{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="dst_email"    class="crm-contact">{ts}Email{/ts} 1</th>
+        <th data-data="src_email"    class="crm-contact-duplicate">{ts}Email{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="dst_street"   class="crm-contact">{ts}Street Address{/ts} 1</th>
+        <th data-data="src_street"   class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="dst_postcode" class="crm-contact">{ts}Postcode{/ts} 1</th>
+        <th data-data="src_postcode" class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
         <th data-data="conflicts"    class="crm-contact-conflicts">{ts}Conflicts{/ts}</th>
         <th data-data="weight"       class="crm-threshold">{ts}Threshold{/ts}</th>
         <th data-data="actions"      class="crm-empty">&nbsp;</th>

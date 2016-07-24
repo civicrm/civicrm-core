@@ -169,12 +169,16 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
 
+    $documentTypes = implode(',', CRM_Core_SelectValues::documentApplicationType());
+    $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=60 accept="' . $documentTypes . '"');
+    $form->addUploadElement("document_file");
+
     CRM_Mailing_BAO_Mailing::commonCompose($form);
 
     $buttons = array();
     if ($form->get('action') != CRM_Core_Action::VIEW) {
       $buttons[] = array(
-        'type' => 'submit',
+        'type' => 'upload',
         'name' => ts('Download Document'),
         'isDefault' => TRUE,
         'icon' => 'fa-download',
@@ -244,13 +248,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * Part of the post process which prepare and extract information from the template.
    *
    *
-   * @param CRM_Core_Form $form
+   * @param array $formValues
    *
    * @return array
    *   [$categories, $html_message, $messageToken, $returnProperties]
    */
-  static protected function processMessageTemplate(&$form) {
-    $formValues = $form->controller->exportValues($form->getName());
+  public static function processMessageTemplate($formValues) {
+    $html_message = CRM_Utils_Array::value('html_message', $formValues);
 
     // process message template
     if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
@@ -285,19 +289,27 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = NULL WHERE id = {$formValues['template']}";
       }
       CRM_Core_DAO::executeQuery($query);
+
+      $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $formValues['template']);
+      foreach ((array) $documentInfo as $info) {
+        list($html_message, $formValues['document_type']) = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
+        $formValues['document_file_path'] = $info['fullPath'];
+      }
     }
+    // extract the content of uploaded document file
+    elseif (!empty($formValues['document_file'])) {
+      list($html_message, $formValues['document_type']) = CRM_Utils_PDF_Document::docReader($formValues['document_file']['name'], $formValues['document_file']['type']);
+      $formValues['document_file_path'] = $formValues['document_file']['name'];
+    }
+
     if (!empty($formValues['update_format'])) {
       $bao = new CRM_Core_BAO_PdfFormat();
       $bao->savePdfFormat($formValues, $formValues['format_id']);
     }
 
-    $html = array();
-
     $tokens = array();
     CRM_Utils_Hook::tokens($tokens);
     $categories = array_keys($tokens);
-
-    $html_message = $formValues['html_message'];
 
     //time being hack to strip '&nbsp;'
     //from particular letter line, CRM-6798
@@ -321,13 +333,24 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    */
   public static function postProcess(&$form) {
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
+    $formValues = $form->controller->exportValues($form->getName());
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
     $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
-    $html = array();
+    $html = $document = array();
+
+    // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
+    if ($buttonName == '_qf_PDF_submit') {
+      self::createActivities($form, $html_message, $form->_contactIds);
+    }
+
+    if (!empty($formValues['document_file_path'])) {
+      list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
+    }
 
     foreach ($form->_contactIds as $item => $contactId) {
+      $caseId = NULL;
       $params = array('contact_id' => $contactId);
 
       list($contact) = CRM_Utils_Token::getTokenDetails($params,
@@ -338,6 +361,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         $messageToken,
         'CRM_Contact_Form_Task_PDFLetterCommon'
       );
+
       if (civicrm_error($contact)) {
         $notSent[] = $contactId;
         continue;
@@ -345,7 +369,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
       $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact[$contactId], TRUE, $messageToken);
       if (!empty($form->_caseId)) {
-        $tokenHtml = CRM_Utils_Token::replaceCaseTokens($form->_caseId, $html_message, $messageToken);
+        $caseId = $form->_caseId;
+      }
+      if (empty($caseId) && !empty($form->_caseIds[$item])) {
+        $caseId = $form->_caseIds[$item];
+      }
+      if ($caseId) {
+        $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenHtml, $messageToken);
       }
       $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact[$contactId], $categories, TRUE);
 
@@ -359,15 +389,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $html[] = $tokenHtml;
     }
 
-    // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
-    if ($buttonName == '_qf_PDF_submit') {
-      self::createActivities($form, $html_message, $form->_contactIds);
-    }
-
     $type = $formValues['document_type'];
 
     if ($type == 'pdf') {
       CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+    }
+    elseif (!empty($formValues['document_file_path'])) {
+      CRM_Utils_PDF_Document::printDocuments($formValues['document_file_path'], $html, $type, $zip);
     }
     else {
       CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);

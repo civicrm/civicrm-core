@@ -646,7 +646,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    * Override group by function.
    */
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id";
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_activity']}.id");
   }
 
   /**
@@ -831,9 +831,10 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       }
     }
     $this->limit();
+    $groupByFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, 'civicrm_activity_id');
     $sql = "{$this->_select}
 FROM civireport_activity_temp_target tar
-GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}";
+{$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
     $this->buildRows($sql, $rows);
 
     // format result set.
@@ -1033,8 +1034,10 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
+      $this->_select = "SELECT " . implode(", ", $ifnulls);
+      $this->appendSelect($ifnulls, $sectionAliases);
 
-      $query = "select " . implode(", ", $ifnulls) .
+      $query = $this->_select .
         ", count(DISTINCT civicrm_activity_id) as ct from civireport_activity_temp_target group by " .
         implode(", ", $sectionAliases);
 

@@ -384,43 +384,7 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
     }
 
     if (!empty($foundDupes)) {
-      $cids = $displayNames = $values = array();
-      foreach ($foundDupes as $dupe) {
-        $cids[$dupe[0]] = 1;
-        $cids[$dupe[1]] = 1;
-      }
-      $cidString = implode(', ', array_keys($cids));
-      $sql = "SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name";
-      $dao = new CRM_Core_DAO();
-      $dao->query($sql);
-      while ($dao->fetch()) {
-        $displayNames[$dao->id] = $dao->display_name;
-      }
-
-      $session = CRM_Core_Session::singleton();
-      $userId = $session->get('userID');
-
-      foreach ($foundDupes as $dupes) {
-        $srcID = $dupes[0];
-        $dstID = $dupes[1];
-        if ($dstID == $userId) {
-          $srcID = $dupes[1];
-          $dstID = $dupes[0];
-        }
-
-        $row = array(
-          'srcID' => $srcID,
-          'srcName' => $displayNames[$srcID],
-          'dstID' => $dstID,
-          'dstName' => $displayNames[$dstID],
-          'weight' => $dupes[2],
-          'canMerge' => TRUE,
-        );
-
-        $data = CRM_Core_DAO::escapeString(serialize($row));
-        $values[] = " ( 'civicrm_contact', $srcID, $dstID, '$cacheKeyString', '$data' ) ";
-      }
-      self::setItem($values);
+      CRM_Dedupe_Finder::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
     }
   }
 
@@ -627,8 +591,8 @@ WHERE  cacheKey LIKE %1
           $data['dst' . $key] = $originalData['src' . $key];
         }
         $dao->data = serialize($data);
-        $dao->entity_id1 = $data['srcID'];
-        $dao->entity_id2 = $data['dstID'];
+        $dao->entity_id1 = $data['dstID'];
+        $dao->entity_id2 = $data['srcID'];
         $dao->save();
       }
     }

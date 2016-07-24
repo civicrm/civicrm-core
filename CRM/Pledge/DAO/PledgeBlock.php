@@ -128,6 +128,24 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
    */
   public $additional_reminder_day;
   /**
+   * The date the first scheduled pledge occurs.
+   *
+   * @var string
+   */
+  public $pledge_start_date;
+  /**
+   * If true - recurring start date is shown.
+   *
+   * @var boolean
+   */
+  public $is_pledge_start_date_visible;
+  /**
+   * If true - recurring start date is editable.
+   *
+   * @var boolean
+   */
+  public $is_pledge_start_date_editable;
+  /**
    * class constructor
    *
    * @return civicrm_pledge_block
@@ -214,6 +232,28 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'description' => 'Send additional reminder this many days after last one sent, up to maximum number of reminders.',
           'default' => '5',
         ) ,
+        'pledge_start_date' => array(
+          'name' => 'pledge_start_date',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Pledge Start Date') ,
+          'description' => 'The date the first scheduled pledge occurs.',
+          'maxlength' => 64,
+          'size' => CRM_Utils_Type::BIG,
+        ) ,
+        'is_pledge_start_date_visible' => array(
+          'name' => 'is_pledge_start_date_visible',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Show Recurring Donation Start Date?') ,
+          'description' => 'If true - recurring start date is shown.',
+          'required' => true,
+        ) ,
+        'is_pledge_start_date_editable' => array(
+          'name' => 'is_pledge_start_date_editable',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Allow Edits to Recurring Donation Start Date?') ,
+          'description' => 'If true - recurring start date is editable.',
+          'required' => true,
+        ) ,
       );
     }
     return self::$_fields;
@@ -235,6 +275,9 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
         'max_reminders' => 'max_reminders',
         'initial_reminder_day' => 'initial_reminder_day',
         'additional_reminder_day' => 'additional_reminder_day',
+        'pledge_start_date' => 'pledge_start_date',
+        'is_pledge_start_date_visible' => 'is_pledge_start_date_visible',
+        'is_pledge_start_date_editable' => 'is_pledge_start_date_editable',
       );
     }
     return self::$_fieldKeys;

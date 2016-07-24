@@ -213,7 +213,12 @@
         </td>
       </tr>
     {/if}
-
+    {if $form.revenue_recognition_date}
+      <tr class="crm-contribution-form-block-revenue_recognition_date">
+        <td class="label">{$form.revenue_recognition_date.label}</td>
+        <td>{$form.revenue_recognition_date.html}</td>
+      </tr>
+    {/if}
   </table>
 
   {include file='CRM/Core/BillingBlockWrapper.tpl'}

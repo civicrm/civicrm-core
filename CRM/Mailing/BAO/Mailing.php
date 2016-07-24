@@ -287,7 +287,7 @@ WHERE  c.group_id = {$groupDAO->id}
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
 
-                    SELECT DISTINCT     $email.id as email_id,
+                    SELECT      $email.id as email_id,
                                         $contact.id as contact_id
                     FROM                $email
                     INNER JOIN          $contact
@@ -312,6 +312,7 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
+                        GROUP BY $email.id, $contact.id
                     $order_by";
 
     if ($mode == 'sms') {
@@ -348,7 +349,7 @@ WHERE  c.group_id = {$groupDAO->id}
     // Query prior mailings.
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
-                    SELECT DISTINCT     $email.id as email_id,
+                    SELECT      $email.id as email_id,
                                         $contact.id as contact_id
                     FROM                $email
                     INNER JOIN          $contact
@@ -370,6 +371,7 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
+                        GROUP BY $email.id, $contact.id
                     $order_by";
 
     if ($mode == 'sms') {
@@ -472,7 +474,7 @@ AND    $mg.mailing_id = {$mailing_id}
     // Get the emails with only location override.
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
-                    SELECT DISTINCT     $email.id as local_email_id,
+                    SELECT              $email.id as local_email_id,
                                         $contact.id as contact_id
                     FROM                $email
                     INNER JOIN          $contact
@@ -494,6 +496,7 @@ AND    $mg.mailing_id = {$mailing_id}
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
+                        GROUP BY $email.id, $contact.id
                     $order_by";
     if ($mode == "sms") {
       $query = "REPLACE INTO       I_$job_id (phone_id, contact_id)
@@ -539,7 +542,7 @@ WHERE  mailing_id = %1
       $groupBy = $groupJoin = '';
       if ($dedupeEmail) {
         $groupJoin = " INNER JOIN civicrm_email e ON e.id = i.email_id";
-        $groupBy = " GROUP BY e.email ";
+        $groupBy = " GROUP BY e.email, i.contact_id ";
       }
 
       $sql = "
@@ -2470,7 +2473,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
         $mailings = implode(',', $mailingIDs);
         $mailingQuery = "
            SELECT DISTINCT ( m.id ) as id
-           FROM civicrm_mailing m 
+           FROM civicrm_mailing m
            LEFT JOIN civicrm_mailing_group g ON g.mailing_id = m.id
            WHERE g.entity_table like 'civicrm_mailing%' AND g.entity_id IN ($mailings)";
         $mailingDao = CRM_Core_DAO::executeQuery($mailingQuery);
@@ -2509,31 +2512,31 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
+    $select = array(
+      "$mailing.id", "$mailing.name", "$job.status",
+      "$mailing.approval_status_id", "createdContact.sort_name as created_by", "scheduledContact.sort_name as scheduled_by",
+      "$mailing.created_id as created_id", "$mailing.scheduled_id as scheduled_id", "$mailing.is_archived as archived",
+      "$mailing.created_date as created_date", "campaign_id", "$mailing.sms_provider_id as sms_provider_id",
+    );
 
     // we only care about parent jobs, since that holds all the info on
     // the mailing
+    $selectClause = implode(', ', $select);
+    $groupFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, "$mailing.id");
     $query = "
-            SELECT      $mailing.id,
-                        $mailing.name,
-                        $job.status,
-                        $mailing.approval_status_id,
+            SELECT      {$selectClause},
                         MIN($job.scheduled_date) as scheduled_date,
                         MIN($job.start_date) as start_date,
-                        MAX($job.end_date) as end_date,
-                        createdContact.sort_name as created_by,
-                        scheduledContact.sort_name as scheduled_by,
-                        $mailing.created_id as created_id,
-                        $mailing.scheduled_id as scheduled_id,
-                        $mailing.is_archived as archived,
-                        $mailing.created_date as created_date,
-                        campaign_id,
-                        $mailing.sms_provider_id as sms_provider_id
+                        MAX($job.end_date) as end_date
             FROM        $mailing
             LEFT JOIN   $job ON ( $job.mailing_id = $mailing.id AND $job.is_test = 0 AND $job.parent_id IS NULL )
             LEFT JOIN   civicrm_contact createdContact ON ( civicrm_mailing.created_id = createdContact.id )
             LEFT JOIN   civicrm_contact scheduledContact ON ( civicrm_mailing.scheduled_id = scheduledContact.id )
-            WHERE       $mailingACL $additionalClause
-            GROUP BY    $mailing.id ";
+            WHERE       $mailingACL $additionalClause";
+
+    if (!empty($groupFromSelect)) {
+      $query .= $groupFromSelect;
+    }
 
     if ($sort) {
       $orderBy = trim($sort->orderBy());

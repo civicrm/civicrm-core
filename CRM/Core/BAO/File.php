@@ -532,8 +532,6 @@ AND       CEF.entity_id    = %2";
 
     $numAttachments = Civi::settings()->get('max_attachments');
 
-    $now = date('YmdHis');
-
     // setup all attachments
     for ($i = 1; $i <= $numAttachments; $i++) {
       $attachName = "attachFile_$i";
@@ -551,17 +549,13 @@ AND       CEF.entity_id    = %2";
 
         // we dont care if the file is empty or not
         // CRM-7448
-        $fileParams = array(
-          'uri' => $formValues[$attachName]['name'],
-          'type' => $formValues[$attachName]['type'],
-          'location' => $formValues[$attachName]['name'],
+        $extraParams = array(
           'description' => $formValues[$attachDesc],
-          'upload_date' => $now,
           'tag' => $tagParams,
           'attachment_taglist' => CRM_Utils_Array::value($attachFreeTags, $formValues, array()),
         );
 
-        $params[$attachName] = $fileParams;
+        CRM_Utils_File::formatFile($formValues, $attachName, $extraParams);
       }
     }
   }

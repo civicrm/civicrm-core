@@ -320,7 +320,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
         }
       }
     }
-
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -1014,7 +1014,7 @@ SELECT {$subSelect2} contribution2.{$this->contributionJoinTableColumn},
        currency
 {$from}
 {$subWhere}
-GROUP BY contribution2.{$this->contributionJoinTableColumn}";
+GROUP BY contribution2.{$this->contributionJoinTableColumn}, currency";
     $this->tempTableRepeat1 = 'civicrm_temp_civireport_repeat1' . uniqid();
     $sql = "
 CREATE TEMPORARY TABLE $this->tempTableRepeat1 (

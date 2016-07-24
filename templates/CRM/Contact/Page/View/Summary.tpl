@@ -243,6 +243,7 @@
           </div><!-- #contact_panel -->
           {if $showAddress}
             <div class="contact_panel">
+              {crmRegion name="contact-addresses"}
               {assign var='locationIndex' value=1}
               {if $address}
                 {foreach from=$address item=add key=locationIndex}
@@ -259,26 +260,30 @@
                   {include file="CRM/Contact/Page/Inline/Address.tpl"}
                 </div>
               {/if}
-
+              {/crmRegion}
               </div> <!-- end of contact panel -->
             {/if}
             <div class="contact_panel">
               {if $showCommunicationPreferences}
                 <div class="contactCardLeft">
+                  {crmRegion name="contact-comm-pref"}
                   <div class="crm-summary-comm-pref-block">
                     <div class="crm-summary-block" id="communication-pref-block" >
                       {include file="CRM/Contact/Page/Inline/CommunicationPreferences.tpl"}
                     </div>
                   </div>
+                  {/crmRegion}
                 </div> <!-- contactCardLeft -->
               {/if}
               {if $contact_type eq 'Individual' AND $showDemographics}
                 <div class="contactCardRight">
+                  {crmRegion name="contact-demographic"}
                   <div class="crm-summary-demographic-block">
                     <div class="crm-summary-block" id="demographic-block">
                       {include file="CRM/Contact/Page/Inline/Demographics.tpl"}
                     </div>
                   </div>
+                  {/crmRegion}
                 </div> <!-- contactCardRight -->
               {/if}
               <div class="clear"></div>

@@ -380,6 +380,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         }
       }
     }
+    $this->selectClause = $select;
 
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
@@ -458,6 +459,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_rollup = 'WITH ROLLUP';
+    $this->appendSelect($this->selectClause, array("{$this->_aliases['civicrm_contribution_soft']}.contact_id", "constituentname.id"));
     $this->_groupBy = "
 GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentname.id {$this->_rollup}";
   }

@@ -282,6 +282,12 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       }
     }
 
+    // CRM-16189
+    $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($params['financial_type_id']);
+    if ($isError) {
+      $errors['financial_type_id'] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 

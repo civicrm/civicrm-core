@@ -141,12 +141,13 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       // hidden field to catch the field id in profile
       $this->add('hidden', 'account_type_id', $this->_id);
     }
-    $AccountTypeRelationship = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+    $params['orderColumn'] = 'label';
+    $AccountTypeRelationship = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
     if (!empty($AccountTypeRelationship)) {
       $element = $this->add('select',
         'account_relationship',
         ts('Financial Account Relationship'),
-        array('select' => '- select -') + $AccountTypeRelationship,
+        array('select' => ts('- Select Financial Account Relationship -')) + $AccountTypeRelationship,
         TRUE
       );
     }
@@ -157,16 +158,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
     if ($this->_action == CRM_Core_Action::ADD) {
       if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
-        $financialAccountType = array(
-          '5' => 5, //expense
-          '3' => 1, //AR relation
-          '1' => 3, //revenue
-          '6' => 1, //Asset
-          '7' => 4, //cost of sales
-          '8' => 1, //premium inventory
-          '9' => 3, //discount account is,
-        );
-
+        $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
         $financialAccountType = CRM_Utils_Array::value($this->_submitValues['account_relationship'], $financialAccountType);
         $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
 
@@ -179,16 +171,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       }
     }
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $financialAccountType = array(
-        '5' => 5, //expense
-        '3' => 1, //AR relation
-        '1' => 3, //revenue
-        '6' => 1, //Asset
-        '7' => 4, //cost of sales
-        '8' => 1, //premium inventory
-        '9' => 3, //discount account is,
-      );
-
+      $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
       $financialAccountType = $financialAccountType[$this->_defaultValues['account_relationship']];
       $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
 

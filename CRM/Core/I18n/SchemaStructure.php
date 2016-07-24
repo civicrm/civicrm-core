@@ -157,6 +157,8 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_price_field_value' => array(
           'label' => "varchar(255)",
           'description' => "text",
+          'help_pre' => "text",
+          'help_post' => "text",
         ) ,
         'civicrm_pcp_block' => array(
           'link_text' => "varchar(255)",
@@ -547,6 +549,16 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ) ,
           'description' => array(
+            'type' => "TextArea",
+            'rows' => "2",
+            'cols' => "60",
+          ) ,
+          'help_pre' => array(
+            'type' => "TextArea",
+            'rows' => "2",
+            'cols' => "60",
+          ) ,
+          'help_post' => array(
             'type' => "TextArea",
             'rows' => "2",
             'cols' => "60",

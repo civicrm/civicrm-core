@@ -932,6 +932,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $pledgeParams['frequency_day'] = 1;
         }
         $pledgeParams['create_date'] = $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date("Ymd");
+        $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($contribution->contribution_page_id);
+        if (CRM_Utils_Array::value('start_date', $params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
+          $pledgeStartDate = CRM_Utils_Array::value('start_date', $params, NULL);
+          $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
+        }
         $pledgeParams['status_id'] = $contribution->contribution_status_id;
         $pledgeParams['max_reminders'] = $form->_values['max_reminders'];
         $pledgeParams['initial_reminder_day'] = $form->_values['initial_reminder_day'];
@@ -1103,6 +1108,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
       CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
+    }
+    // Only set contribution recur ID for contributions since offline membership recur payments are handled somewhere else.
+    if (!is_a($form, "CRM_Member_Form_Membership")) {
+      $form->_params['contributionRecurID'] = $recurring->id;
     }
 
     return $recurring->id;
@@ -1846,6 +1855,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // hack these in for test support.
     $form->_fields['billing_first_name'] = 1;
     $form->_fields['billing_last_name'] = 1;
+    // CRM-18854 - Set form values to allow pledge to be created for api test.
+    if (CRM_Utils_Array::value('pledge_block_id', $params)) {
+      $form->_values['pledge_block_id'] = $params['pledge_block_id'];
+      $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($params['id']);
+      $form->_values['max_reminders'] = $pledgeBlock['max_reminders'];
+      $form->_values['initial_reminder_day'] = $pledgeBlock['initial_reminder_day'];
+      $form->_values['additional_reminder_day'] = $pledgeBlock['additional_reminder_day'];
+      $form->_values['is_email_receipt'] = FALSE;
+    }
     $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
     $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
     $priceSetFields = reset($priceFields);
@@ -1928,6 +1946,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // fix currency ID
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
+
+    // CRM-18854
+    if (CRM_Utils_Array::value('adjust_recur_start_date', $this->_values)) {
+      $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
+      if (CRM_Utils_Array::value('start_date', $this->_params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
+        $pledgeStartDate = CRM_Utils_Array::value('start_date', $this->_params, NULL);
+        $this->_params['receive_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
+        $recurParams = CRM_Pledge_BAO_Pledge::buildRecurParams($this->_params);
+        $this->_params = array_merge($this->_params, $recurParams);
+      }
+    }
 
     //carry payment processor id.
     if (CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
@@ -2315,6 +2344,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             'payment_processor_id' => $this->_paymentProcessor['id'],
             'is_transactional' => FALSE,
             'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+            'receive_date' => CRM_Utils_Array::value('receive_date', $result),
           )
         );
       }

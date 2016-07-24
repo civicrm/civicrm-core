@@ -207,66 +207,8 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           CRM_Utils_System::redirect($url);
         }
         else {
-          $cids = array();
-          foreach ($foundDupes as $dupe) {
-            $cids[$dupe[0]] = 1;
-            $cids[$dupe[1]] = 1;
-          }
-          $cidString = implode(', ', array_keys($cids));
-          $sql = "SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name";
-          $dao = new CRM_Core_DAO();
-          $dao->query($sql);
-          $displayNames = array();
-          while ($dao->fetch()) {
-            $displayNames[$dao->id] = $dao->display_name;
-          }
+          $mainContacts = CRM_Dedupe_Finder::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
 
-          // FIXME: sort the contacts; $displayName
-          // is already sort_name-sorted, so use that
-          // (also, consider sorting by dupe count first)
-          // lobo - change the sort to by threshold value
-          // so the more likely dupes are sorted first
-          $userId = CRM_Core_Session::singleton()->getLoggedInContactID();
-          $mainContacts = $permission = array();
-
-          foreach ($foundDupes as $dupes) {
-            $srcID = $dupes[0];
-            $dstID = $dupes[1];
-            if ($dstID == $userId) {
-              $srcID = $dupes[1];
-              $dstID = $dupes[0];
-            }
-
-            /***
-             * Eliminate this since it introduces 3 queries PER merge row
-             * and hence is very expensive
-             * CRM-8822
-             * if ( !array_key_exists( $srcID, $permission ) ) {
-             * $permission[$srcID] = CRM_Contact_BAO_Contact_Permission::allow( $srcID, CRM_Core_Permission::EDIT );
-             * }
-             * if ( !array_key_exists( $dstID, $permission ) ) {
-             * $permission[$dstID] = CRM_Contact_BAO_Contact_Permission::allow( $dstID, CRM_Core_Permission::EDIT );
-             * }
-             *
-             * $canMerge = ( $permission[$dstID] && $permission[$srcID] );
-             *
-             */
-
-            // we'll do permission checking during the merge process
-            $canMerge = TRUE;
-
-            $mainContacts[] = $row = array(
-              'srcID' => $srcID,
-              'srcName' => $displayNames[$srcID],
-              'dstID' => $dstID,
-              'dstName' => $displayNames[$dstID],
-              'weight' => $dupes[2],
-              'canMerge' => $canMerge,
-            );
-
-            $data = CRM_Core_DAO::escapeString(serialize($row));
-            $values[] = " ( 'civicrm_contact', $srcID, $dstID, '$cacheKeyString', '$data' ) ";
-          }
           if ($cid) {
             $this->_cid = $cid;
           }
@@ -276,7 +218,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           $this->_rgid = $rgid;
           $this->_mainContacts = $mainContacts;
 
-          CRM_Core_BAO_PrevNextCache::setItem($values);
           $session = CRM_Core_Session::singleton();
           if ($this->_cid) {
             $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/deduperules',

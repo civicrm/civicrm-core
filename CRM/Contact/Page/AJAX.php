@@ -676,14 +676,14 @@ LIMIT {$offset}, {$rowCount}
 
     $nextParamKey = 3;
     $mappings = array(
-      'src' => 'cc1.display_name',
-      'dst' => 'cc2.display_name',
-      'src_email' => 'ce1.email',
-      'dst_email' => 'ce2.email',
-      'src_postcode' => 'ca1.postal_code',
-      'dst_postcode' => 'ca2.postal_code',
-      'src_street' => 'ca1.street',
-      'dst_street' => 'ca2.street',
+      'dst' => 'cc1.display_name',
+      'src' => 'cc2.display_name',
+      'dst_email' => 'ce1.email',
+      'src_email' => 'ce2.email',
+      'dst_postcode' => 'ca1.postal_code',
+      'src_postcode' => 'ca2.postal_code',
+      'dst_street' => 'ca1.street',
+      'src_street' => 'ca2.street',
     );
 
     foreach ($mappings as $key => $dbName) {
@@ -710,18 +710,18 @@ LIMIT {$offset}, {$rowCount}
     $join .= CRM_Dedupe_Merger::getJoinOnDedupeTable();
 
     $select = array(
-      'cc1.contact_type'     => 'src_contact_type',
-      'cc1.display_name'     => 'src_display_name',
-      'cc1.contact_sub_type' => 'src_contact_sub_type',
-      'cc2.contact_type'     => 'dst_contact_type',
-      'cc2.display_name'     => 'dst_display_name',
-      'cc2.contact_sub_type' => 'dst_contact_sub_type',
-      'ce1.email'            => 'src_email',
-      'ce2.email'            => 'dst_email',
-      'ca1.postal_code'      => 'src_postcode',
-      'ca2.postal_code'      => 'dst_postcode',
-      'ca1.street_address'   => 'src_street',
-      'ca2.street_address'   => 'dst_street',
+      'cc1.contact_type'     => 'dst_contact_type',
+      'cc1.display_name'     => 'dst_display_name',
+      'cc1.contact_sub_type' => 'dst_contact_sub_type',
+      'cc2.contact_type'     => 'src_contact_type',
+      'cc2.display_name'     => 'src_display_name',
+      'cc2.contact_sub_type' => 'src_contact_sub_type',
+      'ce1.email'            => 'dst_email',
+      'ce2.email'            => 'src_email',
+      'ca1.postal_code'      => 'dst_postcode',
+      'ca2.postal_code'      => 'src_postcode',
+      'ca1.street_address'   => 'dst_street',
+      'ca2.street_address'   => 'src_street',
     );
 
     if ($select) {
@@ -745,38 +745,39 @@ LIMIT {$offset}, {$rowCount}
     if (!empty($columnDetails)) {
       switch ($columnDetails['data']) {
         case 'src':
-          $orderByClause = " ORDER BY cc1.display_name {$dir}";
-          break;
-
-        case 'src_email':
-          $orderByClause = " ORDER BY ce1.email {$dir}";
-          break;
-
-        case 'src_street':
-          $orderByClause = " ORDER BY ca1.street_address {$dir}";
-          break;
-
-        case 'src_postcode':
-          $orderByClause = " ORDER BY ca1.postal_code {$dir}";
-          break;
-
-        case 'dst':
           $orderByClause = " ORDER BY cc2.display_name {$dir}";
           break;
 
-        case 'dst_email':
+        case 'src_email':
           $orderByClause = " ORDER BY ce2.email {$dir}";
           break;
 
-        case 'dst_street':
+        case 'src_street':
           $orderByClause = " ORDER BY ca2.street_address {$dir}";
           break;
 
-        case 'dst_postcode':
+        case 'src_postcode':
           $orderByClause = " ORDER BY ca2.postal_code {$dir}";
           break;
 
+        case 'dst':
+          $orderByClause = " ORDER BY cc1.display_name {$dir}";
+          break;
+
+        case 'dst_email':
+          $orderByClause = " ORDER BY ce1.email {$dir}";
+          break;
+
+        case 'dst_street':
+          $orderByClause = " ORDER BY ca1.street_address {$dir}";
+          break;
+
+        case 'dst_postcode':
+          $orderByClause = " ORDER BY ca1.postal_code {$dir}";
+          break;
+
         default:
+          $orderByClause = " ORDER BY cc1.display_name ASC";
           break;
       }
     }
@@ -786,29 +787,29 @@ LIMIT {$offset}, {$rowCount}
 
     $count = 0;
     foreach ($dupePairs as $key => $pairInfo) {
-      $pair =& $pairInfo['data'];
+      $pair = $pairInfo['data'];
       $srcContactSubType  = CRM_Utils_Array::value('src_contact_sub_type', $pairInfo);
       $dstContactSubType  = CRM_Utils_Array::value('dst_contact_sub_type', $pairInfo);
       $srcTypeImage = CRM_Contact_BAO_Contact_Utils::getImage($srcContactSubType ?
         $srcContactSubType : $pairInfo['src_contact_type'],
         FALSE,
-        $pairInfo['entity_id1']
+        $pairInfo['entity_id2']
       );
       $dstTypeImage = CRM_Contact_BAO_Contact_Utils::getImage($dstContactSubType ?
         $dstContactSubType : $pairInfo['dst_contact_type'],
         FALSE,
-        $pairInfo['entity_id2']
+        $pairInfo['entity_id1']
       );
 
       $searchRows[$count]['is_selected'] = $pairInfo['is_selected'];
       $searchRows[$count]['is_selected_input'] = "<input type='checkbox' class='crm-dedupe-select' name='pnid_{$pairInfo['prevnext_id']}' value='{$pairInfo['is_selected']}' onclick='toggleDedupeSelect(this)'>";
       $searchRows[$count]['src_image'] = $srcTypeImage;
-      $searchRows[$count]['src'] = CRM_Utils_System::href($pair['srcName'], 'civicrm/contact/view', "reset=1&cid={$pairInfo['entity_id1']}");
+      $searchRows[$count]['src'] = CRM_Utils_System::href($pair['srcName'], 'civicrm/contact/view', "reset=1&cid={$pairInfo['entity_id2']}");
       $searchRows[$count]['src_email'] = CRM_Utils_Array::value('src_email', $pairInfo);
       $searchRows[$count]['src_street'] = CRM_Utils_Array::value('src_street', $pairInfo);
       $searchRows[$count]['src_postcode'] = CRM_Utils_Array::value('src_postcode', $pairInfo);
       $searchRows[$count]['dst_image'] = $dstTypeImage;
-      $searchRows[$count]['dst'] = CRM_Utils_System::href($pair['dstName'], 'civicrm/contact/view', "reset=1&cid={$pairInfo['entity_id2']}");
+      $searchRows[$count]['dst'] = CRM_Utils_System::href($pair['dstName'], 'civicrm/contact/view', "reset=1&cid={$pairInfo['entity_id1']}");
       $searchRows[$count]['dst_email'] = CRM_Utils_Array::value('dst_email', $pairInfo);
       $searchRows[$count]['dst_street'] = CRM_Utils_Array::value('dst_street', $pairInfo);
       $searchRows[$count]['dst_postcode'] = CRM_Utils_Array::value('dst_postcode', $pairInfo);

@@ -173,7 +173,6 @@ function civicrm_initialize() {
     if (!defined('CIVICRM_SETTINGS_PATH')) {
       define('CIVICRM_SETTINGS_PATH', $settingsFile);
     }
-    $error = include_once ($settingsFile);
 
     // get ready for problems
     $docLinkInstall = "http://wiki.civicrm.org/confluence/display/CRMDOC/Drupal+Installation+Guide";
@@ -188,7 +187,7 @@ function civicrm_initialize() {
       )
     );
 
-    if ($error == FALSE) {
+    if (!include_once($settingsFile)) {
       $failure = TRUE;
       drupal_set_message("<strong><p class='error'>" .
         t("Oops! - The CiviCRM settings file (civicrm.settings.php) was not found in the expected location ") .
@@ -199,8 +198,7 @@ function civicrm_initialize() {
     }
 
     // this does pretty much all of the civicrm initialization
-    $error = include_once ('CRM/Core/Config.php');
-    if ($error == FALSE) {
+    if (!include_once('CRM/Core/Config.php')) {
       $failure = TRUE;
       drupal_set_message("<strong><p class='error'>" .
         t("Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (!1).",
@@ -329,6 +327,7 @@ function _civicrm_registerClassLoader() {
   require_once $home . $path;
   CRM_Core_ClassLoader::singleton()->register();
 }
+
 /**
  * Function to get the contact type.
  *
@@ -391,19 +390,14 @@ function civicrm_invoke() {
   // synchronize the drupal uid with the contacts db
   global $user;
 
-  /*
-  * FIXME: hack to bypass synchronize if running upgrade to avoid
-  * any serious non-recoverable error which might hinder the
-  * upgrade process.
-  */
-
-  if (!isset($args[1]) ||
-    $args[1] != 'upgrade'
-  ) {
-
-    CRM_Core_BAO_UFMatch::synchronize($user, FALSE, 'Drupal',
-      civicrm_get_ctype('Individual')
-    );
+  /**
+   * Bypass synchronize if running upgrade to avoid any serious
+   * non-recoverable error which might hinder the upgrade process.
+   *
+   * @FIXME
+   */
+  if (!isset($args[1]) || $args[1] != 'upgrade') {
+    CRM_Core_BAO_UFMatch::synchronize($user, FALSE, 'Drupal', civicrm_get_ctype('Individual'));
   }
 
   // Fix the path for the url alias module.
@@ -856,7 +850,7 @@ function civicrm_add_jquery(&$html) {
   return $html;
 }
 
-function civicrm_form_alter(&$form, &$formValues, $formID) {
+function civicrm_form_alter(&$form, $formValues, $formID) {
   switch ($formID) {
     case 'user_admin_permissions':
       $form['#submit'][] = 'civicrm_user_admin_permissions_submit';
@@ -878,7 +872,6 @@ function civicrm_form_alter(&$form, &$formValues, $formID) {
         NULL, TRUE, FALSE
       );
       $form = array_merge($form, $output);
-      $formValues['no_cache'] = TRUE;
       break;
 
     case 'user_profile_form':
@@ -908,7 +901,6 @@ function civicrm_form_alter(&$form, &$formValues, $formID) {
           $form = array_merge($form, $output);
         }
       }
-      $formValues['no_cache'] = TRUE;
       break;
 
     default:

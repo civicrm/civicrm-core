@@ -1011,6 +1011,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['id'] = $contribID;
     }
 
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      $eventStartDate = CRM_Utils_Array::value(
+        'start_date',
+        CRM_Utils_Array::value(
+          'event',
+          $form->_values
+        )
+      );
+      if ($eventStartDate) {
+        $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
+      }
+    }
     //create an contribution address
     // The concept of contributeMode is deprecated. Elsewhere we use the function processBillingAddress() - although
     // currently that is only inherited by back-office forms.

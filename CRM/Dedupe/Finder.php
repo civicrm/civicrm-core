@@ -348,4 +348,61 @@ class CRM_Dedupe_Finder {
     return $params;
   }
 
+  /**
+   * Parse duplicate pairs into a standardised array and store in the prev_next_cache.
+   *
+   * @param array $foundDupes
+   * @param string $cacheKeyString
+   *
+   * @return array Dupe pairs with the keys
+   *   Dupe pairs with the keys
+   *   -srcID
+   *   -srcName
+   *   -dstID
+   *   -dstName
+   *   -weight
+   *   -canMerge
+   *
+   * @throws CRM_Core_Exception
+   */
+  public static function parseAndStoreDupePairs($foundDupes, $cacheKeyString) {
+    $cids = array();
+    foreach ($foundDupes as $dupe) {
+      $cids[$dupe[0]] = 1;
+      $cids[$dupe[1]] = 1;
+    }
+    $cidString = implode(', ', array_keys($cids));
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name");
+    $displayNames = array();
+    while ($dao->fetch()) {
+      $displayNames[$dao->id] = $dao->display_name;
+    }
+
+    $userId = CRM_Core_Session::singleton()->getLoggedInContactID();
+    foreach ($foundDupes as $dupes) {
+      $srcID = $dupes[1];
+      $dstID = $dupes[0];
+      // The logged in user should never be the src (ie. the contact to be removed).
+      if ($srcID == $userId) {
+        $srcID = $dstID;
+        $dstID = $userId;
+      }
+
+      $mainContacts[] = $row = array(
+        'dstID' => $dstID,
+        'dstName' => $displayNames[$dstID],
+        'srcID' => $srcID,
+        'srcName' => $displayNames[$srcID],
+        'weight' => $dupes[2],
+        'canMerge' => TRUE,
+      );
+
+      $data = CRM_Core_DAO::escapeString(serialize($row));
+      $values[] = " ( 'civicrm_contact', $dstID, $srcID, '$cacheKeyString', '$data' ) ";
+    }
+    CRM_Core_BAO_PrevNextCache::setItem($values);
+    return $mainContacts;
+  }
+
 }

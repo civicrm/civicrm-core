@@ -507,7 +507,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       FROM civicrm_batch
       WHERE item_count >= 1
       AND status_id != {$dataEntryStatusId}
-      ORDER BY id DESC";
+      ORDER BY title";
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);

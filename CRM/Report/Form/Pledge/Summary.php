@@ -273,12 +273,15 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
-      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy) .
-        " {$this->_rollup} ";
+      $groupBy = $this->_groupBy;
+      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
     }
     else {
-      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id";
+      $groupBy = "{$this->_aliases['civicrm_contact']}.id";
+      $this->_groupBy = "GROUP BY {$groupBy}";
     }
+    $this->appendSelect($this->_selectClauses, $groupBy);
+    $this->_groupBy .= " {$this->_rollup}";
   }
 
   /**

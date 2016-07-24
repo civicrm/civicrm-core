@@ -110,6 +110,18 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
    */
   public $description;
   /**
+   * Price field option pre help text.
+   *
+   * @var text
+   */
+  public $help_pre;
+  /**
+   * Price field option post field help.
+   *
+   * @var text
+   */
+  public $help_post;
+  /**
    * Price field option amount
    *
    * @var string
@@ -250,6 +262,30 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
             'type' => 'TextArea',
           ) ,
         ) ,
+        'help_pre' => array(
+          'name' => 'help_pre',
+          'type' => CRM_Utils_Type::T_TEXT,
+          'title' => ts('Help Pre') ,
+          'description' => 'Price field option pre help text.',
+          'rows' => 2,
+          'cols' => 60,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'TextArea',
+          ) ,
+        ) ,
+        'help_post' => array(
+          'name' => 'help_post',
+          'type' => CRM_Utils_Type::T_TEXT,
+          'title' => ts('Help Post') ,
+          'description' => 'Price field option post field help.',
+          'rows' => 2,
+          'cols' => 60,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'TextArea',
+          ) ,
+        ) ,
         'amount' => array(
           'name' => 'amount',
           'type' => CRM_Utils_Type::T_STRING,
@@ -378,6 +414,8 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
         'name' => 'name',
         'label' => 'label',
         'description' => 'description',
+        'help_pre' => 'help_pre',
+        'help_post' => 'help_post',
         'amount' => 'amount',
         'count' => 'count',
         'max_value' => 'max_value',

@@ -37,28 +37,42 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   static $_paymentProcessor = NULL;
 
   /**
-   * Constructor.
+   * Input parameters from payment processor. Store these so that
+   * the code does not need to keep retrieving from the http request
+   * @var array
    */
-  public function __construct() {
+  protected $_inputParameters = array();
+
+  /**
+   * Constructor function.
+   *
+   * @param array $inputData
+   *   Contents of HTTP REQUEST.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function __construct($inputData) {
+    $this->setInputParameters($inputData);
     parent::__construct();
   }
 
   /**
    * @param string $name
    * @param $type
-   * @param string $location
    * @param bool $abort
    *
    * @return mixed
    */
-  public static function retrieve($name, $type, $location = 'POST', $abort = TRUE) {
+  public function retrieve($name, $type, $abort = TRUE) {
     static $store = NULL;
-    $value = CRM_Utils_Request::retrieve($name, $type, $store,
-      FALSE, NULL, $location
+    $value = CRM_Utils_Type::validate(
+      CRM_Utils_Array::value($name, $this->_inputParameters),
+      $type,
+      FALSE
     );
     if ($abort && $value === NULL) {
-      CRM_Core_Error::debug_log_message("Could not find an entry for $name in $location");
-      echo "Failure: Missing Parameter<p>";
+      CRM_Core_Error::debug_log_message("Could not find an entry for $name");
+      echo "Failure: Missing Parameter<p>" . CRM_Utils_Type::escape($name, 'String');
       exit();
     }
     return $value;
@@ -110,7 +124,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $sendNotification = FALSE;
     $subscriptionPaymentStatus = NULL;
     //set transaction type
-    $txnType = $_POST['txn_type'];
+    $txnType = $this->retrieve('txn_type', 'String');
     switch ($txnType) {
       case 'subscr_signup':
         $recur->create_date = $now;
@@ -122,7 +136,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         if ($statusID != 5) {
           $recur->contribution_status_id = 2;
         }
-        $recur->processor_id = $_POST['subscr_id'];
+        $recur->processor_id = $this->retrieve('subscr_id', 'String');
         $recur->trxn_id = $recur->processor_id;
         $sendNotification = TRUE;
         $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_START;
@@ -296,36 +310,35 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @return bool
    */
   public function main() {
-    //@todo - this could be refactored like PayPalProIPN & a test could be added
 
     $objects = $ids = $input = array();
-    $component = CRM_Utils_Array::value('module', $_GET);
+    $component = $this->retrieve('module', 'String');
     $input['component'] = $component;
 
-    // get the contribution and contact ids from the GET params
-    $ids['contact'] = self::retrieve('contactID', 'Integer', 'GET', TRUE);
-    $ids['contribution'] = self::retrieve('contributionID', 'Integer', 'GET', TRUE);
+    $ids['contact'] = $this->retrieve('contactID', 'Integer', TRUE);
+    $ids['contribution'] = $this->retrieve('contributionID', 'Integer', TRUE);
 
     $this->getInput($input, $ids);
 
     if ($component == 'event') {
-      $ids['event'] = self::retrieve('eventID', 'Integer', 'GET', TRUE);
-      $ids['participant'] = self::retrieve('participantID', 'Integer', 'GET', TRUE);
+      $ids['event'] = $this->retrieve('eventID', 'Integer', TRUE);
+      $ids['participant'] = $this->retrieve('participantID', 'Integer', TRUE);
     }
     else {
       // get the optional ids
-      $ids['membership'] = self::retrieve('membershipID', 'Integer', 'GET', FALSE);
-      $ids['contributionRecur'] = self::retrieve('contributionRecurID', 'Integer', 'GET', FALSE);
-      $ids['contributionPage'] = self::retrieve('contributionPageID', 'Integer', 'GET', FALSE);
-      $ids['related_contact'] = self::retrieve('relatedContactID', 'Integer', 'GET', FALSE);
-      $ids['onbehalf_dupe_alert'] = self::retrieve('onBehalfDupeAlert', 'Integer', 'GET', FALSE);
+      $ids['membership'] = $this->retrieve('membershipID', 'Integer', FALSE);
+      $ids['contributionRecur'] = $this->retrieve('contributionRecurID', 'Integer', FALSE);
+      $ids['contributionPage'] = $this->retrieve('contributionPageID', 'Integer', FALSE);
+      $ids['related_contact'] = $this->retrieve('relatedContactID', 'Integer', FALSE);
+      $ids['onbehalf_dupe_alert'] = $this->retrieve('onBehalfDupeAlert', 'Integer', FALSE);
     }
 
     $processorParams = array(
-      'user_name' => self::retrieve('receiver_email', 'String', 'POST', FALSE),
+      'user_name' => $this->retrieve('receiver_email', 'String', FALSE),
       'payment_processor_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', 'PayPal_Standard', 'id', 'name'),
       'is_test' => empty($input['is_test']) ? 0 : 1,
     );
+
     $processorInfo = array();
     if (!CRM_Financial_BAO_PaymentProcessor::retrieve($processorParams, $processorInfo)) {
       return FALSE;
@@ -365,11 +378,11 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    $input['txnType'] = self::retrieve('txn_type', 'String', 'POST', FALSE);
-    $input['paymentStatus'] = self::retrieve('payment_status', 'String', 'POST', FALSE);
-    $input['invoice'] = self::retrieve('invoice', 'String', 'POST', TRUE);
-    $input['amount'] = self::retrieve('mc_gross', 'Money', 'POST', FALSE);
-    $input['reasonCode'] = self::retrieve('ReasonCode', 'String', 'POST', FALSE);
+    $input['txnType'] = $this->retrieve('txn_type', 'String', FALSE);
+    $input['paymentStatus'] = $this->retrieve('payment_status', 'String', FALSE);
+    $input['invoice'] = $this->retrieve('invoice', 'String', TRUE);
+    $input['amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
+    $input['reasonCode'] = $this->retrieve('ReasonCode', 'String', FALSE);
 
     $billingID = $ids['billing'];
     $lookup = array(
@@ -382,14 +395,14 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       "country-{$billingID}" => 'address_country_code',
     );
     foreach ($lookup as $name => $paypalName) {
-      $value = self::retrieve($paypalName, 'String', 'POST', FALSE);
+      $value = $this->retrieve($paypalName, 'String', FALSE);
       $input[$name] = $value ? $value : NULL;
     }
 
-    $input['is_test'] = self::retrieve('test_ipn', 'Integer', 'POST', FALSE);
-    $input['fee_amount'] = self::retrieve('mc_fee', 'Money', 'POST', FALSE);
-    $input['net_amount'] = self::retrieve('settle_amount', 'Money', 'POST', FALSE);
-    $input['trxn_id'] = self::retrieve('txn_id', 'String', 'POST', FALSE);
+    $input['is_test'] = $this->retrieve('test_ipn', 'Integer', FALSE);
+    $input['fee_amount'] = $this->retrieve('mc_fee', 'Money', FALSE);
+    $input['net_amount'] = $this->retrieve('settle_amount', 'Money', FALSE);
+    $input['trxn_id'] = $this->retrieve('txn_id', 'String', FALSE);
   }
 
 }

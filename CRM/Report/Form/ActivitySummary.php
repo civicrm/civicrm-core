@@ -275,6 +275,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -400,7 +401,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
-  public function groupBy() {
+  public function groupBy($includeSelectCol = TRUE) {
     $this->_groupBy = array();
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys'])) {
@@ -431,11 +432,15 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           }
         }
       }
-
+      $groupBy = $this->_groupBy;
       $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
     }
     else {
+      $groupBy = "{$this->_aliases['civicrm_activity']}.id";
       $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id ";
+    }
+    if ($includeSelectCol) {
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
   }
 
@@ -537,6 +542,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     // now build the query for duration sum
     $this->from(TRUE);
     $this->where(TRUE);
+    $this->groupBy(FALSE);
 
     // build the query to calulate duration sum
     $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";

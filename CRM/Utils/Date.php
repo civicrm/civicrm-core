@@ -1886,4 +1886,20 @@ class CRM_Utils_Date {
     return $formattedDate;
   }
 
+  /**
+   * Function to return days of the month.
+   *
+   * @return array
+   */
+  public static function getCalendarDayOfMonth() {
+    $month = array();
+    for ($i = 1; $i <= 31; $i++) {
+      $month[$i] = $i;
+      if ($i == 31) {
+        $month[$i] = $i . ' / Last day of month';
+      }
+    }
+    return $month;
+  }
+
 }

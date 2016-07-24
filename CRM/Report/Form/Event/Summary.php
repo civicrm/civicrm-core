@@ -128,6 +128,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
       }
     }
 
+    $this->_selectClauses = $select;
     $this->_select = 'SELECT ' . implode(', ', $select);
   }
 
@@ -179,7 +180,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
 
   public function groupBy() {
     $this->assign('chartSupported', TRUE);
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_event']}.id";
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_event']}.id");
   }
 
   /**
@@ -204,7 +205,8 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
                   $this->_participantWhere
 
         GROUP BY civicrm_participant.event_id,
-                 civicrm_participant.status_id";
+                 civicrm_participant.status_id,
+                 civicrm_participant.fee_currency";
 
     $info = CRM_Core_DAO::executeQuery($sql);
     $participant_data = $participant_info = $currency = array();

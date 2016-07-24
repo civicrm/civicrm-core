@@ -501,8 +501,8 @@ AND    $cond
         }
       }
     }
-    if (!empty($DTparams)) {
-      return array($result, $sortedResult);
+    if (!empty($sortedResult)) {
+      $result['sortedResult'] = $sortedResult;
     }
     return $result;
   }
