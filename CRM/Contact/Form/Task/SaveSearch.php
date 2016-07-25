@@ -118,6 +118,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
     //CRM-14190
     CRM_Group_Form_Edit::buildParentGroups($this);
+    CRM_Group_Form_Edit::buildGroupOrganizations($this);
 
     // get the group id for the saved search
     $groupID = NULL;
@@ -238,6 +239,19 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     if (!empty($formValues['parents'])) {
       CRM_Contact_BAO_GroupNestingCache::update();
     }
+  }
+
+  /**
+   * Set form defaults.
+   *
+   * return array
+   */
+  public function setDefaultValues() {
+    $defaults = array();
+    if (empty($defaults['parents'])) {
+      $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
+    }
+    return $defaults;
   }
 
 }
