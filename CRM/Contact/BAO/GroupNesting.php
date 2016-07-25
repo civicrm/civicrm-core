@@ -285,44 +285,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
   }
 
   /**
-   * Returns array of group ids of ancestor groups of the specified group.
-   *
-   * @param array $groupIds
-   *   An array of valid group ids (passed by reference).
-   *
-   * @param bool $includeSelf
-   *
-   * @return array
-   *   List of groupIds that represent the requested group and its ancestors
-   */
-  protected static function getAncestorGroupIds($groupIds, $includeSelf = TRUE) {
-    if (!is_array($groupIds)) {
-      $groupIds = array($groupIds);
-    }
-    $dao = new CRM_Contact_DAO_GroupNesting();
-    $query = "SELECT parent_group_id, child_group_id
-                  FROM   civicrm_group_nesting
-                  WHERE  child_group_id IN (" . implode(',', $groupIds) . ")";
-    $dao->query($query);
-    $tmpGroupIds = array();
-    $parentGroupIds = array();
-    if ($includeSelf) {
-      $parentGroupIds = $groupIds;
-    }
-    while ($dao->fetch()) {
-      // make sure we're not following any cyclical references
-      if (!array_key_exists($dao->child_group_id, $parentGroupIds) && $dao->parent_group_id != $groupIds[0]) {
-        $tmpGroupIds[] = $dao->parent_group_id;
-      }
-    }
-    if (!empty($tmpGroupIds)) {
-      $newParentGroupIds = self::getAncestorGroupIds($tmpGroupIds);
-      $parentGroupIds = array_merge($parentGroupIds, $newParentGroupIds);
-    }
-    return $parentGroupIds;
-  }
-
-  /**
    * Returns array of group ids of child groups of the specified group.
    *
    * @param array $groupIds
