@@ -506,7 +506,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * and store it for future use
    */
   public function buildClause() {
-    $params = array(array('group', 'IN', array($this->id => 1), 0, 0));
+    $params = array(array('group', 'IN', array($this->id), 0, 0));
 
     if (!empty($params)) {
       $tables = $whereTables = array();
@@ -1304,6 +1304,22 @@ WHERE {$whereClause}";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 
     return CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
+  }
+
+  /**
+   * Assign Test Value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'children' || $fieldName = 'parents') {
+      $this->{$fieldName} = "NULL";
+    }
+    else {
+      parent::assignTestValues($fieldaName, $fieldDef, $counter);
+    }
   }
 
 }
