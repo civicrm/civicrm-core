@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<extension key="org.civicrm.demotheme" type="module">
+  <file>demotheme</file>
+  <name>Demo Theme</name>
+  <description>Demo Theme</description>
+  <license>MIT</license>
+  <maintainer>
+    <author>Tim Otten</author>
+    <email>totten@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">http://FIXME</url>
+    <url desc="Documentation">http://FIXME</url>
+    <url desc="Support">http://FIXME</url>
+    <url desc="Licensing">http://opensource.org/licenses/MIT</url>
+  </urls>
+  <releaseDate>2016-06-09</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.7</ver>
+  </compatibility>
+  <comments>This is a new, undeveloped module</comments>
+</extension>
