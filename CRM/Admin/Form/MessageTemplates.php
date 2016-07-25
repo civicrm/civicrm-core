@@ -175,7 +175,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $element->freeze();
     }
 
-    $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=60');
+    $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
     $this->addUploadElement("file_id");
 
     $this->add('text', 'msg_subject',
