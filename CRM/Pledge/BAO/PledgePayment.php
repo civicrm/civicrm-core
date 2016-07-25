@@ -269,7 +269,7 @@ WHERE     pledge_id = %1
         if ($payment->contribution_id) {
           CRM_Contribute_BAO_Contribution::deleteContribution($payment->contribution_id);
         }
-        $payment->delete();
+        self::del($payment->id);
       }
     }
 

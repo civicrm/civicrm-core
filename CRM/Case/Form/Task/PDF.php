@@ -32,47 +32,60 @@
  */
 
 /**
- * This class contains all the function that are called using AJAX
+ * This class provides the functionality to create PDF letter for a group of contacts.
  */
-class CRM_Mailing_Page_AJAX {
+class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
+  /**
+   * All the existing templates in the system.
+   *
+   * @var array
+   */
+  public $_templates = NULL;
+
+  public $_single = NULL;
+
+  public $_cid = NULL;
 
   /**
-   * Fetch the template text/html messages
+   * Build all the data structures needed to build the form.
    */
-  public static function template() {
-    $templateId = CRM_Utils_Type::escape($_POST['tid'], 'Integer');
+  public function preProcess() {
+    $this->skipOnHold = $this->skipDeceased = FALSE;
+    parent::preProcess();
+    $this->setContactIDs();
+    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
+  }
 
-    $messageTemplate = new CRM_Core_DAO_MessageTemplate();
-    $messageTemplate->id = $templateId;
-    $messageTemplate->selectAdd();
-    $messageTemplate->selectAdd('msg_text, msg_html, msg_subject, pdf_format_id');
-    $messageTemplate->find(TRUE);
-    $messages = array(
-      'subject' => $messageTemplate->msg_subject,
-      'msg_text' => $messageTemplate->msg_text,
-      'msg_html' => $messageTemplate->msg_html,
-      'pdf_format_id' => $messageTemplate->pdf_format_id,
-    );
-
-    $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $templateId);
-    foreach ((array) $documentInfo as $info) {
-      list($messages['document_body']) = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
-    }
-
-    CRM_Utils_JSON::output($messages);
+  public function setDefaultValues() {
+    return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
   }
 
   /**
-   * Retrieve contact mailings.
+   * Build the form object.
    */
-  public static function getContactMailings() {
-    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
-    $params += CRM_Core_Page_AJAX::validateParams(array('contact_id' => 'Integer'));
+  public function buildQuickForm() {
+    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+  }
 
-    // get the contact mailings
-    $mailings = CRM_Mailing_BAO_Mailing::getContactMailingSelector($params);
+  /**
+   * Process the form after the input has been submitted and validated.
+   */
+  public function postProcess() {
+    CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
+  }
 
-    CRM_Utils_JSON::output($mailings);
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    foreach ($this->_caseIds as $key => $caseId) {
+      $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseId, 'case_type_id');
+      $tokens += CRM_Core_SelectValues::caseTokens($caseTypeId);
+    }
+    return $tokens;
   }
 
 }

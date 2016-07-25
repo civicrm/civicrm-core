@@ -263,55 +263,65 @@ class CRM_Member_BAO_Query {
         return;
 
       case 'member_auto_renew':
-        $op = "=";
-        if ($value == 1) {
-          $query->_where[$grouping][] = " civicrm_membership.contribution_recur_id IS NULL";
-          $query->_qill[$grouping][] = ts("Membership is NOT Auto-Renew");
+        $op = '=';
+        $where = $qill = array();
+        foreach ($value as $val) {
+          if ($val == 1) {
+            $where[] = ' civicrm_membership.contribution_recur_id IS NULL';
+            $qill[] = ts('Membership is NOT Auto-Renew');
+          }
+          elseif ($val == 2) {
+            $where[] = ' civicrm_membership.contribution_recur_id IS NOT NULL AND ' . CRM_Contact_BAO_Query::buildClause(
+                'ccr.contribution_status_id',
+                $op,
+                array_search(
+                  'In Progress',
+                  CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
+                ),
+                'Integer'
+              );
+            $qill[] = ts('Membership is Auto-Renew and In Progress');
+          }
+          elseif ($val == 3) {
+            $where[] = ' civicrm_membership.contribution_recur_id IS NOT NULL AND ' .
+              CRM_Contact_BAO_Query::buildClause(
+                'ccr.contribution_status_id',
+                $op,
+                array_search(
+                  'Failed',
+                  CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
+                ),
+                'Integer'
+              );
+            $qill[] = ts('Membership is Auto-Renew and Failed');
+          }
+          elseif ($val == 4) {
+            $where[] = ' civicrm_membership.contribution_recur_id IS NOT NULL AND ' .
+              CRM_Contact_BAO_Query::buildClause(
+                'ccr.contribution_status_id',
+                $op,
+                array_search(
+                  'Cancelled',
+                  CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
+                ),
+                'Integer'
+              );
+            $qill[] = ts('Membership is Auto-Renew and Cancelled');
+          }
+          elseif ($val == 5) {
+            $where[] = ' civicrm_membership.contribution_recur_id IS NOT NULL AND ccr.end_date IS NOT NULL AND ccr.end_date < NOW()';
+            $qill[] = ts('Membership is Auto-Renew and Ended');
+          }
+          elseif ($val == 6) {
+            $where[] = ' civicrm_membership.contribution_recur_id IS NOT NULL';
+            $qill[] = ts('Membership is Auto-Renew');
+          }
         }
-        elseif ($value == 2) {
-          $query->_where[$grouping][] = " civicrm_membership.contribution_recur_id IS NOT NULL";
-          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(
-            "ccr.contribution_status_id",
-            $op,
-            array_search(
-              'In Progress',
-              CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
-            ),
-            "Integer"
-          );
-          $query->_qill[$grouping][] = ts("Membership is Auto-Renew and In Progress");
+        if (!empty($where)) {
+          $query->_where[$grouping][] = implode(' OR ', $where);
+          $query->_qill[$grouping][] = implode(' OR ', $qill);
         }
-        elseif ($value == 3) {
-          $query->_where[$grouping][] = " civicrm_membership.contribution_recur_id IS NOT NULL";
-          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(
-            "ccr.contribution_status_id",
-            $op,
-            array_search(
-              'Failed',
-              CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
-            ),
-            "Integer"
-          );
-          $query->_qill[$grouping][] = ts("Membership is Auto-Renew and Failed");
-        }
-        elseif ($value == 4) {
-          $query->_where[$grouping][] = " civicrm_membership.contribution_recur_id IS NOT NULL";
-          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(
-            "ccr.contribution_status_id",
-            $op,
-            array_search(
-              'Cancelled',
-              CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
-            ),
-            "Integer"
-          );
-          $query->_qill[$grouping][] = ts("Membership is Auto-Renew and Cancelled");
-        }
-        elseif ($value == 5) {
-          $query->_where[$grouping][] = " civicrm_membership.contribution_recur_id IS NOT NULL";
-          $query->_where[$grouping][] = " ccr.end_date IS NOT NULL AND ccr.end_date < NOW()";
-          $query->_qill[$grouping][] = ts("Membership is Auto-Renew and Ended");
-        }
+
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
@@ -486,7 +496,9 @@ class CRM_Member_BAO_Query {
         '3' => ts('Failed'),
         '4' => ts('Cancelled'),
         '5' => ts('Ended'),
-      )
+        '6' => ts('Any'),
+      ),
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
     );
 
     $form->addYesNo('member_test', ts('Membership is a Test?'), TRUE);

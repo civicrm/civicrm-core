@@ -365,8 +365,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (isset($params['group_type'])) {
       if (is_array($params['group_type'])) {
         $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-            array_keys($params['group_type'])
+            $params['group_type']
           ) . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+      else {
+        $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['group_type'] . CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
     else {
@@ -756,7 +759,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $value['class'] = array_diff($value['class'], array('crm-row-parent'));
       }
       $group['DT_RowId'] = 'row_' . $value['id'];
-      if (!$params['parentsOnly']) {
+      if (empty($params['parentsOnly'])) {
         foreach ($value['class'] as $id => $class) {
           if ($class == 'crm-group-parent') {
             unset($value['class'][$id]);
@@ -1318,6 +1321,22 @@ WHERE {$whereClause}";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 
     return CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
+  }
+
+  /**
+   * Assign Test Value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'children' || $fieldName = 'parents') {
+      $this->{$fieldName} = "NULL";
+    }
+    else {
+      parent::assignTestValues($fieldaName, $fieldDef, $counter);
+    }
   }
 
 }

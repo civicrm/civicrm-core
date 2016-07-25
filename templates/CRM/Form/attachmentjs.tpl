@@ -15,6 +15,9 @@
         request.done(function() {
           $el.trigger('crmPopupFormSuccess');
           $row.remove();
+          {/literal}{if $context EQ 'MessageTemplate'}{literal}
+            $('#file_id').show();
+          {/literal}{/if}{literal}
         });
       });
       e.preventDefault();

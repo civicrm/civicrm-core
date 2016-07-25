@@ -766,4 +766,19 @@ HTACCESS;
     return TRUE;
   }
 
+  public static function formatFile(&$param, $fileName, $extraParams = array()) {
+    if (empty($param[$fileName])) {
+      return;
+    }
+
+    $fileParams = array(
+      'uri' => $param[$fileName]['name'],
+      'type' => $param[$fileName]['type'],
+      'location' => $param[$fileName]['name'],
+      'upload_date' => date('YmdHis'),
+    ) + $extraParams;
+
+    $param[$fileName] = $fileParams;
+  }
+
 }

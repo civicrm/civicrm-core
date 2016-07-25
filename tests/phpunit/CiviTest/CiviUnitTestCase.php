@@ -1165,16 +1165,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return mixed
    */
   public function contactMembershipCreate($params) {
-    $pre = array(
+    $params = array_merge(array(
       'join_date' => '2007-01-21',
       'start_date' => '2007-01-21',
       'end_date' => '2007-12-21',
       'source' => 'Payment',
-    );
-
-    foreach ($pre as $key => $val) {
-      if (!isset($params[$key])) {
-        $params[$key] = $val;
+      'membership_type_id' => 'General',
+    ), $params);
+    if (!is_numeric($params['membership_type_id'])) {
+      $membershipTypes = $this->callAPISuccess('Membership', 'getoptions', array('action' => 'create', 'field' => 'membership_type_id'));
+      if (!in_array($params['membership_type_id'], $membershipTypes['values'])) {
+        $this->membershipTypeCreate(array('name' => $params['membership_type_id']));
       }
     }
 
@@ -1957,40 +1958,37 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @return array|int
    */
-  public function activityCreate($params = NULL) {
-
-    if ($params === NULL) {
-      $individualSourceID = $this->individualCreate();
-
-      $contactParams = array(
+  public function activityCreate($params = array()) {
+    $params = array_merge(array(
+      'subject' => 'Discussion on warm beer',
+      'activity_date_time' => date('Ymd'),
+      'duration_hours' => 30,
+      'duration_minutes' => 20,
+      'location' => 'Baker Street',
+      'details' => 'Lets schedule a meeting',
+      'status_id' => 1,
+      'activity_name' => 'Meeting',
+    ), $params);
+    if (!isset($params['source_contact_id'])) {
+      $params['source_contact_id'] = $this->individualCreate();
+    }
+    if (!isset($params['target_contact_id'])) {
+      $params['target_contact_id'] = $this->individualCreate(array(
         'first_name' => 'Julia',
         'Last_name' => 'Anderson',
         'prefix' => 'Ms.',
         'email' => 'julia_anderson@civicrm.org',
         'contact_type' => 'Individual',
-      );
-
-      $individualTargetID = $this->individualCreate($contactParams);
-
-      $params = array(
-        'source_contact_id' => $individualSourceID,
-        'target_contact_id' => array($individualTargetID),
-        'assignee_contact_id' => array($individualTargetID),
-        'subject' => 'Discussion on warm beer',
-        'activity_date_time' => date('Ymd'),
-        'duration_hours' => 30,
-        'duration_minutes' => 20,
-        'location' => 'Baker Street',
-        'details' => 'Lets schedule a meeting',
-        'status_id' => 1,
-        'activity_name' => 'Meeting',
-      );
+      ));
+    }
+    if (!isset($params['assignee_contact_id'])) {
+      $params['assignee_contact_id'] = $params['target_contact_id'];
     }
 
     $result = $this->callAPISuccess('Activity', 'create', $params);
 
-    $result['target_contact_id'] = $individualTargetID;
-    $result['assignee_contact_id'] = $individualTargetID;
+    $result['target_contact_id'] = $params['target_contact_id'];
+    $result['assignee_contact_id'] = $params['assignee_contact_id'];
     return $result;
   }
 
