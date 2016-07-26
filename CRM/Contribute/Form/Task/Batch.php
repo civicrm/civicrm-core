@@ -235,7 +235,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         $contribution = CRM_Contribute_BAO_Contribution::add($value, $ids);
 
         if (!empty($value['contribution_status_id'])) {
-          CRM_Contribute_Form_AbstractEditPayment::updateRelatedComponent($contribution->id,
+          CRM_Contribute_BAO_Contribution::transitionComponentWithReturnMessage($contribution->id,
             $value['contribution_status_id'],
             CRM_Utils_Array::value("field[{$key}][contribution_status_id]",
               $this->_defaultValues
