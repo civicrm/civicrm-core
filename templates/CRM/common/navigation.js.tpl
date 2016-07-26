@@ -110,7 +110,13 @@ $('#civicrm-menu').ready(function() {
             });
           } else {
             $('#sort_name_navigation').autocomplete('widget').menu('option', 'disabled', true);
-            ret.push({value: '0', label: {/literal}'{ts escape='js'}None found.{/ts}'{literal}});
+            var label = option.closest('label').text();
+            var msg = {/literal}ts('{ts escape='js' 1=%1}%1 not found.{/ts}'{literal}, {1: label});
+            // Remind user they are not searching by contact name (unless they enter a number)
+            if (params.field_name && !(/[\d].*/.test(params.name))) {
+              msg += {/literal}' {ts escape='js'}Did you mean to search by Name/Email instead?{/ts}'{literal};
+            }
+            ret.push({value: '0', label: msg});
           }
           response(ret);
         })
