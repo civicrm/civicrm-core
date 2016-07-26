@@ -170,7 +170,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
 
     $documentTypes = implode(',', CRM_Core_SelectValues::documentApplicationType());
-    $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=60 accept="' . $documentTypes . '"');
+    $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=255 accept="' . $documentTypes . '"');
     $form->addUploadElement("document_file");
 
     CRM_Mailing_BAO_Mailing::commonCompose($form);
