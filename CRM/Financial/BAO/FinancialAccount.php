@@ -450,7 +450,7 @@ LIMIT 1";
     }
     $deferredFinancialType = self::getDeferredFinancialType();
     if (!array_key_exists($financialTypeId, $deferredFinancialType)) {
-      return TRUE;
+      throw new CRM_Core_Exception(ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts'));
     }
     return FALSE;
   }
