@@ -63,7 +63,7 @@ class CRM_Core_CodeGen_Main {
 
     CRM_Core_CodeGen_Util_Smarty::singleton()->setPluginDirs($smartyPluginDirs);
 
-    $versionFile = "version.xml";
+    $versionFile = $this->phpCodePath . "/xml/version.xml";
     $versionXML = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
     $this->db_version = $versionXML->version_no;
     $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
@@ -95,12 +95,6 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       exit();
     }
 
-    $specification = new CRM_Core_CodeGen_Specification();
-    $specification->parse($this->schemaPath, $this->buildVersion);
-    # cheese:
-    $this->database = $specification->database;
-    $this->tables = $specification->tables;
-
     foreach ($this->getTasks() as $task) {
       if (getenv('GENCODE_FORCE') || $task->needsUpdate()) {
         $task->run();
@@ -114,6 +108,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
    * @throws \Exception
    */
   public function getTasks() {
+    $this->init();
+
     $tasks = array();
     $tasks[] = new CRM_Core_CodeGen_Config($this);
     $tasks[] = new CRM_Core_CodeGen_Version($this);
@@ -143,6 +139,16 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       $this->sourceDigest = CRM_Core_CodeGen_Util_File::digestAll($files);
     }
     return $this->sourceDigest;
+  }
+
+  protected function init() {
+    if (!$this->database || !$this->tables) {
+      $specification = new CRM_Core_CodeGen_Specification();
+      $specification->parse($this->schemaPath, $this->buildVersion);
+      # cheese:
+      $this->database = $specification->database;
+      $this->tables = $specification->tables;
+    }
   }
 
 }
