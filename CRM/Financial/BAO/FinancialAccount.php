@@ -401,19 +401,25 @@ LIMIT 1";
       }
     }
     $deferredFinancialType = self::getDeferredFinancialType();
+    $isError = FALSE;
     if (!empty($lineItems)) {
       foreach ($lineItems as $lineItem) {
         foreach ($lineItem as $items) {
           if (!array_key_exists($items['financial_type_id'], $deferredFinancialType)) {
-            return TRUE;
+            $isError = TRUE;
           }
         }
       }
     }
     elseif (!array_key_exists($financialTypeID, $deferredFinancialType)) {
-      return TRUE;
+      $isError = TRUE;
     }
-    return FALSE;
+
+    if ($isError) {
+      $error = ts('Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+      throw new CRM_Core_Exception($error);
+    }
+    return $isError;
   }
 
   /**

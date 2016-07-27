@@ -178,10 +178,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     // CRM-16189
-    if (CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contributionID)) {
-      $error = ts('Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
-      throw new CRM_Core_Exception($error);
-    }
+    CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contributionID);
+
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
     }
