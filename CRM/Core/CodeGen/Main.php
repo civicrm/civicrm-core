@@ -127,28 +127,6 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   /**
-   * @return array
-   */
-  public function getExpectedFiles() {
-    return array(
-      $this->sqlCodePath . '/civicrm.mysql',
-      $this->phpCodePath . '/CRM/Contact/DAO/Contact.php',
-    );
-  }
-
-  /**
-   * @return bool
-   */
-  public function hasExpectedFiles() {
-    foreach ($this->getExpectedFiles() as $file) {
-      if (!file_exists($file)) {
-        return FALSE;
-      }
-    }
-    return TRUE;
-  }
-
-  /**
    * Compute a digest based on the GenCode logic (PHP/tpl).
    *
    * @return string
