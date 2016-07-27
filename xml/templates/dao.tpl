@@ -31,6 +31,7 @@
  *
  * Generated from {$table.sourceFile}
  * {$generated}
+ * (GenCodeChecksum:{$genCodeChecksum})
  */
 
 require_once 'CRM/Core/DAO.php';
