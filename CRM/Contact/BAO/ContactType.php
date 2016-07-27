@@ -904,8 +904,8 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
     CRM_Core_DAO::dropTriggers($tableName);
 
     foreach ($subtypesToPreserve as $subtypeToPreserve) {
-     $subtypeToPreserve = CRM_Utils_Type::escape($subtypeToPreserve, 'String');
-     $subtypesToPreserveClause[] = "(civicrm_contact.contact_sub_type NOT LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . $subtypeToPreserve . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
+      $subtypeToPreserve = CRM_Utils_Type::escape($subtypeToPreserve, 'String');
+      $subtypesToPreserveClause[] = "(civicrm_contact.contact_sub_type NOT LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . $subtypeToPreserve . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
     }
     $subtypesToPreserveClause = implode(' AND ', $subtypesToPreserveClause);
 
