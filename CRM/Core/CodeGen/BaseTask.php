@@ -29,4 +29,12 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
     $this->tables = $this->config->tables;
   }
 
+  /**
+   * @return bool
+   *   TRUE if an update is needed.
+   */
+  public function needsUpdate() {
+    return TRUE;
+  }
+
 }
