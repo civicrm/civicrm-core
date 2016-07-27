@@ -286,9 +286,11 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $errors['count'] = ts('Participant count can not be greater than max participants.');
     }
     // CRM-16189
-    $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_fid, 'PriceField');
-    if ($isError) {
-      $errors['financial_type_id'] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+    try {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_fid, 'PriceField');
+    }
+    catch (CRM_Core_Exception $e) {
+      $errors['financial_type_id'] = $e->getMessage();
     }
     return empty($errors) ? TRUE : $errors;
   }
