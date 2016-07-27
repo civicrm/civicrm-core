@@ -2622,6 +2622,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->from();
     $this->customDataFrom();
     $this->where();
+    if (array_key_exists('civicrm_contribution', $this->getVar('_columns'))) {
+      $this->getPermissionedFTQuery($this);
+    }
     $this->groupBy();
     $this->orderBy();
 
@@ -4548,9 +4551,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     else {
       $contFTs = $liFTs = implode(',', array_keys($financialTypes));
     }
+    $temp = CRM_Utils_Array::value('civicrm_line_item', $query->_aliases);
     if ($alias) {
-      $temp = CRM_Utils_Array::value('civicrm_line_item', $query->_aliases);
       $query->_aliases['civicrm_line_item'] = $alias;
+    }
+    elseif (!$temp) {
+      $query->_aliases['civicrm_line_item'] = 'civicrm_line_item_civireport';
     }
     if (empty($query->_where)) {
       $query->_where = "WHERE {$query->_aliases['civicrm_contribution']}.id IS NOT NULL ";
