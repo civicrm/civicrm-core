@@ -43,6 +43,15 @@ function civicrm_api3_print_label_create($params) {
 }
 
 /**
+ * Adjust metadata for navigation create action.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_print_label_create_spec(&$params) {
+  $params['name']['api.required'] = 1;
+}
+
+/**
  * Get a PrintLabel.
  *
  * @param array $params
