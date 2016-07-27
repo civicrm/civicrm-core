@@ -3,7 +3,6 @@
 backdrop/
 bower_components
 CRM/Case/xml/configuration
-CRM/Core/DAO/AllCoreTables.php
 CRM/Core/DAO/.listAll.php
 CRM/Core/DAO/listAll.php
 CRM/Core/I18n/SchemaStructure.php
