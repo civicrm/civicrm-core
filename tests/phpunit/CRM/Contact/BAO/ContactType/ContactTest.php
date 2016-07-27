@@ -286,4 +286,61 @@ DELETE FROM civicrm_contact_type
     CRM_Contact_BAO_Contact::deleteContact($contact->id);
   }
 
+  /**
+   * Unit test to ensure that removing any subtype from CustomGroup's
+   * extend_for setting, won't delete any custom data of contact
+   *
+   * Success expected
+   */
+  public function testCRM19133() {
+    $customGroupName = md5(microtime());
+    $subtypesToPreserve = array($this->student, $this->parent);
+
+    // Create custom group that extends student and parent subtype
+    $apiParams = array(
+      'title' => $customGroupName,
+      'extends' => array('Individual', $subtypesToPreserve),
+      'is_active' => TRUE,
+    );
+    $result = civicrm_api3('customGroup', 'create', $apiParams);
+    $customGroupId = $result['id'];
+
+    // Create desired custom field
+    $apiParams = array(
+      'debug' => 1,
+      'custom_group_id' => $result['id'],
+      'label' => $customGroupName,
+      'html_type' => 'Text',
+      'data_type' => 'String',
+      'is_active' => TRUE,
+    );
+    $result = civicrm_api3('custom_field', 'create', $apiParams);
+    $customFieldId = $result['id'];
+
+    // Create contact of subtype parent and student
+    $params = array(
+      'first_name' => 'Anne',
+      'last_name' => 'Grant',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => array($this->student, $this->parent),
+    );
+    $contact = CRM_Contact_BAO_Contact::add($params);
+
+    // Record custom value for desired customGroup
+    $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contact->id, 'custom_' . $customFieldId => 'value 1'));
+
+    // Subtype to be removed from customGroup setting
+    $subtypesToBeRemoved = array($this->student);
+    CRM_Contact_BAO_ContactType::deleteCustomRowsOfSubtype($customGroupId, $subtypesToBeRemoved, $subtypesToPreserve);
+
+    // Check with correct value to assert that custom data is not deleted
+    $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customFieldId => 'value 1'));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($contact->id, $result['id']);
+
+    //Check with incorrect custom value that our previous assertion was correct
+    $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customFieldId => 'wrong value'));
+    $this->assertEquals(0, $result['count']);
+  }
+
 }
