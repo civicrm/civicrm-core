@@ -611,7 +611,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   public function beginPostProcessCommon() {
     $this->buildQuery();
     // @todo this acl has no test coverage and is very hard to test manually so could be fragile.
-    $this->getPermissionedFTQuery($this);
     $this->resetFormSqlAndWhereHavingClauses();
 
     $this->contactTempTable = 'civicrm_report_temp_lybunt_c_' . date('Ymd_') . uniqid();
