@@ -28,7 +28,7 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     if (!file_exists($this->getAbsFileName())) {
       return TRUE;
     }
-    return $this->getChecksum() !== self::extractChecksum($this->getAbsFileName(), ';\(GenCodeChecksum:([a-z0-9]+)\);');
+    return $this->getChecksum() !== self::extractRegex($this->getAbsFileName(), ';\(GenCodeChecksum:([a-z0-9]+)\);');
   }
 
   public function run() {
@@ -57,16 +57,6 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     CRM_Core_CodeGen_Util_File::createDir($directory);
     $absFileName = $directory . $this->getRelFileName();
     return $absFileName;
-  }
-
-  protected static function extractChecksum($file, $regex) {
-    $content = file_get_contents($file);
-    if (preg_match($regex, $content, $matches)) {
-      return $matches[1];
-    }
-    else {
-      return NULL;
-    }
   }
 
   protected function getChecksum() {
