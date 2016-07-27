@@ -21,11 +21,6 @@ class CRM_Core_CodeGen_Util_Smarty {
 
   private $smartyPluginDirs = array();
 
-  /**
-   * @var Smarty
-   */
-  private $smarty;
-
   private $compileDir;
 
   public function __destruct() {
@@ -41,7 +36,6 @@ class CRM_Core_CodeGen_Util_Smarty {
    */
   public function setPluginDirs($pluginDirs) {
     $this->smartyPluginDirs = $pluginDirs;
-    $this->smarty = NULL;
   }
 
   /**
@@ -57,20 +51,24 @@ class CRM_Core_CodeGen_Util_Smarty {
   }
 
   /**
-   * Get smarty instance.
+   * Create a Smarty instance.
    *
    * @return \Smarty
    */
-  public function getSmarty() {
-    if ($this->smarty === NULL) {
-      require_once 'Smarty/Smarty.class.php';
-      $this->smarty = new Smarty();
-      $this->smarty->template_dir = './templates';
-      $this->smarty->plugins_dir = $this->smartyPluginDirs;
-      $this->smarty->compile_dir = $this->getCompileDir();
-      $this->smarty->clear_all_cache();
-    }
-    return $this->smarty;
+  public function createSmarty() {
+    require_once 'Smarty/Smarty.class.php';
+    $smarty = new Smarty();
+    $smarty->template_dir = './templates';
+    $smarty->plugins_dir = $this->smartyPluginDirs;
+    $smarty->compile_dir = $this->getCompileDir();
+    $smarty->clear_all_cache();
+
+    // CRM-5308 / CRM-3507 - we need {localize} to work in the templates
+
+    require_once 'CRM/Core/Smarty/plugins/block.localize.php';
+    $smarty->register_block('localize', 'smarty_block_localize');
+
+    return $smarty;
   }
 
 }
