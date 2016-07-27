@@ -280,8 +280,12 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
         ),
       ),
     );
-    $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
-    $this->assertFalse($valid, "This should have been false");
+    try {
+      CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail("Missed expected exception");
+    }
     $params = array(
       'contact_id' => $cid,
       'receive_date' => '2016-01-20',
@@ -289,8 +293,13 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
     );
-    $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
-    $this->assertTrue($valid, "This should have been true.");
+    try {
+      CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
+      $this->fail("Missed expected exception");
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts', $e->getMessage());
+    }
   }
 
   /**
