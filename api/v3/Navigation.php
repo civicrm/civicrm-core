@@ -93,6 +93,7 @@ function civicrm_api3_navigation_get($params) {
  * @param array $params
  */
 function _civicrm_api3_navigation_create_spec(&$params) {
+  $params['name']['api.required'] = 1;
 }
 
 /**
