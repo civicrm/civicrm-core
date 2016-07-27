@@ -37,4 +37,24 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
     return TRUE;
   }
 
+  /**
+   * Extract a single regex from a file.
+   *
+   * @param string $file
+   *   File name
+   * @param string $regex
+   *   A pattern to match. Ex: "foo=([a-z]+)".
+   * @return string|NULL
+   *   The value matched.
+   */
+  protected static function extractRegex($file, $regex) {
+    $content = file_get_contents($file);
+    if (preg_match($regex, $content, $matches)) {
+      return $matches[1];
+    }
+    else {
+      return NULL;
+    }
+  }
+
 }
