@@ -893,7 +893,7 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    *
    * @return bool
    */
-  public static function deleteCustomRowsOfSubtype($gID, $subtypes = array(), $subtypesToPreserve = array() ) {
+  public static function deleteCustomRowsOfSubtype($gID, $subtypes = array(), $subtypesToPreserve = array()) {
     if (!$gID or empty($subtypes)) {
       return FALSE;
     }
@@ -902,19 +902,18 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
 
     // drop triggers CRM-13587
     CRM_Core_DAO::dropTriggers($tableName);
-    
+
     foreach ($subtypesToPreserve as $subtypeToPreserve) {
-    	$subtypeToPreserve = CRM_Utils_Type::escape($subtypeToPreserve, 'String');
-    	$subtypesToPreserveClause[] = "( civicrm_contact.contact_sub_type NOT LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . $subtypeToPreserve . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
+     $subtypeToPreserve = CRM_Utils_Type::escape($subtypeToPreserve, 'String');
+     $subtypesToPreserveClause[] = "(civicrm_contact.contact_sub_type NOT LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . $subtypeToPreserve . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
     }
     $subtypesToPreserveClause = implode(' AND ', $subtypesToPreserveClause);
-    
 
     $subtypeClause = array();
     foreach ($subtypes as $subtype) {
       $subtype = CRM_Utils_Type::escape($subtype, 'String');
       $subtypeClause[] = "( civicrm_contact.contact_sub_type LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . $subtype . CRM_Core_DAO::VALUE_SEPARATOR . "%'"
-      					    . " AND " . $subtypesToPreserveClause . ")";
+                            . " AND " . $subtypesToPreserveClause . ")";
     }
     $subtypeClause = implode(' OR ', $subtypeClause);
 
