@@ -90,6 +90,7 @@ class CRM_Core_CodeGen_Util_File {
       list ($dir, $pattern) = $pair;
       $files = array_merge($files, CRM_Utils_File::findFiles($dir, $pattern));
     }
+    sort($files);
     return $files;
   }
 

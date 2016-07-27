@@ -10,4 +10,10 @@ interface CRM_Core_CodeGen_ITask {
    */
   public function run();
 
+  /**
+   * @return bool
+   *   TRUE if an update is needed.
+   */
+  public function needsUpdate();
+
 }

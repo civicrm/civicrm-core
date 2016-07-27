@@ -15,6 +15,20 @@ class CRM_Core_CodeGen_Main {
   var $schemaPath; // ex: schema/Schema.xml
 
   /**
+   * Definitions of all tables.
+   *
+   * @var array
+   *   Ex: $tables['civicrm_address_format']['className'] = 'CRM_Core_DAO_AddressFormat';
+   */
+  var $tables;
+
+  /**
+   * @var array
+   *   Ex: $database['tableAttributes_modern'] = "ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+   */
+  var $database;
+
+  /**
    * @var string|NULL path in which to store a marker that indicates the last execution of
    * GenCode. If a matching marker already exists, GenCode doesn't run.
    */
@@ -23,7 +37,7 @@ class CRM_Core_CodeGen_Main {
   /**
    * @var string|NULL a digest of the inputs to the code-generator (eg the properties and source files)
    */
-  var $digest;
+  var $sourceDigest;
 
   /**
    * @param $CoreDAOCodePath
@@ -42,7 +56,7 @@ class CRM_Core_CodeGen_Main {
     $this->phpCodePath = $phpCodePath;
     $this->tplCodePath = $tplCodePath;
     $this->digestPath = $digestPath;
-    $this->digest = NULL;
+    $this->sourceDigest = NULL;
 
     // default cms is 'drupal', if not specified
     $this->cms = isset($argCms) ? strtolower($argCms) : 'drupal';
@@ -88,7 +102,9 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $this->tables = $specification->tables;
 
     foreach ($this->getTasks() as $task) {
-      $task->run();
+      if (getenv('GENCODE_FORCE') || $task->needsUpdate()) {
+        $task->run();
+      }
     }
   }
 
@@ -130,6 +146,25 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       }
     }
     return TRUE;
+  }
+
+  /**
+   * Compute a digest based on the GenCode logic (PHP/tpl).
+   *
+   * @return string
+   */
+  public function getSourceDigest() {
+    if ($this->sourceDigest === NULL) {
+      $srcDir = CRM_Core_CodeGen_Util_File::findCoreSourceDir();
+      $files = CRM_Core_CodeGen_Util_File::findManyFiles(array(
+        array("$srcDir/CRM/Core/CodeGen", '*.php'),
+        array("$srcDir/xml", "*.php"),
+        array("$srcDir/xml", "*.tpl"),
+      ));
+
+      $this->sourceDigest = CRM_Core_CodeGen_Util_File::digestAll($files);
+    }
+    return $this->sourceDigest;
   }
 
 }
