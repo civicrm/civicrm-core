@@ -207,9 +207,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'type' => CRM_Utils_Type::T_STRING,
             'options' => array(
-              'both' => ts('Both'),
               'contributions_only' => ts('Contributions Only'),
               'soft_credits_only' => ts('Soft Credits Only'),
+              'both' => ts('Both'),
             ),
           ),
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
