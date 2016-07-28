@@ -463,7 +463,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         $subtypesToBeRemoved = array();
         $subtypesToPreserve = $params['extends'][1];
         // Don't remove any value if group is extended to -any- subtype
-        if (!empty(current($subtypesToPreserve))) {
+        if (!empty($subtypesToPreserve[0])) {
           $subtypesToBeRemoved = array_diff($this->_subtypes, array_intersect($this->_subtypes, $subtypesToPreserve));
         }
         CRM_Contact_BAO_ContactType::deleteCustomRowsOfSubtype($this->_id, $subtypesToBeRemoved, $subtypesToPreserve);
