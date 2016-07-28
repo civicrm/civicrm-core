@@ -603,10 +603,10 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @return int
    *   Id of deleted Membership on success, false otherwise.
    */
-  public static function del($membershipId) {
+  public static function del($membershipId, $deleteContrib = 1) {
     //delete related first and then delete parent.
     self::deleteRelatedMemberships($membershipId);
-    return self::deleteMembership($membershipId);
+    return self::deleteMembership($membershipId, $deleteContrib);
   }
 
   /**
@@ -618,7 +618,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @return int
    *   Id of deleted Membership on success, false otherwise.
    */
-  public static function deleteMembership($membershipId) {
+  public static function deleteMembership($membershipId, $deleteContrib = 1) {
     // CRM-12147, retrieve membership data before we delete it for hooks
     $params = array('id' => $membershipId);
     $memValues = array();
@@ -654,7 +654,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $params['source_record_id'] = $membershipId;
       CRM_Activity_BAO_Activity::deleteActivity($params);
     }
-    self::deleteMembershipPayment($membershipId);
+    self::deleteMembershipPayment($membershipId, $deleteContrib);
 
     $results = $membership->delete();
     $transaction->commit();
@@ -1507,7 +1507,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     $membershipPayment->find();
 
     while ($membershipPayment->fetch()) {
-      CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
+      if($deleteContrib) {
+        CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
+      }
       CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
       $membershipPayment->delete();
       CRM_Utils_Hook::post('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
