@@ -51,6 +51,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   protected $_groupByDateFreq = array(
     'MONTH' => 'Month',
     'YEARWEEK' => 'Week',
+    'DATE' => 'Day',
     'QUARTER' => 'Quarter',
     'YEAR' => 'Year',
     'FISCALYEAR' => 'Fiscal Year',
@@ -308,14 +309,14 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEARWEEK({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "WEEKOFYEAR({$field['dbAlias']}) AS {$tableName}_{$fieldName}_interval";
-                $field['title'] = 'Week';
+                $field['title'] = ts('Week Beginning');
                 break;
 
               case 'YEAR':
                 $select[] = "MAKEDATE(YEAR({$field['dbAlias']}), 1)  AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEAR({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "YEAR({$field['dbAlias']}) AS {$tableName}_{$fieldName}_interval";
-                $field['title'] = 'Year';
+                $field['title'] = ts('Year Beginning');
                 break;
 
               case 'FISCALYEAR':
@@ -326,14 +327,19 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 $select[] = "DATE_ADD(MAKEDATE({$fiscal}, 1), INTERVAL ({$fy{'M'}})-1 MONTH) AS {$tableName}_{$fieldName}_start";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_interval";
-                $field['title'] = 'Fiscal Year';
+                $field['title'] = ts('Fiscal Year Beginning');
                 break;
 
               case 'MONTH':
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL (DAYOFMONTH({$field['dbAlias']})-1) DAY) as {$tableName}_{$fieldName}_start";
                 $select[] = "MONTH({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "MONTHNAME({$field['dbAlias']}) AS {$tableName}_{$fieldName}_interval";
-                $field['title'] = 'Month';
+                $field['title'] = ts('Month Beginning');
+                break;
+
+              case 'DATE':
+                $select[] = "DATE({$field['dbAlias']}) as {$tableName}_{$fieldName}_start";
+                $field['title'] = ts('Date');
                 break;
 
               case 'QUARTER':
@@ -345,7 +351,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             }
             if (!empty($this->_params['group_bys_freq'][$fieldName])) {
               $this->_interval = $field['title'];
-              $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'] . ' Beginning';
+              $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
 

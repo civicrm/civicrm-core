@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   protected $_addressField = FALSE;
@@ -213,6 +211,11 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             ),
           ),
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'contribution_source' => array(
+            'title' => ts('Source'),
+            'name' => 'source',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'currency' => array(
             'title' => 'Currency',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
