@@ -48,12 +48,6 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -232,28 +226,16 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'app_guid' => 'app_guid',
-        'app_meta' => 'app_meta',
-        'cxn_guid' => 'cxn_guid',
-        'secret' => 'secret',
-        'perm' => 'perm',
-        'options' => 'options',
-        'is_active' => 'is_active',
-        'created_date' => 'created_date',
-        'modified_date' => 'modified_date',
-        'fetched_date' => 'fetched_date',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

@@ -48,12 +48,6 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -642,55 +636,16 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'name' => 'name',
-        'title' => 'title',
-        'recipient' => 'recipient',
-        'limit_to' => 'limit_to',
-        'entity_value' => 'entity_value',
-        'entity_status' => 'entity_status',
-        'start_action_offset' => 'start_action_offset',
-        'start_action_unit' => 'start_action_unit',
-        'start_action_condition' => 'start_action_condition',
-        'start_action_date' => 'start_action_date',
-        'is_repeat' => 'is_repeat',
-        'repetition_frequency_unit' => 'repetition_frequency_unit',
-        'repetition_frequency_interval' => 'repetition_frequency_interval',
-        'end_frequency_unit' => 'end_frequency_unit',
-        'end_frequency_interval' => 'end_frequency_interval',
-        'end_action' => 'end_action',
-        'end_date' => 'end_date',
-        'is_active' => 'is_active',
-        'recipient_manual' => 'recipient_manual',
-        'recipient_listing' => 'recipient_listing',
-        'body_text' => 'body_text',
-        'body_html' => 'body_html',
-        'sms_body_text' => 'sms_body_text',
-        'subject' => 'subject',
-        'record_activity' => 'record_activity',
-        'mapping_id' => 'mapping_id',
-        'group_id' => 'group_id',
-        'msg_template_id' => 'msg_template_id',
-        'sms_template_id' => 'sms_template_id',
-        'absolute_date' => 'absolute_date',
-        'from_name' => 'from_name',
-        'from_email' => 'from_email',
-        'mode' => 'mode',
-        'sms_provider_id' => 'sms_provider_id',
-        'used_for' => 'used_for',
-        'filter_contact_language' => 'filter_contact_language',
-        'communication_language' => 'communication_language',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

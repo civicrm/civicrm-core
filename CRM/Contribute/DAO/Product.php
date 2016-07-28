@@ -48,12 +48,6 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -405,36 +399,16 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'name' => 'product_name',
-        'description' => 'description',
-        'sku' => 'sku',
-        'options' => 'options',
-        'image' => 'image',
-        'thumbnail' => 'thumbnail',
-        'price' => 'price',
-        'currency' => 'currency',
-        'financial_type_id' => 'financial_type_id',
-        'min_contribution' => 'min_contribution',
-        'cost' => 'cost',
-        'is_active' => 'is_active',
-        'period_type' => 'period_type',
-        'fixed_period_start_day' => 'fixed_period_start_day',
-        'duration_unit' => 'duration_unit',
-        'duration_interval' => 'duration_interval',
-        'frequency_unit' => 'frequency_unit',
-        'frequency_interval' => 'frequency_interval',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

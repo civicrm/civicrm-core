@@ -48,12 +48,6 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -285,30 +279,16 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'entity_table' => 'entity_table',
-        'entity_id' => 'entity_id',
-        'target_entity_type' => 'target_entity_type',
-        'target_entity_id' => 'target_entity_id',
-        'supporter_profile_id' => 'supporter_profile_id',
-        'owner_notify_id' => 'owner_notify_id',
-        'is_approval_needed' => 'is_approval_needed',
-        'is_tellfriend_enabled' => 'is_tellfriend_enabled',
-        'tellfriend_limit' => 'tellfriend_limit',
-        'link_text' => 'link_text',
-        'is_active' => 'is_active',
-        'notify_email' => 'notify_email',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

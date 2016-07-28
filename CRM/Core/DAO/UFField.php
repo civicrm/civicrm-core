@@ -48,12 +48,6 @@ class CRM_Core_DAO_UFField extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -362,36 +356,16 @@ class CRM_Core_DAO_UFField extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'uf_group_id' => 'uf_group_id',
-        'field_name' => 'field_name',
-        'is_active' => 'is_active',
-        'is_view' => 'is_view',
-        'is_required' => 'is_required',
-        'weight' => 'weight',
-        'help_post' => 'help_post',
-        'help_pre' => 'help_pre',
-        'visibility' => 'visibility',
-        'in_selector' => 'in_selector',
-        'is_searchable' => 'is_searchable',
-        'location_type_id' => 'location_type_id',
-        'phone_type_id' => 'phone_type_id',
-        'website_type_id' => 'website_type_id',
-        'label' => 'label',
-        'field_type' => 'field_type',
-        'is_reserved' => 'is_reserved',
-        'is_multi_summary' => 'is_multi_summary',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

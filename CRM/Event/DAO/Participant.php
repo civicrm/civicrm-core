@@ -48,12 +48,6 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -467,36 +461,16 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'participant_id',
-        'contact_id' => 'participant_contact_id',
-        'event_id' => 'event_id',
-        'status_id' => 'participant_status_id',
-        'role_id' => 'participant_role_id',
-        'register_date' => 'participant_register_date',
-        'source' => 'participant_source',
-        'fee_level' => 'participant_fee_level',
-        'is_test' => 'participant_is_test',
-        'is_pay_later' => 'participant_is_pay_later',
-        'fee_amount' => 'participant_fee_amount',
-        'registered_by_id' => 'participant_registered_by_id',
-        'discount_id' => 'participant_discount_id',
-        'fee_currency' => 'participant_fee_currency',
-        'campaign_id' => 'participant_campaign_id',
-        'discount_amount' => 'discount_amount',
-        'cart_id' => 'cart_id',
-        'must_wait' => 'must_wait',
-        'transferred_to_contact_id' => 'transferred_to_contact_id',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

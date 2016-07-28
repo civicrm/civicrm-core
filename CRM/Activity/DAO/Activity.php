@@ -48,12 +48,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -546,41 +540,16 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'activity_id',
-        'source_record_id' => 'source_record_id',
-        'activity_type_id' => 'activity_type_id',
-        'subject' => 'activity_subject',
-        'activity_date_time' => 'activity_date_time',
-        'duration' => 'activity_duration',
-        'location' => 'activity_location',
-        'phone_id' => 'phone_id',
-        'phone_number' => 'phone_number',
-        'details' => 'activity_details',
-        'status_id' => 'activity_status_id',
-        'priority_id' => 'priority_id',
-        'parent_id' => 'parent_id',
-        'is_test' => 'activity_is_test',
-        'medium_id' => 'activity_medium_id',
-        'is_auto' => 'is_auto',
-        'relationship_id' => 'relationship_id',
-        'is_current_revision' => 'is_current_revision',
-        'original_id' => 'original_id',
-        'result' => 'activity_result',
-        'is_deleted' => 'activity_is_deleted',
-        'campaign_id' => 'activity_campaign_id',
-        'engagement_level' => 'activity_engagement_level',
-        'weight' => 'weight',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

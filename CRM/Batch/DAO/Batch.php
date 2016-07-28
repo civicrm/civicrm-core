@@ -48,12 +48,6 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -369,34 +363,16 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'name' => 'name',
-        'title' => 'title',
-        'description' => 'description',
-        'created_id' => 'created_id',
-        'created_date' => 'created_date',
-        'modified_id' => 'modified_id',
-        'modified_date' => 'modified_date',
-        'saved_search_id' => 'saved_search_id',
-        'status_id' => 'status_id',
-        'type_id' => 'type_id',
-        'mode_id' => 'mode_id',
-        'total' => 'total',
-        'item_count' => 'item_count',
-        'payment_instrument_id' => 'payment_instrument_id',
-        'exported_date' => 'exported_date',
-        'data' => 'data',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

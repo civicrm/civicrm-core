@@ -48,12 +48,6 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -721,46 +715,16 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'contribution_id',
-        'contact_id' => 'contribution_contact_id',
-        'financial_type_id' => 'financial_type_id',
-        'contribution_page_id' => 'contribution_page_id',
-        'payment_instrument_id' => 'payment_instrument_id',
-        'receive_date' => 'receive_date',
-        'non_deductible_amount' => 'non_deductible_amount',
-        'total_amount' => 'total_amount',
-        'fee_amount' => 'fee_amount',
-        'net_amount' => 'net_amount',
-        'trxn_id' => 'trxn_id',
-        'invoice_id' => 'invoice_id',
-        'currency' => 'currency',
-        'cancel_date' => 'cancel_date',
-        'cancel_reason' => 'cancel_reason',
-        'receipt_date' => 'receipt_date',
-        'thankyou_date' => 'thankyou_date',
-        'source' => 'contribution_source',
-        'amount_level' => 'amount_level',
-        'contribution_recur_id' => 'contribution_recur_id',
-        'is_test' => 'is_test',
-        'is_pay_later' => 'is_pay_later',
-        'contribution_status_id' => 'contribution_status_id',
-        'address_id' => 'address_id',
-        'check_number' => 'check_number',
-        'campaign_id' => 'contribution_campaign_id',
-        'creditnote_id' => 'creditnote_id',
-        'tax_amount' => 'tax_amount',
-        'revenue_recognition_date' => 'revenue_recognition_date',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

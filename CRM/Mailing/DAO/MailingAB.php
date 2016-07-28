@@ -48,12 +48,6 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -285,31 +279,16 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'name' => 'name',
-        'status' => 'status',
-        'mailing_id_a' => 'mailing_id_a',
-        'mailing_id_b' => 'mailing_id_b',
-        'mailing_id_c' => 'mailing_id_c',
-        'domain_id' => 'domain_id',
-        'testing_criteria' => 'testing_criteria',
-        'winner_criteria' => 'winner_criteria',
-        'specific_url' => 'specific_url',
-        'declare_winning_time' => 'declare_winning_time',
-        'group_percentage' => 'group_percentage',
-        'created_id' => 'created_id',
-        'created_date' => 'created_date',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

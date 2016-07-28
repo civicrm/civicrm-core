@@ -51,12 +51,6 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -660,46 +654,16 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'contact_id' => 'contact_id',
-        'location_type_id' => 'location_type_id',
-        'is_primary' => 'is_primary',
-        'is_billing' => 'is_billing',
-        'street_address' => 'street_address',
-        'street_number' => 'street_number',
-        'street_number_suffix' => 'street_number_suffix',
-        'street_number_predirectional' => 'street_number_predirectional',
-        'street_name' => 'street_name',
-        'street_type' => 'street_type',
-        'street_number_postdirectional' => 'street_number_postdirectional',
-        'street_unit' => 'street_unit',
-        'supplemental_address_1' => 'supplemental_address_1',
-        'supplemental_address_2' => 'supplemental_address_2',
-        'supplemental_address_3' => 'supplemental_address_3',
-        'city' => 'city',
-        'county_id' => 'county_id',
-        'state_province_id' => 'state_province_id',
-        'postal_code_suffix' => 'postal_code_suffix',
-        'postal_code' => 'postal_code',
-        'usps_adc' => 'usps_adc',
-        'country_id' => 'country_id',
-        'geo_code_1' => 'geo_code_1',
-        'geo_code_2' => 'geo_code_2',
-        'manual_geo_code' => 'manual_geo_code',
-        'timezone' => 'timezone',
-        'name' => 'address_name',
-        'master_id' => 'master_id',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

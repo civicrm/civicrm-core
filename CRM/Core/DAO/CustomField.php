@@ -48,12 +48,6 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -508,47 +502,16 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'custom_group_id' => 'custom_group_id',
-        'name' => 'name',
-        'label' => 'label',
-        'data_type' => 'data_type',
-        'html_type' => 'html_type',
-        'default_value' => 'default_value',
-        'is_required' => 'is_required',
-        'is_searchable' => 'is_searchable',
-        'is_search_range' => 'is_search_range',
-        'weight' => 'weight',
-        'help_pre' => 'help_pre',
-        'help_post' => 'help_post',
-        'mask' => 'mask',
-        'attributes' => 'attributes',
-        'javascript' => 'javascript',
-        'is_active' => 'is_active',
-        'is_view' => 'is_view',
-        'options_per_line' => 'options_per_line',
-        'text_length' => 'text_length',
-        'start_date_years' => 'start_date_years',
-        'end_date_years' => 'end_date_years',
-        'date_format' => 'date_format',
-        'time_format' => 'time_format',
-        'note_columns' => 'note_columns',
-        'note_rows' => 'note_rows',
-        'column_name' => 'column_name',
-        'option_group_id' => 'option_group_id',
-        'filter' => 'filter',
-        'in_selector' => 'in_selector',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table
