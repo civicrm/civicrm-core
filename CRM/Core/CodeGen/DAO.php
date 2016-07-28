@@ -34,21 +34,13 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
       return TRUE;
     }
 
-    // Has the table metadata changed since the DAO was generated?
     if ($this->getTableChecksum() !== self::extractRegex($this->getAbsFileName(), ';\(GenCodeChecksum:([a-zA-Z0-9]+)\);')) {
       return TRUE;
     }
 
-    // Has someone messed with the logic of the DAO?
-    // Compare suggested+actual code (modulo whitespace).
-    $stripped['actual'] = file_get_contents($this->getAbsFileName());
-    $stripped['expect'] = $this->getRaw();
-
-    foreach (array('actual', 'expect') as $key) {
-      $stripped[$key] = preg_replace(';\(GenCodeChecksum:([a-zA-Z0-9]+)\);', '', $stripped[$key]);
-      $stripped[$key] = preg_replace(';[ \r\n\t];', '', $stripped[$key]);
-    }
-    return $stripped['actual'] !== $stripped['expect'];
+    return !$this->isApproxPhpMatch(
+      file_get_contents($this->getAbsFileName()),
+      $this->getRaw());
   }
 
   public function run() {
