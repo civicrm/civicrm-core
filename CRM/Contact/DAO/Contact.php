@@ -48,12 +48,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -1168,69 +1162,16 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'contact_type' => 'contact_type',
-        'contact_sub_type' => 'contact_sub_type',
-        'do_not_email' => 'do_not_email',
-        'do_not_phone' => 'do_not_phone',
-        'do_not_mail' => 'do_not_mail',
-        'do_not_sms' => 'do_not_sms',
-        'do_not_trade' => 'do_not_trade',
-        'is_opt_out' => 'is_opt_out',
-        'legal_identifier' => 'legal_identifier',
-        'external_identifier' => 'external_identifier',
-        'sort_name' => 'sort_name',
-        'display_name' => 'display_name',
-        'nick_name' => 'nick_name',
-        'legal_name' => 'legal_name',
-        'image_URL' => 'image_URL',
-        'preferred_communication_method' => 'preferred_communication_method',
-        'preferred_language' => 'preferred_language',
-        'preferred_mail_format' => 'preferred_mail_format',
-        'hash' => 'hash',
-        'api_key' => 'api_key',
-        'source' => 'contact_source',
-        'first_name' => 'first_name',
-        'middle_name' => 'middle_name',
-        'last_name' => 'last_name',
-        'prefix_id' => 'prefix_id',
-        'suffix_id' => 'suffix_id',
-        'formal_title' => 'formal_title',
-        'communication_style_id' => 'communication_style_id',
-        'email_greeting_id' => 'email_greeting_id',
-        'email_greeting_custom' => 'email_greeting_custom',
-        'email_greeting_display' => 'email_greeting_display',
-        'postal_greeting_id' => 'postal_greeting_id',
-        'postal_greeting_custom' => 'postal_greeting_custom',
-        'postal_greeting_display' => 'postal_greeting_display',
-        'addressee_id' => 'addressee_id',
-        'addressee_custom' => 'addressee_custom',
-        'addressee_display' => 'addressee_display',
-        'job_title' => 'job_title',
-        'gender_id' => 'gender_id',
-        'birth_date' => 'birth_date',
-        'is_deceased' => 'is_deceased',
-        'deceased_date' => 'deceased_date',
-        'household_name' => 'household_name',
-        'primary_contact_id' => 'primary_contact_id',
-        'organization_name' => 'organization_name',
-        'sic_code' => 'sic_code',
-        'user_unique_id' => 'user_unique_id',
-        'employer_id' => 'current_employer_id',
-        'is_deleted' => 'contact_is_deleted',
-        'created_date' => 'created_date',
-        'modified_date' => 'modified_date',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

@@ -48,12 +48,6 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -1262,86 +1256,16 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'title' => 'event_title',
-        'summary' => 'summary',
-        'description' => 'event_description',
-        'event_type_id' => 'event_type_id',
-        'participant_listing_id' => 'participant_listing_id',
-        'is_public' => 'is_public',
-        'start_date' => 'event_start_date',
-        'end_date' => 'event_end_date',
-        'is_online_registration' => 'is_online_registration',
-        'registration_link_text' => 'registration_link_text',
-        'registration_start_date' => 'registration_start_date',
-        'registration_end_date' => 'registration_end_date',
-        'max_participants' => 'max_participants',
-        'event_full_text' => 'event_full_text',
-        'is_monetary' => 'is_monetary',
-        'financial_type_id' => 'financial_type_id',
-        'payment_processor' => 'payment_processor',
-        'is_map' => 'is_map',
-        'is_active' => 'is_active',
-        'fee_label' => 'fee_label',
-        'is_show_location' => 'is_show_location',
-        'loc_block_id' => 'loc_block_id',
-        'default_role_id' => 'default_role_id',
-        'intro_text' => 'intro_text',
-        'footer_text' => 'footer_text',
-        'confirm_title' => 'confirm_title',
-        'confirm_text' => 'confirm_text',
-        'confirm_footer_text' => 'confirm_footer_text',
-        'is_email_confirm' => 'is_email_confirm',
-        'confirm_email_text' => 'confirm_email_text',
-        'confirm_from_name' => 'confirm_from_name',
-        'confirm_from_email' => 'confirm_from_email',
-        'cc_confirm' => 'cc_confirm',
-        'bcc_confirm' => 'bcc_confirm',
-        'default_fee_id' => 'default_fee_id',
-        'default_discount_fee_id' => 'default_discount_fee_id',
-        'thankyou_title' => 'thankyou_title',
-        'thankyou_text' => 'thankyou_text',
-        'thankyou_footer_text' => 'thankyou_footer_text',
-        'is_pay_later' => 'is_pay_later',
-        'pay_later_text' => 'pay_later_text',
-        'pay_later_receipt' => 'pay_later_receipt',
-        'is_partial_payment' => 'is_partial_payment',
-        'initial_amount_label' => 'initial_amount_label',
-        'initial_amount_help_text' => 'initial_amount_help_text',
-        'min_initial_amount' => 'min_initial_amount',
-        'is_multiple_registrations' => 'is_multiple_registrations',
-        'max_additional_participants' => 'max_additional_participants',
-        'allow_same_participant_emails' => 'allow_same_participant_emails',
-        'has_waitlist' => 'has_waitlist',
-        'requires_approval' => 'requires_approval',
-        'expiration_time' => 'expiration_time',
-        'allow_selfcancelxfer' => 'allow_selfcancelxfer',
-        'selfcancelxfer_time' => 'selfcancelxfer_time',
-        'waitlist_text' => 'waitlist_text',
-        'approval_req_text' => 'approval_req_text',
-        'is_template' => 'is_template',
-        'template_title' => 'template_title',
-        'created_id' => 'created_id',
-        'created_date' => 'created_date',
-        'currency' => 'currency',
-        'campaign_id' => 'campaign_id',
-        'is_share' => 'is_share',
-        'is_confirm_enabled' => 'is_confirm_enabled',
-        'parent_event_id' => 'parent_event_id',
-        'slot_label_id' => 'slot_label_id',
-        'dedupe_rule_group_id' => 'dedupe_rule_group_id',
-        'is_billing_required' => 'is_billing_required',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

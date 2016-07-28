@@ -48,12 +48,6 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -527,40 +521,16 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'pledge_id',
-        'contact_id' => 'pledge_contact_id',
-        'financial_type_id' => 'pledge_financial_type_id',
-        'contribution_page_id' => 'pledge_contribution_page_id',
-        'amount' => 'pledge_amount',
-        'original_installment_amount' => 'pledge_original_installment_amount',
-        'currency' => 'currency',
-        'frequency_unit' => 'pledge_frequency_unit',
-        'frequency_interval' => 'pledge_frequency_interval',
-        'frequency_day' => 'frequency_day',
-        'installments' => 'installments',
-        'start_date' => 'start_date',
-        'create_date' => 'pledge_create_date',
-        'acknowledge_date' => 'acknowledge_date',
-        'modified_date' => 'modified_date',
-        'cancel_date' => 'cancel_date',
-        'end_date' => 'end_date',
-        'max_reminders' => 'max_reminders',
-        'initial_reminder_day' => 'initial_reminder_day',
-        'additional_reminder_day' => 'additional_reminder_day',
-        'status_id' => 'pledge_status_id',
-        'is_test' => 'pledge_is_test',
-        'campaign_id' => 'pledge_campaign_id',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

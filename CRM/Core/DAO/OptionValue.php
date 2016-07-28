@@ -48,12 +48,6 @@ class CRM_Core_DAO_OptionValue extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -342,33 +336,16 @@ class CRM_Core_DAO_OptionValue extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'option_group_id' => 'option_group_id',
-        'label' => 'label',
-        'value' => 'value',
-        'name' => 'name',
-        'grouping' => 'grouping',
-        'filter' => 'filter',
-        'is_default' => 'is_default',
-        'weight' => 'weight',
-        'description' => 'description',
-        'is_optgroup' => 'is_optgroup',
-        'is_reserved' => 'is_reserved',
-        'is_active' => 'is_active',
-        'component_id' => 'component_id',
-        'domain_id' => 'domain_id',
-        'visibility_id' => 'visibility_id',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

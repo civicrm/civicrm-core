@@ -48,12 +48,6 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -743,62 +737,16 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'title' => 'title',
-        'intro_text' => 'intro_text',
-        'financial_type_id' => 'financial_type_id',
-        'payment_processor' => 'payment_processor',
-        'is_credit_card_only' => 'is_credit_card_only',
-        'is_monetary' => 'is_monetary',
-        'is_recur' => 'is_recur',
-        'is_confirm_enabled' => 'is_confirm_enabled',
-        'recur_frequency_unit' => 'recur_frequency_unit',
-        'is_recur_interval' => 'is_recur_interval',
-        'is_recur_installments' => 'is_recur_installments',
-        'adjust_recur_start_date' => 'adjust_recur_start_date',
-        'is_pay_later' => 'is_pay_later',
-        'pay_later_text' => 'pay_later_text',
-        'pay_later_receipt' => 'pay_later_receipt',
-        'is_partial_payment' => 'is_partial_payment',
-        'initial_amount_label' => 'initial_amount_label',
-        'initial_amount_help_text' => 'initial_amount_help_text',
-        'min_initial_amount' => 'min_initial_amount',
-        'is_allow_other_amount' => 'is_allow_other_amount',
-        'default_amount_id' => 'default_amount_id',
-        'min_amount' => 'min_amount',
-        'max_amount' => 'max_amount',
-        'goal_amount' => 'goal_amount',
-        'thankyou_title' => 'thankyou_title',
-        'thankyou_text' => 'thankyou_text',
-        'thankyou_footer' => 'thankyou_footer',
-        'is_email_receipt' => 'is_email_receipt',
-        'receipt_from_name' => 'receipt_from_name',
-        'receipt_from_email' => 'receipt_from_email',
-        'cc_receipt' => 'cc_receipt',
-        'bcc_receipt' => 'bcc_receipt',
-        'receipt_text' => 'receipt_text',
-        'is_active' => 'is_active',
-        'footer_text' => 'footer_text',
-        'amount_block_is_active' => 'amount_block_is_active',
-        'start_date' => 'start_date',
-        'end_date' => 'end_date',
-        'created_id' => 'created_id',
-        'created_date' => 'created_date',
-        'currency' => 'currency',
-        'campaign_id' => 'campaign_id',
-        'is_share' => 'is_share',
-        'is_billing_required' => 'is_billing_required',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

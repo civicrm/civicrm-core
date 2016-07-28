@@ -48,12 +48,6 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -273,30 +267,16 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'entity_table' => 'entity_table',
-        'entity_id' => 'entity_id',
-        'membership_types' => 'membership_types',
-        'membership_type_default' => 'membership_type_default',
-        'display_min_fee' => 'display_min_fee',
-        'is_separate_payment' => 'is_separate_payment',
-        'new_title' => 'new_title',
-        'new_text' => 'new_text',
-        'renewal_title' => 'renewal_title',
-        'renewal_text' => 'renewal_text',
-        'is_required' => 'is_required',
-        'is_active' => 'is_active',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table

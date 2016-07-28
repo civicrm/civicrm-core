@@ -48,12 +48,6 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
    */
   static $_fields = null;
   /**
-   * static instance to hold the keys used in $_fields for each field.
-   *
-   * @var array
-   */
-  static $_fieldKeys = null;
-  /**
    * static instance to hold the FK relationships
    *
    * @var string
@@ -571,45 +565,16 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
     return self::$_fields;
   }
   /**
-   * Returns an array containing, for each field, the arary key used for that
-   * field in self::$_fields.
+   * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
+   *   Array(string $name => string $uniqueName).
    */
   static function &fieldKeys() {
-    if (!(self::$_fieldKeys)) {
-      self::$_fieldKeys = array(
-        'id' => 'id',
-        'contact_id' => 'contact_id',
-        'amount' => 'amount',
-        'currency' => 'currency',
-        'frequency_unit' => 'frequency_unit',
-        'frequency_interval' => 'frequency_interval',
-        'installments' => 'installments',
-        'start_date' => 'start_date',
-        'create_date' => 'create_date',
-        'modified_date' => 'modified_date',
-        'cancel_date' => 'cancel_date',
-        'end_date' => 'end_date',
-        'processor_id' => 'processor_id',
-        'payment_token_id' => 'payment_token_id',
-        'trxn_id' => 'trxn_id',
-        'invoice_id' => 'invoice_id',
-        'contribution_status_id' => 'contribution_status_id',
-        'is_test' => 'is_test',
-        'cycle_day' => 'cycle_day',
-        'next_sched_contribution_date' => 'next_sched_contribution_date',
-        'failure_count' => 'failure_count',
-        'failure_retry_date' => 'failure_retry_date',
-        'auto_renew' => 'auto_renew',
-        'payment_processor_id' => 'payment_processor_id',
-        'financial_type_id' => 'financial_type_id',
-        'payment_instrument_id' => 'payment_instrument_id',
-        'campaign_id' => 'contribution_campaign_id',
-        'is_email_receipt' => 'is_email_receipt',
-      );
+    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
+      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
     }
-    return self::$_fieldKeys;
+    return Civi::$statics[__CLASS__]['fieldKeys'];
   }
   /**
    * Returns the names of this table
