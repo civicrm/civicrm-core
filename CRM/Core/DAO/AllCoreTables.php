@@ -173,4 +173,82 @@ class CRM_Core_DAO_AllCoreTables {
     self::init($fresh);
   }
 
+  /**
+   * (Quasi-Private) Do not call externally. For use by DAOs.
+   *
+   * @param string $dao
+   *   Ex: 'CRM_Core_DAO_Address'.
+   * @param string $labelName
+   *   Ex: 'address'.
+   * @param bool $prefix
+   * @param array $foreignDAOs
+   * @return array
+   */
+  public static function getExports($dao, $labelName, $prefix, $foreignDAOs) {
+    // Bug-level compatibility -- or sane behavior?
+    $cacheKey = $dao . ':export';
+    // $cacheKey = $dao . ':' . ($prefix ? 'export-prefix' : 'export');
+
+    if (!isset(Civi::$statics[__CLASS__][$cacheKey])) {
+      $exports = array();
+      $fields = $dao::fields();
+
+      foreach($fields as $name => $field) {
+        if (CRM_Utils_Array::value('export', $field)) {
+          if ($prefix) {
+            $exports[$labelName] = & $fields[$name];
+          } else {
+            $exports[$name] = & $fields[$name];
+          }
+        }
+      }
+
+      foreach ($foreignDAOs as $foreignDAO) {
+        $exports = array_merge($exports, $foreignDAO::export(TRUE));
+      }
+
+      Civi::$statics[__CLASS__][$cacheKey] = $exports;
+    }
+    return Civi::$statics[__CLASS__][$cacheKey];
+  }
+
+  /**
+   * (Quasi-Private) Do not call externally. For use by DAOs.
+   *
+   * @param string $dao
+   *   Ex: 'CRM_Core_DAO_Address'.
+   * @param string $labelName
+   *   Ex: 'address'.
+   * @param bool $prefix
+   * @param array $foreignDAOs
+   * @return array
+   */
+  public static function getImports($dao, $labelName, $prefix, $foreignDAOs) {
+    // Bug-level compatibility -- or sane behavior?
+    $cacheKey = $dao . ':import';
+    // $cacheKey = $dao . ':' . ($prefix ? 'import-prefix' : 'import');
+
+    if (!isset(Civi::$statics[__CLASS__][$cacheKey])) {
+      $imports = array();
+      $fields = $dao::fields();
+
+      foreach($fields as $name => $field) {
+        if (CRM_Utils_Array::value('import', $field)) {
+          if ($prefix) {
+            $imports[$labelName] = & $fields[$name];
+          } else {
+            $imports[$name] = & $fields[$name];
+          }
+        }
+      }
+
+      foreach ($foreignDAOs as $foreignDAO) {
+        $imports = array_merge($imports, $foreignDAO::import(TRUE));
+      }
+
+      Civi::$statics[__CLASS__][$cacheKey] = $imports;
+    }
+    return Civi::$statics[__CLASS__][$cacheKey];
+  }
+
 }
