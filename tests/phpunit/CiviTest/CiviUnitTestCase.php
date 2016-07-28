@@ -133,6 +133,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected $origExtensionSystem;
 
   /**
+   * Array of IDs created during test setup routine.
+   *
+   * The cleanUpSetUpIds method can be used to clear these at the end of the test.
+   *
+   * @var array
+   */
+  public $setupIDs = array();
+
+  /**
    *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
@@ -1137,7 +1146,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function membershipTypeCreate($params = array()) {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
-    $memberOfOrganization = $this->organizationCreate();
+    $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge(array(
       'name' => 'General',
       'duration_unit' => 'year',
@@ -3588,6 +3597,25 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
     // when calling completeTransaction or repeatTransaction.
     $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
+  }
+
+  /**
+   * Cleanup function for contents of $this->ids.
+   *
+   * This is a best effort cleanup to use in tear downs etc.
+   *
+   * It will not fail if the data has already been removed (some tests may do
+   * their own cleanup).
+   */
+  protected function cleanUpSetUpIDs() {
+    foreach ($this->setupIDs as $entity => $id) {
+      try {
+        civicrm_api3($entity, 'delete', array('id' => $id, 'skip_undelete' => 1));
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        // This is a best-effort cleanup function, ignore.
+      }
+    }
   }
 
 }
