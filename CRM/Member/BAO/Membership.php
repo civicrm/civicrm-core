@@ -1500,7 +1500,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @return object
    *   $membershipPayment deleted membership payment object
    */
-  public static function deleteMembershipPayment($membershipId) {
+  public static function deleteMembershipPayment($membershipId, $deleteContrib = 1) {
 
     $membershipPayment = new CRM_Member_DAO_MembershipPayment();
     $membershipPayment->membership_id = $membershipId;
