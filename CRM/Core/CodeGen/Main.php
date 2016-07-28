@@ -44,13 +44,13 @@ class CRM_Core_CodeGen_Main {
    * @param $sqlCodePath
    * @param $phpCodePath
    * @param $tplCodePath
-   * @param $smartyPluginDirs
+   * @param $IGNORE
    * @param $argCms
    * @param $argVersion
    * @param $schemaPath
    * @param $digestPath
    */
-  public function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
+  public function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $IGNORE, $argCms, $argVersion, $schemaPath, $digestPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
     $this->phpCodePath = $phpCodePath;
@@ -60,8 +60,6 @@ class CRM_Core_CodeGen_Main {
 
     // default cms is 'drupal', if not specified
     $this->cms = isset($argCms) ? strtolower($argCms) : 'drupal';
-
-    CRM_Core_CodeGen_Util_Smarty::singleton()->setPluginDirs($smartyPluginDirs);
 
     $versionFile = $this->phpCodePath . "/xml/version.xml";
     $versionXML = CRM_Core_CodeGen_Util_Xml::parse($versionFile);

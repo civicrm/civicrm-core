@@ -19,23 +19,12 @@ class CRM_Core_CodeGen_Util_Smarty {
     return self::$singleton;
   }
 
-  private $smartyPluginDirs = array();
-
   private $compileDir;
 
   public function __destruct() {
     if ($this->compileDir) {
       CRM_Core_CodeGen_Util_File::cleanTempDir($this->compileDir);
     }
-  }
-
-  /**
-   * Set plugin directories.
-   *
-   * @param array $pluginDirs
-   */
-  public function setPluginDirs($pluginDirs) {
-    $this->smartyPluginDirs = $pluginDirs;
   }
 
   /**
@@ -56,10 +45,12 @@ class CRM_Core_CodeGen_Util_Smarty {
    * @return \Smarty
    */
   public function createSmarty() {
+    $base = dirname(dirname(dirname(dirname(__DIR__))));
+
     require_once 'Smarty/Smarty.class.php';
     $smarty = new Smarty();
-    $smarty->template_dir = './templates';
-    $smarty->plugins_dir = $this->smartyPluginDirs;
+    $smarty->template_dir = "$base/xml/templates";
+    $smarty->plugins_dir = array("$base/packages/Smarty/plugins", "$base/CRM/Core/Smarty/plugins");
     $smarty->compile_dir = $this->getCompileDir();
     $smarty->clear_all_cache();
 

@@ -68,6 +68,10 @@ class CRM_Core_CodeGen_Util_Template {
     }
   }
 
+  public function fetch($infile) {
+    return $this->smarty->fetch($infile);
+  }
+
   /**
    * @param $key
    * @param $value
