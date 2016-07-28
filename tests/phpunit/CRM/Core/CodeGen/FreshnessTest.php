@@ -13,6 +13,7 @@ class CRM_Core_CodeGen_FreshnessTest extends CiviUnitTestCase {
     $tasks = $this->findTasks('CRM_Core_CodeGen_DAO');
     $names = array();
     foreach ($tasks as $task) {
+      /** @var CRM_Core_CodeGen_DAO $task */
       $names[] = $task->name;
       $this->assertFalse($task->needsUpdate(), "Expect DAO for {$task->name} is up-to-date");
     }
@@ -59,11 +60,7 @@ class CRM_Core_CodeGen_FreshnessTest extends CiviUnitTestCase {
       $path . '/sql/', // $sqlCodePath
       $path . '/', // $phpCodePath
       $path . '/templates/', // $tplCodePath
-      array(
-        // smarty plugin dirs
-        $path . '/packages/Smarty/plugins',
-        $path . '/CRM/Core/Smarty/plugins',
-      ),
+      NULL, // IGNORE,
       CIVICRM_UF, // cms
       NULL, // db version
       $path . '/xml/schema/Schema.xml', // schema file
