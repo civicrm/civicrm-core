@@ -60,20 +60,6 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
    */
   static $_links = null;
   /**
-   * static instance to hold the values that can
-   * be imported
-   *
-   * @var array
-   */
-  static $_import = null;
-  /**
-   * static instance to hold the values that can
-   * be exported
-   *
-   * @var array
-   */
-  static $_export = null;
-  /**
    * static value to see if we should log any modifications to
    * this table in the civicrm_log table
    *
@@ -294,20 +280,8 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
    * @return array
    */
   static function &import($prefix = false) {
-    if (!(self::$_import)) {
-      self::$_import = array();
-      $fields = self::fields();
-      foreach($fields as $name => $field) {
-        if (CRM_Utils_Array::value('import', $field)) {
-          if ($prefix) {
-            self::$_import['sms_provider'] = & $fields[$name];
-          } else {
-            self::$_import[$name] = & $fields[$name];
-          }
-        }
-      }
-    }
-    return self::$_import;
+    $r = CRM_Core_DAO_AllCoreTables::getImports(__CLASS__, 'sms_provider', $prefix, array());
+    return $r;
   }
   /**
    * Returns the list of fields that can be exported
@@ -317,19 +291,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
    * @return array
    */
   static function &export($prefix = false) {
-    if (!(self::$_export)) {
-      self::$_export = array();
-      $fields = self::fields();
-      foreach($fields as $name => $field) {
-        if (CRM_Utils_Array::value('export', $field)) {
-          if ($prefix) {
-            self::$_export['sms_provider'] = & $fields[$name];
-          } else {
-            self::$_export[$name] = & $fields[$name];
-          }
-        }
-      }
-    }
-    return self::$_export;
+    $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'sms_provider', $prefix, array());
+    return $r;
   }
 }
