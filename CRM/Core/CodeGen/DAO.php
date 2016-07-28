@@ -13,7 +13,12 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
   /**
    * @var string
    */
-  private $checksum;
+  private $tableChecksum;
+
+  /**
+   * @var string
+   */
+  private $raw;
 
   public function __construct($config, $name) {
     parent::__construct($config);
@@ -28,7 +33,22 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     if (!file_exists($this->getAbsFileName())) {
       return TRUE;
     }
-    return $this->getChecksum() !== self::extractRegex($this->getAbsFileName(), ';\(GenCodeChecksum:([a-z0-9]+)\);');
+
+    // Has the table metadata changed since the DAO was generated?
+    if ($this->getTableChecksum() !== self::extractRegex($this->getAbsFileName(), ';\(GenCodeChecksum:([a-zA-Z0-9]+)\);')) {
+      return TRUE;
+    }
+
+    // Has someone messed with the logic of the DAO?
+    // Compare suggested+actual code (modulo whitespace).
+    $stripped['actual'] = file_get_contents($this->getAbsFileName());
+    $stripped['expect'] = $this->getRaw();
+
+    foreach (array('actual', 'expect') as $key) {
+      $stripped[$key] = preg_replace(';\(GenCodeChecksum:([a-zA-Z0-9]+)\);', '', $stripped[$key]);
+      $stripped[$key] = preg_replace(';[ \r\n\t];', '', $stripped[$key]);
+    }
+    return $stripped['actual'] !== $stripped['expect'];
   }
 
   public function run() {
@@ -41,8 +61,23 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
 
     $template = new CRM_Core_CodeGen_Util_Template('php');
     $template->assign('table', $this->tables[$this->name]);
-    $template->assign('genCodeChecksum', $this->getChecksum());
+    $template->assign('genCodeChecksum', $this->getTableChecksum());
     $template->run('dao.tpl', $this->getAbsFileName());
+  }
+
+  /**
+   * Generate the raw PHP code for the DAO.
+   *
+   * @return string
+   */
+  public function getRaw() {
+    if (!$this->raw) {
+      $template = new CRM_Core_CodeGen_Util_Template('php');
+      $template->assign('table', $this->tables[$this->name]);
+      $template->assign('genCodeChecksum', 'NEW');
+      $this->raw = $template->fetch('dao.tpl');
+    }
+    return $this->raw;
   }
 
   public function getRelFileName() {
@@ -59,13 +94,18 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     return $absFileName;
   }
 
-  protected function getChecksum() {
-    if (!$this->checksum) {
+  /**
+   * Get a unique signature for the table/schema.
+   *
+   * @return string
+   */
+  protected function getTableChecksum() {
+    if (!$this->tableChecksum) {
       CRM_Utils_Array::flatten($this->tables[$this->name], $flat);
       ksort($flat);
-      $this->checksum = md5($this->config->getSourceDigest() . json_encode($flat));
+      $this->tableChecksum = md5(json_encode($flat));
     }
-    return $this->checksum;
+    return $this->tableChecksum;
   }
 
 }
