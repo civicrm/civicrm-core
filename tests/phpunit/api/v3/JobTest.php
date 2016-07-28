@@ -75,7 +75,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     parent::tearDown();
     // The membershipType create breaks transactions so this extra cleanup is needed.
     $this->membershipTypeDelete(array('id' => $this->membershipTypeID));
-    $this->cleanUpIDs();
+    $this->cleanUpSetUpIDs();
   }
 
   /**
