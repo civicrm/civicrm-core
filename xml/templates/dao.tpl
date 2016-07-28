@@ -62,13 +62,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       static $_fields = null;
 
      /**
-      * static instance to hold the keys used in $_fields for each field.
-      *
-      * @var array
-      */
-      static $_fieldKeys = null;
-
-     /**
       * static instance to hold the FK relationships
       *
       * @var string
@@ -220,26 +213,16 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       {rdelim}
 
       /**
-       * Returns an array containing, for each field, the arary key used for that
-       * field in self::$_fields.
+       * Return a mapping from field-name to the corresponding key (as used in fields()).
        *
        * @return array
+       *   Array(string $name => string $uniqueName).
        */
       static function &fieldKeys( ) {ldelim}
-        if ( ! ( self::$_fieldKeys ) ) {ldelim}
-               self::$_fieldKeys = array (
-{foreach from=$table.fields item=field}
-                    '{$field.name}' =>
-{if $field.uniqueName}
-                                            '{$field.uniqueName}'
-{else}
-                                            '{$field.name}'
-{/if},
-
-{/foreach} {* table.fields *}
-                                      );
-          {rdelim}
-          return self::$_fieldKeys;
+        if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {ldelim}
+          Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
+        {rdelim}
+        return Civi::$statics[__CLASS__]['fieldKeys'];
       {rdelim}
 
       /**
