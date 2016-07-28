@@ -21,11 +21,3 @@ INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`)
 VALUES
    (@option_group_id_ext, {localize}'{ts escape="sql"}odt{/ts}'{/localize}, @option_group_id_ext_val+1, 'odt', NULL, 0, 0, @option_group_id_ext_wt+1, 0, 1, 1);
-
--- CRM-19134 Missing French overseas departments.
-INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
-  (NULL, 1076, "GP", "Guadeloupe"),
-  (NULL, 1076, "MQ", "Martinique"),
-  (NULL, 1076, "GF", "Guyane"),
-  (NULL, 1076, "RE", "La Réunion"),
-  (NULL, 1076, "YT", "Mayotte");
