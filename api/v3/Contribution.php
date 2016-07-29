@@ -82,7 +82,11 @@ function civicrm_api3_contribution_create(&$params) {
 
   // Make sure tax calculation is handled via api.
   // @todo this belongs in the BAO NOT the api.
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
+  // CRM-19152 A contribution might be update here without the total_amount
+  // which would result in a $0 transaction if this function is called.
+  if (! empty($params['total_amount'])) {
+    $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
+  }
 
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
