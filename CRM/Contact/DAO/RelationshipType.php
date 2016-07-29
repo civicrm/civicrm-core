@@ -42,18 +42,6 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
    */
   static $_tableName = 'civicrm_relationship_type';
   /**
-   * static instance to hold the field values
-   *
-   * @var array
-   */
-  static $_fields = null;
-  /**
-   * static instance to hold the FK relationships
-   *
-   * @var string
-   */
-  static $_links = null;
-  /**
    * static value to see if we should log any modifications to
    * this table in the civicrm_log table
    *
@@ -147,8 +135,8 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
    * @return array
    */
   static function &fields() {
-    if (!(self::$_fields)) {
-      self::$_fields = array(
+    if (!isset(Civi::$statics[__CLASS__]['fields'])) {
+      Civi::$statics[__CLASS__]['fields'] = array(
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
@@ -281,8 +269,9 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'default' => '1',
         ) ,
       );
+      CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
     }
-    return self::$_fields;
+    return Civi::$statics[__CLASS__]['fields'];
   }
   /**
    * Return a mapping from field-name to the corresponding key (as used in fields()).
