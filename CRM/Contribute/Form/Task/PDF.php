@@ -154,10 +154,6 @@ AND    {$this->_componentClause}";
     $params = $this->controller->exportValues($this->_name);
     $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds);
 
-    $fromEmail = $params['fromEmailAddress'];
-    $from = CRM_Utils_Array::value($fromEmail, $this->_emails);
-    $fromDetails = explode(' <', $from);
-
     foreach ($elements['details'] as $contribID => $detail) {
       $input = $ids = $objects = array();
 
@@ -201,6 +197,7 @@ AND    {$this->_componentClause}";
 
       $values = array();
       if (isset($params['fromEmailAddress']) && !$elements['createPdf']) {
+        // CRM-19129 Allow useres the choice of From Email to send the receipt from.
         $fromEmail = $params['fromEmailAddress'];
         $from = CRM_Utils_Array::value($fromEmail, $this->_emails);
         $fromDetails = explode(' <', $from);
