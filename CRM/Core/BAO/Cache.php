@@ -68,17 +68,12 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       $cache = CRM_Utils_Cache::singleton();
       self::$_cache[$argString] = $cache->get($argString);
       if (!self::$_cache[$argString]) {
-        $dao = new CRM_Core_DAO_Cache();
-
-        $dao->group_name = $group;
-        $dao->path = $path;
-        $dao->component_id = $componentID;
-
-        $data = NULL;
-        if ($dao->find(TRUE)) {
-          $data = unserialize($dao->data);
-        }
+        $table = self::getTableName();
+        $where = self::whereCache($group, $path, $componentID);
+        $dao = CRM_Core_DAO::executeQuery("SELECT data FROM $table WHERE $where");
+        $data = isset($dao->data) ? unserialize($dao->data) : NULL;
         $dao->free();
+
         self::$_cache[$argString] = $data;
         $cache->set($argString, self::$_cache[$argString]);
       }
@@ -107,11 +102,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       $cache = CRM_Utils_Cache::singleton();
       self::$_cache[$argString] = $cache->get($argString);
       if (!self::$_cache[$argString]) {
-        $dao = new CRM_Core_DAO_Cache();
-
-        $dao->group_name = $group;
-        $dao->component_id = $componentID;
-        $dao->find();
+        $table = self::getTableName();
+        $where = self::whereCache($group, NULL, $componentID);
+        $dao = CRM_Core_DAO::executeQuery("SELECT path, data FROM $table WHERE $where");
 
         $result = array();
         while ($dao->fetch()) {
@@ -144,12 +137,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       self::$_cache = array();
     }
 
-    $dao = new CRM_Core_DAO_Cache();
-
-    $dao->group_name = $group;
-    $dao->path = $path;
-    $dao->component_id = $componentID;
-
     // get a lock so that multiple ajax requests on the same page
     // dont trample on each other
     // CRM-11234
@@ -158,10 +145,33 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       CRM_Core_Error::fatal();
     }
 
-    $dao->find(TRUE);
-    $dao->data = serialize($data);
-    $dao->created_date = date('YmdHis');
-    $dao->save(FALSE);
+    $table = self::getTableName();
+    $where = self::whereCache($group, $path, $componentID);
+    $id = CRM_Core_DAO::singleValueQuery("SELECT id FROM $table WHERE $where");
+    $now = date('Y-m-d H:i:s'); // FIXME - Use SQL NOW() or CRM_Utils_Time?
+    $dataSerialized = serialize($data);
+
+    // This table has a wonky index, so we cannot use REPLACE or
+    // "INSERT ... ON DUPE". Instead, use SELECT+(INSERT|UPDATE).
+    if ($id) {
+      $sql = "UPDATE $table SET data = %1, created_date = %2 WHERE id = %3";
+      $dao = CRM_Core_DAO::executeQuery($sql, array(
+        1 => array($dataSerialized, 'String'),
+        2 => array($now, 'String'),
+        3 => array($id, 'Int'),
+      ));
+    }
+    else {
+      $insert = CRM_Utils_SQL_Insert::into($table)
+        ->row(array(
+          'group_name' => $group,
+          'path' => $path,
+          'component_id' => $componentID,
+          'data' => $dataSerialized,
+          'created_date' => $now,
+        ));
+      $dao = CRM_Core_DAO::executeQuery($insert->toSQL());
+    }
 
     $lock->release();
 
@@ -171,7 +181,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
     $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
     $cache = CRM_Utils_Cache::singleton();
-    $data = unserialize($dao->data);
+    $data = unserialize($dataSerialized);
     self::$_cache[$argString] = $data;
     $cache->set($argString, $data);
 
@@ -190,17 +200,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param bool $clearAll clear all caches
    */
   public static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
-    $dao = new CRM_Core_DAO_Cache();
-
-    if (!empty($group)) {
-      $dao->group_name = $group;
-    }
-
-    if (!empty($path)) {
-      $dao->path = $path;
-    }
-
-    $dao->delete();
+    $table = self::getTableName();
+    $where = self::whereCache($group, $path, NULL);
+    CRM_Core_DAO::executeQuery("DELETE FROM $table WHERE $where");
 
     if ($clearAll) {
       // also reset ACL Cache
@@ -360,6 +362,31 @@ AND         created_date < date_sub( NOW( ), INTERVAL $timeIntervalDays DAY )
 ";
       CRM_Core_DAO::executeQuery($sql);
     }
+  }
+
+  /**
+   * Compose a SQL WHERE clause for the cache.
+   *
+   * Note: We need to use the cache during bootstrap, so we don't have
+   * full access to DAO services.
+   *
+   * @param string $group
+   * @param string|NULL $path
+   *   Filter by path. If NULL, then return any paths.
+   * @param int|NULL $componentID
+   *   Filter by component. If NULL, then look for explicitly NULL records.
+   * @return string
+   */
+  protected static function whereCache($group, $path, $componentID) {
+    $clauses = array();
+    $clauses[] = ('group_name = "' . CRM_Core_DAO::escapeString($group) . '"');
+    if ($path) {
+      $clauses[] = ('path = "' . CRM_Core_DAO::escapeString($path) . '"');
+    }
+    if ($componentID && is_numeric($componentID)) {
+      $clauses[] = ('component_id = ' . (int) $componentID);
+    }
+    return $clauses ? implode(' AND ', $clauses) : '(1)';
   }
 
 }
