@@ -44,6 +44,7 @@ class CRM_Core_DAO_AllCoreTables {
     if ($init && !$fresh) {
       return;
     }
+    Civi::$statics[__CLASS__] = array();
 
     $file = preg_replace('/\.php$/', '.data.php', __FILE__);
     $entityTypes = require $file;
@@ -53,8 +54,13 @@ class CRM_Core_DAO_AllCoreTables {
     self::$tables = array();
     self::$daoToClass = array();
     foreach ($entityTypes as $entityType) {
-      self::registerEntityType($entityType['name'], $entityType['class'],
-        $entityType['table']);
+      self::registerEntityType(
+        $entityType['name'],
+        $entityType['class'],
+        $entityType['table'],
+        isset($entityType['fields_callback']) ? $entityType['fields_callback'] : NULL,
+        isset($entityType['links_callback']) ? $entityType['links_callback'] : NULL
+      );
     }
 
     $init = TRUE;
@@ -63,13 +69,15 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * (Quasi-Private) Do not call externally (except for unit-testing)
    */
-  public static function registerEntityType($daoName, $className, $tableName) {
+  public static function registerEntityType($daoName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
     self::$daoToClass[$daoName] = $className;
     self::$tables[$tableName] = $className;
     self::$entityTypes[$className] = array(
       'name' => $daoName,
       'class' => $className,
       'table' => $tableName,
+      'fields_callback' => $fields_callback,
+      'links_callback' => $links_callback,
     );
   }
 
@@ -249,6 +257,25 @@ class CRM_Core_DAO_AllCoreTables {
       Civi::$statics[__CLASS__][$cacheKey] = $imports;
     }
     return Civi::$statics[__CLASS__][$cacheKey];
+  }
+
+  /**
+   * (Quasi-Private) Do not call externally. For use by DAOs.
+   *
+   * Apply any third-party alterations to the `fields()`.
+   *
+   * @param string $className
+   * @param string $event
+   * @param mixed $values
+   */
+  public static function invoke($className, $event, &$values) {
+    self::init();
+    if (isset(self::$entityTypes[$className][$event])) {
+      foreach (self::$entityTypes[$className][$event] as $filter) {
+        $args = array($className, &$values);
+        \Civi\Core\Resolver::singleton()->call($filter, $args);
+      }
+    }
   }
 
 }
