@@ -85,7 +85,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
 
     //fix for CRM-16317
-    $form->_params['receive_date'] = date('YmdHis');
+    if (empty($form->_params['receive_date'])) {
+      $form->_params['receive_date'] = date('YmdHis');
+    }
+    if (!empty($form->_params['start_date'])) {
+      $form->_params['start_date'] = date('YmdHis');
+    }
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
