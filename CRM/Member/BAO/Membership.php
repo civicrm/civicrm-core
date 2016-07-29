@@ -1507,7 +1507,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     $membershipPayment->find();
 
     while ($membershipPayment->fetch()) {
-      if(!$preserveContrib) {
+      if (!$preserveContrib) {
         CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
       }
       CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
