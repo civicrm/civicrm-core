@@ -42,18 +42,6 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
    */
   static $_tableName = 'civicrm_mailing_event_trackable_url_open';
   /**
-   * static instance to hold the field values
-   *
-   * @var array
-   */
-  static $_fields = null;
-  /**
-   * static instance to hold the FK relationships
-   *
-   * @var string
-   */
-  static $_links = null;
-  /**
    * static value to see if we should log any modifications to
    * this table in the civicrm_log table
    *
@@ -99,12 +87,13 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
    *   [CRM_Core_Reference_Interface]
    */
   static function getReferenceColumns() {
-    if (!self::$_links) {
-      self::$_links = static ::createReferenceColumns(__CLASS__);
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'event_queue_id', 'civicrm_mailing_event_queue', 'id');
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'trackable_url_id', 'civicrm_mailing_trackable_url', 'id');
+    if (!isset(Civi::$statics[__CLASS__]['links'])) {
+      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'event_queue_id', 'civicrm_mailing_event_queue', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'trackable_url_id', 'civicrm_mailing_trackable_url', 'id');
+      CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
-    return self::$_links;
+    return Civi::$statics[__CLASS__]['links'];
   }
   /**
    * Returns all the column names of this table
@@ -112,8 +101,8 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
    * @return array
    */
   static function &fields() {
-    if (!(self::$_fields)) {
-      self::$_fields = array(
+    if (!isset(Civi::$statics[__CLASS__]['fields'])) {
+      Civi::$statics[__CLASS__]['fields'] = array(
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
@@ -144,8 +133,9 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'required' => true,
         ) ,
       );
+      CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
     }
-    return self::$_fields;
+    return Civi::$statics[__CLASS__]['fields'];
   }
   /**
    * Return a mapping from field-name to the corresponding key (as used in fields()).

@@ -42,18 +42,6 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
    */
   static $_tableName = 'civicrm_loc_block';
   /**
-   * static instance to hold the field values
-   *
-   * @var array
-   */
-  static $_fields = null;
-  /**
-   * static instance to hold the FK relationships
-   *
-   * @var string
-   */
-  static $_links = null;
-  /**
    * static value to see if we should log any modifications to
    * this table in the civicrm_log table
    *
@@ -122,18 +110,19 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
    *   [CRM_Core_Reference_Interface]
    */
   static function getReferenceColumns() {
-    if (!self::$_links) {
-      self::$_links = static ::createReferenceColumns(__CLASS__);
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'address_id', 'civicrm_address', 'id');
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'email_id', 'civicrm_email', 'id');
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'phone_id', 'civicrm_phone', 'id');
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'im_id', 'civicrm_im', 'id');
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'address_2_id', 'civicrm_address', 'id');
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'email_2_id', 'civicrm_email', 'id');
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'phone_2_id', 'civicrm_phone', 'id');
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'im_2_id', 'civicrm_im', 'id');
+    if (!isset(Civi::$statics[__CLASS__]['links'])) {
+      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'address_id', 'civicrm_address', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'email_id', 'civicrm_email', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'phone_id', 'civicrm_phone', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'im_id', 'civicrm_im', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'address_2_id', 'civicrm_address', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'email_2_id', 'civicrm_email', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'phone_2_id', 'civicrm_phone', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName() , 'im_2_id', 'civicrm_im', 'id');
+      CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
-    return self::$_links;
+    return Civi::$statics[__CLASS__]['links'];
   }
   /**
    * Returns all the column names of this table
@@ -141,8 +130,8 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
    * @return array
    */
   static function &fields() {
-    if (!(self::$_fields)) {
-      self::$_fields = array(
+    if (!isset(Civi::$statics[__CLASS__]['fields'])) {
+      Civi::$statics[__CLASS__]['fields'] = array(
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
@@ -199,8 +188,9 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'FKClassName' => 'CRM_Core_DAO_IM',
         ) ,
       );
+      CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
     }
-    return self::$_fields;
+    return Civi::$statics[__CLASS__]['fields'];
   }
   /**
    * Return a mapping from field-name to the corresponding key (as used in fields()).
