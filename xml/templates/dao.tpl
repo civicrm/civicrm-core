@@ -46,20 +46,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       */
       static $_tableName = '{$table.name}';
 
-     /**
-      * static instance to hold the field values
-      *
-      * @var array
-      */
-      static $_fields = null;
-
-     /**
-      * static instance to hold the FK relationships
-      *
-      * @var string
-      */
-      static $_links = null;
-
       /**
        * static value to see if we should log any modifications to
        * this table in the civicrm_log table
@@ -99,17 +85,18 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
      *   [CRM_Core_Reference_Interface]
      */
     static function getReferenceColumns() {ldelim}
-      if (!self::$_links) {ldelim}
-        self::$_links = static::createReferenceColumns(__CLASS__);
+      if (!isset(Civi::$statics[__CLASS__]['links'])) {ldelim}
+        Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
 {foreach from=$table.foreignKey item=foreign}
-        self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}');
+        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}');
 {/foreach}
 
 {foreach from=$table.dynamicForeignKey item=foreign}
-        self::$_links[] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
+        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
 {/foreach}
+        CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
       {rdelim}
-      return self::$_links;
+      return Civi::$statics[__CLASS__]['links'];
     {rdelim}
 {/if} {* table.foreignKey *}
 
@@ -119,8 +106,8 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * @return array
        */
       static function &fields( ) {ldelim}
-        if ( ! ( self::$_fields ) ) {ldelim}
-               self::$_fields = array (
+        if ( ! isset(Civi::$statics[__CLASS__]['fields']) ) {ldelim}
+          Civi::$statics[__CLASS__]['fields'] = array (
 {foreach from=$table.fields item=field}
 
 {if $field.uniqueName}
@@ -200,8 +187,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/if} {* field.pseudoconstant *}                                                                    ),
 {/foreach} {* table.fields *}
                                       );
+            CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
           {rdelim}
-          return self::$_fields;
+          return Civi::$statics[__CLASS__]['fields'];
       {rdelim}
 
       /**
