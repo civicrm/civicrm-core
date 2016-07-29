@@ -949,10 +949,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $pledgeParams['frequency_day'] = 1;
         }
         $pledgeParams['create_date'] = $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date("Ymd");
-        $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($contribution->contribution_page_id);
-        if (CRM_Utils_Array::value('start_date', $params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
-          $pledgeStartDate = CRM_Utils_Array::value('start_date', $params, NULL);
-          $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
+        if (CRM_Utils_Array::value('start_date', $params)) {
+          $pledgeParams['frequency_day'] = intval(date("d", strtotime(CRM_Utils_Array::value('start_date', $params))));
+          $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = CRM_Utils_Array::value('start_date', $params);
         }
         $pledgeParams['status_id'] = $contribution->contribution_status_id;
         $pledgeParams['max_reminders'] = $form->_values['max_reminders'];
