@@ -5749,7 +5749,7 @@ AND   displayRelType.is_active = 1
       }
 
       if (is_object($dao) && property_exists($dao, $value['idCol'])) {
-        $val = $dao->$value['idCol'];
+        $val = $dao->{$value['idCol']};
         if ($key == 'groups') {
           $dao->groups = $this->convertGroupIDStringToLabelString($dao, $val);
           return;
@@ -5764,10 +5764,10 @@ AND   displayRelType.is_active = 1
           $dao->$idColumn = $val;
 
           if ($key == 'state_province_name') {
-            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
+            $dao->{$value['pseudoField']} = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
           }
           else {
-            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+            $dao->{$value['pseudoField']} = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
           }
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {

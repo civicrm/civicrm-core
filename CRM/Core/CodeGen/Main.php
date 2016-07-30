@@ -81,7 +81,7 @@ class CRM_Core_CodeGen_Main {
       exit();
     }
 
-    if (substr(phpversion(), 0, 1) != 5) {
+    if (substr(phpversion(), 0, 1) < 5) {
       echo phpversion() . ', ' . substr(phpversion(), 0, 1) . "\n";
       echo "
 CiviCRM requires a PHP Version >= 5
