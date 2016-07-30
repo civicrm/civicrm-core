@@ -93,7 +93,7 @@ AND    {$this->_componentClause}";
         'title' => ts('Search Results'),
       ),
     );
-    CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this);
+    CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this, FALSE);
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
   }
