@@ -77,15 +77,6 @@ class CRM_Core_Smarty extends Smarty {
    */
   private $backupFrames = array();
 
-  /**
-   * Class constructor.
-   *
-   * @return CRM_Core_Smarty
-   */
-  private function __construct() {
-    parent::__construct();
-  }
-
   private function initialize() {
     $config = CRM_Core_Config::singleton();
 
