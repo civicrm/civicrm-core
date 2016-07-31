@@ -1547,9 +1547,15 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
  */
 function _civicrm_api3_validate($entity, $action, $params) {
   $errors = array();
-  $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => $action));
+  $fields = civicrm_api3($entity, 'getfields', array('sequential' => 1, 'api_action' => $action));
+  $fields = $fields['values'];
 
-  // Check for required fields here.
+  // Check for required fields.
+  foreach ($fields as $field => $values) {
+    if (!empty($values['api.required'] && empty($params[$field]))) {
+      $errors[$values['name']] = "Mandatory key(s) missing from params array: " . $values['name'];
+    }
+  }
 
   // Select only the fields which have been input as a param.
   $fields = array_intersect_key($fields, $params);
@@ -1557,67 +1563,59 @@ function _civicrm_api3_validate($entity, $action, $params) {
   // This derives heavily from the function "_civicrm_api3_validate_fields".
   // However, the difference is that try-catch blocks are nested in the loop, making it
   // possible for us to get all errors in one go.
-  foreach ($fields as $fieldName => $fieldInfo) {
-    switch (CRM_Utils_Array::value('type', $fieldInfo)) {
-      case CRM_Utils_Type::T_INT:
-        try {
-          _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);
-        }
-        catch (Exception $e) {
-          $errors[] = $e->getMessage();
-        }
-        break;
-
-      case CRM_Utils_Type::T_DATE:
-      case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
-      case CRM_Utils_Type::T_TIMESTAMP:
-        //field is of type date or datetime
-        try {
-          _civicrm_api3_validate_date($params, $fieldName, $fieldInfo);
-        }
-        catch (Exception $e) {
-          $errors[] = $e->getMessage();
-        }
-        break;
-
-      case CRM_Utils_Type::T_TEXT:
-        try {
-          _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
-        }
-        catch (Exception $e) {
-          $errors[] = $e->getMessage();
-        }
-        break;
-
-      case CRM_Utils_Type::T_STRING:
-        try {
-          _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
-        }
-        catch (Exception $e) {
-          $errors[] = $e->getMessage();
-        }
-        break;
-
-      case CRM_Utils_Type::T_MONEY:
-        try {
-          list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
-          if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
-            break;
-          }
-          foreach ((array) $fieldValue as $fieldvalue) {
-            if (!CRM_Utils_Rule::money($fieldvalue) && !empty($fieldvalue)) {
-              throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
-            }
-          }
-        }
-        catch (Exception $e) {
-          $errors[] = $e->getMessage();
-        }
-        break;
+  foreach ($fields as $fieldInfo) {
+    try {
+      _civicrm_api3_validate_switch_cases($fieldInfo, $entity, $params);
+    }
+    catch (Exception $e) {
+      $errors[$fieldName] = $e->getMessage();
     }
   }
 
-  return $errors;
+  return array($errors);
+}
+/**
+ * Used by the Validate API.
+ * @param array $fieldInfo
+ * @param string $entity
+ * @param array $params
+ *
+ * @throws Exception
+ */
+function _civicrm_api3_validate_switch_cases($fieldInfo, $entity, $params) {
+  $feildName = $fieldInfo['name'];
+  switch (CRM_Utils_Array::value('type', $fieldInfo)) {
+    case CRM_Utils_Type::T_INT:
+      _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);
+      break;
+
+    case CRM_Utils_Type::T_DATE:
+    case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
+    case CRM_Utils_Type::T_TIMESTAMP:
+      //field is of type date or datetime
+      _civicrm_api3_validate_date($params, $fieldName, $fieldInfo);
+      break;
+
+    case CRM_Utils_Type::T_TEXT:
+      _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
+      break;
+
+    case CRM_Utils_Type::T_STRING:
+      _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
+      break;
+
+    case CRM_Utils_Type::T_MONEY:
+      list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+      if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+        break;
+      }
+      foreach ((array) $fieldValue as $fieldvalue) {
+        if (!CRM_Utils_Rule::money($fieldvalue) && !empty($fieldvalue)) {
+          throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
+        }
+      }
+      break;
+  }
 }
 
 /**

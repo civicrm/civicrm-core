@@ -46,7 +46,7 @@ function _civicrm_api3_generic_validate_spec(&$params) {
  * @return mixed
  */
 function civicrm_api3_generic_validate($apiRequest) {
-  $errors = _civicrm_api3_validate($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
+  $errors = _civicrm_api3_validate($apiRequest['entity'], $apiRequest['params']['action'], $apiRequest['params']);
 
   return civicrm_api3_create_success($errors, $apiRequest['params'], $apiRequest['entity'], 'validate');
 }
