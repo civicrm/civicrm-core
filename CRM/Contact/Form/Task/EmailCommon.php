@@ -129,12 +129,8 @@ class CRM_Contact_Form_Task_EmailCommon {
       $form->_emails[$domainEmail] = $domainEmail;
     }
     $form->_fromEmails = CRM_Utils_Array::crmArrayMerge($emails, $domainEmails);
-    foreach ($form->_fromEmails as $key => $fromEmail) {
-      if (empty($fromEmail)) {
-        unset($form->_fromEmails[$key]);
-      }
-    }
-    if (!empty($emails)) {
+    $form->_fromEmails = array_filter($form->_fromEmails);
+    if (is_numeric(key($form->_fromEmails))) {
       // Add signature
       $defaultEmail = civicrm_api3('email', 'getsingle', array('id' => key($form->_fromEmails)));
       $defaults = array();
