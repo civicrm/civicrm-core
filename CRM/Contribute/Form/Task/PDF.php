@@ -96,6 +96,7 @@ AND    {$this->_componentClause}";
       ),
     );
     CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this, FALSE);
+    parent::setContactIDs();
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
   }
