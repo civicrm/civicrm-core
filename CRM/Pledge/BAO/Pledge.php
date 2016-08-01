@@ -159,8 +159,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       $params['amount'] = $params['installment_amount'] * $params['installments'];
     }
 
-    // update the pledge status only if it does NOT come from form
-    if (!isset($params['pledge_status_id'])) {
+    if (!isset($params['pledge_status_id']) && !isset($params['status_id'])) {
       if (isset($params['contribution_id'])) {
         if ($params['installments'] > 1) {
           $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'In Progress');
