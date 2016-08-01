@@ -78,8 +78,6 @@ AND    {$this->_componentClause}";
       CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
     }
 
-    // we have all the contribution ids, so now we get the contact ids
-    parent::setContactIDs();
     $this->assign('single', $this->_single);
 
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
@@ -96,6 +94,7 @@ AND    {$this->_componentClause}";
       ),
     );
     CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this, FALSE);
+    // we have all the contribution ids, so now we get the contact ids
     parent::setContactIDs();
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
