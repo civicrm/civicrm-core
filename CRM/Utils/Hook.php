@@ -2095,6 +2095,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called to alter Deferred revenue item values just before they are
+   * inserted in civicrm_financial_trxn table
+   *
+   * @param array $deferredRevenues
+   *
+   * @param array $contributionDetails
+   *
+   * @param bool $update
+   *
+   * @param string $context
+   *
+   * @return mixed
+   */
+  public static function alterDeferredRevenueItems(&$deferredRevenues, $contributionDetails, $update, $context) {
+    return self::singleton()->invoke(4, $deferredRevenues, $contributionDetails, $update, $context,
+      self::$_nullObject, self::$_nullObject, 'civicrm_alterDeferredRevenueItems'
+    );
+  }
+
+  /**
    * This hook is called when the entries of the CSV Batch export are mapped.
    *
    * @param array $results
