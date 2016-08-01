@@ -46,6 +46,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
   public $_entity = 'Job';
   public $_params = array();
+  /**
+   * Created membership type.
+   *
+   * Must be created outside the transaction due to it breaking the transaction.
+   *
+   * @var
+   */
+  public $membershipTypeID;
 
   public function setUp() {
     parent::setUp();
@@ -88,7 +96,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
-    $result = $this->callAPIFailure('job', 'create', $params);
+    $this->callAPIFailure('job', 'create', $params);
   }
 
   /**
@@ -96,7 +104,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testCreate() {
     $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($result['values'][0]['id']);
 
     // mutate $params to match expected return value
     unset($this->_params['sequential']);
@@ -247,24 +255,25 @@ class api_v3_JobTest extends CiviUnitTestCase {
         $this->callAPISuccess('membership', 'create', array(
             'contact_id' => $contactID,
             'membership_type_id' => $membershipTypeID,
-            'join_date' => '+ 1 hour',
+            'join_date' => 'now',
+            'start_date' => '+ 1 day',
           )
         );
       }
     }
-    $result = $this->callAPISuccess('action_schedule', 'create', array(
+    $this->callAPISuccess('action_schedule', 'create', array(
       'title' => " remind all Texans",
       'subject' => "drawling renewal",
       'entity_value' => $membershipTypeID,
       'mapping_id' => 4,
-      'start_action_date' => 'membership_join_date',
-      'start_action_offset' => 0,
+      'start_action_date' => 'membership_start_date',
+      'start_action_offset' => 1,
       'start_action_condition' => 'before',
-      'start_action_unit' => 'hour',
+      'start_action_unit' => 'day',
       'group_id' => $groupID,
       'limit_to' => TRUE,
     ));
-    $result = $this->callAPISuccess('job', 'send_reminder', array());
+    $this->callAPISuccess('job', 'send_reminder', array());
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
     $this->assertEquals($successfulCronCount, 1);
     $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");

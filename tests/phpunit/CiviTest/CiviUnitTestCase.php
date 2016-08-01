@@ -1619,15 +1619,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create contribution.
    *
-   * @param int $cID
+   * @param array|int $params
    *   Contact_id.
    *
    * @return int
    *   id of created contribution
    */
-  public function pledgeCreate($cID) {
-    $params = array(
-      'contact_id' => $cID,
+  public function pledgeCreate($params) {
+    if (is_numeric($params)) {
+      $params = array('contact_id' => $params);
+    }
+    $params = array_merge(array(
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
       'scheduled_date' => date('Ymd'),
@@ -1639,7 +1641,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'frequency_unit' => 'year',
       'frequency_day' => 15,
       'installments' => 5,
-    );
+    ), $params);
 
     $result = $this->callAPISuccess('Pledge', 'create', $params);
     return $result['id'];
