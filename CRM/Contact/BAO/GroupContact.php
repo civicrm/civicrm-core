@@ -528,7 +528,7 @@ SELECT    *
     }
 
     if ($contactId) {
-      $contactGroupList = &CRM_Contact_BAO_GroupContact::getContactGroup($contactId, 'Added',
+      $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($contactId, 'Added',
         NULL, FALSE, $ignorePermission
       );
       if (is_array($contactGroupList)) {
