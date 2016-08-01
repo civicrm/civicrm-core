@@ -1,6 +1,7 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.7                                                |                                    |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
@@ -22,37 +23,36 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-<div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
-      {include file="CRM/Contribute/Form/Task.tpl"}
-</div>
-<div class="help">
-    {ts}You may choose to email receipts to contributors OR download a PDF file containing one receipt per page to your local computer by clicking <strong>Process Receipt(s)</strong>. Your browser may display the file for you automatically, or you may need to open it for printing using any PDF reader (such as Adobe&reg; Reader).{/ts}
-</div>
+ */
+ /**
+  * Test class for CRM_Contact_Form_Task_EmailCommon.
+  * @group headless
+  */
+class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
 
-<table class="form-layout-compressed">
-  <tr>
-    <td>{$form.output.email_receipt.html}</td>
-  </tr>
-  <tr id="selectEmailFrom" style="display: none">
-    <td>{$form.fromEmailAddress.label}: {$form.fromEmailAddress.html}</td>
-  </tr>
-  <tr>
-    <td>{$form.output.pdf_receipt.html}</td>
-  </tr>
-  <tr id="selectPdfFormat" style="display: none;">
-    <td>{$form.pdf_format_id.html} {$form.pdf_format_id.label} {help id="id-contribution-receipt" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
-  </tr>
-  <tr>
-    <td>{$form.receipt_update.html} {$form.receipt_update.label}</td>
-  </tr>
-  <tr>
-    <td>{$form.override_privacy.html} {$form.override_privacy.label}</td>
-  </tr>
-</table>
+  protected function setUp() {
+    parent::setUp();
+    $this->_contactIds = array(
+      $this->individualCreate(array('first_name' => 'Antonia', 'last_name' => 'D`souza')),
+      $this->individualCreate(array('first_name' => 'Anthony', 'last_name' => 'Collins')),
+    );
+    $this->_optionValue = $this->callApiSuccess('optionValue', 'create', array(
+      'label' => '"Seamus Lee" <seamus@example.com>',
+      'option_group_id' => 'from_email_address',
+    ));
+  }
 
-<div class="spacer"></div>
-<div class="form-item">
- {$form.buttons.html}
-</div>
+  /**
+   * Test generating domain emails
+   */
+  public function testDomainEmailGeneation() {
+    $emails = CRM_Contact_Form_Task_EmailCommon::domainEmails();
+    $this->assertNotEmpty($emails);
+    $optionValue = $this->callAPISuccess('OptionValue', 'Get', array(
+      'id' => $this->_optionValue['id'],
+    ));
+    $this->assertTrue(array_key_exists('"Seamus Lee" <seamus@example.com>', $emails));
+    $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->_optionValue['id']]['label']);
+  }
+
+}
