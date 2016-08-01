@@ -1551,24 +1551,36 @@ function _civicrm_api3_validate($entity, $action, $params) {
   $fields = $fields['values'];
 
   // Check for required fields.
-  foreach ($fields as $field => $values) {
-    if (!empty($values['api.required'] && empty($params[$field]))) {
-      $errors[$values['name']] = "Mandatory key(s) missing from params array: " . $values['name'];
+  foreach ($fields as $values) {
+    if (!empty($values['api.required']) && empty($params[$values['name']])) {
+      $errors[$values['name']] = array(
+        'message' => "Mandatory key(s) missing from params array: " . $values['name'],
+        'code' => "mandatory_missing",
+      );
     }
   }
 
   // Select only the fields which have been input as a param.
-  $fields = array_intersect_key($fields, $params);
+  $finalfields = array();
+  foreach ($fields as $values) {
+    if (array_key_exists($values['name'], $params)) {
+      $finalfields[] = $values;
+    }
+  }
 
   // This derives heavily from the function "_civicrm_api3_validate_fields".
   // However, the difference is that try-catch blocks are nested in the loop, making it
   // possible for us to get all errors in one go.
-  foreach ($fields as $fieldInfo) {
+  foreach ($finalfields as $fieldInfo) {
+    $fieldName = $fieldInfo['name'];
     try {
-      _civicrm_api3_validate_switch_cases($fieldInfo, $entity, $params);
+      _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $params);
     }
     catch (Exception $e) {
-      $errors[$fieldName] = $e->getMessage();
+      $errors[$fieldName] = array(
+        'message' => $e->getMessage(),
+        'code' => 'incorrect_value',
+      );
     }
   }
 
@@ -1582,8 +1594,7 @@ function _civicrm_api3_validate($entity, $action, $params) {
  *
  * @throws Exception
  */
-function _civicrm_api3_validate_switch_cases($fieldInfo, $entity, $params) {
-  $feildName = $fieldInfo['name'];
+function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $params) {
   switch (CRM_Utils_Array::value('type', $fieldInfo)) {
     case CRM_Utils_Type::T_INT:
       _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);
@@ -1606,9 +1617,7 @@ function _civicrm_api3_validate_switch_cases($fieldInfo, $entity, $params) {
 
     case CRM_Utils_Type::T_MONEY:
       list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
-      if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
-        break;
-      }
+
       foreach ((array) $fieldValue as $fieldvalue) {
         if (!CRM_Utils_Rule::money($fieldvalue) && !empty($fieldvalue)) {
           throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
