@@ -485,7 +485,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                         ON {$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id AND
                            {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn'\n";
     }
-    $this->getPermissionedFTQuery($this);
   }
 
   /**
