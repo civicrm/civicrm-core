@@ -26,28 +26,44 @@
  */
 
 /**
+ *  Tests for the generic validate API action.
+ *
  * @package CiviCRM_APIv3
+ * @group headless
  */
+class api_v3_ValidateTest extends CiviUnitTestCase {
+  /**
+   * This method is called before a test is executed.
+   */
+  protected function setUp() {
+    parent::setUp();
+  }
 
-/**
- * Provide meta-data for this api.
- *
- * @param array $params
- */
-function _civicrm_api3_generic_validate_spec(&$params) {
-  $params['action']['api.required'] = TRUE;
-  $params['action']['title'] = ts('API Action');
-}
+  public function testEmptyContactValidate() {
+    $validation = $this->callAPISuccess('Contact', 'validate', array('action' => "create"));
+    $expectedOut = array(
+      'contact_type' => array(
+        'message' => "Mandatory key(s) missing from params array: contact_type",
+        'code' => "mandatory_missing",
+      ),
+    );
+    $this->assertEquals($validation['values'][0], $expectedOut);
+  }
 
-/**
- * Generic api wrapper used for validation of entity-action pair.
- *
- * @param array $apiRequest
- *
- * @return mixed
- */
-function civicrm_api3_generic_validate($apiRequest) {
-  $errors = _civicrm_api3_validate($apiRequest['entity'], $apiRequest['params']['action'], $apiRequest['params']);
+  public function testContributionValidate() {
+    $validation = $this->callAPISuccess('Contribution', 'validate', array('action' => "create", 'total_amount' => "100w"));
+    $totalAmountErrors = array(
+      'message' => "total_amount is  not a valid amount: 100w",
+      'code' => "incorrect_value",
+    );
 
-  return civicrm_api3_create_success($errors, $apiRequest['params'], $apiRequest['entity'], 'validate');
+    $contactIdErrors = array(
+      'message' => "Mandatory key(s) missing from params array: contact_id",
+      'code' => "mandatory_missing",
+    );
+
+    $this->assertEquals($validation['values'][0]['total_amount'], $totalAmountErrors);
+    $this->assertEquals($validation['values'][0]['contact_id'], $contactIdErrors);
+  }
+
 }
