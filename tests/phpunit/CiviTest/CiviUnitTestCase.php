@@ -1619,7 +1619,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create contribution.
    *
-   * @param int $cID
+   * @param array|int $params
    *   Contact_id.
    *
    * @return int
