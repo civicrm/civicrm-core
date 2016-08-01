@@ -353,11 +353,9 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     // set pledge related fields
     $pledgeStatus = CRM_Utils_Request::retrieve('pstatus', 'String');
-    if ($pledgeStatus) {
-      $statusValues = CRM_Contribute_PseudoConstant::contributionStatus();
 
-      // Remove status values that are only used for recurring contributions for now (Failed).
-      unset($statusValues['4']);
+    if ($pledgeStatus) {
+      $statusValues = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
 
       // we need set all statuses except Cancelled
       unset($statusValues[$pledgeStatus]);

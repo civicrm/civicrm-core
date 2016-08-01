@@ -159,14 +159,11 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       $params['amount'] = $params['installment_amount'] * $params['installments'];
     }
 
-    // get All Payments status types.
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
     // update the pledge status only if it does NOT come from form
     if (!isset($params['pledge_status_id'])) {
       if (isset($params['contribution_id'])) {
         if ($params['installments'] > 1) {
-          $params['status_id'] = array_search('In Progress', $paymentStatusTypes);
+          $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'In Progress');
         }
       }
       else {
@@ -174,7 +171,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
           $params['status_id'] = CRM_Pledge_BAO_PledgePayment::calculatePledgeStatus($params['id']);
         }
         else {
-          $params['status_id'] = array_search('Pending', $paymentStatusTypes);
+          $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
         }
       }
     }
@@ -352,28 +349,16 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
     $where = array();
     $select = $from = $queryDate = NULL;
-    // get all status
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $statusId = array_search($status, $allStatus);
+    $statusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', $status);
 
     switch ($status) {
       case 'Completed':
-        $statusId = array_search('Cancelled', $allStatus);
-        $where[] = 'status_id != ' . $statusId;
+        $where[] = 'status_id != ' . CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled');
         break;
 
       case 'Cancelled':
-        $where[] = 'status_id = ' . $statusId;
-        break;
-
       case 'In Progress':
-        $where[] = 'status_id = ' . $statusId;
-        break;
-
       case 'Pending':
-        $where[] = 'status_id = ' . $statusId;
-        break;
-
       case 'Overdue':
         $where[] = 'status_id = ' . $statusId;
         break;
@@ -413,7 +398,6 @@ GROUP BY  currency
     );
 
     $where = array();
-    $statusId = array_search($status, $allStatus);
     switch ($status) {
       case 'Completed':
         $select = 'sum( total_amount ) as received_pledge , count( cd.id ) as received_count';
@@ -1288,6 +1272,25 @@ SELECT  pledge.contact_id              as contact_id,
 
     }
     return $date;
+  }
+
+  /**
+   * Override buildOptions to hack out some statuses.
+   *
+   * @todo instead of using & hacking the shared optionGroup contribution_status use a separate one.
+   *
+   * @param string $fieldName
+   * @param string $context
+   * @param array $props
+   *
+   * @return array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $result = parent::buildOptions($fieldName, $context, $props);
+    if ($fieldName == 'status_id') {
+      $result = array_diff($result, array('Failed'));
+    }
+    return $result;
   }
 
 }
