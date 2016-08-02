@@ -57,6 +57,36 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_contribution' => array(
+        'dao' => 'CRM_Contribute_DAO_Contribution',
+        'filters' => array(
+          'receive_date' => array(
+            'title' => ts('Receive Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'cancel_date' => array(
+            'title' => ts('Cancel Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'revenue_recognition_date' => array(
+            'title' => ts('Revenue Recognition Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+        ),
+      ),
+      'civicrm_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'filters' => array(
+          'trxn_date' => array(
+            'title' => ts('Transaction Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+        ),
+      ),
     );
     parent::__construct();
   }
