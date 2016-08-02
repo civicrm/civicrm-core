@@ -40,7 +40,13 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       if ($formValues['group_by_separator'] == 'td') {
         $realSeparator = "</td><td>";
       }
-    }
+		elseif ($formValues['group_by_separator'] == 'tr') {
+		  $realSeparator = "</td></tr><tr><td>";
+		}
+		elseif ($formValues['group_by_separator'] == 'br') {
+		  $realSeparator = "<br />";
+		}
+	 }
     $separator = '****~~~~';// a placeholder in case the separator is common in the string - e.g ', '
     $validated = FALSE;
 
