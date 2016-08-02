@@ -183,10 +183,11 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'financial_type_id' => 4,
     );
     $contribution = CRM_Contribute_BAO_Contribution::create($params);
-     $params = array(
+    $params = array(
       'total_amount' => 100,
       'id' => $contribution->id,
     );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
     $alias = array(
       'civicrm_financial_trxn' => 'financial_trxn_civireport',
       'civicrm_financial_account' => 'financial_account_civireport',
