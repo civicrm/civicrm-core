@@ -4112,6 +4112,18 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 
     // Update contribution.
     if (!empty($params['id'])) {
+      // CRM-19126 and CRM-19152, civicrm_line_item.tax_amount incorrectly set when using online payment processor.
+      // It looks like this method is meant to be called in multiple contexts: new & update
+      // When creating, would expect total_amount to be set?  Prior to 4.7, when creating online membership
+      // via contribution page, call scenario was different.
+      // This would not never get called, end result, taxes were correct.
+      // Since 4.7 it does.  Not sure this fix is ideal, but it does do the trick.
+      // Conceptually, if we're "updating", and total_amount is unknown.  We're dealing with an incomplete
+      // view, why are we nulling out all line item taxes, or messing with any other tax amounts?
+      if (!isset($params['total_amount'])) {
+        return $params;
+      }
+
       $id = $params['id'];
       $values = $ids = array();
       $contrbutionParams = array('id' => $id);
