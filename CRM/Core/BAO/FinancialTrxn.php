@@ -707,7 +707,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
 
   /**
    * Create trial balance export file
-   * and update civicrm_financial_account.current_period_opening_balance field 
+   * and update civicrm_financial_account.current_period_opening_balance field.
    *
    *
    * @return string
