@@ -37,7 +37,7 @@ class CRM_Report_Form_Contribute_TrialBalance extends CRM_Report_Form {
   /**
    */
   public function __construct() {
-    $params['orderColumn'] = 'label';
+    $params['labelColumn'] = 'name';
     $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
     $financialAccountType = array(
       array_search('Liability', $financialAccountType),
@@ -118,7 +118,25 @@ class CRM_Report_Form_Contribute_TrialBalance extends CRM_Report_Form {
   }
 
   public function postProcess() {
-    parent::postProcess();
+    // get ready with post process params
+    $this->beginPostProcess();
+
+    // build query
+    $sql = $this->buildQuery(FALSE);
+
+    // build array of result based on column headers. This method also allows
+    // modifying column headers before using it to build result set i.e $rows.
+    $rows = array();
+    $this->buildRows($sql, $rows);
+
+    // format result set.
+    $this->formatDisplay($rows);
+
+    // assign variables to templates
+    $this->doTemplateAssignment($rows);
+
+    // do print / pdf / instance stuff if needed
+    $this->endPostProcess($rows);
   }
 
   public function groupBy() {
