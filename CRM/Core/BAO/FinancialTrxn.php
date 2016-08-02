@@ -705,4 +705,66 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
     }
   }
 
+  /**
+   * Generate sql query for trial balance report.
+   *
+   * @param array $alias
+   *   table name alias
+   *
+   * @param bool $onlyFromClause
+   *
+   *
+   * @return string
+   */
+  public static function getTrialBalanceQuery($alias, $onlyFromClause = FALSE) {
+    $closingDate = 'now()';
+    if (!$onlyFromClause && Civi::settings()->get('closing_date')) {
+      $closingDate = Civi::settings()->get('closing_date');
+      $closingDate = $closingDate['M'] . '/' . $closingDate['d'] . '/' . date('Y');
+      $closingDate = "'" . date('Y-m-d', strtotime($closingDate)) . "'";
+    }
+    $priorDate = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
+    if (empty($priorDate)) {
+      $where = " <= $closingDate ";
+    }
+    else {
+      $priorDate = date('Y-m-d', strtotime($priorDate));
+      $where = " BETWEEN '$priorDate' AND $closingDate ";
+    }
+    $from = "
+      FROM (
+        SELECT SUM(total_amount) AS total_amount_1, to_financial_account_id AS financial_account_id 
+          FROM civicrm_financial_trxn
+          WHERE trxn_date {$where}
+          GROUP BY to_financial_account_id
+        UNION
+        SELECT -sum(total_amount) AS total_amount_2, from_financial_account_id 
+          FROM civicrm_financial_trxn
+          WHERE from_financial_account_id IS NOT NULL AND trxn_date {$where}
+          GROUP BY from_financial_account_id
+        UNION
+        SELECT -sum(amount) total_amount_3, financial_account_id 
+          FROM civicrm_financial_item
+          WHERE transaction_date {$where}
+          GROUP BY financial_account_id
+      ) AS {$alias['civicrm_financial_trxn']}
+      INNER JOIN civicrm_financial_account {$alias['civicrm_financial_account']} ON {$alias['civicrm_financial_trxn']}.financial_account_id = {$alias['civicrm_financial_account']}.id
+";
+    if ($onlyFromClause) {
+      return $from;
+    }
+    $query = "
+SELECT financial_account_civireport.id as civicrm_financial_account_id,
+financial_account_civireport.name as civicrm_financial_account_name,
+financial_account_civireport.financial_account_type_id as civicrm_financial_account_financial_account_type_id,
+financial_account_civireport.accounting_code as civicrm_financial_account_accounting_code,
+IF (financial_account_type_id NOT IN (2,3), total_amount_1, NULL) + IF (current_period_opening_balance <> 0, current_period_opening_balance, opening_balance) as civicrm_financial_trxn_debit,
+IF (financial_account_type_id IN (2,3), total_amount_1, NULL) + IF (current_period_opening_balance <> 0, current_period_opening_balance, opening_balance) as civicrm_financial_trxn_credit  
+  {$from}
+  GROUP BY financial_account_civireport.id
+  ORDER BY financial_account_civireport.name  
+";
+    return $query;
+  }
+
 }
