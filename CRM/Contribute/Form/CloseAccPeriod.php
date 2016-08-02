@@ -115,6 +115,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
       'Close Accounting Period',
       'name'
     );
+    $previousPriorFinPeriod = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
     $activityParams = array(
       'source_contact_id' => CRM_Core_Session::singleton()->get('userID'),
       'assignee_contact_id' => CRM_Core_Session::singleton()->get('userID'),
@@ -125,6 +126,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
         'name'
       ),
       'activity_date_time' => date('YmdHis'),
+      'details' => "Trial Balance report From {$previousPriorFinPeriod} To {$priorFinPeriod}.",
     );
     $fileName = CRM_Core_BAO_FinancialTrxn::createTrialBalanceExport();
     if ($fileName) {
