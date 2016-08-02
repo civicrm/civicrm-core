@@ -3280,8 +3280,9 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     // Update phone table to populate phone_numeric field
     if (!$tableName || $tableName == 'civicrm_phone') {
       // Define stored sql function needed for phones
-      CRM_Core_DAO::executeQuery(self::DROP_STRIP_FUNCTION_43);
-      CRM_Core_DAO::executeQuery(self::CREATE_STRIP_FUNCTION_43);
+      $sqlTriggers = Civi::service('sql_triggers');
+      $sqlTriggers->enqueueQuery(self::DROP_STRIP_FUNCTION_43);
+      $sqlTriggers->enqueueQuery(self::CREATE_STRIP_FUNCTION_43);
       $info[] = array(
         'table' => array('civicrm_phone'),
         'when' => 'BEFORE',
