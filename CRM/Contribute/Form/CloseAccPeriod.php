@@ -143,6 +143,9 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
     $updateField['prior_financial_period'] = $priorFinPeriod;
     CRM_Contribute_BAO_Contribution::checkContributeSettings(NULL, $updateField);
     CRM_Core_Session::setStatus(ts("Accounting Period has been closed successfully!"), ts('Success'), 'success');
+    CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url('civicrm/activity',
+      "action=view&reset=1&id={$activity->id}&atype={$activityType}&cid={$activityParams['source_contact_id']}"
+    ));
   }
 
 }
