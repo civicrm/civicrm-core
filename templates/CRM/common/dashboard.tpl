@@ -38,21 +38,10 @@ CRM.$(function($) {
     // Required.
     emptyPlaceholderInner: '',
 
-    // These define the urls and data objects used for all of the ajax requests to the server.
-    // data objects are extended with more properties, as defined below.
-    // All are required.  All should return JSON.
-    ajaxCallbacks: {
+    widgetsByColumn: {/literal}{$contactDashlets|@json_encode}{literal},
 
-      // Server returns the configuration of widgets for this user;
-      // An array (keyed by zero-indexed column ID), of arrays (keyed by widget ID) of
-      // booleans; true if the widget is minimized.  False if not.
-      // E.g. [{ widgetID: isMinimized, ...}, ...]
-      getWidgetsByColumn: {
-        url:  {/literal}'{crmURL p='civicrm/ajax/dashboard' h=0 }'{literal},
-        data: {
-          op: 'get_widgets_by_column', key: {/literal}"{crmKey name='civicrm/ajax/dashboard'}"{literal}
-        }
-      },
+    // These define the urls and data objects used for all of the ajax requests to the server.
+    ajaxCallbacks: {
 
       // Given the widget ID, the server returns the widget object as an associative array.
       // E.g. {content: '<p>Widget content</p>', title: 'Widget Title', }

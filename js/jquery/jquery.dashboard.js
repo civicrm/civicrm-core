@@ -159,10 +159,8 @@
     // Merge in the caller's options with the defaults.
     var opts = $.extend({}, $.fn.dashboard.defaults, options);
 
-    // Execution 'forks' here and restarts in init().  Tell the user we're busy with a throbber.
-    var throbber = $(opts.throbberMarkup).appendTo(dashboard.element);
-    $.getJSON(opts.ajaxCallbacks.getWidgetsByColumn.url, opts.ajaxCallbacks.getWidgetsByColumn.data, init);
-    asynchronousRequestCounter++;
+    init(opts.widgetsByColumn);
+
     return dashboard;
     // End of constructor and private properties for dashboard object.
 
@@ -170,10 +168,8 @@
      * Private methods of dashboard.
      */
 
-    // Ajax callback for getWidgetsByColumn.
-    function init(widgets, status) {
-      asynchronousRequestCounter--;
-      throbber.remove();
+    // Initialize widget columns.
+    function init(widgets) {
       var markup = '<li class="empty-placeholder">' + opts.emptyPlaceholderInner + '</li>';
 
       // Build the dashboard in the DOM.  For each column...
@@ -462,12 +458,12 @@
         minimize: {
           description: ts('Collapse or expand'),
           callback: widget.toggleMinimize,
-          icon: 'fa-caret-down',
+          icon: 'fa-caret-down'
         },
         fullscreen: {
           description: ts('View fullscreen'),
           callback: widget.enterFullscreen,
-          icon: 'fa-expand',
+          icon: 'fa-expand'
         },
         close: {
           description: ts('Remove from dashboard'),
