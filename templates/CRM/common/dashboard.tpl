@@ -195,6 +195,14 @@ CRM.$(function($) {
   // Initialize the dashboard using these options
   $('#civicrm-dashboard').dashboard(options);
 
+  $('#civicrm-dashboard')
+    .on('mouseover', '.widget-header', function() {
+      $(this).closest('.widget-wrapper').addClass('db-hover-handle');
+    })
+    .on('mouseout', '.widget-header', function() {
+      $(this).closest('.widget-wrapper').removeClass('db-hover-handle');
+    });
+
 });
 
 </script>
