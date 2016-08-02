@@ -105,6 +105,11 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
+
+    // Set closing date
+    Civi::settings()->set('closing_date', $params['closing_date']);
+    $priorFinPeriod = $params['closing_date']['M'] . '/' . $params['closing_date']['d'] . '/' . date('Y');
+    $priorFinPeriod = date('m/d/Y', strtotime($priorFinPeriod));
     // Create activity
     $activityType = CRM_Core_OptionGroup::getValue('activity_type',
       'Close Accounting Period',
@@ -121,12 +126,20 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
       ),
       'activity_date_time' => date('YmdHis'),
     );
-    CRM_Activity_BAO_Activity::create($activityParams);
+    $fileName = CRM_Core_BAO_FinancialTrxn::createTrialBalanceExport();
+    if ($fileName) {
+      $activityParams['attachFile_1'] = array(
+        'uri' => $fileName,
+        'type' => 'text/csv',
+        'upload_date' => date('YmdHis'),
+        'location' => $fileName,
+        'cleanName' => 'CiviReport.csv',
+      );
+    }
+    $activity = CRM_Activity_BAO_Activity::create($activityParams);
     // Set Prior Financial Period
-    $priorFinPeriod = $params['closing_date']['M'] . '/' . $params['closing_date']['d'] . '/' . date('Y');
-    Civi::settings()->set('prior_financial_period', date('m/d/Y', strtotime($priorFinPeriod)));
-    // Set closing date
-    Civi::settings()->set('closing_date', $params['closing_date']);
+    $updateField['prior_financial_period'] = $priorFinPeriod;
+    CRM_Contribute_BAO_Contribution::checkContributeSettings(NULL, $updateField);
     CRM_Core_Session::setStatus(ts("Accounting Period has been closed successfully!"), ts('Success'), 'success');
   }
 
