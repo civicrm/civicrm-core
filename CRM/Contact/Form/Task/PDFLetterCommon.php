@@ -170,7 +170,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
 
     $documentTypes = implode(',', CRM_Core_SelectValues::documentApplicationType());
-    $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=60 accept="' . $documentTypes . '"');
+    $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=255 accept="' . $documentTypes . '"');
     $form->addUploadElement("document_file");
 
     CRM_Mailing_BAO_Mailing::commonCompose($form);
@@ -214,17 +214,24 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @param array $fields
    *   The input form values.
-   * @param array $dontCare
+   * @param array $files
    * @param array $self
    *   Additional values form 'this'.
    *
    * @return bool
    *   TRUE if no errors, else array of errors.
    */
-  public static function formRule($fields, $dontCare, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $template = CRM_Core_Smarty::singleton();
 
+    // If user uploads non-document file other than odt/docx
+    if (empty($fields['template']) &&
+      !empty($files['document_file']['tmp_name']) &&
+      array_search($files['document_file']['type'], CRM_Core_SelectValues::documentApplicationType()) == NULL
+    ) {
+      $errors['document_file'] = ts('Invalid document file format');
+    }
     //Added for CRM-1393
     if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
       $errors['saveTemplateName'] = ts("Enter name to save message template");
