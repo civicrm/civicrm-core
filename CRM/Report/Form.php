@@ -4415,6 +4415,52 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Get a standard set of contact filters.
+   *
+   * @return array
+   */
+  public function getBasicContactFilters() {
+    return array(
+      'sort_name' => array(
+        'title' => ts('Contact Name'),
+      ),
+      'source' => array(
+        'title' => ts('Contact Source'),
+        'type' => CRM_Utils_Type::T_STRING,
+      ),
+      'id' => array(
+        'title' => ts('Contact ID'),
+        'no_display' => TRUE,
+      ),
+      'gender_id' => array(
+        'title' => ts('Gender'),
+        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+      ),
+      'birth_date' => array(
+        'title' => ts('Birth Date'),
+        'operatorType' => CRM_Report_Form::OP_DATE,
+      ),
+      'contact_type' => array(
+        'title' => ts('Contact Type'),
+      ),
+      'contact_sub_type' => array(
+        'title' => ts('Contact Subtype'),
+      ),
+      'modified_date' => array(
+        'title' => ts('Contact Modified'),
+        'operatorType' => CRM_Report_Form::OP_DATE,
+        'type' => CRM_Utils_Type::T_DATE,
+      ),
+      'is_deceased' => array(
+        'title' => ts('Deceased'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'default' => 0,
+      ),
+    );
+  }
+
+  /**
    * Add contact to group.
    *
    * @param int $groupID
