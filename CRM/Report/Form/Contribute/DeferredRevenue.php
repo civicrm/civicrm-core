@@ -334,27 +334,27 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['
     );
     $dateFormat = Civi::settings()->get('dateformatFinancialBatch');
     while ($dao->fetch()) {
-      $arraykey = $dao->deferred_account_id . '_' . $dao->revenue_account_id;
+      $arraykey = $dao->civicrm_financial_account_id . '_' . $dao->civicrm_financial_account_1_id;
       if (empty($rows[$arraykey])) {
-        $rows[$arraykey]['label'] = "Deferred Revenue Account: {$dao->deferred_account} ({$dao->deferred_account_code}), Revenue Account: {$dao->revenue_account} {$dao->revenue_account_code}";
+        $rows[$arraykey]['label'] = "Deferred Revenue Account: {$dao->civicrm_financial_account_name} ({$dao->civicrm_financial_account_accounting_code}), Revenue Account: {$dao->civicrm_financial_account_1_name} {$dao->civicrm_financial_account_1_accounting_code}";
       }
-      $rows[$arraykey]['rows'][$dao->item_id] = array(
-        'Transaction' => $statuses[$dao->status_id],
-        'Date of Transaction' => CRM_Utils_Date::customFormat($dao->transaction_date, $dateFormat),
-        'Amount' => CRM_Utils_Money::format($dao->total_amount),
-        'Contribution ID' => $dao->contribution_id,
-        'Item' => $dao->description,
-        'Contact ID' => $dao->contact_id,
-        'Contact Name' => $dao->display_name,
-        'Source' => $dao->source,
-        'Start Date' => CRM_Utils_Date::customFormat($dao->start_date, $dateFormat),
-        'End Date' => CRM_Utils_Date::customFormat($dao->end_date, $dateFormat),
+      $rows[$arraykey]['rows'][$dao->civicrm_financial_item_id] = array(
+        'Transaction' => $statuses[$dao->civicrm_financial_trxn_status_id],
+        'Date of Transaction' => CRM_Utils_Date::customFormat($dao->civicrm_financial_trxn_trxn_date, $dateFormat),
+        'Amount' => CRM_Utils_Money::format($dao->civicrm_financial_trxn_total_amount),
+        'Contribution ID' => $dao->civicrm_contribution_id,
+        'Item' => $dao->civicrm_financial_item_description,
+        'Contact ID' => $dao->civicrm_contribution_contact_id,
+        'Contact Name' => $dao->civicrm_contact_display_name,
+        'Source' => $dao->civicrm_contribution_source,
+        'Start Date' => CRM_Utils_Date::customFormat($dao->civicrm_membership_start_date, $dateFormat),
+        'End Date' => CRM_Utils_Date::customFormat($dao->civicrm_membership_end_date, $dateFormat),
       );
-      $trxnDate = explode(',', $dao->trxn_date);
-      $trxnAmount = explode(',', $dao->trxn_amount);
+      $trxnDate = explode(',', $dao->civicrm_financial_trxn_1_trxn_date);
+      $trxnAmount = explode(',', $dao->civicrm_financial_trxn_1_total_amount);
       foreach ($trxnDate as $key => $date) {
         $keyDate = date('M, Y', strtotime($date));
-        $rows[$arraykey]['rows'][$dao->item_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$key]);
+        $rows[$arraykey]['rows'][$dao->civicrm_financial_item_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$key]);
         $dateColumn[date('Ymd', strtotime($date))] = 1;
       }
     }
