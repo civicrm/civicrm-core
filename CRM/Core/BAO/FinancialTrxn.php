@@ -705,4 +705,63 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
     }
   }
 
+  /**
+   * Create trial balance export file
+   * and update civicrm_financial_account.current_period_opening_balance field 
+   *
+   *
+   * @return string
+   */
+  public static function createTrialBalanceExport() {
+    $alias = array(
+      'civicrm_financial_trxn' => 'financial_trxn_civireport',
+      'civicrm_financial_account' => 'financial_account_civireport',
+    );
+    $query = self::getTrialBalanceQuery($alias);
+    $result = CRM_Core_DAO::executeQuery($query);
+    $rows = array();
+    $credit = $debit = 0;
+    $params['labelColumn'] = 'name';
+    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
+    while ($result->fetch()) {
+      $rows[] = array(
+        $result->civicrm_financial_account_name,
+        $result->civicrm_financial_account_accounting_code,
+        $result->civicrm_financial_trxn_debit,
+        $result->civicrm_financial_trxn_credit,
+      );
+      $debit += $result->civicrm_financial_trxn_debit;
+      $credit += $result->civicrm_financial_trxn_credit;
+      if (!in_array($financialAccountType[$result->civicrm_financial_account_financial_account_type_id], array('Liability', 'Asset'))) {
+        continue;
+      }
+      // Update current_period_opening_balance
+      $financialAccountParams = array(
+        'id' => $result->civicrm_financial_account_id,
+        'current_period_opening_balance' => ($financialAccountType[$result->civicrm_financial_account_financial_account_type_id] == 'Asset') ? $result->civicrm_financial_trxn_debit : $result->civicrm_financial_trxn_credit,
+      );
+      civicrm_api3('FinancialAccount', 'Create', $financialAccountParams);
+    }
+    if (empty($rows)) {
+      return NULL;
+    }
+    $rows[] = array(
+      NULL,
+      NULL,
+      CRM_Utils_Money::format($debit),
+      CRM_Utils_Money::format($credit),
+    );
+    $config = CRM_Core_Config::singleton();
+    $fileName = $config->customFileUploadDir . CRM_Utils_File::makeFileName('TrialBalanceReport.csv');
+    $header = array(
+      'Account',
+      'Accounting Code',
+      'Debit',
+      'Credit',
+    );
+    CRM_Contact_Import_Parser::exportCSV($fileName, $header, $rows);
+
+    return $fileName;
+  }
+
 }
