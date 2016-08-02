@@ -171,4 +171,29 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
   }
 
+  /**
+   * Test for getTrialBalanceQuery().
+   */
+  public function testgetTrialBalanceQuery() {
+    $cid = $this->individualCreate();
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 622,
+      'financial_type_id' => 4,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+     $params = array(
+      'total_amount' => 100,
+      'id' => $contribution->id,
+    );
+    $alias = array(
+      'civicrm_financial_trxn' => 'financial_trxn_civireport',
+      'civicrm_financial_account' => 'financial_account_civireport',
+    );
+    $query = CRM_Core_BAO_FinancialTrxn::getTrialBalanceQuery($alias);
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $this->assertEquals(2, $dao->N);
+  }
+
 }
