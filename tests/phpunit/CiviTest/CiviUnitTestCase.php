@@ -1537,6 +1537,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     ), $params);
 
     $result = $this->callAPISuccess('contribution', 'create', $params);
+    $this->_contributionID = $result['id'];
+
     return $result['id'];
   }
 

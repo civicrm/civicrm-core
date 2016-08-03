@@ -687,11 +687,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * We don't need to handle paypal standard using this path as there has never been any historic support
    * for paypal standard to call civicrm/payment/ipn as a path.
    */
-  static public function handlePaymentNotification() {
+  public function handlePaymentNotification() {
     $log = new CRM_Utils_SystemLogger();
     $log->alert('Payment notification of PayPal_Standard', $_REQUEST);
     try {
-      $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
+      $paypalIPN = new CRM_Core_Payment_PayPalIPN($_REQUEST);
       $paypalIPN->main($this->_paymentProcessor['id']);
     }
     catch (CRM_Core_Exception $e) {

@@ -38,8 +38,8 @@
 class CRM_Core_Page_AJAX_Payment {
 
   /**
-  * Handle payment notification response
-  */
+   * Handle payment notification response
+   */
   public static function ipn() {
     $paymentProcessorID = CRM_Utils_Request::retrieve('paymentProcessorID', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
     if (!$paymentProcessorID) {
