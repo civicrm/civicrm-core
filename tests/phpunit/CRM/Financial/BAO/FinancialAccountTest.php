@@ -308,15 +308,21 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   public function testValidateFinancialType() {
     Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
-    $deferred = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     foreach ($financialTypes as $key => $value) {
-      $validate = CRM_Financial_BAO_FinancialAccount::validateFinancialType($key);
-      if (array_key_exists($key, $deferred)) {
-        $this->assertFalse($validate, "This should not have thrown an error.");
+      try {
+        CRM_Financial_BAO_FinancialAccount::validateFinancialType($key);
+        if (!in_array($value, array('Member Dues', 'Event Fee'))) {
+          $this->fail("Missed expected exception");
+        }
       }
-      else {
-        $this->assertEquals($validate, TRUE);
+      catch (CRM_Core_Exception $e) {
+        if (in_array($value, array('Member Dues', 'Event Fees'))) {
+          $this->fail("Should not call exception");
+        }
+        else {
+          $this->assertEquals('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts', $e->getMessage());
+        }
       }
     }
   }
