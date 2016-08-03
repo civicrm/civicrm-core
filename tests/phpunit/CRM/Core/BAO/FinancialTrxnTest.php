@@ -31,6 +31,7 @@
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   public function setUp() {
+    $this->quickCleanUpFinancialEntities();
     parent::setUp();
   }
 
