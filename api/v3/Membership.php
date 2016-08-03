@@ -41,7 +41,12 @@
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_delete_spec(&$params) {
-  $params['preserve_contribution']['api.required'] = 0;
+  $params['preserve_contribution'] = array(
+    'api.required' => 0,
+    'title' => 'Preserve Contribution',
+    'description' => 'By default this is 0, or 0 if not set. Set to 1 to preserve the associated contribution record when membership is deleted.',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }
 
 /**
@@ -54,7 +59,11 @@ function _civicrm_api3_membership_delete_spec(&$params) {
  *   API result array.
  */
 function civicrm_api3_membership_delete($params) {
+<<<<<<< HEAD
   if (isset($params['preserve_contribution'])) {
+=======
+  if (isset($params['preserve_contribution'])){
+>>>>>>> crm-19150
     if (CRM_Member_BAO_Membership::del($params['id'], $params['preserve_contribution'])) {
       return civicrm_api3_create_success(TRUE, $params);
     }
