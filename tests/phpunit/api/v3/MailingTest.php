@@ -62,6 +62,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     );
 
     $this->footer = civicrm_api3('MailingComponent', 'create', array(
+      'name' => 'test domain footer',
+      'component_type' => 'footer',
       'body_html' => '<p>From {domain.address}. To opt out, go to {action.optOutUrl}.</p>',
       'body_text' => 'From {domain.address}. To opt out, go to {action.optOutUrl}.',
     ));
