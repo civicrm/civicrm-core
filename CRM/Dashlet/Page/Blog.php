@@ -117,7 +117,12 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
         $item = (array) $item;
         // Clean up description - remove tags that would break dashboard layout
         $description = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $item['description']);
-        $item['description'] = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br/>");
+        $description = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br/>");
+        // Add paragraph markup if it's missing.
+        if (strpos($description, '<p') === FALSE) {
+          $description = '<p>' . $description . '</p>';
+        }
+        $item['description'] = $description;
         $blog[] = $item;
       }
       if ($blog) {
