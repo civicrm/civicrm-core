@@ -59,11 +59,7 @@ function _civicrm_api3_membership_delete_spec(&$params) {
  *   API result array.
  */
 function civicrm_api3_membership_delete($params) {
-<<<<<<< HEAD
   if (isset($params['preserve_contribution'])) {
-=======
-  if (isset($params['preserve_contribution'])){
->>>>>>> crm-19150
     if (CRM_Member_BAO_Membership::del($params['id'], $params['preserve_contribution'])) {
       return civicrm_api3_create_success(TRUE, $params);
     }
