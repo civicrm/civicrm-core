@@ -291,7 +291,7 @@ LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
 LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['civicrm_participant']}.event_id = {$this->_aliases['civicrm_event']}.id
 ";
 
-if (!empty($this->_params['batch_id_value'])) {
+    if (!empty($this->_params['batch_id_value'])) {
       $this->_from .= "
         LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
           ON {$this->_aliases['civicrm_batch']}.entity_id = {$this->_aliases['civicrm_financial_trxn_1']}.id AND
