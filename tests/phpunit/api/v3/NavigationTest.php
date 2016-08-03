@@ -46,7 +46,7 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
    * Test create function.
    */
   public function testCreate() {
-    $params = array('name' => 'feed', 'label' => 'Feed the Goats', 'domain_id' => 1);
+    $params = array('label' => 'Feed the Goats', 'domain_id' => 1);
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $this->getAndCheck($params, $result['id'], $this->_entity, TRUE);
   }
