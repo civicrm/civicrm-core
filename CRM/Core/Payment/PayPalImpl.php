@@ -692,7 +692,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $log->alert('Payment notification of PayPal_Standard', $_REQUEST);
     try {
       $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
-      $paypalIPN->main();
+      $paypalIPN->main($this->_paymentProcessor['id']);
     }
     catch (CRM_Core_Exception $e) {
       CRM_Core_Error::debug_log_message($e->getMessage());

@@ -306,10 +306,11 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * Main function.
+   * @param int $paymentProcessorID
    *
    * @return bool
    */
-  public function main() {
+  public function main($paymentProcessorID = NULL) {
 
     $objects = $ids = $input = array();
     $component = $this->retrieve('module', 'String');
@@ -333,18 +334,21 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $ids['onbehalf_dupe_alert'] = $this->retrieve('onBehalfDupeAlert', 'Integer', FALSE);
     }
 
-    $processorParams = array(
-      'user_name' => $this->retrieve('receiver_email', 'String', FALSE),
-      'payment_processor_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', 'PayPal_Standard', 'id', 'name'),
-      'is_test' => empty($input['is_test']) ? 0 : 1,
-    );
+    if (empty($paymentProcessorID)) {
+      $processorParams = array(
+        'user_name' => $this->retrieve('receiver_email', 'String', FALSE),
+        'payment_processor_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', 'PayPal_Standard', 'id', 'name'),
+        'is_test' => empty($input['is_test']) ? 0 : 1,
+      );
 
-    $processorInfo = array();
-    if (!CRM_Financial_BAO_PaymentProcessor::retrieve($processorParams, $processorInfo)) {
-      return FALSE;
+      $processorInfo = array();
+      if (!CRM_Financial_BAO_PaymentProcessor::retrieve($processorParams, $processorInfo)) {
+        return FALSE;
+      }
+      $paymentProcessorID = $processorInfo['id'];
     }
 
-    if (!$this->validateData($input, $ids, $objects, TRUE, $processorInfo['id'])) {
+    if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       return FALSE;
     }
 
