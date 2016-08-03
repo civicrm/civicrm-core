@@ -41,7 +41,12 @@
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_delete_spec(&$params) {
-  $params['preserve_contribution']['api.required'] = 0;
+  $params['preserve_contribution'] = array(
+    'api.required' => 0,
+    'title' => 'Preserve Contribution',
+    'description' => 'By default this is 0, or 0 if not set. Set to 1 to preserve the associated contribution record when membership is deleted.',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }
 
 /**
