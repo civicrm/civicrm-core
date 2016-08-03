@@ -66,4 +66,24 @@ class api_v3_ValidateTest extends CiviUnitTestCase {
     $this->assertEquals($validation['values'][0]['contact_id'], $contactIdErrors);
   }
 
+  public function testContributionDateValidate() {
+    $params = array(
+      'action' => "create",
+      'financial_type_id' => "1",
+      'total_amount' => "100",
+      'contact_id' => "1",
+      'receive_date' => 'abc',
+    );
+    $validation = $this->callAPISuccess('Contribution', 'validate', $params);
+
+    $expectedOut = array(
+      'receive_date' => array(
+        'message' => "receive_date is not a valid date: abc",
+        'code' => "incorrect_value",
+      ),
+    );
+
+    $this->assertEquals($validation['values'][0], $expectedOut);
+  }
+
 }
