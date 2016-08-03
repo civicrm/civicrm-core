@@ -163,6 +163,18 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
       'civicrm_participant' => array(
         'dao' => 'CRM_Event_DAO_Participant',
       ),
+      'civicrm_batch' => array(
+        'dao' => 'CRM_Batch_DAO_EntityBatch',
+        'grouping' => 'contri-fields',
+        'filters' => array(
+          'batch_id' => array(
+            'title' => ts('Batch Title'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Batch_BAO_Batch::getBatches(),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+        ),
+      ),
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
         'fields' => array(
@@ -278,6 +290,13 @@ LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
   END
 LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['civicrm_participant']}.event_id = {$this->_aliases['civicrm_event']}.id
 ";
+
+if (!empty($this->_params['batch_id_value'])) {
+      $this->_from .= "
+        LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
+          ON {$this->_aliases['civicrm_batch']}.entity_id = {$this->_aliases['civicrm_financial_trxn_1']}.id AND
+            {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn'\n";
+    }
   }
 
   public function postProcess() {
