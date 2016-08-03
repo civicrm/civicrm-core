@@ -267,6 +267,7 @@ class CRM_Utils_Mail {
       }
       if (!empty($headers['Bcc'])) {
         $to[] = CRM_Utils_Array::value('Bcc', $headers);
+        unset($headers['Bcc']);
       }
     }
     if (is_object($mailer)) {
