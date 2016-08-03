@@ -281,7 +281,7 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['
   }
 
   public function postProcess() {
-    $this->_noFields = FALSE;
+    $this->_noFields = TRUE;
     // get ready with post process params
     $this->beginPostProcess();
 
@@ -301,6 +301,16 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['
 
     // do print / pdf / instance stuff if needed
     $this->endPostProcess($rows);
+  }
+
+  /**
+   * Build where clause.
+   */
+  public function where() {
+    parent::where();
+    $startDate = date('Y-m-01');
+    $endDate = date('Y-m-t', strtotime(date('ymd') . '+11 month'));
+    $this->_where .= " AND {$this->_aliases['civicrm_financial_trxn_1']}.trxn_date BETWEEN '{$startDate}' AND '{$endDate}'";
   }
 
   public function groupBy() {
@@ -333,6 +343,10 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['
       'End Date' => 1,
     );
     $dateFormat = Civi::settings()->get('dateformatFinancialBatch');
+    for ($i = 0; $i < 12; $i++) {
+      //$columns[date('M, Y', strtotime("+1 month", date('Y-m-d')))] = 1;
+      $columns[date('M, Y', strtotime(date('Y-m-d') . "+{$i} month"))] = 1;
+    }
     while ($dao->fetch()) {
       $arraykey = $dao->civicrm_financial_account_id . '_' . $dao->civicrm_financial_account_1_id;
       if (empty($rows[$arraykey])) {
@@ -354,13 +368,11 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['
       $trxnAmount = explode(',', $dao->civicrm_financial_trxn_1_total_amount);
       foreach ($trxnDate as $key => $date) {
         $keyDate = date('M, Y', strtotime($date));
+        if (!array_key_exists($keyDate, $columns)) {
+          continue;
+        }
         $rows[$arraykey]['rows'][$dao->civicrm_financial_item_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$key]);
-        $dateColumn[date('Ymd', strtotime($date))] = 1;
       }
-    }
-    ksort($dateColumn);
-    foreach ($dateColumn as $key => $ignore) {
-      $columns[date('M, Y', strtotime($key))] = 1;
     }
     $this->_columnHeaders = $columns;
   }
