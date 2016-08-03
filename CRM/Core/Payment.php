@@ -963,10 +963,10 @@ abstract class CRM_Core_Payment {
    * @return string
    *   URL to notify outcome of transaction.
    */
-  protected function getNotifyUrl() {
+  protected function getNotifyUrl($args = array()) {
     $url = CRM_Utils_System::url(
       'civicrm/payment/ipn/' . $this->_paymentProcessor['id'],
-      array(),
+      $args,
       TRUE
     );
     return (stristr($url, '.')) ? $url : '';
