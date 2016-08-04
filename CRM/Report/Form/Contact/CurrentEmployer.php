@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
@@ -44,6 +42,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   /**
+   * Class constructor.
    */
   public function __construct() {
 

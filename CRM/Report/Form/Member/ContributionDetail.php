@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   protected $_addressField = FALSE;
@@ -47,6 +45,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   /**
    */
   /**
+   * Class constructor.
    */
   public function __construct() {
     $config = CRM_Core_Config::singleton();

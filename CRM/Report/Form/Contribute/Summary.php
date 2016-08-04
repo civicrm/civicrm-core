@@ -443,6 +443,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    * Set from clause.
    *
    * @param string $entity
+   *
+   * @todo fix function signature to match parent. Remove hacky passing of $entity
+   * to acheive unclear results.
    */
   public function from($entity = NULL) {
     $softCreditJoinType = "LEFT";
