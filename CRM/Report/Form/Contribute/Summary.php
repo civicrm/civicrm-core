@@ -475,13 +475,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                      ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                         {$this->_aliases['civicrm_phone']}.is_primary = 1)";
 
-    if ($this->_addressField) {
-      $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                         ON {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_address']}.contact_id AND
-                            {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
+    $this->addAddressFromClause();
     if (!empty($this->_params['batch_id_value'])) {
       $this->_from .= "
                  LEFT JOIN civicrm_entity_financial_trxn eft
