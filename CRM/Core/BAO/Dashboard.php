@@ -360,9 +360,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @throws RuntimeException
    */
   public static function saveDashletChanges($columns, $contactID = NULL) {
-    $session = CRM_Core_Session::singleton();
     if (!$contactID) {
-      $contactID = $session->get('userID');
+      $contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
     if (empty($contactID)) {

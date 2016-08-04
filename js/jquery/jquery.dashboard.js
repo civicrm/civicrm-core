@@ -35,13 +35,8 @@
  *      Sortable
  *      Draggable
  *      UI Core
- *
- * NOTE: This file is viewed as "legacy" and shouldn't be used to
- * develop new functionality. Its lint problems are grandfathered
- * (although if someone wants to cleanup+test, please feel welcome).
  */
-/* jshint ignore:start */
-(function($) { // Create closure.
+(function($) {
   // Constructor for dashboard object.
   $.fn.dashboard = function(options) {
     // Public properties of dashboard.
@@ -57,7 +52,7 @@
      */
 
     // Saves the order of widgets for all columns including the widget.minimized status to options.ajaxCallbacks.saveColumns.
-    dashboard.saveColumns = function() {
+    dashboard.saveColumns = function(showStatus) {
       // Update the display status of the empty placeholders.
       for (var c in dashboard.columns) {
         var col = dashboard.columns[c];
@@ -99,9 +94,12 @@
 
       // The ajaxCallback settings overwrite any duplicate properties.
       $.extend(params, opts.ajaxCallbacks.saveColumns.data);
-      $.post(opts.ajaxCallbacks.saveColumns.url, params, function(response, status) {
+      var post = $.post(opts.ajaxCallbacks.saveColumns.url, params, function(response, status) {
         invokeCallback(opts.callbacks.saveColumns, dashboard);
       });
+      if (showStatus !== false) {
+        CRM.status({}, post);
+      }
     };
 
     // Puts the dashboard into full screen mode, saving element for when the user exits full-screen mode.
@@ -434,13 +432,16 @@
 
       // Removes the widget from the dashboard, and saves columns.
       widget.remove = function() {
-          if ( confirm( 'Are you sure you want to remove "' + widget.title + '"?') ) {
-              invokeCallback(opts.widgetCallbacks.remove, widget);
-              widget.element.fadeOut(opts.animationSpeed, function() {
-                  $(this).remove();
-                  dashboard.saveColumns();
-              });
-          }
+        invokeCallback(opts.widgetCallbacks.remove, widget);
+        widget.element.fadeOut(opts.animationSpeed, function() {
+          $(this).remove();
+        });
+        dashboard.saveColumns(false);
+        CRM.alert(
+          ts('You can re-add it by clicking the "Configure Your Dashboard" button.'),
+          ts('"%1" Removed', {1: widget.title}),
+          'success'
+        );
       };
       // End public methods of widget.
 
