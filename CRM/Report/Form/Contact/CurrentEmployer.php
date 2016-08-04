@@ -32,6 +32,19 @@
  */
 class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
+  /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
   protected $_summary = NULL;
 
   protected $_customGroupExtends = array(

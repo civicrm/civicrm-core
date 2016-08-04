@@ -45,6 +45,19 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
    * This will be a_b or b_a.
    *
    * @var string
