@@ -29,13 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
+
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
 

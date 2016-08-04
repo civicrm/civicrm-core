@@ -3144,7 +3144,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         else {
           CRM_Core_Session::setStatus(ts("Report mail could not be sent."), ts('Mail Error'), 'error');
         }
-        return TRUE;
+        return;
       }
       elseif ($this->_outputMode == 'print') {
         echo $content;
