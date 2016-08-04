@@ -83,6 +83,15 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   protected $contributionJoinTableColumn;
 
   /**
+   * This report has been optimised for group filtering.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = FALSE;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
