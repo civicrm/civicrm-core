@@ -469,13 +469,13 @@ ORDER BY start_date desc
 
         $from = $this->get('start_date');
         if (!CRM_Utils_System::isNull($from)) {
-          $clauses[] = '( start_date >= %3 OR start_date IS NULL )';
+          $clauses[] = '( end_date >= %3 OR end_date IS NULL )';
           $params[3] = array($from, 'String');
         }
 
         $to = $this->get('end_date');
         if (!CRM_Utils_System::isNull($to)) {
-          $clauses[] = '( end_date <= %4 OR end_date IS NULL )';
+          $clauses[] = '( start_date <= %4 OR start_date IS NULL )';
           $params[4] = array($to, 'String');
         }
       }
