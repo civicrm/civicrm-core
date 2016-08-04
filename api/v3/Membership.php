@@ -33,18 +33,6 @@
  */
 
 /**
- * Adjust Metadata for Delete action.
- *
- * The metadata is used for setting defaults, documentation & validation.
- *
- * @param array $params
- *   Array of parameters determined by getfields.
- */
-function _civicrm_api3_membership_delete_spec(&$params) {
-  $params['preserve_contribution']['api.required'] = 0;
-}
-
-/**
  * Deletes an existing contact Membership.
  *
  * @param array $params
@@ -54,13 +42,15 @@ function _civicrm_api3_membership_delete_spec(&$params) {
  *   API result array.
  */
 function civicrm_api3_membership_delete($params) {
-  if (isset($params['preserve_contribution'])){
+  if (isset($params['preserve_contribution'])) {
     if (CRM_Member_BAO_Membership::del($params['id'], $params['preserve_contribution'])) {
       return civicrm_api3_create_success(TRUE, $params);
-    }else {
+    }
+    else {
       return civicrm_api3_create_error('Could not delete membership');
     }
-  }else {
+  }
+  else {
     return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 }

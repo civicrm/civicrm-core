@@ -151,10 +151,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ));
     $memParams = array(
       'id' => $membershipID,
-      'preserve_contribution' => 1,
+      'preserve_contribution' => TRUE,
     );
     $contribParams = array(
-      'id' => $ContributionCreate['values'][0]['id']
+      'id' => $ContributionCreate['values'][0]['id'],
     );
     $this->callAPIAndDocument('membership', 'delete', $memParams, __FUNCTION__, __FILE__);
     $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
