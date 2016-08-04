@@ -93,55 +93,41 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * Additionlly, initializes the dashboard with defaults if this is the
    * user's first visit to their dashboard.
    *
-   * @param bool $flatFormat
-   *   This is true if you want simple associated.
-   *   array of all the contact's dashlets whether or not they are enabled.
-   *
    * @param int $contactID
-   *   Provide the dashlets for the contact id.
-   *   passed rather than the current user.
+   *   Defaults to the current user.
    *
    * @return array
    *   array of dashlets
    */
-  public static function getContactDashlets($flatFormat = FALSE, $contactID = NULL) {
+  public static function getContactDashlets($contactID = NULL) {
+    $contactID = $contactID ? $contactID : CRM_Core_Session::singleton()->getLoggedInContactID();
     $dashlets = array();
 
     // Get contact dashboard dashlets.
-    $hasDashlets = FALSE;
-    $dao = new CRM_Contact_DAO_DashboardContact();
-    $dao->contact_id = $contactID ? $contactID : CRM_Core_Session::singleton()->getLoggedInContactID();
-    $dao->orderBy('column_no asc, weight asc');
-    $dao->find();
+    $results = civicrm_api3('dashboard_contact', 'get', array(
+      'contact_id' => $contactID,
+      'options' => array('sort' => 'column_no asc, weight asc'),
+    ));
 
     // The available list will only include those which are valid for the domain.
     $availableDashlets = self::getDashlets();
-    while ($dao->fetch()) {
+    foreach ($results['values'] as $item) {
       // When a dashlet is removed, it stays in the table with status disabled,
       // so even if a user decides not to have any dashlets show, they will still
       // have records in the table to indicate that we are not newly initializing.
-      if ((!empty($availableDashlets[$dao->dashboard_id]) && $availableDashlets[$dao->dashboard_id]['is_active'])) {
-        $hasDashlets = TRUE;
-        if (!$flatFormat) {
-          if ($dao->is_active) {
-            // append weight so that order is preserved.
-            $dashlets[$dao->column_no]["{$dao->weight}-{$dao->dashboard_id}"] = $dao->is_minimized;
-          }
-        }
-        else {
-          $dashlets[$dao->dashboard_id] = $dao->dashboard_id;
+      if ((!empty($availableDashlets[$item['dashboard_id']]) && $availableDashlets[$item['dashboard_id']]['is_active'])) {
+        if ($item['is_active']) {
+          // append weight so that order is preserved.
+          $dashlets[$item['column_no']]["{$item['weight']}-{$item['dashboard_id']}"] = $item['is_minimized'];
         }
       }
     }
 
-    if ($flatFormat) {
-      return $dashlets;
+    // If empty, then initialize contact dashboard for this user.
+    if (!$results['count']) {
+      $dashlets = self::initializeDashlets();
     }
 
-    // If empty, then initialize contact dashboard for this user.
-    if (!$hasDashlets) {
-      return self::initializeDashlets($flatFormat);
-    }
     return $dashlets;
   }
 
@@ -151,13 +137,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * When a user accesses their dashboard for the first time, set up
    * the default dashlets.
    *
-   * @param bool $flatFormat
-   *
    * @return array
    *    Array of dashboard_id's
    * @throws \CiviCRM_API3_Exception
    */
-  public static function initializeDashlets($flatFormat = FALSE) {
+  public static function initializeDashlets() {
     $dashlets = array();
     $getDashlets = civicrm_api3("Dashboard", "get", array(
         'domain_id' => CRM_Core_Config::domainID(),
@@ -188,13 +172,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         }
         else {
           $assignDashlets = civicrm_api3("dashboard_contact", "create", $defaultDashlet);
-          if (!$flatFormat) {
-            $values = $assignDashlets['values'][$assignDashlets['id']];
-            $dashlets[$values['column_no']][$values['weight'] - $values['dashboard_id']] = $values['is_minimized'];
-          }
-          else {
-            $dashlets[$dashboard_id] = $defaultDashlet['dashboard_id'];
-          }
+          $values = $assignDashlets['values'][$assignDashlets['id']];
+          $dashlets[$values['column_no']][$values['weight'] - $values['dashboard_id']] = $values['is_minimized'];
         }
       }
     }
