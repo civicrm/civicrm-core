@@ -378,9 +378,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   }
 
   /**
-   * @param bool $softcredit
+   * Set the FROM clause for the report.
    */
-  public function from($softcredit = FALSE) {
+  public function from() {
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
@@ -398,64 +398,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       $this->_from .= "\n INNER JOIN civicrm_contribution_soft contribution_soft_civireport
                          ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
     }
-
-    if ($softcredit) {
-      $this->_from = "
-        FROM  civireport_contribution_detail_temp1 temp1_civireport
-               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                       ON temp1_civireport.civicrm_contribution_contribution_id = {$this->_aliases['civicrm_contribution']}.id
-               INNER JOIN civicrm_contribution_soft contribution_soft_civireport
-                       ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id
-               INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']}
-                       ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id
-               {$this->_aclFrom}";
-    }
-
-    if (!empty($this->_params['ordinality_value'])) {
-      $this->_from .= "
-              INNER JOIN (SELECT c.id, IF(COUNT(oc.id) = 0, 0, 1) AS ordinality FROM civicrm_contribution c LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date GROUP BY c.id) {$this->_aliases['civicrm_contribution_ordinality']}
-                      ON {$this->_aliases['civicrm_contribution_ordinality']}.id = {$this->_aliases['civicrm_contribution']}.id";
-    }
-
-    $this->addPhoneFromClause();
-
-    if ($this->_addressField OR
-      (!empty($this->_params['state_province_id_value']) OR
-        !empty($this->_params['country_id_value']))
-    ) {
-      $this->_from .= "
-            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
-
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
-    // include contribution note
-    if (!empty($this->_params['fields']['contribution_note']) ||
-      !empty($this->_params['note_value'])
-    ) {
-      $this->_from .= "
-            LEFT JOIN civicrm_note {$this->_aliases['civicrm_note']}
-                      ON ( {$this->_aliases['civicrm_note']}.entity_table = 'civicrm_contribution' AND
-                           {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_note']}.entity_id )";
-    }
-    //for contribution batches
-    if (!empty($this->_params['fields']['batch_id']) ||
-        !empty($this->_params['bid_value'])
-    ) {
-      $this->_from .= "
-        LEFT JOIN civicrm_entity_financial_trxn eft
-          ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
-            eft.entity_table = 'civicrm_contribution'
-        LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
-          ON ({$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id
-          AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn')";
-    }
+    $this->appendAdditionalFromJoins();
   }
 
   public function groupBy() {
@@ -560,6 +503,18 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     return $statistics;
   }
 
+  /**
+   * This function appears to have been overrriden for the purposes of facilitating soft credits in the report.
+   *
+   * An alternative approach would have been to have had 2 reports.
+   * 1) contribution report with optional join extending the retrievable fields & filters with soft credit data
+   * 2) soft credit report - showing a row per 'payment engagement' (payment or soft credit).
+   *
+   * As it is many people are confused by the duplicate rows in 'soft credit mode' and this report is complex
+   * and slowed down by soft credit calculations regardless of whether that information is desired.
+   *
+   * Soft credit functionality is not currently unit tested for this report.
+   */
   public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
@@ -589,14 +544,15 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $this->setPager();
 
     // 2. customize main contribution query for soft credit, and build temp table 2 with soft credit contributions only
-    $this->from(TRUE);
+    $this->softCreditFrom();
     // also include custom group from if included
     // since this might be included in select
     $this->customDataFrom();
 
     $select = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_select);
     $select = str_ireplace("'Contribution' as", "'Soft Credit' as", $select);
-    if (!empty($this->_groupBy)) {
+    // We really don't want to join soft credit in if not required.
+    if (!empty($this->_groupBy) && !$this->noDisplayContributionOrSoftColumn) {
       $this->_groupBy .= ', contribution_soft_civireport.amount';
     }
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
@@ -964,6 +920,66 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       else {
         $this->assign('sectionTotals', $totals);
       }
+    }
+  }
+
+  /**
+   * Generate the from clause as it relates to the soft credits.
+   */
+  public function softCreditFrom() {
+
+      $this->_from = "
+        FROM  civireport_contribution_detail_temp1 temp1_civireport
+               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+                       ON temp1_civireport.civicrm_contribution_contribution_id = {$this->_aliases['civicrm_contribution']}.id
+               INNER JOIN civicrm_contribution_soft contribution_soft_civireport
+                       ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+               INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']}
+                       ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id
+               {$this->_aclFrom}";
+
+    $this->appendAdditionalFromJoins();
+  }
+
+  /**
+   * Append the joins that are required regardless of context.
+   */
+  public function appendAdditionalFromJoins() {
+    if (!empty($this->_params['ordinality_value'])) {
+      $this->_from .= "
+              INNER JOIN (SELECT c.id, IF(COUNT(oc.id) = 0, 0, 1) AS ordinality FROM civicrm_contribution c LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date GROUP BY c.id) {$this->_aliases['civicrm_contribution_ordinality']}
+                      ON {$this->_aliases['civicrm_contribution_ordinality']}.id = {$this->_aliases['civicrm_contribution']}.id";
+    }
+    $this->addPhoneFromClause();
+
+    $this->addAddressFromClause();
+
+    if ($this->_emailField) {
+      $this->_from .= "
+            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
+                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
+                      {$this->_aliases['civicrm_email']}.is_primary = 1\n";
+    }
+    // include contribution note
+    if (!empty($this->_params['fields']['contribution_note']) ||
+      !empty($this->_params['note_value'])
+    ) {
+      $this->_from .= "
+            LEFT JOIN civicrm_note {$this->_aliases['civicrm_note']}
+                      ON ( {$this->_aliases['civicrm_note']}.entity_table = 'civicrm_contribution' AND
+                           {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_note']}.entity_id )";
+    }
+    //for contribution batches
+    if (!empty($this->_params['fields']['batch_id']) ||
+      !empty($this->_params['bid_value'])
+    ) {
+      $this->_from .= "
+        LEFT JOIN civicrm_entity_financial_trxn eft
+          ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
+            eft.entity_table = 'civicrm_contribution'
+        LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
+          ON ({$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id
+          AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn')";
     }
   }
 
