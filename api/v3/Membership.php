@@ -33,6 +33,23 @@
  */
 
 /**
+ * Adjust Metadata for Delete action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_membership_delete_spec(&$params) {
+  $params['preserve_contribution'] = array(
+    'api.aliases' => array('client_id'),
+    'title' => 'Preserve related contribution?',
+    'api.required' => 0,
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+}
+
+/**
  * Deletes an existing contact Membership.
  *
  * @param array $params
