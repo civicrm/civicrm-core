@@ -47,19 +47,16 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   /**
-   * This report has not been optimised for group filtering.
-   *
-   * The functionality for group filtering has been improved but not
-   * all reports have been adjusted to take care of it. This report has not
-   * and will run an inefficient query until fixed.
+   * This report has been optimised for group filtering.
    *
    * CRM-19170
    *
    * @var bool
    */
-  protected $groupFilterNotOptimised = TRUE;
+  protected $groupFilterNotOptimised = FALSE;
 
   /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_rollup = 'WITH ROLLUP';
@@ -121,7 +118,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'grouping' => 'contact-fields',
         'order_bys' => array(
           'sort_name' => array(
             'title' => ts('Last Name, First Name'),
@@ -330,9 +326,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   public function from() {
-
-    $this->_from = "
-        FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
+    $this->setFromBase('civicrm_contribution', 'contact_id');
+    $this->_from .= "
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
              {$this->_aclFrom}";
