@@ -47,6 +47,13 @@
     <onDelete>CASCADE</onDelete>
     <add>3.1</add>
   </foreignKey>
+  <index>
+    <name>index_dashboard_id_contact_id</name>
+    <fieldName>dashboard_id</fieldName>
+    <fieldName>contact_id</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
   <field>
     <name>column_no</name>
     <type>boolean</type>
