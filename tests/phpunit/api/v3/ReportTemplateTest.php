@@ -309,7 +309,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $rows = $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => 'contribute/summary',
       'gid_value' => $groupID,
-      'gid_op' => 'not in',
+      'gid_op' => 'notin',
       'options' => array('metadata' => array('sql')),
     ));
     $this->assertEquals(2, $rows['values'][0]['civicrm_contribution_total_amount_count']);
