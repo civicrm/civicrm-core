@@ -277,7 +277,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     }
     $this->_selectClauses = $select;
 
-    $this->_select = " SELECT * FROM ( SELECT " . implode(', ', $select) . " ";
+    $this->_select = " SELECT " . implode(', ', $select) . " ";
   }
 
   /**
@@ -391,7 +391,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $setVariable = " SET @rows:=0, @rank=0 ";
     CRM_Core_DAO::singleValueQuery($setVariable);
 
-    $sql = " {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
+    $sql = "SELECT * FROM ( {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
                      ORDER BY civicrm_contribution_total_amount_sum DESC
                  ) as abc {$this->_outerCluase} $this->_limit
                ";
