@@ -221,6 +221,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Alter index and type for image URL'), 'alterIndexAndTypeForImageURL');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_11($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Dashboard schema updates', 'dashboardSchemaUpdate');
+  }
+
   /*
    * Important! All upgrade functions MUST call the 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -725,6 +735,21 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
 
     return TRUE;
+  }
+
+  /**
+   * CRM-17663 - Dashboard schema changes
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function dashboardSchemaUpdate(CRM_Queue_TaskContext $ctx) {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_dashboard_contact', 'index_dashboard_id_contact_id')) {
+      // Delete any stray duplicate rows and add unique index to prevent new dupes and enable INSERT/UPDATE combo query
+      CRM_Core_DAO::executeQuery('DELETE c1 FROM civicrm_dashboard_contact c1, civicrm_dashboard_contact c2 WHERE c1.contact_id = c2.contact_id AND c1.dashboard_id = c2.dashboard_id AND c1.id > c2.id');
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard_contact ADD UNIQUE INDEX index_dashboard_id_contact_id (dashboard_id, contact_id);');
+    }
   }
 
   /**
