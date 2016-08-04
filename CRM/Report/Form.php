@@ -1341,6 +1341,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->sqlFormattedArray[] = $sql;
       $this->assign('sql', implode(';<br><br><br><br>', $this->sqlFormattedArray));
     }
+
   }
 
   /**
