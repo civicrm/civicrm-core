@@ -58,6 +58,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   );
 
   /**
+   * This report has been optimised for group filtering.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = FALSE;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -462,8 +471,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $softCreditJoin .= " AND {$this->_aliases['civicrm_contribution_soft']}.id = (SELECT MIN(id) FROM civicrm_contribution_soft cs WHERE cs.contribution_id = {$this->_aliases['civicrm_contribution']}.id) ";
     }
 
-    $this->_from = "
-        FROM civicrm_contact  {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
+    $this->setFromBase('civicrm_contact');
+
+    $this->_from .= "
              INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                         {$this->_aliases['civicrm_contribution']}.is_test = 0
