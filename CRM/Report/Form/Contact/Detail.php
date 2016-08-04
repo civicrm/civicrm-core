@@ -45,8 +45,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   );
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
@@ -89,30 +88,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'filters' => array(
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ),
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'filters' => $this->getBasicContactFilters(),
         'grouping' => 'contact-fields',
         'order_bys' => array(
           'sort_name' => array(

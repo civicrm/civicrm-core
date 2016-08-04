@@ -252,11 +252,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
         'title' => ts('Campaign'),
         'default' => 'false',
+        'type' => CRM_Utils_Type::T_INT,
       );
       $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
     }
 
