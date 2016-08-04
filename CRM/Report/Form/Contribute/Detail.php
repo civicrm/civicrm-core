@@ -391,10 +391,11 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
    * Set the FROM clause for the report.
    */
   public function from() {
-    $this->_from = "
-        FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-              INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
+    $this->setFromBase('civicrm_contact');
+    $this->_from .= "
+      INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+        ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
+        AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
 
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'both'
@@ -939,15 +940,16 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
    */
   public function softCreditFrom() {
 
-      $this->_from = "
-        FROM  civireport_contribution_detail_temp1 temp1_civireport
-               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                       ON temp1_civireport.civicrm_contribution_contribution_id = {$this->_aliases['civicrm_contribution']}.id
-               INNER JOIN civicrm_contribution_soft contribution_soft_civireport
-                       ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id
-               INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']}
-                       ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id
-               {$this->_aclFrom}";
+    $this->_from = "
+      FROM  civireport_contribution_detail_temp1 temp1_civireport
+      INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+        ON temp1_civireport.civicrm_contribution_contribution_id = {$this->_aliases['civicrm_contribution']}.id
+      INNER JOIN civicrm_contribution_soft contribution_soft_civireport
+        ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+      INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']}
+        ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id
+      {$this->_aclFrom}
+    ";
 
     $this->appendAdditionalFromJoins();
   }
