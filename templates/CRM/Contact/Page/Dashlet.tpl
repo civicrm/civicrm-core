@@ -98,32 +98,32 @@
                 var postUrl = {/literal}"{crmURL p='civicrm/ajax/dashboard' h=0 }"{literal};
                 params['op'] = 'save_columns';
                 params['key'] = {/literal}"{crmKey name='civicrm/ajax/dashboard'}"{literal};
-                $.post( postUrl, params, function(response, status) {
-                    // TO DO show done / disable escape action
-                });
+                CRM.status({}, $.post(postUrl, params));
             }
         }
 
         $('.delete-dashlet').click( function( ) {
-            var message = {/literal}'{ts escape="js"}Do you want to remove this dashlet as an "Available Dashlet", AND delete it from all user dashboards?{/ts}'{literal};
-            if ( confirm( message) ) {
-                var dashletID = $(this).parent().attr('id');
-                var idState = dashletID.split('-')
+          var $dashlet = $(this).closest('.portlet-header');
+          CRM.confirm({
+            title: {/literal}'{ts escape="js"}Remove Permanently?{/ts}'{literal},
+            message: {/literal}'{ts escape="js"}Do you want to remove this dashlet as an "Available Dashlet", AND delete it from all user dashboards?{/ts}'{literal}
+          })
+            .on('crmConfirm:yes', function() {
+              var dashletID = $dashlet.attr('id');
+              var idState = dashletID.split('-');
 
-                // Build a list of params to post to the server.
-                var params = {};
+              // Build a list of params to post to the server.
+              var params = {dashlet_id: idState[0]};
 
-                params['dashlet_id'] = idState[0];
-
-                // delete dashlet
-                var postUrl = {/literal}"{crmURL p='civicrm/ajax/dashboard' h=0 }"{literal};
-                params['op'] = 'delete_dashlet';
-                params['key'] = {/literal}"{crmKey name='civicrm/ajax/dashboard'}"{literal};
-                $.post( postUrl, params, function(response, status) {
-                    // delete dom object
-                    $('#' + dashletID ).parent().remove();
-                });
-            }
+              // delete dashlet
+              var postUrl = {/literal}"{crmURL p='civicrm/ajax/dashboard' h=0 }"{literal};
+              params['op'] = 'delete_dashlet';
+              params['key'] = {/literal}"{crmKey name='civicrm/ajax/dashboard'}"{literal};
+              CRM.status({}, $.post(postUrl, params));
+              $dashlet.parent().fadeOut('fast', function() {
+                $(this).remove();
+              });
+            });
         });
   });
 </script>
