@@ -506,12 +506,13 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   /**
    * This function appears to have been overrriden for the purposes of facilitating soft credits in the report.
    *
-   * An alternative approach would have been to have had 2 reports.
-   * 1) contribution report with optional join extending the retrievable fields & filters with soft credit data
-   * 2) soft credit report - showing a row per 'payment engagement' (payment or soft credit).
+   * The report appears to have 2 different functions:
+   * 1) contribution report
+   * 2) soft credit report - showing a row per 'payment engagement' (payment or soft credit). There is a separate
+   * soft credit report as well.
    *
-   * As it is many people are confused by the duplicate rows in 'soft credit mode' and this report is complex
-   * and slowed down by soft credit calculations regardless of whether that information is desired.
+   * Somewhat confusingly this report returns multiple rows per contribution when soft credits are included. It feels
+   * like there is a case to split it into 2 separate reports.
    *
    * Soft credit functionality is not currently unit tested for this report.
    */

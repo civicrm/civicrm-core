@@ -47,6 +47,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   /**
    */
   /**
+   * Class constructor.
    */
   public function __construct() {
 
@@ -77,10 +78,6 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
           'first_name' => array(
             'title' => ts('First Name'),
             'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
           ),
           'last_name' => array(
             'title' => ts('Last Name'),

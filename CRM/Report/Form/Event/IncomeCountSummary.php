@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
 
@@ -51,8 +49,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   public $_drilldownReport = array('event/participantlist' => 'Link to Detail Report');
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
 

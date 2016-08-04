@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   protected $_addressField = FALSE;

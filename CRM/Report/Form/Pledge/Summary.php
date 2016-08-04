@@ -44,6 +44,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   /**
    */
   /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array(
