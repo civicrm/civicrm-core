@@ -70,6 +70,7 @@
   background-color: #ffffff;
   padding:0.5em;
   overflow-x:auto;
+  min-height: 10em;
 }
 
 #crm-container .widget-content .crm-accordion-header {

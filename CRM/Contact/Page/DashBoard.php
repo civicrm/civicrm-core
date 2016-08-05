@@ -44,7 +44,7 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $resources = CRM_Core_Resources::singleton();
     $resources->addScriptFile('civicrm', 'js/jquery/jquery.dashboard.js', 0, 'html-header', FALSE);
     $resources->addStyleFile('civicrm', 'css/dashboard.css');
-    $this->assign('contactDashlets', CRM_Core_BAO_Dashboard::getContactDashlets());
+    $this->assign('contactDashlets', CRM_Core_BAO_Dashboard::getContactDashletsForJS());
 
     $resetCache = CRM_Utils_Request::retrieve('resetCache', 'Positive', CRM_Core_DAO::$_nullObject);
 
