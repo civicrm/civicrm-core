@@ -104,31 +104,65 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $dashlets = array();
 
     // Get contact dashboard dashlets.
-    $results = civicrm_api3('dashboard_contact', 'get', array(
+    $results = civicrm_api3('DashboardContact', 'get', array(
       'contact_id' => $contactID,
-      'options' => array('sort' => 'column_no asc, weight asc'),
+      'is_active' => 1,
+      'dashboard_id.is_active' => 1,
+      'options' => array('sort' => 'weight'),
+      'return' => array(
+        'id',
+        'weight',
+        'column_no',
+        'is_minimized',
+        'dashboard_id',
+        'dashboard_id.name',
+        'dashboard_id.label',
+        'dashboard_id.url',
+        'dashboard_id.fullscreen_url',
+        'dashboard_id.permission',
+        'dashboard_id.permission_operator',
+      ),
     ));
 
-    // The available list will only include those which are valid for the domain.
-    $availableDashlets = self::getDashlets();
     foreach ($results['values'] as $item) {
-      // When a dashlet is removed, it stays in the table with status disabled,
-      // so even if a user decides not to have any dashlets show, they will still
-      // have records in the table to indicate that we are not newly initializing.
-      if ((!empty($availableDashlets[$item['dashboard_id']]) && $availableDashlets[$item['dashboard_id']]['is_active'])) {
-        if ($item['is_active']) {
-          // append weight so that order is preserved.
-          $dashlets[$item['column_no']]["{$item['weight']}-{$item['dashboard_id']}"] = $item['is_minimized'];
-        }
+      if (self::checkPermission(CRM_Utils_Array::value('dashboard_id.permission', $item), CRM_Utils_Array::value('dashboard_id.permission_operator', $item))) {
+        $dashlets[$item['id']] = array(
+          'dashboard_id' => $item['dashboard_id'],
+          'weight' => $item['weight'],
+          'column_no' => $item['column_no'],
+          'is_minimized' => $item['is_minimized'],
+          'name' => $item['dashboard_id.name'],
+          'label' => $item['dashboard_id.label'],
+          'url' => $item['dashboard_id.url'],
+          'fullscreen_url' => $item['dashboard_id.fullscreen_url'],
+        );
       }
     }
 
-    // If empty, then initialize contact dashboard for this user.
+    // If empty, then initialize default dashlets for this user.
     if (!$results['count']) {
-      $dashlets = self::initializeDashlets();
+      // They may just have disabled all their dashlets. Check if any records exist for this contact.
+      if (!civicrm_api3('DashboardContact', 'getcount', array('contact_id' => $contactID))) {
+        $dashlets = self::initializeDashlets();
+      }
     }
 
     return $dashlets;
+  }
+
+  public static function getContactDashletsForJS() {
+    $data = array(array(), array());
+    foreach (self::getContactDashlets() as $item) {
+      $data[$item['column_no']][] = array(
+        'id' => (int) $item['dashboard_id'],
+        'minimized' => (bool) $item['is_minimized'],
+        'name' => $item['name'],
+        'title' => $item['label'],
+        'url' => self::parseUrl($item['url']),
+        'fullscreenUrl' => self::parseUrl($item['fullscreen_url']),
+      );
+    }
+    return $data;
   }
 
   /**
@@ -165,21 +199,40 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     if (is_array($defaultDashlets) && !empty($defaultDashlets)) {
       foreach ($defaultDashlets as $id => $defaultDashlet) {
         $dashboard_id = $defaultDashlet['dashboard_id'];
-        if (!self::checkPermission($getDashlets['values'][$dashboard_id]['permission'],
-          CRM_Utils_Array::value('permission_operator', $getDashlets['values'][$dashboard_id]))
-        ) {
+        $dashlet = $getDashlets['values'][$dashboard_id];
+        if (!self::checkPermission(CRM_Utils_Array::value('permission', $dashlet), CRM_Utils_Array::value('permission_operator', $dashlet))) {
           continue;
         }
         else {
           $assignDashlets = civicrm_api3("dashboard_contact", "create", $defaultDashlet);
           $values = $assignDashlets['values'][$assignDashlets['id']];
-          $dashlets[$values['column_no']][$values['weight'] - $values['dashboard_id']] = $values['is_minimized'];
+          $dashlets[$assignDashlets['id']] = array(
+            'dashboard_id' => $values['dashboard_id'],
+            'weight' => $values['weight'],
+            'column_no' => $values['column_no'],
+            'is_minimized' => $values['is_minimized'],
+            'name' => $dashlet['name'],
+            'label' => $dashlet['label'],
+            'url' => $dashlet['url'],
+            'fullscreen_url' => $dashlet['fullscreen_url'],
+          );
         }
       }
     }
     return $dashlets;
   }
 
+  /**
+   * @param $url
+   * @return string
+   */
+  public static function parseUrl($url) {
+    if (substr($url, 0, 4) != 'http') {
+      $urlParam = explode('?', $url);
+      $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, FALSE);
+    }
+    return $url;
+  }
 
   /**
    * Check dashlet permission for current user.
