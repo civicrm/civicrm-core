@@ -207,4 +207,9 @@
     <access_arguments>access CiviCRM</access_arguments>
     <title>Insert CiviCRM Content</title>
   </item>
+  <item>
+    <path>civicrm/payment/ipn</path>
+    <page_callback>CRM_Core_Page_AJAX_Payment::ipn</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

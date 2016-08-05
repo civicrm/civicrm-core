@@ -687,9 +687,20 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * We don't need to handle paypal standard using this path as there has never been any historic support
    * for paypal standard to call civicrm/payment/ipn as a path.
    */
-  static public function handlePaymentNotification() {
-    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
-    $paypalIPN->main();
+  public function handlePaymentNotification() {
+    $log = new CRM_Utils_SystemLogger();
+    $log->alert('Payment notification of PayPal_Standard', $_REQUEST);
+    try {
+      $paypalIPN = new CRM_Core_Payment_PayPalIPN($_REQUEST);
+      $paypalIPN->main($this->_paymentProcessor['id']);
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::debug_log_message($e->getMessage());
+      CRM_Core_Error::debug_var('error data', $e->getErrorData(), TRUE, TRUE);
+      CRM_Core_Error::debug_var('REQUEST', $_REQUEST, TRUE, TRUE);
+      //@todo give better info to logged in user - ie dev
+      echo "The transaction has failed. Please review the log for more detail";
+    }
   }
 
   /**
@@ -780,6 +791,15 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     );
   }
 
+  protected function getNotifyUrl($args = array()) {
+    $url = CRM_Utils_System::url(
+      'civicrm/payment/ipn',
+      $args,
+      TRUE
+    );
+    return (stristr($url, '.')) ? $url : '';
+  }
+
   /**
    * @param array $params
    * @param string $component
@@ -793,23 +813,28 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       CRM_Core_Error::fatal(ts('Component is invalid'));
     }
 
-    $notifyURL = $config->userFrameworkResourceURL . "extern/ipn.php?reset=1&contactID={$params['contactID']}" . "&contributionID={$params['contributionID']}" . "&module={$component}";
+    $args = array(
+      'reset' => 1,
+      'paymentProcessorID' => $this->_paymentProcessor['id'],
+      'contributionID' => $params['contributionID'],
+      'module' => $component,
+    );
 
     if ($component == 'event') {
-      $notifyURL .= "&eventID={$params['eventID']}&participantID={$params['participantID']}";
+      $args += array('eventID' => $params['eventID'], 'participantID' => $params['participantID']);
     }
     else {
       $membershipID = CRM_Utils_Array::value('membershipID', $params);
       if ($membershipID) {
-        $notifyURL .= "&membershipID=$membershipID";
+        $args += array('membershipID', $params['membershipID']);
       }
       $relatedContactID = CRM_Utils_Array::value('related_contact', $params);
       if ($relatedContactID) {
-        $notifyURL .= "&relatedContactID=$relatedContactID";
+        $args += array('relatedContactID' => $relatedContactID);
 
         $onBehalfDupeAlert = CRM_Utils_Array::value('onbehalf_dupe_alert', $params);
         if ($onBehalfDupeAlert) {
-          $notifyURL .= "&onBehalfDupeAlert=$onBehalfDupeAlert";
+          $args += array('onBehalfDupeAlert' => $onBehalfDupeAlert);
         }
       }
     }
@@ -840,7 +865,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $paypalParams = array(
       'business' => $this->_paymentProcessor['user_name'],
-      'notify_url' => $notifyURL,
+      'notify_url' => $this->getNotifyUrl($args),
       'item_name' => $this->getPaymentDescription($params),
       'quantity' => 1,
       'undefined_quantity' => 0,
@@ -897,8 +922,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     // if recurring donations, add a few more items
     if (!empty($params['is_recur'])) {
       if ($params['contributionRecurID']) {
-        $notifyURL .= "&contributionRecurID={$params['contributionRecurID']}&contributionPageID={$params['contributionPageID']}";
-        $paypalParams['notify_url'] = $notifyURL;
+        $args += array('contributionRecurID' => $params['contributionRecurID'], 'contributionPageID' => $params['contributionPageID']);
+        $paypalParams['notify_url'] = $this->getNotifyUrl($args);
       }
       else {
         CRM_Core_Error::fatal(ts('Recurring contribution, but no database id'));
