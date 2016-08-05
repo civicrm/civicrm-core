@@ -1794,9 +1794,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'completetransaction', array(
        'id' => $contribution['id'],
        'trxn_id' => '777788888',
+       'fee_amount' => '6.00',
     ));
-    $contribution2 = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'return' => 'tax_amount', 'sequential' => 1));
+    $contribution2 = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'return' => array('tax_amount', 'fee_amount', 'net_amount'), 'sequential' => 1));
     $this->assertEquals($contribution1['values'][0]['tax_amount'], $contribution2['values'][0]['tax_amount']);
+    $this->assertEquals('6.00', $contribution2['values'][0]['fee_amount']);
+    $this->assertEquals('94.00', $contribution2['values'][0]['net_amount']);
   }
 
   /**
