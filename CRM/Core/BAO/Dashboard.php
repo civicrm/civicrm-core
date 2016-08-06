@@ -155,7 +155,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     foreach (self::getContactDashlets() as $item) {
       $data[$item['column_no']][] = array(
         'id' => (int) $item['dashboard_id'],
-        'minimized' => (bool) $item['is_minimized'],
         'name' => $item['name'],
         'title' => $item['label'],
         'url' => self::parseUrl($item['url']),

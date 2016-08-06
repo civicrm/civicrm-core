@@ -87,7 +87,7 @@ CRM.$(function($) {
 
   };
 
-  $('#civicrm-dashboard')
+  var dashboard = $('#civicrm-dashboard')
     .on('mouseover', '.widget-header', function() {
       $(this).closest('.widget-wrapper').addClass('db-hover-handle');
     })
@@ -95,6 +95,14 @@ CRM.$(function($) {
       $(this).closest('.widget-wrapper').removeClass('db-hover-handle');
     })
     .dashboard(options);
+
+
+  $('.crm-hover-button.show-refresh').click(function(e) {
+    e.preventDefault();
+    $.each(dashboard.widgets, function(id, widget) {
+      widget.reloadContent();
+    });
+  });
 
 });
 

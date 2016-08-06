@@ -1,5 +1,6 @@
 // https://civicrm.org/licensing
 /* global CRM, ts */
+/*jshint loopfunc: true */
 (function($) {
   'use strict';
   // Constructor for dashboard object.
@@ -9,8 +10,7 @@
     dashboard.element = this.empty();
     dashboard.ready = false;
     dashboard.columns = [];
-    dashboard.widgets = [];
-    // End of public properties of dashboard.
+    dashboard.widgets = {};
 
     /**
      * Public methods of dashboard.
@@ -19,18 +19,17 @@
     // Saves the order of widgets for all columns including the widget.minimized status to options.ajaxCallbacks.saveColumns.
     dashboard.saveColumns = function(showStatus) {
       // Update the display status of the empty placeholders.
-      for (var c in dashboard.columns) {
-        var col = dashboard.columns[c];
-       if ( typeof col == 'object' ) {
-			// Are there any visible children of the column (excluding the empty placeholder)?
-			if (col.element.children(':visible').not(col.emptyPlaceholder).length > 0) {
-			  col.emptyPlaceholder.hide();
-			}
-			else {
-			  col.emptyPlaceholder.show();
-			}
-		}
-	  }
+      $.each(dashboard.columns, function(c, col) {
+        if ( typeof col == 'object' ) {
+          // Are there any visible children of the column (excluding the empty placeholder)?
+          if (col.element.children(':visible').not(col.emptyPlaceholder).length > 0) {
+            col.emptyPlaceholder.hide();
+          }
+          else {
+            col.emptyPlaceholder.show();
+          }
+        }
+      });
 
       // Don't save any changes to the server unless the dashboard has finished initiating.
       if (!dashboard.ready) {
@@ -41,39 +40,36 @@
       var params = {};
 
       // For each column...
-      for (var c2 in dashboard.columns) {
+      $.each(dashboard.columns, function(c, col) {
 
         // IDs of the sortable elements in this column.
-        var ids = (typeof dashboard.columns[c2] == 'object') ? dashboard.columns[c2].element.sortable('toArray') : undefined;
+        var ids = (typeof col == 'object') ? col.element.sortable('toArray') : [];
 
         // For each id...
-        for (var w in ids) {
-          // Chop 'widget-' off of the front so that we have the real widget id.
-          var id = (typeof ids[w] == 'string') ? ids[w].substring('widget-'.length) : undefined;
-
-          // Add one flat property to the params object that will look like an array element to the PHP server.
-          // Unfortunately jQuery doesn't do this for us.
-          if ( typeof dashboard.widgets[id] == 'object' ) params['columns[' + c2 + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
-        }
-      }
+        $.each(ids, function(w, id) {
+          if (typeof id == 'string') {
+            // Chop 'widget-' off of the front so that we have the real widget id.
+            id = id.substring('widget-'.length);
+            // Add one flat property to the params object that will look like an array element to the PHP server.
+            // Unfortunately jQuery doesn't do this for us.
+            if (typeof dashboard.widgets[id] == 'object') params['columns[' + c + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
+          }
+        });
+      });
 
       // The ajaxCallback settings overwrite any duplicate properties.
       $.extend(params, opts.ajaxCallbacks.saveColumns.data);
-      var post = $.post(opts.ajaxCallbacks.saveColumns.url, params, function(response, status) {
+      var post = $.post(opts.ajaxCallbacks.saveColumns.url, params, function() {
         invokeCallback(opts.callbacks.saveColumns, dashboard);
       });
       if (showStatus !== false) {
         CRM.status({}, post);
       }
     };
-    // End of public methods of dashboard.
 
     /**
      * Private properties of dashboard.
      */
-
-    // Used to determine whether there are any incomplete ajax requests pending initialization of the dashboard.
-    var asynchronousRequestCounter = 0;
 
     // Used to determine whether two resort events are resulting from the same UI event.
     var currentReSortEvent = null;
@@ -81,10 +77,11 @@
     // Merge in the caller's options with the defaults.
     var opts = $.extend({}, $.fn.dashboard.defaults, options);
 
+    var localCache = window.localStorage && localStorage.dashboard ? JSON.parse(localStorage.dashboard) : {};
+
     init(opts.widgetsByColumn);
 
     return dashboard;
-    // End of constructor and private properties for dashboard object.
 
     /**
      * Private methods of dashboard.
@@ -133,10 +130,24 @@
         $("#empty-message").show( );
     }
 
+    function saveLocalCache() {
+      localCache = {};
+      $.each(dashboard.widgets, function(id, widget) {
+        localCache[id] = {
+          content: widget.content,
+          expires: widget.expires,
+          minimized: widget.minimized
+        };
+      });
+      if (window.localStorage) {
+        localStorage.dashboard = JSON.stringify(localCache);
+      }
+    }
+
     // Contructors for each widget call this when initialization has finished so that dashboard can complete it's intitialization.
     function completeInit() {
-      // Don't do anything if any widgets are waiting for ajax requests to complete in order to finish initialization.
-      if (asynchronousRequestCounter > 0 || dashboard.ready) {
+      // Only do this once.
+      if (dashboard.ready) {
           return;
       }
 
@@ -205,7 +216,7 @@
      */
     function widget(widget) {
       // Merge default options with the options defined for this widget.
-      widget = $.extend({}, $.fn.dashboard.widget.defaults, widget);
+      widget = $.extend({}, $.fn.dashboard.widget.defaults, localCache[widget.id] || {}, widget);
 
       /**
        * Public methods of widget.
@@ -221,7 +232,6 @@
         }
 
         widget.hideSettings();
-        dashboard.saveColumns();
       };
       widget.minimize = function() {
         $('.widget-content', widget.element).slideUp(opts.animationSpeed);
@@ -230,17 +240,19 @@
           .removeClass('fa-caret-down')
           .attr('title', ts('Expand'));
         widget.minimized = true;
+        saveLocalCache();
       };
       widget.maximize = function() {
-        $('.widget-content', widget.element).slideDown(opts.animationSpeed);
         $(widget.controls.minimize.element)
           .removeClass( 'fa-caret-right' )
           .addClass( 'fa-caret-down' )
           .attr('title', ts('Collapse'));
         widget.minimized = false;
+        saveLocalCache();
         if (!widget.contentLoaded) {
           loadContent();
         }
+        $('.widget-content', widget.element).slideDown(opts.animationSpeed);
       };
 
       // Toggles whether the widget is in settings-display mode or not.
@@ -283,12 +295,11 @@
         var params = {};
         // serializeArray() returns an array of objects.  Process it.
         var fields = widget.settings.element.serializeArray();
-        for (var i in fields) {
-            var field = fields[i];
+        $.each(fields, function(i, field) {
             // Put the values into flat object properties that PHP will parse into an array server-side.
             // (Unfortunately jQuery doesn't do this)
             params['settings[' + field.name + ']'] = field.value;
-        }
+        });
 
         // Things get messy here.
         // @todo Refactor to use currentState and targetedState properties to determine what needs
@@ -345,11 +356,15 @@
           control.element = $(markup).prependTo($('.widget-controls', widget.element)).click(control.callback);
       };
 
-      // An external method used only by and from external scripts to reload content.  Not invoked or used internally.
-      // The widget must provide the script that executes this, as well as the script that invokes it.
+      // Fetch remote content.
       widget.reloadContent = function() {
-          getJavascript(widget.reloadContentScript);
-          invokeCallback(opts.widgetCallbacks.reloadContent, widget);
+        // If minimized, we'll reload later
+        if (widget.minimized) {
+          widget.contentLoaded = false;
+          widget.expires = 0;
+        } else {
+          CRM.loadPage(widget.url, {target: widget.contentElement});
+        }
       };
 
       // Removes the widget from the dashboard, and saves columns.
@@ -357,15 +372,15 @@
         invokeCallback(opts.widgetCallbacks.remove, widget);
         widget.element.fadeOut(opts.animationSpeed, function() {
           $(this).remove();
+          delete(dashboard.widgets[widget.id]);
+          dashboard.saveColumns(false);
         });
-        dashboard.saveColumns(false);
         CRM.alert(
           ts('You can re-add it by clicking the "Configure Your Dashboard" button.'),
           ts('"%1" Removed', {1: widget.title}),
           'success'
         );
       };
-      // End public methods of widget.
 
       /**
        * Public properties of widget.
@@ -396,8 +411,6 @@
       };
       widget.contentLoaded = false;
 
-      // End public properties of widget.
-
       init();
       return widget;
 
@@ -406,14 +419,23 @@
        */
 
       function loadContent() {
-        asynchronousRequestCounter++;
-        widget.contentLoaded = true;
-        CRM.loadPage(widget.url, {target: widget.contentElement})
-          .one('crmLoad', function() {
-            asynchronousRequestCounter--;
+        var loadFromCache = (widget.expires > $.now() && widget.content);
+        if (loadFromCache) {
+          widget.contentElement.html(widget.content).trigger('crmLoad', widget);
+        }
+        widget.contentElement.off('crmLoad').on('crmLoad', function(event, data) {
+          if ($(event.target).is(widget.contentElement)) {
+            widget.content = data.content;
+            // Cache for one day
+            widget.expires = $.now() + 86400000;
+            saveLocalCache();
             invokeCallback(opts.widgetCallbacks.get, widget);
-            completeInit();
-          });
+          }
+        });
+        if (!loadFromCache) {
+          widget.reloadContent();
+        }
+        widget.contentLoaded = true;
       }
 
       // Build widget & load content.
@@ -533,8 +555,10 @@
   $.fn.dashboard.widget = {
     defaults: {
       minimized: false,
+      content: null,
+      expires: 0,
       settings: false
-      // url, fullscreenUrl, content, title, name
+      // url, fullscreenUrl, title, name
     }
   };
 })(jQuery);
