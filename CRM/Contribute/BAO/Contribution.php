@@ -5200,4 +5200,29 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return $statusMsg;
   }
 
+  /**
+   * Assign Test Value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'tax_amount') {
+      $this->{$fieldName} = "0.00";
+    }
+    elseif ($fieldName == 'net_amount') {
+      $this->{$fieldName} = "2.00";
+    }
+    elseif ($fieldName == 'total_amount') {
+      $this->{$fieldName} = "3.00";
+    }
+    elseif ($fieldName == 'fee_amount') {
+      $this->{$fieldName} = "1.00";
+    }
+    else {
+      parent::assignTestValues($fieldName, $fieldDef, $counter);
+    }
+  }
+
 }
