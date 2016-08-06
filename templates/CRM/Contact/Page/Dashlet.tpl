@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+    <div class="crm-submit-buttons">{crmButton p="civicrm/dashboard" q="reset=1" icon="check"}{ts}Done{/ts}{/crmButton}</div>
     <div id="help" style="padding: 1em;">
         {ts}Available dashboard elements - dashlets - are displayed in the dark gray top bar. Drag and drop dashlets onto the left or right columns below to add them to your dashboard. Changes are automatically saved. Click 'Done' to return to the normal dashboard view.{/ts}
         {help id="id-dash_configure" file="CRM/Contact/Page/Dashboard.hlp" admin=$admin}
