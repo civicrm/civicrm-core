@@ -393,8 +393,19 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         }
         // get status strings as per locale settings CRM-4411.
         $rows[$key]['status'] = CRM_Mailing_BAO_MailingJob::status($row['status']);
+        $validLinks = $actionLinks;
+        if (($mailingUrl = CRM_Mailing_BAO_Mailing::getPublicViewUrl($row['id'])) != FALSE) {
+          $validLinks[] = array(
+            'name' => ts('Public View'),
+            'url' => 'civicrm/mailing/view',
+            'qs' => 'id=%%mid%%&reset=1',
+            'title' => ts('Public View'),
+            'fe' => TRUE,
+          );
+        }
 
-        $rows[$key]['action'] = CRM_Core_Action::formLink($actionLinks,
+        $rows[$key]['action'] = CRM_Core_Action::formLink(
+          $validLinks,
           $actionMask,
           array('mid' => $row['id']),
           "more",

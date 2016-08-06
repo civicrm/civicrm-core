@@ -76,6 +76,8 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
    * @param int $contactID
    * @param bool $print
    * @param bool $allowID
+   *
+   * @return null|string
    */
   public function run($id = NULL, $contactID = NULL, $print = TRUE, $allowID = FALSE) {
     if (is_numeric($id)) {
@@ -94,8 +96,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $this->_contactID = $contactID;
     }
     else {
-      $session = CRM_Core_Session::singleton();
-      $this->_contactID = $session->get('userID');
+      $this->_contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     }
 
     // mailing key check
