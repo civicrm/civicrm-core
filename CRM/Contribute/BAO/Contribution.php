@@ -183,11 +183,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
     if ($contributionID && $setPrevContribution) {
-      $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+      $params['prevContribution'] = self::getOriginalContribution($contributionID);
     }
 
     // CRM-16189
     CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contributionID);
+
+    if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) || isset
+      ($params['financial_type_id']))) {
+      CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
+    }
 
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
@@ -4079,12 +4084,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   }
 
   /**
-   * Get financial account id has 'Sales Tax Account is'
-   * account relationship with financial type
+   * Get financial account id has 'Sales Tax Account is' account relationship with financial type.
    *
    * @param int $financialTypeId
    *
-   * @return FinancialAccountId
+   * @return int
+   *   Financial Account Id
    */
   public static function getFinancialAccountId($financialTypeId) {
     $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
@@ -4100,61 +4105,50 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   }
 
   /**
-   * Check tax amount.
+   * Get the tax amount (misnamed function).
    *
    * @param array $params
    * @param bool $isLineItem
    *
-   * @return mixed
+   * @return array
    */
   public static function checkTaxAmount($params, $isLineItem = FALSE) {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
 
     // Update contribution.
     if (!empty($params['id'])) {
-
-      $id = $params['id'];
-      $values = $ids = array();
-      $contrbutionParams = array('id' => $id);
-      $prevContributionValue = CRM_Contribute_BAO_Contribution::getValues($contrbutionParams, $values, $ids);
-
-      // CRM-19126 and CRM-19152, civicrm_line_item.tax_amount incorrectly set when using online payment processor.
-      // It looks like this method is meant to be called in multiple contexts: new & update
-      // When creating, would expect total_amount to be set?  Prior to 4.7, when creating online membership
-      // via contribution page, call scenario was different.
-      // This would not never get called, end result, taxes were correct.
-      // Since 4.7 it does.  Not sure this fix is ideal, but it does do the trick.
-      // Conceptually, if we're "updating", and total_amount is unknown.  We're dealing with an incomplete
-      // view, why are we nulling out all line item taxes, or messing with any other tax amounts?
-      if (!isset($params['total_amount'])) {
-        if (!empty($prevContributionValue->tax_amount)) {
-          $params['total_amount'] = $prevContributionValue->total_amount - $prevContributionValue->tax_amount;
-          if (isset($params['fee_amount'])) {
-            $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+      // CRM-19126 and CRM-19152 If neither total or financial_type_id are set on an update
+      // there are no tax implications - early return.
+      if (!isset($params['total_amount']) && !isset($params['financial_type_id'])) {
+        return $params;
+      }
+      if (empty($params['prevContribution'])) {
+        $params['prevContribution'] = self::getOriginalContribution($params['id']);
+      }
+      $isRequireTaxCalculation = FALSE;
+      foreach (array('total_amount', 'financial_type_id', 'fee_amount', 'tax_amount') as $field) {
+        if (!isset($params[$field])) {
+          if ($field == 'total_amount' && $params['prevContribution']->tax_amount) {
+            // Tax amount gets added back on later....
+            $params['total_amount'] = $params['prevContribution']->total_amount -
+              $params['prevContribution']->tax_amount;
+            $isRequireTaxCalculation = TRUE;
           }
           else {
-            $params['net_amount'] = $params['total_amount'] - $prevContributionValue->fee_amount;
-            $params['fee_amount'] = $prevContributionValue->fee_amount;
-          }
-        }
-        else {
-          if (isset($params['fee_amount'])) {
-            $params['net_amount'] = $prevContributionValue->total_amount - $params['fee_amount'];
-            $params['total_amount'] = $prevContributionValue->total_amount;
-          }
-          else {
-            $params['total_amount'] = $prevContributionValue->total_amount;
-            $params['fee_amount'] = $prevContributionValue->fee_amount;
+            $params[$field] = $params['prevContribution']->$field;
+            if ($params[$field] != $params['prevContribution']->$field) {
+              $isRequireTaxCalculation = TRUE;
+            }
           }
         }
       }
-      // To assign pervious finantial type on update of contribution
-      if (!isset($params['financial_type_id'])) {
-        $params['financial_type_id'] = $prevContributionValue->financial_type_id;
+      if (!$isRequireTaxCalculation) {
+        return $params;
       }
-      elseif (isset($params['financial_type_id']) && !array_key_exists($params['financial_type_id'], $taxRates)) {
-        // Assisn tax Amount on update of contrbution
-        if (!empty($prevContributionValue->tax_amount)) {
+      self::calculateMissingAmountParams($params, $params['id']);
+      if (!array_key_exists($params['financial_type_id'], $taxRates)) {
+        // Assign tax Amount on update of contribution
+        if (!empty($params['prevContribution']->tax_amount)) {
           $params['tax_amount'] = 'null';
           CRM_Price_BAO_LineItem::getLineItemArray($params, array($params['id']));
           foreach ($params['line_item'] as $setID => $priceField) {
@@ -4166,7 +4160,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       }
     }
 
-    // New Contrbution and update of contribution with tax rate financial type
+    // New Contribution and update of contribution with tax rate financial type
     if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) &&
       empty($params['skipLineItem']) && !$isLineItem
     ) {
@@ -5217,6 +5211,17 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
 
     return $statusMsg;
+  }
+
+  /**
+   * Get the contribution as it is in the database before being updated.
+   *
+   * @param int $contributionID
+   *
+   * @return array
+   */
+  private static function getOriginalContribution($contributionID) {
+    return self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
   }
 
   /**
