@@ -61,7 +61,6 @@ function civicrm_api3_group_nesting_get($params) {
 function civicrm_api3_group_nesting_create($params) {
   CRM_Contact_BAO_GroupNesting::add($params['parent_group_id'], $params['child_group_id']);
 
-  // FIXME: CRM_Contact_BAO_GroupNesting requires some work
   $result = array('is_error' => 0);
   return civicrm_api3_create_success($result, $params, 'GroupNesting');
 }
