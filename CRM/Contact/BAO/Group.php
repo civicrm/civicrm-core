@@ -107,11 +107,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $query = "DELETE FROM civicrm_acl_entity_role where entity_table = 'civicrm_group' AND entity_id = %1";
     CRM_Core_DAO::executeQuery($query, $params);
 
-    if (Civi::settings()->get('is_enabled')) {
-      // clear any descendant groups cache if exists
-      CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
-    }
-
     // delete from group table
     $group = new CRM_Contact_DAO_Group();
     $group->id = $id;
@@ -447,9 +442,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           }
         }
       }
-
-      // clear any descendant groups cache if exists
-      $finalGroups = CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
 
       // this is always required, since we don't know when a
       // parent group is removed
