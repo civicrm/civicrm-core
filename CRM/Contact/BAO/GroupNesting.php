@@ -41,14 +41,12 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
 
   private $_lastParentlessGroup;
 
-  private $_styleLabels;
-
   private $_styleIndent;
 
   private $_alreadyStyled = FALSE;
 
   /**
-   * Class constructor.
+   * Get the number of levels of nesting.
    *
    * @param bool $styleLabels
    * @param string $styleIndent
@@ -285,6 +283,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *   Id of the group to add the child to.
    * @param int $childID
    *   Id of the new child group.
+   *
+   * @return \CRM_Contact_DAO_GroupNesting
    */
   public static function add($parentID, $childID) {
     // TODO: Add checks here to make sure invalid nests can't be created
@@ -294,9 +294,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   }
 
   /**
-   * Removes a child group identified by $childGroupId from the group
-   * identified by $groupId; does not delete child group, just the
-   * association between the two
+   * Removes a child group from it's parent.
    *
    * @param $parentID
    *   The id of the group to remove the child from.
@@ -314,6 +312,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * identified by $groupId; does not delete child group, just the
    * association between the two
    *
+   * @param int $parentID
+   *   The id of the group to remove the child from.
    * @param int $childID
    *   The id of the child group being removed.
    */
@@ -327,9 +327,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if the association between parent and child is present,
    * false otherwise.
    *
-   * @param $parentID
+   * @param int $parentID
    *   The parent id of the association.
-   * @param $childID
+   *
+   * @param int $childID
    *   The child id of the association.
    *
    * @return bool
