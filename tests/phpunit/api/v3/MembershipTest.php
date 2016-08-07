@@ -133,6 +133,37 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test membership deletion and with the preserve contribution param.
+   */
+  public function testMembershipDeletePreserveContribution() {
+    $membershipID = $this->contactMembershipCreate($this->_params); //DELETE
+    $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID); //DELETE
+    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', array(
+      'sequential' => 1,
+      'financial_type_id' => "Member Dues",
+      'total_amount' => 100,
+      'contact_id' => $this->_params['contact_id'],
+    ));
+    $membershipPaymentCreate = $this->callAPISuccess('MembershipPayment', 'create', array(
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['values'][0]['id'],
+      'membership_id' => $membershipID,
+    ));
+    $memParams = array(
+      'id' => $membershipID,
+      'preserve_contribution' => 1,
+    );
+    $contribParams = array(
+      'id' => $ContributionCreate['values'][0]['id'],
+    );
+    $this->callAPIAndDocument('membership', 'delete', $memParams, __FUNCTION__, __FILE__);
+    $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
+    $this->assertDBRowExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
+    $this->callAPISuccess('Contribution', 'delete', $contribParams);
+    $this->assertDBRowNotExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
+  }
+
+  /**
    * Test membership get.
    */
   public function testContactMembershipsGet() {
