@@ -460,6 +460,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Contact_BAO_GroupOrganization::add($groupOrg);
     }
 
+    CRM_Utils_System::flushCache();
     CRM_Contact_BAO_GroupContactCache::add($group->id);
 
     if (!empty($params['id'])) {
