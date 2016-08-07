@@ -40,12 +40,17 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
    *   Id of the group to add the child to.
    * @param int $childID
    *   Id of the new child group.
+   *
+   * @return \CRM_Contact_DAO_GroupNesting
    */
   public static function add($parentID, $childID) {
-    // TODO: Add checks here to make sure invalid nests can't be created
     $dao = new CRM_Contact_DAO_GroupNesting();
-    $query = "REPLACE INTO civicrm_group_nesting (child_group_id, parent_group_id) VALUES ($childID,$parentID);";
-    $dao->query($query);
+    $dao->child_group_id = $childID;
+    $dao->parent_group_id = $parentID;
+    if (!$dao->find(TRUE)) {
+      $dao->save();
+    }
+    return $dao;
   }
 
   /**
@@ -60,13 +65,15 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
    */
   public static function remove($parentID, $childID) {
     $dao = new CRM_Contact_DAO_GroupNesting();
-    $query = "DELETE FROM civicrm_group_nesting WHERE child_group_id = $childID AND parent_group_id = $parentID";
-    $dao->query($query);
+    $dao->child_group_id = $childID;
+    $dao->parent_group_id = $parentID;
+    if ($dao->find(TRUE)) {
+      $dao->delete();
+    }
   }
 
   /**
-   * Returns true if the association between parent and child is present,
-   * false otherwise.
+   * Checks whether the association between parent and child is present.
    *
    * @param int $parentID
    *   The parent id of the association.
@@ -79,19 +86,18 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
    */
   public static function isParentChild($parentID, $childID) {
     $dao = new CRM_Contact_DAO_GroupNesting();
-    $query = "SELECT id FROM civicrm_group_nesting WHERE child_group_id = $childID AND parent_group_id = $parentID";
-    $dao->query($query);
-    if ($dao->fetch()) {
+    $dao->child_group_id = $childID;
+    $dao->parent_group_id = $parentID;
+    if ($dao->find()) {
       return TRUE;
     }
     return FALSE;
   }
 
   /**
-   * Returns true if the given groupId has 1 or more parent groups,
-   * false otherwise.
+   * Checks whether groupId has 1 or more parent groups.
    *
-   * @param $groupId
+   * @param int $groupId
    *   The id of the group to check for parent groups.
    *
    * @return bool
