@@ -483,6 +483,14 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  */
 function civicrm_api3_contribution_repeattransaction(&$params) {
   $input = $ids = array();
+  civicrm_api3_verify_one_mandatory($params, NULL, array('contribution_recur_id', 'original_contribution_id'));
+  if (empty($params['original_contribution_id'])) {
+    $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', array(
+      'return' => 'id',
+      'contribution_recur_id' => $params['contribution_recur_id'],
+      'options' => array('limit' => 1, 'sort' => 'id DESC'),
+    ));
+  }
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['original_contribution_id'];
   if (!$contribution->find(TRUE)) {
@@ -499,7 +507,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     $contribution->contribution_status_id = $params['contribution_status_id'];
     $contribution->receive_date = $params['receive_date'];
 
-    $passThroughParams = array('trxn_id', 'total_amount', 'campaign_id', 'fee_amount');
+    $passThroughParams = array('trxn_id', 'total_amount', 'campaign_id', 'fee_amount', 'financial_type_id');
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
     $params = _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
@@ -535,7 +543,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   $input['component'] = $contribution->_component;
   $input['is_test'] = $contribution->is_test;
   $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];
-
+  if (isset($params['fee_amount'])) {
+    $input['fee_amount'] = $params['fee_amount'];
+  }
   if (isset($params['is_email_receipt'])) {
     $input['is_email_receipt'] = $params['is_email_receipt'];
   }
@@ -563,8 +573,12 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
 function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
   $params['original_contribution_id'] = array(
     'title' => 'Original Contribution ID',
+    'description' => 'Contribution ID to copy (will be calculated from recurring contribution if not provided)',
     'type' => CRM_Utils_Type::T_INT,
-    'api.required' => TRUE,
+  );
+  $params['contribution_recur_id'] = array(
+    'title' => 'Recurring contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
   );
   $params['trxn_id'] = array(
     'title' => 'Transaction ID',
@@ -593,6 +607,26 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
     'title' => 'Transaction ID',
     'name' => 'trxn_id',
     'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['campaign_id'] = array(
+    'title' => 'Campaign ID',
+    'name' => 'campaign_id',
+    'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_campaign',
+      'keyColumn' => 'id',
+      'labelColumn' => 'title',
+    ),
+  );
+  $params['financial_type_id'] = array(
+    'title' => 'Financial ID (ignored if more than one line item)',
+    'name' => 'financial_type_id',
+    'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'table' => 'civicrm_financial_type',
+      'keyColumn' => 'id',
+      'labelColumn' => 'name',
+    ),
   );
   $params['payment_processor_id'] = array(
     'description' => ts('Payment processor ID, will be loaded from contribution_recur if not provided'),

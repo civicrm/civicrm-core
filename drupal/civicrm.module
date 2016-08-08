@@ -269,10 +269,8 @@ function civicrm_initialize() {
  * them and we need them for language switching and generating urls for metadata.
  */
 function _civicrm_get_url_parameters() {
-  $query = $_REQUEST;
-  unset($query['IDS_request_uri']);
-  unset($query['IDS_user_agent']);
-  return $query;
+  $excludes = array('q', 'IDS_request_uri', 'IDS_user_agent');
+  return drupal_get_query_parameters(NULL, $excludes);
 }
 
 /**
@@ -286,14 +284,9 @@ function _civicrm_get_url_parameters() {
  *   String of url parameters e.g '?reset=1&id=2'.
  */
 function _civicrm_get_url_parameters_as_url_string() {
-  $string = '';
-  foreach (_civicrm_get_url_parameters() as $key => $value) {
-    if (empty($string)) {
-      $string = '?' . $key . '=' . $value;
-    }
-    else {
-      $string .= '&' . $key . '=' . $value;
-    }
+  $string = drupal_http_build_query(_civicrm_get_url_parameters());
+  if (!empty($string)) {
+    $string = '?' . $string;
   }
   return $string;
 }

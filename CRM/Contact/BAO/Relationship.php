@@ -942,7 +942,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       'version' => 3,
     ));
 
-    if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Relationship already exists') {
+    if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Duplicate Relationship') {
       throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
     }
 
@@ -1223,7 +1223,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           elseif ($status == self::DISABLED) {
             $mask |= CRM_Core_Action::ENABLE;
           }
-          $mask = $mask & $permissionMask;
+          // temporary hold the value of $mask.
+          $tempMask = $mask;
         }
       }
 
@@ -1235,6 +1236,17 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           (!CRM_Contact_BAO_Contact_Permission::allow($cid))
         ) {
           continue;
+        }
+        if ($status != self::INACTIVE && $links) {
+          // assign the original value to $mask
+          $mask = $tempMask;
+          // display action links if $cid has edit permission for the relationship.
+          if (!($permissionMask & CRM_Core_Permission::EDIT) && CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
+            $permissions[] = CRM_Core_Permission::EDIT;
+            $permissions[] = CRM_Core_Permission::DELETE;
+            $permissionMask = CRM_Core_Action::mask($permissions);
+          }
+          $mask = $mask & $permissionMask;
         }
         $values[$rid]['id'] = $rid;
         $values[$rid]['cid'] = $cid;
@@ -1474,11 +1486,10 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     $query = 'SELECT * FROM `civicrm_membership_status`';
     if ($active) {
-      $query .= 'WHERE `is_current_member` = 1 OR `id` = %1 ';
+      $query .= ' WHERE `is_current_member` = 1 OR `id` = %1 ';
     }
 
-    $params[1] = array($pendingStatusId, 'String');
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($pendingStatusId, 'Integer')));
 
     while ($dao->fetch()) {
       $membershipStatusRecordIds[$dao->id] = $dao->id;

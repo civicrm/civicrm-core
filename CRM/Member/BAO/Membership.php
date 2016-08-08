@@ -143,7 +143,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     CRM_Member_BAO_MembershipLog::add($membershipLog, CRM_Core_DAO::$_nullArray);
 
     // reset the group contact cache since smart groups might be affected due to this
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if ($id) {
       if ($membership->status_id != $oldStatus) {
@@ -2966,6 +2966,7 @@ WHERE      civicrm_membership.is_test = 0";
       'membership_id',
       'tax_amount',
       'skipLineItem',
+      'contribution_recur_id',
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);

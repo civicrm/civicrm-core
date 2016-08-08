@@ -203,8 +203,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $params['contribution'] = $contribution;
     self::recordFinancialAccounts($params);
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if ($contributionID) {
       CRM_Utils_Hook::post('edit', 'Contribution', $contribution->id, $contribution);
@@ -1273,7 +1272,7 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
 {$additionalClause}
 ";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
       $paymentDetails[$dao->id] = array(
@@ -2247,6 +2246,11 @@ WHERE  contribution_id = %1 ";
     }
     // todo remove strtolower - check consistency
     if (strtolower($this->_component) == 'event') {
+
+      if (!empty($ids['contribution'])) {
+        $values['contributionId'] = $ids['contribution'];
+      }
+
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
         $this->_relatedObjects['participant']->id, $this->is_test, $returnMessageText
       );
@@ -2531,7 +2535,7 @@ WHERE  contribution_id = %1 ";
 
     $template->assign('trxn_id', $this->trxn_id);
     $template->assign('receive_date',
-      CRM_Utils_Date::mysqlToIso($this->receive_date)
+      CRM_Utils_Date::processDate($this->receive_date)
     );
     $template->assign('contributeMode', 'notify');
     $template->assign('action', $this->is_test ? 1024 : 1);
@@ -2701,6 +2705,7 @@ WHERE  contribution_id = %1 ";
 
     $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatus = empty($params['contribution_status_id']) ? NULL : $contributionStatuses[$params['contribution_status_id']];
 
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'participant') {
       $entityId = $params['participant_id'];
@@ -2819,6 +2824,9 @@ WHERE  contribution_id = %1 ";
         'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
+      if ($contributionStatus == 'Refunded') {
+        $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
+      }
 
       if (!empty($params['payment_processor'])) {
         $trxnParams['payment_processor_id'] = $params['payment_processor'];
@@ -3015,12 +3023,13 @@ WHERE  contribution_id = %1 ";
     if ($context == 'changedStatus') {
       //get all the statuses
       $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
+      $cancelledTaxAmount = 0;
       if ($params['prevContribution']->contribution_status_id == array_search('Completed', $contributionStatus)
         && ($params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
           || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))
       ) {
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
+        $cancelledTaxAmount = CRM_Utils_Array::value('tax_amount', $params, '0.00');
         if (empty($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
           $creditNoteId = self::createCreditNoteId();
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
@@ -3045,7 +3054,7 @@ WHERE  contribution_id = %1 ";
           $params['trxnParams']['from_financial_account_id'] = $arAccountId;
         }
       }
-      $itemAmount = $params['trxnParams']['total_amount'];
+      $itemAmount = $params['trxnParams']['total_amount'] + $cancelledTaxAmount;
     }
     elseif ($context == 'changePaymentInstrument') {
       if ($params['trxnParams']['total_amount'] < 0) {
@@ -3126,6 +3135,11 @@ WHERE  contribution_id = %1 ";
             $currency = $params['contribution']->currency;
           }
           $diff = 1;
+          if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)
+            || $params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
+            ) {
+            $diff = -1;
+          }
           if (!empty($params['is_quick_config'])) {
             $amount = $itemAmount;
             if (!$amount) {
@@ -3133,11 +3147,6 @@ WHERE  contribution_id = %1 ";
             }
           }
           else {
-            if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)
-              || $params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
-            ) {
-              $diff = -1;
-            }
             $amount = $diff * $fieldValues['line_total'];
           }
 
@@ -3207,7 +3216,9 @@ WHERE  contribution_id = %1 ";
       'Refunded' => array('Cancelled', 'Completed'),
     );
 
-    if (!in_array($contributionStatuses[$fields['contribution_status_id']], $checkStatus[$contributionStatuses[$values['contribution_status_id']]])) {
+    if (!in_array($contributionStatuses[$fields['contribution_status_id']],
+      CRM_Utils_Array::value($contributionStatuses[$values['contribution_status_id']], $checkStatus, array()))
+    ) {
       $errors['contribution_status_id'] = ts("Cannot change contribution status from %1 to %2.", array(
         1 => $contributionStatuses[$values['contribution_status_id']],
         2 => $contributionStatuses[$fields['contribution_status_id']],
@@ -3542,6 +3553,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         }
       }
     }
+    else {
+      $contributionId = $id;
+      $entity = 'contribution';
+      $entityTable = 'civicrm_contribution';
+    }
+
     $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $baseTrxnId = !empty($total['trxn_id']) ? $total['trxn_id'] : NULL;
     $isBalance = NULL;
@@ -3592,12 +3609,22 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     if ($getTrxnInfo && $baseTrxnId) {
       // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
       $sql = "
-SELECT ft.total_amount, con.financial_type_id, ft.payment_instrument_id, ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number
-FROM civicrm_contribution con
-  LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
-  INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id AND ft.to_financial_account_id != {$feeFinancialAccount}
-WHERE con.id = {$contributionId}
-";
+        SELECT GROUP_CONCAT(fa.`name`) as financial_account,
+          ft.total_amount,
+          ft.payment_instrument_id,
+          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, con.currency
+
+        FROM civicrm_contribution con
+          LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
+          INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
+            AND ft.to_financial_account_id != {$feeFinancialAccount}
+          INNER JOIN civicrm_entity_financial_trxn ef ON (ef.financial_trxn_id = ft.id AND ef.entity_table = 'civicrm_financial_item')
+          LEFT JOIN civicrm_financial_item fi ON fi.id = ef.entity_id
+          INNER JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
+
+        WHERE con.id = {$contributionId}
+        GROUP BY ft.id
+      ";
 
       // conditioned WHERE clause
       if ($isBalance) {
@@ -3607,17 +3634,18 @@ WHERE con.id = {$contributionId}
       $resultDAO = CRM_Core_DAO::executeQuery($sql);
 
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
-      $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+
       while ($resultDAO->fetch()) {
         $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
         $paidByName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
         $val = array(
           'total_amount' => $resultDAO->total_amount,
-          'financial_type' => $financialTypes[$resultDAO->financial_type_id],
+          'financial_type' => $resultDAO->financial_account,
           'payment_instrument' => $paidByLabel,
           'receive_date' => $resultDAO->trxn_date,
           'trxn_id' => $resultDAO->trxn_id,
           'status' => $statuses[$resultDAO->status_id],
+          'currency' => $resultDAO->currency,
         );
         if ($paidByName == 'Check') {
           $val['check_number'] = $resultDAO->check_number;
@@ -3764,6 +3792,20 @@ WHERE con.id = {$contributionId}
   }
 
   /**
+   * Is there only one line item attached to the contribution.
+   *
+   * @param int $id
+   *   Contribution ID.
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function isSingleLineItem($id) {
+    $lineItemCount = civicrm_api3('LineItem', 'getcount', array('contribution_id' => $id));
+    return ($lineItemCount == 1);
+  }
+
+  /**
    * Generate credit note id with next avaible number
    *
    * @return string
@@ -3778,10 +3820,8 @@ WHERE con.id = {$contributionId}
     do {
       $creditNoteNum++;
       $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . $creditNoteNum;
-      $result = civicrm_api3('Contribution', 'getcount', array(
-        'sequential' => 1,
-        'creditnote_id' => $creditNoteId,
-      ));
+      $params = array(1 => array($creditNoteId, 'String'));
+      $result = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_contribution WHERE creditnote_id = %1", $params);
     } while ($result > 0);
 
     return $creditNoteId;

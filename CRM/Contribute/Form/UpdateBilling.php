@@ -65,7 +65,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->_crid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'info');
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
+      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
 
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
@@ -90,6 +90,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       $this->assign('membershipType', CRM_Utils_Array::value($membershipTypeId, $membershipTypes));
       $this->_mode = 'auto_renew';
     }
+
+    $this->_paymentProcessorObj = CRM_Utils_Array::value('object', $this->_paymentProcessor);
 
     if ((!$this->_crid && !$this->_coid && !$this->_mid) ||
       ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)

@@ -36,8 +36,11 @@
  *      Draggable
  *      UI Core
  *
+ * NOTE: This file is viewed as "legacy" and shouldn't be used to
+ * develop new functionality. Its lint problems are grandfathered
+ * (although if someone wants to cleanup+test, please feel welcome).
  */
-
+/* jshint ignore:start */
 (function($) { // Create closure.
   // Constructor for dashboard object.
   $.fn.dashboard = function(options) {
@@ -78,19 +81,19 @@
       var params = {};
 
       // For each column...
-      for (var c in dashboard.columns) {
+      for (var c2 in dashboard.columns) {
 
         // IDs of the sortable elements in this column.
-        if( typeof dashboard.columns[c] == 'object' ) var ids = dashboard.columns[c].element.sortable('toArray');
+        var ids = (typeof dashboard.columns[c2] == 'object') ? dashboard.columns[c2].element.sortable('toArray') : undefined;
 
         // For each id...
         for (var w in ids) {
           // Chop 'widget-' off of the front so that we have the real widget id.
-          if( typeof ids[w] == 'string' ) var id = ids[w].substring('widget-'.length);
+          var id = (typeof ids[w] == 'string') ? ids[w].substring('widget-'.length) : undefined;
 
           // Add one flat property to the params object that will look like an array element to the PHP server.
           // Unfortunately jQuery doesn't do this for us.
-          if ( typeof dashboard.widgets[id] == 'object' ) params['columns[' + c + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
+          if ( typeof dashboard.widgets[id] == 'object' ) params['columns[' + c2 + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
         }
       }
 
@@ -266,7 +269,7 @@
     // Callback for when a user starts resorting a list.  Hides all the empty placeholders.
     function hideEmptyPlaceholders(e, ui) {
         for (var c in dashboard.columns) {
-            if( typeof dashboard.columns[c] == 'object ' ) dashboard.columns[c].emptyPlaceholder.hide();
+            if( (typeof dashboard.columns[c]) == 'object' ) dashboard.columns[c].emptyPlaceholder.hide();
         }
     }
 

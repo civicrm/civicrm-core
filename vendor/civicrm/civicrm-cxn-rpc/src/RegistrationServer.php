@@ -83,7 +83,7 @@ class RegistrationServer extends Agent {
     $cxn = $reqData['cxn'];
     $validation = Cxn::getValidationMessages($cxn);
     if (!empty($validation)) {
-      // $cxn is not valid, so we can't encode it use it for encoding.
+      // $cxn is not valid, so we can't use it for encoding.
       $resp = new InsecureMessage(array(
         'is_error' => 1,
         'error_message' => 'Invalid cxn details: ' . implode(', ', array_keys($validation)),
@@ -91,6 +91,18 @@ class RegistrationServer extends Agent {
       return $resp->setCode(400);
     }
 
+    $respData = $this->call($reqData);
+    $this->log->debug('Responding', array($cxn['cxnId'], $cxn['secret'], $respData));
+    return new StdMessage($cxn['cxnId'], $cxn['secret'], $respData);
+  }
+
+  /**
+   * Delegate handling of hte registration message to a callback function.
+   *
+   * @param $reqData
+   * @return array|mixed
+   */
+  public function call($reqData) {
     $respData = $this->createError('Unrecognized entity or action');
 
     if ($reqData['entity'] == 'Cxn' && preg_match('/^[a-zA-Z]+$/', $reqData['action'])) {
@@ -99,8 +111,8 @@ class RegistrationServer extends Agent {
         $respData = call_user_func(array($this, $func), $reqData['cxn'], $reqData['params']);
       }
     }
-    $this->log->debug('Responding', array($cxn['cxnId'], $cxn['secret'], $respData));
-    return new StdMessage($cxn['cxnId'], $cxn['secret'], $respData);
+
+    return $respData;
   }
 
   /**

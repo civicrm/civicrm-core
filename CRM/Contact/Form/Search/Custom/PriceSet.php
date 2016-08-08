@@ -339,13 +339,6 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
   }
 
   /**
-   * @return array
-   */
-  public function setDefaultValues() {
-    return array();
-  }
-
-  /**
    * @param $row
    */
   public function alterRow(&$row) {

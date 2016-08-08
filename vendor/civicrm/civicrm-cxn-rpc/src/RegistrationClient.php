@@ -25,14 +25,29 @@ class RegistrationClient extends Agent {
   protected $siteUrl;
 
   /**
+   * @var string|NULL
+   *   Ex: "123.123.123.123:456".
+   *   Ex: "proxy.example.com:789"
+   *   Ex: "dhcp123.isp.example.net:456"
+   */
+  protected $viaPort;
+
+  /**
    * @param CxnStore\CxnStoreInterface $cxnStore
    *   The place to store active connections.
    * @param string $siteUrl
    *   The callback URL used when the app wishes to send an API call to the site.
+   * @param string|NULL $viaPort
+   *   If $siteUrl is behind a firewall or otherwise unrouteable, you can
+   *   specify a proxy for any callback messages.
+   *   Ex: "123.123.123.123:456".
+   *   Ex: "proxy.example.com:789"
+   *   Ex: "dhcp123.isp.example.net:456"
    */
-  public function __construct($cxnStore, $siteUrl) {
+  public function __construct($cxnStore, $siteUrl, $viaPort = NULL) {
     parent::__construct(NULL, $cxnStore);
     $this->siteUrl = $siteUrl;
+    $this->viaPort = $viaPort;
   }
 
   /**
@@ -57,6 +72,9 @@ class RegistrationClient extends Agent {
     $cxn['appUrl'] = $appMeta['appUrl'];
     $cxn['siteUrl'] = $this->siteUrl;
     $cxn['perm'] = $appMeta['perm'];
+    if (!empty($this->viaPort)) {
+      $cxn['viaPort'] = $this->viaPort;
+    }
     Cxn::validate($cxn);
     $this->cxnStore->add($cxn);
 

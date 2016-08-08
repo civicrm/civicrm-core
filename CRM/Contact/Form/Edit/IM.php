@@ -67,6 +67,7 @@ class CRM_Contact_Form_Edit_IM {
         'entity' => 'im',
         'class' => 'eight',
         'placeholder' => NULL,
+        'option_url' => NULL,
       ));
 
     //IM box

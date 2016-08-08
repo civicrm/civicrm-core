@@ -83,15 +83,12 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    // get the qill
+    // @todo sync this more with CRM_Group_Form_Edit.
     $query = new CRM_Contact_BAO_Query($this->get('queryParams'));
-    $qill = $query->qill();
+    $this->assign('qill', $query->qill());
 
     // Values from the search form
     $formValues = $this->controller->exportValues();
-
-    // need to save qill for the smarty template
-    $this->assign('qill', $qill);
 
     // the name and description are actually stored with the group and not the saved search
     $this->add('text', 'title', ts('Name'),
@@ -125,6 +122,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
     //CRM-14190
     CRM_Group_Form_Edit::buildParentGroups($this);
+    CRM_Group_Form_Edit::buildGroupOrganizations($this);
 
     // get the group id for the saved search
     $groupID = NULL;
@@ -219,7 +217,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
 
-    $group = CRM_Contact_BAO_Group::create($params);
+    CRM_Contact_BAO_Group::create($params);
 
     // CRM-9464
     $this->_id = $savedSearch->id;
@@ -228,6 +226,19 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     if (!empty($formValues['parents'])) {
       CRM_Contact_BAO_GroupNestingCache::update();
     }
+  }
+
+  /**
+   * Set form defaults.
+   *
+   * return array
+   */
+  public function setDefaultValues() {
+    $defaults = array();
+    if (empty($defaults['parents'])) {
+      $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
+    }
+    return $defaults;
   }
 
 }

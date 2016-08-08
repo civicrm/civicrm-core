@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -29,9 +29,7 @@
  * Our base DAO class. All DAO classes should inherit from this class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 require_once 'PEAR.php';
@@ -99,8 +97,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param string $dsn
    *   The database connection string.
-   *
-   * @return void
    */
   public static function init($dsn) {
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
@@ -133,26 +129,26 @@ class CRM_Core_DAO extends DB_DataObject {
       if ($fkDAO->find(TRUE)) {
         $this->$dbName = $fkDAO->id;
       }
-      unset($fkDAO);
+      $fkDAO->free();
     }
 
     elseif (in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)) {
       $depObject = new $FKClassName();
       $depObject->find(TRUE);
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
     elseif ($daoName == 'CRM_Member_DAO_MembershipType' && $fieldName == 'member_of_contact_id') {
       // FIXME: the fields() metadata is not specific enough
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, array('contact_type' => 'Organization'));
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
     else {
       //if it is required we need to generate the dependency object first
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, CRM_Utils_Array::value($dbName, $params, 1));
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
   }
 
@@ -220,7 +216,7 @@ class CRM_Core_DAO extends DB_DataObject {
           break;
 
         case CRM_Utils_Type::T_TIME:
-          CRM_Core_Error::fatal('T_TIME shouldnt be used.');
+          CRM_Core_Error::fatal("T_TIME shouldn't be used.");
           //$object->$dbName='000000';
           //break;
         case CRM_Utils_Type::T_CCNUM:
@@ -267,11 +263,11 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Reset the DAO object. DAO is kinda crappy in that there is an unwritten
-   * rule of one query per DAO. We attempt to get around this crappy restricrion
-   * by resetting some of DAO's internal fields. Use this with caution
+   * Reset the DAO object.
    *
-   * @return void
+   * DAO is kinda crappy in that there is an unwritten rule of one query per DAO.
+   *
+   * We attempt to get around this crappy restriction by resetting some of DAO's internal fields. Use this with caution
    */
   public function reset() {
 
@@ -322,7 +318,23 @@ class CRM_Core_DAO extends DB_DataObject {
       $query = CRM_Core_I18n_Schema::rewriteQuery($query);
     }
 
-    return parent::query($query);
+    $timeBegan = microtime(TRUE);
+    CRM_Core_Error::debug_query($query);
+
+    $result = parent::query($query);
+
+    $elapsedSeconds = sprintf("%0.6f", microtime(TRUE) - $timeBegan);
+    if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
+      if (CIVICRM_DEBUG_LOG_QUERY) {
+        $msg = "Query took {$elapsedSeconds} sec.";
+        if ($this->getDatabaseResult()) {
+          $msg .= " result is {$this->getDatabaseResult()->numRows()} rows by {$this->getDatabaseResult()->numCols()} columns.";
+        }
+        CRM_Core_Error::debug_log_message($msg);
+      }
+    }
+
+    return $result;
   }
 
   /**
@@ -330,8 +342,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param object $factory
    *   The factory application object.
-   *
-   * @return void
    */
   public static function setFactory(&$factory) {
     self::$_factory = &$factory;
@@ -341,8 +351,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * Factory method to instantiate a new object from a table name.
    *
    * @param string $table
-   *
-   * @return void
    */
   public function factory($table = '') {
     if (!isset(self::$_factory)) {
@@ -355,8 +363,6 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Initialization for all DAO objects. Since we access DB_DO programatically
    * we need to set the links manually.
-   *
-   * @return void
    */
   public function initialize() {
     $this->_connect();
@@ -437,6 +443,8 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Save DAO object.
+   *
    * @return $this
    */
   public function save() {
@@ -489,6 +497,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
     \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-delete", $event);
+    $this->free();
 
     return $result;
   }
@@ -571,8 +580,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *   The object that we are extracting data from.
    * @param array $values
    *   (reference ) associative array of name/value pairs.
-   *
-   * @return void
    */
   public static function storeValues(&$object, &$values) {
     $fields = &$object->fields();
@@ -1138,8 +1145,6 @@ FROM   civicrm_domain
    *   Name of the dao object.
    * @param int $contactId
    *   Id of the contact to delete.
-   *
-   * @return void
    */
   public static function deleteEntityContact($daoName, $contactId) {
     $object = new $daoName();
@@ -1246,14 +1251,16 @@ FROM   civicrm_domain
   }
 
   /**
-   * @param $query
+   * Compose the query by merging the parameters into it.
+   *
+   * @param string $query
    * @param array $params
    * @param bool $abort
    *
    * @return string
    * @throws Exception
    */
-  public static function composeQuery($query, &$params, $abort = TRUE) {
+  public static function composeQuery($query, $params, $abort = TRUE) {
     $tr = array();
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
@@ -2278,7 +2285,7 @@ SELECT contact_id
    *   a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    */
-  public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
+  public static function createSQLFilter($fieldName, $filter, $type = NULL, $alias = NULL, $returnSanitisedArray = FALSE) {
     foreach ($filter as $operator => $criteria) {
       if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {
@@ -2390,7 +2397,7 @@ SELECT contact_id
     }
 
     // the string is longer than the length and we need a uniq string
-    // for the same tablename we need the same uniq string everytime
+    // for the same tablename we need the same uniq string every time
     // hence we use md5 on the string, which is not random
     // we'll append 8 characters to the end of the tableName
     $md5string = substr(md5($string), 0, 8);
@@ -2401,6 +2408,75 @@ SELECT contact_id
    * @param array $params
    */
   public function setApiFilter(&$params) {
+  }
+
+  /**
+   * Generates acl clauses suitable for adding to WHERE or ON when doing an api.get for this entity
+   *
+   * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
+   * @code
+   *   array(
+   *     'location_type_id' => array('IS NOT NULL', 'IN (1,2,3)')
+   *   )
+   * @endcode
+   *
+   * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
+   *
+   * @return array
+   */
+  public function addSelectWhereClause() {
+    // This is the default fallback, and works for contact-related entities like Email, Relationship, etc.
+    $clauses = array();
+    foreach ($this->fields() as $fieldName => $field) {
+      if (strpos($fieldName, 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+        $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
+      }
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
+  /**
+   * This returns the final permissioned query string for this entity
+   *
+   * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
+   *
+   * @param string $tableAlias
+   * @return array
+   */
+  public static function getSelectWhereClause($tableAlias = NULL) {
+    $bao = new static();
+    if ($tableAlias === NULL) {
+      $tableAlias = $bao->tableName();
+    }
+    $clauses = array();
+    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+      $clauses[$field] = NULL;
+      if ($vals) {
+        $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+      }
+    }
+    return $clauses;
+  }
+
+  /**
+   * function to check valid db name containing only characters in [0-9,a-z,A-Z_]
+   *
+   * @param $database
+   *
+   * @return bool
+   */
+  public static function requireValidDBName($database) {
+    $matches = array();
+    preg_match(
+      "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
+      $database,
+      $matches
+    );
+    if (empty($matches)) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
 }

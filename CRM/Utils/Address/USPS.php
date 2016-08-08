@@ -39,11 +39,30 @@
 class CRM_Utils_Address_USPS {
 
   /**
+   * Whether USPS validation should be disabled during import.
+   *
+   * @var bool
+   */
+  protected static $_disabled = FALSE;
+
+  /**
+   * @param $disabled
+   *
+   * @return void
+   */
+  public static function disable($disable = TRUE) {
+    self::$_disabled = $disable;
+  }
+
+  /**
    * @param $values
    *
    * @return bool
    */
   public static function checkAddress(&$values) {
+    if (self::$_disabled) {
+      return FALSE;
+    }
     if (!isset($values['street_address']) ||
       (!isset($values['city']) &&
         !isset($values['state_province']) &&

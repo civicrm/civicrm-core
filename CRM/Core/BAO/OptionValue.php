@@ -518,4 +518,22 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     return $options;
   }
 
+  /**
+   * Ensure an option value exists.
+   *
+   * This function is intended to be called from the upgrade script to ensure
+   * that an option value exists, without hitting an error if it already exists.
+   *
+   * This is sympathetic to sites who might pre-add it.
+   */
+  public static function ensureOptionValueExists($params) {
+    $existingValues = civicrm_api3('OptionValue', 'get', array(
+      'option_group_id' => $params['option_group_id'],
+      'name' => $params['name'],
+    ));
+    if (!$existingValues['count']) {
+      civicrm_api3('OptionValue', 'create', $params);
+    }
+  }
+
 }

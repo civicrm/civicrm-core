@@ -52,6 +52,8 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
   protected $_caseDetailExtra = array();
 
+  protected $_customGroupExtends = array('Case');
+
   /**
    */
   /**

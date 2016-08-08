@@ -1475,10 +1475,11 @@ WHERE civicrm_event.is_active = 1
           break;
         }
       }
-      $customVal = '';
+
       $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
       //start of code to set the default values
       foreach ($fields as $name => $field) {
+        $customVal = '';
         $skip = FALSE;
         // skip fields that should not be displayed separately
         if ($field['skipDisplay']) {

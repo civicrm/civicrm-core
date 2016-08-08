@@ -31,6 +31,9 @@
  *}
 
 {if $buildOnBehalfForm or $onBehalfRequired}
+{if $context eq 'front-end'}
+<div class="crm-public-form-item crm-section">
+{/if}
 <fieldset id="for_organization" class="for_organization-group">
 <legend>{$fieldSetTitle}</legend>
   {if ( $relatedOrganizationFound or $onBehalfRequired ) and !$organizationName}
@@ -135,6 +138,9 @@
 </div>
 <div>{$form.mode.html}</div>
 </fieldset>
+{if $context eq 'front-end'}
+</div>
+{/if}
 {/if}
 {if empty($snippet)}
 {literal}
@@ -258,7 +264,12 @@ function setLocationDetails(contactID , reset) {
         else {
           // do not set defaults to file type fields
           if (cj('#' + ele).attr('type') != 'file') {
-            cj('#' + ele ).val(data[ele].value).change();
+            if (ele.split("_").pop() == 'display') {
+              cj("[id^='"+ele+"']").val(data[ele].value).change();
+            }
+            else {
+              cj('#' + ele ).val(data[ele].value).change();
+            }
           }
         }
       }

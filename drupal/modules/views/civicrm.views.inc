@@ -303,7 +303,7 @@ function civicrm_views_add_date_arguments(&$data, $value) {
  */
 function civicrm_views_custom_data_cache(&$data, $entity_type, $group_id, $sub_type) {
   // From http://forum.civicrm.org/index.php/topic,17658.msg73901.html#msg73901, CRM-7860.
-  $tree = CRM_Core_BAO_CustomGroup::getTree($entity_type, CRM_Core_DAO::$_nullObject, NULL, $group_id, $sub_type, NULL);
+  $tree = CRM_Core_BAO_CustomGroup::getTree($entity_type, NULL, NULL, $group_id, $sub_type, NULL);
 
   $join_table = civicrm_views_get_join_table($entity_type);
   foreach ($tree as $groupkey => $current_group) {
@@ -707,7 +707,7 @@ function civicrm_date_views_fields($field) {
     // The type of date: DATE_UNIX, DATE_ISO, DATE_DATETIME.
     'sql_type' => DATE_DATETIME,
     // Timezone handling options: 'none', 'site', 'date', 'utc'.
-    'tz_handling' => 'site',
+    'tz_handling' => 'none',
     // Needed only for dates that use 'date' tz_handling.
     'timezone_field' => '',
     // Needed only for dates that use 'date' tz_handling.
@@ -754,16 +754,16 @@ function civicrm_date_views_tables() {
  */
 function civicrm_views_plugins() {
   $data = array();
-  
+
   // This just tells us that the themes are elsewhere
   $data['module'] = 'civicrm';
-  
+
   // Default argument to pull CiviCRM IDs from the URL
   $data['argument default']['civicrm_id'] = array(
     'title' => t('CiviCRM ID from URL'),
     'handler' => 'civicrm_plugin_argument_default_civicrm_id'
   );
-  
+
   // Calendar module integration
   if (module_exists('calendar')) {
     $civicrm_module_path = drupal_get_path('module', 'civicrm');
@@ -831,7 +831,6 @@ function civicrm_views_plugins() {
       ),
     );
   }
-	
+
   return $data;
 }
-

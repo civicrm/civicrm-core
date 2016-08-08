@@ -58,7 +58,7 @@
 
         function buildOptions() {
           var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/optionlist" h=0 q="snippet=4&fid=$fid&gid=$gid"}'{literal};
-          var $context = $('.crm-ajax-container');
+          var $context = $('.crm-container');
           var ZeroRecordText = {/literal}'{ts escape="js"}None found.{/ts}'{literal};
 
           crmOptionSelector = $('table.crm-option-selector', $context).dataTable({

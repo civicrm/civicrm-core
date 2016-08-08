@@ -1299,6 +1299,8 @@ SELECT is_primary,
 
       // Not a real field in this entity
       case 'world_region':
+      case 'worldregion':
+      case 'worldregion_id':
         return CRM_Core_PseudoConstant::worldRegion();
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);

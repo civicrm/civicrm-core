@@ -312,11 +312,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param CRM_Core_Form $form
-   *   Not used but required.
+
+   * @param CRM_Core_Form $deprecated
+   *   Not used.
    * @param int $entityID
    * @param int $groupID
-   * @param string $subType
+   * @param array $subTypes
    * @param string $subName
    * @param bool $fromCache
    * @param bool $onlySubType
@@ -330,14 +331,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
    *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    *   With caching the performance impact would be small & the function would be cleaner
-   *
    */
-  public static function &getTree(
+  public static function getTree(
     $entityType,
-    &$form,
+    $deprecated = NULL,
     $entityID = NULL,
     $groupID = NULL,
-    $subType = NULL,
+    $subTypes = array(),
     $subName = NULL,
     $fromCache = TRUE,
     $onlySubType = NULL
@@ -345,10 +345,26 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
     }
+    if (!is_array($subTypes)) {
+      if (empty($subTypes)) {
+        $subTypes = array();
+      }
+      else {
+        if (stristr($subTypes, ',')) {
+          $subTypes = explode(',', $subTypes);
+        }
+        // CRM-18654 Custom field error on CiviVolunteer activity type from getTree updates
+        elseif (!trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR)) {
+          $subTypes = array();
+        }
+        else {
+          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
+        }
+      }
+    }
 
     // create a new tree
-    $strSelect = $strFrom = $strWhere = $orderBy = '';
-    $tableData = array();
+    $strWhere = $orderBy = '';
 
     // using tableData to build the queryString
     $tableData = array(
@@ -419,41 +435,15 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
       $in = "'$entityType'";
     }
 
-    if ($subType) {
-      $subTypeClause = '';
-      if (is_array($subType)) {
-        $subType = implode(',', $subType);
+    if (!empty($subTypes)) {
+      foreach ($subTypes as $key => $subType) {
+        // CRM-18559: the value returned from validateSubTypeByEntity does not
+        // include value separators, so they need to be added for the query.
+        $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", self::validateSubTypeByEntity($entityType, $subType));
       }
-      if (strpos($subType, ',')) {
-        $subTypeParts = explode(',', $subType);
-        $subTypeClauses = array();
-        foreach ($subTypeParts as $subTypePart) {
-          $subTypePart = CRM_Core_DAO::VALUE_SEPARATOR .
-            trim($subTypePart, CRM_Core_DAO::VALUE_SEPARATOR) .
-            CRM_Core_DAO::VALUE_SEPARATOR;
-          $subTypeClauses[] = "civicrm_custom_group.extends_entity_column_value LIKE '%$subTypePart%'";
-        }
-
-        if ($onlySubType) {
-          $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
-        }
-        else {
-          $subTypeClause = '(' . implode(' OR ', $subTypeClauses) .
-            " OR civicrm_custom_group.extends_entity_column_value IS NULL )";
-        }
-      }
-      else {
-        $subType = CRM_Core_DAO::VALUE_SEPARATOR .
-          trim($subType, CRM_Core_DAO::VALUE_SEPARATOR) .
-          CRM_Core_DAO::VALUE_SEPARATOR;
-
-        if ($onlySubType) {
-          $subTypeClause = "( civicrm_custom_group.extends_entity_column_value LIKE '%$subType%' )";
-        }
-        else {
-          $subTypeClause = "( civicrm_custom_group.extends_entity_column_value LIKE '%$subType%'
-    OR    civicrm_custom_group.extends_entity_column_value IS NULL )";
-        }
+      $subTypeClause = '(' .  implode(' OR ', $subTypeClauses) . ')';
+      if (!$onlySubType) {
+        $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
       }
 
       $strWhere = "
@@ -547,8 +537,10 @@ ORDER BY civicrm_custom_group.weight,
               continue;
             }
             // CRM-5507
-            if ($fieldName == 'extends_entity_column_value' && $subType) {
-              $groupTree[$groupID]['subtype'] = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
+            // This is an old bit of code - per the CRM number & probably does not work reliably if
+            // that one contact sub-type exists.
+            if ($fieldName == 'extends_entity_column_value' && !empty($subTypes[0])) {
+              $groupTree[$groupID]['subtype'] = self::validateSubTypeByEntity($entityType, $subType);
             }
             $groupTree[$groupID][$fieldName] = $crmDAO->$fullFieldName;
           }
@@ -632,6 +624,49 @@ ORDER BY civicrm_custom_group.weight,
 
     }
     return $groupTree;
+  }
+
+  /**
+   * Clean and validate the filter before it is used in a db query.
+   *
+   * @param string $entityType
+   * @param string $subType
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function validateSubTypeByEntity($entityType, $subType) {
+    $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
+    if (is_numeric($subType)) {
+      return $subType;
+    }
+
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
+    if ($entityType != 'Contact' && !array_key_exists($entityType, $contactTypes)) {
+      throw new CRM_Core_Exception('Invalid Entity Filter');
+    }
+    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+    if (!array_key_exists($subType, $subTypes)) {
+      throw new CRM_Core_Exception('Invalid Filter');
+    }
+    return $subType;
+  }
+
+  /**
+   * Suppose you have a SQL column, $column, which includes a delimited list, and you want
+   * a WHERE condition for rows that include $value. Use whereListHas().
+   *
+   * @param string $column
+   * @param string $value
+   * @param string $delimiter
+   * @return string
+   *   SQL condition.
+   */
+  static private function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
+    $bareValue = trim($value, $delimiter); // ?
+    $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
+    return "($column LIKE \"$escapedValue\")";
   }
 
   /**
@@ -1578,7 +1613,7 @@ ORDER BY civicrm_custom_group.weight,
       return array();
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type, $form);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type);
     $customValue = array();
     $htmlType = array(
       'CheckBox',

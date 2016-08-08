@@ -3365,7 +3365,7 @@ class HTML5_TreeBuilder {
     }
 
     private function getElementCategory($node) {
-        if (!is_object($node)) debug_print_backtrace();
+        if (!is_object($node)) CRM_Core_Error::backtrace("backTrace", TRUE);
         $name = $node->tagName;
         if(in_array($name, $this->special))
             return self::SPECIAL;

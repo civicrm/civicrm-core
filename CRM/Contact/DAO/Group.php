@@ -155,13 +155,13 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
   /**
    * Date when we created the cache for a smart group
    *
-   * @var datetime
+   * @var timestamp
    */
   public $cache_date;
   /**
    * Date and time when we need to refresh the cache next.
    *
-   * @var datetime
+   * @var timestamp
    */
   public $refresh_date;
   /**
@@ -332,15 +332,17 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
         ) ,
         'cache_date' => array(
           'name' => 'cache_date',
-          'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+          'type' => CRM_Utils_Type::T_TIMESTAMP,
           'title' => ts('Group Cache Date') ,
           'description' => 'Date when we created the cache for a smart group',
+          'required' => false,
         ) ,
         'refresh_date' => array(
           'name' => 'refresh_date',
-          'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+          'type' => CRM_Utils_Type::T_TIMESTAMP,
           'title' => ts('Next Group Refresh Time') ,
           'description' => 'Date and time when we need to refresh the cache next.',
+          'required' => false,
         ) ,
         'parents' => array(
           'name' => 'parents',

@@ -29,14 +29,14 @@
      <tr class="columnheader">
        <th>{ts}Amount{/ts}</th>
        <th>{ts}Type{/ts}</th>
-       <th>{ts}Paid By{/ts}</th>
+       <th>{ts}Payment Method{/ts}</th>
        <th>{ts}Received{/ts}</th>
        <th>{ts}Transaction ID{/ts}</th>
        <th>{ts}Status{/ts}</th>
      </tr>
      {foreach from=$rows item=row}
      <tr>
-       <td>{$row.total_amount|crmMoney}</td>
+       <td>{$row.total_amount|crmMoney:$row.currency}</td>
        <td>{$row.financial_type}</td>
        <td>{$row.payment_instrument}{if $row.check_number} (#{$row.check_number}){/if}</td>
        <td>{$row.receive_date|crmDate}</td>
@@ -51,12 +51,14 @@
      {else}
        {assign var='entity' value=$component}
      {/if}
-    {ts 1=$entity}No additional payments found for this %1 record{/ts}
+     {ts 1=$entity}No payments found for this %1 record{/ts}
   {/if}
- <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
- </div>
-{elseif $formType}
+  {if !$suppressPaymentFormButtons}
+    <div class="crm-submit-buttons">
+       {include file="CRM/common/formButtons.tpl"}
+    </div>
+  {/if}
+ {elseif $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 

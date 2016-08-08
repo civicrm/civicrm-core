@@ -57,6 +57,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'sort_name',
             'required' => TRUE,
           ),
+          'display_name_a' => array(
+            'title' => ts('Contact A Full Name'),
+            'name' => 'display_name',
+          ),
           'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
@@ -95,6 +99,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Contact B'),
             'name' => 'sort_name',
             'required' => TRUE,
+          ),
+          'display_name_b' => array(
+            'title' => ts('Contact B Full Name'),
+            'name' => 'display_name',
           ),
           'id' => array(
             'no_display' => TRUE,
@@ -219,14 +227,29 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             ),
             'type' => CRM_Utils_Type::T_INT,
           ),
-          'relationship_type_id' => array(
-            'title' => ts('Relationship'),
+          'is_valid' => array(
+            'title' => ts('Relationship Dates Validity'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array(
-              '' => '- any relationship type -',
-            ) +
-            CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
+              NULL => ts('- Any -'),
+              1 => ts('Not expired'),
+              0 => ts('Expired'),
+            ),
             'type' => CRM_Utils_Type::T_INT,
+          ),
+          'relationship_type_id' => array(
+            'title' => ts('Relationship'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'start_date' => array(
+            'title' => ts('Start Date'),
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'end_date' => array(
+            'title' => ts('End Date'),
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
         'grouping' => 'relation-fields',
@@ -420,13 +443,17 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                 }
               }
               else {
-
-                $clause = $this->whereClause($field,
-                  $op,
-                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-                );
+                if ($fieldName == 'is_valid') {
+                  $clause = $this->buildValidityQuery(CRM_Utils_Array::value("{$fieldName}_value", $this->_params));
+                }
+                else {
+                  $clause = $this->whereClause($field,
+                    $op,
+                    CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+                    CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+                    CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                  );
+                }
               }
             }
           }
@@ -482,9 +509,14 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         //for displaying relationship type filter
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
-          $statistics['filters'][$id]['value'] = 'Is equal to ' .
-            $relTypes[$this->_params['relationship_type_id_value']]['label_' .
-            $this->relationType];
+          $op = CRM_Utils_array::value('relationship_type_id_op', $this->_params) == 'in' ?
+            ts('Is one of') . ' ' : ts('Is not one of') . ' ';
+          $relationshipTypes = array();
+          foreach ($this->_params['relationship_type_id_value'] as $relationship) {
+            $relationshipTypes[] = $relTypes[$relationship]['label_' . $this->relationType];
+          }
+          $statistics['filters'][$id]['value'] = $op .
+            implode(', ', $relationshipTypes);
         }
 
         //for displaying relationship status
@@ -531,12 +563,20 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->beginPostProcess();
 
     $this->relationType = NULL;
-    $relType = array();
+    $originalRelationshipTypeIdValue = $this->_params['relationship_type_id_value'];
     if (!empty($this->_params['relationship_type_id_value'])) {
-      $relType = explode('_', $this->_params['relationship_type_id_value']);
-
-      $this->relationType = $relType[1] . '_' . $relType[2];
-      $this->_params['relationship_type_id_value'] = intval($relType[0]);
+      $relationshipTypes = array();
+      $direction = array();
+      $relType = array();
+      foreach ($this->_params['relationship_type_id_value'] as $relationship_type) {
+        $relType = explode('_', $relationship_type);
+        $direction[] = $relType[1] . '_' . $relType[2];
+        $relationshipTypes[] = intval($relType[0]);
+      }
+      // Lets take the first relationship type to guide us in the relationship direction
+      // we should use.
+      $this->relationType = $direction[0];
+      $this->_params['relationship_type_id_value'] = $relationshipTypes;
     }
 
     $this->buildACLClause(array(
@@ -549,9 +589,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
 
-    if (!empty($relType)) {
+    if (!empty($originalRelationshipTypeIdValue)) {
       // store its old value, CRM-5837
-      $this->_params['relationship_type_id_value'] = implode('_', $relType);
+      $this->_params['relationship_type_id_value'] = $originalRelationshipTypeIdValue;
     }
     $this->endPostProcess($rows);
   }
@@ -627,6 +667,24 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         break;
       }
     }
+  }
+
+  /**
+   * @param $valid bool - set to 1 if we are looking for a valid relationship, 0 if not
+   *
+   * @return array
+   */
+  public function buildValidityQuery($valid) {
+    $clause = NULL;
+    if ($valid == '1') {
+      // relationships dates are not expired
+      $clause = "((start_date <= CURDATE() OR start_date is null) AND (end_date >= CURDATE() OR end_date is null))";
+    }
+    elseif ($valid == '0') {
+      // relationships dates are expired or has not started yet
+      $clause = "(start_date >= CURDATE() OR end_date < CURDATE())";
+    }
+    return $clause;
   }
 
 }

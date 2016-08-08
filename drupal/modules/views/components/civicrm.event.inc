@@ -601,6 +601,7 @@ function _civicrm_event_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'fee_currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',

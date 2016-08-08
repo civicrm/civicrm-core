@@ -43,7 +43,7 @@
           {/if}
         {/if}
 
-        {if $mode ne 8 && $action ne 1028 && $action ne 4}
+        {if $mode ne 8 && $action ne 1028 && $action ne 4 && !$hideFieldset}
         <fieldset class="crm-profile crm-profile-id-{$field.group_id} crm-profile-name-{$field.groupName}"><legend>{$field.groupTitle}</legend>
         {/if}
 
@@ -164,7 +164,7 @@
       </div>
     {/if}
 
-    {if $mode ne 8 && $action neq 1028}
+    {if $mode ne 8 && $action neq 1028 && !$hideFieldset}
     </fieldset>
     {/if}
 

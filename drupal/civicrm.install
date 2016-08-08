@@ -86,3 +86,12 @@ function civicrm_update_7400(&$sandbox) {
   db_query("UPDATE {system} SET weight = 100 WHERE name = 'civicrm'");
 }
 
+/**
+ * Trigger cache clear to pick up TZ handling change from CRM-6877.
+ */
+function civicrm_update_7401($sandbox) {
+  // This is an empty hook_update_N() so that caches will be
+  // cleared when update_finished() is called.
+  return t('TZ changes in CiviCRM Views picked up.');
+}
+

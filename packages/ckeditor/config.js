@@ -26,7 +26,14 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'about' }
 	];
 
+	// Add some extra plugins
+	config.extraPlugins = 'justify,showborders,pastefromword,pastetext,htmlwriter';
+
 	// Remove some buttons, provided by the standard plugins, which we don't
 	// need to have in the Standard(s) toolbar.
 	config.removeButtons = 'Underline,Subscript,Superscript';
+
+	// Force the use of a simple ampersand so CiviCRM links don't break
+	config.forceSimpleAmpersand = true;
+	config.basicEntities = false;
 };

@@ -102,7 +102,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
-   * Common buildForm tasks required by all searches.
+   * Common buildform tasks required by all searches
    */
   public function buildQuickform() {
     $resources = CRM_Core_Resources::singleton();
@@ -133,7 +133,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
-   * Add checkboxes for each row plus a master checkbox.
+   * Add checkboxes for each row plus a master checkbox
    */
   public function addRowSelectors($rows) {
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
@@ -158,6 +158,46 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
       $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
     }
+  }
+
+  /**
+   * Add the sort-name field to the form.
+   *
+   * There is a setting to determine whether email is included in the search & we look this up to determine
+   * which text to choose.
+   *
+   * Note that for translation purposes the full string works better than using 'prefix' hence we use override-able functions
+   * to define the string.
+   */
+  protected function addSortNameField() {
+    $this->addElement(
+      'text',
+      'sort_name',
+      civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences')) ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail(),
+      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
+    );
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is on.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithEmail() {
+    return ts('Name or Email');
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is off.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithOutEmail() {
+    return ts('Name');
   }
 
 }

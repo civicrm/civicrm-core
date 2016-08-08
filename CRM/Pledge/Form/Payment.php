@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing a pledge payment
- *
+ * This class generates form components for processing a pledge payment.
  */
 class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
@@ -48,8 +45,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     // check for edit permission
@@ -64,10 +59,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
+   * the default values are retrieved from the database.
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -78,7 +70,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
       if (isset($defaults['contribution_id'])) {
         $this->assign('pledgePayment', TRUE);
       }
-      $status = CRM_Contribute_PseudoConstant::contributionStatus($defaults['status_id']);
+      $status = CRM_Core_PseudoConstant::getName('CRM_Pledge_BAO_Pledge', 'status_id', $defaults['status_id']);
       $this->assign('status', $status);
     }
     $defaults['option_type'] = 1;
@@ -87,11 +79,9 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
-    //add various dates
+    // add various dates
     $this->addDate('scheduled_date', ts('Scheduled Date'), TRUE);
 
     $this->addMoney('scheduled_amount',
@@ -130,25 +120,21 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
-    //get the submitted form values.
+    // get the submitted form values.
     $formValues = $this->controller->exportValues($this->_name);
     $params = array();
     $formValues['scheduled_date'] = CRM_Utils_Date::processDate($formValues['scheduled_date']);
     $params['scheduled_date'] = CRM_Utils_Date::format($formValues['scheduled_date']);
     $params['currency'] = CRM_Utils_Array::value('currency', $formValues);
     $now = date('Ymd');
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     if (CRM_Utils_Date::overdue(CRM_Utils_Date::customFormat($params['scheduled_date'], '%Y%m%d'), $now)) {
-      $params['status_id'] = array_search('Overdue', $contributionStatus);
+      $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Overdue');
     }
     else {
-      $params['status_id'] = array_search('Pending', $contributionStatus);
+      $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
     }
 
     $params['id'] = $this->_id;
@@ -173,7 +159,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     if (($formValues['scheduled_amount'] - $pledgeScheduledAmount) >= $oldestPaymentAmount['amount']) {
       $adjustTotalAmount = TRUE;
     }
-    //update pledge status
+    // update pledge status
     CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId,
       array($params['id']),
       $params['status_id'],

@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -73,19 +71,15 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   public function preProcess() {
 
-    /**
-     * set the button names
-     */
     $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
     $this->defaults = array();
 
-    /*
-     * we allow the controller to set force/reset externally, useful when we are being
-     * driven by the wizard framework
-     */
+    // we allow the controller to set force/reset externally, useful when we are being
+    // driven by the wizard framework
+
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
@@ -152,13 +146,10 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addElement('text', 'sort_name', ts('Pledger Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+    $this->addSortNameField();
 
     CRM_Pledge_BAO_Query::buildSearchForm($this);
 
@@ -176,6 +167,28 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Get the label for the sortName field if email searching is on.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithEmail() {
+    return ts('Pledger Name or Email');
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is off.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithOutEmail() {
+    return ts('Pledger Name');
+  }
+
+  /**
    * The post processing of the form gets done here.
    *
    * Key things done during post processing are
@@ -186,10 +199,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_done) {
@@ -283,7 +292,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return void
    * @see valid_date
    */
   public function addRules() {
@@ -296,7 +304,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return void
+   * @return array|bool
    */
   public static function formRule($fields) {
     $errors = array();
@@ -354,14 +362,10 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     }
 
     // set pledge related fields
-    $pledgeStatus = CRM_Utils_Request::retrieve('pstatus', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
-    if ($pledgeStatus) {
-      $statusValues = CRM_Contribute_PseudoConstant::contributionStatus();
+    $pledgeStatus = CRM_Utils_Request::retrieve('pstatus', 'String');
 
-      // Remove status values that are only used for recurring contributions for now (Failed).
-      unset($statusValues['4']);
+    if ($pledgeStatus) {
+      $statusValues = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
 
       // we need set all statuses except Cancelled
       unset($statusValues[$pledgeStatus]);

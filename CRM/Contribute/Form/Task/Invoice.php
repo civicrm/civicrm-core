@@ -480,6 +480,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       if (empty($contactID)) {
         $contactID = $session->get('transaction.userID');
       }
+      // Fix Invoice email doesnot send out when completed payment using Paypal
+      if (empty($contactID)) {
+        $contactID = current($contactIds);
+      }
       $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
       $emails = array();
       $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',

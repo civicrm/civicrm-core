@@ -108,12 +108,14 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
       // if text, retrieve price
       if ($defaults['html_type'] == 'Text') {
+        $isActive = $defaults['is_active'];
         $valueParams = array('price_field_id' => $this->_fid);
 
         CRM_Price_BAO_PriceFieldValue::retrieve($valueParams, $defaults);
 
         // fix the display of the monetary value, CRM-4038
         $defaults['price'] = CRM_Utils_Money::format($defaults['amount'], NULL, '%a');
+        $defaults['is_active'] = $isActive;
       }
 
       if (!empty($defaults['active_on'])) {
@@ -647,7 +649,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       //$params['option_description']  = array( 1 => $params['description'] );
       $params['option_weight'] = array(1 => $params['weight']);
       $params['option_financial_type_id'] = array(1 => $params['financial_type_id']);
-      $params['is_active'] = array(1 => 1);
     }
 
     if ($this->_fid) {

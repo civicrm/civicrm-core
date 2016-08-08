@@ -47,4 +47,3 @@
   </div>
   {include file="CRM/common/notifications.tpl"}
 {/if}
-

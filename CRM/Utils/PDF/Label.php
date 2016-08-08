@@ -34,8 +34,6 @@
  *
  */
 
-require_once 'tcpdf/tcpdf.php';
-
 /**
  * Class CRM_Utils_PDF_Label
  */

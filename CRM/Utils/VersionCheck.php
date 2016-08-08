@@ -36,7 +36,7 @@ class CRM_Utils_VersionCheck {
   const
     PINGBACK_URL = 'http://latest.civicrm.org/stable.php?format=json',
     // timeout for when the connection or the server is slow
-    CHECK_TIMEOUT = 5,
+    CHECK_TIMEOUT = 1,
     // relative to $civicrm_root
     LOCALFILE_NAME = 'civicrm-version.php',
     // relative to $config->uploadDir
@@ -179,17 +179,39 @@ class CRM_Utils_VersionCheck {
   public function isSecurityUpdateAvailable() {
     $thisVersion = $this->getReleaseInfo($this->localVersion);
     $localVersionDate = CRM_Utils_Array::value('date', $thisVersion, 0);
-    foreach ($this->versionInfo as $majorVersion) {
+
+    foreach ($this->versionInfo as $majorVersionNumber => $majorVersion) {
       foreach ($majorVersion['releases'] as $release) {
         if (!empty($release['security']) && $release['date'] > $localVersionDate
           && version_compare($this->localVersion, $release['version']) < 0
         ) {
-          if (!$this->ignoreDate || $this->ignoreDate < $release['date']) {
+          if ((!$this->ignoreDate || $this->ignoreDate < $release['date'])
+            && (!$this->isThisReleaseTheLTS() || $majorVersionNumber === $this->localMajorVersion)
+          ) {
             return TRUE;
           }
         }
       }
     }
+  }
+
+  /**
+   * Is this the LTS release.
+   *
+   * This function is only really being used in 4.6 & is a bit heavy on the enotice
+   * handling for test reasons
+   */
+  public function isThisReleaseTheLTS() {
+    if (empty($this->versionInfo)) {
+      return FALSE;
+    }
+    if (empty($this->versionInfo[$this->localMajorVersion])) {
+      return FALSE;
+    }
+    if ($this->versionInfo[$this->localMajorVersion]['status'] === 'lts') {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**

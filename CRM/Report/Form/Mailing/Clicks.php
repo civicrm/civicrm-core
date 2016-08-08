@@ -153,16 +153,6 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
           'title' => ts('Click through URL'),
         ),
       ),
-      // To do this filter should really be like mailing id filter a multi select, However
-      // Not clear on how to make filter dependant on selected mailings at this stage so have set a
-      // text filter which works for now
-      'filters' => array(
-        'url' => array(
-          'title' => ts('URL'),
-          'type' => CRM_Utils_Type::T_STRING,
-          'operator' => 'like',
-        ),
-      ),
       'order_bys' => array(
         'url' => array('title' => ts('Click through URL')),
       ),
@@ -293,7 +283,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     }
 
     $chartInfo = array(
-      'legend' => ts('Mail Clickthrough Report'),
+      'legend' => ts('Mail Click-Through Report'),
       'xname' => ts('Mailing'),
       'yname' => ts('Clicks'),
       'xLabelAngle' => 20,

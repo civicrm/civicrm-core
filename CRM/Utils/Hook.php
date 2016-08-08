@@ -28,9 +28,7 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 abstract class CRM_Utils_Hook {
 
@@ -44,9 +42,9 @@ abstract class CRM_Utils_Hook {
 
   // by default - place content below existing content
   const SUMMARY_BELOW = 1;
-  // pace hook content above
+  // place hook content above
   const SUMMARY_ABOVE = 2;
-  // create your own summarys
+  // create your own summaries
   const SUMMARY_REPLACE = 3;
 
   static $_nullObject = NULL;
@@ -490,6 +488,19 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * @param string|CRM_Core_DAO $entity
+   * @param array $clauses
+   * @return mixed
+   */
+  public static function selectWhereClause($entity, &$clauses) {
+    $entityName = is_object($entity) ? _civicrm_api_get_entity_name_from_dao($entity) : $entity;
+    return self::singleton()->invoke(2, $entityName, $clauses,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_selectWhereClause'
+    );
+  }
+
+  /**
    * This hook is called when building the menu table.
    *
    * @param array $files
@@ -640,6 +651,7 @@ abstract class CRM_Utils_Hook {
    *   The contactID for whom the dashboard is being rendered.
    *
    * @return null
+   * @deprecated Use tabset() instead.
    */
   public static function tabs(&$tabs, $contactID) {
     return self::singleton()->invoke(2, $tabs, $contactID,
@@ -1880,12 +1892,13 @@ abstract class CRM_Utils_Hook {
    * This hook fires whenever a record in a case changes.
    *
    * @param \Civi\CCase\Analyzer $analyzer
+   *   A bundle of data about the case (such as the case and activity records).
    */
   public static function caseChange(\Civi\CCase\Analyzer $analyzer) {
     $event = new \Civi\CCase\Event\CaseChangeEvent($analyzer);
     \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_caseChange", $event);
 
-    return self::singleton()->invoke(1, $angularModules,
+    self::singleton()->invoke(1, $analyzer,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_caseChange'
     );
@@ -1962,6 +1975,17 @@ abstract class CRM_Utils_Hook {
     self::singleton()->invoke(2, $list, $region,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_coreResourceList'
+    );
+  }
+
+  /**
+   * This hook is called for bypass a few civicrm urls from IDS check
+   * @param array $skip list of civicrm url;
+   */
+  public static function idsException(&$skip) {
+    return self::singleton()->invoke(1, $skip, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_idsException'
     );
   }
 

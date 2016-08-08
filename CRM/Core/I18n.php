@@ -542,6 +542,16 @@ class CRM_Core_I18n {
     return $locales[$tsLocale];
   }
 
+  /**
+   * Get the current locale
+   *
+   * @return string
+   */
+  public static function getLocale() {
+    global $tsLocale;
+    return $tsLocale;
+  }
+
 }
 
 /**

@@ -32,13 +32,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Pledge_Info extends CRM_Core_Component_Info {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected $keyword = 'pledge';
 
@@ -62,7 +60,7 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
 
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides permissions that are used by component.
    * Needs to be implemented in component's information
    * class.
@@ -103,16 +101,13 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides information about user dashboard element
    * offered by this component.
    *
    * @return array|null
    *   collection of required dashboard settings,
    *                    null if no element offered
-   */
-  /**
-   * @return array|null
    */
   public function getUserDashboardElement() {
     return array(
@@ -125,16 +120,13 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides information about user dashboard element
    * offered by this component.
    *
    * @return array|null
    *   collection of required dashboard settings,
    *                    null if no element offered
-   */
-  /**
-   * @return array|null
    */
   public function registerTab() {
     return array(
@@ -145,16 +137,13 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides information about advanced search pane
    * offered by this component.
    *
    * @return array|null
    *   collection of required pane settings,
    *                    null if no element offered
-   */
-  /**
-   * @return array|null
    */
   public function registerAdvancedSearchPane() {
     return array(
@@ -164,7 +153,7 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides potential activity types that this
    * component might want to register in activity history.
    * Needs to be implemented in component's information
@@ -172,9 +161,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *
    * @return array|null
    *   collection of activity types
-   */
-  /**
-   * @return array|null
    */
   public function getActivityTypes() {
     return NULL;

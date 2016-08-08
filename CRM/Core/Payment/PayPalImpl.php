@@ -25,12 +25,16 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ */
+
+/**
+ * Class CRM_Core_Payment_PayPalImpl for paypal pro, paypal standard & paypal express.
  */
 class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   const CHARSET = 'iso-8859-1';
@@ -51,7 +55,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param $paymentProcessor
+   * @param CRM_Core_Payment $paymentProcessor
    *
    * @return \CRM_Core_Payment_PayPalImpl
    */
@@ -392,7 +396,41 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $params['trxn_id'] = CRM_Utils_Array::value('transactionid', $result);
     $params['gross_amount'] = CRM_Utils_Array::value('amt', $result);
+    $params = array_merge($params, $this->doQuery($params));
     return $params;
+  }
+
+  /**
+   * Query payment processor for details about a transaction.
+   *
+   * For paypal see : https://developer.paypal.com/webapps/developer/docs/classic/api/merchant/GetTransactionDetails_API_Operation_NVP/
+   *
+   * @param array $params
+   *   Array of parameters containing one of:
+   *   - trxn_id Id of an individual transaction.
+   *   - processor_id Id of a recurring contribution series as stored in the civicrm_contribution_recur table.
+   *
+   * @return array
+   *   Extra parameters retrieved.
+   *   Any parameters retrievable through this should be documented in the function comments at
+   *   CRM_Core_Payment::doQuery. Currently
+   *   - fee_amount Amount of fee paid
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doQuery($params) {
+    if (empty($params['trxn_id'])) {
+      return array();
+    }
+    $args = array(
+      'TRANSACTIONID' => $params['trxn_id'],
+    );
+    $this->initialize($args, 'GetTransactionDetails');
+    $result = $this->invokeAPI($args);
+    return array(
+      'fee_amount' => $result['feeamt'],
+      'net_amount' => $params['gross_amount'] - $result['feeamt'],
+    );
   }
 
   /**

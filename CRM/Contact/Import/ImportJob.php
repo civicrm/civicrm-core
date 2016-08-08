@@ -49,6 +49,7 @@ class CRM_Contact_Import_ImportJob {
   protected $_dedupe;
   protected $_newGroupName;
   protected $_newGroupDesc;
+  protected $_newGroupType;
   protected $_groups;
   protected $_allGroups;
   protected $_newTagName;
@@ -316,7 +317,8 @@ class CRM_Contact_Import_ImportJob {
     if ($this->_newGroupName || count($this->_groups)) {
       $groupAdditions = $this->_addImportedContactsToNewGroup($contactIds,
         $this->_newGroupName,
-        $this->_newGroupDesc
+        $this->_newGroupDesc,
+        $this->_newGroupType
       );
       if ($form) {
         $form->set('groupAdditions', $groupAdditions);
@@ -350,17 +352,18 @@ class CRM_Contact_Import_ImportJob {
    */
   private function _addImportedContactsToNewGroup(
     $contactIds,
-    $newGroupName, $newGroupDesc
+    $newGroupName, $newGroupDesc, $newGroupType
   ) {
 
     $newGroupId = NULL;
 
     if ($newGroupName) {
       /* Create a new group */
-
+      $newGroupType = isset($newGroupType) ? $newGroupType : array();
       $gParams = array(
         'title' => $newGroupName,
         'description' => $newGroupDesc,
+        'group_type' => $newGroupType,
         'is_active' => TRUE,
       );
       $group = CRM_Contact_BAO_Group::create($gParams);
@@ -427,7 +430,7 @@ class CRM_Contact_Import_ImportJob {
     if (is_array($this->_tag)) {
       $tagAdditions = array();
       foreach ($this->_tag as $tagId => $val) {
-        $addTagCount = CRM_Core_BAO_EntityTag::addEntitiesToTag($contactIds, $tagId);
+        $addTagCount = CRM_Core_BAO_EntityTag::addEntitiesToTag($contactIds, $tagId, 'civicrm_contact', FALSE);
         $totalTagCount = $addTagCount[1];
         if (isset($addedTag) && $tagId == $addedTag->id) {
           $tagName = $newTagName;

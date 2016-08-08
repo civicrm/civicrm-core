@@ -237,6 +237,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
+        if ($v == 'skip') {
+          continue;
+        }
         $individualTaxAmount = 0;
         //display tax amount on confirmation page
         $taxAmount += $v['tax_amount'];
@@ -746,10 +749,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $totalTaxAmount = 0;
       $dataArray = array();
       foreach ($this->_lineItem as $key => $value) {
-        if (($value != 'skip') &&
-          ($entityId = CRM_Utils_Array::value($key, $allParticipantIds))
-        ) {
-
+        if ($value == 'skip') {
+          continue;
+        }
+        if ($entityId = CRM_Utils_Array::value($key, $allParticipantIds)) {
           // do cleanup line  items if participant re-walking wizard.
           if ($this->_allowConfirmation) {
             CRM_Price_BAO_LineItem::deleteLineItems($entityId, $entityTable);

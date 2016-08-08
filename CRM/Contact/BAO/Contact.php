@@ -919,7 +919,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_acl_contact_cache WHERE contact_id = %1', array(1 => array($contactID, 'Integer')));
     }
     else {
-      CRM_Contact_BAO_GroupContactCache::remove();
+      CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
     }
   }
 
@@ -1948,8 +1948,7 @@ ORDER BY civicrm_email.is_primary DESC";
       CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $addToGroupID);
     }
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if ($editHook) {
       CRM_Utils_Hook::post('edit', 'Profile', $contactID, $params);
@@ -3369,6 +3368,13 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       case 'tag':
         $props['entity_table'] = 'civicrm_contact';
         return CRM_Core_BAO_EntityTag::buildOptions('tag_id', $context, $props);
+
+      case 'state_province_id':
+      case 'country_id':
+      case 'county_id':
+      case 'worldregion':
+      case 'worldregion_id':
+        return CRM_Core_BAO_Address::buildOptions($fieldName, 'get', $props);
 
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);

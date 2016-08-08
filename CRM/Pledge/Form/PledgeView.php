@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class generates form components for Pledge
- *
  */
 class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
 
@@ -67,7 +62,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
       $values['honor_type'] = $honor[$values['honor_type_id']];
     }
 
-    //handle custom data.
+    // handle custom data.
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', $this, $params['id']);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
 
@@ -78,7 +73,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
     $values['financial_type'] = CRM_Utils_Array::value($values['financial_type_id'], CRM_Contribute_PseudoConstant::financialType());
 
     if ($values['status_id']) {
-      $values['pledge_status'] = CRM_Utils_Array::value($values['status_id'], CRM_Contribute_PseudoConstant::contributionStatus());
+      $values['pledge_status'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', $values['status_id']);
     }
 
     $url = CRM_Utils_System::url('civicrm/contact/view/pledge',
@@ -121,7 +116,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     CRM_Utils_System::setTitle(ts('View Pledge by') . ' ' . $displayName);
 
-    //do check for campaigns
+    // do check for campaigns
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
@@ -132,8 +127,6 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addButtons(array(

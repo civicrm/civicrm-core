@@ -76,6 +76,7 @@ class CRM_Contact_Form_Edit_Phone {
           'entity' => 'phone',
           'class' => 'eight',
           'placeholder' => NULL,
+          'option_url' => NULL,
         ));
 
       //is_Primary radio
