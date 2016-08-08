@@ -1800,6 +1800,8 @@ WHERE  id = %1
   public static function getTaxRates() {
     if (!isset(Civi::$statics[__CLASS__]['taxRates'])) {
       Civi::$statics[__CLASS__]['taxRates'] = array();
+      // Never do a copy & paste of this as the join on the option value is not indexed.
+      // @todo fix to resolve option values first.
       $sql = "
         SELECT fa.tax_rate, efa.entity_id
         FROM civicrm_entity_financial_account efa

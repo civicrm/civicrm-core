@@ -361,7 +361,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Updation of contrbution.
+   * Update a contribution.
+   *
    * Function tests that line items, financial records are updated when contribution amount is changed
    */
   public function testCreateUpdateContributionChangeTotal() {
@@ -389,7 +390,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'financial_type_id' => 1, // without tax rate i.e Donation
       'total_amount' => '300',
     );
-    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
 
     $lineItems = $this->callAPISuccess('line_item', 'getvalue', array(
       'entity_id' => $contribution['id'],
