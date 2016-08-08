@@ -861,7 +861,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     else {
       // Only update next sched date if it's empty or 'just now' because payment processors may be managing
       // the scheduled date themselves as core did not previously provide any help.
-      if (empty($params['next_sched_contribution_date']) || strtotime($params['next_sched_contribution_date']) ==
+      if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) ==
         strtotime(date('Y-m-d'))) {
         $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit']));
       }
