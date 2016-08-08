@@ -1786,7 +1786,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'account_relationship' => 10,
       'financial_account_id' => $financialAccountId,
     );
-    $financialRelation = CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'financial_type_id' => $financialTypeId));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
@@ -1794,9 +1794,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'completetransaction', array(
        'id' => $contribution['id'],
        'trxn_id' => '777788888',
+       'fee_amount' => '6.00',
     ));
-    $contribution2 = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'return' => 'tax_amount', 'sequential' => 1));
+    $contribution2 = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'return' => array('tax_amount', 'fee_amount', 'net_amount'), 'sequential' => 1));
     $this->assertEquals($contribution1['values'][0]['tax_amount'], $contribution2['values'][0]['tax_amount']);
+    $this->assertEquals('6.00', $contribution2['values'][0]['fee_amount']);
+    $this->assertEquals('99.00', $contribution2['values'][0]['net_amount']);
   }
 
   /**

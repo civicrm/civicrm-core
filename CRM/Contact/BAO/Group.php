@@ -1336,11 +1336,11 @@ WHERE {$whereClause}";
    * @param int $counter
    */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
-    if ($fieldName == 'children' || $fieldName = 'parents') {
+    if ($fieldName == 'children' || $fieldName == 'parents') {
       $this->{$fieldName} = "NULL";
     }
     else {
-      parent::assignTestValues($fieldaName, $fieldDef, $counter);
+      parent::assignTestValues($fieldName, $fieldDef, $counter);
     }
   }
 
