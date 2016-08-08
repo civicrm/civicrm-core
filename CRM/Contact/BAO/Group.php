@@ -456,10 +456,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       if (!empty($params['parents'])) {
         foreach ($params['parents'] as $parentId => $dnc) {
-          if (CRM_Utils_Type::validate($parentId, 'Integer')) {
-            if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
-              CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
-            }
+          if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
+            CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
           }
         }
       }
