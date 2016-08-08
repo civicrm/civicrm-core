@@ -2601,6 +2601,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       CRM_Report_BAO_ReportInstance::doFormDelete($this->_id, 'civicrm/report/list?reset=1', 'civicrm/report/list?reset=1');
     }
 
+    $this->_formValues = $this->_params;
+
     $this->beginPostProcessCommon();
   }
 
