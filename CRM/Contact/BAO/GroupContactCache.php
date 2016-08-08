@@ -386,6 +386,8 @@ SET    refresh_date = %2
 WHERE  g.cache_date < %1
 AND    refresh_date IS NULL
 ";
+        $cacheTime = date('Y-m-d H-i-s', strtotime("- $smartGroupCacheTimeout minutes"));
+        $params = array(1 => array($cacheTime, 'String'));
       }
     }
     elseif (is_array($groupID)) {

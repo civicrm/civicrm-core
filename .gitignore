@@ -1,5 +1,6 @@
 *~
 *.bak
+bin/setup.conf
 packages/.channels
 packages/.depdb
 packages/.depdblock

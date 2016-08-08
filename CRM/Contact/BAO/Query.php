@@ -4760,7 +4760,8 @@ civicrm_relationship.is_permission_a_b = 0
         $this->_whereTables,
         NULL,
         $onlyDeleted,
-        $this->_skipDeleteClause
+        $this->_skipDeleteClause,
+        TRUE
       );
 
       // regenerate fromClause since permission might have added tables
