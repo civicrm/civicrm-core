@@ -406,39 +406,37 @@ class CRM_Utils_OpenFlashChart {
    * @return array
    */
   public static function chart($rows, $chart, $interval) {
+    $lcInterval = strtolower($interval);
+    $label = ucfirst($lcInterval);
     $chartData = $dateKeys = array();
+    $intervalLabels = array(
+      'month' => ts('Monthly'),
+      'quarter' => ts('Quarterly'),
+      'week' => ts('Weekly'),
+    );
 
-    switch ($interval) {
-      case 'Month':
+    switch ($lcInterval) {
+      case 'month':
+      case 'quarter':
+      case 'week':
         foreach ($rows['receive_date'] as $key => $val) {
           list($year, $month) = explode('-', $val);
-          $dateKeys[] = substr($rows['Month'][$key], 0, 3) . ' ' . $year;
+          if ($lcInterval != 'year') {
+            $dateKeys[] = substr($rows[$interval][$key], 0, 3) . ' of ' . $year;
+          }
+          else {
+            $dateKeys[] = $year;
+          }
         }
-        $legend = ts('Monthly');
+        $legend = $intervalLabels[$lcInterval];
         break;
 
-      case 'Quarter':
-        foreach ($rows['receive_date'] as $key => $val) {
-          list($year, $month) = explode('-', $val);
-          $dateKeys[] = 'Quarter ' . $rows['Quarter'][$key] . ' of ' . $year;
-        }
-        $legend = ts('Quarterly');
-        break;
-
-      case 'Week':
-        foreach ($rows['receive_date'] as $key => $val) {
-          list($year, $month) = explode('-', $val);
-          $dateKeys[] = 'Week ' . $rows['Week'][$key] . ' of ' . $year;
-        }
-        $legend = ts('Weekly');
-        break;
-
-      case 'Year':
+      default:
         foreach ($rows['receive_date'] as $key => $val) {
           list($year, $month) = explode('-', $val);
           $dateKeys[] = $year;
         }
-        $legend = ts('Yearly');
+        $legend = ts("%1", array(1 => $label));
         break;
     }
 
