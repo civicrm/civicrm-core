@@ -382,7 +382,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       }
 
       $this->_rollup = ' WITH ROLLUP';
-      $this->appendSelect($this->_selectClauses, array_filter($this->_groupBy));
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, array_filter($this->_groupBy));
       $this->_groupBy = 'GROUP BY ' . implode(', ', array_filter($this->_groupBy)) .
         " {$this->_rollup} ";
     }

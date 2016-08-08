@@ -552,7 +552,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
-    $this->appendSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
     $this->assign('chartSupported', TRUE);
   }
 

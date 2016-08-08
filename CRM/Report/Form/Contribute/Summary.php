@@ -559,7 +559,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     }
     $this->_groupBy .= $this->_rollup;
     // append select with ANY_VALUE() keyword
-    $this->appendSelect($this->_selectClauses, $groupBy);
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBy);
   }
 
   /**

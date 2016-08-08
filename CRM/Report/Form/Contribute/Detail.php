@@ -886,7 +886,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
       $this->_select = "SELECT " . implode(", ", $ifnulls);
-      $this->appendSelect($ifnulls, $sectionAliases);
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       /* Group (un-limited) report by all aliases and get counts. This might
        * be done more efficiently when the contents of $sql are known, ie. by
