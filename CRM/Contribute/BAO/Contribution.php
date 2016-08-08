@@ -4112,6 +4112,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 
     // Update contribution.
     if (!empty($params['id'])) {
+
+      $id = $params['id'];
+      $values = $ids = array();
+      $contrbutionParams = array('id' => $id);
+      $prevContributionValue = CRM_Contribute_BAO_Contribution::getValues($contrbutionParams, $values, $ids);
+
       // CRM-19126 and CRM-19152, civicrm_line_item.tax_amount incorrectly set when using online payment processor.
       // It looks like this method is meant to be called in multiple contexts: new & update
       // When creating, would expect total_amount to be set?  Prior to 4.7, when creating online membership
@@ -4121,14 +4127,27 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       // Conceptually, if we're "updating", and total_amount is unknown.  We're dealing with an incomplete
       // view, why are we nulling out all line item taxes, or messing with any other tax amounts?
       if (!isset($params['total_amount'])) {
-        return $params;
+        if (!empty($prevContributionValue->tax_amount)) {
+          $params['total_amount'] = $prevContributionValue->total_amount - $prevContributionValue->tax_amount;
+          if (isset($params['fee_amount'])) {
+            $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+          }
+          else {
+            $params['net_amount'] = $params['total_amount'] - $prevContributionValue->fee_amount;
+            $params['fee_amount'] = $prevContributionValue->fee_amount;
+          }
+        }
+        else {
+          if (isset($params['fee_amount'])) {
+            $params['net_amount'] = $prevContributionValue->total_amount - $params['fee_amount'];
+            $params['total_amount'] = $prevContributionValue->total_amount;
+          }
+          else {
+            $params['total_amount'] = $prevContributionValue->total_amount;
+            $params['fee_amount'] = $prevContributionValue->fee_amount;
+          }
+        }
       }
-
-      $id = $params['id'];
-      $values = $ids = array();
-      $contrbutionParams = array('id' => $id);
-      $prevContributionValue = CRM_Contribute_BAO_Contribution::getValues($contrbutionParams, $values, $ids);
-
       // To assign pervious finantial type on update of contribution
       if (!isset($params['financial_type_id'])) {
         $params['financial_type_id'] = $prevContributionValue->financial_type_id;
@@ -5198,6 +5217,31 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
 
     return $statusMsg;
+  }
+
+  /**
+   * Assign Test Value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'tax_amount') {
+      $this->{$fieldName} = "0.00";
+    }
+    elseif ($fieldName == 'net_amount') {
+      $this->{$fieldName} = "2.00";
+    }
+    elseif ($fieldName == 'total_amount') {
+      $this->{$fieldName} = "3.00";
+    }
+    elseif ($fieldName == 'fee_amount') {
+      $this->{$fieldName} = "1.00";
+    }
+    else {
+      parent::assignTestValues($fieldName, $fieldDef, $counter);
+    }
   }
 
 }
