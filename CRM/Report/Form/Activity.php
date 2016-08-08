@@ -1035,7 +1035,7 @@ FROM civireport_activity_temp_target tar
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
       $this->_select = "SELECT " . implode(", ", $ifnulls);
-      $this->appendSelect($ifnulls, $sectionAliases);
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       $query = $this->_select .
         ", count(DISTINCT civicrm_activity_id) as ct from civireport_activity_temp_target group by " .
