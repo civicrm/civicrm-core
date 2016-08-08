@@ -191,7 +191,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) || isset
       ($params['financial_type_id']))) {
-      CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
+      $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
     }
 
     if ($contributionID) {
