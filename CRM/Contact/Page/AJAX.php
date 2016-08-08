@@ -570,12 +570,6 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function dashboard() {
     switch ($_REQUEST['op']) {
-      case 'get_widget':
-        $dashletID = CRM_Utils_Type::escape($_GET['id'], 'Positive');
-        $dashlets = CRM_Core_BAO_Dashboard::getDashletInfo($dashletID);
-        CRM_Utils_JSON::output($dashlets);
-        break;
-
       case 'save_columns':
         CRM_Core_BAO_Dashboard::saveDashletChanges($_REQUEST['columns']);
         break;

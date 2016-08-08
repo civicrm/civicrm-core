@@ -113,7 +113,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         'id',
         'weight',
         'column_no',
-        'is_minimized',
         'dashboard_id',
         'dashboard_id.name',
         'dashboard_id.label',
@@ -130,7 +129,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
           'dashboard_id' => $item['dashboard_id'],
           'weight' => $item['weight'],
           'column_no' => $item['column_no'],
-          'is_minimized' => $item['is_minimized'],
           'name' => $item['dashboard_id.name'],
           'label' => $item['dashboard_id.label'],
           'url' => $item['dashboard_id.url'],
@@ -150,6 +148,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     return $dashlets;
   }
 
+  /**
+   * @return array
+   */
   public static function getContactDashletsForJS() {
     $data = array(array(), array());
     foreach (self::getContactDashlets() as $item) {
@@ -209,7 +210,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
             'dashboard_id' => $values['dashboard_id'],
             'weight' => $values['weight'],
             'column_no' => $values['column_no'],
-            'is_minimized' => $values['is_minimized'],
             'name' => $dashlet['name'],
             'label' => $dashlet['label'],
             'url' => $dashlet['url'],
@@ -313,76 +313,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Get details of each dashlets.
-   *
-   * @param int $dashletID
-   *   Widget ID.
-   *
-   * @return array
-   *   associted array title and content
-   */
-  public static function getDashletInfo($dashletID) {
-    $dashletInfo = array();
-
-    $params = array(1 => array($dashletID, 'Integer'));
-    $query = "SELECT name, label, url, fullscreen_url, is_fullscreen FROM civicrm_dashboard WHERE id = %1";
-    $dashboadDAO = CRM_Core_DAO::executeQuery($query, $params);
-    $dashboadDAO->fetch();
-
-    // build the content
-    $dao = new CRM_Contact_DAO_DashboardContact();
-
-    $session = CRM_Core_Session::singleton();
-    $dao->contact_id = $session->get('userID');
-    $dao->dashboard_id = $dashletID;
-    $dao->find(TRUE);
-
-    //reset content based on the cache time set in config
-    $createdDate = strtotime($dao->created_date);
-    $dateDiff = round(abs(time() - $createdDate) / 60);
-
-    $config = CRM_Core_Config::singleton();
-    if ($config->dashboardCacheTimeout <= $dateDiff) {
-      $dao->content = NULL;
-    }
-
-    // if content is empty and url is set, retrieve it from url
-    if (!$dao->content && $dashboadDAO->url) {
-      $url = $dashboadDAO->url;
-
-      // CRM-7087
-      // -lets use relative url for internal use.
-      // -make sure relative url should not be htmlize.
-      if (substr($dashboadDAO->url, 0, 4) != 'http') {
-        $urlParam = explode('?', $dashboadDAO->url);
-        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], TRUE, NULL, FALSE);
-      }
-
-      //get content from url
-      $dao->content = CRM_Utils_System::getServerResponse($url);
-      $dao->created_date = date("YmdHis");
-      $dao->save();
-    }
-
-    $dashletInfo = array(
-      'title' => $dashboadDAO->label,
-      'name' => $dashboadDAO->name,
-      'content' => $dao->content,
-    );
-
-    if ($dashboadDAO->is_fullscreen) {
-      $fullscreenUrl = $dashboadDAO->fullscreen_url;
-      if (substr($fullscreenUrl, 0, 4) != 'http') {
-        $urlParam = explode('?', $dashboadDAO->fullscreen_url);
-        $fullscreenUrl = CRM_Utils_System::url($urlParam[0], $urlParam[1], TRUE, NULL, FALSE);
-      }
-      $dashletInfo['fullscreenUrl'] = $fullscreenUrl;
-    }
-    return $dashletInfo;
-  }
-
-  /**
-   * Save changes made by use to the Dashlet.
+   * Save changes made by user to the Dashlet.
    *
    * @param array $columns
    *
@@ -407,12 +338,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         }
         $weight = 1;
         foreach ($dashlets as $dashletID => $isMinimized) {
-          $isMinimized = (int) $isMinimized;
           $dashletID = (int) $dashletID;
           $query = "INSERT INTO civicrm_dashboard_contact
-                    (weight, is_minimized, column_no, is_active, dashboard_id, contact_id)
-                    VALUES({$weight},  {$isMinimized},  {$colNo}, 1, {$dashletID}, {$contactID})
-                    ON DUPLICATE KEY UPDATE weight = {$weight}, is_minimized = {$isMinimized}, column_no = {$colNo}, is_active = 1";
+                    (weight, column_no, is_active, dashboard_id, contact_id)
+                    VALUES({$weight}, {$colNo}, 1, {$dashletID}, {$contactID})
+                    ON DUPLICATE KEY UPDATE weight = {$weight}, column_no = {$colNo}, is_active = 1";
           // fire update query for each column
           CRM_Core_DAO::executeQuery($query);
 
@@ -484,22 +414,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * @param $url
-   *
-   * @return string
-   */
-  public static function getDashletName($url) {
-    $urlElements = explode('/', $url);
-    if ($urlElements[1] == 'dashlet') {
-      return $urlElements[2];
-    }
-    elseif ($urlElements[1] == 'report') {
-      return 'report/' . $urlElements[3];
-    }
-    return $url;
-  }
-
-  /**
    * Update contact dashboard with new dashlet.
    *
    * @param object $dashlet
@@ -562,23 +476,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     }
     self::saveDashletChanges($columns, $contactID);
     return TRUE;
-  }
-
-  /**
-   * Reset dashlet cache.
-   *
-   * @param int $contactID
-   *   Reset cache only for specific contact.
-   */
-  public static function resetDashletCache($contactID = NULL) {
-    $whereClause = NULL;
-    $params = array();
-    if ($contactID) {
-      $whereClause = "WHERE contact_id = %1";
-      $params[1] = array($contactID, 'Integer');
-    }
-    $query = "UPDATE civicrm_dashboard_contact SET content = NULL $whereClause";
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
   }
 
   /**

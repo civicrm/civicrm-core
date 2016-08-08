@@ -46,15 +46,9 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $resources->addStyleFile('civicrm', 'css/dashboard.css');
     $this->assign('contactDashlets', CRM_Core_BAO_Dashboard::getContactDashletsForJS());
 
-    $resetCache = CRM_Utils_Request::retrieve('resetCache', 'Positive', CRM_Core_DAO::$_nullObject);
-
     CRM_Utils_System::setTitle(ts('CiviCRM Home'));
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
-
-    if ($resetCache) {
-      CRM_Core_BAO_Dashboard::resetDashletCache($contactID);
-    }
 
     // call hook to get html from other modules
     // ignored but needed to prevent warnings

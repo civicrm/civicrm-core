@@ -43,9 +43,7 @@ CRM.$(function($) {
     // These define the urls and data objects used for all of the ajax requests to the server.
     ajaxCallbacks: {
 
-      // jQuery.dashboard() POSTs the widget-to-column settings here.  The server's
-      // response is sent to console.log() (if it exists), but is not used.  No checks
-      // for errors have been implemented yet.
+      // jQuery.dashboard() POSTs the widget-to-column settings here.
       // The 'columns' property of data is reserved for the widget-to-columns settings:
       //    An array (keyed by zero-indexed column ID), of arrays (keyed by widget ID)
       //    of ints; 1 if the widget is minimized.  0 if not.
