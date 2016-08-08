@@ -1786,7 +1786,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'account_relationship' => 10,
       'financial_account_id' => $financialAccountId,
     );
-    $financialRelation = CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'financial_type_id' => $financialTypeId));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);

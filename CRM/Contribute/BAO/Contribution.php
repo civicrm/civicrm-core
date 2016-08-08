@@ -4125,26 +4125,22 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       if (empty($params['prevContribution'])) {
         $params['prevContribution'] = self::getOriginalContribution($params['id']);
       }
-      $isRequireTaxCalculation = FALSE;
-      foreach (array('total_amount', 'financial_type_id', 'fee_amount', 'tax_amount') as $field) {
+
+      foreach (array('total_amount', 'financial_type_id', 'fee_amount') as $field) {
         if (!isset($params[$field])) {
           if ($field == 'total_amount' && $params['prevContribution']->tax_amount) {
             // Tax amount gets added back on later....
             $params['total_amount'] = $params['prevContribution']->total_amount -
               $params['prevContribution']->tax_amount;
-            $isRequireTaxCalculation = TRUE;
           }
           else {
             $params[$field] = $params['prevContribution']->$field;
             if ($params[$field] != $params['prevContribution']->$field) {
-              $isRequireTaxCalculation = TRUE;
             }
           }
         }
       }
-      if (!$isRequireTaxCalculation) {
-        return $params;
-      }
+
       self::calculateMissingAmountParams($params, $params['id']);
       if (!array_key_exists($params['financial_type_id'], $taxRates)) {
         // Assign tax Amount on update of contribution
