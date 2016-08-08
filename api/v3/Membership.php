@@ -64,7 +64,7 @@ function civicrm_api3_membership_delete($params) {
       return civicrm_api3_create_success(TRUE, $params);
     }
     else {
-      return civicrm_api3_create_error('Could not delete membership');
+      throw new CiviCRM_API3_Exception('Could not delete membership');
     }
   }
   else {
