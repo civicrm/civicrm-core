@@ -52,7 +52,7 @@ class CRM_Contact_Page_Dashlet extends CRM_Core_Page {
     $contactDashlets = $availableDashlets = array();
 
     foreach ($currentDashlets as $item) {
-      $key = "{$item['dashboard_id']}-{$item['is_minimized']}";
+      $key = "{$item['dashboard_id']}-0";
       $contactDashlets[$item['column_no']][$key] = array(
         'label' => $item['label'],
         'is_reserved' => $allDashlets[$item['dashboard_id']]['is_reserved'],
