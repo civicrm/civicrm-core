@@ -305,7 +305,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   public function groupBy() {
     $this->assign('chartSupported', TRUE);
     $this->_rollup = " WITH ROLLUP";
-    $this->appendSelect($this->_selectClauses, "{$this->_aliases['civicrm_event']}.id");
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, "{$this->_aliases['civicrm_event']}.id");
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_event']}.id {$this->_rollup}";
   }
 
