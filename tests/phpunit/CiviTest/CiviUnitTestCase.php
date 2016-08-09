@@ -3397,8 +3397,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @return array
    */
   protected function createPriceSet($component = 'contribution_page', $componentId = NULL) {
-    $paramsSet['title'] = 'Price Set';
-    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
+    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
+    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 4;
     $paramsSet['extends'] = 1;
