@@ -846,4 +846,98 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals($settings, 1, 'Check for settings has failed');
   }
 
+  /**
+   * Test allowUpdateRevenueRecognitionDate.
+   */
+  public function testAllowUpdateRevenueRecognitionDate() {
+    $contactId = $this->individualCreate();
+    $params = array(
+      'contact_id' => $contactId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 3,
+    );
+    $order = $this->callAPISuccess('order', 'create', $params);
+    $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
+    $this->assertTrue($allowUpdate);
+
+    $event = $this->eventCreate();
+    $params = array(
+      'contact_id' => $contactId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 300,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 1,
+    );
+    $priceFields = $this->createPriceSet('event', $event['id']);
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[$key] = array(
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+        'entity_table' => 'civicrm_participant',
+      );
+    }
+    $params['line_items'][] = array(
+      'line_item' => $lineItems,
+      'params' => array(
+        'contact_id' => $contactId,
+        'event_id' => $event['id'],
+        'status_id' => 1,
+        'role_id' => 1,
+        'register_date' => '2007-07-21 00:00:00',
+        'source' => 'Online Event Registration: API Testing',
+      ),
+    );
+    $order = $this->callAPISuccess('order', 'create', $params);
+    $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
+    $this->assertFalse($allowUpdate);
+
+    $params = array(
+      'contact_id' => $contactId,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 200,
+      'financial_type_id' => 2,
+      'contribution_status_id' => 1,
+    );
+    $membershipType = $this->membershipTypeCreate();
+    $priceFields = $this->createPriceSet();
+    $lineItems = array();
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[$key] = array(
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+        'entity_table' => 'civicrm_membership',
+        'membership_type_id' => $membershipType,
+      );
+    }
+    $params['line_items'][] = array(
+      'line_item' => array(array_pop($lineItems)),
+      'params' => array(
+        'contact_id' => $contactId,
+        'membership_type_id' => $membershipType,
+        'join_date' => '2006-01-21',
+        'start_date' => '2006-01-21',
+        'end_date' => '2006-12-21',
+        'source' => 'Payment',
+        'is_override' => 1,
+        'status_id' => 1,
+      ),
+    );
+    $order = $this->callAPISuccess('order', 'create', $params);
+    $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
+    $this->assertFalse($allowUpdate);
+  }
+
 }
