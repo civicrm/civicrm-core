@@ -596,11 +596,12 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     $select = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_select);
     $select = str_ireplace("'Contribution' as", "'Soft Credit' as", $select);
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy .= ', contribution_soft_civireport.amount';
+    $groupBy = $this->_groupBy;
+    if (!empty($groupBy)) {
+      $groupBy .= ', contribution_soft_civireport.amount';
     }
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
-    $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy}";
+    $sql = "{$select} {$this->_from} {$this->_where} {$groupBy}";
     $tempQuery = 'CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 AS ' . $sql;
     CRM_Core_DAO::executeQuery($tempQuery);
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
