@@ -398,7 +398,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->assign('chartSupported', TRUE);
     $fiscalYearOffset = self::fiscalYearOffset("{$this->_aliases['civicrm_contribution']}.receive_date");
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contribution']}.contact_id, {$fiscalYearOffset}";
-    $this->appendSelect($this->_selectClauses, array("{$this->_aliases['civicrm_contribution']}.contact_id", $fiscalYearOffset));
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, array("{$this->_aliases['civicrm_contribution']}.contact_id", $fiscalYearOffset));
     $this->_groupBy .= " {$this->_rollup}";
   }
 
