@@ -760,6 +760,13 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'weight');
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET url = REPLACE(url, "&snippet=5", ""), fullscreen_url = REPLACE(fullscreen_url, "&snippet=5", "")');
+
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_dashboard', 'cache_minutes')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard ADD COLUMN cache_minutes int unsigned NOT NULL DEFAULT 60 COMMENT "Number of minutes to cache dashlet content in browser localStorage."');
+    }
+
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 1440 WHERE name = "blog"');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 7200 WHERE name IN ("activity","getting-started")');
     return TRUE;
   }
 

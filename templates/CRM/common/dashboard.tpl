@@ -29,14 +29,6 @@
 CRM.$(function($) {
   // The set of options we can use to initialize jQuery.dashboard().
   var options = {
-    // Optional. Defaults to 3.  You'll need to change the width of columns in CSS too.
-    columns: 2,
-
-    // Set this to a link to your server-side script that adds widgets to the dashboard.
-    // The server will need to choose a column to add it to, and change the user's settings
-    // stored server-side.
-    // Required.
-    emptyPlaceholderInner: '',
 
     widgetsByColumn: {/literal}{$contactDashlets|@json_encode}{literal},
 
