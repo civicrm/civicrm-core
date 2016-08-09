@@ -5295,14 +5295,14 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     // check if line item is for membership or participant
     foreach ($lineItems as $items) {
       if ($items['entity_table'] == 'civicrm_participant') {
-        $Update = FALSE;
+        $flag = FALSE;
         break;
       }
       elseif ($items['entity_table'] == 'civicrm_membership') {
-        $Update = FALSE;
+        $flag = FALSE;
       }
       else {
-        $Update = TRUE;
+        $flag = TRUE;
         break;
       }
     }
