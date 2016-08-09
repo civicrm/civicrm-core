@@ -410,23 +410,22 @@ class CRM_Utils_OpenFlashChart {
     $label = ucfirst($lcInterval);
     $chartData = $dateKeys = array();
     $intervalLabels = array(
+      'year' => ts('Yearly'),
+      'fiscalyear' => ts('Yearly (Fiscal)'),
       'month' => ts('Monthly'),
       'quarter' => ts('Quarterly'),
       'week' => ts('Weekly'),
+      'yearweek' => ts('Weekly'),
     );
 
     switch ($lcInterval) {
       case 'month':
       case 'quarter':
       case 'week':
+      case 'yearweek':
         foreach ($rows['receive_date'] as $key => $val) {
           list($year, $month) = explode('-', $val);
-          if ($lcInterval != 'year') {
-            $dateKeys[] = substr($rows[$interval][$key], 0, 3) . ' of ' . $year;
-          }
-          else {
-            $dateKeys[] = $year;
-          }
+          $dateKeys[] = substr($rows[$interval][$key], 0, 3) . ' of ' . $year;
         }
         $legend = $intervalLabels[$lcInterval];
         break;
@@ -437,6 +436,9 @@ class CRM_Utils_OpenFlashChart {
           $dateKeys[] = $year;
         }
         $legend = ts("%1", array(1 => $label));
+        if (!empty($intervalLabels[$lcInterval])) {
+          $legend = $intervalLabels[$lcInterval];
+        }
         break;
     }
 
