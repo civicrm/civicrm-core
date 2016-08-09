@@ -283,7 +283,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
       'type' => CRM_Utils_Type::T_INT,
     );
     $this->_columnHeaders['totalAmount'] = array(
-      'title' => 'Total Income',
+      'title' => ts('Total Income'),
       'type' => CRM_Utils_Type::T_STRING,
     );
   }

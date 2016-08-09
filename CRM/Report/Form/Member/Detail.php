@@ -86,7 +86,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Member_DAO_Membership',
         'fields' => array(
           'membership_type_id' => array(
-            'title' => 'Membership Type',
+            'title' => ts('Membership Type'),
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
@@ -102,7 +102,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('Join Date'),
             'default' => TRUE,
           ),
-          'source' => array('title' => 'Source'),
+          'source' => array('title' => ts('Source')),
         ),
         'filters' => array(
           'join_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
@@ -206,7 +206,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,

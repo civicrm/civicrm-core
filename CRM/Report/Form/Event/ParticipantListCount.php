@@ -149,7 +149,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
             'required' => TRUE,
           ),
           'organization_name' => array(
-            'title' => 'Employer',
+            'title' => ts('Employer'),
             'default' => TRUE,
             'no_repeat' => TRUE,
           ),
@@ -362,17 +362,17 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
       }
       $statistics['counts']['count'] = array(
         'value' => $dao->count,
-        'title' => 'Total Participants',
+        'title' => ts('Total Participants'),
         'type' => CRM_Utils_Type::T_INT,
       );
       $statistics['counts']['amount'] = array(
         'value' => $dao->amount,
-        'title' => 'Total Income',
+        'title' => ts('Total Income'),
         'type' => CRM_Utils_Type::T_MONEY,
       );
-      $statistics['counts']['avg    '] = array(
+      $statistics['counts']['avg'] = array(
         'value' => $avg,
-        'title' => 'Average',
+        'title' => ts('Average'),
         'type' => CRM_Utils_Type::T_MONEY,
       );
     }
