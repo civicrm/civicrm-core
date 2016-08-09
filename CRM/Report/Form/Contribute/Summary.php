@@ -350,7 +350,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 break;
             }
             if (!empty($this->_params['group_bys_freq'][$fieldName])) {
-              $this->_interval = $field['title'];
+              $this->_interval = $this->_params['group_bys_freq'][$fieldName];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
