@@ -79,7 +79,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
           'email' => array(
-            'title' => 'Email',
+            'title' => ts('Email'),
           ),
         ),
         'order_bys' => array(
@@ -93,7 +93,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
           'phone' => array(
-            'title' => 'Phone',
+            'title' => ts('Phone'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -632,7 +632,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   public function modifyColumnHeaders() {
     //CRM-16719 modify name of column
     if (!empty($this->_columnHeaders['civicrm_activity_status_id'])) {
-      $this->_columnHeaders['civicrm_activity_status_id']['title'] = "Status";
+      $this->_columnHeaders['civicrm_activity_status_id']['title'] = ts('Status');
     }
   }
 
