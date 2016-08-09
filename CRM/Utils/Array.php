@@ -98,7 +98,6 @@ class CRM_Utils_Array {
    * checks that $list is an array before attempting to search it.
    *
    *
-   *
    * @param mixed $value
    *   The value to search for.
    * @param array $list
@@ -517,7 +516,8 @@ class CRM_Utils_Array {
     if ($lcMessages && $lcMessages != 'en_US' && class_exists('Collator')) {
       $collator = new Collator($lcMessages . '.utf8');
       $collator->asort($array);
-    } else {
+    }
+    else {
       // This calls PHP's built-in asort().
       asort($array);
     }
@@ -542,7 +542,8 @@ class CRM_Utils_Array {
         foreach ($key as $k) {
           unset($items[$k]);
         }
-      } elseif ($n) {
+      }
+      elseif ($n) {
         unset($items[$key]);
       }
     }
@@ -642,7 +643,7 @@ class CRM_Utils_Array {
     if ($values === '') {
       return array();
     }
-    return explode($delim, trim((string)$values, $delim));
+    return explode($delim, trim((string) $values, $delim));
   }
 
   /**
@@ -670,7 +671,7 @@ class CRM_Utils_Array {
     if (is_string($values)) {
       $values = trim($values, $delim);
     }
-    return $delim . implode($delim, (array)$values) . $delim;
+    return $delim . implode($delim, (array) $values) . $delim;
   }
 
   /**
@@ -851,12 +852,14 @@ class CRM_Utils_Array {
           if (count($recursiveDiff)) {
             $arrayDiff[$mKey] = $recursiveDiff;
           }
-        } else {
+        }
+        else {
           if ($mValue != $array2[$mKey]) {
             $arrayDiff[$mKey] = $mValue;
           }
         }
-      } else {
+      }
+      else {
         $arrayDiff[$mKey] = $mValue;
       }
     }
@@ -911,7 +914,8 @@ class CRM_Utils_Array {
     foreach ($other as $key => $value) {
       if (is_array($value)) {
         self::extend($array[$key], $value);
-      } else {
+      }
+      else {
         $array[$key] = $value;
       }
     }
