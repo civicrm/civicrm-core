@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
 
@@ -52,8 +50,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;

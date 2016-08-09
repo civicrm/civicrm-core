@@ -83,6 +83,15 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   protected $contributionJoinTableColumn;
 
   /**
+   * This report has been optimised for group filtering.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = FALSE;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -399,10 +408,11 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
    * @return mixed|string
    */
   public function fromContribution($replaceAliasWith = 'contribution1') {
-    $from = " FROM civicrm_contribution {$replaceAliasWith} ";
+    $this->setFromBase('civicrm_contribution', 'contact_id', $replaceAliasWith);
+
     $temp = $this->_aliases['civicrm_contribution'];
     $this->_aliases['civicrm_contribution'] = $replaceAliasWith;
-    $this->_from = $from;
+    $from = $this->_from;
     $from .= (string) $this->getPermissionedFTQuery($this, 'civicrm_line_item_report', TRUE);
     $this->_aliases['civicrm_contribution'] = $temp;
     $this->_where = '';

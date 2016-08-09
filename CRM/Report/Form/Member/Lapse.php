@@ -45,8 +45,20 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   public $_drilldownReport = array('member/detail' => 'Link to Detail Report');
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
    */
+  protected $groupFilterNotOptimised = TRUE;
+
   /**
+   * Class constructor.
    */
   public function __construct() {
 
@@ -77,10 +89,6 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
           'first_name' => array(
             'title' => ts('First Name'),
             'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
           ),
           'last_name' => array(
             'title' => ts('Last Name'),

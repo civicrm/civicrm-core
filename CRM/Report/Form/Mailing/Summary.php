@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
@@ -50,8 +48,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   public $campaignEnabled = FALSE;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array();

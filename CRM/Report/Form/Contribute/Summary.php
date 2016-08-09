@@ -58,6 +58,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   );
 
   /**
+   * This report has been optimised for group filtering.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = FALSE;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -443,6 +452,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    * Set from clause.
    *
    * @param string $entity
+   *
+   * @todo fix function signature to match parent. Remove hacky passing of $entity
+   * to acheive unclear results.
    */
   public function from($entity = NULL) {
     $softCreditJoinType = "LEFT";
@@ -459,8 +471,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $softCreditJoin .= " AND {$this->_aliases['civicrm_contribution_soft']}.id = (SELECT MIN(id) FROM civicrm_contribution_soft cs WHERE cs.contribution_id = {$this->_aliases['civicrm_contribution']}.id) ";
     }
 
-    $this->_from = "
-        FROM civicrm_contact  {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
+    $this->setFromBase('civicrm_contact');
+
+    $this->_from .= "
              INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                         {$this->_aliases['civicrm_contribution']}.is_test = 0
@@ -475,13 +488,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                      ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                         {$this->_aliases['civicrm_phone']}.is_primary = 1)";
 
-    if ($this->_addressField) {
-      $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                         ON {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_address']}.contact_id AND
-                            {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
+    $this->addAddressFromClause();
     if (!empty($this->_params['batch_id_value'])) {
       $this->_from .= "
                  LEFT JOIN civicrm_entity_financial_trxn eft
