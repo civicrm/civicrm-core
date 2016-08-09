@@ -118,6 +118,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         'dashboard_id.label',
         'dashboard_id.url',
         'dashboard_id.fullscreen_url',
+        'dashboard_id.cache_minutes',
         'dashboard_id.permission',
         'dashboard_id.permission_operator',
       ),
@@ -132,6 +133,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
           'name' => $item['dashboard_id.name'],
           'label' => $item['dashboard_id.label'],
           'url' => $item['dashboard_id.url'],
+          'cache_minutes' => $item['dashboard_id.cache_minutes'],
           'fullscreen_url' => $item['dashboard_id.fullscreen_url'],
         );
       }
@@ -159,6 +161,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         'name' => $item['name'],
         'title' => $item['label'],
         'url' => self::parseUrl($item['url']),
+        'cacheMinutes' => $item['cache_minutes'],
         'fullscreenUrl' => self::parseUrl($item['fullscreen_url']),
       );
     }
@@ -212,6 +215,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
             'column_no' => $values['column_no'],
             'name' => $dashlet['name'],
             'label' => $dashlet['label'],
+            'cache_minutes' => $dashlet['cache_minutes'],
             'url' => $dashlet['url'],
             'fullscreen_url' => $dashlet['fullscreen_url'],
           );

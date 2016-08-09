@@ -215,8 +215,11 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
         $section = 1;
         $chart = "&charts=" . $params['charts'];
       }
-      if (!empty($params['row_count'])) {
+      if (!empty($params['row_count']) && CRM_Utils_Rule::positiveInteger($params['row_count'])) {
         $limitResult = '&rowCount=' . $params['row_count'];
+      }
+      if (!empty($params['cache_minutes']) && CRM_Utils_Rule::positiveInteger($params['cache_minutes'])) {
+        $dashletParams['cache_minutes'] = $params['cache_minutes'];
       }
       $dashletParams['name'] = "report/{$instance->id}";
       $dashletParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}{$chart}&context=dashlet" . $limitResult;

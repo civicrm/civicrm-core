@@ -130,12 +130,13 @@
         $("#empty-message").show( );
     }
 
+    // Cache dashlet info in localStorage
     function saveLocalCache() {
       localCache = {};
       $.each(dashboard.widgets, function(id, widget) {
         localCache[id] = {
           content: widget.content,
-          expires: widget.expires,
+          lastLoaded: widget.lastLoaded,
           minimized: widget.minimized
         };
       });
@@ -181,6 +182,17 @@
       dashboard.saveColumns();
       dashboard.ready = true;
       invokeCallback(opts.callbacks.ready, dashboard);
+
+      // Auto-refresh widgets when content is stale
+      window.setInterval(function() {
+        if (!document.hasFocus || document.hasFocus()) {
+          $.each(dashboard.widgets, function (i, widget) {
+            if (!widget.cacheIsFresh()) {
+              widget.reloadContent();
+            }
+          });
+        }
+      }, 5000);
     }
 
     // Callback for when any list has changed (and the user has finished resorting).
@@ -361,7 +373,7 @@
         // If minimized, we'll reload later
         if (widget.minimized) {
           widget.contentLoaded = false;
-          widget.expires = 0;
+          widget.lastLoaded = 0;
         } else {
           CRM.loadPage(widget.url, {target: widget.contentElement});
         }
@@ -380,6 +392,10 @@
           ts('"%1" Removed', {1: widget.title}),
           'success'
         );
+      };
+
+      widget.cacheIsFresh = function() {
+        return (((widget.cacheMinutes * 60000 + widget.lastLoaded) > $.now()) && widget.content);
       };
 
       /**
@@ -419,7 +435,7 @@
        */
 
       function loadContent() {
-        var loadFromCache = (widget.expires > $.now() && widget.content);
+        var loadFromCache = widget.cacheIsFresh();
         if (loadFromCache) {
           widget.contentElement.html(widget.content).trigger('crmLoad', widget);
         }
@@ -427,7 +443,7 @@
           if ($(event.target).is(widget.contentElement)) {
             widget.content = data.content;
             // Cache for one day
-            widget.expires = $.now() + 86400000;
+            widget.lastLoaded = $.now();
             saveLocalCache();
             invokeCallback(opts.widgetCallbacks.get, widget);
           }
@@ -544,7 +560,7 @@
   // Public static properties of dashboard.  Default settings.
   $.fn.dashboard.defaults = {
     columns: 2,
-    emptyPlaceholderInner: ts('There are no dashlets in this column of your dashboard.'),
+    emptyPlaceholderInner: '',
     throbberMarkup: '',
     animationSpeed: 200,
     callbacks: {},
@@ -556,9 +572,9 @@
     defaults: {
       minimized: false,
       content: null,
-      expires: 0,
+      lastLoaded: 0,
       settings: false
-      // url, fullscreenUrl, title, name
+      // id, url, fullscreenUrl, title, name, cacheMinutes
     }
   };
 })(jQuery);
