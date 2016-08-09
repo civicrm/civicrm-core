@@ -298,7 +298,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       // Add display column and filter for Survey Results, Campaign and Engagement Index if CiviCampaign is enabled
 
       $this->_columns['civicrm_activity']['fields']['result'] = array(
-        'title' => 'Survey Result',
+        'title' => ts('Survey Result'),
         'default' => 'false',
       );
       $this->_columns['civicrm_activity']['filters']['result'] = array(
@@ -308,7 +308,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       );
       if (!empty($this->activeCampaigns)) {
         $this->_columns['civicrm_activity']['fields']['campaign_id'] = array(
-          'title' => 'Campaign',
+          'title' => ts('Campaign'),
           'default' => 'false',
         );
         $this->_columns['civicrm_activity']['filters']['campaign_id'] = array(
@@ -320,7 +320,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
       if (!empty($this->engagementLevels)) {
         $this->_columns['civicrm_activity']['fields']['engagement_level'] = array(
-          'title' => 'Engagement Index',
+          'title' => ts('Engagement Index'),
           'default' => 'false',
         );
         $this->_columns['civicrm_activity']['filters']['engagement_level'] = array(
