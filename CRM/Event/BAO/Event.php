@@ -2261,4 +2261,46 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
+  /**
+   * Change revenue recognition date for participants.
+   *
+   * @param array $params
+   */
+  public static function updateDeferredTransactions($params) {
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+    ));
+    $accountRelationship = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', array(
+      'labelColumn' => 'name',
+    ));
+    $sql = "SELECT cpp.contribution_id
+      FROM civicrm_participant_payment cpp
+      INNER JOIN civicrm_participant cp ON cp.id = cpp.participant_id
+      INNER JOIN civicrm_entity_financial_trxn eft ON eft.entity_id = cpp.contribution_id AND eft.entity_table = 'civicrm_contribution'
+      INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
+      INNER JOIN civicrm_entity_financial_account efa 
+        ON efa.financial_account_id = ft.from_financial_account_id AND %3 = efa.account_relationship AND efa.entity_table = 'civicrm_financial_type'
+      WHERE cp.event_id = %1 AND ft.from_financial_account_id = efa.financial_account_id AND ft.status_id = %2 GROUP BY cpp.contribution_id";
+    $sqlParams = array(
+      1 => array($params['id'], 'Integer'),
+      2 => array(array_search('Completed', $contributionStatuses), 'Integer'),
+      3 => array(array_search('Deferred Revenue Account is', $accountRelationship), 'Integer'),
+    );
+    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
+    while ($dao->fetch()) {
+      $contributionDetails = new CRM_Contribute_DAO_Contribution();
+      $contributionDetails->id = $dao->contribution_id;
+      $contributionDetails->find(TRUE);
+      $lineItems = CRM_Price_BAO_LineItem::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
+      if (empty($lineItems)) {
+        continue;
+      }
+      $lineItems[1] = $lineItems;
+      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails, FALSE, 'changeRevenueRecognitionDate');
+      $contributionDetails->revenue_recognition_date = date('Ymd', strtotime($params['start_date']));
+      $contributionDetails->save();
+      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails);
+    }
+  }
+
 }
