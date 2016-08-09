@@ -5281,4 +5281,32 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
   }
 
+  /**
+   * Check if contribution has participant/membership payment.
+   *
+   * @param int $contributionId
+   *   Contribution ID
+   *
+   * @return bool
+   */
+  public static function allowUpdateRevenueRecognitionDate($contributionId) {
+    // get line item for contribution
+    $lineItems = CRM_Price_BAO_LineItem::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
+    // check if line item is for membership or participant
+    foreach ($lineItems as $items) {
+      if ($items['entity_table'] == 'civicrm_participant') {
+        $Update = FALSE;
+        break;
+      }
+      elseif ($items['entity_table'] == 'civicrm_membership') {
+        $Update = FALSE;
+      }
+      else {
+        $Update = TRUE;
+        break;
+      }
+    }
+    return $flag;
+  }
+
 }
