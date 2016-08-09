@@ -312,7 +312,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -560,12 +560,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
 
     $statistics['counts']['amount'] = array(
       'value' => implode(', ', $amount),
-      'title' => 'Total Amount',
+      'title' => ts('Total Amount'),
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['avg'] = array(
       'value' => implode(', ', $avg),
-      'title' => 'Average',
+      'title' => ts('Average'),
       'type' => CRM_Utils_Type::T_STRING,
     );
     return $statistics;
