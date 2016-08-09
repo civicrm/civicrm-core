@@ -317,8 +317,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $formValues['main_details'] = $this->_mainDetails;
     $formValues['other_details'] = $this->_otherDetails;
-
-    CRM_Dedupe_Merger::moveAllBelongings($this->_cid, $this->_oid, $formValues);
+    $migrationData = array('migration_info' => $formValues);
+    CRM_Utils_Hook::merge('form', $migrationData, $this->_cid, $this->_oid);
+    CRM_Dedupe_Merger::moveAllBelongings($this->_cid, $this->_oid, $migrationData['migration_info']);
 
     $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_cid, 'display_name');
     $message = '<ul><li>' . ts('%1 has been updated.', array(1 => $name)) . '</li><li>' . ts('Contact ID %1 has been deleted.', array(1 => $this->_oid)) . '</li></ul>';
