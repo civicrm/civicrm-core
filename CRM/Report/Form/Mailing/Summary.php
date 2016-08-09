@@ -580,26 +580,26 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     foreach ($rows as $row) {
       $chartInfo['values'][$row['civicrm_mailing_name']] = array();
       if ($plotCount) {
-        foreach ($criteria['count'] as $criteria => $label) {
-          if (isset($row[$criteria])) {
-            $chartInfo['values'][$row['civicrm_mailing_name']][$label] = $row[$criteria];
+        foreach ($criteria['count'] as $criteriaName => $label) {
+          if (isset($row[$criteriaName])) {
+            $chartInfo['values'][$row['civicrm_mailing_name']][$label] = $row[$criteriaName];
             $chartInfo['tip'][$label] = "{$label} #val#";
             $plotRate = FALSE;
           }
-          elseif (isset($criteria['count'][$criteria])) {
-            unset($criteria['count'][$criteria]);
+          elseif (isset($criteria['count'][$criteriaName])) {
+            unset($criteria['count'][$criteriaName]);
           }
         }
       }
       if ($plotRate) {
-        foreach ($criteria['rate'] as $criteria => $label) {
+        foreach ($criteria['rate'] as $criteriaName => $label) {
           if (isset($row[$criteria])) {
-            $chartInfo['values'][$row['civicrm_mailing_name']][$label] = $row[$criteria];
+            $chartInfo['values'][$row['civicrm_mailing_name']][$label] = $row[$criteriaName];
             $chartInfo['tip'][$label] = "{$label} #val#";
             $plotCount = FALSE;
           }
-          elseif (isset($criteria['rate'][$criteria])) {
-            unset($criteria['rate'][$criteria]);
+          elseif (isset($criteria['rate'][$criteriaName])) {
+            unset($criteria['rate'][$criteriaName]);
           }
         }
       }
