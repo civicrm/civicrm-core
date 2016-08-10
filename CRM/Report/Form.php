@@ -2135,7 +2135,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       }
       elseif (isset($this->_columnHeaders[$colName])) {
         if ($subtotal) {
-          $row[$colName] = ts('Subtotal');
+          $row[$colName] = 'Subtotal';
           $subtotal = FALSE;
         }
         else {
