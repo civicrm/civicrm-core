@@ -1884,8 +1884,8 @@ SELECT contact_id
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
     if ($view) {
-      $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
-      if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
+      $result = $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
+      if (PEAR::getStaticProperty('DB_DataObject', 'lastError') || is_a($result, 'DB_Error')) {
         return FALSE;
       }
     }
