@@ -35,6 +35,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   protected $_rgid;
   protected $_mainContacts;
   protected $_gid;
+  protected $action;
 
   /**
    * Get BAO Name.
@@ -158,7 +159,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           if (!$foundDupes) {
             $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIds);
           }
-          $this->get("search_dedupe_dupes_$gid", $foundDupes);
+          $this->set("search_dedupe_dupes_$gid", $foundDupes);
         }
         else {
           $foundDupes = $this->get('dedupe_dupes');
