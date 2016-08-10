@@ -96,11 +96,11 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
             'options' => CRM_Core_OptionGroup::values('event_type'),
           ),
           'event_start_date' => array(
-            'title' => 'Event Start Date',
+            'title' => ts('Event Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'event_end_date' => array(
-            'title' => 'Event End Date',
+            'title' => ts('Event End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
@@ -283,7 +283,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
       'type' => CRM_Utils_Type::T_INT,
     );
     $this->_columnHeaders['totalAmount'] = array(
-      'title' => 'Total Income',
+      'title' => ts('Total Income'),
       'type' => CRM_Utils_Type::T_STRING,
     );
   }

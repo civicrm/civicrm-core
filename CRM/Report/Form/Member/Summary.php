@@ -71,7 +71,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
         'grouping' => 'member-fields',
         'fields' => array(
           'membership_type_id' => array(
-            'title' => 'Membership Type',
+            'title' => ts('Membership Type'),
             'required' => TRUE,
           ),
         ),
@@ -120,7 +120,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
             'type' => 12,
           ),
           'membership_type_id' => array(
-            'title' => 'Membership Type',
+            'title' => ts('Membership Type'),
             'default' => TRUE,
             'chart' => TRUE,
           ),
@@ -159,7 +159,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
         ),
         'filters' => array(
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -179,7 +179,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_membership']['fields']['campaign_id'] = array(
-        'title' => 'Campaign',
+        'title' => ts('Campaign'),
         'default' => 'false',
       );
       $this->_columns['civicrm_membership']['filters']['campaign_id'] = array(
@@ -625,7 +625,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
         !$row['civicrm_membership_membership_type_id']
       ) {
         $this->fixSubTotalDisplay($rows[$rowNum], $this->_statFields, FALSE);
-        $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>SubTotal</b>';
+        $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>' . ts('Subtotal') . '</b>';
         $entryFound = TRUE;
       }
 

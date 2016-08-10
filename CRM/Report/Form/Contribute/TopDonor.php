@@ -164,7 +164,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
