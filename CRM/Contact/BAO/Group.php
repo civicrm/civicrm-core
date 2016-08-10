@@ -368,8 +368,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (isset($params['group_type'])) {
       if (is_array($params['group_type'])) {
         $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-            array_keys($params['group_type'])
+            $params['group_type']
           ) . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+      else {
+        $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['group_type'] . CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
     else {
@@ -389,7 +392,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // CRM-19068.
     // Validate parents parameter when creating group.
-    if (isset($params['parents'])) {
+    if (!empty($params['parents'])) {
       if (is_array($params['parents'])) {
         foreach ($params['parents'] as $parent => $dc) {
           CRM_Utils_Type::validate($parent, 'Integer');
