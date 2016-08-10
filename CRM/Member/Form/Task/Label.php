@@ -111,23 +111,20 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       $individualFormat = TRUE;
     }
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
-    if (!empty($rows)) {
-      foreach ($rows as $id => $row) {
-        if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
-          $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
-          $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
-          $temp = array();
-          foreach ($val as $vals) {
-            $temp[] = $comm[$vals];
-          }
-          $row['preferred_communication_method'] = implode(', ', $temp);
+    foreach ((array) $rows as $id => $row) {
+      if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
+        $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
+        $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
+        $temp = array();
+        foreach ($val as $vals) {
+          $temp[] = $comm[$vals];
         }
-        $row['id'] = $id;
-        $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $individualFormat, $tokenFields);
-        $rows[$id] = array($formatted);
-      } 
+        $row['preferred_communication_method'] = implode(', ', $temp);
+      }
+      $row['id'] = $id;
+      $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $individualFormat, $tokenFields);
+      $rows[$id] = array($formatted);
     }
-
     if ($isPerMembership) {
       $labelRows = array();
       $memberships = civicrm_api3('membership', 'get', array(
