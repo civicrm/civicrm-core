@@ -2559,7 +2559,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     elseif ($this->_outputMode == 'copy' && $this->_criteriaForm) {
       $this->_createNew = TRUE;
     }
-    $this->assign('outputMode', $this->_outputMode);
 
     $this->assign('outputMode', $this->_outputMode);
     $this->assign('printOnly', $printOnly);
@@ -2601,6 +2600,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     if ($this->_outputMode == 'delete') {
       CRM_Report_BAO_ReportInstance::doFormDelete($this->_id, 'civicrm/report/list?reset=1', 'civicrm/report/list?reset=1');
     }
+
+    $this->_formValues = $this->_params;
 
     $this->beginPostProcessCommon();
   }
