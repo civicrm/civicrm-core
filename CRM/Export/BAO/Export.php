@@ -706,14 +706,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $queryString .= $groupBy;
 
-    // always add contact_a.id to the ORDER clause
-    // so the order is deterministic
-    //CRM-15301
-    if (strpos('contact_a.id', $order) === FALSE) {
-      $order .= ", contact_a.id";
-    }
-
     if ($order) {
+      // always add contact_a.id to the ORDER clause
+      // so the order is deterministic
+      //CRM-15301
+      if (strpos('contact_a.id', $order) === FALSE) {
+        $order .= ", contact_a.id";
+      }
+      
       list($field, $dir) = explode(' ', $order, 2);
       $field = trim($field);
       if (!empty($returnProperties[$field])) {
