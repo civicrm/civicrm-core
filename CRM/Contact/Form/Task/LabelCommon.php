@@ -53,15 +53,13 @@ class CRM_Contact_Form_Task_LabelCommon {
 
     //build contact string that needs to be printed
     $val = NULL;
-    if (!empty($contactRows)) {
-      foreach ($contactRows as $row => $value) {
-        foreach ($value as $k => $v) {
-          $val .= "$v\n";
-        }
-
-        $pdf->AddPdfLabel($val);
-        $val = '';
+    foreach ((array) $contactRows as $row => $value) {
+      foreach ($value as $k => $v) {
+        $val .= "$v\n";
       }
+
+      $pdf->AddPdfLabel($val);
+      $val = '';
     }
     $pdf->Output($fileName, 'D');
   }
