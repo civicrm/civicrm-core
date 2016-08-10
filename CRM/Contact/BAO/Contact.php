@@ -520,7 +520,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param array $params
    */
   public static function addBillingNameFieldsIfOtherwiseNotSet(&$params) {
-    $nameFields = array('first_name', 'middle_name', 'last_name');
+    $nameFields = array('first_name', 'middle_name', 'last_name', 'nick_name', 'prefix_id', 'suffix_id');
     foreach ($nameFields as $field) {
       if (!empty($params[$field])) {
         return;
