@@ -199,7 +199,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,

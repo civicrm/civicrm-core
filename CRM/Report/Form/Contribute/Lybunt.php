@@ -252,11 +252,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
         'title' => ts('Campaign'),
         'default' => 'false',
+        'type' => CRM_Utils_Type::T_INT,
       );
       $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
     }
 
@@ -550,7 +552,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
-    $this->appendSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
     $this->assign('chartSupported', TRUE);
   }
 
@@ -611,7 +613,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   public function beginPostProcessCommon() {
     $this->buildQuery();
     // @todo this acl has no test coverage and is very hard to test manually so could be fragile.
-    $this->getPermissionedFTQuery($this);
     $this->resetFormSqlAndWhereHavingClauses();
 
     $this->contactTempTable = 'civicrm_report_temp_lybunt_c_' . date('Ymd_') . uniqid();

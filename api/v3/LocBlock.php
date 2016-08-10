@@ -40,9 +40,12 @@
  *
  * @return array
  *   API result array.
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_loc_block_create($params) {
   $entities = array();
+  civicrm_api3_verify_one_mandatory($params, NULL, array('address', 'address_id', 'phone', 'phone_id', 'im', 'im_id', 'email', 'email_id'));
   // Call the appropriate api to create entities if any are passed in the params
   // This is basically chaining but in reverse - we create the sub-entities first
   // This exists because chainging does not work in reverse, or with keys like 'email_2'
@@ -58,12 +61,8 @@ function civicrm_api3_loc_block_create($params) {
         }
         // Bother calling the api
         else {
-          $info['version'] = $params['version'];
           $info['contact_id'] = CRM_Utils_Array::value('contact_id', $info, 'null');
-          $result = civicrm_api($item, 'create', $info);
-          if (!empty($result['is_error'])) {
-            return $result;
-          }
+          $result = civicrm_api3($item, 'create', $info);
           $entities[$key] = $result['values'][$result['id']];
           $params[$key . '_id'] = $result['id'];
         }
@@ -78,7 +77,7 @@ function civicrm_api3_loc_block_create($params) {
     _civicrm_api3_object_to_array($dao, $values[$dao->id]);
     return civicrm_api3_create_success($values, $params, 'LocBlock', 'create', $dao);
   }
-  return civicrm_api3_create_error('Unable to create LocBlock. Please check your params.');
+  throw New API_Exception('Unable to create LocBlock. Please check your params.');
 }
 
 /**

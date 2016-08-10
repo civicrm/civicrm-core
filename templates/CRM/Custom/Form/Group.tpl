@@ -188,7 +188,7 @@ CRM.$(function($) {
     });
 
     if (warning) {
-      return confirm({/literal}'{ts escape='js'}Warning: You have chosen to remove one or more subtypes. This will cause any custom data records associated with those subtypes to be removed.{/ts}'{literal});
+      return confirm({/literal}'{ts escape='js'}Warning: You have chosen to remove one or more subtypes. This will cause any custom data records associated with those subtypes to be removed as long as the contact does not have a contact subtype still selected.{/ts}'{literal});
     }
     return true;
   });

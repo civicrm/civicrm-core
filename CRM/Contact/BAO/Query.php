@@ -4523,6 +4523,41 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
+   * For some special cases, grouping by subset of select fields becomes mandatory.
+   * Hence, full_group_by mode is handled by appending any_value
+   * keyword to select fields not present in groupBy
+   *
+   * @param array $selectClauses
+   * @param array $groupBy - Columns already included in GROUP By clause.
+   *
+   * @return string
+   */
+  public static function appendAnyValueToSelect($selectClauses, $groupBy) {
+    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    $sqlMode = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
+
+    // Disable only_full_group_by mode for lower sql versions.
+    if (version_compare($mysqlVersion, '5.7', '<') || (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', $sqlMode))) {
+      $key = array_search('ONLY_FULL_GROUP_BY', $sqlMode);
+      unset($sqlMode[$key]);
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlMode) . "'");
+    }
+    else {
+      $groupBy = array_map('trim', (array) $groupBy);
+      $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+      foreach ($selectClauses as $key => &$val) {
+        list($selectColumn, $alias) = array_pad(preg_split('/ as /i', $val), 2, NULL);
+        // append ANY_VALUE() keyword
+        if (!in_array($selectColumn, $groupBy) && preg_match($aggregateFunctions, trim($selectColumn)) !== 1) {
+          $val = str_replace($selectColumn, "ANY_VALUE({$selectColumn})", $val);
+        }
+      }
+    }
+
+    return "SELECT " . implode(', ', $selectClauses) . " ";
+  }
+
+  /**
    * Include Select columns in groupBy clause.
    *
    * @param array $selectClauses
@@ -5749,7 +5784,7 @@ AND   displayRelType.is_active = 1
       }
 
       if (is_object($dao) && property_exists($dao, $value['idCol'])) {
-        $val = $dao->$value['idCol'];
+        $val = $dao->{$value['idCol']};
         if ($key == 'groups') {
           $dao->groups = $this->convertGroupIDStringToLabelString($dao, $val);
           return;
@@ -5764,10 +5799,10 @@ AND   displayRelType.is_active = 1
           $dao->$idColumn = $val;
 
           if ($key == 'state_province_name') {
-            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
+            $dao->{$value['pseudoField']} = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
           }
           else {
-            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+            $dao->{$value['pseudoField']} = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
           }
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {

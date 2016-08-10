@@ -175,7 +175,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $element->freeze();
     }
 
-    $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=60');
+    $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
     $this->addUploadElement("file_id");
 
     $this->add('text', 'msg_subject',
@@ -245,8 +245,14 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   public static function formRule($params, $files, $self) {
     $errors = array();
 
-    //empty file upload validation for odt/docx template
-    if (empty($files['file_id']['tmp_name']) && !empty($params['file_type']) && !$self->_is_document) {
+    // If user uploads non-document file other than odt/docx
+    if (!empty($files['file_id']['tmp_name']) &&
+      array_search($files['file_id']['type'], CRM_Core_SelectValues::documentApplicationType()) == NULL
+    ) {
+      $error['file_id'] = ts('Invalid document file format');
+    }
+    // If default is not set and no document file is uploaded
+    elseif (empty($files['file_id']['tmp_name']) && !empty($params['file_type']) && !$self->_is_document) {
       //On edit page of docx/odt message template if user changes file type but forgot to upload document
       $errors['file_id'] = ts('Please upload document');
     }

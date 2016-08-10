@@ -164,7 +164,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -385,16 +385,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
-    $this->select();
-
-    $this->from();
-    $this->getPermissionedFTQuery($this);
-
-    $this->where();
-
-    $this->groupBy();
-
-    $this->limit();
+    $this->buildQuery();
 
     //set the variable value rank, rows = 0
     $setVariable = " SET @rows:=0, @rank=0 ";

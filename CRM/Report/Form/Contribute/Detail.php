@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   protected $_addressField = FALSE;
@@ -207,14 +205,19 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'type' => CRM_Utils_Type::T_STRING,
             'options' => array(
-              'both' => ts('Both'),
               'contributions_only' => ts('Contributions Only'),
               'soft_credits_only' => ts('Soft Credits Only'),
+              'both' => ts('Both'),
             ),
           ),
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'contribution_source' => array(
+            'title' => ts('Source'),
+            'name' => 'source',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -262,7 +265,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         ),
         'filters' => array(
           'soft_credit_type_id' => array(
-            'title' => 'Soft Credit Type',
+            'title' => ts('Soft Credit Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
             'default' => NULL,
@@ -382,7 +385,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
-    $this->getPermissionedFTQuery($this);
 
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'both'
@@ -884,7 +886,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
       $this->_select = "SELECT " . implode(", ", $ifnulls);
-      $this->appendSelect($ifnulls, $sectionAliases);
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       /* Group (un-limited) report by all aliases and get counts. This might
        * be done more efficiently when the contents of $sql are known, ie. by

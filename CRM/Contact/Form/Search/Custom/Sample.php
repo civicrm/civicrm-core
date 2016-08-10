@@ -77,7 +77,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle('My Search Title');
+    $this->setTitle(ts('My Search Title'));
 
     /**
      * if you are using the standard template, this array tells the template what elements
