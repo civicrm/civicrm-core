@@ -625,7 +625,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
         !$row['civicrm_membership_membership_type_id']
       ) {
         $this->fixSubTotalDisplay($rows[$rowNum], $this->_statFields, FALSE);
-        $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>SubTotal</b>';
+        $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>' . ts('Subtotal') . '</b>';
         $entryFound = TRUE;
       }
 
