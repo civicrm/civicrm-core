@@ -133,7 +133,9 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
         'return' => 'contact_id',
       ));
       foreach ($memberships['values'] as $id => $membership) {
-        $labelRows[$id] = $rows[$membership['contact_id']];
+        if (isset($rows[$membership['contact_id']])) {
+          $labelRows[$id] = $rows[$membership['contact_id']];
+        }
       }
     }
     else {
