@@ -53,13 +53,15 @@ class CRM_Contact_Form_Task_LabelCommon {
 
     //build contact string that needs to be printed
     $val = NULL;
-    foreach ($contactRows as $row => $value) {
-      foreach ($value as $k => $v) {
-        $val .= "$v\n";
-      }
+    if (!empty($contactRows)) {
+      foreach ($contactRows as $row => $value) {
+        foreach ($value as $k => $v) {
+          $val .= "$v\n";
+        }
 
-      $pdf->AddPdfLabel($val);
-      $val = '';
+        $pdf->AddPdfLabel($val);
+        $val = '';
+      }
     }
     $pdf->Output($fileName, 'D');
   }
@@ -80,6 +82,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    */
   public static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
     $locName = NULL;
+    $rows = array();
     //get the address format sequence from the config file
     $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
 
