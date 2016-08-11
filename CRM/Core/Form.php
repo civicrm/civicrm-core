@@ -1593,12 +1593,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // force to ignore the authenticated user
-    if ($tempID === '0' || $tempID === 0) {
+    if ($tempID === '0' || $tempID === 0 || $tempID === '') {
       // we set the cid on the form so that this will be retained for the Confirm page
       // in the multi-page form & prevent us returning the $userID when this is called
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
+      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return (int) $tempID;
     }
 
