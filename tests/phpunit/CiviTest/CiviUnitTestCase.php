@@ -1154,7 +1154,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'period_type' => 'rolling',
       'member_of_contact_id' => $memberOfOrganization,
       'domain_id' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => 2,
       'is_active' => 1,
       'sequential' => 1,
       'visibility' => 'Public',
