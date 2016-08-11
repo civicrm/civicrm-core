@@ -532,4 +532,62 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     return array($groupID, $groupID2);
   }
 
+  /**
+   * Test Deferred Revenue Report.
+   */
+  public function testDeferredRevenueReport() {
+    $indv1 = $this->individualCreate();
+    $indv2 = $this->individualCreate();
+    $params = array(
+      'contribution_invoice_settings' => array(
+        'deferred_revenue_enabled' => '1',
+      ),
+    );
+    $this->callAPISuccess('Setting', 'create', $params);
+    $this->contributionCreate(
+      array(
+        'contact_id' => $indv1,
+        'receive_date' => '2016-10-01',
+        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+3 month')),
+        'financial_type_id' => 2,
+      )
+    );
+    $this->contributionCreate(
+      array(
+        'contact_id' => $indv1,
+        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+22 month')),
+        'financial_type_id' => 4,
+        'trxn_id' => NULL,
+        'invoice_id' => NULL,
+      )
+    );
+    $this->contributionCreate(
+      array(
+        'contact_id' => $indv2,
+        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+1 month')),
+        'financial_type_id' => 4,
+        'trxn_id' => NULL,
+        'invoice_id' => NULL,
+      )
+    );
+    $this->contributionCreate(
+      array(
+        'contact_id' => $indv2,
+        'receive_date' => '2016-03-01',
+        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+4 month')),
+        'financial_type_id' => 2,
+        'trxn_id' => NULL,
+        'invoice_id' => NULL,
+      )
+    );
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => 'contribute/deferredrevenue',
+    ));
+    $this->assertEquals(2, $rows['count'], "Report failed to get row count");
+    $count = array(2, 1);
+    foreach ($rows['values'] as $row) {
+      $this->assertEquals(array_pop($count), count($row['rows']), "Report failed to get row count");
+    }
+  }
+
 }
