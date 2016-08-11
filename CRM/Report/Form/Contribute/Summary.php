@@ -155,7 +155,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -242,7 +242,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'title' => ts('Soft Credit Amount'),
           ),
           'soft_credit_type_id' => array(
-            'title' => 'Soft Credit Type',
+            'title' => ts('Soft Credit Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
             'default' => NULL,
@@ -273,7 +273,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
-        'title' => 'Campaign',
+        'title' => ts('Campaign'),
         'default' => 'false',
       );
       $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
@@ -350,7 +350,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 break;
             }
             if (!empty($this->_params['group_bys_freq'][$fieldName])) {
-              $this->_interval = $field['title'];
+              $this->_interval = $this->_params['group_bys_freq'][$fieldName];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
@@ -559,7 +559,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     }
     $this->_groupBy .= $this->_rollup;
     // append select with ANY_VALUE() keyword
-    $this->appendSelect($this->_selectClauses, $groupBy);
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBy);
   }
 
   /**

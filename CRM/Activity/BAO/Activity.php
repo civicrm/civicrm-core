@@ -789,22 +789,20 @@ WHERE ac.record_type_id != %1
     $params = array(1 => array($targetID, 'Integer'));
     CRM_Core_DAO::executeQuery($query, $params);
 
+    $activityFields = array("ac.activity_id", "ac.contact_id", "ac.record_type_id", "c.sort_name", "c.is_deleted");
+    $select = CRM_Contact_BAO_Query::appendAnyValueToSelect($activityFields, "ac.activity_id");
+
     // for each activity insert one target contact
     // if we load all target contacts the performance will suffer a lot for mass-activities.
     $query = "
 INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name, is_deleted, counter )
-SELECT     ac.activity_id,
-           ac.contact_id,
-           ac.record_type_id,
-           c.sort_name,
-           c.is_deleted,
-           count(ac.contact_id)
+{$select}, count(ac.contact_id)
 FROM       {$activityTempTable}
 INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_activity_contact ac ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
 WHERE ac.record_type_id = %1
-GROUP BY ac.activity_id, ac.contact_id
+GROUP BY ac.activity_id
 ";
 
     CRM_Core_DAO::executeQuery($query, $params);
