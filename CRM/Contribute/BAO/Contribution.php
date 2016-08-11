@@ -226,6 +226,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     //add Account details
     $params['contribution'] = $contribution;
+    if (empty($contributionID)) {
+      self::recordAlwaysAccountsReceivable($params);
+    }
     self::recordFinancialAccounts($params);
 
     if (self::isUpdateToRecurringContribution($params)) {
@@ -5294,6 +5297,39 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       }
     }
     return $flag;
+  }
+
+  /**
+   * Create Accounts Receivable financial trxn entry for Completed Contribution.
+   *
+   * @param array $params
+   *
+   */
+  public static function recordAlwaysAccountsReceivable(&$params) {
+    if (!self::checkContributeSettings('always_post_to_accounts_receivable')) {
+      return NULL;
+    }
+
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatus = empty($params['contribution_status_id']) ? NULL : $contributionStatuses[$params['contribution_status_id']];
+    // Return if contribution status is not completed.
+    if ($contributionStatus != 'Completed') {
+      return NULL;
+    }
+
+    $params['contribution_status_id'] = $params['contribution']->contribution_status_id = array_search('Pending', $contributionStatuses);
+    $params['is_pay_later'] = $params['contribution']->is_pay_later = TRUE;
+
+    self::recordFinancialAccounts($params);
+
+    $params['prevContribution'] = self::getOriginalContribution($params['contribution']->id);
+    $params['prevContribution']->contribution_status_id = array_search('Pending', $contributionStatuses);
+    $params['prevContribution']->is_pay_later = TRUE;
+
+    $params['contribution_status_id'] = $params['contribution']->contribution_status_id = array_search('Completed', $contributionStatuses);
+    unset($params['is_pay_later']);
+    $params['contribution']->is_pay_later = NULL;
+    $params['id'] = $params['contribution']->id;
   }
 
 }
