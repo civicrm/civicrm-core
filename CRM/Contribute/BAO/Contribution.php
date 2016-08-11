@@ -5322,7 +5322,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     if (empty($context)) {
       $params['contribution_status_id'] = $params['contribution']->contribution_status_id = array_search('Pending', $contributionStatuses);
       $params['is_pay_later'] = $params['contribution']->is_pay_later = TRUE;
-      
+
       self::recordFinancialAccounts($params);
     }
 
