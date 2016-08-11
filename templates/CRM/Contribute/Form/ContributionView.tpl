@@ -227,6 +227,12 @@
       <td>{$thankyou_date|crmDate}</td>
     </tr>
   {/if}
+  {if $participantId and $hasPayment}
+    <tr>
+      <td class='label'>{ts}Fees{/ts}</td>
+      <td id='payment-info'></td>
+    </tr>
+  {/if}	
 </table>
 
 {if count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
@@ -321,6 +327,9 @@
       {$billing_address|nl2br}
     </div>
   </fieldset>
+{/if}
+{if $participantId and $hasPayment}
+  {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
 {/if}
 
 <div class="crm-submit-buttons">
