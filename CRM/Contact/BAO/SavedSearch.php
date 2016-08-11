@@ -96,7 +96,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @return array
    *   the values of the posted saved search used as default values in various Search Form
    */
-  public static function &getFormValues($id) {
+  public static function getFormValues($id) {
     $fv = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'form_values');
     $result = NULL;
     if ($fv) {
@@ -126,10 +126,14 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
       }
       if (!empty($value) && is_array($value)) {
         if (in_array($element, $specialFields)) {
+          // Remove the element to minimise support for legacy formats. It is stored in $value
+          // so will be re-set with the right name.
+          unset($result[$element]);
           $element = str_replace('member_membership_type_id', 'membership_type_id', $element);
           $element = str_replace('member_status_id', 'membership_status_id', $element);
           CRM_Contact_BAO_Query::legacyConvertFormValues($element, $value);
           $result[$element] = $value;
+
         }
         // As per the OK (Operator as Key) value format, value array may contain key
         // as an operator so to ensure the default is always set actual value

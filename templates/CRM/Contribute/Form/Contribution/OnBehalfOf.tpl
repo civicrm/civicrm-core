@@ -264,7 +264,12 @@ function setLocationDetails(contactID , reset) {
         else {
           // do not set defaults to file type fields
           if (cj('#' + ele).attr('type') != 'file') {
-            cj('#' + ele ).val(data[ele].value).change();
+            if (ele.split("_").pop() == 'display') {
+              cj("[id^='"+ele+"']").val(data[ele].value).change();
+            }
+            else {
+              cj('#' + ele ).val(data[ele].value).change();
+            }
           }
         }
       }

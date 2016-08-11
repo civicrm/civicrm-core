@@ -1,8 +1,9 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,28 +23,40 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{*CRM-14190*}
-{if $parent_groups|@count > 0 or $form.parents.html}
-  <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
-  {if $parent_groups|@count > 0}
-    <table class="form-layout-compressed">
-      <tr>
-        <td><label>{ts}Remove Parent?{/ts}</label></td>
-      </tr>
-      {foreach from=$parent_groups item=cgroup key=group_id}
-        {assign var="element_name" value="remove_parent_group_"|cat:$group_id}
-        <tr>
-          <td>&nbsp;&nbsp;{$form.$element_name.html}&nbsp;{$form.$element_name.label}</td>
-        </tr>
-      {/foreach}
-    </table>
-    <br />
-  {/if}
-  <table class="form-layout-compressed">
-    <tr class="crm-group-form-block-parents">
-      <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.parents.label}</td>
-      <td>{$form.parents.html|crmAddClass:huge}</td>
-    </tr>
-  </table>
-{/if}
+ */
+
+/**
+ * Just another collection of static utils functions.
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2016
+ */
+class CRM_Utils_SQL {
+
+  /**
+   * Helper function for adding the permissioned subquery from one entity onto another
+   *
+   * @param string $entity
+   * @param string $joinColumn
+   * @return array
+   */
+  public static function mergeSubquery($entity, $joinColumn = 'id') {
+    require_once 'api/v3/utils.php';
+    $baoName = _civicrm_api3_get_BAO($entity);
+    $bao = new $baoName();
+    $clauses = $subclauses = array();
+    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+      if ($vals && $field == $joinColumn) {
+        $clauses = array_merge($clauses, (array) $vals);
+      }
+      elseif ($vals) {
+        $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);
+      }
+    }
+    if ($subclauses) {
+      $clauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subclauses) . ")";
+    }
+    return $clauses;
+  }
+
+}

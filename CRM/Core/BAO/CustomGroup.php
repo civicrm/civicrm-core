@@ -350,8 +350,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         $subTypes = array();
       }
       else {
-        if (stristr(',', $subTypes)) {
+        if (stristr($subTypes, ',')) {
           $subTypes = explode(',', $subTypes);
+        }
+        // CRM-18654 Custom field error on CiviVolunteer activity type from getTree updates
+        elseif (!trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR)) {
+          $subTypes = array();
         }
         else {
           $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
@@ -433,7 +437,9 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
 
     if (!empty($subTypes)) {
       foreach ($subTypes as $key => $subType) {
-        $subTypeClauses[] = "civicrm_custom_group.extends_entity_column_value LIKE '%" . self::validateSubTypeByEntity($entityType, $subType) . "%'";
+        // CRM-18559: the value returned from validateSubTypeByEntity does not
+        // include value separators, so they need to be added for the query.
+        $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", self::validateSubTypeByEntity($entityType, $subType));
       }
       $subTypeClause = '(' .  implode(' OR ', $subTypeClauses) . ')';
       if (!$onlySubType) {
@@ -635,18 +641,32 @@ ORDER BY civicrm_custom_group.weight,
     if (is_numeric($subType)) {
       return $subType;
     }
-    $contactTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_type'));
-    if ($entityType != 'Contact' && !in_array($entityType, $contactTypes['values'])) {
-      // Not quite sure if we want to fail this hard. But quiet ignore would be pretty bad too.
-      // Am inclined to go with this for RC release & considering softening.
+
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
+    if ($entityType != 'Contact' && !array_key_exists($entityType, $contactTypes)) {
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
-    $subTypes = civicrm_api3('Contact', 'getoptions', array('field' => 'contact_sub_type'));
-    if (!isset($subTypes['values'][$subType])) {
-      // Same comments about fail hard as above.
+    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+    if (!array_key_exists($subType, $subTypes)) {
       throw new CRM_Core_Exception('Invalid Filter');
     }
     return $subType;
+  }
+
+  /**
+   * Suppose you have a SQL column, $column, which includes a delimited list, and you want
+   * a WHERE condition for rows that include $value. Use whereListHas().
+   *
+   * @param string $column
+   * @param string $value
+   * @param string $delimiter
+   * @return string
+   *   SQL condition.
+   */
+  static private function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
+    $bareValue = trim($value, $delimiter); // ?
+    $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
+    return "($column LIKE \"$escapedValue\")";
   }
 
   /**

@@ -189,6 +189,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       ))
       ->addPermissions(array(
         'view all contacts',
+        'edit all contacts',
         'access CiviMail',
         'create mailings',
         'schedule mailings',

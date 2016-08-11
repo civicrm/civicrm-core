@@ -1662,6 +1662,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
     }
 
+    $mailSend = FALSE;
     if (!empty($formValues['send_receipt']) && $receiptSend) {
       $formValues['contact_id'] = $this->_contactID;
       $formValues['contribution_id'] = $contributionId;
@@ -1679,7 +1680,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $endDate = CRM_Utils_Date::customFormat($endDate);
         $statusMsg .= ' ' . ts('The membership End Date is %1.', array(1 => $endDate));
       }
-      if ($receiptSend) {
+      if ($mailSend) {
         $statusMsg .= ' ' . ts('A confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
       }
     }

@@ -16,6 +16,11 @@
       var deferred = $q.defer();
       var p;
       var backend = crmApi.backend || CRM.api3;
+      if (params && params.body_html) {
+        // CRM-18474 - remove Unicode Character 'LINE SEPARATOR' (U+2028)
+        // and 'PARAGRAPH SEPARATOR' (U+2029) from the html if present.
+        params.body_html = params.body_html.replace(/([\u2028]|[\u2029])/g, '\n');
+      }
       if (_.isObject(entity)) {
         // eval content is locally generated.
         /*jshint -W061 */

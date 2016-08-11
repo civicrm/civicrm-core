@@ -2636,7 +2636,7 @@ CREATE TABLE `civicrm_acl_cache` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique table ID',
      `contact_id` int unsigned    COMMENT 'Foreign Key to Contact',
      `acl_id` int unsigned NOT NULL   COMMENT 'Foreign Key to ACL',
-     `modified_date` date    COMMENT 'When was this cache entry last modified' 
+     `modified_date` timestamp NULL   COMMENT 'When was this cache entry last modified' 
 ,
     PRIMARY KEY ( `id` )
  
@@ -2669,8 +2669,8 @@ CREATE TABLE `civicrm_group` (
      `select_tables` text    COMMENT 'the tables to be included in a select data',
      `where_tables` text    COMMENT 'the tables to be included in the count statement',
      `group_type` varchar(128)    COMMENT 'FK to group type',
-     `cache_date` datetime    COMMENT 'Date when we created the cache for a smart group',
-     `refresh_date` datetime    COMMENT 'Date and time when we need to refresh the cache next.',
+     `cache_date` timestamp NULL   COMMENT 'Date when we created the cache for a smart group',
+     `refresh_date` timestamp NULL   COMMENT 'Date and time when we need to refresh the cache next.',
      `parents` text    COMMENT 'IDs of the parent(s)',
      `children` text    COMMENT 'IDs of the child(ren)',
      `is_hidden` tinyint   DEFAULT 0 COMMENT 'Is this group hidden?',

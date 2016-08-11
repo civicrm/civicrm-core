@@ -306,7 +306,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'trxn_result_code' => array(
           'name' => 'trxn_result_code',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Transaction result Code') ,
+          'title' => ts('Transaction Result Code') ,
           'description' => 'processor result code',
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,

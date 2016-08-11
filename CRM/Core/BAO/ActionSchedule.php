@@ -682,7 +682,6 @@ AND   cas.entity_value = $id AND
    */
   public static function sendMailings($mappingID, $now) {
     $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-    $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
 
     $mapping = new CRM_Core_DAO_ActionMapping();
     $mapping->id = $mappingID;
@@ -699,6 +698,7 @@ AND   cas.entity_value = $id AND
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
+      $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
       if ($actionSchedule->from_email) {
         $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
       }
