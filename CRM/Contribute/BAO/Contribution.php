@@ -5304,23 +5304,27 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    *
    * @param array $params
    *
+   * @param string $context
+   *
    */
-  public static function recordAlwaysAccountsReceivable(&$params) {
+  public static function recordAlwaysAccountsReceivable(&$params, $context = NULL) {
     if (!self::checkContributeSettings('always_post_to_accounts_receivable')) {
       return NULL;
     }
-
+    $statusId = $params['contribution']->contribution_status_id;
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $contributionStatus = empty($params['contribution_status_id']) ? NULL : $contributionStatuses[$params['contribution_status_id']];
+    $contributionStatus = empty($statusId) ? NULL : $contributionStatuses[$statusId];
     // Return if contribution status is not completed.
     if ($contributionStatus != 'Completed') {
       return NULL;
     }
 
-    $params['contribution_status_id'] = $params['contribution']->contribution_status_id = array_search('Pending', $contributionStatuses);
-    $params['is_pay_later'] = $params['contribution']->is_pay_later = TRUE;
-
-    self::recordFinancialAccounts($params);
+    if (empty($context)) {
+      $params['contribution_status_id'] = $params['contribution']->contribution_status_id = array_search('Pending', $contributionStatuses);
+      $params['is_pay_later'] = $params['contribution']->is_pay_later = TRUE;
+      
+      self::recordFinancialAccounts($params);
+    }
 
     $params['prevContribution'] = self::getOriginalContribution($params['contribution']->id);
     $params['prevContribution']->contribution_status_id = array_search('Pending', $contributionStatuses);
@@ -5330,6 +5334,9 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     unset($params['is_pay_later']);
     $params['contribution']->is_pay_later = NULL;
     $params['id'] = $params['contribution']->id;
+    if (!empty($context)) {
+      self::recordFinancialAccounts($params);
+    }
   }
 
 }
