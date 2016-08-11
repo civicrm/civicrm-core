@@ -1806,7 +1806,7 @@ WHERE  id = %1
         'name' => 'Sales Tax Account is',
       ));
       if ($option['count'] !== 0) {
-        $where = 'AND efa.account_relationship IN (' . $option['values']['value'] . ' )';
+        $where = 'AND efa.account_relationship IN (' . $option['values'][0]['value'] . ' )';
       }
       else {
         $where = '';
