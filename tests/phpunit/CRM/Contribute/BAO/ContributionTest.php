@@ -855,7 +855,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_id' => $contactId,
       'receive_date' => '2010-01-20',
       'total_amount' => 100,
-      'financial_type_id' => 3,
+      'financial_type_id' => 4,
     );
     $order = $this->callAPISuccess('order', 'create', $params);
     $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
@@ -866,7 +866,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_id' => $contactId,
       'receive_date' => '2010-01-20',
       'total_amount' => 300,
-      'financial_type_id' => 1,
+      'financial_type_id' => 4,
       'contribution_status_id' => 1,
     );
     $priceFields = $this->createPriceSet('event', $event['id']);
