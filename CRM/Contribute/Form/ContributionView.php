@@ -219,6 +219,13 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       NULL,
       $recentOther
     );
+
+    $participantID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+      $values['id'], 'participant_id', 'contribution_id'
+    );
+    $this->assign('contactId', $values['contact_id']);
+    $this->assign('hasPayment', $values['id']);
+    $this->assign('participantId', $participantID);
   }
 
   /**
