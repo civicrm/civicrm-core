@@ -31,18 +31,11 @@
  *
  * Generated from {$table.sourceFile}
  * {$generated}
+ * (GenCodeChecksum:{$genCodeChecksum})
  */
 
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
-
-{if $table.foreignKey}
-  {foreach from=$table.foreignKey item=foreign}
-     {if $foreign.import}
-require_once '{$foreign.fileName}';
-     {/if}
-  {/foreach}
-{/if}
 
 class {$table.className} extends CRM_Core_DAO {ldelim}
 
@@ -52,43 +45,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       * @var string
       */
       static $_tableName = '{$table.name}';
-
-     /**
-      * static instance to hold the field values
-      *
-      * @var array
-      */
-      static $_fields = null;
-
-     /**
-      * static instance to hold the keys used in $_fields for each field.
-      *
-      * @var array
-      */
-      static $_fieldKeys = null;
-
-     /**
-      * static instance to hold the FK relationships
-      *
-      * @var string
-      */
-      static $_links = null;
-
-     /**
-      * static instance to hold the values that can
-      * be imported
-      *
-      * @var array
-      */
-      static $_import = null;
-
-      /**
-       * static instance to hold the values that can
-       * be exported
-       *
-       * @var array
-       */
-      static $_export = null;
 
       /**
        * static value to see if we should log any modifications to
@@ -129,17 +85,18 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
      *   [CRM_Core_Reference_Interface]
      */
     static function getReferenceColumns() {ldelim}
-      if (!self::$_links) {ldelim}
-        self::$_links = static::createReferenceColumns(__CLASS__);
+      if (!isset(Civi::$statics[__CLASS__]['links'])) {ldelim}
+        Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
 {foreach from=$table.foreignKey item=foreign}
-        self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}');
+        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}');
 {/foreach}
 
 {foreach from=$table.dynamicForeignKey item=foreign}
-        self::$_links[] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
+        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
 {/foreach}
+        CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
       {rdelim}
-      return self::$_links;
+      return Civi::$statics[__CLASS__]['links'];
     {rdelim}
 {/if} {* table.foreignKey *}
 
@@ -149,8 +106,8 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * @return array
        */
       static function &fields( ) {ldelim}
-        if ( ! ( self::$_fields ) ) {ldelim}
-               self::$_fields = array (
+        if ( ! isset(Civi::$statics[__CLASS__]['fields']) ) {ldelim}
+          Civi::$statics[__CLASS__]['fields'] = array (
 {foreach from=$table.fields item=field}
 
 {if $field.uniqueName}
@@ -230,31 +187,22 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/if} {* field.pseudoconstant *}                                                                    ),
 {/foreach} {* table.fields *}
                                       );
+            CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
           {rdelim}
-          return self::$_fields;
+          return Civi::$statics[__CLASS__]['fields'];
       {rdelim}
 
       /**
-       * Returns an array containing, for each field, the arary key used for that
-       * field in self::$_fields.
+       * Return a mapping from field-name to the corresponding key (as used in fields()).
        *
        * @return array
+       *   Array(string $name => string $uniqueName).
        */
       static function &fieldKeys( ) {ldelim}
-        if ( ! ( self::$_fieldKeys ) ) {ldelim}
-               self::$_fieldKeys = array (
-{foreach from=$table.fields item=field}
-                    '{$field.name}' =>
-{if $field.uniqueName}
-                                            '{$field.uniqueName}'
-{else}
-                                            '{$field.name}'
-{/if},
-
-{/foreach} {* table.fields *}
-                                      );
-          {rdelim}
-          return self::$_fieldKeys;
+        if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {ldelim}
+          Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
+        {rdelim}
+        return Civi::$statics[__CLASS__]['fieldKeys'];
       {rdelim}
 
       /**
@@ -287,28 +235,12 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * @return array
        */
        static function &import( $prefix = false ) {ldelim}
-            if ( ! ( self::$_import ) ) {ldelim}
-               self::$_import = array ( );
-               $fields = self::fields( );
-               foreach ( $fields as $name => $field ) {ldelim}
-                 if ( CRM_Utils_Array::value( 'import', $field ) ) {ldelim}
-                   if ( $prefix ) {ldelim}
-                     self::$_import['{$table.labelName}'] =& $fields[$name];
-                   {rdelim} else {ldelim}
-                     self::$_import[$name] =& $fields[$name];
-                   {rdelim}
-                 {rdelim}
-               {rdelim}
-               {if $table.foreignKey}
-                  {foreach from=$table.foreignKey item=foreign}
-                     {if $foreign.import}
-                        self::$_import = array_merge( self::$_import,
-                  {$foreign.className}::import( true ) );
-                     {/if}
-                  {/foreach}
-               {/if}
-          {rdelim}
-          return self::$_import;
+            $r = CRM_Core_DAO_AllCoreTables::getImports(__CLASS__, '{$table.labelName}', $prefix, array(
+            {if $table.foreignKey}{foreach from=$table.foreignKey item=foreign}
+              {if $foreign.import}'{$foreign.className}',{/if}
+            {/foreach}{/if}
+            ));
+            return $r;
       {rdelim}
 
        /**
@@ -319,28 +251,12 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
         * @return array
         */
        static function &export( $prefix = false ) {ldelim}
-            if ( ! ( self::$_export ) ) {ldelim}
-               self::$_export = array ( );
-               $fields = self::fields( );
-               foreach ( $fields as $name => $field ) {ldelim}
-                 if ( CRM_Utils_Array::value( 'export', $field ) ) {ldelim}
-                   if ( $prefix ) {ldelim}
-                     self::$_export['{$table.labelName}'] =& $fields[$name];
-                   {rdelim} else {ldelim}
-                     self::$_export[$name] =& $fields[$name];
-                   {rdelim}
-                 {rdelim}
-               {rdelim}
-               {if $table.foreignKey}
-                   {foreach from=$table.foreignKey item=foreign}
-                       {if $foreign.export}
-                           self::$_export = array_merge( self::$_export,
-                                                        {$foreign.className}::export( true ) );
-                       {/if}
-                   {/foreach}
-               {/if}
-          {rdelim}
-          return self::$_export;
+            $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, '{$table.labelName}', $prefix, array(
+            {if $table.foreignKey}{foreach from=$table.foreignKey item=foreign}
+              {if $foreign.export}'{$foreign.className}',{/if}
+            {/foreach}{/if}
+            ));
+            return $r;
       {rdelim}
 
 {rdelim}
