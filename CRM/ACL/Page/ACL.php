@@ -185,7 +185,12 @@ ORDER BY entity_id
       $acl[$dao->id]['is_active'] = $dao->is_active;
 
       if ($acl[$dao->id]['entity_id']) {
-        $acl[$dao->id]['entity'] = $roles[$acl[$dao->id]['entity_id']];
+        // take disabled roles into account
+        if (isset($roles[$acl[$dao->id]['entity_id']])) {
+           $acl[$dao->id]['entity'] = $roles[$acl[$dao->id]['entity_id']];
+        } else {
+           $acl[$dao->id]['entity'] = "";
+        }
       }
       else {
         $acl[$dao->id]['entity'] = ts('Everyone');
