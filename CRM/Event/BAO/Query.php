@@ -90,6 +90,13 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         $query->_element['participant_fee_amount'] = 1;
       }
 
+      if (!empty($query->_returnProperties['participant_contribution_id'])) {
+        $query->_select['participant_contribution_id'] = "civicrm_participant_payment.participant_id as participant_contribution_id";
+        $query->_element['participant_contribution_id'] = 1;
+        $query->_tables['civicrm_contribution_participant_payment'] = 1;
+        $query->_whereTables['civicrm_contribution_participant_payment'] = 1;
+      }
+
       //add fee currency
       if (!empty($query->_returnProperties['participant_fee_currency'])) {
         $query->_select['participant_fee_currency'] = "civicrm_participant.fee_currency as participant_fee_currency";
@@ -479,6 +486,10 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     switch ($name) {
       case 'civicrm_participant':
         $from = " LEFT JOIN civicrm_participant ON civicrm_participant.contact_id = contact_a.id ";
+        break;
+
+      case 'civicrm_contribution_participant_payment':
+        $from = " $side JOIN civicrm_participant_payment ON civicrm_contribution.id = civicrm_participant_payment.contribution_id ";
         break;
 
       case 'civicrm_event':
