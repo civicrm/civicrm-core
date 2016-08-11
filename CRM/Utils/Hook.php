@@ -1740,6 +1740,8 @@ abstract class CRM_Utils_Hook {
    *   - name: string, a unique short name (e.g. "ReportInstance")
    *   - class: string, a PHP DAO class (e.g. "CRM_Report_DAO_Instance")
    *   - table: string, a SQL table name (e.g. "civicrm_report_instance")
+   *   - fields_callback: array, list of callables which manipulates field list
+   *   - links_callback: array, list of callables which manipulates fk list
    *
    * @return null
    *   The return value is ignored

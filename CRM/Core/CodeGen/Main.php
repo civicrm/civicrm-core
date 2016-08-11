@@ -15,6 +15,20 @@ class CRM_Core_CodeGen_Main {
   var $schemaPath; // ex: schema/Schema.xml
 
   /**
+   * Definitions of all tables.
+   *
+   * @var array
+   *   Ex: $tables['civicrm_address_format']['className'] = 'CRM_Core_DAO_AddressFormat';
+   */
+  var $tables;
+
+  /**
+   * @var array
+   *   Ex: $database['tableAttributes_modern'] = "ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+   */
+  var $database;
+
+  /**
    * @var string|NULL path in which to store a marker that indicates the last execution of
    * GenCode. If a matching marker already exists, GenCode doesn't run.
    */
@@ -23,33 +37,31 @@ class CRM_Core_CodeGen_Main {
   /**
    * @var string|NULL a digest of the inputs to the code-generator (eg the properties and source files)
    */
-  var $digest;
+  var $sourceDigest;
 
   /**
    * @param $CoreDAOCodePath
    * @param $sqlCodePath
    * @param $phpCodePath
    * @param $tplCodePath
-   * @param $smartyPluginDirs
+   * @param $IGNORE
    * @param $argCms
    * @param $argVersion
    * @param $schemaPath
    * @param $digestPath
    */
-  public function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
+  public function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $IGNORE, $argCms, $argVersion, $schemaPath, $digestPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
     $this->phpCodePath = $phpCodePath;
     $this->tplCodePath = $tplCodePath;
     $this->digestPath = $digestPath;
-    $this->digest = NULL;
+    $this->sourceDigest = NULL;
 
     // default cms is 'drupal', if not specified
     $this->cms = isset($argCms) ? strtolower($argCms) : 'drupal';
 
-    CRM_Core_CodeGen_Util_Smarty::singleton()->setPluginDirs($smartyPluginDirs);
-
-    $versionFile = "version.xml";
+    $versionFile = $this->phpCodePath . "/xml/version.xml";
     $versionXML = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
     $this->db_version = $versionXML->version_no;
     $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
@@ -65,16 +77,6 @@ class CRM_Core_CodeGen_Main {
    * Automatically generate a variety of files.
    */
   public function main() {
-    if (!empty($this->digestPath) && file_exists($this->digestPath) && $this->hasExpectedFiles()) {
-      if ($this->getDigest() === file_get_contents($this->digestPath)) {
-        echo "GenCode has previously executed. To force execution, please (a) omit CIVICRM_GENCODE_DIGEST\n";
-        echo "or (b) remove {$this->digestPath} or (c) call GenCode with new parameters.\n";
-        exit();
-      }
-      // Once we start GenCode, the old build is invalid
-      unlink($this->digestPath);
-    }
-
     echo "\ncivicrm_domain.version := " . $this->db_version . "\n\n";
     if ($this->buildVersion < 1.1) {
       echo "The Database is not compatible for this version";
@@ -91,106 +93,60 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       exit();
     }
 
-    $specification = new CRM_Core_CodeGen_Specification();
-    $specification->parse($this->schemaPath, $this->buildVersion);
-    # cheese:
-    $this->database = $specification->database;
-    $this->tables = $specification->tables;
-
-    $this->runAllTasks();
-
-    if (!empty($this->digestPath)) {
-      file_put_contents($this->digestPath, $this->getDigest());
-    }
-  }
-
-  public function runAllTasks() {
-    // TODO: This configuration can be manipulated dynamically.
-    $components = $this->getTasks();
-    foreach ($components as $component) {
-      $task = new $component($this);
-
-      if (is_a($task, 'CRM_Core_CodeGen_ITask')) {
-        $task->setConfig($this);
+    foreach ($this->getTasks() as $task) {
+      if (getenv('GENCODE_FORCE') || $task->needsUpdate()) {
         $task->run();
-      }
-      else {
-        echo "Bad news: we tried to run a codegen task of an unrecognized type: {$component}\n";
-        exit();
       }
     }
   }
 
   /**
    * @return array
-   *   Array of class names; each class implements CRM_Core_CodeGen_ITask
+   *   Array<CRM_Core_CodeGen_ITask>.
+   * @throws \Exception
    */
   public function getTasks() {
-    $components = array(
-      'CRM_Core_CodeGen_Config',
-      'CRM_Core_CodeGen_Reflection',
-      'CRM_Core_CodeGen_Schema',
-      'CRM_Core_CodeGen_DAO',
-      //'CRM_Core_CodeGen_Test',
-      'CRM_Core_CodeGen_I18n',
-    );
-    return $components;
+    $this->init();
+
+    $tasks = array();
+    $tasks[] = new CRM_Core_CodeGen_Config($this);
+    $tasks[] = new CRM_Core_CodeGen_Version($this);
+    $tasks[] = new CRM_Core_CodeGen_Reflection($this);
+    $tasks[] = new CRM_Core_CodeGen_Schema($this);
+    foreach (array_keys($this->tables) as $name) {
+      $tasks[] = new CRM_Core_CodeGen_DAO($this, $name);
+    }
+    $tasks[] = new CRM_Core_CodeGen_I18n($this);
+    return $tasks;
   }
 
   /**
-   * Compute a digest based on the inputs to the code-generator (ie the properties
-   * of the codegen and the source files loaded by the codegen).
+   * Compute a digest based on the GenCode logic (PHP/tpl).
    *
    * @return string
    */
-  public function getDigest() {
-    if ($this->digest === NULL) {
+  public function getSourceDigest() {
+    if ($this->sourceDigest === NULL) {
       $srcDir = CRM_Core_CodeGen_Util_File::findCoreSourceDir();
       $files = CRM_Core_CodeGen_Util_File::findManyFiles(array(
         array("$srcDir/CRM/Core/CodeGen", '*.php'),
         array("$srcDir/xml", "*.php"),
         array("$srcDir/xml", "*.tpl"),
-        array("$srcDir/xml", "*.xml"),
       ));
 
-      $properties = var_export(array(
-        CRM_Core_CodeGen_Util_File::digestAll($files),
-        $this->buildVersion,
-        $this->db_version,
-        $this->cms,
-        $this->CoreDAOCodePath,
-        $this->sqlCodePath,
-        $this->phpCodePath,
-        $this->tplCodePath,
-        $this->schemaPath,
-        $this->getTasks(),
-      ), TRUE);
-
-      $this->digest = md5($properties);
+      $this->sourceDigest = CRM_Core_CodeGen_Util_File::digestAll($files);
     }
-    return $this->digest;
+    return $this->sourceDigest;
   }
 
-  /**
-   * @return array
-   */
-  public function getExpectedFiles() {
-    return array(
-      $this->sqlCodePath . '/civicrm.mysql',
-      $this->phpCodePath . '/CRM/Contact/DAO/Contact.php',
-    );
-  }
-
-  /**
-   * @return bool
-   */
-  public function hasExpectedFiles() {
-    foreach ($this->getExpectedFiles() as $file) {
-      if (!file_exists($file)) {
-        return FALSE;
-      }
+  protected function init() {
+    if (!$this->database || !$this->tables) {
+      $specification = new CRM_Core_CodeGen_Specification();
+      $specification->parse($this->schemaPath, $this->buildVersion);
+      # cheese:
+      $this->database = $specification->database;
+      $this->tables = $specification->tables;
     }
-    return TRUE;
   }
 
 }
