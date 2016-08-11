@@ -1584,7 +1584,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if (isset($this->_params) && isset($this->_params['select_contact_id'])) {
+    if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
       $tempID = $this->_params['select_contact_id'];
     }
     if (isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
@@ -1593,7 +1593,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // force to ignore the authenticated user
-    if ($tempID === '0' || $tempID === 0 || $tempID === '') {
+    if ($tempID === '0' || $tempID === 0) {
       // we set the cid on the form so that this will be retained for the Confirm page
       // in the multi-page form & prevent us returning the $userID when this is called
       // from that page
