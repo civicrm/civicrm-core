@@ -59,6 +59,24 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $this->assertEquals($oldCount + 1, $newCount);
     $this->DashboardDelete($dashboard['id'], $oldCount);
+    $this->assertEquals($dashboard['values'][$dashboard['id']]['is_active'], 1);
+  }
+
+  /**
+   * CRM-19217.
+   * Ensure that where is_active is specifically set to 0 is_active returns 0.
+   */
+  public function testDashboardCreateNotActive() {
+    $params = array(
+      'version' => 3,
+      'label' => 'New Dashlet element',
+      'name' => 'New Dashlet element',
+      'url' => 'civicrm/report/list&reset=1&compid=99&snippet=5',
+      'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&snippet=5&context=dashletFullscreen',
+      'is_active' => 0,
+    );
+    $dashboard = $this->callAPISuccess('dashboard', 'create', $params);
+    $this->assertEquals($dashboard['values'][$dashboard['id']]['is_active'], 0);
   }
 
   /**
