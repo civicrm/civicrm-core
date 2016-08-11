@@ -77,7 +77,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $membershipType = $this->callAPIAndDocument('membership_type', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($membershipType['values'][$id]['name'], 'General');
     $this->assertEquals($membershipType['values'][$id]['member_of_contact_id'], $this->_contactID);
-    $this->assertEquals($membershipType['values'][$id]['financial_type_id'], 1);
+    $this->assertEquals($membershipType['values'][$id]['financial_type_id'], 2);
     $this->assertEquals($membershipType['values'][$id]['duration_unit'], 'year');
     $this->assertEquals($membershipType['values'][$id]['duration_interval'], '1');
     $this->assertEquals($membershipType['values'][$id]['period_type'], 'rolling');
