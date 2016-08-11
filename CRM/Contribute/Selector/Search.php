@@ -82,6 +82,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     'contribution_soft_credit_contact_id',
     'contribution_soft_credit_amount',
     'contribution_soft_credit_type',
+    'participant_contribution_id',
   );
 
   /**
@@ -183,11 +184,12 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
 
     // type of selector
     $this->_action = $action;
-
+    $returnProperties = CRM_Contribute_BAO_Query::selectorReturnProperties();
+    $returnProperties['participant_contribution_id'] = 1;
     $this->_includeSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_queryParams);
     $this->_query = new CRM_Contact_BAO_Query(
       $this->_queryParams,
-      CRM_Contribute_BAO_Query::selectorReturnProperties(),
+      $returnProperties,
       NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_CONTRIBUTE
     );
@@ -439,7 +441,27 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         'id' => $result->contribution_id,
         'cid' => $result->contact_id,
         'cxt' => $this->_context,
+        'pid' => $result->participant_id,
       );
+      if (!empty($row['participant_contribution_id'])) {
+        if ($row['contribution_status_name'] == 'Partially paid') {
+          $links[CRM_Core_Action::ADD] = array(
+            'name' => ts('Record Payment'),
+            'url' => 'civicrm/payment',
+            'qs' => 'reset=1&id=%%pid%%&cid=%%cid%%&action=add&component=event',
+            'title' => ts('Record Payment'),
+          );
+        }
+
+        if ($row['contribution_status_name'] == 'Pending refund') {
+          $links[CRM_Core_Action::ADD] = array(
+            'name' => ts('Record Refund'),
+            'url' => 'civicrm/payment',
+            'qs' => 'reset=1&id=%%pid%%&cid=%%cid%%&action=add&component=event',
+            'title' => ts('Record Refund'),
+          );
+        }
+      }
 
       $row['action'] = CRM_Core_Action::formLink(
         $links,
