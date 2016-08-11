@@ -70,9 +70,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       if (!self::$_cache[$argString]) {
         $table = self::getTableName();
         $where = self::whereCache($group, $path, $componentID);
-        $dao = CRM_Core_DAO::executeQuery("SELECT data FROM $table WHERE $where");
-        $data = isset($dao->data) ? unserialize($dao->data) : NULL;
-        $dao->free();
+        $rawData = CRM_Core_DAO::singleValueQuery("SELECT data FROM $table WHERE $where");
+        $data = $rawData ? unserialize($rawData) : NULL;
 
         self::$_cache[$argString] = $data;
         $cache->set($argString, self::$_cache[$argString]);
