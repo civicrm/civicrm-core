@@ -414,7 +414,7 @@ SELECT  id, html_type
         CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE);
       }
       elseif (!$form->_mode) {
-        $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
+        $form->addElement('checkbox', 'record_contribution', ts('Record Invoice?'), NULL,
           array('onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);")
         );
         // Check permissions for financial type first
