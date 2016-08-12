@@ -210,18 +210,20 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     // add to dashlet
     if (!empty($dashletParams)) {
       $section = 2;
-      $chart = '';
+      $chart = $limitResult = '';
       if (!empty($params['charts'])) {
         $section = 1;
         $chart = "&charts=" . $params['charts'];
       }
-      $limitResult = NULL;
-      if (!empty($params['row_count'])) {
+      if (!empty($params['row_count']) && CRM_Utils_Rule::positiveInteger($params['row_count'])) {
         $limitResult = '&rowCount=' . $params['row_count'];
       }
+      if (!empty($params['cache_minutes']) && CRM_Utils_Rule::positiveInteger($params['cache_minutes'])) {
+        $dashletParams['cache_minutes'] = $params['cache_minutes'];
+      }
       $dashletParams['name'] = "report/{$instance->id}";
-      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}&snippet=5{$chart}&context=dashlet" . $limitResult;
-      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen" . $limitResult;
+      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}{$chart}&context=dashlet" . $limitResult;
+      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}{$chart}&context=dashletFullscreen" . $limitResult;
       $dashletParams['instanceURL'] = "civicrm/report/instance/{$instance->id}";
       CRM_Core_BAO_Dashboard::addDashlet($dashletParams);
     }

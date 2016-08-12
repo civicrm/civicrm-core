@@ -91,6 +91,7 @@
     <comment>column no for this dashlet</comment>
     <default>0</default>
     <add>3.1</add>
+    <drop>4.7</drop>
   </field>
   <field>
     <name>is_minimized</name>
@@ -99,6 +100,7 @@
     <comment>Is Minimized?</comment>
     <default>0</default>
     <add>3.1</add>
+    <drop>4.7</drop>
   </field>
   <field>
     <name>fullscreen_url</name>
@@ -115,6 +117,7 @@
     <comment>Is Fullscreen?</comment>
     <default>1</default>
     <add>3.1</add>
+    <drop>4.7</drop>
   </field>
   <field>
     <name>is_active</name>
@@ -139,6 +142,16 @@
     <comment>Ordering of the dashlets.</comment>
     <default>0</default>
     <add>3.1</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>cache_minutes</name>
+    <type>int unsigned</type>
+    <title>Cache Minutes</title>
+    <comment>Number of minutes to cache dashlet content in browser localStorage.</comment>
+    <default>60</default>
+    <required>true</required>
+    <add>4.7</add>
   </field>
   <field>
     <name>created_date</name>

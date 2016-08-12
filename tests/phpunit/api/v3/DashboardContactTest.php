@@ -49,8 +49,8 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
       'version' => 3,
       'label' => 'New Dashlet element',
       'name' => 'New Dashlet element',
-      'url' => 'civicrm/report/list&compid=99&reset=1&snippet=5',
-      'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&snippet=5&context=dashletFullscreen',
+      'url' => 'civicrm/report/list&compid=99&reset=1',
+      'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&context=dashletFullscreen',
     );
     $dashresult = $this->callAPISuccess('dashboard', 'create', $dashParams);
     $contact = $this->callAPISuccess('contact', 'create', array(
