@@ -1805,8 +1805,17 @@ WHERE  id = %1
         'option_group_id' => 'account_relationship',
         'name' => 'Sales Tax Account is',
       ));
+      $value = array();
       if ($option['count'] !== 0) {
-        $where = 'AND efa.account_relationship IN (' . $option['values'][0]['value'] . ' )';
+        if ($option['count'] > 1) {
+          foreach ($option['values'] as $opt) {
+            $value[] = $opt['value'];
+          }
+        }
+        else {
+          $value[] = $option['values'][0]['value'];
+        }
+        $where = 'AND efa.account_relationship IN (' . implode(', ', $value)  . ' )';
       }
       else {
         $where = '';
