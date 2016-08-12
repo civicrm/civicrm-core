@@ -230,9 +230,10 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @return string
    */
   public static function parseUrl($url) {
-    if (substr($url, 0, 4) != 'http') {
+    // Check if it is already a fully-formed url
+    if (substr($url, 0, 4) != 'http' && $url[0] != '/') {
       $urlParam = explode('?', $url);
-      $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, FALSE);
+      $url = CRM_Utils_System::url($urlParam[0], CRM_Utils_Array::value(1, $urlParam), FALSE, NULL, FALSE);
     }
     return $url;
   }
