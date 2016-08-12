@@ -134,7 +134,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
           'label' => $item['dashboard_id.label'],
           'url' => $item['dashboard_id.url'],
           'cache_minutes' => $item['dashboard_id.cache_minutes'],
-          'fullscreen_url' => $item['dashboard_id.fullscreen_url'],
+          'fullscreen_url' => CRM_Utils_Array::value('dashboard_id.fullscreen_url', $item),
         );
       }
     }
@@ -217,7 +217,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
             'label' => $dashlet['label'],
             'cache_minutes' => $dashlet['cache_minutes'],
             'url' => $dashlet['url'],
-            'fullscreen_url' => $dashlet['fullscreen_url'],
+            'fullscreen_url' => CRM_Utils_Array::value('fullscreen_url', $dashlet),
           );
         }
       }
@@ -231,7 +231,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    */
   public static function parseUrl($url) {
     // Check if it is already a fully-formed url
-    if (substr($url, 0, 4) != 'http' && $url[0] != '/') {
+    if ($url && substr($url, 0, 4) != 'http' && $url[0] != '/') {
       $urlParam = explode('?', $url);
       $url = CRM_Utils_System::url($urlParam[0], CRM_Utils_Array::value(1, $urlParam), FALSE, NULL, FALSE);
     }
