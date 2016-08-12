@@ -27,43 +27,76 @@
 /* The placeholder that indicates where a dragged widget will land if dropped now. */
 #crm-container .placeholder {
   margin: 5px;
-  border: 3px dashed pink;
+  border: 3px dashed #CDE8FE;
 }
 
 /* Spacing between widgets. */
-#crm-container li.widget, #crm-container li.empty-placeholder { margin: 6px 3px; }
+#crm-container li.widget,
+#crm-container li.empty-placeholder {
+  margin: 0 3px 10px 3px;
+}
 #crm-container li.widget {
-  padding: 0px;
+  padding: 0;
 }
 
 /* Spacing inside widgets. */
 #crm-container .widget-wrapper {
-  padding: 0px;
-  overflow-x:auto;
-  margin-right: .25em
+  padding: 0;
+  overflow: hidden;
+  margin-right: .25em;
+  box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
+  border-radius: 3px;
 }
 
-/* wodget header / title */
+#crm-container .widget-wrapper.db-hover-handle {
+  box-shadow: 1px 1px 8px 3px rgba(0,0,0,0.2);
+}
+
+#crm-container .ui-sortable-helper .widget-wrapper {
+  box-shadow: 1px 1px 8px 3px rgba(0,0,0,0.5);
+}
+
+/* widget header / title */
 #crm-container .widget-header {
-  background:#CDE8FE none repeat scroll 0 0;
-  color:#000;
-  cursor:move;
-  display:inline;
-  font-size:1.2em;
-  margin:0;
+  background: transparent none repeat scroll 0 0;
+  cursor: move;
+  margin: 0 50px 0 0;
+  padding: 0;
+  color: #fff;
 }
 
 /* widget content / body*/
 #crm-container .widget-content {
   background-color: #ffffff;
   padding:0.5em;
+  overflow-x:auto;
+  min-height: 10em;
 }
 
-/* Standards-browsers do this anyway because all inner block elements are floated.  IE doesn't because it's crap. */
+#crm-container .widget-content .crm-accordion-header {
+  background-color: #EFEFE5;
+  background-image: url("../i/TreeMinus.gif");
+  color: #080808;
+}
+
+#crm-container .widget-content .crm-accordion-wrapper.collapsed .crm-accordion-header {
+  background-image: url("../i/TreePlus.gif");
+}
+
+#crm-container .widget-content .crm-accordion-header:hover {
+  background-color: #e8e8de;
+}
+
+#crm-container .widget-content .crm-accordion-body {
+  border-color: #e8e8de;
+  padding: 4px .5em;
+}
+
 #crm-container .widget-controls {
-  background-color:#CDE8FE;
-  display:block;
-  padding:5px 0px;
+  background-color: #5D677B;
+  /* Standards-browsers do this anyway because all inner block elements are floated.  IE doesn't because it's crap. */
+  display: block;
+  padding: 5px 0;
 }
 
 #crm-container .widget-icon, #crm-container .full-screen-close-icon img {
@@ -100,7 +133,7 @@
   font-weight: normal;
   float: left;
   cursor: pointer;
-  color: #222222;
+  color: #fff;
   opacity: .7;
 }
 
@@ -117,7 +150,7 @@
 
 #crm-container #available-dashlets {
   width: 98%;
-  border: 2px dashed pink;
+  border: 2px dashed #CDE8FE;
   background-color: #999999;
   min-height:40px;
 }
