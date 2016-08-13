@@ -411,12 +411,22 @@ class CRM_Core_Permission {
   }
 
   /**
-   * @param $module
+   * Checks that component is enabled and optionally that user has basic perm.
+   *
+   * @param string $module
+   *   Specifies the name of the CiviCRM component.
    * @param bool $checkPermission
+   *   Check not only that module is enabled, but that user has necessary
+   *   permission.
+   * @param bool $requireAllCasesPermOnCiviCase
+   *   Significant only if $module == CiviCase
+   *   Require "access all cases and activities", not just
+   *   "access my cases and activities".
    *
    * @return bool
+   *   Access to specified $module is granted.
    */
-  public static function access($module, $checkPermission = TRUE) {
+  public static function access($module, $checkPermission = TRUE, $requireAllCasesPermOnCiviCase = FALSE) {
     $config = CRM_Core_Config::singleton();
 
     if (!in_array($module, $config->enableComponents)) {
@@ -424,11 +434,17 @@ class CRM_Core_Permission {
     }
 
     if ($checkPermission) {
-      if ($module == 'CiviCase') {
-        return CRM_Case_BAO_Case::accessCiviCase();
-      }
-      else {
-        return CRM_Core_Permission::check("access $module");
+      switch ($module) {
+        case 'CiviCase':
+          $access_all_cases = CRM_Core_Permission::check("access all cases and activities");
+          $access_my_cases  = CRM_Core_Permission::check("access my cases and activities");
+          return $access_all_cases || (!$requireAllCasesPermOnCiviCase && $access_my_cases);
+
+        case 'CiviCampaign':
+          return CRM_Core_Permission::check("administer $module");
+
+        default:
+          return CRM_Core_Permission::check("access $module");
       }
     }
 
