@@ -4197,6 +4197,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $taxRate = $taxRates[$params['financial_type_id']];
         $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($params['line_total'], $taxRate);
         $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
+        $params['tax_rate'] = $taxRate;
       }
     }
     return $params;

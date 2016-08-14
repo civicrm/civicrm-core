@@ -1543,18 +1543,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
 
         // Update line total and total amount with tax on edit.
-        $financialItemsId = CRM_Core_PseudoConstant::getTaxRates();
-        if (array_key_exists($submittedValues['financial_type_id'], $financialItemsId)) {
-          $lineItems[$itemId]['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
-        }
-        else {
-          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = "";
-          $submittedValues['tax_amount'] = 'null';
-        }
-        if ($lineItems[$itemId]['tax_rate']) {
-          $lineItems[$itemId]['tax_amount'] = ($lineItems[$itemId]['tax_rate'] / 100) * $lineItems[$itemId]['line_total'];
+        $lineItems[$itemId] = CRM_Contribute_BAO_Contribution::checkTaxAmount($lineItems[$itemId], TRUE);
+        if (!empty($lineItems[$itemId]['tax_amount'])) {
           $submittedValues['total_amount'] = $lineItems[$itemId]['line_total'] + $lineItems[$itemId]['tax_amount'];
           $submittedValues['tax_amount'] = $lineItems[$itemId]['tax_amount'];
+        }
+        else {
+          $submittedValues['tax_amount'] = 'null';
         }
       }
       // CRM-10117 update the line items for participants.
