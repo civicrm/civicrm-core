@@ -680,15 +680,23 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   /**
    * Process incoming notification.
-   *
-   * This is only supported for paypal pro at the moment & no specific plans to add this path to core
-   * for paypal standard as the goal must be to separate the 2.
-   *
-   * We don't need to handle paypal standard using this path as there has never been any historic support
-   * for paypal standard to call civicrm/payment/ipn as a path.
    */
   static public function handlePaymentNotification() {
-    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
+    $params = array_merge($_GET, $_REQUEST);
+    $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
+    $lastParam = array_pop($q);
+    if (is_numeric($lastParam)) {
+      $params['processor_id'] = $lastParam;
+    }
+    if (civicrm_api3('PaymentProcessor', 'getvalue', array(
+        'id' => $params['processor_id'],
+        'return' => 'class_name')
+      ) == 'Payment_PayPalImpl') {
+      $paypalIPN = new CRM_Core_Payment_PayPalIPN($params);
+    }
+    else {
+      $paypalIPN = new CRM_Core_Payment_PayPalProIPN($params);
+    }
     $paypalIPN->main();
   }
 
@@ -787,39 +795,28 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws Exception
    */
   public function doTransferCheckout(&$params, $component = 'contribute') {
+
+    $notifyParameters = array('module' => $component);
+    $notifyParameterMap = array(
+      'contactID' => 'contactID',
+      'contributionID' => 'contributionID',
+      'eventID' => 'eventID',
+      'participantID' => 'participantID',
+      'membershipID' => 'membershipID',
+      'related_contact' => 'relatedContactID',
+      'onbehalf_dupe_alert' => 'onBehalfDupeAlert',
+    );
+    foreach ($notifyParameterMap as $paramsName => $notifyName) {
+      if (!empty($params[$paramsName])) {
+        $notifyParameters[$notifyName] = $params[$paramsName];
+      }
+    }
+    $this->setNotifyUrlParameters($notifyParameters);
+    $notifyURL = $this->getNotifyUrl();
+
     $config = CRM_Core_Config::singleton();
-
-    if ($component != 'contribute' && $component != 'event') {
-      CRM_Core_Error::fatal(ts('Component is invalid'));
-    }
-
-    $notifyURL = $config->userFrameworkResourceURL . "extern/ipn.php?reset=1&contactID={$params['contactID']}" . "&contributionID={$params['contributionID']}" . "&module={$component}";
-
-    if ($component == 'event') {
-      $notifyURL .= "&eventID={$params['eventID']}&participantID={$params['participantID']}";
-    }
-    else {
-      $membershipID = CRM_Utils_Array::value('membershipID', $params);
-      if ($membershipID) {
-        $notifyURL .= "&membershipID=$membershipID";
-      }
-      $relatedContactID = CRM_Utils_Array::value('related_contact', $params);
-      if ($relatedContactID) {
-        $notifyURL .= "&relatedContactID=$relatedContactID";
-
-        $onBehalfDupeAlert = CRM_Utils_Array::value('onbehalf_dupe_alert', $params);
-        if ($onBehalfDupeAlert) {
-          $notifyURL .= "&onBehalfDupeAlert=$onBehalfDupeAlert";
-        }
-      }
-    }
-
     $url = ($component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
     $cancel = ($component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
-    $returnURL = CRM_Utils_System::url($url,
-      "_qf_ThankYou_display=1&qfKey={$params['qfKey']}",
-      TRUE, NULL, FALSE
-    );
 
     $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
     if (!empty($params['is_recur'])) {
@@ -832,12 +829,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       TRUE, NULL, FALSE
     );
 
-    // ensure that the returnURL is absolute.
-    if (substr($returnURL, 0, 4) != 'http') {
-      $fixUrl = CRM_Utils_System::url("civicrm/admin/setting/url", '&reset=1');
-      CRM_Core_Error::fatal(ts('Sending a relative URL to PayPalIPN is erroneous. Please make your resource URL (in <a href="%1">Administer &raquo; System Settings &raquo; Resource URLs</a> ) complete.', array(1 => $fixUrl)));
-    }
-
     $paypalParams = array(
       'business' => $this->_paymentProcessor['user_name'],
       'notify_url' => $notifyURL,
@@ -847,7 +838,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'cancel_return' => $cancelURL,
       'no_note' => 1,
       'no_shipping' => 1,
-      'return' => $returnURL,
+      'return' => $this->getReturnSuccessUrl($params['qfKey']),
       'rm' => 2,
       'currency_code' => $params['currencyID'],
       'invoice' => $params['invoiceID'],
