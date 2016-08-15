@@ -92,7 +92,7 @@ class CRM_Utils_Mail_Incoming {
       return NULL;
     }
 
-    CRM_Core_Error::fatal(ts("No clue about the %1", array(1 => get_class($part))));
+    return self::formatMailUnrecognisedPart($part);
   }
 
   /**
@@ -126,7 +126,7 @@ class CRM_Utils_Mail_Incoming {
       return self::formatMailDeliveryStatus($part);
     }
 
-    CRM_Core_Error::fatal(ts("No clue about the %1", array(1 => get_class($part))));
+    return self::formatMailUnrecognisedPart($part);
   }
 
   /**
@@ -246,6 +246,15 @@ class CRM_Utils_Mail_Incoming {
     $t .= $part->generateBody();
     $t .= "-DELIVERY STATUS END-\n";
     return $t;
+  }
+
+  /**
+   * @param $part
+   *
+   * @return string
+   */
+  public function formatUnrecognisedPart($part) {
+    return ts('Unrecognised message part of type "%1".', array('%1' => get_class($part)));
   }
 
   /**
