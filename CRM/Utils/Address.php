@@ -94,6 +94,11 @@ class CRM_Utils_Address {
       }
     }
 
+    //CRM-16876 Display countries in all caps when in mailing mode.
+    if (!empty($fields['country']) && $mailing) {
+      $fields['country'] = strtoupper($fields['country']);
+    }
+
     $contactName = CRM_Utils_Array::value('display_name', $fields);
     if (!$individualFormat) {
       if (isset($fields['id'])) {
