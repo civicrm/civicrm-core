@@ -951,7 +951,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $pledgeParams['create_date'] = $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date("Ymd");
         if (CRM_Utils_Array::value('start_date', $params)) {
           $pledgeParams['frequency_day'] = intval(date("d", strtotime(CRM_Utils_Array::value('start_date', $params))));
-          $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = CRM_Utils_Array::value('start_date', $params);
+          $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date('Ymd', strtotime(CRM_Utils_Array::value('start_date', $params)));
         }
         $pledgeParams['status_id'] = $contribution->contribution_status_id;
         $pledgeParams['max_reminders'] = $form->_values['max_reminders'];
@@ -1093,7 +1093,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
     if (!empty($params['receive_date'])) {
-      $recurParams['start_date'] = $params['receive_date'];
+      $recurParams['start_date'] = date('YmdHis', strtotime($params['receive_date']));
     }
     $recurParams['invoice_id'] = CRM_Utils_Array::value('invoiceID', $params);
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
@@ -1110,7 +1110,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $campaignId = CRM_Utils_Array::value('campaign_id', $params, CRM_Utils_Array::value('campaign_id', $form->_values));
     $recurParams['campaign_id'] = $campaignId;
-
     $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
     if (is_a($recurring, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($recurring);
