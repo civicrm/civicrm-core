@@ -1215,7 +1215,9 @@ SELECT  pledge.contact_id              as contact_id,
     }
     switch ($field) {
       case 'contribution_date':
-        $date = date('Ymd');
+        if (empty($date)) {
+          $date = date('Ymd');
+        }
         break;
 
       case 'calendar_date':
