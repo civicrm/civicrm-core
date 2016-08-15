@@ -2150,6 +2150,20 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Allows the list of filters on the EntityRef widget to be altered.
+   *
+   * @see CRM_Core_Resources::entityRefFilters
+   *
+   * @param array $filters
+   */
+  public static function entityRefFilters(&$filters) {
+    self::singleton()->invoke(1, $filters, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_entityRefFilters'
+    );
+  }
+
+  /**
    * This hook is called for bypass a few civicrm urls from IDS check
    * @param array $skip list of civicrm url;
    */
