@@ -325,8 +325,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
     if (!empty($caseTypeXML->ActivityTypes) && $caseTypeXML->ActivityTypes->ActivityType) {
       foreach ($caseTypeXML->ActivityTypes->ActivityType as $activityTypeXML) {
-        $result[] = array('name' => (string) $activityTypeXML->name,
-          'component_name' =>  $componentName);
+        $result[] = array(
+          'name' => (string) $activityTypeXML->name,
+          'component_name' => $componentName);
       }
     }
 
@@ -334,8 +335,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       foreach ($caseTypeXML->ActivitySets->ActivitySet as $activitySetXML) {
         if ($activitySetXML->ActivityTypes && $activitySetXML->ActivityTypes->ActivityType) {
           foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
-            $result[] = array('name' => (string) $activityTypeXML->name,
-              'component_name' =>  $componentName);
+            $result[] = array(
+              'name' => (string) $activityTypeXML->name,
+              'component_name' => $componentName);
           }
         }
       }
