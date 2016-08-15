@@ -83,6 +83,10 @@ class CRM_Utils_Mail_Incoming {
       return self::formatMailMultipart($part, $attachments);
     }
 
+    if ($part instanceof ezcMailDeliveryStatus) {
+      return self::formatMailDeliveryStatus($part);
+    }
+
     // CRM-19111 - Handle blank emails with a subject.
     if (!$part) {
       return NULL;
@@ -116,6 +120,10 @@ class CRM_Utils_Mail_Incoming {
 
     if ($part instanceof ezcMailMultipartReport) {
       return self::formatMailMultipartReport($part, $attachments);
+    }
+
+    if ($part instanceof ezcMailDeliveryStatus) {
+      return self::formatMailDeliveryStatus($part);
     }
 
     CRM_Core_Error::fatal(ts("No clue about the %1", array(1 => get_class($part))));
@@ -224,6 +232,19 @@ class CRM_Utils_Mail_Incoming {
       $t .= self::formatMailPart($reportPart, $attachments);
     }
     $t .= "-REPORT END---\n";
+    return $t;
+  }
+
+  /**
+   * @param $part
+   *
+   * @return string
+   */
+  public function formatMailDeliveryStatus($part) {
+    $t = '';
+    $t .= "-DELIVERY STATUS BEGIN-\n";
+    $t .= $part->generateBody();
+    $t .= "-DELIVERY STATUS END-\n";
     return $t;
   }
 
