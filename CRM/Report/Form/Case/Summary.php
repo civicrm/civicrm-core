@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
@@ -41,8 +39,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   protected $_customGroupExtends = array('Case');
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->case_types = CRM_Case_PseudoConstant::caseType();
