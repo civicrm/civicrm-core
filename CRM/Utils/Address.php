@@ -31,6 +31,13 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
  */
+
+use CommerceGuys\Addressing\Model\Address;
+use CommerceGuys\Addressing\Formatter\PostalLabelFormatter;
+use CommerceGuys\Addressing\Repository\AddressFormatRepository;
+use CommerceGuys\Addressing\Repository\CountryRepository;
+use CommerceGuys\Addressing\Repository\SubdivisionRepository;
+
 class CRM_Utils_Address {
 
   /**
@@ -92,11 +99,6 @@ class CRM_Utils_Address {
       if (!isset($fields[$f])) {
         $fields[$f] = NULL;
       }
-    }
-
-    //CRM-16876 Display countries in all caps when in mailing mode.
-    if (!empty($fields['country']) && $mailing) {
-      $fields['country'] = strtoupper($fields['country']);
     }
 
     $contactName = CRM_Utils_Array::value('display_name', $fields);
@@ -233,6 +235,36 @@ class CRM_Utils_Address {
       else {
         $formatted = "\n<div class=\"vcard\"><span class=\"adr\">$formatted</span></div>\n";
       }
+    }
+
+    if ($mailing) {
+      $countries = CRM_Core_PseudoConstant::country();
+      $countryId = array_search($fields['country'], $countries);
+      $countryISOCode = CRM_Core_PseudoConstant::countryIsoCode($countryId);
+      $states = CRM_Core_PseudoConstant::stateProvince();
+      $stateId = array_search($fields['state_province_name'], $states);
+      $stateAbbreviation = CRM_Core_PseudoConstant::stateProvinceAbbreviation($stateId);
+      $locale = CRM_Core_Config::singleton()->lcMessages;
+      $locale = explode('_', $locale);
+      $domainCountry = $locale[1];
+      $domainLanguage = $locale[0];
+      $addressLine1 = !empty($fields['street_number']) ? $fields['street_number'] . ' ' . $fields['street_address'] : $fields['street_address'];
+      $addressFormatRepository = new AddressFormatRepository();
+      $countryRepository = new CountryRepository();
+      $subdivisionRepository = new SubdivisionRepository();
+      $addressee = !empty($fields['addressee_display']) ? $fields['addressee_display'] : $fields['display_name'];
+      $formatter = new PostalLabelFormatter($addressFormatRepository, $countryRepository, $subdivisionRepository, $domainCountry, $domainLanguage);
+      $address = new Address();
+      $address = $address
+         ->withCountryCode($countryISOCode)
+         ->withAdministrativeArea($countryISOCode . '-' . $stateAbbreviation)
+         ->withLocality($fields['city'])
+         ->withAddressLine1($addressLine1)
+         ->withPostalCode($fields['postal_code'])
+         ->withAddressLine2($fields['supplemental_address_1'])
+         ->withRecipient($addressee);
+      $formatted = $formatter->format($address);
+      return $formatted;
     }
 
     $formatted = preg_replace('/\n{[^{}]*}/u', "\n", $formatted);
