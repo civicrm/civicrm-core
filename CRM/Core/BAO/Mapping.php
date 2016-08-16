@@ -1005,6 +1005,15 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             $value = array($params['operator'][$key][$k] => $value);
           }
 
+          #CRM-19081 Fix levacy StateProvince Filed Values
+          if (!is_numeric($value) && $fldName == 'state_province') {
+            $states = civicrm_api3('address', 'getoptions', array(
+              'field' => 'state_province_id',
+            ));
+            $fixValue = array_search($value, $states['values']);
+            $value = is_numeric($fixValue) ? $fixValue : $value;
+          }
+
           if ($row) {
             $fields[] = array(
               $fldName,
