@@ -1800,17 +1800,32 @@ WHERE  id = %1
   public static function getTaxRates() {
     if (!isset(Civi::$statics[__CLASS__]['taxRates'])) {
       Civi::$statics[__CLASS__]['taxRates'] = array();
-      // Never do a copy & paste of this as the join on the option value is not indexed.
-      // @todo fix to resolve option values first.
+      $option = civicrm_api3('option_value', 'get', array(
+        'sequential' => 1,
+        'option_group_id' => 'account_relationship',
+        'name' => 'Sales Tax Account is',
+      ));
+      $value = array();
+      if ($option['count'] !== 0) {
+        if ($option['count'] > 1) {
+          foreach ($option['values'] as $opt) {
+            $value[] = $opt['value'];
+          }
+        }
+        else {
+          $value[] = $option['values'][0]['value'];
+        }
+        $where = 'AND efa.account_relationship IN (' . implode(', ', $value)  . ' )';
+      }
+      else {
+        $where = '';
+      }
       $sql = "
         SELECT fa.tax_rate, efa.entity_id
         FROM civicrm_entity_financial_account efa
         INNER JOIN civicrm_financial_account fa ON fa.id = efa.financial_account_id
-        INNER JOIN civicrm_option_value cov ON cov.value = efa.account_relationship
-        INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
         WHERE efa.entity_table = 'civicrm_financial_type'
-        AND cov.name = 'Sales Tax Account is'
-        AND cog.name = 'account_relationship'
+        {$where}
         AND fa.is_active = 1";
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
