@@ -608,7 +608,6 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    */
   public function clauseComponent() {
     $selectedContacts = implode(',', $this->_contactSelected);
-    $contribution = $membership = $participant = NULL;
     $eligibleResult = $rows = $tempArray = array();
     foreach ($this->_component as $val) {
       if (!empty($this->_selectComponent[$val]) &&
