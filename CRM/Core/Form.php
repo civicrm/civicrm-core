@@ -1584,7 +1584,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if (isset($this->_params) && isset($this->_params['select_contact_id'])) {
+    if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
       $tempID = $this->_params['select_contact_id'];
     }
     if (isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
@@ -1599,6 +1599,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
+      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return (int) $tempID;
     }
 
