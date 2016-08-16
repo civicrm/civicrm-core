@@ -465,6 +465,14 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
 
   protected $sqlArray;
+
+  /**
+   * Holds permissioned financial type.
+   *
+   */
+
+  protected $financialTypes = NULL;
+
   /**
    * Class constructor.
    */
@@ -4679,6 +4687,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
     $financialTypes = NULL;
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    $this->financialTypes = $financialTypes;
     if (empty($financialTypes)) {
       $contFTs = "0";
       $liFTs = implode(',', array_keys(CRM_Contribute_Pseudoconstant::financialType()));
