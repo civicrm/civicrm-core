@@ -517,7 +517,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
-      
+
       $this->_formComponent['activity_civireport'] = "FROM
                         civicrm_activity {$this->_aliases['civicrm_activity']}
                         LEFT JOIN civicrm_activity_contact civicrm_activity_target ON
@@ -999,6 +999,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         $this->_formComponent[$component] .= " LEFT JOIN civicrm_line_item ON civicrm_line_item.entity_id = {$alias}.id AND 'civicrm_{$tableName}' = civicrm_line_item.entity_table";
         $whereClause = " AND (civicrm_line_item.{$clause} OR civicrm_line_item.id IS NULL)";
         break;
+
       case 'contribution_civireport':
         $this->_formComponent[$component] .= " AND {$this->_aliases['civicrm_contribution']}.$clause
         INNER JOIN civicrm_line_item ON civicrm_line_item.contribution_id = {$this->_aliases['civicrm_contribution']}.id
