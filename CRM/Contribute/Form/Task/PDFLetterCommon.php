@@ -12,7 +12,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param CRM_Contribute_Form_Task $form
    */
   public static function postProcess(&$form) {
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
+    $formValues = $form->controller->exportValues($form->getName());
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
     $isPDF = FALSE;
     $emailParams = array();
     if (!empty($formValues['email_options'])) {
@@ -34,11 +35,18 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $updateStatus = '';
     $task = 'CRM_Contribution_Form_Task_PDFLetterCommon';
     $realSeparator = ', ';
+    $tableSeparators = array(
+      'td' => '</td><td>',
+      'tr' => '</td></tr><tr><td>',
+    );
     //the original thinking was mutliple options - but we are going with only 2 (comma & td) for now in case
     // there are security (& UI) issues we need to think through
     if (isset($formValues['group_by_separator'])) {
-      if ($formValues['group_by_separator'] == 'td') {
-        $realSeparator = "</td><td>";
+      if (in_array($formValues['group_by_separator'], array('td', 'tr'))) {
+        $realSeparator = $tableSeparators[$formValues['group_by_separator']];
+      }
+      elseif ($formValues['group_by_separator'] == 'br') {
+        $realSeparator = "<br />";
       }
     }
     $separator = '****~~~~';// a placeholder in case the separator is common in the string - e.g ', '
@@ -68,7 +76,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       self::assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID);
 
       if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
-        if (!$validated && $realSeparator == '</td><td>' && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
+        if (!$validated && in_array($realSeparator, $tableSeparators) && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
           $realSeparator = ', ';
           CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
         }

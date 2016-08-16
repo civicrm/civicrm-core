@@ -569,32 +569,17 @@ LIMIT {$offset}, {$rowCount}
    * Function used for CiviCRM dashboard operations.
    */
   public static function dashboard() {
-    $operation = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
-
-    switch ($operation) {
-      case 'get_widgets_by_column':
-        // This would normally be coming from either the database (this user's settings) or a default/initial dashboard configuration.
-        // get contact id of logged in user
-
-        $dashlets = CRM_Core_BAO_Dashboard::getContactDashlets();
-        break;
-
-      case 'get_widget':
-        $dashletID = CRM_Utils_Type::escape($_GET['id'], 'Positive');
-
-        $dashlets = CRM_Core_BAO_Dashboard::getDashletInfo($dashletID);
-        break;
-
+    switch ($_REQUEST['op']) {
       case 'save_columns':
         CRM_Core_BAO_Dashboard::saveDashletChanges($_REQUEST['columns']);
-        CRM_Utils_System::civiExit();
+        break;
+
       case 'delete_dashlet':
         $dashletID = CRM_Utils_Type::escape($_REQUEST['dashlet_id'], 'Positive');
         CRM_Core_BAO_Dashboard::deleteDashlet($dashletID);
-        CRM_Utils_System::civiExit();
     }
 
-    CRM_Utils_JSON::output($dashlets);
+    CRM_Utils_System::civiExit();
   }
 
   /**

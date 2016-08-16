@@ -100,12 +100,6 @@ class CRM_Core_PseudoConstant {
   private static $group;
 
   /**
-   * GroupIterator
-   * @var mixed
-   */
-  private static $groupIterator;
-
-  /**
    * RelationshipType
    * @var array
    */
@@ -922,28 +916,6 @@ WHERE  id = %1";
       self::populate(self::$group[$groupKey], 'CRM_Contact_DAO_Group', FALSE, 'title', 'is_active', $condition);
     }
     return self::$group[$groupKey];
-  }
-
-  /**
-   * Create or get groups iterator (iterates over nested groups in a
-   * logical fashion)
-   *
-   * The GroupNesting instance is returned; it's created if this is being
-   * called for the first time
-   *
-   *
-   *
-   * @param bool $styledLabels
-   *
-   * @return CRM_Contact_BAO_GroupNesting
-   */
-  public static function &groupIterator($styledLabels = FALSE) {
-    if (!self::$groupIterator) {
-      // When used as an object, GroupNesting implements Iterator
-      // and iterates nested groups in a logical manner for us
-      self::$groupIterator = new CRM_Contact_BAO_GroupNesting($styledLabels);
-    }
-    return self::$groupIterator;
   }
 
   /**
@@ -1828,6 +1800,8 @@ WHERE  id = %1
   public static function getTaxRates() {
     if (!isset(Civi::$statics[__CLASS__]['taxRates'])) {
       Civi::$statics[__CLASS__]['taxRates'] = array();
+      // Never do a copy & paste of this as the join on the option value is not indexed.
+      // @todo fix to resolve option values first.
       $sql = "
         SELECT fa.tax_rate, efa.entity_id
         FROM civicrm_entity_financial_account efa

@@ -3727,13 +3727,10 @@ CREATE TABLE `civicrm_dashboard` (
      `url` varchar(255)    COMMENT 'url in case of external dashlet',
      `permission` varchar(255)    COMMENT 'Permission for the dashlet',
      `permission_operator` varchar(3)    COMMENT 'Permission Operator',
-     `column_no` tinyint   DEFAULT 0 COMMENT 'column no for this dashlet',
-     `is_minimized` tinyint   DEFAULT 0 COMMENT 'Is Minimized?',
      `fullscreen_url` varchar(255)    COMMENT 'fullscreen url for dashlet',
-     `is_fullscreen` tinyint   DEFAULT 1 COMMENT 'Is Fullscreen?',
      `is_active` tinyint   DEFAULT 0 COMMENT 'Is this dashlet active?',
      `is_reserved` tinyint   DEFAULT 0 COMMENT 'Is this dashlet reserved?',
-     `weight` int   DEFAULT 0 COMMENT 'Ordering of the dashlets.' 
+     `cache_minutes` int unsigned NOT NULL  DEFAULT 60 COMMENT 'Number of minutes to cache dashlet content in browser localStorage.' 
 ,
     PRIMARY KEY ( `id` )
  
@@ -4006,16 +4003,16 @@ CREATE TABLE `civicrm_dashboard_contact` (
      `dashboard_id` int unsigned NOT NULL   COMMENT 'Dashboard ID',
      `contact_id` int unsigned NOT NULL   COMMENT 'Contact ID',
      `column_no` tinyint   DEFAULT 0 COMMENT 'column no for this widget',
-     `is_minimized` tinyint   DEFAULT 0 COMMENT 'Is Minimized?',
-     `is_fullscreen` tinyint   DEFAULT 1 COMMENT 'Is Fullscreen?',
      `is_active` tinyint   DEFAULT 0 COMMENT 'Is this widget active?',
-     `weight` int   DEFAULT 0 COMMENT 'Ordering of the widgets.',
-     `content` longtext    COMMENT 'dashlet content',
-     `created_date` datetime    COMMENT 'When was content populated' 
+     `weight` int   DEFAULT 0 COMMENT 'Ordering of the widgets.' 
 ,
     PRIMARY KEY ( `id` )
  
- 
+    ,     UNIQUE INDEX `index_dashboard_id_contact_id`(
+        dashboard_id
+      , contact_id
+  )
+  
 ,          CONSTRAINT FK_civicrm_dashboard_contact_dashboard_id FOREIGN KEY (`dashboard_id`) REFERENCES `civicrm_dashboard`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_dashboard_contact_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 

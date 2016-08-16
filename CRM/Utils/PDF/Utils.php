@@ -25,6 +25,7 @@
  +--------------------------------------------------------------------+
  */
 
+
 use Dompdf\Dompdf;
 use Dompdf\Options;
 /**
@@ -196,7 +197,7 @@ class CRM_Utils_PDF_Utils {
    * @return string
    */
   public static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
-    // CRM-12165 - Remote file support needed for image handling
+    // CRM-12165 - Remote file support required for image handling.
     $options = new Options();
     $options->set('isRemoteEnabled', TRUE);
 

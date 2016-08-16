@@ -42,9 +42,9 @@ class CRM_Core_IDS {
   );
 
   /**
-   * The init object
+   * @var string
    */
-  private $init = NULL;
+  private $path;
 
   /**
    * Check function.
@@ -52,16 +52,17 @@ class CRM_Core_IDS {
    * This function includes the IDS vendor parts and runs the
    * detection routines on the request array.
    *
-   * @param object $args cake controller object
+   * @param array $args
+   *   List of path parts.
    *
    * @return bool
    */
-  public function check(&$args) {
+  public function check($args) {
     // lets bypass a few civicrm urls from this check
     $skip = array('civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates');
     CRM_Utils_Hook::idsException($skip);
-    $path = implode('/', $args);
-    if (in_array($path, $skip)) {
+    $this->path = implode('/', $args);
+    if (in_array($this->path, $skip)) {
       return NULL;
     }
 
@@ -186,7 +187,7 @@ class CRM_Core_IDS {
     $impact = $result->getImpact();
     if ($impact >= $this->threshold['kick']) {
       $this->log($result, 3, $impact);
-      $this->kick($result);
+      $this->kick();
       return TRUE;
     }
     elseif ($impact >= $this->threshold['warn']) {
@@ -248,21 +249,18 @@ class CRM_Core_IDS {
   }
 
   /**
-   * Kick (whatever that means!).
-   *
-   * @param array $result
+   * Create an error that prevents the user from continuing.
    *
    * @throws \Exception
    */
-  private function kick($result) {
+  private function kick() {
     $session = CRM_Core_Session::singleton();
     $session->reset(2);
 
     $msg = ts('There is a validation error with your HTML input. Your activity is a bit suspicious, hence aborting');
 
-    $path = implode('/', $args);
     if (in_array(
-      $path,
+      $this->path,
       array("civicrm/ajax/rest", "civicrm/api/json")
     )) {
       require_once "api/v3/utils.php";

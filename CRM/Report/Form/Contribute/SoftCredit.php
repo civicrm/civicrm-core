@@ -53,6 +53,19 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
    */
   public function __construct() {
 
@@ -238,7 +251,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         'filters' => array(
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -277,7 +290,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         ),
         'filters' => array(
           'soft_credit_type_id' => array(
-            'title' => 'Soft Credit Type',
+            'title' => ts('Soft Credit Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
             'default' => NULL,
@@ -459,7 +472,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_rollup = 'WITH ROLLUP';
-    $this->appendSelect($this->selectClause, array("{$this->_aliases['civicrm_contribution_soft']}.contact_id", "constituentname.id"));
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->selectClause, array("{$this->_aliases['civicrm_contribution_soft']}.contact_id", "constituentname.id"));
     $this->_groupBy = "
 GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentname.id {$this->_rollup}";
   }

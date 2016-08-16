@@ -25,13 +25,6 @@
 *}
 <div class="crm-block crm-form-block crm-miscellaneous-form-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-    <table class="form-layout">
-        <tr class="crm-miscellaneous-form-block-dashboardCacheTimeout">
-            <td class="label">{$form.dashboardCacheTimeout.label}</td>
-            <td>{$form.dashboardCacheTimeout.html}<br />
-                <span class="description">{ts}The number of minutes to cache dashlet content on dashboard.{/ts}</span></td>
-        </tr>
-    </table>
 
     <table class="form-layout">
         <tr class="crm-miscellaneous-form-block-checksumTimeout">

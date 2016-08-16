@@ -234,6 +234,16 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         unset($value['contribution_source']);
         $contribution = CRM_Contribute_BAO_Contribution::add($value, $ids);
 
+        if (!empty($value['contribution_status_id'])) {
+          CRM_Contribute_BAO_Contribution::transitionComponentWithReturnMessage($contribution->id,
+            $value['contribution_status_id'],
+            CRM_Utils_Array::value("field[{$key}][contribution_status_id]",
+              $this->_defaultValues
+            ),
+            $contribution->receive_date
+          );
+        }
+
         // add custom field values
         if (!empty($value['custom']) &&
           is_array($value['custom'])

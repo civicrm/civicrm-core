@@ -117,8 +117,16 @@ class Frame {
     $this->doCommit = FALSE;
   }
 
+  /**
+   * Begin frame processing.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function begin() {
-    assert('$this->state === self::F_NEW');
+    if ($this->state !== self::F_NEW) {
+      throw new \CRM_Core_Exception('State is not F_NEW');
+    };
+
     $this->state = self::F_ACTIVE;
     if ($this->beginStmt) {
       $this->dao->query($this->beginStmt);
@@ -126,14 +134,20 @@ class Frame {
   }
 
   /**
+   * Finish frame processing.
+   *
    * @param int $newState
-   * @void
+   *
+   * @throws \CRM_Core_Exception
    */
   public function finish($newState = self::F_DONE) {
     if ($this->state == self::F_FORCED) {
       return;
     }
-    assert('$this->state === self::F_ACTIVE');
+    if ($this->state !== self::F_ACTIVE) {
+      throw new \CRM_Core_Exception('State is not F_ACTIVE');
+    };
+
     $this->state = $newState;
 
     if ($this->doCommit) {

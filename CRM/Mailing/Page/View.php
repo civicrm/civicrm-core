@@ -76,6 +76,9 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
    * @param int $contactID
    * @param bool $print
    * @param bool $allowID
+   *
+   * @return null|string
+   *   Not really sure if anything should be returned - parent doesn't
    */
   public function run($id = NULL, $contactID = NULL, $print = TRUE, $allowID = FALSE) {
     if (is_numeric($id)) {
@@ -94,8 +97,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $this->_contactID = $contactID;
     }
     else {
-      $session = CRM_Core_Session::singleton();
-      $this->_contactID = $session->get('userID');
+      $this->_contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     }
 
     // mailing key check
@@ -114,7 +116,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
           !$allowID
         ) {
           CRM_Utils_System::permissionDenied();
-          return;
+          return NULL;
         }
       }
     }
@@ -127,7 +129,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       !$this->checkPermission()
     ) {
       CRM_Utils_System::permissionDenied();
-      return;
+      return NULL;
     }
 
     CRM_Mailing_BAO_Mailing::tokenReplace($this->_mailing);

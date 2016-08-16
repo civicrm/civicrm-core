@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
 
@@ -41,8 +39,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
   protected $_add2groupSupported = FALSE;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array(

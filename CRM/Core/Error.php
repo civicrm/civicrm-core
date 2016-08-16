@@ -125,8 +125,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $log = CRM_Core_Config::getLog();
     $this->setLogger($log);
 
-    // set up error handling for Pear Error Stack
-    $this->setDefaultCallback(array($this, 'handlePES'));
+    // PEAR<=1.9.0 does not declare "static" properly.
+    if (!is_callable(array('PEAR', '__callStatic'))) {
+      $this->setDefaultCallback(array($this, 'handlePES'));
+    }
+    else {
+      PEAR_ErrorStack::setDefaultCallback(array($this, 'handlePES'));
+    }
   }
 
   /**

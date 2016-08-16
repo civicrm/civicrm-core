@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
 
@@ -51,8 +49,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   public $_drilldownReport = array('event/participantlist' => 'Link to Detail Report');
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
 
@@ -65,7 +62,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
             'required' => TRUE,
           ),
           'id' => array(
-            'title' => 'Event ID',
+            'title' => ts('Event ID'),
             'no_display' => TRUE,
             'required' => TRUE,
           ),
@@ -285,17 +282,17 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
       }
       $statistics['counts']['count'] = array(
         'value' => $dao->count,
-        'title' => 'Total Participants',
+        'title' => ts('Total Participants'),
         'type' => CRM_Utils_Type::T_INT,
       );
       $statistics['counts']['amount'] = array(
         'value' => $dao->amount,
-        'title' => 'Total Income',
+        'title' => ts('Total Income'),
         'type' => CRM_Utils_Type::T_MONEY,
       );
       $statistics['counts']['avg'] = array(
         'value' => $avg,
-        'title' => 'Average',
+        'title' => ts('Average'),
         'type' => CRM_Utils_Type::T_MONEY,
       );
     }
@@ -305,7 +302,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   public function groupBy() {
     $this->assign('chartSupported', TRUE);
     $this->_rollup = " WITH ROLLUP";
-    $this->appendSelect($this->_selectClauses, "{$this->_aliases['civicrm_event']}.id");
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, "{$this->_aliases['civicrm_event']}.id");
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_event']}.id {$this->_rollup}";
   }
 

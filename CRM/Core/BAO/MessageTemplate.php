@@ -360,6 +360,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     );
     $params = array_merge($defaults, $params);
 
+    CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
+
     if ((!$params['groupName'] ||
         !$params['valueName']
       ) &&
@@ -399,11 +401,15 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
     }
 
-    $subject = $dao->subject;
-    $text = $dao->text;
-    $html = $dao->html;
-    $format = $dao->format;
+    $mailContent = array(
+      'subject' => $dao->subject,
+      'text' => $dao->text,
+      'html' => $dao->html,
+      'format' => $dao->format,
+    );
     $dao->free();
+
+    CRM_Utils_Hook::alterMailContent($mailContent);
 
     // add the test banner (if requested)
     if ($params['isTest']) {
@@ -415,9 +421,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $testDao = CRM_Core_DAO::executeQuery($query);
       $testDao->fetch();
 
-      $subject = $testDao->subject . $subject;
-      $text = $testDao->text . $text;
-      $html = preg_replace('/<body(.*)$/im', "<body\\1\n{$testDao->html}", $html);
+      $mailContent['subject'] = $testDao->subject . $mailContent['subject'];
+      $mailContent['text'] = $testDao->text . $mailContent['text'];
+      $mailContent['html'] = preg_replace('/<body(.*)$/im', "<body\\1\n{$testDao->html}", $mailContent['html']);
       $testDao->free();
     }
 
@@ -425,9 +431,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $domain = CRM_Core_BAO_Domain::getDomain();
     $hookTokens = array();
     $mailing = new CRM_Mailing_BAO_Mailing();
-    $mailing->subject = $subject;
-    $mailing->body_text = $text;
-    $mailing->body_html = $html;
+    $mailing->subject = $mailContent['subject'];
+    $mailing->body_text = $mailContent['text'];
+    $mailing->body_html = $mailContent['html'];
     $tokens = $mailing->getTokens();
     CRM_Utils_Hook::tokens($hookTokens);
     $categories = array_keys($hookTokens);
@@ -470,14 +476,14 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $contact = $contact[$contactID];
     }
 
-    $subject = CRM_Utils_Token::replaceDomainTokens($subject, $domain, FALSE, $tokens['text'], TRUE);
-    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text'], TRUE);
-    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html'], TRUE);
+    $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['text'], TRUE);
+    $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], TRUE);
+    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], TRUE);
 
     if ($contactID) {
-      $subject = CRM_Utils_Token::replaceContactTokens($subject, $contact, FALSE, $tokens['text'], FALSE, TRUE);
-      $text = CRM_Utils_Token::replaceContactTokens($text, $contact, FALSE, $tokens['text'], FALSE, TRUE);
-      $html = CRM_Utils_Token::replaceContactTokens($html, $contact, FALSE, $tokens['html'], FALSE, TRUE);
+      $mailContent['subject'] = CRM_Utils_Token::replaceContactTokens($mailContent['subject'], $contact, FALSE, $tokens['text'], FALSE, TRUE);
+      $mailContent['text'] = CRM_Utils_Token::replaceContactTokens($mailContent['text'], $contact, FALSE, $tokens['text'], FALSE, TRUE);
+      $mailContent['html'] = CRM_Utils_Token::replaceContactTokens($mailContent['html'], $contact, FALSE, $tokens['html'], FALSE, TRUE);
 
       $contactArray = array($contactID => $contact);
       CRM_Utils_Hook::tokenValues($contactArray,
@@ -489,13 +495,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       );
       $contact = $contactArray[$contactID];
 
-      $subject = CRM_Utils_Token::replaceHookTokens($subject, $contact, $categories, TRUE);
-      $text = CRM_Utils_Token::replaceHookTokens($text, $contact, $categories, TRUE);
-      $html = CRM_Utils_Token::replaceHookTokens($html, $contact, $categories, TRUE);
+      $mailContent['subject'] = CRM_Utils_Token::replaceHookTokens($mailContent['subject'], $contact, $categories, TRUE);
+      $mailContent['text'] = CRM_Utils_Token::replaceHookTokens($mailContent['text'], $contact, $categories, TRUE);
+      $mailContent['html'] = CRM_Utils_Token::replaceHookTokens($mailContent['html'], $contact, $categories, TRUE);
     }
 
     // strip whitespace from ends and turn into a single line
-    $subject = "{strip}$subject{/strip}";
+    $mailContent['subject'] = "{strip}{$mailContent['subject']}{/strip}";
 
     // parse the three elements with Smarty
     $smarty = CRM_Core_Smarty::singleton();
@@ -503,20 +509,20 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $smarty->assign($name, $value);
     }
     foreach (array(
-               'subject',
-               'text',
-               'html',
-             ) as $elem) {
-      $$elem = $smarty->fetch("string:{$$elem}");
+      'subject',
+      'text',
+      'html',
+    ) as $elem) {
+      $mailContent[$elem] = $smarty->fetch("string:{$mailContent[$elem]}");
     }
 
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
 
     // create the params array
-    $params['subject'] = $subject;
-    $params['text'] = $text;
-    $params['html'] = $html;
+    $params['subject'] = $mailContent['subject'];
+    $params['text'] = $mailContent['text'];
+    $params['html'] = $mailContent['html'];
 
     if ($params['toEmail']) {
       $contactParams = array(array('email', 'LIKE', $params['toEmail'], 0, 1));
@@ -538,7 +544,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         if (empty($params['attachments'])) {
           $params['attachments'] = array();
         }
-        $params['attachments'][] = CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format);
+        $params['attachments'][] = CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $mailContent['format']);
       }
       $pdf_filename = '';
       if ($config->doNotAttachPDFReceipt &&
@@ -548,7 +554,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         if (empty($params['attachments'])) {
           $params['attachments'] = array();
         }
-        $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $format);
+        $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $mailContent['format']);
         if (isset($params['tplParams']['email_comment'])) {
           $params['html'] = $params['tplParams']['email_comment'];
           $params['text'] = strip_tags($params['tplParams']['email_comment']);
@@ -562,7 +568,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
     }
 
-    return array($sent, $subject, $text, $html);
+    return array($sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']);
   }
 
 }

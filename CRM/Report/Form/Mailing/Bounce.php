@@ -52,6 +52,20 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   );
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array();
@@ -412,7 +426,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
    */
   public function bounce_type() {
 
-    $data = array('' => '--Please Select--');
+    $data = array('' => ts('--Please Select--'));
 
     $bounce_type = new CRM_Mailing_DAO_BounceType();
     $query = "SELECT name FROM civicrm_mailing_bounce_type";

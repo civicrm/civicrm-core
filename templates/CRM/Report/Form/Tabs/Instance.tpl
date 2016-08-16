@@ -106,9 +106,13 @@
         <span class="description">{ts}Users with appropriate permissions can add this report to their dashboard.{/ts}</span>
       </td>
     </tr>
-    <tr id ="limit_result" class="crm-report-instanceForm-form-block-limitUser">
+    <tr class="crm-report-instanceForm-form-block-limitUser">
       <td class="report-label">{$form.row_count.label} {help id="id-dash_limit" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
-      <td>{$form.row_count.html}</td>
+      <td>{$form.row_count.html} {ts}rows{/ts}</td>
+    </tr>
+    <tr class="crm-report-instanceForm-form-block-cache_minutes">
+      <td class="report-label">{$form.cache_minutes.label} {help id="cache_minutes" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td>{$form.cache_minutes.html} {ts}minutes{/ts}</td>
     </tr>
   </table>
 </div>
@@ -121,15 +125,16 @@
     field_type          ="radio"
     invert              = 0
 }
-{include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="addToDashboard"
-    trigger_value       =""
-    target_element_id   ="limit_result"
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-}
-
+{literal}
+<script type="text/javascript">
+  CRM.$(function($) {
+    function showHideDashletControls() {
+      $('.crm-report-instanceForm-form-block-limitUser, .crm-report-instanceForm-form-block-cache_minutes').toggle($(this).is(':checked'));
+    }
+    $('#addToDashboard').each(showHideDashletControls).change(showHideDashletControls);
+  });
+</script>
+{/literal}
 {if $is_navigation}
   <script type="text/javascript">
     document.getElementById('is_navigation').checked = true;

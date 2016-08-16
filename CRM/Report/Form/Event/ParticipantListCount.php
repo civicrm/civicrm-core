@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
 
@@ -41,10 +39,23 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     'Participant',
     'Event',
   );
+  /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
   /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array(
@@ -149,7 +160,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
             'required' => TRUE,
           ),
           'organization_name' => array(
-            'title' => 'Employer',
+            'title' => ts('Employer'),
             'default' => TRUE,
             'no_repeat' => TRUE,
           ),
@@ -362,17 +373,17 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
       }
       $statistics['counts']['count'] = array(
         'value' => $dao->count,
-        'title' => 'Total Participants',
+        'title' => ts('Total Participants'),
         'type' => CRM_Utils_Type::T_INT,
       );
       $statistics['counts']['amount'] = array(
         'value' => $dao->amount,
-        'title' => 'Total Income',
+        'title' => ts('Total Income'),
         'type' => CRM_Utils_Type::T_MONEY,
       );
-      $statistics['counts']['avg    '] = array(
+      $statistics['counts']['avg'] = array(
         'value' => $avg,
-        'title' => 'Average',
+        'title' => ts('Average'),
         'type' => CRM_Utils_Type::T_MONEY,
       );
     }

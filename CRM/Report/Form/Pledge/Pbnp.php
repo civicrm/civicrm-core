@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   protected $_charts = array(
@@ -45,8 +43,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   );
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
 
@@ -115,7 +112,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_INT,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -151,7 +148,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           ),
           'scheduled_amount' => array(
             'type' => CRM_Utils_Type::T_MONEY,
-            'title' => 'Next Payment Amount',
+            'title' => ts('Next Payment Amount'),
           ),
         ),
         'filters' => array(
@@ -203,7 +200,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_pledge']['fields']['campaign_id'] = array(
-        'title' => 'Campaign',
+        'title' => ts('Campaign'),
         'default' => 'false',
       );
       $this->_columns['civicrm_pledge']['filters']['campaign_id'] = array(

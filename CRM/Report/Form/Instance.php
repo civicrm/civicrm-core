@@ -82,13 +82,10 @@ class CRM_Report_Form_Instance {
       $attributes['email_subject']
     );
 
-    $form->add('text',
+    $form->add('number',
       'row_count',
       ts('Limit Dashboard Results'),
-      array(
-        'maxlength' => 64,
-        'size' => 5,
-      )
+      array('class' => 'four', 'min' => 1)
     );
 
     $form->add('textarea',
@@ -112,8 +109,8 @@ class CRM_Report_Form_Instance {
       'criteria' => ts('Show Criteria'),
     ));
 
-    $form->addElement('checkbox', 'addToDashboard', ts('Available for Dashboard?'), NULL,
-      array('onclick' => "return showHideByValue('addToDashboard','','limit_result','table-row','radio',false);"));
+    $form->addElement('checkbox', 'addToDashboard', ts('Available for Dashboard?'));
+    $form->add('number', 'cache_minutes', ts('Cache dashlet for'), array('class' => 'four', 'min' => 1));
     $form->addElement('checkbox', 'add_to_my_reports', ts('Add to My Reports?'), NULL);
 
     $form->addElement('checkbox', 'is_reserved', ts('Reserved Report?'));
@@ -261,6 +258,10 @@ class CRM_Report_Form_Instance {
     $output = CRM_Utils_Request::retrieve('output', 'String');
     if ($output == 'criteria') {
       $defaults['view_mode'] = 'criteria';
+    }
+
+    if (empty($defaults['cache_minutes'])) {
+      $defaults['cache_minutes'] = '60';
     }
 
     if ($instanceID) {

@@ -522,9 +522,11 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       }
     }
     // CRM-16189
-    $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($values['financial_type_id']);
-    if ($isError) {
-      $errors['financial_type_id'] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+    try {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType($values['financial_type_id']);
+    }
+    catch (CRM_Core_Exception $e) {
+      $errors['financial_type_id'] = $e->getMessage();
     }
     return empty($errors) ? TRUE : $errors;
   }

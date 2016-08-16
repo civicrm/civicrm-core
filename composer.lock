@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4f2c36b177638f5e22ca05021396c01d",
-    "content-hash": "0d5b97cd31ec69081403638a7e478f1b",
+    "hash": "2ee156bdc437928934defe7a8d5967a8",
+    "content-hash": "6df12f0708915cdf2f7a678918213440",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -415,12 +415,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e"
+                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
-                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "url": "https://api.github.com/repos/symfony/config/zipball/d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
+                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
                 "shasum": ""
             },
             "require": {

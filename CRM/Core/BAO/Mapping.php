@@ -1004,6 +1004,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             $value = explode(',', $value);
             $value = array($params['operator'][$key][$k] => $value);
           }
+          // CRM-19081 Fix legacy StateProvince Field Values.
+          // These derive from smart groups created using search builder under older
+          // CiviCRM versions.
+          if (!is_numeric($value) && $fldName == 'state_province') {
+            $value = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'state_province_id', $value);
+          }
 
           if ($row) {
             $fields[] = array(

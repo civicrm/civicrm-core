@@ -23,14 +23,35 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{foreach from=$blog item=article}
+{strip}{literal}
+<style type="text/css">
+  #civicrm-blog-feed .collapsed .crm-accordion-header {
+    text-overflow: ellipsis;
+    text-wrap: none;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  #civicrm-blog-feed .crm-blog-preview {
+    color: #8d8d8d;
+    display: none;
+  }
+  #civicrm-blog-feed .collapsed .crm-blog-preview {
+    display: inline;
+  }
+</style>
+{/literal}
 <div id="civicrm-blog-feed">
+{foreach from=$blog item=article}
   <div class="crm-accordion-wrapper collapsed">
-    <div class="crm-accordion-header">{$article.title}</div>
-    <div class="crm-accordion-body help">
+    <div class="crm-accordion-header">
+      <span class="crm-blog-title">{$article.title}</span>
+      <span class="crm-blog-preview"> - {$article.description|strip_tags|substr:0:100}…</span>
+    </div>
+    <div class="crm-accordion-body">
       <div>{$article.description}</div>
-      <div><a href="{$article.link}" title="{$article.title}">{ts}read more{/ts}.</a></div>
+      <div><a target="_blank" href="{$article.link}" title="{$article.title}"><i class="crm-i fa-external-link"></i> {ts}read more{/ts}…</a></div>
     </div>
   </div>
-</div>
 {/foreach}
+</div>
+{/strip}

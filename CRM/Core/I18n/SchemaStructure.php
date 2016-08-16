@@ -236,8 +236,7 @@ class CRM_Core_I18n_SchemaStructure {
     }
     return $result;
   }
-  static function &widgets()
-  {
+  static function &widgets() {
     static $result = null;
     if (!$result) {
       $result = array(
