@@ -165,6 +165,10 @@ dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 
 ## Get latest dependencies
 dm_generate_vendor "$DM_SOURCEDIR"
+## if we already have a bower_compoents dir empty it.
+if [ -d "$DM_SOURCEDIR/bower_components" ]; then
+  rm -rf $DM_SOURCEDIR/bower_components/* 
+fi
 dm_generate_bower "$DM_SOURCEDIR"
 
 # Before anything - regenerate DAOs
