@@ -385,13 +385,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // CRM-19068.
     // Validate parents parameter when creating group.
     if (!empty($params['parents'])) {
-      if (is_array($params['parents'])) {
-        foreach ($params['parents'] as $parent => $dc) {
-          CRM_Utils_Type::validate($parent, 'Integer');
-        }
-      }
-      else {
-        CRM_Utils_Type::validate($params['parents'], 'Integer');
+      $parents = is_array($params['parents']) ? array_keys($params['parents']) : (array) $params['parents'];
+      foreach ($parents as $parent) {
+        CRM_Utils_Type::validate($parent, 'Integer');
       }
     }
     $group = new CRM_Contact_BAO_Group();
