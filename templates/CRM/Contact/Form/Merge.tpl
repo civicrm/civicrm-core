@@ -113,7 +113,9 @@
           {assign var=blockName value=$field|substr:14:$position-14}
 
           <td>
-            {if $row.title|substr:0:7 == "Address"}<span style="white-space:pre">{else}<span>{/if}{if !is_array($row.other)}{$row.other}{elseif $row.other.fileName}{$row.other.fileName}{else}{', '|implode:$row.other}{/if}</span>
+            {* @TODO check if this is ever an array or a fileName? *}
+            {* This is on one long line for address formatting *}
+            {if $row.title|substr:0:7 == "Address"}<span style="white-space: pre">{else}<span>{/if}{if !is_array($row.other)}{$row.other}{elseif $row.other.fileName}{$row.other.fileName}{else}{', '|implode:$row.other}{/if}</span>
           </td>
 
           <td style='white-space: nowrap'>
@@ -128,7 +130,9 @@
               $row.title|substr:0:5 == "Phone"}
 
             <td>
-              {if $row.title|substr:0:7 == "Address"}<span id="main_{$blockName}_{$blockId}" style="white-space:pre">{else}<span id="main_{$blockName}_{$blockId}">{/if}{if !is_array($row.main)}{$row.main}{elseif $row.main.fileName}{$row.main.fileName}{else}{', '|implode:$row.main}{/if}</span>
+              {* @TODO check if this is ever an array or a fileName? *}
+              {* This is on one long line for address formatting *}
+              {if $row.title|substr:0:7 == "Address"}<span style="white-space: pre" id="main_{$blockName}_{$blockId}">{else}<span id="main_{$blockName}_{$blockId}">{/if}{if !is_array($row.main)}{$row.main}{elseif $row.main.fileName}{$row.main.fileName}{else}{', '|implode:$row.main}{/if}</span>
             </td>
 
             <td>
@@ -145,7 +149,13 @@
               {* Display the overwrite/add/add new label *}
               <span id="main_{$blockName}_{$blockId}_overwrite">
                 {if $row.main}
-                  <span class="action_label">({ts}overwrite{/ts})</span>&nbsp;
+                  <span class="action_label">
+                  {* Display whether it is primary *}
+                    {if $row.main_is_primary == "1"}
+                      Primary&nbsp;
+                    {/if}
+                    ({ts}overwrite{/ts})
+                  </span>
                    {if $blockName eq 'email' || $blockName eq 'phone' }
                      {$form.location_blocks.$blockName.$blockId.operation.html}&nbsp;
                    {/if}
@@ -154,6 +164,7 @@
                   <span class="action_label">({ts}add{/ts})</span>&nbsp;
                 {/if}
               </span>
+
             </td>
 
           {* For non-location blocks *}
@@ -266,13 +277,21 @@
       label = '<span class="action_label">({/literal}{ts}add{/ts}{literal})</span>';
     }
     else {
-
       // Set display and ID
       mainBlockDisplay = mainBlock['display'];
       mainBlockId = mainBlock['id'];
 
       // Set label
-      var label = '<span class="action_label">({/literal}{ts}overwrite{/ts}{literal})</span> ';
+      var label = '<span class="action_label">';
+
+      // Check if the main location is primary
+      console.log(mainBlock);
+      if (mainBlock['is_primary'] == "1") {
+        label += 'Primary ';
+      }
+
+      // Display the action
+      label += '({/literal}{ts}overwrite{/ts}{literal})</span> ';
       if (blockname == 'email' || blockname == 'phone') {
         var opLabel = 'location_blocks[' + blockname + '][' + blockId + '][operation]';
         label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">{/literal}{ts}add new{/ts}{literal}</label><br />';
@@ -310,7 +329,8 @@
         if (locationBlockInfo[entName]['hasType'] == false || typeID == entityArray[i][locationBlockInfo[entName]['hasType']]) {
           result = {
             display: entityArray[i][locationBlockInfo[entName]['displayField']],
-            id: entityArray[i]['id']
+            id: entityArray[i]['id'],
+            is_primary: entityArray[i]['is_primary']
           };
           break;
         }

@@ -1227,6 +1227,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               ) {
                 // Set this value as the default against the 'other' contact value
                 $rows["move_location_{$blockName}_{$count}"]['main'] = $mainValueCheck[$blockInfo['displayField']];
+                $rows["move_location_{$blockName}_{$count}"]['main_is_primary'] = $mainValueCheck['is_primary'];
                 $mainContactBlockId = $mainValueCheck['id'];
                 break;
               }
