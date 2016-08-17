@@ -25,6 +25,13 @@
  +--------------------------------------------------------------------+
  */
 
+die("This script is disabled because it is dangerous. If you need it, please duplicate it elsewhere and provide your own secure workflow. This example file will be removed in the future.");
+
+// TIP: If/when we do delete this file, take care to affirmatively check for
+// deletion as part of the status-check infrastructure. Some upgrade workflows
+// don't clear out old files properly, and there's no telling the history
+// of upgrades that have been performed.
+
 /**
  *
  * @package CRM
