@@ -1249,17 +1249,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // Provide a select drop-down for the location's location type
           // eg: Home, Work...
 
-          $js = NULL;
-
           if ($blockInfo['hasLocation']) {
 
             // Load the location options for this entity
             $locationOptions = civicrm_api3($blockName, 'getoptions', array('field' => 'location_type_id'));
-
-            // JS lookup 'main' contact's location (if there are any)
-            if (!empty($locations['main'][$blockName])) {
-              $js = array('onChange' => "mergeBlock('$blockName', this, $count, 'locTypeId' );");
-            }
 
             $thisLocId = $value['location_type_id'];
 
@@ -1274,7 +1267,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               "location_blocks[$blockName][$count][locTypeId]",
               NULL,
               $defaultLocId + $tmpIdList,
-              $js,
             );
 
             // Add the relevant information to the $migrationInfo
@@ -1292,17 +1284,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // Provide a select drop-down for the location's type/provider
           // eg websites: Google+, Facebook...
 
-          $js = NULL;
-
           if ($blockInfo['hasType']) {
 
             // Load the type options for this entity
             $typeOptions = civicrm_api3($blockName, 'getoptions', array('field' => $blockInfo['hasType']));
-
-            // CRM-17556 Set up JS lookup of 'main' contact's value by type
-            if (!empty($locations['main'][$blockName])) {
-              $js = array('onChange' => "mergeBlock('$blockName', this, $count, 'typeTypeId' );");
-            }
 
             $thisTypeId = CRM_Utils_Array::value($blockInfo['hasType'], $value);
 
@@ -1317,7 +1302,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               "location_blocks[$blockName][$count][typeTypeId]",
               NULL,
               $defaultTypeId + $tmpIdList,
-              $js,
             );
 
             // Add the information to the migrationInfo

@@ -259,7 +259,7 @@
     // Look for a matching block on the main contact
     var mainBlockId = 0;
     var mainBlockDisplay = '';
-    var mainBlock = findBlock(allBlock, blockname, locTypeId, typeTypeId);
+    var mainBlock = findBlock(blockname, locTypeId, typeTypeId);
 
     // Create appropriate label / add new link after changing the block
     if (mainBlock == false) {
@@ -290,8 +290,6 @@
    * Look for a matching 'main' contact location block by entity, location and
    * type
    *
-   * @param allBlock array
-   *   All location blocks on the main contact record.
    * @param entName string
    *   The entity name to lookup.
    * @param locationID int
@@ -303,7 +301,7 @@
    *   Returns false if no match, otherwise an object with the location ID and
    *   display value.
    */
-  function findBlock(allBlock, entName, locationID, typeID) {
+  function findBlock(entName, locationID, typeID) {
     var entityArray = allBlock[entName];
     var result = false;
     for (var i = 0; i < entityArray.length; i++) {
@@ -359,6 +357,16 @@
     // Show/hide matching data rows
     $('.toggle_equal_rows').click(function() {
       $('tr.merge-row-equal').toggle();
+    });
+
+    // Call mergeBlock whenever a location type is changed
+    jQuery('select[id^="location_blocks_"]').change(function(){
+      // All the information we need is held in the id, separated by underscores
+      var idSplit = this.id.split('_');
+      // Lookup the main value, if any are available
+      if (allBlock[idSplit[2]] != undefined) {
+        mergeBlock(idSplit[2], this, idSplit[3], idSplit[4]);
+      }
     });
 
   });
