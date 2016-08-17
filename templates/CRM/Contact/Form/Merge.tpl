@@ -285,7 +285,6 @@
       var label = '<span class="action_label">';
 
       // Check if the main location is primary
-      console.log(mainBlock);
       if (mainBlock['is_primary'] == "1") {
         label += 'Primary ';
       }
