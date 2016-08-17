@@ -87,10 +87,12 @@ function civicrm_api3_payment_processor_delete($params) {
 function civicrm_api3_payment_processor_get($params) {
   $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   // CRM-16621
-  if (CRM_Utils_Array::value('values', $result)) {
-    foreach ($result['values'] as &$values) {
-      if (CRM_Utils_Array::value('password', $values)) {
-        CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($values['password']);
+  if (!empty($result['values'])) {
+    if (is_array($result['values'])) {
+      foreach ($result['values'] as $values) {
+        if (CRM_Utils_Array::value('password', $values)) {
+          CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($values['password']);
+        }
       }
     }
   }
