@@ -691,4 +691,36 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $this->assertContains('https://civicrm.org', $url);
   }
 
+  /**
+   * Test Trackable URL with unicode character
+   */
+  public function testTrackableURLWithUnicodeSign() {
+    $unicodeURL = "https://civińcrm.org";
+    $this->_params['body_text'] = str_replace("https://civicrm.org", $unicodeURL, $this->_params['body_text']);
+    $this->_params['body_html'] = str_replace("https://civicrm.org", $unicodeURL, $this->_params['body_html']);
+
+    $mail = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
+
+    $params = array('mailing_id' => $mail['id'], 'test_email' => 'alice@example.org', 'test_group' => NULL);
+    $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
+
+    $sql = "SELECT turl.id as url_id, turl.url, q.id as queue_id
+      FROM civicrm_mailing_trackable_url as turl
+      INNER JOIN civicrm_mailing_job as j ON turl.mailing_id = j.mailing_id
+      INNER JOIN civicrm_mailing_event_queue q ON j.id = q.job_id
+      ORDER BY turl.id DESC LIMIT 1";
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->assertTrue($dao->fetch());
+
+    $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
+    $this->assertContains($unicodeURL, $url);
+
+    // Now delete the event queue hashes and see if the tracking still works.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
+
+    $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
+    $this->assertContains($unicodeURL, $url);
+  }
+
 }
