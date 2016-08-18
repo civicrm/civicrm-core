@@ -348,7 +348,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $html = $document = array();
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
-    if ($buttonName == '_qf_PDF_submit') {
+    if ($buttonName == '_qf_PDF_upload') {
       self::createActivities($form, $html_message, $form->_contactIds);
     }
 
