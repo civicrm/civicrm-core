@@ -52,12 +52,11 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->_paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0, 'payment_processor_type_id' => 'PayPal_Standard'));
     $this->_contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', array(
-        'title' => "Test Contribution Page",
-        'financial_type_id' => $this->_financialTypeID,
-        'currency' => 'USD',
-        'payment_processor' => $this->_paymentProcessorID,
-      )
-    );
+      'title' => "Test Contribution Page",
+      'financial_type_id' => $this->_financialTypeID,
+      'currency' => 'USD',
+      'payment_processor' => $this->_paymentProcessorID,
+    ));
     $this->_contributionPageID = $contributionPage['id'];
   }
 
@@ -66,6 +65,35 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+  }
+
+  public function testIPNPaymentSuccess() {
+    $pendingStatusID = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+    $completedStatusID = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $params = array(
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'contact_id' => $this->_contactID,
+      'trxn_id' => NULL,
+      'invoice_id' => $this->_invoiceID,
+      'contribution_status_id' => $pendingStatusID,
+    );
+    $this->_contributionID = $this->contributionCreate($params);
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $this->_contributionID, 'sequential' => 1));
+    // assert that contribution created before handling payment via paypal standard has no transaction id set and pending status
+    $this->assertEquals(NULL, $contribution['values'][0]['trxn_id']);
+    $this->assertEquals($pendingStatusID, $contribution['values'][0]['contribution_status_id']);
+
+    global $_REQUEST;
+    $_REQUEST = array('q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)) + $this->getPaypalTransaction();
+
+    $paymentProcesors = civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $this->_paymentProcessorID));
+    $payment = Civi\Payment\System::singleton()->getByProcessor($paymentProcesors);
+    $payment->handlePaymentNotification();
+
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $this->_contributionID, 'sequential' => 1));
+    // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
+    $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
+    $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
   }
 
   /**
@@ -147,6 +175,30 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'payment_status' => 'Completed',
       'receiver_email' => 'sunil._1183377782_biz_api1.webaccess.co.in',
       'txn_type' => 'subscr_payment',
+      'last_name' => 'Roberty',
+      'payment_fee' => '0.63',
+      'first_name' => 'Robert',
+      'txn_id' => '8XA571746W2698126',
+      'residence_country' => 'US',
+    );
+  }
+
+  /**
+   * Get IPN style details for an incoming paypal standard transaction.
+   */
+  public function getPaypalTransaction() {
+    return array(
+      'contactID' => $this->_contactID,
+      'contributionID' => $this->_contributionID,
+      'invoice' => $this->_invoiceID,
+      'mc_gross' => '100.00',
+      'mc_fee' => '5.00',
+      'settle_amount' => '95.00',
+      'module' => 'contribute',
+      'payer_id' => 'FV5ZW7TLMQ874',
+      'payment_status' => 'Completed',
+      'receiver_email' => 'sunil._1183377782_biz_api1.webaccess.co.in',
+      'txn_type' => 'web_accept',
       'last_name' => 'Roberty',
       'payment_fee' => '0.63',
       'first_name' => 'Robert',
