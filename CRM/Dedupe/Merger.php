@@ -2118,7 +2118,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // and remove it from the current primary location (if there is one).
           // But only once for each entity.
           $set_primary = CRM_Utils_Array::value('set_other_primary', $migrationInfo['location_blocks'][$name][$blkCount]);
-          if (!$changePrimary && $set_primary == "1"){
+          if (!$changePrimary && $set_primary == "1") {
             $otherBlockDAO->is_primary = 1;
             if ($primaryDAOId) {
               $removePrimaryDAO = new $daoName();
