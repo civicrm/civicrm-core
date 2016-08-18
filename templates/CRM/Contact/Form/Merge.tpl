@@ -364,6 +364,25 @@
     return result;
   }
 
+  /**
+   * Called when a 'set primary' checkbox is clicked in order to disable any
+   * other 'set primary' checkboxes for blocks of the same entity. So don't let
+   * users try to set two different phone numbers as primary on the form.
+   */
+  function updateSetPrimaries() {
+    var nameSplit = event.target.name.split('[');
+    var blockName = nameSplit[1].slice(0, -1);
+    var controls = CRM.$('span.location_block_controls[id^="main_' + blockName + '"]');
+
+    // Enable everything
+    controls.find('input[id$="[set_other_primary]"]:not(:checked)').removeAttr("disabled");
+
+    // If one is checked, disable the others
+    if (controls.find('input[id$="[set_other_primary]"]:checked').length > 0) {
+      controls.find('input[id$="[set_other_primary]"]:not(:checked)').attr("disabled", "disabled");
+    }
+  }
+
   CRM.$(function($) {
 
     $('table td input.form-checkbox').each(function() {
@@ -396,12 +415,18 @@
 
     // Call mergeBlock whenever a location type is changed
     $('body').on('change', 'select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]', function(){
+
       // All the information we need is held in the id, separated by underscores
       var nameSplit = this.name.split('[');
+
       // Lookup the main value, if any are available
       if (allBlock[nameSplit[1].slice(0, -1)] != undefined) {
         updateMainLocationBlock(nameSplit[1].slice(0, -1), nameSplit[2].slice(0, -1));
       }
+
+      // Update all 'set primary' checkboxes
+      updateSetPrimaries();
+
     });
 
   });
