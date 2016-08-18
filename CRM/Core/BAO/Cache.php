@@ -41,12 +41,6 @@
 class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
   /**
-   * Const the default maximum number of minutes that secure form data should linger
-   * @var int
-   */
-  const SECURE_TIMEOUT = 20;
-
-  /**
    * @var array ($cacheKey => $cacheValue)
    */
   static $_cache = NULL;
@@ -313,7 +307,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE) {
     // first delete all sessions more than 20 minutes old which are related to any potential transaction
     $timeIntervalMins = (int) Civi::settings()->get('secure_cache_timeout_minutes');
-    $timeIntervalMins = empty($timeIntervalMins) ? self::SECURE_TIMEOUT : $timeIntervalMins;
     if (TRUE) {
       $transactionPages = array(
         'CRM_Contribute_Controller_Contribution',
