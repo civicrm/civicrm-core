@@ -1237,6 +1237,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // Add checkbox to migrate data from 'other' to 'main'
           $elements[] = array('advcheckbox', "move_location_{$blockName}_{$count}");
 
+          // Add checkbox to set the 'other' location as primary
+          $elements[] = array('advcheckbox', "location_blocks[$blockName][$count][set_other_primary]", NULL, ts('Set as primary'));
+
           // Flag up this field to skipMerge function (@todo: do we need to?)
           $migrationInfo["move_location_{$blockName}_{$count}"] = 1;
 
@@ -1275,7 +1278,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             // @todo Check this logic out
             $migrationInfo['location_blocks'][$blockName][$count]['locTypeId'] = $thisLocId;
             if ($blockName != 'address') {
-              $elements[] = array('advcheckbox', "location_blocks[{$blockName}][$count][operation]", NULL, ts('add new'));
+              $elements[] = array('advcheckbox', "location_blocks[{$blockName}][$count][operation]", NULL, ts('Add new'));
               // always use add operation
               $migrationInfo['location_blocks'][$blockName][$count]['operation'] = 1;
             }
@@ -2083,6 +2086,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           continue;
         }
         $daoName = 'CRM_Core_DAO_' . $locationBlocks[$name]['label'];
+        $changePrimary = FALSE;
         $primaryDAOId = (array_key_exists($name, $primaryBlockIds)) ? array_pop($primaryBlockIds[$name]) : NULL;
         $billingDAOId = (array_key_exists($name, $billingBlockIds)) ? array_pop($billingBlockIds[$name]) : NULL;
 
@@ -2110,10 +2114,26 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
           }
 
-          // if main contact already has primary & billing, set the flags to 0.
-          if ($primaryDAOId) {
+          // If we're deliberately setting this as primary then add the flag
+          // and remove it from the current primary location (if there is one).
+          // But only once for each entity.
+          $set_primary = CRM_Utils_Array::value('set_other_primary', $migrationInfo['location_blocks'][$name][$blkCount]);
+          if (!$changePrimary && $set_primary == "1"){
+            $otherBlockDAO->is_primary = 1;
+            if ($primaryDAOId) {
+              $removePrimaryDAO = new $daoName();
+              $removePrimaryDAO->id = $primaryDAOId;
+              $removePrimaryDAO->is_primary = 0;
+              $blocksDAO[$name]['update'][$primaryDAOId] = $removePrimaryDAO;
+            }
+            $changePrimary = TRUE;
+          }
+          // Otherwise, if main contact already has primary, set it to 0.
+          elseif ($primaryDAOId) {
             $otherBlockDAO->is_primary = 0;
           }
+
+          // If the main contact already has a billing location, set this to 0.
           if ($billingDAOId) {
             $otherBlockDAO->is_billing = 0;
           }

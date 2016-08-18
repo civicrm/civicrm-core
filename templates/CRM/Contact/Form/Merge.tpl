@@ -147,22 +147,27 @@
               {/if}
 
               {* Display the overwrite/add/add new label *}
-              <span id="main_{$blockName}_{$blockId}_overwrite">
-                {if $row.main}
-                  <span class="action_label">
-                  {* Display whether it is primary *}
-                    {if $row.main_is_primary == "1"}
-                      Primary&nbsp;
-                    {/if}
-                    ({ts}overwrite{/ts})
+              <span id="main_{$blockName}_{$blockId}_overwrite" class="location_block_controls">
+
+                <span class="location_primary">
+                  {if $row.main && $row.main_is_primary == "1"}Primary{/if}
+                </span>
+
+                <span class="location_block_controls_options">
+                  <span class="location_operation_description">
+                    {if $row.main}({ts}overwrite{/ts}){else}({ts}add{/ts}){/if}
                   </span>
-                   {if $blockName eq 'email' || $blockName eq 'phone' }
-                     {$form.location_blocks.$blockName.$blockId.operation.html}&nbsp;
-                   {/if}
-                   <br />
-                {else}
-                  <span class="action_label">({ts}add{/ts})</span>&nbsp;
-                {/if}
+                  <span style="display: block" class="location_operation_checkbox">
+                    {if $row.main && ($blockName eq 'email' || $blockName eq 'phone')}
+                      {$form.location_blocks.$blockName.$blockId.operation.html}
+                    {/if}
+                  </span>
+                  <span style="display: block"  class="location_set_other_primary">
+                    {if $blockName neq 'website' && (($row.main && $row.main_is_primary != "1") || !$row.main)}
+                      {$form.location_blocks.$blockName.$blockId.set_other_primary.html}
+                    {/if}
+                  </span>
+                </span>
               </span>
 
             </td>
@@ -232,76 +237,97 @@
   var allBlock = {/literal}{$mainLocBlock}{literal};
 
   /**
-   * Triggered when a 'location' or 'type' destination is changed.
+   * Triggered when a 'location' or 'type' destination is changed, and when
+   * the operation or 'set primary' checkboxes are changed.
+   * 
    * Check to see if the 'main' contact record has a corresponding location
    * block when the destination of a field is changed. Allow existing location
    * fields to be overwritten with data from the 'other' contact.
    *
-   * @param blockname string
+   * @param blockName string
    *   The name of the entity.
-   * @param element object
-   *   The element that was changed (location or type dropdown)
    * @param blockId int
    *   The block ID being affected
-   * @param type string
-   *   Location or type (locTypeId / typeTypeId)
    */
-  function mergeBlock(blockname, element, blockId, type) {
+  function updateMainLocationBlock(blockName, blockId) {
 
     // Get type of select list that's been changed (location or type)
-    var locTypeId = '';
-    var typeTypeId = '';
-
-    // If the location was changed, lookup the type if it exists
-    if (type == 'locTypeId') {
-      locTypeId = element.value;
-      typeTypeId = CRM.$( 'select#location_blocks_' + blockname + '_' + blockId + '_typeTypeId' ).val();
-    }
-
-    // Otherwise the type was changed, lookup the location if it exists
-    else {
-      locTypeId = CRM.$( 'select#location_blocks_' + blockname + '_' + blockId + '_locTypeId' ).val();
-      typeTypeId = element.value;
-    }
+    var locTypeId = CRM.$('select#location_blocks_' + blockName + '_' + blockId + '_locTypeId').val();
+    var typeTypeId = CRM.$('select#location_blocks_' + blockName + '_' + blockId + '_typeTypeId').val();
 
     // @todo Fix this 'special handling' for websites (no location id)
-    if (!locTypeId) { locTypeId = 0; }
+    if (!locTypeId) {
+      locTypeId = 0;
+    }
 
     // Look for a matching block on the main contact
     var mainBlockId = 0;
     var mainBlockDisplay = '';
-    var mainBlock = findBlock(blockname, locTypeId, typeTypeId);
-
-    // Create appropriate label / add new link after changing the block
-    if (mainBlock == false) {
-      label = '<span class="action_label">({/literal}{ts}add{/ts}{literal})</span>';
-    }
-    else {
-      // Set display and ID
+    var mainBlock = findBlock(blockName, locTypeId, typeTypeId);
+    if (mainBlock != false) {
       mainBlockDisplay = mainBlock['display'];
       mainBlockId = mainBlock['id'];
-
-      // Set label
-      var label = '<span class="action_label">';
-
-      // Check if the main location is primary
-      if (mainBlock['is_primary'] == "1") {
-        label += 'Primary ';
-      }
-
-      // Display the action
-      label += '({/literal}{ts}overwrite{/ts}{literal})</span> ';
-      if (blockname == 'email' || blockname == 'phone') {
-        var opLabel = 'location_blocks[' + blockname + '][' + blockId + '][operation]';
-        label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">{/literal}{ts}add new{/ts}{literal}</label><br />';
-      }
-      label += '<br>';
     }
 
-    // Update DOM
-    CRM.$( "input[name='location_blocks[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
-    CRM.$( "#main_" + blockname + "_" + blockId ).html( mainBlockDisplay );
-    CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
+    // Update main location display and id
+    CRM.$("input[name='location_blocks[" + blockName + "][" + blockId + "][mainContactBlockId]']").val(mainBlockId);
+    CRM.$("#main_" + blockName + "_" + blockId).html(mainBlockDisplay);
+
+    // Update controls area
+
+    // Get the parent block once for speed
+    var this_controls = CRM.$("#main_" + blockName + "_" + blockId + "_overwrite");
+
+    // Update primary label
+    if (mainBlock != false && mainBlock['is_primary'] == '1') {
+      this_controls.find(".location_primary").text('Primary');
+    }
+    else {
+      this_controls.find(".location_primary").text('');
+    }
+
+    // Update operation description
+    var operation_description = "{/literal}{ts}add{/ts}{literal}";
+    var add_new_check_length = this_controls.find(".location_operation_checkbox input:checked").length;
+    if (mainBlock != false) {
+      if (add_new_check_length > 0) {
+        operation_description = "{/literal}{ts}add new{/ts}{literal}";
+      }
+      else {
+        operation_description = "{/literal}{ts}overwrite{/ts}{literal}";
+      }
+    }
+    this_controls.find(".location_operation_description").text("(" + operation_description + ")");
+
+    // Skip if the 'add new' or 'set primary' checkboxes were clicked
+    if (event.target.id.match(/(operation|set_other_primary)/) === null) {
+      // Display 'Add new' checkbox if there is a main block, and this is an
+      // email or phone type.
+      if (mainBlock != false && (blockName == 'email' || blockName == 'phone')) {
+        var op_id = 'location_blocks[' + blockName + '][' + blockId + '][operation]';
+        this_controls.find(".location_operation_checkbox").html(
+                '<input id="' + op_id + '" name="' + op_id + '" type="checkbox" value="1" class="crm-form-checkbox"><label for="' + op_id + '">{/literal}{ts}Add new{/ts}{literal}</label>'
+        );
+      }
+      else {
+        this_controls.find(".location_operation_checkbox").html('');
+      }
+    }
+
+    // Skip if 'set primary' was clicked
+    if (event.target.id.match(/(set_other_primary)/) === null) {
+      // Display 'Set primary' checkbox if applicable
+      if (blockName != 'website' && (mainBlock == false || mainBlock['is_primary'] != "1" || add_new_check_length > 0)) {
+        var prim_id = 'location_blocks[' + blockName + '][' + blockId + '][set_other_primary]';
+        this_controls.find(".location_set_other_primary").html(
+                '<input id="' + prim_id + '" name="' + prim_id + '" type="checkbox" value="1" class="crm-form-checkbox"><label for="' + prim_id + '">{/literal}{ts}Set as primary{/ts}{literal}</label>'
+        );
+      }
+      else {
+        this_controls.find(".location_set_other_primary").html('');
+      }
+    }
+
   }
 
   /**
@@ -340,16 +366,6 @@
 
   CRM.$(function($) {
 
-    $('body').on('change', "input[id*='[operation]']", function() {
-      var originalHtml = $(this).prevAll('span.action_label').html();
-      if ($(this).is(":checked")) {
-        $(this).prevAll('span.action_label').html(originalHtml.replace('({/literal}{ts}overwrite{/ts}{literal})', '({/literal}{ts}add new{/ts}{literal})'));
-      }
-      else {
-        $(this).prevAll('span.action_label').html(originalHtml.replace('({/literal}{ts}add new{/ts}{literal})', '({/literal}{ts}overwrite{/ts}{literal})'));
-      }
-    });
-
     $('table td input.form-checkbox').each(function() {
       var ele = null;
       var element = $(this).attr('id').split('_',3);
@@ -379,12 +395,12 @@
     });
 
     // Call mergeBlock whenever a location type is changed
-    jQuery('select[id^="location_blocks_"]').change(function(){
+    $('body').on('change', 'select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]', function(){
       // All the information we need is held in the id, separated by underscores
-      var idSplit = this.id.split('_');
+      var nameSplit = this.name.split('[');
       // Lookup the main value, if any are available
-      if (allBlock[idSplit[2]] != undefined) {
-        mergeBlock(idSplit[2], this, idSplit[3], idSplit[4]);
+      if (allBlock[nameSplit[1].slice(0, -1)] != undefined) {
+        updateMainLocationBlock(nameSplit[1].slice(0, -1), nameSplit[2].slice(0, -1));
       }
     });
 
