@@ -4539,6 +4539,26 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'default' => 0,
       ),
+      'do_not_email' => array(
+        'title' => ts('Do not email'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_phone' => array(
+        'title' => ts('Do not phone'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_mail' => array(
+        'title' => ts('Do not mail'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_sms' => array(
+        'title' => ts('Do not SMS'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'is_opt_out' => array(
+        'title' => ts('Do not bulk email'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
     );
   }
 
