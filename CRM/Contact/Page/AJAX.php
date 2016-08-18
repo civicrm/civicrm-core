@@ -923,7 +923,7 @@ LIMIT {$offset}, {$rowCount}
     }
     $prevNextId = CRM_Utils_Type::escapeAll((array) $prevNextId, 'Positive');
     CRM_Core_BAO_PrevNextCache::flipPair($prevNextId, $onlySelected);
-    CRM_Utils_JSON::output();
+    CRM_Utils_SYSTEM::civiExit();
   }
 
   /**
