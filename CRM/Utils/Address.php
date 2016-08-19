@@ -94,6 +94,7 @@ class CRM_Utils_Address {
       }
     }
 
+    //CRM-16876 Display countries in all caps when in mailing mode.
     if ($mailing && !empty($fields['country'])) {
       if (Civi::settings()->get('hideCountryMailingLabels')) {
         $domain = CRM_Core_BAO_Domain::getDomain();
