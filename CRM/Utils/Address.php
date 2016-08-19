@@ -98,7 +98,7 @@ class CRM_Utils_Address {
     if ($mailing && !empty($fields['country'])) {
       if (Civi::settings()->get('hideCountryMailingLabels')) {
         $domain = CRM_Core_BAO_Domain::getDomain();
-        $domainLocation = CRM_Core_Location::getValues(array('contact_id' => $domain->contact_id));
+        $domainLocation = CRM_Core_BAO_Location::getValues(array('contact_id' => $domain->contact_id));
         $domainAddress = $domainLocation['address'][1];
         $domainCountryId = $domainAddress['country_id'];
         if ($fields['country'] == CRM_Core_PseudoConstant::country($domainCountryId)) {
