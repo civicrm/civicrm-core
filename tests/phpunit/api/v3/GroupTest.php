@@ -32,22 +32,33 @@
  * @group headless
  */
 class api_v3_GroupTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_groupID;
 
+  /**
+   * Set up for tests.
+   */
   public function setUp() {
-    $this->_apiversion = 3;
-
     parent::setUp();
     $this->_groupID = $this->groupCreate();
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
   }
 
+  /**
+   * Clean up after test.
+   */
   public function tearDown() {
-
     $this->groupDelete($this->_groupID);
+    CRM_Utils_Hook::singleton()->reset();
+    $config = CRM_Core_Config::singleton();
+    unset($config->userPermissionClass->permissions);
   }
 
-  public function testgroupCreateNoTitle() {
+  /**
+   * Test missing required title parameter results in an error.
+   */
+  public function testGroupCreateNoTitle() {
     $params = array(
       'name' => 'Test Group No title ',
       'domain_id' => 1,
@@ -60,12 +71,12 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       ),
     );
 
-    $group = $this->callAPIFailure('group', 'create', $params, 'Mandatory key(s) missing from params array: title');
+    $this->callAPIFailure('group', 'create', $params, 'Mandatory key(s) missing from params array: title');
   }
 
 
   public function testGetGroupWithEmptyParams() {
-    $group = $this->callAPISuccess('group', 'get', $params = array());
+    $group = $this->callAPISuccess('group', 'get', array());
 
     $group = $group["values"];
     $this->assertNotNull(count($group));
@@ -213,10 +224,36 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params['parents'] = array();
     $params['parents'][$this->_groupID] = 'test Group';
     $params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"] = "Test";
-    $group2 = $this->callAPIFailure('group', 'create', $params);
+    $this->callAPIFailure('group', 'create', $params);
     unset($params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"]);
     $group2 = $this->callAPISuccess('group', 'create', $params);
     $this->assertEquals(count($group2['values'][$group2['id']]['parents']), 1);
+  }
+
+  /**
+   * Test that ACLs are applied to group.get calls.
+   */
+  public function testGroupGetACLs() {
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $this->callAPISuccessGetCount('Group', array('check_permissions' => 1), 0);
+    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'aclGroupAllGroups'));
+    unset(Civi::$statics['CRM_ACL_API']['group_permission']);
+    $this->callAPISuccessGetCount('Group', array('check_permissions' => 1), 1);
+  }
+
+  /**
+   * Implement hook to restrict to test group 1.
+   *
+   * @param string $type
+   * @param int $contactID
+   * @param string $tableName
+   * @param array $allGroups
+   * @param array $ids
+   */
+  public function aclGroupAllGroups($type, $contactID, $tableName, $allGroups, &$ids) {
+    $group = $this->callAPISuccess('Group', 'get', array('name' => 'Test Group 1'));
+    $ids = array_keys($group['values']);
   }
 
 }
