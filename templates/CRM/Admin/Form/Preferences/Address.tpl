@@ -38,6 +38,12 @@
                 <span class="description">{ts}Content and format for mailing labels.{/ts}</span>
             </td>
         </tr>
+         <tr class="crm-preferences-address-form-block-hideCountryMailingLabels">
+           <td class="label">{$form.hideCountryMailingLabels.label}
+           <td>{$form.hideCountryMailingLabels.html}
+           </td>
+        </tr>
+
       </table>
 
     <h3>{ts}Address Display{/ts}</h3>
