@@ -236,6 +236,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
     }
 
+    if (!empty($query->_returnProperties['contribution_participant_id'])) {
+      $query->_select['contribution_participant_id'] = "civicrm_participant.id as contribution_participant_id";
+      $query->_whereTables['contribution_participant'] = $query->_tables['contribution_participant'] = 1;
+    }
+
     // Adding address_id in a way that is more easily extendable since the above is a bit ... wordy.
     $supportedBasicReturnValues = array('address_id');
     foreach ($supportedBasicReturnValues as $fieldName) {
