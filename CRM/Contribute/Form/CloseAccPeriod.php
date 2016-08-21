@@ -84,6 +84,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
         ),
       )
     );
+    $this->addFormRule(array('CRM_Contribute_Form_CloseAccPeriod', 'formRule'), $this);
   }
 
   /**
@@ -97,6 +98,15 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
    *
    */
   public static function formRule($fields, $files, $self) {
+    $error = array();
+    $previousPriorFinPeriod = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
+    if (!empty($previousPriorFinPeriod)) {
+      $priorFinPeriod = $fields['closing_date']['M'] . '/' . $fields['closing_date']['d'] . '/' . date('Y');
+      if (strtotime($previousPriorFinPeriod) > strtotime($priorFinPeriod)) {
+        $error['closing_date'] = ts('Closing Accounting Period Date cannot be less than prior Closing Accounting Period Date.');
+      }
+    }
+    return $error;
   }
 
   /**
