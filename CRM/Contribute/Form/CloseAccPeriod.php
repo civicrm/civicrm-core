@@ -47,7 +47,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
     if (!empty($prior)) {
       $period = array(
         'M' => date('n', strtotime($prior)),
-        'd' => date('j', strtotime($prior)),
+        'Y' => date('Y', strtotime($prior)),
       );
       if ($period['M'] == 1) {
         $period['M'] = 12;
@@ -60,7 +60,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
     else {
       $defaults['closing_date'] = array(
         'M' => date('n', strtotime("-1 month")),
-        'd' => date('j'),
+        'Y' => date('Y'),
       );
     }
     return $defaults;
@@ -70,7 +70,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->add('date', 'closing_date', ts('Accounting Period to Close'), CRM_Core_SelectValues::date(NULL, 'M d'), TRUE);
+    $this->add('date', 'closing_date', ts('Accounting Period to Close'), CRM_Core_SelectValues::date(NULL, 'M Y'), TRUE);
     $confirmClose = ts('Are you sure you want to close accounting period?');
     $this->addButtons(array(
         array(
@@ -110,14 +110,16 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
   }
 
   /**
-   * Function to create Closing date based on Month and Date.
+   * Function to create Closing date based on Month and Year.
    *
    * @param array $closingDate
    *
    */
-  public static function buildClosingDate($closingDate) {
-    $priorFinPeriod = $closingDate['M'] . $closingDate['d'] . date('Y');
-    return strtotime($priorFinPeriod);
+  public static function buildClosingDate(&$closingDate) {
+    $priorFinPeriod = date('Ymt', mktime(0, 0, 0, $closingDate['M'], 1, $closingDate['Y']));
+    $priorFinPeriod = strtotime($priorFinPeriod);
+    $closingDate['d'] = date('d', $priorFinPeriod);
+    return $priorFinPeriod;
   }
 
   /**
@@ -128,8 +130,8 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     // Set closing date
-    Civi::settings()->set('closing_date', $params['closing_date']);
     $priorFinPeriod = self::buildClosingDate($params['closing_date']);
+    Civi::settings()->set('closing_date', $params['closing_date']);
     $priorFinPeriod = date('m/d/Y', $priorFinPeriod);
     // Create activity
     $activityType = CRM_Core_OptionGroup::getValue('activity_type',
@@ -148,7 +150,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
         'name'
       ),
       'activity_date_time' => date('YmdHis'),
-      'details' => 'Trial Balance Report ' . empty($previousPriorFinPeriod) ? 'for All Time Prior' : "From {$previousPriorFinPeriod}" . " To {$priorFinPeriod}.",
+      'details' => 'Trial Balance Report ' . (empty($previousPriorFinPeriod) ? 'for All Time Prior' : "From {$previousPriorFinPeriod}") . " To {$priorFinPeriod}.",
     );
     $fileName = CRM_Core_BAO_FinancialTrxn::createTrialBalanceExport();
     if ($fileName) {
