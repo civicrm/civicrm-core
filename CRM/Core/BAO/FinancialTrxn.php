@@ -720,7 +720,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
     $closingDate = 'now()';
     if (!$onlyFromClause && Civi::settings()->get('closing_date')) {
       $closingDate = Civi::settings()->get('closing_date');
-      $closingDate = $closingDate['M'] . '/' . $closingDate['d'] . '/' . date('Y');
+      $closingDate = implode('/', $closingDate);
       $closingDate = "'" . date('Y-m-d', strtotime($closingDate)) . "'";
     }
     $priorDate = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
