@@ -101,12 +101,23 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
     $error = array();
     $previousPriorFinPeriod = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
     if (!empty($previousPriorFinPeriod)) {
-      $priorFinPeriod = $fields['closing_date']['M'] . '/' . $fields['closing_date']['d'] . '/' . date('Y');
-      if (strtotime($previousPriorFinPeriod) > strtotime($priorFinPeriod)) {
+      $priorFinPeriod = self::buildClosingDate($fields['closing_date']);
+      if (strtotime($previousPriorFinPeriod) > $priorFinPeriod) {
         $error['closing_date'] = ts('Closing Accounting Period Date cannot be less than prior Closing Accounting Period Date.');
       }
     }
     return $error;
+  }
+
+  /**
+   * Function to create Closing date based on Month and Date.
+   *
+   * @param array $closingDate
+   *
+   */
+  public static function buildClosingDate($closingDate) {
+    $priorFinPeriod = $closingDate['M'] . $closingDate['d'] . date('Y');
+    return strtotime($priorFinPeriod);
   }
 
   /**
@@ -118,8 +129,8 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
 
     // Set closing date
     Civi::settings()->set('closing_date', $params['closing_date']);
-    $priorFinPeriod = $params['closing_date']['M'] . '/' . $params['closing_date']['d'] . '/' . date('Y');
-    $priorFinPeriod = date('m/d/Y', strtotime($priorFinPeriod));
+    $priorFinPeriod = self::buildClosingDate($params['closing_date']);
+    $priorFinPeriod = date('m/d/Y', $priorFinPeriod);
     // Create activity
     $activityType = CRM_Core_OptionGroup::getValue('activity_type',
       'Close Accounting Period',
