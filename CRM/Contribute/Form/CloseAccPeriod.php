@@ -70,7 +70,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->add('date', 'closing_date', ts('Accounting Period to Close'), CRM_Core_SelectValues::date(NULL, 'M Y'), TRUE);
+    $this->add('date', 'closing_date', ts('Accounting Period to Close'), CRM_Core_SelectValues::date(NULL, 'M Y', 2, 5), TRUE);
     $confirmClose = ts('Are you sure you want to close accounting period?');
     $this->addButtons(array(
         array(
