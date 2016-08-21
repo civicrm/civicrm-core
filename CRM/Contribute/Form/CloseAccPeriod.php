@@ -142,7 +142,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
     $closingDate =  date('Y-m-d', strtotime($priorFinPeriod));
     $activityParams = array(
       'source_contact_id' => CRM_Core_Session::singleton()->get('userID'),
-      'assignee_contact_id' => CRM_Core_Session::singleton()->get('userID'),
+      'assignee_contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
       'activity_type_id' => $activityType,
       'subject' => ts('Close Accounting Period') . $closingDate,
       'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
