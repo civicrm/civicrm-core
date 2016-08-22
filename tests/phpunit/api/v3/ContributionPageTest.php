@@ -305,7 +305,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
-    $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $this->callAPISuccessGetSingle('LineItem', array('contribution_id' => $contribution['id'], 'entity_id' => $membershipPayment['id']));
   }
 
   /**
@@ -837,7 +838,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'membership_type_id' => $membershipTypeID,
         'price_field_id' => $priceField['id'],
       ));
-      $this->_ids['price_field_value'][] = $priceFieldValue['id'];
+      $this->_ids['price_field_value'][] = $priceFieldValue;
     }
   }
 
