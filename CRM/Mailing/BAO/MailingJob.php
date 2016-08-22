@@ -499,8 +499,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $edTable = CRM_Mailing_Event_BAO_Delivered::getTableName();
     $ebTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
 
-    list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($mailing->created_id);
-
     $query = "  SELECT      $eqTable.id,
                                 $emailTable.email as email,
                                 $eqTable.contact_id,
@@ -509,18 +507,16 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
                     FROM        $eqTable
                     INNER JOIN  $emailTable
                             ON  $eqTable.email_id = $emailTable.id
-                    INNER JOIN  $contactTable contact_a
-                            ON  contact_a.id = $emailTable.contact_id
+                    INNER JOIN  $contactTable
+                            ON  $contactTable.id = $emailTable.contact_id
                     LEFT JOIN   $edTable
                             ON  $eqTable.id = $edTable.event_queue_id
                     LEFT JOIN   $ebTable
                             ON  $eqTable.id = $ebTable.event_queue_id
-                    $aclJoin
                     WHERE       $eqTable.job_id = " . $this->id . "
                         AND     $edTable.id IS null
                         AND     $ebTable.id IS null
-                        AND    contact_a.is_opt_out = 0 
-                        $aclWhere";
+                        AND    $contactTable.is_opt_out = 0";
 
     if ($mailing->sms_provider_id) {
       $query = "
@@ -532,19 +528,17 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
                     FROM        $eqTable
                     INNER JOIN  $phoneTable
                             ON  $eqTable.phone_id = $phoneTable.id
-                    INNER JOIN  $contactTable contact_a
-                            ON  contact_a.id = $phoneTable.contact_id
+                    INNER JOIN  $contactTable
+                            ON  $contactTable.id = $phoneTable.contact_id
                     LEFT JOIN   $edTable
                             ON  $eqTable.id = $edTable.event_queue_id
                     LEFT JOIN   $ebTable
                             ON  $eqTable.id = $ebTable.event_queue_id
-                    $aclJoin
                     WHERE       $eqTable.job_id = " . $this->id . "
                         AND     $edTable.id IS null
                         AND     $ebTable.id IS null
-                        AND    ( contact_a.is_opt_out = 0
-                        OR       contact_a.do_not_sms = 0 )
-                        $aclWhere}";
+                        AND    ( $contactTable.is_opt_out = 0
+                        OR       $contactTable.do_not_sms = 0 )";
     }
     $eq->query($query);
 
