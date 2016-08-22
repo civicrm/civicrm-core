@@ -530,23 +530,25 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   public static function getFormattedList(&$list) {
     $relName = array();
 
+    $keys = array();
+    // Ensure every relationship key only exists once.
     foreach ($list as $listItemKey => $itemValue) {
       // Extract the relationship ID.
       $key = substr($listItemKey, 0, strpos($listItemKey, '_'));
-      if (isset($list["{$key}_b_a"])) {
-        $relName["$key"] = $list["{$key}_a_b"];
-        // Are the two labels different?
-        if ($list["{$key}_a_b"] != $list["{$key}_b_a"]) {
-          $relName["$key"] = $list["{$key}_a_b"] . ' / ' . $list["{$key}_b_a"];
-        }
-        unset($list["{$key}_b_a"]);
-        unset($list["{$key}_a_b"]);
+      $keys[$key] = $key;
+    }
+
+    foreach ($keys as $key) {
+      // If the relationship has different labels in both directions, add them
+      // both.
+      if (isset($list["{$key}_a_b"]) && isset($list["{$key}_b_a"]) && $list["{$key}_a_b"] != $list["{$key}_b_a"]) {
+        $relName["$key"] = $list["{$key}_a_b"] . ' / ' . $list["{$key}_b_a"];
       }
       else {
-        // If no '_b_a' label exists save the '_a_b' one and unset it from the list
         $relName["{$key}"] = $list["{$key}_a_b"];
-        unset($list["{$key}_a_b"]);
       }
+      unset($list["{$key}_b_a"]);
+      unset($list["{$key}_a_b"]);
     }
     return $relName;
   }
