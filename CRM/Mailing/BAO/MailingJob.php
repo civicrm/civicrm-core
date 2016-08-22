@@ -501,7 +501,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
     list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($mailing->created_id);
 
-    $query = "  SELECT      $eqTable.id,
+    $query = "  
+                SELECT DISTINCT $eqTable.id,
                                 $emailTable.email as email,
                                 $eqTable.contact_id,
                                 $eqTable.hash,
@@ -524,7 +525,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
     if ($mailing->sms_provider_id) {
       $query = "
-                    SELECT      $eqTable.id,
+                SELECT DISTINCT $eqTable.id,
                                 $phoneTable.phone as phone,
                                 $eqTable.contact_id,
                                 $eqTable.hash,
