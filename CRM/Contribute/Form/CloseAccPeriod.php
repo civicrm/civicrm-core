@@ -102,7 +102,7 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
     $previousPriorFinPeriod = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
     if (!empty($previousPriorFinPeriod)) {
       $priorFinPeriod = self::buildClosingDate($fields['closing_date']);
-      if (strtotime($previousPriorFinPeriod) > $priorFinPeriod) {
+      if (strtotime($previousPriorFinPeriod) >= $priorFinPeriod) {
         $error['closing_date'] = ts('Closing Accounting Period Date cannot be less than prior Closing Accounting Period Date.');
       }
     }
@@ -118,7 +118,6 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
   public static function buildClosingDate(&$closingDate) {
     $priorFinPeriod = date('Ymt', mktime(0, 0, 0, $closingDate['M'], 1, $closingDate['Y']));
     $priorFinPeriod = strtotime($priorFinPeriod);
-    $closingDate['d'] = date('d', $priorFinPeriod);
     return $priorFinPeriod;
   }
 
@@ -144,13 +143,13 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
       'source_contact_id' => CRM_Core_Session::singleton()->get('userID'),
       'assignee_contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
       'activity_type_id' => $activityType,
-      'subject' => ts('Close Accounting Period') . $closingDate,
+      'subject' => ts('Close Accounting Period : ') . $closingDate,
       'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
         'Completed',
         'name'
       ),
       'activity_date_time' => date('YmdHis'),
-      'details' => 'Trial Balance Report ' . (empty($previousPriorFinPeriod) ? 'for All Time Prior' : "From {$previousPriorFinPeriod}") . " To {$priorFinPeriod}.",
+      'details' => ts('Trial Balance Report ' . (empty($previousPriorFinPeriod) ? 'for All Time Prior' : "From {$previousPriorFinPeriod}") . " To {$priorFinPeriod}."),
     );
     $fileName = CRM_Core_BAO_FinancialTrxn::createTrialBalanceExport();
     if ($fileName) {
