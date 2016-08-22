@@ -476,7 +476,7 @@ WHERE li.contribution_id = %1";
       }
     }
     if (!$update && $contributionDetails) {
-      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItem, $contributionDetails);
+      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItem, $contributionDetails->id);
     }
   }
 

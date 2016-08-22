@@ -40,6 +40,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   static $_importableFields = NULL;
 
   /**
+   * Static field  to hold line items for contribution.
+   *
+   * @var array
+   */
+  static $_deferredLineItems = NULL;
+
+  /**
    * Static field for all the contribution information that we can potentially export
    *
    * @var array
@@ -168,15 +175,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', array('id' => $contributionID, 'return' => 'contribution_status_id'));
     }
 
-    if (!$contributionID
-      && CRM_Utils_Array::value('membership_id', $params)
-      && self::checkContributeSettings('deferred_revenue_enabled')
-    ) {
-      $memberStartDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['membership_id'], 'start_date');
-      if ($memberStartDate) {
-        $params['revenue_recognition_date'] = date('Ymd', strtotime($memberStartDate));
-      }
-    }
     self::calculateMissingAmountParams($params, $contributionID);
 
     if (!empty($params['payment_instrument_id'])) {
@@ -202,6 +200,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params['prevContribution'] = self::getOriginalContribution($contributionID);
     }
 
+    // CRM-16189
+    CRM_Core_BAO_FinancialTrxn::generateRevenueRecognitionDate($params, $contributionID);
     if ($contributionID && !empty($params['revenue_recognition_date']) && !empty($params['prevContribution'])
       && !($contributionStatus[$params['prevContribution']->contribution_status_id] == 'Pending')
       && !self::allowUpdateRevenueRecognitionDate($contributionID)
@@ -2013,6 +2013,12 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             }
 
             CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership);
+            if (!empty($contribution->contribution_page_id)
+              && $contributionStatuses[$previousContriStatusId] == 'Pending'
+              && $contributionStatuses[$contributionStatusId] == 'Completed'
+            ) {
+              CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(self::$_deferredLineItems, $contributionId, TRUE);
+            }
           }
         }
       }
@@ -3573,6 +3579,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         );
         foreach ($params['line_item'] as $fieldId => $fields) {
           foreach ($fields as $fieldValueId => $lineItemDetails) {
+            self::$_deferredLineItems[$fieldId][$fieldValueId] = $lineItemDetails;
             $fparams = array(
               1 => array(CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'), 'Integer'),
               2 => array($lineItemDetails['id'], 'Integer'),
@@ -3583,6 +3590,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             );
             $financialItem = CRM_Core_DAO::executeQuery($sql, $fparams);
             while ($financialItem->fetch()) {
+              self::$_deferredLineItems[$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
               $entityParams['entity_id'] = $financialItem->id;
               $entityParams['amount'] = $financialItem->amount;
               foreach (self::$_trxnIDs as $tID) {
@@ -3591,6 +3599,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               }
             }
           }
+        }
+        if ($params['prevContribution']->contribution_page_id && !$params['prevContribution']->is_pay_later
+          && $previousContributionStatus == 'Pending' && !empty($params['membership_id'])
+        ) {
+          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(self::$_deferredLineItems, $params['id'], TRUE);
         }
         return;
       }
@@ -3669,7 +3682,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
+    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['id'], TRUE, $context);
   }
 
   /**
