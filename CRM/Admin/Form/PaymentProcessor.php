@@ -321,7 +321,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if (!$dao->find(TRUE)) {
       return $defaults;
     }
-
+    // CRM-16621
+    CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($dao->password);
     CRM_Core_DAO::storeValues($dao, $defaults);
     // When user changes payment processor type, it is passed in via $this->_ppType so update defaults array.
     if ($this->_ppType) {
@@ -335,7 +336,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $testDAO->domain_id = $domainID;
     if ($testDAO->find(TRUE)) {
       $this->_testID = $testDAO->id;
-
+      // CRM-16621
+      CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($testDAO->password);
       foreach ($this->_fields as $field) {
         $testName = "test_{$field['name']}";
         $defaults[$testName] = $testDAO->{$field['name']};
