@@ -2290,16 +2290,15 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     while ($dao->fetch()) {
       $contributionDetails = new CRM_Contribute_DAO_Contribution();
       $contributionDetails->id = $dao->contribution_id;
-      $contributionDetails->find(TRUE);
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
+      $lineItems = CRM_Price_BAO_LineItem::getLineItems($dao->contribution_id, 'contribution', NULL, TRUE, TRUE);
       if (empty($lineItems)) {
         continue;
       }
       $lineItems[1] = $lineItems;
-      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails, FALSE, 'changeRevenueRecognitionDate');
+      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $dao->contribution_id, FALSE, 'changeRevenueRecognitionDate');
       $contributionDetails->revenue_recognition_date = date('Ymd', strtotime($params['start_date']));
       $contributionDetails->save();
-      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails);
+      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $dao->contribution_id);
     }
   }
 
