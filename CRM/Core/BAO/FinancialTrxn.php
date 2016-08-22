@@ -553,34 +553,72 @@ WHERE ft.is_payment = 1
    *
    * @param array $lineItem
    *
+   * @param date $receiveDate
+   *
    * @return array
    */
-  public static function getMembershipRevenueAmount($lineItem) {
+  public static function getMembershipRevenueAmount($lineItem, $receiveDate) {
     $revenueAmount = array();
     $membershipDetail = civicrm_api3('Membership', 'getsingle', array(
       'id' => $lineItem['entity_id'],
     ));
+    $membershipTypeDetail = civicrm_api3('MembershipType', 'getsingle', array(
+      'id' => $lineItem['membership_type_id'],
+    ));
+
     if (empty($membershipDetail['end_date'])) {
       return $revenueAmount;
     }
 
-    $startDate = strtotime($membershipDetail['start_date']);
-    $endDate = strtotime($membershipDetail['end_date']);
-    $startYear = date('Y', $startDate);
-    $endYear = date('Y', $endDate);
-    $startMonth = date('m', $startDate);
-    $endMonth = date('m', $endDate);
+    if ($membershipTypeDetail['period_type'] == 'rolling') {
+      $startDate = strtotime($receiveDate);
+      $startDateOfRevenue = $receiveDate;
+    }
+    else {
+      $startDate = strtotime($membershipDetail['start_date']);
+      $startDateOfRevenue = $membershipDetail['start_date'];
+    }
 
-    $monthOfService = (($endYear - $startYear) * 12) + ($endMonth - $startMonth);
-    $startDateOfRevenue = $membershipDetail['start_date'];
+    $startYear = date('Y', $startDate);
+    $startMonth = date('m', $startDate);
+
+    $endDate = strtotime($membershipDetail['end_date']);
+    $endYear = date('Y', $endDate);
+    $endMonth = date('m', $endDate);
+    //TODO: fix date calculation using some date function
+    if ($endMonth == $startMonth && $endYear != $startYear) {
+      $endMonth--;
+    }
+
+    $monthOfService = (($endYear - $startYear) * 12) + ($endMonth - $startMonth) + 1;
+    $forFixedMembershipAmount = 0;
+    if ($monthOfService == 0) {
+      return $revenueAmount;
+    }
     $typicalPayment = round(($lineItem['line_total'] / $monthOfService), 2);
-    for ($i = 0; $i <= $monthOfService - 1; $i++) {
-      $revenueAmount[$i]['amount'] = $typicalPayment;
+    $receiveDateMonthYear = date('Ym', strtotime($receiveDate));
+
+    for ($i = 0; $i < $monthOfService; $i++) {
+      $checkDate = $startDateOfRevenue;
+      $monthYearDate = date('Ym', strtotime($checkDate));
+      $deferredAmount = $typicalPayment;
       if ($i == 0) {
-        $revenueAmount[$i]['amount'] -= (($typicalPayment * $monthOfService) - $lineItem['line_total']);
+        $deferredAmount -= (($typicalPayment * $monthOfService) - $lineItem['line_total']);
+        $startDateOfRevenue = date('Y-m', strtotime($startDateOfRevenue)) . '-01';
       }
-      $revenueAmount[$i]['revenue_date'] = $startDateOfRevenue;
       $startDateOfRevenue = date('Y-m', strtotime('+1 month', strtotime($startDateOfRevenue))) . '-01';
+      if ($membershipTypeDetail['period_type'] == 'fixed' && $monthYearDate <= $receiveDateMonthYear) {
+        $forFixedMembershipAmount += $deferredAmount;
+        if ($monthYearDate == $receiveDateMonthYear) {
+          $deferredAmount = $forFixedMembershipAmount;
+          $checkDate = $receiveDate;
+        }
+        else {
+          continue;
+        }
+      }
+      $revenueAmount[$i]['amount'] = $deferredAmount;
+      $revenueAmount[$i]['revenue_date'] = date('Y-m-d', strtotime($checkDate));
     }
     return $revenueAmount;
   }
@@ -590,36 +628,40 @@ WHERE ft.is_payment = 1
    *
    * @param array $lineItems
    *
-   * @param CRM_Contribute_BAO_Contribution $contributionDetails
+   * @param int $contributionId
    *
    * @param bool $update
    *
    * @param string $context
    *
    */
-  public static function createDeferredTrxn($lineItems, $contributionDetails, $update = FALSE, $context = NULL) {
+  public static function createDeferredTrxn($lineItems, $contributionId, $update = FALSE, $context = NULL) {
     if (empty($lineItems)) {
       return;
     }
-    $revenueRecognitionDate = $contributionDetails->revenue_recognition_date;
+    $contributionDetails = civicrm_api3('Contribution', 'getsingle', array(
+      'id' => $contributionId,
+    ));
+    $revenueRecognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $contributionDetails);
     if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       if (!$update
-        && (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Completed'
-          || (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Pending'
-            && $contributionDetails->is_pay_later)
-          )
+        && (!(CRM_Utils_Array::value($contributionDetails['contribution_status_id'], $statuses) == 'Completed'
+        || (CRM_Utils_Array::value($contributionDetails['contribution_status_id'], $statuses) == 'Pending'
+          && $contributionDetails['is_pay_later']))
+        )
       ) {
         return;
       }
       $trxnParams = array(
-        'contribution_id' => $contributionDetails->id,
+        'contribution_id' => $contributionId,
         'fee_amount' => '0.00',
-        'currency' => $contributionDetails->currency,
-        'trxn_id' => $contributionDetails->trxn_id,
-        'status_id' => $contributionDetails->contribution_status_id,
-        'payment_instrument_id' => $contributionDetails->payment_instrument_id,
-        'check_number' => $contributionDetails->check_number,
+        'currency' => $contributionDetails['currency'],
+        'trxn_id' => $contributionDetails['trxn_id'],
+        'status_id' => array_search('Completed', $statuses),
+        'payment_instrument_id' => $contributionDetails['payment_instrument_id'],
+        'check_number' => $contributionDetails['check_number'],
+        'is_payment' => 1,
       );
 
       $deferredRevenues = array();
@@ -647,7 +689,7 @@ WHERE ft.is_payment = 1
           else {
             // for membership
             $item['line_total'] = $lineTotal;
-            $deferredRevenues[$key]['revenue'] = self::getMembershipRevenueAmount($item);
+            $deferredRevenues[$key]['revenue'] = self::getMembershipRevenueAmount($item, $contributionDetails['receive_date']);
           }
         }
       }
@@ -727,6 +769,33 @@ WHERE ft.is_payment = 1
       $trxnparams['pan_truncation'] = $panTruncation;
     }
     civicrm_api3('FinancialTrxn', 'create', $trxnparams);
+  }
+
+  /**
+   * Calculate Revenue Recognition date for Membership.
+   *
+   * @param array $params
+   *   Holds submitted formvalues and params from api for updating/adding contribution.
+   * @param int $contributionID Contribution ID
+   *
+   * @return bool|void
+   */
+  public static function generateRevenueRecognitionDate(&$params, $contributionID) {
+    if (!CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled') ||
+      !empty($params['revenue_recognition_date'])
+    ) {
+      return FALSE;
+    }
+    $membershipID = CRM_Utils_Array::value('membership_id', $params);
+    // if there is no membership ID in parameter, fetch from membership payment table on basis of contribution ID
+    if (!$membershipID && $contributionID) {
+      $membershipID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $contributionID, 'membership_id', 'contribution_id');
+    }
+    // consider revenue_recognition_date as the recieve date or current date
+    if ($membershipID) {
+      $params['revenue_recognition_date'] = CRM_Utils_Array::value('receive_date', $params, date('Ymd'));
+      $params['membership_id'] = $membershipID;
+    }
   }
 
 }
