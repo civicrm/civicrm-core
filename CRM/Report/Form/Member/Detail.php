@@ -295,10 +295,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             // CRM-17824: receive date should be most recent date
             if ($fieldName == 'receive_date') {
               $select[] = "MAX({$field['dbAlias']}) as {$tableName}_{$fieldName}";
-            } else {
+            } 
+            else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             }
-            
+
             if (array_key_exists('title', $field)) {
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             }
