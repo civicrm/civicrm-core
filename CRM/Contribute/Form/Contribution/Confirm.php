@@ -1972,7 +1972,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // CRM-18854
     if (CRM_Utils_Array::value('adjust_recur_start_date', $this->_values)) {
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
-      if (CRM_Utils_Array::value('start_date', $this->_params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
+      if (CRM_Utils_Array::value('start_date', $this->_params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)
+          || !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
         $pledgeStartDate = CRM_Utils_Array::value('start_date', $this->_params, NULL);
         $this->_params['receive_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
         $recurParams = CRM_Pledge_BAO_Pledge::buildRecurParams($this->_params);
