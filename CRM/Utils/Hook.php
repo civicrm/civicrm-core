@@ -1636,7 +1636,7 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $permission
    *   The name of an atomic permission, ie. 'access deleted contacts'
-   * @param boolean $granted
+   * @param bool $granted
    *   Whether this permission is currently granted. The hook can change this value.
    *
    * @return null
