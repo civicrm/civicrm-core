@@ -41,7 +41,10 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    *   collection of info about this data source
    */
   public function getInfo() {
-    return array('title' => ts('SQL Query'));
+    return array(
+      'title' => ts('SQL Query'),
+      'permissions' => array('import SQL datasource'),
+    );
   }
 
   /**
