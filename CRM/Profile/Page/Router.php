@@ -98,11 +98,11 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
 
     if ($secondArg == 'edit' || $secondArg == 'create') {
       if ($secondArg == 'edit') {
-        $allowHtmlSnippet = Civi::settings()->get('allow_profile_html_snippet');
+        $allowRemoteSubmit = Civi::settings()->get('remote_profile_submissions_allowed');
         $controller = new CRM_Core_Controller_Simple('CRM_Profile_Form_Edit',
           ts('Create Profile'),
           CRM_Core_Action::UPDATE,
-          FALSE, FALSE, $allowHtmlSnippet
+          FALSE, FALSE, $allowRemoteSubmit
         );
         $controller->set('edit', 1);
         $controller->process();

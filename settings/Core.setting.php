@@ -32,7 +32,8 @@
  * $Id$
  *
  */
-/*
+
+/**
  * Settings metadata file
  */
 return array(
@@ -176,19 +177,19 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
-  'allow_profile_html_snippet' => array(
+  'remote_profile_submissions_allowed' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
-    'name' => 'allow_profile_html_snippet',
+    'name' => 'remote_profile_submissions_allowed',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => FALSE,
     'html_type' => 'radio',
     'add' => '4.7',
-    'title' => 'Allow Profile Html Snippet',
+    'title' => 'Accept profile submissions from external sites',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'This settings allows to enable HTML snippet for profile.',
+    'description' => 'If enabled, CiviCRM will permit submissions from external sites to profiles. This is disabled by default to limit abuse.',
     'help_text' => NULL,
   ),
   'editor_id' => array(

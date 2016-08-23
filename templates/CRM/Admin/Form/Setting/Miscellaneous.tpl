@@ -75,10 +75,10 @@
             <td>{$form.recentItemsProviders.html}<br />
                 <span class="description">{$recentItemsProviders_description}</span></td>
         </tr>
-        <tr class="crm-miscellaneous-form-block-allow_profile_html_snippet">
-          <td class="label">{$form.allow_profile_html_snippet.label}</td>
-          <td>{$form.allow_profile_html_snippet.html}<br />
-            <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles using HTML snippets.{/ts}</p>
+        <tr class="crm-miscellaneous-form-block-remote_profile_submissions_allowed">
+          <td class="label">{$form.remote_profile_submissions_allowed.label}</td>
+          <td>{$form.remote_profile_submissions_allowed.html}<br />
+            <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles from external sites. This is disabled by default to limit abuse.{/ts}</p>
           </td>
         </tr>
         {foreach from=$pure_config_settings item=setting_name}
