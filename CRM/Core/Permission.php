@@ -690,6 +690,10 @@ class CRM_Core_Permission {
         $prefix . ts('import contacts'),
         ts('Import contacts and activities'),
       ),
+      'import SQL datasource' => array(
+        $prefix . ts('import SQL datasource'),
+        ts('When importing, consume data directly from a SQL datasource'),
+      ),
       'edit groups' => array(
         $prefix . ts('edit groups'),
         ts('Create new groups, edit group settings (e.g. group name, visibility...), delete groups'),
