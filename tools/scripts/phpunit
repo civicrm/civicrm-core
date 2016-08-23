@@ -32,18 +32,20 @@ chdir(dirname(dirname(__DIR__))); // civicrm-core root dir
 array_shift($argv);
 
 // Convert class names to file names
+$CIVICRM_UF = 'UnitTests';
 foreach ($argv as $k => $v) {
-  if (preg_match('/^(CRM_|api_v3_|EnvTest|WebTest_)/', $v)) {
+  if (preg_match('/^(CRM_|api_v3_|EnvTest|WebTest_|E2E_)/', $v)) {
     $argv[$k] = 'tests/phpunit/' . strtr($v, '_', '/') . '.php';
   }
   elseif (preg_match('/^Civi\\\\/', $v)) {
     $argv[$k] = 'tests/phpunit/' . strtr($v, '\\', '/') . '.php';
   }
 
-  if (!preg_match('/^(WebTest)/', $v)) {
-    putenv('CIVICRM_UF=UnitTests');
+  if (preg_match('/^(WebTest|E2E)/', $v)) {
+    $CIVICRM_UF='';
   }
 }
+putenv("CIVICRM_UF=$CIVICRM_UF");
 
 // Transition: Make sure we use phpunit code from PATH, not
 // civicrm-packages.  This will be unnecessary once civicrm-packages is
