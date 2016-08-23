@@ -87,7 +87,12 @@
       {if $contributionPageID}
         {capture assign='contributionPageID'}id={$contributionPageID}&{/capture}
       {else}
-        {capture assign='contributionPageID'}{/capture}
+        {capture assign='pageID'}{/capture}
+      {/if}
+      {if $custom_pre_id}
+        {capture assign='preProfileID'}pre_profile_id={$custom_pre_id}&{/capture}
+      {else}
+        {capture assign='preProfileID'}{/capture}
       {/if}
       {if $urlPathVar}
         {capture assign='urlPathVar'}{$urlPathVar}&{/capture}
@@ -100,7 +105,7 @@
         {capture assign='profilePathVar'}{/capture}
       {/if}
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="currency=`$currency`&`$urlPathVar``$profilePathVar``$contributionPageID`processor_id="}" + type;
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="currency=`$currency`&`$urlPathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id="}" + type;
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {

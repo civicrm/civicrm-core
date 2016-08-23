@@ -1,8 +1,5 @@
 <?php
 
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/Custom.php';
-
 /**
  * Class CRM_Contact_BAO_ContactTest
  * @group headless
@@ -641,14 +638,12 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   public function testDeleteContact() {
     $contactParams = $this->contactParams();
 
-    //create custom data
-    require_once 'CiviTest/Custom.php';
-    $customGroup = Custom::createGroup(array(), 'Individual');
+    $customGroup = $this->customGroupCreate();
     $fields = array(
       'label' => 'testFld',
       'data_type' => 'String',
       'html_type' => 'Text',
-      'custom_group_id' => $customGroup->id,
+      'custom_group_id' => $customGroup['id'],
     );
     $customField = CRM_Core_BAO_CustomField::create($fields);
     $contactParams['custom'] = array(
@@ -657,8 +652,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
           'value' => 'Test custom value',
           'type' => 'String',
           'custom_field_id' => $customField->id,
-          'custom_group_id' => $customGroup->id,
-          'table_name' => $customGroup->table_name,
+          'custom_group_id' => $customGroup['id'],
+          'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
           'column_name' => $customField->column_name,
           'file_id' => NULL,
         ),
@@ -716,7 +711,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'id', 'sort_name', 'Database check, contact deleted successfully.'
     );
     $this->quickCleanup(array('civicrm_contact', 'civicrm_note'));
-    Custom::deleteGroup($customGroup);
+    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -1494,10 +1489,10 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Looking at it when contact-related custom data is updated.
    */
   public function testTimestampsCustom() {
-    $customGroup = Custom::createGroup(array(), 'Individual');
-    $this->assertNotNull($customGroup);
+    $customGroup = $this->customGroupCreate();
+    $customGroup = $customGroup['values'][$customGroup['id']];
     $fields = array(
-      'custom_group_id' => $customGroup->id,
+      'custom_group_id' => $customGroup['id'],
       'data_type' => 'String',
       'html_type' => 'Text',
     );
@@ -1506,26 +1501,25 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $test = $this;
     $this->_testTimestamps(array(
       'INSERT' => function ($contactId) use ($test, $customGroup, $customField) {
-        $result = civicrm_api3('contact', 'create', array(
+        civicrm_api3('contact', 'create', array(
           'contact_id' => $contactId,
           'custom_' . $customField['id'] => 'test-1',
         ));
       },
       'UPDATE' => function ($contactId) use ($test, $customGroup, $customField) {
         CRM_Core_DAO::executeQuery(
-          "UPDATE {$customGroup->table_name} SET {$customField['column_name']} = 'test-2' WHERE entity_id = %1",
+          "UPDATE {$customGroup['table_name']} SET {$customField['column_name']} = 'test-2' WHERE entity_id = %1",
           array(1 => array($contactId, 'Integer'))
         );
       },
       'DELETE' => function ($contactId) use ($test, $customGroup, $customField) {
         CRM_Core_DAO::executeQuery(
-          "DELETE FROM {$customGroup->table_name} WHERE entity_id = %1",
+          "DELETE FROM {$customGroup['table_name']} WHERE entity_id = %1",
           array(1 => array($contactId, 'Integer'))
         );
       },
     ));
-
-    Custom::deleteGroup($customGroup);
+    $this->quickCleanup(array('civicrm_contact'), TRUE);
   }
 
   /**
@@ -1539,7 +1533,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    */
   public function _testTimestamps($callbacks) {
     CRM_Core_DAO::triggerRebuild();
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $origTimestamps = CRM_Contact_BAO_Contact::getTimestamps($contactId);
     $this->assertRegexp('/^\d\d\d\d-\d\d-\d\d /', $origTimestamps['created_date']);

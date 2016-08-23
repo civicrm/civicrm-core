@@ -152,9 +152,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    WHERE ( object_table IN ( 'civicrm_saved_search', 'civicrm_uf_group', 'civicrm_custom_group', 'civicrm_event' ) )
 ORDER BY entity_id
 ";
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $roles = CRM_Core_OptionGroup::values('acl_role');
 
@@ -187,7 +185,7 @@ ORDER BY entity_id
       $acl[$dao->id]['is_active'] = $dao->is_active;
 
       if ($acl[$dao->id]['entity_id']) {
-        $acl[$dao->id]['entity'] = $roles[$acl[$dao->id]['entity_id']];
+        $acl[$dao->id]['entity'] = CRM_Utils_Array::value($acl[$dao->id]['entity_id'], $roles);
       }
       else {
         $acl[$dao->id]['entity'] = ts('Everyone');

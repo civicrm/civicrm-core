@@ -43,21 +43,21 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
       $this->_onlyPublicGroups
     );
 
-    $in =& CRM_Contact_BAO_GroupContact::getContactGroup(
+    $in = CRM_Contact_BAO_GroupContact::getContactGroup(
       $this->_contactId,
       'Added',
       NULL, FALSE, TRUE,
       $this->_onlyPublicGroups
     );
 
-    $pending =& CRM_Contact_BAO_GroupContact::getContactGroup(
+    $pending = CRM_Contact_BAO_GroupContact::getContactGroup(
       $this->_contactId,
       'Pending',
       NULL, FALSE, TRUE,
       $this->_onlyPublicGroups
     );
 
-    $out =& CRM_Contact_BAO_GroupContact::getContactGroup(
+    $out = CRM_Contact_BAO_GroupContact::getContactGroup(
       $this->_contactId,
       'Removed',
       NULL, FALSE, TRUE,

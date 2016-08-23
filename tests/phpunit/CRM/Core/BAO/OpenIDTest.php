@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/Contact.php';
-
 /**
  * Class CRM_Core_BAO_OpenIDTest
  * @group headless
@@ -23,7 +21,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
    * Add() method (create and update modes)
    */
   public function testAdd() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $this->assertDBRowExist('CRM_Contact_DAO_Contact', $contactId);
 
     $openIdURL = "http://test-username.civicrm.org/";
@@ -67,7 +65,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
    * IfAllowedToLogin() method (set and reset allowed_to_login)
    */
   public function testIfAllowedToLogin() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $this->assertDBRowExist('CRM_Contact_DAO_Contact', $contactId);
     $openIdURL = "http://test-username.civicrm.org/";
 
@@ -112,7 +110,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
    * AllOpenIDs() method - get all OpenIDs for the given contact
    */
   public function testAllOpenIDs() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $this->assertDBRowExist('CRM_Contact_DAO_Contact', $contactId);
 
     // create first openid

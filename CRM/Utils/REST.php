@@ -282,13 +282,13 @@ class CRM_Utils_REST {
     $requestParams = CRM_Utils_Request::exportValues();
 
     // Get the function name being called from the q parameter in the query string
-    $q = CRM_Utils_array::value('q', $requestParams);
+    $q = CRM_Utils_Array::value('q', $requestParams);
     // or for the rest interface, from fnName
-    $r = CRM_Utils_array::value('fnName', $requestParams);
+    $r = CRM_Utils_Array::value('fnName', $requestParams);
     if (!empty($r)) {
       $q = $r;
     }
-    $entity = CRM_Utils_array::value('entity', $requestParams);
+    $entity = CRM_Utils_Array::value('entity', $requestParams);
     if (empty($entity) && !empty($q)) {
       $args = explode('/', $q);
       // If the function isn't in the civicrm namespace, reject the request.
@@ -311,8 +311,8 @@ class CRM_Utils_REST {
       // or the api format (entity+action)
       $args = array();
       $args[0] = 'civicrm';
-      $args[1] = CRM_Utils_array::value('entity', $requestParams);
-      $args[2] = CRM_Utils_array::value('action', $requestParams);
+      $args[1] = CRM_Utils_Array::value('entity', $requestParams);
+      $args[2] = CRM_Utils_Array::value('action', $requestParams);
     }
 
     // Everyone should be required to provide the server key, so the whole
@@ -320,7 +320,7 @@ class CRM_Utils_REST {
     // first check for civicrm site key
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
       $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
-      $key = CRM_Utils_array::value('key', $requestParams);
+      $key = CRM_Utils_Array::value('key', $requestParams);
       if (empty($key)) {
         return self::error("FATAL: mandatory param 'key' missing. More info at: " . $docLink);
       }
@@ -669,7 +669,7 @@ class CRM_Utils_REST {
    */
   public function loadCMSBootstrap() {
     $requestParams = CRM_Utils_Request::exportValues();
-    $q = CRM_Utils_array::value('q', $requestParams);
+    $q = CRM_Utils_Array::value('q', $requestParams);
     $args = explode('/', $q);
 
     // Proceed with bootstrap for "?entity=X&action=Y"
@@ -712,6 +712,9 @@ class CRM_Utils_REST {
       $session = CRM_Core_Session::singleton();
       $session->set('ufID', $uid);
       $session->set('userID', $contact_id);
+      CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+        array(1 => array($contact_id, 'Integer'))
+      );
       return NULL;
     }
     else {

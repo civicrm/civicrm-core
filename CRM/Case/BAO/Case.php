@@ -458,7 +458,6 @@ t_act.act_type AS case_activity_type ";
       FROM civicrm_view_case_activity_upcoming
       ORDER BY activity_date_time ASC, id ASC
       ) AS upcomingOrdered
-    GROUP BY case_id
     ) AS act
   LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
   LEFT JOIN civicrm_option_value aov ON ( aov.option_group_id = aog.id AND aov.value = act.activity_type_id )
@@ -478,7 +477,6 @@ t_act.act_type AS case_activity_type ";
       FROM civicrm_view_case_activity_recent
       ORDER BY activity_date_time DESC, id ASC
       ) AS recentOrdered
-    GROUP BY case_id
     ) AS act
 LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
   LEFT JOIN civicrm_option_value aov ON ( aov.option_group_id = aog.id AND aov.value = act.activity_type_id )
@@ -759,6 +757,7 @@ AND civicrm_case.status_id != $closedId";
       $myCaseWhereClause = " AND case_relationship.contact_id_b = {$userID}";
       $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
     }
+    $myGroupByClause .= ", case_status.label, status_id, case_type_id";
 
     // FIXME: This query could be a lot more efficient if it used COUNT() instead of returning all rows and then counting them with php
     $query = "
@@ -775,7 +774,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
 {$myCaseWhereClause} {$myGroupByClause}";
 
-    $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $res = CRM_Core_DAO::executeQuery($query);
     while ($res->fetch()) {
       if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
@@ -986,7 +985,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     }
 
     $groupBy = "
-         GROUP BY ca.id ";
+         GROUP BY ca.id, tcc.id, scc.id, acc.id, ov.value";
 
     $sortBy = CRM_Utils_Array::value('sortBy', $params);
     if (!$sortBy) {
@@ -1246,8 +1245,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       LEFT JOIN civicrm_email ce
         ON ce.contact_id = cc.id
         AND ce.is_primary= 1
-      WHERE cr.case_id =  %1
-      GROUP BY cc.id';
+      WHERE cr.case_id =  %1';
 
     $params = array(1 => array($caseID, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -1562,7 +1560,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     $query = self::getCaseActivityQuery($type, $userID, $condition, $cases['case_deleted']);
 
-    $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $res = CRM_Core_DAO::executeQuery($query);
 
     $activityInfo = array();
     while ($res->fetch()) {
@@ -1732,7 +1730,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       if (!empty($criteriaParams['activity_type_id'])) {
         $where .= " AND ca.activity_type_id    = " . CRM_Utils_Type::escape($criteriaParams['activity_type_id'], 'Integer');
         $where .= " AND ca.is_current_revision = 1";
-        $groupBy .= " GROUP BY ca.activity_type_id";
+        $groupBy .= " GROUP BY ca.activity_type_id, ca.id";
       }
 
       if (!empty($criteriaParams['newest'])) {
@@ -2140,7 +2138,7 @@ SELECT civicrm_contact.id as casemanager_id,
             $from = ' FROM ' . $tableName;
             $where = " WHERE {$tableName}.entity_id = {$otherCaseId}";
             $query = $insert . $select . $from . $where;
-            $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+            $dao = CRM_Core_DAO::executeQuery($query);
           }
         }
 

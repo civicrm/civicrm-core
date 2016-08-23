@@ -54,6 +54,8 @@
           <tr>
             <th>{ts}Option Label{/ts}</th>
             <th>{ts}Option Amount{/ts}</th>
+            <th>{ts}Pre Help{/ts}</th>
+            <th>{ts}Post Help{/ts}</th>
             {if $isEvent}
               <th>{ts}Participant Count{/ts}</th>
               <th>{ts}Maximum{/ts}</th>
@@ -74,6 +76,8 @@
             <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
               <td class="crm-price-option-label crm-editable" data-field="label">{$row.label}</td>
               <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
+              <td class="crm-price-option-pre-help">{$row.help_pre}</td>
+              <td class="crm-price-option-post-help">{$row.help_post}</td>
               {if $isEvent}
                 <td class="crm-price-option-count">{$row.count}</td>
                 <td class="crm-price-option-max">{$row.max_value}</td>

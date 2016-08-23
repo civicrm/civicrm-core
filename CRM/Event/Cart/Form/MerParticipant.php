@@ -46,7 +46,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
    *
    * @return array
    */
-  public function get_profile_groups($event_id) {
+  public static function get_profile_groups($event_id) {
     $ufJoinParams = array(
       'entity_table' => 'civicrm_event',
       'module' => 'CiviEvent',

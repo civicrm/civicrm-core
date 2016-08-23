@@ -63,25 +63,30 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
           'description' => NULL,
           'weight' => 3,
         ),
+        'hideCountryMailingLabels' => array(
+          'html_type' => 'YesNo',
+          'title' => 'Hide Country in Mailing Labels when same as domain country',
+          'weight' => 4,
+        ),
       ),
       CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => array(
         'address_standardization_provider' => array(
           'html_type' => 'select',
           'title' => ts('Provider'),
           'option_values' => $addrProviders,
-          'weight' => 4,
+          'weight' => 5,
         ),
         'address_standardization_userid' => array(
           'html_type' => 'text',
           'title' => ts('User ID'),
           'description' => NULL,
-          'weight' => 5,
+          'weight' => 6,
         ),
         'address_standardization_url' => array(
           'html_type' => 'text',
           'title' => ts('Web Service URL'),
           'description' => NULL,
-          'weight' => 6,
+          'weight' => 7,
         ),
       ),
     );
@@ -102,6 +107,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
     $defaults['address_format'] = $this->_config->address_format;
     $defaults['mailing_format'] = $this->_config->mailing_format;
+    $defaults['hideCountryMailingLabels'] = $this->_config->hideCountryMailingLabels;
 
     parent::cbsDefaultValues($defaults);
 

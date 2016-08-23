@@ -53,16 +53,7 @@ class CRM_Financial_Page_AJAX {
       $result = CRM_Contribute_PseudoConstant::financialAccount();
     }
     else {
-      $financialAccountType = array(
-        '5' => 5, // expense
-        '3' => 1, // AR relation
-        '1' => 3, // revenue
-        '6' => 1, // asset
-        '7' => 4, // cost of sales
-        '8' => 1, // premium inventory
-        '9' => 3, // discount account is
-        '10' => 2, // sales tax liability
-      );
+      $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
       $financialAccountType = CRM_Utils_Array::value($_GET['_value'], $financialAccountType);
       $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
       if ($financialAccountType) {
@@ -101,20 +92,13 @@ class CRM_Financial_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
 
-    if ($_GET['_value'] == 'select') {
-      $result = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
-    }
-    else {
-      $financialAccountType = array(
-        '5' => array(5), //expense
-        '1' => array(3, 6, 8), //Asset
-        '3' => array(1, 9), //revenue
-        '4' => array(7), //cost of sales
-      );
+    if ($_GET['_value'] != 'select') {
+      $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations(TRUE);
       $financialAccountId = CRM_Utils_Request::retrieve('_value', 'Positive', CRM_Core_DAO::$_nullObject);
       $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountId, 'financial_account_type_id');
-      $result = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
     }
+    $params['orderColumn'] = 'label';
+    $result = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
 
     $elements = array(
       array(
@@ -251,7 +235,14 @@ class CRM_Financial_Page_AJAX {
             $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params, $ids));
           }
           if ($updated) {
-            $response = array('status' => 'record-updated-success');
+            $redirectStatus = $updated->status_id;
+            if ($batchStatus[$updated->status_id] == "Reopened") {
+              $redirectStatus = array_search("Open", $batchStatus);
+            }
+            $response = array(
+              'status' => 'record-updated-success',
+              'status_id' => $redirectStatus,
+            );
           }
         }
       }
@@ -363,6 +354,10 @@ class CRM_Financial_Page_AJAX {
       }
     }
     $financialitems = array();
+    if ($statusID) {
+      $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name', 'condition' => " v.value={$statusID}"));
+      $batchStatus = $batchStatuses[$statusID];
+    }
     while ($financialItem->fetch()) {
       $row[$financialItem->id] = array();
       foreach ($columnHeader as $columnKey => $columnValue) {
@@ -392,7 +387,7 @@ class CRM_Financial_Page_AJAX {
           $row[$financialItem->id][$columnKey] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $financialItem->$columnKey);
         }
       }
-      if ($statusID == CRM_Core_OptionGroup::getValue('batch_status', 'Open')) {
+      if (isset($batchStatus) && in_array($batchStatus, array('Open', 'Reopened'))) {
         if (isset($notPresent)) {
           $js = "enableActions('x')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" . $financialItem->id . "' name='mark_x_" . $financialItem->id . "' value='1' onclick={$js}></input>";

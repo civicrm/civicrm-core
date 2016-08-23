@@ -40,7 +40,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * Create() method (create and update modes)
    */
   public function testCreate() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array();
     $params['address']['1'] = array(
@@ -102,7 +102,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * Add() method ( )
    */
   public function testAdd() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $fixParams = array(
       'street_address' => 'E 906N Pine Pl W',
@@ -141,7 +141,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * AllAddress() method ( )
    */
   public function testallAddress() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $fixParams = array(
       'street_address' => 'E 906N Pine Pl W',
@@ -199,7 +199,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * AllAddress() method ( ) with null value
    */
   public function testnullallAddress() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $fixParams = array(
       'street_address' => 'E 906N Pine Pl W',
@@ -237,7 +237,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * GetValues() method (get Address fields)
    */
   public function testGetValues() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array();
     $params['address']['1'] = array(

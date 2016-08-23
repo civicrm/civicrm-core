@@ -99,6 +99,10 @@ function civicrm_api3_domain_get($params) {
       list($domain['from_name'],
         $domain['from_email']
       ) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+
+      // Rename version to domain_version, see CRM-17430.
+      $domain['domain_version'] = $domain['version'];
+      unset($domain['version']);
       $domains[$domain['id']] = array_merge($domains[$domain['id']], $domain);
     }
   }
@@ -129,8 +133,22 @@ function _civicrm_api3_domain_get_spec(&$params) {
  * @return array
  */
 function civicrm_api3_domain_create($params) {
-  $params['version'] = $params['domain_version'];
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  if (isset($params['domain_version'])) {
+    $params['version'] = $params['domain_version'];
+  }
+  else {
+    unset($params['version']);
+  }
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+
+  $result_value = CRM_Utils_Array::first($result['values']);
+  if (isset($result_value['version'])) {
+    // Rename version to domain_version, see CRM-17430.
+    $result_value['domain_version'] = $result_value['version'];
+    unset($result_value['version']);
+    $result['values'][$result['id']] = $result_value;
+  }
+  return $result;
 }
 
 /**
@@ -142,7 +160,11 @@ function civicrm_api3_domain_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_create_spec(&$params) {
-  $params['domain_version'] = $params['version'];
+  $params['domain_version'] = array(
+    'title' => "CiviCRM Version",
+    'description' => "The civicrm version this instance is running",
+    'type' => CRM_Utils_Type::T_STRING,
+  );
   $params['domain_version']['api.required'] = 1;
   unset($params['version']);
   $params['name']['api.required'] = 1;

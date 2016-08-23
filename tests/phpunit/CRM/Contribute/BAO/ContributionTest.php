@@ -830,4 +830,20 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals("$ 200.00 - STUDENT", $activity->subject, 'Check for total amount in activity.');
   }
 
+  /**
+   * Test checkContributeSettings.
+   */
+  public function testCheckContributeSettings() {
+    $settings = CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled');
+    $this->assertNull($settings);
+    $params = array(
+      'contribution_invoice_settings' => array(
+        'deferred_revenue_enabled' => '1',
+      ),
+    );
+    $this->callAPISuccess('Setting', 'create', $params);
+    $settings = CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled');
+    $this->assertEquals($settings, 1, 'Check for settings has failed');
+  }
+
 }

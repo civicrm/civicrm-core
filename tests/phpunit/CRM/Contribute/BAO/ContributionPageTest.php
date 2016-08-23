@@ -25,11 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/ContributionPage.php';
-require_once 'CiviTest/Custom.php';
-require_once 'CiviTest/PaypalPro.php';
-
 /**
  * Class CRM_Contribute_BAO_ContributionPageTest
  * @group headless
@@ -72,7 +67,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
     $this->assertNotNull($contributionpage->id);
     $this->assertType('int', $contributionpage->id);
-    ContributionPage::delete($contributionpage->id);
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $contributionpage->id));
   }
 
   /**
@@ -91,7 +86,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $is_active = 1;
     $pageActive = CRM_Contribute_BAO_ContributionPage::setIsActive($id, $is_active);
     $this->assertEquals($pageActive, TRUE, 'Verify financial types record deletion.');
-    ContributionPage::delete($contributionpage->id);
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $contributionpage->id));
   }
 
   /**
@@ -105,16 +100,16 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
+    $contributionPage = CRM_Contribute_BAO_ContributionPage::create($params);
 
-    $id = $contributionpage->id;
+    $id = $contributionPage->id;
     $values = array();
-    $setValues = CRM_Contribute_BAO_ContributionPage::setValues($id, $values);
+    CRM_Contribute_BAO_ContributionPage::setValues($id, $values);
 
     $this->assertEquals($params['title'], $values['title'], 'Verify contribution title.');
     $this->assertEquals($this->_financialTypeID, $values['financial_type_id'], 'Verify financial types id.');
     $this->assertEquals(1, $values['is_active'], 'Verify contribution is_active value.');
-    ContributionPage::delete($contributionpage->id);
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $contributionPage->id));
   }
 
   /**
@@ -140,12 +135,12 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
       'is_credit_card_only' => '',
     );
 
-    $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
-    $copycontributionpage = CRM_Contribute_BAO_ContributionPage::copy($contributionpage->id);
-    $this->assertEquals($copycontributionpage->financial_type_id, $this->_financialTypeID, 'Check for Financial type id.');
-    $this->assertEquals($copycontributionpage->goal_amount, 400, 'Check for goal amount.');
-    ContributionPage::delete($contributionpage->id);
-    ContributionPage::delete($copycontributionpage->id);
+    $contributionPage = CRM_Contribute_BAO_ContributionPage::create($params);
+    $copyContributionPage = CRM_Contribute_BAO_ContributionPage::copy($contributionPage->id);
+    $this->assertEquals($copyContributionPage->financial_type_id, $this->_financialTypeID, 'Check for Financial type id.');
+    $this->assertEquals($copyContributionPage->goal_amount, 400, 'Check for goal amount.');
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $contributionPage->id));
+    $this->callAPISuccess('ContributionPage', 'delete', array('id' => $copyContributionPage->id));
   }
 
 }

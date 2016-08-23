@@ -456,7 +456,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $tags = $tagSets = array();
     // first get all the tag sets
     $query = "SELECT id FROM civicrm_tag WHERE is_tagset=1 AND parent_id IS NULL";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $tagSets[] = $dao->id;
     }

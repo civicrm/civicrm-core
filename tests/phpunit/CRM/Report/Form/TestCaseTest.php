@@ -180,4 +180,29 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
 
+  /**
+   * Test processReportMode() Function in Reports
+   */
+  public function testOutputMode() {
+    $clazz = new ReflectionClass('CRM_Report_Form');
+    $reportForm = new CRM_Report_Form();
+
+    $params = $clazz->getProperty('_params');
+    $params->setAccessible(TRUE);
+    $outputMode = $clazz->getProperty('_outputMode');
+    $outputMode->setAccessible(TRUE);
+
+    $params->setValue($reportForm, array('groups' => 4));
+    $reportForm->processReportMode();
+    $this->assertEquals('group', $outputMode->getValue($reportForm));
+
+    $params->setValue($reportForm, array('task' => 'copy'));
+    $reportForm->processReportMode();
+    $this->assertEquals('copy', $outputMode->getValue($reportForm));
+
+    $params->setValue($reportForm, array('task' => 'print'));
+    $reportForm->processReportMode();
+    $this->assertEquals('print', $outputMode->getValue($reportForm));
+  }
+
 }

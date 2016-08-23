@@ -237,7 +237,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     );
 
     $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
-    $config = CRM_Core_Config::singleton();
+
     if (isset($this->_id) && !empty($this->_groupValues['saved_search_id'])) {
       unset($groupTypes['Access Control']);
     }
@@ -384,9 +384,18 @@ WHERE  title = %1
       }
 
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-      $params['group_type'] = CRM_Utils_Array::value('group_type', $params, array());
 
-      $customFields = CRM_Core_BAO_CustomField::getFields('Group');
+      $groupTypeIds = array();
+      $groupType = CRM_Utils_Array::value('group_type', $params);
+      if (is_array($groupType)) {
+        foreach ($groupType as $type => $selected) {
+          if ($selected) {
+            $groupTypeIds[] = $type;
+          }
+        }
+      }
+      $params['group_type'] = $groupTypeIds;
+
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
         $this->_id,
         'Group'

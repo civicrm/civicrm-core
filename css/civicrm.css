@@ -838,7 +838,7 @@ input.crm-form-entityref {
 }
 
 #crm-container .crm-flashchart {
-  overflow: scroll;
+  overflow: auto;
 }
 
 #crm-container td.enclosingNested {
@@ -3024,18 +3024,27 @@ div.m ul#civicrm-menu,
 .select2-drop .crm-entityref-filters {
   margin-top: 4px;
 }
-.select2-drop .crm-entityref-filters select {
+.select2-drop .crm-entityref-filters select,
+.select2-drop .crm-entityref-filters input {
   border-radius: 3px;
   border: 1px solid #f2f2f2;
   background-color: #f6f6f6;
   color: #494949;
   font-size: 11px;
-  max-width: 70%;
+  max-width: 60%;
 }
 .select2-drop .crm-entityref-filters select:hover,
 .select2-drop .crm-entityref-filters select:focus,
-.select2-drop .crm-entityref-filters select.active {
+.select2-drop .crm-entityref-filters select.active,
+.select2-drop .crm-entityref-filters input {
   border: 1px solid #808080;
+}
+.select2-drop .crm-entityref-filter-value {
+  margin-left: 1em;
+}
+.select2-drop .crm-entityref-filters input {
+  padding-left: .5em;
+  background-color: #fefefe;
 }
 /* Style autocomplete results */
 .crm-container .select2-results {

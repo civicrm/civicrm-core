@@ -282,6 +282,14 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       }
     }
 
+    // CRM-16189
+    try {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType($params['financial_type_id']);
+    }
+    catch (CRM_Core_Exception $e) {
+      $errors['financial_type_id'] = $e->getMessage();
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 

@@ -210,6 +210,10 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     $this->addElement('text', 'fieldSeparator', ts('Import Field Separator'), array('size' => 2));
 
+    if (Civi::settings()->get('address_standardization_provider') == 'USPS') {
+      $this->addElement('checkbox', 'disableUSPS', ts('Disable USPS address validation during import?'));
+    }
+
     $this->addButtons(array(
         array(
           'type' => 'upload',
@@ -306,6 +310,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
         $$storeName = $this->exportValue($storeValueName);
         $this->set($storeName, $$storeName);
       }
+      $this->set('disableUSPS', !empty($this->_params['disableUSPS']));
 
       $this->set('dataSource', $this->_params['dataSource']);
       $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));

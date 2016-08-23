@@ -54,6 +54,11 @@ class CRM_Mailing_Page_AJAX {
       'pdf_format_id' => $messageTemplate->pdf_format_id,
     );
 
+    $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $templateId);
+    foreach ((array) $documentInfo as $info) {
+      list($messages['document_body']) = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
+    }
+
     CRM_Utils_JSON::output($messages);
   }
 

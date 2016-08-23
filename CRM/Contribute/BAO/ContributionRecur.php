@@ -85,7 +85,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     $recurring->id = CRM_Utils_Array::value('id', $params);
 
     // set currency for CRM-1496
-    if (!isset($recurring->currency)) {
+    if (empty($params['id']) && !isset($recurring->currency)) {
       $config = CRM_Core_Config::singleton();
       $recurring->currency = $config->defaultCurrency;
     }
@@ -200,7 +200,7 @@ SELECT r.payment_processor_id
          WHERE contribution_recur_id IN ( {$recurID}) AND is_test = 0
          GROUP BY contribution_recur_id";
 
-    $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $res = CRM_Core_DAO::executeQuery($query);
 
     while ($res->fetch()) {
       $totalCount[$res->contribution_recur_id] = $res->commpleted;
@@ -596,13 +596,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         }
 
         foreach ($table as $tableName => $tableColumns) {
-          $insert = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
+          $insert = 'INSERT IGNORE INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
           $tableColumns[0] = $targetContributionId;
           $select = 'SELECT ' . implode(', ', $tableColumns);
           $from = ' FROM ' . $tableName;
           $where = " WHERE {$tableName}.entity_id = {$sourceContributionId}";
           $query = $insert . $select . $from . $where;
-          CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          CRM_Core_DAO::executeQuery($query);
         }
       }
     }
@@ -861,7 +861,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     else {
       // Only update next sched date if it's empty or 'just now' because payment processors may be managing
       // the scheduled date themselves as core did not previously provide any help.
-      if (empty($params['next_sched_contribution_date']) || strtotime($params['next_sched_contribution_date']) ==
+      if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) ==
         strtotime(date('Y-m-d'))) {
         $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit']));
       }
