@@ -665,7 +665,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     );
     // Trim 8 chars off the string, make it slightly easier to find
     // but reveals less information from the hash.
-    return substr(md5(var_export($md5inputs,1)), 8);
+    return substr(md5(var_export($md5inputs, 1)), 8);
   }
 
   /**
