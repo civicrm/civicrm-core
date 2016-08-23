@@ -711,9 +711,6 @@ ORDER BY parent_id, weight";
         );
       }
     }
-    // also reset the dashlet cache in case permissions have changed etc
-    // FIXME: decouple this
-    CRM_Core_BAO_Dashboard::resetDashletCache($contactID);
 
     return $newKey;
   }
@@ -929,6 +926,9 @@ ORDER BY parent_id, weight";
 
     // Create or update the All Reports link.
     self::createOrUpdateReportNavItem('All Reports', 'civicrm/report/list', 'reset=1', $reports_nav->id, 'access CiviReport', $domain_id, TRUE);
+    // Create or update the My Reports link.
+    self::createOrUpdateReportNavItem('My Reports', 'civicrm/report/list', 'myreports=1&reset=1', $reports_nav->id, 'access CiviReport', $domain_id, TRUE);
+
   }
 
   /**

@@ -72,6 +72,8 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form {
   }
 
   /**
+   * Common pre-processing.
+   *
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */

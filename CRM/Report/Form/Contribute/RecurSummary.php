@@ -193,6 +193,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -223,7 +224,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contribution_recur']}.payment_instrument_id";
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_contribution_recur']}.payment_instrument_id");
   }
 
   /**
@@ -301,9 +302,9 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
       $lineTotal = 0;
       $amountSql = "
-	SELECT SUM(cc.total_amount) as amount FROM `civicrm_contribution` cc
-	INNER JOIN civicrm_contribution_recur cr ON (cr.id = cc.contribution_recur_id AND cr.payment_instrument_id = {$paymentInstrumentId})
-	WHERE cc.contribution_status_id = 1 AND cc.is_test = 0 AND ";
+  SELECT SUM(cc.total_amount) as amount FROM `civicrm_contribution` cc
+  INNER JOIN civicrm_contribution_recur cr ON (cr.id = cc.contribution_recur_id AND cr.payment_instrument_id = {$paymentInstrumentId})
+  WHERE cc.contribution_status_id = 1 AND cc.is_test = 0 AND ";
       $amountSql .= str_replace("start_date", "cc.`receive_date`", $startedDateSql);
       $amountDao = CRM_Core_DAO::executeQuery($amountSql);
       $amountDao->fetch();

@@ -38,6 +38,12 @@
                 <span class="description">{ts}Content and format for mailing labels.{/ts}</span>
             </td>
         </tr>
+         <tr class="crm-preferences-address-form-block-hideCountryMailingLabels">
+           <td class="label">{$form.hideCountryMailingLabels.label}
+           <td>{$form.hideCountryMailingLabels.html}
+           </td>
+        </tr>
+
       </table>
 
     <h3>{ts}Address Display{/ts}</h3>
@@ -70,7 +76,7 @@
              <tr class="crm-preferences-address-form-block-description">
                 <td colspan="2">
                   <span class="description">
-                      {ts 1=https://www.usps.com/business/web-tools-apis/address-information.htm}CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service. You must register to use the USPS service at <a href='%1' target='_blank'>%1</a>. If you are approved, they will provide you with a User ID and the URL for the service.{/ts}
+                      {ts 1=https://www.usps.com/business/web-tools-apis/welcome.htm}CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service. You must register to use the USPS service at <a href='%1' target='_blank'>%1</a>. If you are approved, they will provide you with a User ID and the URL for the service.{/ts}
                       {ts}Plugins for other address standardization services may be available from 3rd party developers. If installed, they will be included in the drop-down below.{/ts}
                   </span>
               </td>

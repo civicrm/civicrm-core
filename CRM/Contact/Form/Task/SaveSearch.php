@@ -79,15 +79,12 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
    *    - displaying elements for saving the search
    */
   public function buildQuickForm() {
-    // get the qill
+    // @todo sync this more with CRM_Group_Form_Edit.
     $query = new CRM_Contact_BAO_Query($this->get('queryParams'));
-    $qill = $query->qill();
+    $this->assign('qill', $query->qill());
 
     // Values from the search form
     $formValues = $this->controller->exportValues();
-
-    // need to save qill for the smarty template
-    $this->assign('qill', $qill);
 
     // the name and description are actually stored with the group and not the saved search
     $this->add('text', 'title', ts('Name'),
@@ -180,6 +177,11 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     //save the search
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
+    $queryParams = $this->get('queryParams');
+    // CRM-18585 include selected operator in $savedSearch->form_values
+    if (!empty($formValues['operator'])) {
+      $queryParams[] = array('operator', '=', $formValues['operator'], 0, 0);
+    }
     // Use the query parameters rather than the form values - these have already been assessed / converted
     // with the extra knowledge that the form has.
     // Note that we want to move towards a standardised way of saving the query that is not
@@ -187,7 +189,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     // Ideally per CRM-17075 we will use entity reference fields heavily in the form layer & convert to the
     // sql operator syntax at the query layer.
     if (!$isSearchBuilder) {
-      $savedSearch->form_values = serialize($this->get('queryParams'));
+      $savedSearch->form_values = serialize($queryParams);
     }
     else {
       // We want search builder to be able to convert back & forth at the form layer
@@ -226,7 +228,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
 
-    $group = CRM_Contact_BAO_Group::create($params);
+    CRM_Contact_BAO_Group::create($params);
 
     // CRM-9464
     $this->_id = $savedSearch->id;

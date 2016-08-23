@@ -119,6 +119,10 @@
 
         </table>
     </div>
+{if $futurePaymentProcessor}
+    <span id="pledge_calendar_date_field">&nbsp;&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=pledge_calendar_date}</span>
+    <span id="pledge_calendar_month_field">&nbsp;&nbsp;{$form.pledge_calendar_month.html}<br/><span class="description">{ts}Recurring payment will be processed this day of the month following submission of this contribution page.{/ts}</span></span>
+{/if}
 
 
     <div id="amountFields">
@@ -152,6 +156,26 @@
                         <td>{$form.additional_reminder_day.html}
                             <span class="label">{ts}Days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
                     </tr>
+                {if $futurePaymentProcessor}
+                    <tr id="adjustRecurringFields" class="crm-contribution-form-block-adjust_recur_start_date"><th scope="row" class="label">{$form.adjust_recur_start_date.label}</th>
+                        <td>{$form.adjust_recur_start_date.html}<br/>
+			  <div id="recurDefaults">
+                            <span class="description">{$form.pledge_default_toggle.label}</span>
+                            <table class="form-layout-compressed">
+                              <tr class="crm-contribution-form-block-date_of_recurring_contribution">
+                                <td>{$form.pledge_default_toggle.html}</td>
+                              </tr>
+                              <tr class="crm-contribution-form-block-is_pledge_start_date_visible">
+                                <td>{$form.is_pledge_start_date_visible.html}&nbsp;{$form.is_pledge_start_date_visible.label}</td>
+                              </tr>
+                              <tr class="crm-contribution-form-block-is_pledge_start_date_visible">
+                                <td>{$form.is_pledge_start_date_editable.html}&nbsp;{$form.is_pledge_start_date_editable.label}</td>
+                              </tr>
+                            </table>
+                          </div>
+                        </td>
+                    </tr>
+                {/if}
                 </table>
                 </td>
             </tr>
@@ -191,9 +215,53 @@
       </div>
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
 {literal}
 <script type="text/javascript">
+
+   var futurePaymentProcessorMapper = [];
+   {/literal}{if $futurePaymentProcessor}
+   {foreach from=$futurePaymentProcessor item="futurePaymentProcessor" key="index"}{literal}
+     futurePaymentProcessorMapper[{/literal}{$index}{literal}] = '{/literal}{$futurePaymentProcessor}{literal}';
+   {/literal}{/foreach}
+   {literal}
+   CRM.$(function($) {
+     var defId = $('input[name="pledge_default_toggle"][value="contribution_date"]').attr('id');
+     var calId = $('input[name="pledge_default_toggle"][value="calendar_date"]').attr('id');
+     var monId = $('input[name="pledge_default_toggle"][value="calendar_month"]').attr('id');
+
+     $("label[for='" + calId + "']").append($('#pledge_calendar_date_field'));
+     $("label[for='" + monId + "']").append($('#pledge_calendar_month_field'));
+
+     setDateDefaults();
+
+     $("#" + defId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', 'disabled');
+         $("#pledge_calendar_date").next('input').prop('disabled', 'disabled');
+       }
+     });
+
+     $("#" + calId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', false);
+         $("#pledge_calendar_date").next('input').prop('disabled', false);
+       }
+     });
+
+     $("#" + monId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', false);
+         $("#pledge_calendar_date").next('input').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', 'disabled');
+       }
+     });
+
+
+   });
+{/literal}{/if}{literal}
+
    var paymentProcessorMapper = [];
      {/literal}
        {if $recurringPaymentProcessor}
@@ -217,8 +285,10 @@
         // show/hide recurring block
         $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').change(function(){
             showRecurring( checked_payment_processors() );
+            showAdjustRecurring( checked_payment_processors() );
         });
         showRecurring( checked_payment_processors() );
+        showAdjustRecurring( checked_payment_processors() );
     });
   var element_other_amount = document.getElementsByName('is_allow_other_amount');
     if (! element_other_amount[0].checked) {
@@ -327,6 +397,38 @@
         }
     }
 
+    function showAdjustRecurring( paymentProcessorIds ) {
+        var display = true;
+        cj.each(paymentProcessorIds, function(k, id){
+            if( cj.inArray(id, futurePaymentProcessorMapper) == -1 ) {
+                display = false;
+            }
+        });
+
+        if(display) {
+            cj( '#adjustRecurringFields' ).show( );
+        } else {
+            if ( cj( '#adjust_recur_start_date' ).prop('checked' ) ) {
+                cj( '#adjust_recur_start_date' ).prop('checked', false);
+                cj( '#recurDefaults' ).hide( );
+            }
+            cj( '#adjustRecurringFields' ).hide( );
+        }
+    }
+
+{/literal}{if $futurePaymentProcessor}{literal}
+    function setDateDefaults() {
+     {/literal}{if !$pledge_calendar_date}{literal}
+       cj('#pledge_calendar_date').prop('disabled', 'disabled');
+       cj("#pledge_calendar_date").next('input').prop('disabled', 'disabled'); 
+     {/literal}{/if}
+
+     {if !$pledge_calendar_month}{literal}
+       cj('#pledge_calendar_month').prop('disabled', 'disabled');
+     {/literal}{/if}{literal}
+    }
+{/literal}{/if}{literal}
+
 </script>
 {/literal}
 {if $form.is_recur}
@@ -334,6 +436,16 @@
     trigger_field_id    ="is_recur"
     trigger_value       ="true"
     target_element_id   ="recurFields"
+    target_element_type ="table-row"
+    field_type          ="radio"
+    invert              = "false"
+}
+{/if}
+{if $form.adjust_recur_start_date}
+{include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="adjust_recur_start_date"
+    trigger_value       ="true"
+    target_element_id   ="recurDefaults"
     target_element_type ="table-row"
     field_type          ="radio"
     invert              = "false"

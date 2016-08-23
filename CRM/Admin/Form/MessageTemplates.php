@@ -39,6 +39,9 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   // which (and whether) mailing workflow this template belongs to
   protected $_workflow_id = NULL;
 
+  // Is document file is already loaded as default value?
+  protected $_is_document = FALSE;
+
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
@@ -62,6 +65,9 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     if (empty($defaults['pdf_format_id'])) {
       $defaults['pdf_format_id'] = 'null';
     }
+    if (empty($defaults['file_type'])) {
+      $defaults['file_type'] = 0;
+    }
 
     $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $defaults);
     $this->assign('workflow_id', $this->_workflow_id);
@@ -82,12 +88,20 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       else {
         $selectedChild = 'user';
       }
+
+      $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $this->_id, TRUE);
+      if (!empty($documentInfo)) {
+        $defaults['file_type'] = 1;
+        $this->_is_document = TRUE;
+        $this->assign('attachment', $documentInfo);
+      }
+
       $cancelURL = CRM_Utils_System::url('civicrm/admin/messageTemplates', "selectedChild={$selectedChild}&reset=1");
       $cancelURL = str_replace('&amp;', '&', $cancelURL);
       $this->addButtons(
         array(
           array(
-            'type' => 'next',
+            'type' => 'upload',
             'name' => ts('Save'),
             'isDefault' => TRUE,
           ),
@@ -124,7 +138,18 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       );
     }
     else {
-      parent::buildQuickForm();
+      $this->addButtons(array(
+          array(
+            'type' => 'upload',
+            'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+            'isDefault' => TRUE,
+          ),
+          array(
+            'type' => 'cancel',
+            'name' => ts('Cancel'),
+          ),
+        )
+      );
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -143,6 +168,15 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     $this->applyFilter('__ALL__', 'trim');
     $this->add('text', 'msg_title', ts('Message Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_title'), TRUE);
+
+    $options = array(ts('Compose On-screen'), ts('Upload Document'));
+    $element = $this->addRadio('file_type', ts('Source'), $options);
+    if ($this->_id) {
+      $element->freeze();
+    }
+
+    $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
+    $this->addUploadElement("file_id");
 
     $this->add('text', 'msg_subject',
       ts('Message Subject'),
@@ -188,10 +222,42 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
 
+    $this->addFormRule(array(__CLASS__, 'formRule'), $this);
+
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
       CRM_Utils_System::setTitle(ts('View System Default Message Template'));
     }
+  }
+
+  /**
+   * Global form rule.
+   *
+   * @param array $params
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param array $self
+   *
+   * @return array
+   *   array of errors
+   */
+  public static function formRule($params, $files, $self) {
+    $errors = array();
+
+    // If user uploads non-document file other than odt/docx
+    if (!empty($files['file_id']['tmp_name']) &&
+      array_search($files['file_id']['type'], CRM_Core_SelectValues::documentApplicationType()) == NULL
+    ) {
+      $error['file_id'] = ts('Invalid document file format');
+    }
+    // If default is not set and no document file is uploaded
+    elseif (empty($files['file_id']['tmp_name']) && !empty($params['file_type']) && !$self->_is_document) {
+      //On edit page of docx/odt message template if user changes file type but forgot to upload document
+      $errors['file_id'] = ts('Please upload document');
+    }
+
+    return $errors;
   }
 
   /**
@@ -209,10 +275,29 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $params = array();
 
       // store the submitted values in an array
-      $params = $this->exportValues();
+      $params = $this->controller->exportValues($this->_name);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
+      }
+
+      if (!empty($params['file_type'])) {
+        unset($params['msg_html']);
+        unset($params['msg_text']);
+        CRM_Utils_File::formatFile($params, 'file_id');
+      }
+      // delete related file refernces if html/text/pdf template are chosen over document
+      elseif (!empty($this->_id)) {
+        $entityFileDAO = new CRM_Core_DAO_EntityFile();
+        $entityFileDAO->entity_id = $this->_id;
+        $entityFileDAO->entity_table = 'civicrm_msg_template';
+        if ($entityFileDAO->find(TRUE)) {
+          $fileDAO = new CRM_Core_DAO_File();
+          $fileDAO->id = $entityFileDAO->file_id;
+          $fileDAO->find(TRUE);
+          $entityFileDAO->delete();
+          $fileDAO->delete();
+        }
       }
 
       if ($this->_workflow_id) {

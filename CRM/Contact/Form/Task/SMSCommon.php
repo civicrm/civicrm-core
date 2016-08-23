@@ -327,8 +327,8 @@ class CRM_Contact_Form_Task_SMSCommon {
     }
 
     //Added for CRM-1393
-    if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
-      $errors['saveTemplateName'] = ts("Enter name to save message template");
+    if (!empty($fields['SMSsaveTemplate']) && empty($fields['SMSsaveTemplateName'])) {
+      $errors['SMSsaveTemplateName'] = ts("Enter name to save message template");
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -347,19 +347,20 @@ class CRM_Contact_Form_Task_SMSCommon {
     $fromSmsProviderId = $thisValues['sms_provider_id'];
 
     // process message template
-    if (!empty($thisValues['saveTemplate']) || !empty($thisValues['updateTemplate'])) {
+    if (!empty($thisValues['SMSsaveTemplate']) || !empty($thisValues['SMSupdateTemplate'])) {
       $messageTemplate = array(
         'msg_text' => $thisValues['sms_text_message'],
         'is_active' => TRUE,
+        'is_sms' => TRUE,
       );
 
-      if (!empty($thisValues['saveTemplate'])) {
-        $messageTemplate['msg_title'] = $thisValues['saveTemplateName'];
+      if (!empty($thisValues['SMSsaveTemplate'])) {
+        $messageTemplate['msg_title'] = $thisValues['SMSsaveTemplateName'];
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
-      if (!empty($thisValues['template']) && !empty($thisValues['updateTemplate'])) {
-        $messageTemplate['id'] = $thisValues['template'];
+      if (!empty($thisValues['SMStemplate']) && !empty($thisValues['SMSupdateTemplate'])) {
+        $messageTemplate['id'] = $thisValues['SMStemplate'];
         unset($messageTemplate['msg_title']);
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }

@@ -210,7 +210,6 @@ class CRM_Core_Action {
     $objectName = NULL,
     $objectId = NULL
   ) {
-    $config = CRM_Core_Config::singleton();
     if (empty($links)) {
       return NULL;
     }

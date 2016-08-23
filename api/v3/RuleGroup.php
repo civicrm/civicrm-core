@@ -55,6 +55,10 @@ function civicrm_api3_rule_group_create($params) {
  * @param array $params
  */
 function _civicrm_api3_rule_group_create_spec(&$params) {
+  $params['contact_type']['api.required'] = TRUE;
+  $params['threshold']['api.required'] = TRUE;
+  $params['used']['api.required'] = TRUE;
+  $params['name']['api.required'] = TRUE;
 }
 
 /**

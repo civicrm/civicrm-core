@@ -264,7 +264,9 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       // commonly used for both views i.e profile listing view (profileDataView) and custom data listing view (customDataView)
       $result = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_contactId, NULL, $fieldIDs, TRUE, $DTparams);
       $resultCount = !empty($result['count']) ? $result['count'] : count($result);
+      $sortedResult = !empty($result['sortedResult']) ? $result['sortedResult'] : array();
       unset($result['count']);
+      unset($result['sortedResult']);
 
       if ($this->_pageViewType == 'profileDataView') {
         if (!empty($fieldIDs)) {
@@ -389,7 +391,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $actionParams['cid'] = $actionParams['entityID'] = $this->_contactId;
                 $actionParams['recId'] = $recId;
                 $actionParams['type'] = $this->_contactType;
-                $actionParams['cgcount'] = empty($DTparams['sort']) ? $cgcount : $recId;
+                $actionParams['cgcount'] = empty($DTparams['sort']) ? $cgcount : $sortedResult[$recId];
                 $actionParams['newCgCount'] = $newCgCount;
 
                 // DELETE action links

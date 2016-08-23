@@ -323,21 +323,17 @@ AND li.entity_id = {$entityId}
    * @param array $params
    *   Reference to form values.
    * @param array $fields
-   *   Reference to array of fields belonging.
-   *                          to the price set used for particular event
+   *   Array of fields belonging to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
    *   this is
    *                          lineItem array)
-   *
-   * @return void
+   * @param string $amount_override
    */
-  public static function format($fid, &$params, &$fields, &$values) {
+  public static function format($fid, $params, $fields, &$values, $amount_override = NULL) {
     if (empty($params["price_{$fid}"])) {
       return;
     }
-
-    $optionIDs = implode(',', array_keys($params["price_{$fid}"]));
 
     //lets first check in fun parameter,
     //since user might modified w/ hooks.
@@ -354,7 +350,7 @@ AND li.entity_id = {$entityId}
     }
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
-      $price = $options[$oid]['amount'];
+      $price = $amount_override === NULL ? $options[$oid]['amount'] : $amount_override;
 
       // lets clean the price in case it is not yet cleant
       // CRM-10974
@@ -430,12 +426,12 @@ AND li.entity_id = {$entityId}
       return;
     }
 
-    foreach ($lineItem as $priceSetId => $values) {
+    foreach ($lineItem as $priceSetId => &$values) {
       if (!$priceSetId) {
         continue;
       }
 
-      foreach ($values as $line) {
+      foreach ($values as &$line) {
         $line['entity_table'] = $entityTable;
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
@@ -448,6 +444,12 @@ AND li.entity_id = {$entityId}
           if ($line['entity_table'] == 'civicrm_contribution') {
             $line['entity_id'] = $contributionDetails->id;
           }
+          // CRM-19094: entity_table is set to civicrm_membership then ensure
+          // the entityId is set to membership ID not contribution by default
+          elseif ($line['entity_table'] == 'civicrm_membership' && !empty($line['entity_id']) && $line['entity_id'] == $contributionDetails->id) {
+            $membershipId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', 'contribution_id', $line['entity_id'], 'membership_id');
+            $line['entity_id'] = $membershipId ? $membershipId : $line['entity_id'];
+          }
         }
 
         // if financial type is not set and if price field value is NOT NULL
@@ -457,12 +459,16 @@ AND li.entity_id = {$entityId}
         }
         $lineItems = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
-          CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
+          $financialItem = CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
+          $line['financial_item_id'] = $financialItem->id;
           if (!empty($line['tax_amount'])) {
             CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails, TRUE);
           }
         }
       }
+    }
+    if (!$update && $contributionDetails) {
+      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItem, $contributionDetails);
     }
   }
 

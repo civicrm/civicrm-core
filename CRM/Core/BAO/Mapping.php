@@ -72,10 +72,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     // delete from mapping_field table
     $mappingField = new CRM_Core_DAO_MappingField();
     $mappingField->mapping_id = $id;
-    $mappingField->find();
-    while ($mappingField->fetch()) {
-      $mappingField->delete();
-    }
+    $mappingField->delete();
 
     // delete from mapping table
     $mapping = new CRM_Core_DAO_Mapping();
@@ -1006,6 +1003,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           if (!is_array($value) && strstr($params['operator'][$key][$k], 'IN')) {
             $value = explode(',', $value);
             $value = array($params['operator'][$key][$k] => $value);
+          }
+          // CRM-19081 Fix legacy StateProvince Field Values.
+          // These derive from smart groups created using search builder under older
+          // CiviCRM versions.
+          if (!is_numeric($value) && $fldName == 'state_province') {
+            $value = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'state_province_id', $value);
           }
 
           if ($row) {

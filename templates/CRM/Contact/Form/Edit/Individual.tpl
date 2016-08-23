@@ -124,10 +124,8 @@ CRM.$(function($) {
       {$form.nick_name.html}
     </td>
     <td>
-      {if $buildContactSubType}
       {$form.contact_sub_type.label}<br />
       {$form.contact_sub_type.html}
-      {/if}
     </td>
   </tr>
 </table>

@@ -93,4 +93,41 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($contributionRecur['id'], CRM_Core_DAO::$_nullObject);
   }
 
+  /**
+   * Test checking if contribution recurr object can allow for changes to financial types.
+   *
+   */
+  public function testSupportFinancialTypeChange() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
+    $contribution = $this->callAPISuccess('contribution', 'create', array(
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'recieve_date' => 'yesterday',
+    ));
+    $this->assertTrue(CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($contributionRecur['id']));
+  }
+
+  /**
+   * Test we don't change unintended fields on API edit
+   */
+  public function testUpdateRecur() {
+    $createParams = $this->_params;
+    $createParams['currency'] = 'XAU';
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $createParams);
+    $editParams = array(
+      'id' => $contributionRecur['id'],
+      'end_date' => '+ 4 weeks',
+    );
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $editParams);
+    $dao = new CRM_Contribute_BAO_ContributionRecur();
+    $dao->id = $contributionRecur['id'];
+    $dao->find(TRUE);
+    $this->assertEquals('XAU', $dao->currency, 'Edit clobbered recur currency');
+  }
+
 }

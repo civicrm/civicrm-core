@@ -102,7 +102,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     ) {
       $session = CRM_Core_Session::singleton();
       $allCases = CRM_Case_BAO_Case::getCases(TRUE, $session->get('userID'), 'any');
-      if (!array_key_exists($this->_caseId, $allCases)) {
+      if (count(array_intersect($this->_caseId, array_keys($allCases))) == 0) {
         CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
       }
     }
@@ -597,7 +597,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     foreach ($vvalue as $vkey => $vval) {
       foreach ($selectedContacts as $dnt => $val) {
-        if (array_key_exists($val, $params) && !CRM_Utils_array::crmIsEmptyArray($params[$val])) {
+        if (array_key_exists($val, $params) && !CRM_Utils_Array::crmIsEmptyArray($params[$val])) {
           if ($val == 'contact_check') {
             $mailStatus = ts("A copy of the activity has also been sent to selected contacts(s).");
           }

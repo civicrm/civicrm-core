@@ -534,13 +534,8 @@ class CRM_Pledge_BAO_Query {
     $form->add('text', 'pledge_amount_high', ts('To'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('pledge_amount_high', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('99.99', ' '))), 'money');
 
-    $statusValues = CRM_Contribute_PseudoConstant::contributionStatus();
-    // Remove status values that are only used for recurring contributions for now (Failed and In Progress).
-    unset($statusValues['4']);
-    // unset in progress for payment
-    unset($statusValues['5']);
     $form->add('select', 'pledge_status_id',
-      ts('Pledge Status'), $statusValues,
+      ts('Pledge Status'), CRM_Pledge_BAO_Pledge::buildOptions('status_id'),
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
     );
 
@@ -553,7 +548,7 @@ class CRM_Pledge_BAO_Query {
     $form->addRule('pledge_installments_high', ts('Please enter number.'), 'integer');
 
     $form->add('select', 'pledge_payment_status_id',
-      ts('Pledge Payment Status'), $statusValues,
+      ts('Pledge Payment Status'), CRM_Pledge_BAO_PledgePayment::buildOptions('status_id'),
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
     );
 

@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/Contact.php';
-
 /**
  * Test class for CRM_Contact_BAO_GroupContact BAO
  *
@@ -96,48 +94,45 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    */
   public function testContactSearchByParentGroup() {
     // create a parent group
-    // TODO: This is not an API test!!
     $groupParams1 = array(
       'title' => 'Parent Group',
       'description' => 'Parent Group',
       'visibility' => 'User and User Admin Only',
-      'parents' => '',
       'is_active' => 1,
     );
-    $parentGroup = CRM_Contact_BAO_Group::create($groupParams1);
+    $parentGroup = $this->callAPISuccess('Group', 'create', $groupParams1);
 
     // create a child group
     $groupParams2 = array(
       'title' => 'Child Group',
       'description' => 'Child Group',
       'visibility' => 'User and User Admin Only',
-      'parents' => $parentGroup->id,
+      'parents' => $parentGroup['id'],
       'is_active' => 1,
     );
-    $childGroup = CRM_Contact_BAO_Group::create($groupParams2);
+    $childGroup = $this->callAPISuccess('Group', 'create', $groupParams2);
 
     // Create a contact within parent group
     $parentContactParams = array(
       'first_name' => 'Parent1 Fname',
       'last_name' => 'Parent1 Lname',
-      'group' => array($parentGroup->id => 1),
+      'group' => array($parentGroup['id'] => 1),
     );
-    $parentContact = Contact::createIndividual($parentContactParams);
+    $parentContact = $this->individualCreate($parentContactParams);
 
     // create a contact within child dgroup
     $childContactParams = array(
       'first_name' => 'Child1 Fname',
       'last_name' => 'Child2 Lname',
-      'group' => array($childGroup->id => 1),
+      'group' => array($childGroup['id'] => 1),
     );
-    $childContact = Contact::createIndividual($childContactParams);
+    $childContact = $this->individualCreate($childContactParams);
 
     // Check if searching by parent group  returns both parent and child group contacts
     $searchParams = array(
-      'group' => $parentGroup->id,
-      'version' => 3,
+      'group' => $parentGroup['id'],
     );
-    $result = civicrm_api('contact', 'get', $searchParams);
+    $result = $this->callAPISuccess('contact', 'get', $searchParams);
     $validContactIds = array($parentContact, $childContact);
     $resultContactIds = array();
     foreach ($result['values'] as $k => $v) {
@@ -148,10 +143,9 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
     // Check if searching by child group returns just child group contacts
     $searchParams = array(
-      'group' => $childGroup->id,
-      'version' => 3,
+      'group' => $childGroup['id'],
     );
-    $result = civicrm_api('contact', 'get', $searchParams);
+    $result = $this->callAPISuccess('contact', 'get', $searchParams);
     $validChildContactIds = array($childContact);
     $resultChildContactIds = array();
     foreach ($result['values'] as $k => $v) {

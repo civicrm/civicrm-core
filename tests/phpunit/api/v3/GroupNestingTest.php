@@ -183,7 +183,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
       'parent_group_id' => 1,
       'child_group_id' => 700,
     );
-    $result = $this->callAPISuccess('group_nesting', 'get', $params);
+    $this->callAPISuccess('group_nesting', 'get', $params);
   }
 
   ///////////////// civicrm_group_nesting_create methods
@@ -198,23 +198,9 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
       'child_group_id' => 3,
     );
 
-    $result = $this->callAPIAndDocument('group_nesting', 'create', $params, __FUNCTION__, __FILE__);
-
-    // we have 4 group nesting records in the example
-    // data, expecting next number to be the id for newly created
-    $id = 5;
-    $this->assertDBState('CRM_Contact_DAO_GroupNesting', $id, $params);
+    $this->callAPIAndDocument('group_nesting', 'create', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccessGetCount('GroupNesting', $params, 1);
   }
-
-  /**
-   * Test civicrm_group_nesting_create with empty parameter array.
-   * Error expected.
-   */
-  public function testCreateWithEmptyParams() {
-    $result = $this->callAPIFailure('group_nesting', 'create', array());
-  }
-
-  ///////////////// civicrm_group_nesting_remove methods
 
   /**
    * Test civicrm_group_nesting_remove.
@@ -228,16 +214,17 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('group_nesting', 'get', $getparams);
     $params = array('id' => $result['id']);
-    $result = $this->callAPIAndDocument('group_nesting', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('group_nesting', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(0, $this->callAPISuccess('group_nesting', 'getcount', $getparams));
   }
 
   /**
    * Test civicrm_group_nesting_remove with empty parameter array.
+   *
    * Error expected.
    */
   public function testDeleteWithEmptyParams() {
-    $result = $this->callAPIFailure('group_nesting', 'delete', array());
+    $this->callAPIFailure('group_nesting', 'delete', array());
   }
 
 }

@@ -119,6 +119,9 @@
     <title>Group Type</title>
     <length>128</length>
     <comment>FK to group type</comment>
+    <pseudoconstant>
+      <optionGroupName>group_type</optionGroupName>
+    </pseudoconstant>
     <add>1.9</add>
   </field>
   <field>

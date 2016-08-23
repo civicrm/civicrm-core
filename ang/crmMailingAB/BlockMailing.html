@@ -152,7 +152,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
 
     <div crm-ui-field="{name: 'subform.subject', title: ts('Subject')}" ng-if="fields.subject">
       <div style="float: right;">
-        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1"/>
+        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1">
       </div>
       <input
         crm-ui-id="subform.subject"
@@ -162,11 +162,11 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         ng-model="abtest.mailings.a.subject"
         required
         placeholder="Subject"
-        name="subject" />
+        name="subject" >
     </div>
     <div crm-ui-field="{name: 'subform.subjectA', title: ts('Subject (A)')}" ng-if="fields.subjectA">
       <div style="float: right;">
-        <input crm-mailing-token on-select="$broadcast('insert:subjectA', token.name)" tabindex="-1"/>
+        <input crm-mailing-token on-select="$broadcast('insert:subjectA', token.name)" tabindex="-1">
       </div>
       <input
         crm-ui-id="subform.subjectA"
@@ -176,11 +176,11 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         ng-model="abtest.mailings.a.subject"
         required
         placeholder="Subject"
-        name="subjectA" />
+        name="subjectA" >
     </div>
     <div crm-ui-field="{name: 'subform.subjectB', title: ts('Subject (B)')}" ng-if="fields.subjectB">
       <div style="float: right;">
-        <input crm-mailing-token on-select="$broadcast('insert:subjectB', token.name)" tabindex="-1"/>
+        <input crm-mailing-token on-select="$broadcast('insert:subjectB', token.name)" tabindex="-1">
       </div>
       <input
         crm-ui-id="subform.subjectB"
@@ -190,7 +190,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         ng-model="abtest.mailings.b.subject"
         required
         placeholder="Subject"
-        name="subjectB" />
+        name="subjectB" >
     </div>
   </div>
 </div>

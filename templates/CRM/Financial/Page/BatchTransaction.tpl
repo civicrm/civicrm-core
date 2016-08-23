@@ -42,9 +42,9 @@
   </tbody>
 </table>
 
-<div class="crm-submit-buttons">{if $statusID eq 1}{$form.close_batch.html}{/if} {$form.export_batch.html}</div>
+<div class="crm-submit-buttons">{if in_array($batchStatus, array('Open', 'Reopened'))}{$form.close_batch.html}{/if} {$form.export_batch.html}</div>
 
-{if $statusID eq 1} {* Add / remove transactions only allowed for Open batches *}
+{if in_array($batchStatus, array('Open', 'Reopened'))} {* Add / remove transactions only allowed for Open/Reopened batches *}
   <br /><div class="form-layout-compressed">{$form.trans_remove.html}&nbsp;{$form.rSubmit.html}</div><br/>
 {/if}
 
@@ -55,7 +55,7 @@
     <table id="crm-transaction-selector-remove-{$entityID}" cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
-          <th class="crm-transaction-checkbox">{if $statusID eq 1}{$form.toggleSelects.html}{/if}</th>
+          <th class="crm-transaction-checkbox">{if in_array($batchStatus, array('Open', 'Reopened'))}{$form.toggleSelects.html}{/if}</th>
           <th class="crm-contact-type"></th>
           <th class="crm-contact-name">{ts}Name{/ts}</th>
           <th class="crm-amount">{ts}Amount{/ts}</th>

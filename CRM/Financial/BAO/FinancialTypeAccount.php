@@ -86,13 +86,12 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       $financialTypeAccount->entity_table = $params['entity_table'];
       $financialTypeAccount->find(TRUE);
     }
-    else {
-      $financialTypeAccount->id = CRM_Utils_Array::value('entityFinancialAccount', $ids);
-    }
     if (!empty($ids['entityFinancialAccount'])) {
       $financialTypeAccount->id = $ids['entityFinancialAccount'];
+      $financialTypeAccount->find(TRUE);
     }
     $financialTypeAccount->copyValues($params);
+    self::validateRelationship($financialTypeAccount);
     $financialTypeAccount->save();
     return $financialTypeAccount;
   }
@@ -247,7 +246,7 @@ WHERE cog.name = 'payment_instrument' ";
         'account_type_code' => 'INC',
         'is_active' => 1,
       );
-      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, CRM_Core_DAO::$_nullArray);
+      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
     }
     else {
       $existingFinancialAccount[$dao->financial_account_type_id] = $dao->id;
@@ -295,6 +294,24 @@ WHERE cog.name = 'payment_instrument' ";
       $titles = array();
     }
     return $titles;
+  }
+
+  /**
+   * Validate account relationship with financial account type
+   *
+   * @param obj $financialTypeAccount of CRM_Financial_DAO_EntityFinancialAccount
+   *
+   */
+  public static function validateRelationship($financialTypeAccount) {
+    $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
+    $financialAccountType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialTypeAccount->financial_account_id, 'financial_account_type_id');
+    if (CRM_Utils_Array::value($financialTypeAccount->account_relationship, $financialAccountLinks) != $financialAccountType) {
+      $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+      $params = array(
+        1 => $accountRelationships[$financialTypeAccount->account_relationship],
+      );
+      throw new Exception(ts("This financial account cannot have '%1' relationship.", $params));
+    }
   }
 
 }

@@ -57,24 +57,21 @@
        //fetch object and 'POST' image
        swfobject.getObjectById("open_flash_chart_{/literal}{$uniqueId}{literal}").post_image(url, true, false);
      });
+
+     function buildChart( ) {
+       var chartData = {/literal}{$openFlashChartData}{literal};
+       $.each( chartData, function( chartID, chartValues ) {
+         var divName = {/literal}"open_flash_chart_{$uniqueId}"{literal};
+         var loadDataFunction  = {/literal}"loadData{$uniqueId}"{literal};
+
+         createSWFObject( chartID, divName, chartValues.size.xSize, chartValues.size.ySize, loadDataFunction );
+       });
+     }
    });
-
-  function buildChart( ) {
-     var chartData = {/literal}{$openFlashChartData}{literal};
-     cj.each( chartData, function( chartID, chartValues ) {
-       var xSize   = eval( "chartValues.size.xSize" );
-       var ySize   = eval( "chartValues.size.ySize" );
-       var divName = {/literal}"open_flash_chart_{$uniqueId}"{literal};
-
-       var loadDataFunction  = {/literal}"loadData{$uniqueId}"{literal};
-       createSWFObject( chartID, divName, xSize, ySize, loadDataFunction );
-     });
-  }
 
   function loadData{/literal}{$uniqueId}{literal}( chartID ) {
       var allData = {/literal}{$openFlashChartData}{literal};
-      var data    = eval( "allData." + chartID + ".object" );
-      return JSON.stringify( data );
+      return JSON.stringify(allData[chartID].object);
   }
 </script>
 {/literal}

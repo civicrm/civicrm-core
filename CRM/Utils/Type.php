@@ -49,7 +49,10 @@ class CRM_Utils_Type {
     T_CCNUM = 8192,
     T_MEDIUMBLOB = 16384;
 
-  // @todo What's the point of these constants? Backwards compatibility?
+  // @TODO What's the point of these constants? Backwards compatibility?
+  //
+  // These are used for field size (<input type=text size=2>), but redundant TWO=2
+  // usages are rare and should be eliminated. See CRM-18810.
   const
     TWO = 2,
     FOUR = 4,

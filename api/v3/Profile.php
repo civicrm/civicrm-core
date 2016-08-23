@@ -348,12 +348,24 @@ function civicrm_api3_profile_apply($params) {
   );
 
   if (empty($data)) {
-    throw new API_Exception('Enable to format profile parameters.');
+    throw new API_Exception('Unable to format profile parameters.');
   }
 
   return civicrm_api3_create_success($data);
 }
 
+/**
+ * Adjust Metadata for Apply action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_profile_apply_spec(&$params) {
+  $params['profile_id']['api.required'] = 1;
+  $params['profile_id']['title'] = 'Profile ID';
+}
 
 /**
  * Get pseudo profile 'billing'.
