@@ -79,6 +79,7 @@ class CRM_Core_ClassLoader {
       'CiviSeleniumTestCase',
       'CiviTestSuite',
       'CiviUnitTestCase',
+      'CiviEndToEndTestCase',
       'Contact',
       'ContributionPage',
       'Custom',

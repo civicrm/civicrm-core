@@ -28,7 +28,7 @@ and fill in missing test data:
 | PHPUnit |`api_v3_AllTests`|`headless`|Agnostic|`CiviUnitTestCase`|Requires `CIVICRM_UF=UnitTests`|
 | PHPUnit |`Civi\AllTests`|`headless`|Agnostic|`CiviUnitTestCase`|Requires `CIVICRM_UF=UnitTests`|
 | PHPUnit |`CRM_AllTests`|`headless`|Agnostic|`CiviUnitTestCase`|Requires `CIVICRM_UF=UnitTests`|
-| PHPUnit |`E2E_AllTests`|`e2e`|Agnostic|`PHPUnit_Framework_TestCase`|Useful for command-line scripts and web-services|
+| PHPUnit |`E2E_AllTests`|`e2e`|Agnostic|`CiviEndToEndTestCase`|Useful for command-line scripts and web-services|
 | PHPUnit |`WebTest_AllTests`|`e2e`|Drupal|`CiviSeleniumTestCase`|Useful for tests which require a full web-browser|
 | Karma ||`unit`|Agnostic|||
 | QUnit ||`e2e`|Agnostic||Run each test in a browser. See README.|
