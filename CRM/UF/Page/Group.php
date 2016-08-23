@@ -126,8 +126,8 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
         ),
       );
-      $allowHtmlSnippet = Civi::settings()->get('allow_profile_html_snippet');
-      if ($allowHtmlSnippet) {
+      $allowRemoteSubmit = Civi::settings()->get('remote_profile_submissions_allowed');
+      if ($allowRemoteSubmit) {
         self::$_actionLinks[CRM_Core_Action::PROFILE] = array(
           'name' => ts('HTML Form Snippet'),
           'url' => 'civicrm/admin/uf/group',
