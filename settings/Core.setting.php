@@ -177,10 +177,10 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
-  'remote_profile_submissions_allowed' => array(
+  'remote_profile_submissions' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
-    'name' => 'remote_profile_submissions_allowed',
+    'name' => 'remote_profile_submissions',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => FALSE,
