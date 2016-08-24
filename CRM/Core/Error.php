@@ -655,8 +655,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Generate a hash for the logfile.
    * CRM-13640.
    */
-  protected static function generateLogFileHash($config) {
-    // Use multiple (but stable) inputs for hash information. TMI?
+  public static function generateLogFileHash($config) {
+    // Use multiple (but stable) inputs for hash information.
     $md5inputs = array(
       defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
       $config->userFrameworkBaseURL,
