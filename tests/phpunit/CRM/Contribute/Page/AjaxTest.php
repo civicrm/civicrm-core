@@ -110,6 +110,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(3, $amountSortedList['recordsTotal']);
     rsort($amounts);
     foreach ($amounts as $key => $amount) {
+      $amount = CRM_Utils_Money::format($amount, 'USD');
       $this->assertEquals($amount, $amountSortedList['data'][$key]['amount']);
     }
 
@@ -153,7 +154,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
     $softCreditList = CRM_Contribute_Page_AJAX::getSoftContributionRows();
     $this->assertEquals(1, $softCreditList['recordsTotal']);
     $this->assertEquals('Gift', $softCreditList['data'][0]['sct_label']);
-    $this->assertEquals('100.00', $softCreditList['data'][0]['amount']);
+    $this->assertEquals('$ 100.00', $softCreditList['data'][0]['amount']);
     $this->assertEquals('Member Dues', $softCreditList['data'][0]['financial_type']);
   }
 

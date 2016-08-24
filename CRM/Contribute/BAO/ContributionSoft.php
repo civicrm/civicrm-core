@@ -502,7 +502,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $dTParams['total'] = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
     $result = array();
     while ($cs->fetch()) {
-      $result[$cs->id]['amount'] = $cs->amount;
+      $result[$cs->id]['amount'] = CRM_Utils_Money::format($cs->amount, $cs->currency);
       $result[$cs->id]['currency'] = $cs->currency;
       $result[$cs->id]['contributor_id'] = $cs->contributor_id;
       $result[$cs->id]['contribution_id'] = $cs->contribution_id;
