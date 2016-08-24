@@ -65,22 +65,13 @@
                 <p class="description">{ts 1="http://wkhtmltopdf.org/"}<a href="%1">wkhtmltopdf is an alternative utility for generating PDF's</a> which may provide better performance especially if you are generating a large number of PDF letters or receipts. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
             </td>
         </tr>
-        <tr class="crm-miscellaneous-form-block-recentItemsMaxCount">
-            <td class="label">{$form.recentItemsMaxCount.label}</td>
-            <td>{$form.recentItemsMaxCount.html}<br />
-                <span class="description">{$recentItemsMaxCount_description}</span></td>
-        </tr>
-        <tr class="crm-miscellaneous-form-block-recentItemsProviders">
-            <td class="label">{$form.recentItemsProviders.label}</td>
-            <td>{$form.recentItemsProviders.html}<br />
-                <span class="description">{$recentItemsProviders_description}</span></td>
-        </tr>
-        <tr class="crm-miscellaneous-form-block-remote_profile_submissions_allowed">
-          <td class="label">{$form.remote_profile_submissions_allowed.label}</td>
-          <td>{$form.remote_profile_submissions_allowed.html}<br />
+        <tr class="crm-miscellaneous-form-block-remote_profile_submissions">
+          <td class="label">{$form.remote_profile_submissions.label}</td>
+          <td>{$form.remote_profile_submissions.html}<br />
             <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles from external sites. This is disabled by default to limit abuse.{/ts}</p>
           </td>
         </tr>
+
         {foreach from=$pure_config_settings item=setting_name}
           <tr class="crm-miscellaneous-form-block-{$setting_name}">
             <td class="label">{$form.$setting_name.label}</td>
