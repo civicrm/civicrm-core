@@ -2042,7 +2042,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *  ugly.
    *
    * The use of the new hook is tested, including the fact it is called before contributions are merged, as this
-   * is likely to be siginificant data in merge hooks.
+   * is likely to be significant data in merge hooks.
    *
    * @param int $mainId
    * @param int $otherId
