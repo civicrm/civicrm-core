@@ -1545,7 +1545,17 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected function getActions($instanceId) {
     $actions = CRM_Report_BAO_ReportInstance::getActionMetadata();
     if (empty($instanceId)) {
-      $actions['report_instance.save']['title'] = ts('Create Report');
+      $actions['report_instance.save'] = array(
+        'title' => ts('Create Report'),
+        'data' => array(
+          'is_confirm' => TRUE,
+          'confirm_title' => ts('Create Report'),
+          'confirm_refresh_fields' => json_encode(array(
+            'title' => array('selector' => '.crm-report-instanceForm-form-block-title', 'prepend' => ''),
+            'description' => array('selector' => '.crm-report-instanceForm-form-block-description', 'prepend' => ''),
+          )),
+        ),
+      );
     }
 
     if (!$this->_csvSupported) {
