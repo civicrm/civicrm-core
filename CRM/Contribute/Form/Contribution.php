@@ -652,7 +652,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
+        TRUE
+      );
+      $creditCardType = $this->add('select', 'credit_card_type',
+        ts('Credit Card Type'),
+        array('' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'credit_card_type')
       );
     }
 

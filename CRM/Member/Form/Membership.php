@@ -275,10 +275,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     //setting default join date and receive date
     list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
-    if ($this->_action == CRM_Core_Action::ADD) {
-      $defaults['receive_date'] = $now;
-      $defaults['receive_date_time'] = $currentTime;
-    }
 
     if (is_numeric($this->_memType)) {
       $defaults['membership_type_id'] = array();
@@ -338,10 +334,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $defaults['source'] = $defaults['membership_source'];
       }
     }
-    //CRM-13420
-    if (empty($defaults['payment_instrument_id'])) {
-      $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
-    }
+
+    CRM_Contribute_Form_PaymentDetails::setDefaultValues($defaults, NULL);
 
     // User must explicitly choose to send a receipt in both add and update mode.
     $defaults['send_receipt'] = 0;
@@ -618,50 +612,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
 
       $this->addElement('checkbox', 'record_contribution', ts('Record Membership Payment?'));
-
-      $this->add('text', 'total_amount', ts('Amount'));
-      $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
-
-      $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
-
-      $this->add('select', 'payment_instrument_id',
-        ts('Payment Method'),
-        array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
-      );
-      $this->add('text', 'trxn_id', ts('Transaction ID'));
-      $this->addRule('trxn_id', ts('Transaction ID already exists in Database.'),
-        'objectExists', array(
-          'CRM_Contribute_DAO_Contribution',
-          $this->_id,
-          'trxn_id',
-        )
-      );
-
-      $allowStatuses = array();
-      $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
-      if ($this->_onlinePendingContributionId) {
-        $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-        foreach ($statusNames as $val => $name) {
-          if (in_array($name, array(
-            'In Progress',
-            'Overdue',
-          ))
-          ) {
-            continue;
-          }
-          $allowStatuses[$val] = $statuses[$val];
-        }
-      }
-      else {
-        $allowStatuses = $statuses;
-      }
-      $this->add('select', 'contribution_status_id',
-        ts('Payment Status'), $allowStatuses
-      );
-      $this->add('text', 'check_number', ts('Check Number'),
-        CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
-      );
+      CRM_Contribute_Form_PaymentDetails::buildQuickForm($this);
     }
     else {
       //add field for amount to allow an amount to be entered that differs from minimum
