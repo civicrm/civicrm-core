@@ -114,7 +114,7 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
           ts('Create Profile'),
           array(
             'mode' => CRM_Core_Action::ADD,
-            'ignoreKey' => $allowHtmlSnippet,
+            'ignoreKey' => $allowRemoteSubmit,
           )
         );
       }
