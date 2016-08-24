@@ -73,16 +73,6 @@
             </td>
           </tr>
         {/foreach}
-        <tr class="crm-miscellaneous-form-block-recentItemsMaxCount">
-            <td class="label">{$form.recentItemsMaxCount.label}</td>
-            <td>{$form.recentItemsMaxCount.html}<br />
-                <span class="description">{$recentItemsMaxCount_description}</span></td>
-        </tr>
-        <tr class="crm-miscellaneous-form-block-recentItemsProviders">
-            <td class="label">{$form.recentItemsProviders.label}</td>
-            <td>{$form.recentItemsProviders.html}<br />
-                <span class="description">{$recentItemsProviders_description}</span></td>
-        </tr>
         <tr class="crm-miscellaneous-form-block-remote_profile_submissions_allowed">
           <td class="label">{$form.remote_profile_submissions.label}</td>
           <td>{$form.remote_profile_submissions.html}<br />
