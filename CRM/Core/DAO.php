@@ -786,7 +786,7 @@ LIKE %1
        WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
-         AND TABLE_NAME NOT LIKE '%temp'
+         AND TABLE_NAME NOT LIKE '%_temp%'
       ");
 
     while ($dao->fetch()) {
@@ -809,7 +809,7 @@ LIKE %1
          AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
-         AND TABLE_NAME NOT LIKE '%temp'
+         AND TABLE_NAME NOT LIKE '%_temp%'
       ");
   }
 
