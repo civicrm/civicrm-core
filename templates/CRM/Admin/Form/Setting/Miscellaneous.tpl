@@ -73,7 +73,6 @@
             </td>
           </tr>
         {/foreach}
-        </tr>
         <tr class="crm-miscellaneous-form-block-recentItemsMaxCount">
             <td class="label">{$form.recentItemsMaxCount.label}</td>
             <td>{$form.recentItemsMaxCount.html}<br />
