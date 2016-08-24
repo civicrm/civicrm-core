@@ -35,34 +35,18 @@ class CRM_Contribute_Form_CloseAccPeriod extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = $period = array();
-    $period = Civi::settings()->get('closing_date');
-    if (empty($period)) {
-      $prior = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
+    $defaults = array();
+    $date = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
+    if (!empty($date)) {
+      $date = strtotime('+1 month', strtotime(date('01-m-Y', strtotime($date))));
     }
     else {
-      $defaults['closing_date'] = $period;
-      return $defaults;
+      $date = strtotime("-1 month", strtotime(date('01-m-Y')));
     }
-    if (!empty($prior)) {
-      $period = array(
-        'M' => date('n', strtotime($prior)),
-        'Y' => date('Y', strtotime($prior)),
-      );
-      if ($period['M'] == 1) {
-        $period['M'] = 12;
-      }
-      else {
-        $period['M']--;
-      }
-      $defaults['closing_date'] = $period;
-    }
-    else {
-      $defaults['closing_date'] = array(
-        'M' => date('n', strtotime("-1 month")),
-        'Y' => date('Y'),
-      );
-    }
+    $defaults['closing_date'] = array(
+      'M' => date('n', $date),
+      'Y' => date('Y', $date),
+    );
     return $defaults;
   }
 
