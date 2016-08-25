@@ -4068,9 +4068,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $info['payLater'] = $contributionIsPayLater;
     $rows = array();
     if ($getTrxnInfo && $baseTrxnId) {
-      $arRelationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-      $arAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $arRelationTypeId);
-
       // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
       $sql = "
         SELECT GROUP_CONCAT(fa.`name`) as financial_account,
@@ -4086,12 +4083,11 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           LEFT JOIN civicrm_financial_item fi ON fi.id = ef.entity_id
           INNER JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
 
-        WHERE con.id = %1 AND ft.to_financial_account_id <> %3
+        WHERE con.id = %1 AND ft.is_payment = 1
         GROUP BY ft.id";
       $queryParams = array(
         1 => array($contributionId, 'Integer'),
         2 => array($feeFinancialAccount, 'Integer'),
-        3 => array($arAccount, 'Integer'),
       );
       $resultDAO = CRM_Core_DAO::executeQuery($sql, $queryParams);
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
