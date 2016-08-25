@@ -635,7 +635,6 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
         'status_id' => $contributionDetails->contribution_status_id,
         'payment_instrument_id' => $contributionDetails->payment_instrument_id,
         'check_number' => $contributionDetails->check_number,
-        'is_payment' => 1,
       );
 
       $deferredRevenues = array();
