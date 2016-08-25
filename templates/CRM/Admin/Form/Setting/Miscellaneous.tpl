@@ -65,6 +65,13 @@
                 <p class="description">{ts 1="http://wkhtmltopdf.org/"}<a href="%1">wkhtmltopdf is an alternative utility for generating PDF's</a> which may provide better performance especially if you are generating a large number of PDF letters or receipts. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
             </td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-remote_profile_submissions">
+          <td class="label">{$form.remote_profile_submissions.label}</td>
+          <td>{$form.remote_profile_submissions.html}<br />
+            <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles from external sites. This is disabled by default to limit abuse.{/ts}</p>
+          </td>
+        </tr>
+
         {foreach from=$pure_config_settings item=setting_name}
           <tr class="crm-miscellaneous-form-block-{$setting_name}">
             <td class="label">{$form.$setting_name.label}</td>
@@ -73,9 +80,10 @@
             </td>
           </tr>
         {/foreach}
-
     </table>
-<h3>{ts}reCAPTCHA Keys{/ts}</h3>
+
+    <h3>{ts}reCAPTCHA Keys{/ts}</h3>
+
     <div class="description">
         {ts 1="https://www.google.com/recaptcha"}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use reCAPTCHA on public-facing CiviCRM forms: sign up at <a href="%1" "target=_blank">Google's reCaptcha site</a>; enter the provided public and private reCAPTCHA keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
     </div>
@@ -98,6 +106,7 @@
               </span>
             </td>
         </tr>
-        </table>
-           <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+    </table>
+
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

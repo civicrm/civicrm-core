@@ -32,7 +32,8 @@
  * $Id$
  *
  */
-/*
+
+/**
  * Settings metadata file
  */
 return array(
@@ -174,6 +175,21 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
+    'help_text' => NULL,
+  ),
+  'remote_profile_submissions' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'remote_profile_submissions',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => FALSE,
+    'html_type' => 'radio',
+    'add' => '4.7',
+    'title' => 'Accept profile submissions from external sites',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'If enabled, CiviCRM will permit submissions from external sites to profiles. This is disabled by default to limit abuse.',
     'help_text' => NULL,
   ),
   'editor_id' => array(
