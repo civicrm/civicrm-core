@@ -114,8 +114,8 @@
             </td>
         </tr>
         <tr class="crm-miscellaneous-form-block-remote_profile_submissions_allowed">
-          <td class="label">{$form.remote_profile_submissions_allowed.label}</td>
-          <td>{$form.remote_profile_submissions_allowed.html}<br />
+          <td class="label">{$form.remote_profile_submissions.label}</td>
+          <td>{$form.remote_profile_submissions.html}<br />
             <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles from external sites. This is disabled by default to limit abuse.{/ts}</p>
           </td>
         </tr>
