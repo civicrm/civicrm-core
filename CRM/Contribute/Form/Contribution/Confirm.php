@@ -2427,6 +2427,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   protected function completeTransaction($result, $contributionID) {
     if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
       try {
+        $creditCardType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn',
+          'credit_card_type',
+          array('labelColumn' => 'name', 'flip' => TRUE)
+        );
         civicrm_api3('contribution', 'completetransaction', array(
             'id' => $contributionID,
             'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
@@ -2434,6 +2438,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             'is_transactional' => FALSE,
             'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
             'receive_date' => CRM_Utils_Array::value('receive_date', $result),
+            'credit_card_type' => CRM_Utils_Array::value(CRM_Utils_Array::value('credit_card_type', $result), $creditCardType),
           )
         );
       }
