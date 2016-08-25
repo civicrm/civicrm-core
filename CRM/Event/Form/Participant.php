@@ -1454,10 +1454,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
             CRM_Contribute_BAO_Contribution::addPayments($value, $contributions);
           }
         }
-        if (CRM_Utils_Array::value($num, $contributions)) {
-          $trxnParams = array('contribution' => $contributions[$num]);
-          CRM_Contribute_BAO_Contribution::recordAlwaysAccountsReceivable($trxnParams, 'Participant');
-        }
       }
     }
 
