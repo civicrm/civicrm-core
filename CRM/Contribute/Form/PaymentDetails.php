@@ -121,9 +121,8 @@ class CRM_Contribute_Form_PaymentDetails {
       $form->assign('showTransactionId', TRUE);
     }
 
-    $form->add('select', 'credit_card_type',
-      ts('Credit Card Type'),
-      array('' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'credit_card_type')
+    $form->addSelect('credit_card_type',
+      array('entity' => 'financialTrxn', 'label' => ts('Credit Card Type'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
     $status = CRM_Contribute_PseudoConstant::contributionStatus();
 
