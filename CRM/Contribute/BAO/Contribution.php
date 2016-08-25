@@ -5323,10 +5323,16 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     $statusId = $contributionParams['contribution']->contribution_status_id;
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $contributionStatus = empty($statusId) ? NULL : $contributionStatuses[$statusId];
+    $previousContributionStatus = empty($contributionParams['prevContribution']) ? NULL : $contributionStatuses[$contributionParams['prevContribution']->contribution_status_id];
     // Return if contribution status is not completed.
-    if ($contributionStatus != 'Completed') {
+    if (!($contributionStatus == 'Completed' && (empty($previousContributionStatus)
+      || (!empty($previousContributionStatus) && $previousContributionStatus == 'Pending'
+        && $contributionParams['prevContribution']->is_pay_later == 0
+      )))
+    ) {
       return NULL;
     }
+
     $params = $trxnParams;
     $financialTypeID = CRM_Utils_Array::value('financial_type_id', $contributionParams) ? $contributionParams['financial_type_id'] : $contributionParams['prevContribution']->financial_type_id;
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
