@@ -388,6 +388,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($defaults['payment_instrument_id'])) {
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
+    if ($this->_id) {
+      $defaults['credit_card_type'] = CRM_Core_BAO_FinancialTrxn::getCreditCardType($this->_id);
+    }
 
     if (!empty($defaults['is_test'])) {
       $this->assign('is_test', TRUE);
