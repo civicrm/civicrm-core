@@ -426,6 +426,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['fee_amount'] = $params['trxnParams']['net_amount'] = 0;
     $params['trxnParams']['status_id'] = $params['contribution_status_id'];
     $params['trxnParams']['contribution_id'] = $contributionId;
+    $params['trxnParams']['is_payment'] = FALSE;
     $trxn = self::create($params['trxnParams']);
     if (empty($params['entity_id'])) {
       $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
