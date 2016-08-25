@@ -1246,6 +1246,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         'check_number',
         'campaign_id',
         'receive_date',
+        'credit_card_type',
       );
 
       foreach ($recordContribution as $f) {

@@ -1650,6 +1650,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'cancel_reason',
         'source',
         'check_number',
+        'credit_card_type',
       );
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
