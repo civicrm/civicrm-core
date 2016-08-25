@@ -658,7 +658,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         array('entity' => 'financialTrxn', 'label' => ts('Credit Card Type'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
       );
     }
-
+    if ($this->_id) {
+      $creditCardType->freeze();
+    }
     $trxnId = $this->add('text', 'trxn_id', ts('Transaction ID'), array('class' => 'twelve') + $attributes['trxn_id']);
 
     //add receipt for offline contribution
