@@ -2090,6 +2090,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       return;
     }
 
+    $customFields = array();
     $customFieldIds = array();
     foreach ($this->_params['fields'] as $fieldAlias => $value) {
       if ($fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldAlias)) {
