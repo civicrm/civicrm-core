@@ -310,6 +310,7 @@ class CRM_Utils_File {
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
       $db->query('SET SESSION sql_mode = STRICT_TRANS_TABLES');
     }
+    $db->query('SET NAMES utf8');
 
     if (!$isQueryString) {
       $string = $prefix . file_get_contents($fileName);
