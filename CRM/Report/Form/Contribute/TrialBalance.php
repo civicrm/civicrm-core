@@ -56,6 +56,14 @@ class CRM_Report_Form_Contribute_TrialBalance extends CRM_Report_Form {
             'required' => TRUE,
           ),
         ),
+        'filters' => array(
+          'contact_id' => array(
+            'title' => ts('Organization Name'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Financial_BAO_FinancialAccount::getOrganizationNames(),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+        ),
       ),
       'civicrm_financial_trxn' => array(
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
