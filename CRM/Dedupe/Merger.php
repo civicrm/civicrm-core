@@ -963,7 +963,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (in_array($field, $keysToIgnore)) {
         continue;
       }
-      if (!empty($value) && $mainAddress[$field] != $value) {
+      if (!empty($value) && isset($mainAddress[$field]) && $mainAddress[$field] != $value) {
         return FALSE;
       }
     }
