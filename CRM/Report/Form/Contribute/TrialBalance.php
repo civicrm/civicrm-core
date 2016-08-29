@@ -177,7 +177,7 @@ class CRM_Report_Form_Contribute_TrialBalance extends CRM_Report_Form {
       $creditAmount += $row['civicrm_financial_trxn_credit'];
       $debitAmount += $row['civicrm_financial_trxn_debit'];
       $row['civicrm_financial_trxn_credit'] = CRM_Utils_Money::format($row['civicrm_financial_trxn_credit']);
-      $row['civicrm_financial_trxn_debit'] = CRM_Utils_Money::format($row['civicrm_financial_trxn_debit']);    
+      $row['civicrm_financial_trxn_debit'] = CRM_Utils_Money::format($row['civicrm_financial_trxn_debit']);
     }
     $rows[] = array(
       'civicrm_financial_account_accounting_code' => ts('<b>Total Amount</b>'),
