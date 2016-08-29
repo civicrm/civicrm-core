@@ -189,7 +189,7 @@
         $('.parent_is_' + parent_id).hide();
         $('.parent_is_' + parent_id).each(function(i, obj) {
           // also hide children of children
-          var gID = $(this).find('td:nth-child(2)').text();
+          var gID = $(this).data('id');
           $('.parent_is_' + gID).hide();
         });
       }
