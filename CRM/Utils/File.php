@@ -305,7 +305,7 @@ class CRM_Utils_File {
     }
     $db->query('SET NAMES utf8');
     $transactionId = CRM_Utils_Type::escape(CRM_Utils_Request::id(), 'String');
-    $db->query('SET @uniqueID = ' . $transactionId);
+    $db->query('SET @uniqueID = ' . "'$transactionId'");
 
     if (!$isQueryString) {
       $string = $prefix . file_get_contents($fileName);
