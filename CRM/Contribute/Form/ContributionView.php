@@ -167,7 +167,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $values['campaign'] = $campaigns[$campaignId];
     }
     if ($values['contribution_status'] == 'Refunded') {
-      $this->assign('refund_trxn_id', CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnIDgi($id));
+      $this->assign('refund_trxn_id', CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($id));
     }
 
     // assign values to the template
