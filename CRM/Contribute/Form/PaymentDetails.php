@@ -39,7 +39,6 @@ class CRM_Contribute_Form_PaymentDetails {
   /**
    * Set variables up before form is built.
    *
-   * @param CRM_Core_Form $form
    */
   public static function preProcess() {
 
@@ -49,8 +48,9 @@ class CRM_Contribute_Form_PaymentDetails {
    * This function sets the default values for the form in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param CRM_Core_Form $form
-   * @param integer $contriId
+   * @param array $defaults
+   *
+   * @param int $contriId
    */
   public static function setDefaultValues(&$defaults, $contriId) {
     //CRM-13420
