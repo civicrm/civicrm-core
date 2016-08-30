@@ -188,6 +188,7 @@ class Givi {
     $this->dirStack = new DirStack();
     $this->repos = array(
       'core' => '.',
+      'backdrop' => 'backdrop',
       'drupal' => 'drupal',
       'joomla' => 'joomla',
       'packages' => 'packages',
@@ -302,7 +303,7 @@ class Givi {
       elseif (preg_match('/^--repos=(.*)/', $arg, $matches)) {
         $this->repoFilter = $matches[1];
       }
-      elseif (preg_match('/^--(core|packages|joomla|drupal|wordpress)=(.*)/', $arg, $matches)) {
+      elseif (preg_match('/^--(core|packages|joomla|drupal|wordpress|backdrop)=(.*)/', $arg, $matches)) {
         $this->branches[$matches[1]] = $matches[2];
       }
       elseif (preg_match('/^-/', $arg)) {
@@ -350,6 +351,7 @@ class Givi {
     echo "  --dry-run: Don't do anything; only print commands that would be run\n";
     echo "  --d6: Specify that Drupal branches should use 6.x-* prefixes\n";
     echo "  --d7: Specify that Drupal branches should use 7.x-* prefixes (default)\n";
+    echo "  --d8: Specify that Drupal branches should use 8.x-* prefixes\n";
     echo "  -f: When switching branches, proceed even if the index or the working tree differs from HEAD. This is used to throw away local changes.\n";
     echo "  --fetch: Fetch the latest code before creating, updating, or checking-out anything\n";
     echo "  --repos=X: Restrict operations to the listed repos (comma-delimited list) (default: all)";
@@ -359,6 +361,7 @@ class Givi {
     echo "Special options:\n";
     echo "  --core=X: Specify the branch to use on the core repository\n";
     echo "  --packages=X: Specify the branch to use on the packages repository\n";
+    echo "  --backdrop=X: Specify the branch to use on the backdrop repository\n";
     echo "  --drupal=X: Specify the branch to use on the drupal repository\n";
     echo "  --joomla=X: Specify the branch to use on the joomla repository\n";
     echo "  --wordpress=X: Specify the branch to use on the wordpress repository\n";
@@ -676,6 +679,12 @@ class Givi {
     if ($repoName == 'drupal') {
       $parts = explode('/', $branchName);
       $last = $this->drupalVersion . '.x-' . array_pop($parts);
+      array_push($parts, $last);
+      return implode('/', $parts);
+    }
+    if ($repoName == 'backdrop') {
+      $parts = explode('/', $branchName);
+      $last = '1.x-' . array_pop($parts);
       array_push($parts, $last);
       return implode('/', $parts);
     }
