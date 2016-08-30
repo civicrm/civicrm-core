@@ -289,7 +289,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('lineItem', empty($this->_lineItems) ? FALSE : $this->_lineItems);
 
     // Set title
-    if ($this->_mode) {
+    if ($this->_mode && $this->_id) {
+      $this->setPageTitle(ts('Contribution (Pay Now)'));
+    }
+    elseif ($this->_mode) {
       $this->setPageTitle($this->_ppID ? ts('Credit Card Pledge Payment') : ts('Credit Card Contribution'));
     }
     else {
@@ -743,11 +746,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       unset($status[CRM_Utils_Array::key('Chargeback', $statusName)]);
     }
 
-    $this->add('select', 'contribution_status_id',
+    $statusElement = $this->add('select', 'contribution_status_id',
       ts('Contribution Status'),
       $status,
       FALSE
     );
+
+    $currencyFreeze = FALSE;
+    if ($this->_mode && $this->_id && ($this->_action & CRM_Core_Action::UPDATE)) {
+      $statusElement->freeze();
+      $currencyFreeze = TRUE;
+      $attributes['total_amount']['readonly'] = TRUE;
+    }
 
     // CRM-16189, add Revenue Recognition Date
     if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
@@ -824,7 +834,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
       $this->assign('hasPriceSets', $hasPriceSets);
-      $currencyFreeze = FALSE;
       if (!($this->_action & CRM_Core_Action::UPDATE)) {
         if ($this->_online || $this->_ppID) {
           $attributes['total_amount'] = array_merge($attributes['total_amount'], array(
@@ -1218,6 +1227,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->set('is_deductible', TRUE);
     }
     $contributionParams = array(
+      'id' => CRM_Utils_Array::value('contribution_id', $this->_params),
       'contact_id' => $contactID,
       'line_item' => $lineItem,
       'is_test' => $isTest,
@@ -1497,6 +1507,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $pId = $contributionDetails['participant'];
         }
       }
+      $this->_params['contribution_id'] = $this->_id;
     }
 
     if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {

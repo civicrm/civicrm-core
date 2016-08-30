@@ -35,6 +35,46 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     parent::setUp();
   }
 
+  public function testPayNowLink() {
+    $this->webtestLogin();
+
+    //Offline Pay Later Contribution
+    $contact = $this->_testOfflineContribution();
+    $this->openCiviPage("contact/view", "reset=1&cid={$contact['id']}", "css=li#tab_contribute a");
+    $this->click("css=li#tab_contribute a");
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody//tr/td[8]/span/a");
+
+    $this->clickPopupLink("xpath=//table[@class='selector row-highlight']/tbody//tr/td[8]/span/a[@title='Edit Contribution']");
+    $this->waitForElementPresent('financial_type_id');
+
+    $this->clickPopupLink("xpath=//a[contains(text(), 'Pay Now')]");
+    $this->assertElementContainsText("xpath=//span[@class='ui-dialog-title']", "Edit Contribution (Pay Now)");
+    $this->assertElementNotPresent("xpath=//select[@id='currency']");
+    $this->assertNotEditable('total_amount');
+    $this->assertElementNotPresent("xpath=//select[@id='contribution_status_id']");
+
+    $this->webtestAddCreditCardDetails();
+    $this->webtestAddBillingDetails();
+
+    $this->clickAjaxLink('_qf_Contribution_upload-bottom');
+    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
+
+    $this->clickPopupLink("xpath=//table[@class='selector row-highlight']/tbody//tr/td[8]/span/a[@title='View Contribution']");
+
+    // View Contribution Record and test for expected values
+    $expected = array(
+      'From' => $contact['display_name'],
+      'Financial Type' => 'Donation',
+      'Total Amount' => '$ 100.00',
+      'Payment Method' => 'Credit Card (Test Processor)',
+      'Contribution Status' => 'Completed',
+      'Received Into' => 'Payment Processor Account',
+      'Net Amount' => '$ 98.50',
+      'Fee Amount' => '$ 1.50',
+    );
+    $this->webtestVerifyTabularData($expected);
+  }
+
   public function testUpdatePendingContribution() {
     $this->webtestLogin();
 
@@ -122,8 +162,6 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     $this->type("note", "This is a test note.");
     $this->type("non_deductible_amount", "10");
-    $this->type("fee_amount", "0");
-    $this->type("net_amount", "0");
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
@@ -151,7 +189,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     // View Contribution Record and test for expected values
     $expected = array(
       'Financial Type' => 'Donation',
-      'Total Amount' => '100.00',
+      'Total Amount' => '$ 100.00',
       'Contribution Status' => 'Pending',
       'Payment Method' => 'Check',
       'Check Number' => 'check #1041',
@@ -170,7 +208,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     // verify soft credit details
     $expected = array(
       4 => 'Donation',
-      2 => '100.00',
+      2 => '$ 100.00',
       6 => 'Pending',
       1 => $contact['display_name'],
     );
