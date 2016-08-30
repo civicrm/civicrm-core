@@ -41,7 +41,7 @@
   {if $contributionMode}
   <div class="help">
     {if $contactId}
-      {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to {if $contribID} edit {else} submit a new {/if} contribution on behalf of %1. <strong>A
         %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {else}
       {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
@@ -86,6 +86,12 @@
         {ts}(test){/ts}
       {/if} {help id="id-financial_type"}
       </td>
+      <td>
+        {if $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
+          {capture assign=payNowLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=update&id=`$contribID`&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+          <a class="open-inline-noreturn action-item crm-hover-button" href="{$payNowLink}">&raquo; {ts}Pay Now{/ts}</a>
+        {/if}
+      </td>
     </tr>
     {if $action eq 2 and $lineItem and !$defaultContribution}
     <tr>
@@ -111,7 +117,7 @@
       </td>
     </tr>
 
-      {if $buildRecurBlock}
+      {if $buildRecurBlock && !$contribID}
       <tr id='recurringPaymentBlock' class='hiddenElement'>
         <td></td>
         <td>
@@ -152,7 +158,7 @@
   {* CRM-7362 --add campaign to contributions *}
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contribution-form-block-campaign_id"}
 
-    {if $contributionMode}
+    {if $contributionMode && !$contribID}
     {if $email and $outBound_option != 2}
      <tr class="crm-contribution-form-block-is_email_receipt">
        <td class="label">{$form.is_email_receipt.label}</td>
@@ -173,14 +179,16 @@
       </td>
     </tr>
     {/if}
-    {if !$contributionMode}
+    {if !$contributionMode || $contribID}
       <tr class="crm-contribution-form-block-contribution_status_id">
         <td class="label">{$form.contribution_status_id.label}</td>
         <td>{$form.contribution_status_id.html}
         {if $contribution_status_id eq 2}{if $is_pay_later }: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
         </td>
       </tr>
+    {/if}
 
+    {if !$contributionMode}
       {* Cancellation / Refunded fields are hidden unless contribution status is set to Cancelled or Refunded*}
       <tr id="cancelInfo" class="crm-contribution-form-block-cancelInfo">
         <td>&nbsp;</td>
@@ -213,7 +221,7 @@
         </td>
       </tr>
     {/if}
-    {if $form.revenue_recognition_date}
+    {if $form.revenue_recognition_date && !$contribID}
       <tr class="crm-contribution-form-block-revenue_recognition_date">
         <td class="label">{$form.revenue_recognition_date.label}</td>
         <td>{$form.revenue_recognition_date.html}</td>
