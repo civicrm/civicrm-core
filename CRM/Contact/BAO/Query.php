@@ -3016,6 +3016,9 @@ class CRM_Contact_BAO_Query {
     elseif (is_array($groups) && count($groups)) {
       $groups = array('IN' => $groups);
     }
+    elseif (!is_array($groups) && strpos($groups, ',') !== FALSE) {
+      $groups = array('IN' => explode(',', $groups));
+    }
 
     // Find all the groups that are part of a saved search.
     $smartGroupClause = self::buildClause("id", $op, $groups, 'Int');
