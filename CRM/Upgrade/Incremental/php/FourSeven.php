@@ -225,7 +225,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Upgrade Add Help Pre and Post Fields to price value table'), 'addHelpPreAndHelpPostFieldsPriceFieldValue');
     $this->addTask(ts('Alter index and type for image URL'), 'alterIndexAndTypeForImageURL');
-    $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
   }
 
   /**
@@ -237,6 +236,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Dashboard schema updates', 'dashboardSchemaUpdate');
     $this->addTask(ts('Fill in setting "remote_profile_submissions"'), 'migrateRemoteSubmissionsSetting');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_12($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
   }
 
   /*
@@ -834,7 +843,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    * @return bool
    */
   public static function addDataTypeColumnToOptionGroupTable() {
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_option_group', 'data_type') {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_option_group', 'data_type')) {
       CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_option_group` ADD COLUMN `data_type` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL comment 'Data Type of Option Group.'");
     }
     CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `data_type` = 'Integer'
