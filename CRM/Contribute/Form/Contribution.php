@@ -1264,7 +1264,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // NOTE - I expect this is obsolete.
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       try {
-        $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+        $statuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution',
+          'contribution_status_id',
+          array('labelColumn' => 'name')
+        );
         $result = $payment->doPayment($paymentParams, 'contribute');
         $this->assign('trxn_id', $result['trxn_id']);
         $contribution->trxn_id = $result['trxn_id'];
@@ -1280,12 +1283,17 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
          */
         if ($result['payment_status_id'] == array_search('Completed', $statuses)) {
           try {
+            $creditCardType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn',
+              'credit_card_type',
+              array('labelColumn' => 'name', 'flip' => TRUE)
+            );
             civicrm_api3('contribution', 'completetransaction', array(
               'id' => $contribution->id,
               'trxn_id' => $result['trxn_id'],
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
               'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+              'credit_card_type' => CRM_Utils_Array::value(CRM_Utils_Array::value('credit_card_type', $result), $creditCardType),
             ));
             // This has now been set to 1 in the DB - declare it here also
             $contribution->contribution_status_id = 1;
