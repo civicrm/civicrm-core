@@ -118,8 +118,10 @@
 {if $is_recur}
 {if $contributeMode eq 'notify' or $contributeMode eq 'directIPN'}
 {ts 1=$cancelSubscriptionUrl}This membership will be renewed automatically. You can cancel the auto-renewal option by visiting this web page: %1.{/ts}
+{if $updateSubscriptionBillingUrl}
 
 {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
+{/if}
 {/if}
 {/if}
 
