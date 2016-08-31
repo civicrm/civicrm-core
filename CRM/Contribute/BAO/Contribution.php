@@ -3471,12 +3471,22 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
         if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
           $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
-          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+          if ($params['total_amount'] > 0) {
+            $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+          }
+          else {
+            $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
+          }
         }
       }
       else {
         $params['trxnParams']['to_financial_account_id'] = $params['to_financial_account_id'];
-        $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
+        if ($params['total_amount'] < 0) {
+          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+        }
+        else {
+          $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
+        }
       }
     }
 
