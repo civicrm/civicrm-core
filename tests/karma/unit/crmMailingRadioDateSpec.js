@@ -88,7 +88,12 @@ describe('crmMailingRadioDate', function() {
 
       var now = new Date();
       var month = '' + (now.getMonth() + 1);
-      var day = '' + (now.getDate() + 1);
+      var day = '';
+      if (now.getDate() == 31) {
+        day = '01';
+      } else {
+        day = day + (now.getDate() + 1);
+      }
       var year = (now.getFullYear() + 1);
       if (day.length < 2) day = '0' + day;
       if (month.length < 2) month = '0' + month;
