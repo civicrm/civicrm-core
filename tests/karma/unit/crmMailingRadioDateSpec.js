@@ -97,6 +97,8 @@ describe('crmMailingRadioDate', function() {
       var datenow = [year, month, day].join('-');
       var time = [hours, minutes, "00"].join(':');
       var currentDate = datenow + ' ' + time;
+      console.log(datenow);
+      console.log(currentDate);
       var ndate = new Date(datenow);
       model.the_date = currentDate;
 
