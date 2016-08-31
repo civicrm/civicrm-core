@@ -63,6 +63,7 @@
               date = [year, month, day].join('-');
               time = [hours, minutes, "00"].join(':');
               currentDate = date + ' ' + time;
+              console.log(currentDate);
               ngModel.$setValidity('dateTimeInThePast', !($(this).val().length && submittedDate < currentDate));
               if ($(this).val().length && submittedDate < currentDate) {
                 crmUiAlert({
