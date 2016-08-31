@@ -1059,6 +1059,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Function tests that financial records are updated when Payment Instrument is changed when amount is negative.
+   */
+  public function testCreateUpdateNegativeContributionPaymentInstrument() {
+    $instrumentId = $this->_addPaymentInstrument();
+    $contribParams = array(
+      'contact_id' => $this->_individualId,
+      'total_amount' => -100.00,
+      'financial_type_id' => $this->_financialTypeId,
+      'payment_instrument_id' => 4,
+      'contribution_status_id' => 1,
+
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
+
+    $newParams = array_merge($contribParams, array(
+        'id' => $contribution['id'],
+        'payment_instrument_id' => $instrumentId,
+      )
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $this->assertAPISuccess($contribution);
+    $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId, array('total_amount' => '-100.00'));
+  }
+
+  /**
    * Function tests that financial records are added when Contribution is Refunded.
    */
   public function testCreateUpdateContributionRefund() {
@@ -2798,10 +2823,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       $trxnParams1 = array(
         'id' => $trxn['financial_trxn_id'],
       );
-      $compareParams = array(
-        'total_amount' => -100,
-        'status_id' => 1,
-      );
+      if (empty($extraParams)) {
+        $compareParams = array(
+          'total_amount' => -100,
+          'status_id' => 1,
+        );
+      }
+      else {
+        $compareParams = array(
+          'total_amount' => 100,
+          'status_id' => 1,
+        );
+      }
       if ($context == 'paymentInstrument') {
         $compareParams += array(
           'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4),
