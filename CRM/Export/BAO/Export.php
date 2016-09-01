@@ -1312,7 +1312,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
         case CRM_Utils_Type::T_STRING:
           // May be option labels, which could be up to 255 characters
-          $length = max(255, CRM_Utils_Array::value('maxlength', $query->_fields[$field]));
+          $length = max(512, CRM_Utils_Array::value('maxlength', $query->_fields[$field]));
           $sqlColumns[$fieldName] = "$fieldName varchar($length)";
           break;
 
@@ -1373,7 +1373,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             switch ($query->_fields[$field]['data_type']) {
               case 'String':
                 // May be option labels, which could be up to 255 characters
-                $length = max(255, CRM_Utils_Array::value('text_length', $query->_fields[$field]));
+                $length = max(512, CRM_Utils_Array::value('text_length', $query->_fields[$field]));
                 $sqlColumns[$fieldName] = "$fieldName varchar($length)";
                 break;
 
