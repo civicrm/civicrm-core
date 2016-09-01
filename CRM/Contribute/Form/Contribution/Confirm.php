@@ -186,6 +186,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // lineItem isn't set until Register postProcess
     $this->_lineItem = $this->get('lineItem');
+    $this->_ccid = $this->get('ccid');
     $this->_paymentProcessor = $this->get('paymentProcessor');
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
@@ -1938,6 +1939,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     if (isset($this->_params['payment_processor_id']) && $this->_params['payment_processor_id'] === 0) {
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
+    }
+
+    if (!empty($this->_ccid)) {
+      $this->_params['contribution_id'] = $this->_ccid;
     }
     // add a description field at the very beginning
     $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);

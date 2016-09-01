@@ -34,7 +34,10 @@
                     <th>{ts}Receipt Sent{/ts}</th>
                     <th>{ts}Status{/ts}</th>
                     {if $invoicing && $invoices}
-                        <th></th>
+                      <th></th>
+                    {/if}
+                    {if $invoicing && $defaultInvoicePage}
+                      <th></th>
                     {/if}
                 </tr>
 
@@ -57,7 +60,7 @@
                             {assign var='contact_id' value=$row.contact_id}
                             {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
                             {if call_user_func(array('CRM_Core_Permission','check'), 'view my invoices') OR call_user_func(array('CRM_Core_Permission','check'), 'access CiviContribute')}
-                                <a class="button no-popup "
+                                <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
                                     <i class="crm-i fa-print"></i>
                                     {if $row.contribution_status != 'Refunded' && $row.contribution_status != 'Cancelled' }
@@ -67,6 +70,13 @@
                                     {/if}
                                 </a>
                             {/if}
+                          </td>
+                        {/if}
+                        {if $defaultInvoicePage && $row.contribution_status == 'Pending (Pay Later)'}
+                          <td>
+                            {assign var='id' value=$row.contribution_id}
+                            {capture assign=payNowLink}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$defaultInvoicePage`&ccid=`$id`"}{/capture}
+                            <a class="button" href="{$payNowLink}"><span class='nowrap'>{ts}Pay Now{/ts}</span></a>
                           </td>
                         {/if}
                     </tr>

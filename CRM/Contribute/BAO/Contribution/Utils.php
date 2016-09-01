@@ -92,6 +92,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     if ($isPaymentTransaction) {
       $contributionParams = array(
+        'id' => CRM_Utils_Array::value('contribution_id', $paymentParams),
         'contact_id' => $contactID,
         'line_item' => $lineItems,
         'is_test' => $isTest,
