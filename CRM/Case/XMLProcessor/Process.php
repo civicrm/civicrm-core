@@ -313,7 +313,10 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param SimpleXMLElement $caseTypeXML
-   * @return array<string> symbolic activity-type names
+   * @return array[]
+   *   List of activity types along with their component name. Each activity type is an array with keys:
+   *    'name': string; activity type name
+   *    'component_name': string; activity type component name ( e.g : CiviCase )
    */
   public function getDeclaredActivityTypes($caseTypeXML) {
     $result = array();
