@@ -23,75 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Provide meta-data for this api.
  *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
+ * @param array $params
+ */
+function _civicrm_api3_generic_validate_spec(&$params) {
+  $params['action']['api.required'] = TRUE;
+  $params['action']['title'] = ts('API Action');
+}
+
+/**
+ * Generic api wrapper used for validation of entity-action pair.
  *
+ * @param array $apiRequest
+ *
+ * @return mixed
  */
-require_once 'civicrm_rules_utils.inc';
-require_once 'civicrm_rules.contact-eval.inc';
-require_once 'civicrm_rules.mailing-eval.inc';
-require_once 'civicrm_rules.event-eval.inc';
-require_once 'civicrm_rules.participant-eval.inc';
+function civicrm_api3_generic_validate($apiRequest) {
+  $errors = _civicrm_api3_validate($apiRequest['entity'], $apiRequest['params']['action'], $apiRequest['params']);
 
-/**
- * Implements hook_rules_file_info() on behalf of the user module.
- */
-function civicrm_rules_rules_file_info() {
-  return array(
-    'civicrm_rules.contact-eval',
-    'civicrm_rules.mailing-eval',
-    'civicrm_rules.event-eval',
-    'civicrm_rules.participant-eval',
-  );
+  return civicrm_api3_create_success($errors, $apiRequest['params'], $apiRequest['entity'], 'validate');
 }
-
-/**
- * Implementation of hook_rules_event_info().
- */
-function civicrm_rules_rules_event_info() {
-  require_once 'civicrm_rules_event.inc';
-  return civicrm_rules_get_event();
-}
-
-function civicrm_rules_rules_condition_info() {
-  require_once 'civicrm_rules_condition.inc';
-  return civicrm_rules_get_condition();
-}
-
-/**
- * CiviCRM integration access callback.
- */
-function civicrm_rules_rules_integration_access($type, $name) {
-  if ($type == 'event' || $type == 'condition') {
-    return user_access('access CiviCRM');
-  }
-}
-
-/**
- * CiviCRM integration admin access callback.
- */
-function civicrm_rules_rules_admin_access() {
-  return user_access('administer CiviCRM');
-}
-
-/**
- * Implementation of hook_rules_action_info().
- */
-function civicrm_rules_rules_action_info() {
-  require_once 'civicrm_rules_action.inc';
-  return civicrm_rules_get_action();
-}
-
-/**
- * Implementation of hook_rules_data_type_info().
- */
-function civicrm_rules_rules_data_info() {
-  require_once 'civicrm_rules_entity.inc';
-  return civicrm_rules_get_entity();
-}
-

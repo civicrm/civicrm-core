@@ -486,9 +486,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
 
-    // get All Payments status types.
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
     $fields = array(
       'frequency_unit',
       'frequency_interval',
@@ -505,14 +502,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $params[$f] = CRM_Utils_Array::value($f, $formValues);
     }
 
-    // defaults status is "Pending".
-    // if update get status.
-    if ($this->_id) {
-      $params['pledge_status_id'] = $params['status_id'] = $this->_values['status_id'];
-    }
-    else {
-      $params['pledge_status_id'] = $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
-    }
     // format amount
     $params['amount'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('amount', $formValues));
     $params['currency'] = CRM_Utils_Array::value('currency', $formValues);

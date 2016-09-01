@@ -55,15 +55,15 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
    * Build a queue of tasks by dividing dupe pairs in batches.
    */
   public static function getRunner() {
-    $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
-    $gid  = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
+    $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
+    $gid  = CRM_Utils_Request::retrieve('gid', 'Positive');
+    $limit  = CRM_Utils_Request::retrieve('limit', 'Positive');
     $action = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
     $mode   = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'safe');
 
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
 
-    $urlQry = "reset=1&action=update&rgid={$rgid}";
-    $urlQry = $gid ? ($urlQry . "&gid={$gid}") : $urlQry;
+    $urlQry = "reset=1&action=update&rgid={$rgid}&gid={$gid}&limit={$limit}";
 
     if ($mode == 'aggressive' && !CRM_Core_Permission::check('force merge duplicate contacts')) {
       CRM_Core_Session::setStatus(ts('You do not have permission to force merge duplicate contact records'), ts('Permission Denied'), 'error');

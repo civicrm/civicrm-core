@@ -640,8 +640,8 @@ LIMIT {$offset}, {$rowCount}
     $offset    = isset($_REQUEST['start']) ? CRM_Utils_Type::escape($_REQUEST['start'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['length']) ? CRM_Utils_Type::escape($_REQUEST['length'], 'Integer') : 25;
 
-    $gid         = isset($_REQUEST['gid']) ? CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer') : 0;
-    $rgid        = isset($_REQUEST['rgid']) ? CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer') : 0;
+    $gid = CRM_Utils_Request::retrieve('gid', 'Positive');
+    $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
     $selected    = isset($_REQUEST['selected']) ? CRM_Utils_Type::escape($_REQUEST['selected'], 'Integer') : 0;
     if ($rowCount < 0) {
       $rowCount = 0;
@@ -802,7 +802,7 @@ LIMIT {$offset}, {$rowCount}
       $searchRows[$count]['weight'] = CRM_Utils_Array::value('weight', $pair);
 
       if (!empty($pairInfo['data']['canMerge'])) {
-        $mergeParams = "reset=1&cid={$pairInfo['entity_id1']}&oid={$pairInfo['entity_id2']}&action=update&rgid={$rgid}";
+        $mergeParams = "reset=1&cid={$pairInfo['entity_id1']}&oid={$pairInfo['entity_id2']}&action=update&rgid={$rgid}&limit=" . CRM_Utils_Request::retrieve('limit', 'Integer');
         if ($gid) {
           $mergeParams .= "&gid={$gid}";
         }
@@ -923,7 +923,7 @@ LIMIT {$offset}, {$rowCount}
     }
     $prevNextId = CRM_Utils_Type::escapeAll((array) $prevNextId, 'Positive');
     CRM_Core_BAO_PrevNextCache::flipPair($prevNextId, $onlySelected);
-    CRM_Utils_JSON::output();
+    CRM_Utils_System::civiExit();
   }
 
   /**

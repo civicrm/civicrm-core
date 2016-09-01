@@ -94,6 +94,8 @@ class CRM_Core_Menu {
       foreach ($files as $file) {
         self::read($file, self::$_items);
       }
+
+      CRM_Utils_Hook::alterMenu(self::$_items);
     }
 
     return self::$_items;

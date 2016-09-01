@@ -5042,6 +5042,7 @@ LIMIT 1;";
     );
     $valuesToCopy = array(
       // These are the values that I believe to be useful.
+      'id',
       'title',
       'is_email_receipt',
       'pay_later_receipt',

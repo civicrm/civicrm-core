@@ -159,11 +159,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       $params['amount'] = $params['installment_amount'] * $params['installments'];
     }
 
-    // get All Payments status types.
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
-    // update the pledge status only if it does NOT come from form
-    if (!isset($params['pledge_status_id'])) {
+    if (!isset($params['pledge_status_id']) && !isset($params['status_id'])) {
       if (isset($params['contribution_id'])) {
         if ($params['installments'] > 1) {
           $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'In Progress');
@@ -352,9 +348,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
     $where = array();
     $select = $from = $queryDate = NULL;
-    // get all status
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $statusId = array_search($status, $allStatus);
+    $statusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', $status);
 
     switch ($status) {
       case 'Completed':
@@ -1287,92 +1281,6 @@ SELECT  pledge.contact_id              as contact_id,
       $result = array_diff($result, array('Failed'));
     }
     return $result;
-  }
-
-  /**
-   * Create array for recur record for pledge.
-   * @return array
-   *   params for recur record
-   */
-  public static function buildRecurParams($params) {
-    $recurParams = array(
-      'is_recur' => TRUE,
-      'auto_renew' => TRUE,
-      'frequency_unit' => $params['pledge_frequency_unit'],
-      'frequency_interval' => $params['pledge_frequency_interval'],
-      'installments' => $params['pledge_installments'],
-      'start_date' => $params['receive_date'],
-    );
-    return $recurParams;
-  }
-
-  /**
-   * Get pledge start date.
-   *
-   * @return string
-   *   start date
-   */
-  public static function getPledgeStartDate($date, $pledgeBlock) {
-    $startDate = (array) json_decode($pledgeBlock['pledge_start_date']);
-    list($field, $value) = each($startDate);
-    if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
-      return date('Ymd', strtotime($value));
-    }
-    if (!CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
-      return $date;
-    }
-    switch ($field) {
-      case 'contribution_date':
-        $date = date('Ymd');
-        break;
-
-      case 'calendar_date':
-        $date = date('Ymd', strtotime($date));
-        break;
-
-      case 'calendar_month':
-        $date = self::getPaymentDate($date);
-        $date = date('Ymd', strtotime($date));
-        break;
-
-      default:
-        break;
-
-    }
-    return $date;
-  }
-
-  /**
-   * Get first payment date for pledge.
-   *
-   */
-  public static function getPaymentDate($day) {
-    if ($day == 31) {
-      // Find out if current month has 31 days, if not, set it to 30 (last day).
-      $t = date('t');
-      if ($t != $day) {
-        $day = $t;
-      }
-    }
-    $current = date('d');
-    switch (TRUE) {
-      case ($day == $current):
-        $date = date('m/d/Y');
-        break;
-
-      case ($day > $current):
-        $date = date('m/d/Y', mktime(0, 0, 0, date('m'), $day, date('Y')));
-        break;
-
-      case ($day < $current):
-        $date = date('m/d/Y', mktime(0, 0, 0, date('m', strtotime("+1 month")), $day, date('Y')));
-        break;
-
-      default:
-        break;
-
-    }
-    return $date;
   }
 
 }

@@ -318,6 +318,14 @@ class CRM_Utils_Mail_Incoming {
     // and put it in a standardized format
     $params = array('is_error' => 0);
 
+    // Sometimes $mail->from is unset because ezcMail didn't handle format
+    // of From header. CRM-19215.
+    if (!isset($mail->from)) {
+      if (preg_match('/^([^ ]*)( (.*))?$/', $mail->getHeader('from'), $matches)) {
+        $mail->from = new ezcMailAddress($matches[1], trim($matches[2]));
+      }
+    }
+
     $params['from'] = array();
     self::parseAddress($mail->from, $field, $params['from'], $mail);
 

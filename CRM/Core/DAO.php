@@ -2124,6 +2124,7 @@ SELECT contact_id
 
   /**
    * Get options for the called BAO object's field.
+   *
    * This function can be overridden by each BAO to add more logic related to context.
    * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
    *

@@ -1545,7 +1545,17 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected function getActions($instanceId) {
     $actions = CRM_Report_BAO_ReportInstance::getActionMetadata();
     if (empty($instanceId)) {
-      $actions['report_instance.save']['title'] = ts('Create Report');
+      $actions['report_instance.save'] = array(
+        'title' => ts('Create Report'),
+        'data' => array(
+          'is_confirm' => TRUE,
+          'confirm_title' => ts('Create Report'),
+          'confirm_refresh_fields' => json_encode(array(
+            'title' => array('selector' => '.crm-report-instanceForm-form-block-title', 'prepend' => ''),
+            'description' => array('selector' => '.crm-report-instanceForm-form-block-description', 'prepend' => ''),
+          )),
+        ),
+      );
     }
 
     if (!$this->_csvSupported) {
@@ -2080,6 +2090,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       return;
     }
 
+    $customFields = array();
     $customFieldIds = array();
     foreach ($this->_params['fields'] as $fieldAlias => $value) {
       if ($fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldAlias)) {
@@ -4538,6 +4549,26 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'title' => ts('Deceased'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'default' => 0,
+      ),
+      'do_not_email' => array(
+        'title' => ts('Do not email'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_phone' => array(
+        'title' => ts('Do not phone'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_mail' => array(
+        'title' => ts('Do not mail'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_sms' => array(
+        'title' => ts('Do not SMS'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'is_opt_out' => array(
+        'title' => ts('Do not bulk email'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
       ),
     );
   }

@@ -331,26 +331,20 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     }
 
     // set pledge payment related fields
-    $status = CRM_Utils_Request::retrieve('status', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $status = CRM_Utils_Request::retrieve('status', 'String');
     if ($status) {
       $this->_formValues['pledge_payment_status_id'] = array($status => 1);
       $this->_defaults['pledge_payment_status_id'] = array($status => 1);
     }
 
-    $fromDate = CRM_Utils_Request::retrieve('start', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
     if ($fromDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($fromDate);
       $this->_formValues['pledge_payment_date_low'] = $date;
       $this->_defaults['pledge_payment_date_low'] = $date;
     }
 
-    $toDate = CRM_Utils_Request::retrieve('end', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $toDate = CRM_Utils_Request::retrieve('end', 'Date');
     if ($toDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($toDate);
       $this->_formValues['pledge_payment_date_high'] = $date;

@@ -99,6 +99,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
       $postUpgradeMessage .= '<p>' . ts('The custom fatal error template setting has been removed.') . '</p>';
     }
+    if ($rev == '4.7.11') {
+      $postUpgradeMessage .= '<br /><br />' . ts("WARNING: For increased security, profile submissions embedded in remote sites are no longer allowed to create or edit data by default. If you need to allow users to submit profiles from external sites, you can restore this at Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) > 'Accept profile submissions from external sites'");
+    }
   }
 
   /**
