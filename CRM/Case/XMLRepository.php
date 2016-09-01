@@ -231,7 +231,7 @@ class CRM_Case_XMLRepository {
 
   /**
    * @return array[]
-   *   @see CRM_Case_XMLProcessor_Process::getDeclaredActivityTypes()
+   * @see CRM_Case_XMLProcessor_Process::getDeclaredActivityTypes()
    */
   public function getAllDeclaredActivityTypes() {
     $result = array();
