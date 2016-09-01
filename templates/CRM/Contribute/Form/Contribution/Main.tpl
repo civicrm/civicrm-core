@@ -348,6 +348,8 @@
   }
 
   function hidePayLater() {
+    cj('#billingcheckbox').hide();
+    cj('#billingcheckbox').next('label').hide();
     cj('input:radio[name="payment_processor_id"][value=0]').hide();
     cj('input:radio[name="payment_processor_id"][value=0]').next('label').hide();
   }
