@@ -62,10 +62,31 @@ class CRM_Utils_Check_Security {
       $this->checkLogFileIsNotAccessible(),
       $this->checkUploadsAreNotAccessible(),
       $this->checkDirectoriesAreNotBrowseable(),
-      $this->checkFilesAreNotPresent()
+      $this->checkFilesAreNotPresent(),
+      $this->checkRemoteProfile()
     );
     return $messages;
   }
+
+  /**
+   * Discourage use of remote profile forms.
+   */
+  public function checkRemoteProfile() {
+    $messages = array();
+
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'remote_profile_submissions')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Warning: External profile support (aka "HTML Snippet" support) is enabled in <a href="%1">system settings</a>. This setting may be prone to abuse. If you must retain it, consider HTTP throttling or other protections.',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1'))
+        ),
+        ts('Remote Profiles Enabled')
+      );
+    }
+
+    return $messages;
+  }
+
 
   /**
    * Check if our logfile is directly accessible.
