@@ -319,13 +319,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public function buildQuickForm() {
     // build profiles first so that we can determine address fields etc
     // and then show copy address checkbox
-    $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
-    $this->buildCustom($this->_values['custom_post_id'], 'customPost');
+    if (empty($this->_ccid)) {
+      $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
+      $this->buildCustom($this->_values['custom_post_id'], 'customPost');
 
-    // CRM-18399: used by template to pass pre profile id as a url arg
-    $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
+      // CRM-18399: used by template to pass pre profile id as a url arg
+      $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
 
-    $this->buildComponentForm($this->_id, $this);
+      $this->buildComponentForm($this->_id, $this);
+    }
 
     // Build payment processor form
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
@@ -1151,7 +1153,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->set('amount_level', CRM_Utils_Array::value('amount_level', $params));
     }
 
-    if ($this->_ccid) {
+    if (!empty($this->_ccid)) {
       $this->set('lineItem', $this->_lineItem);
     }
     elseif ($priceSetId = CRM_Utils_Array::value('priceSetId', $params)) {

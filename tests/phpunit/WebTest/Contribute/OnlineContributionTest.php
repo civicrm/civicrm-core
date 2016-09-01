@@ -505,7 +505,10 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
- public function testOnlineContributionWithPayNowLink() {
+  /**
+   * CRM-19263 - Test online pay now functionality
+   */
+  public function testOnlineContributionWithPayNowLink() {
     $this->webtestLogin();
     $pageId = 1;
     $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", 'is_pay_later');
@@ -584,7 +587,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
       1 => '$ 588.50',
       2 => '$ 98.50',
     );
-    foreach($amountValues as $row => $amount) {
+    foreach ($amountValues as $row => $amount) {
       $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[{$row}]/td[8]/span//a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
       // View Contribution Record and test for expected values
@@ -603,6 +606,11 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * Contribute using pay now link
+   * @param string $firstName
+   * @param bool $priceSet
+   */
   public function _testContributeWithPayNow($firstName, $priceSet = FALSE) {
     //user dashboard
     $this->openCiviPage("user", "reset=1");
@@ -638,6 +646,13 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
   }
 
+  /**
+   * Contribute with pay later
+   *
+   * @param int $pageId
+   * @param string $firstName
+   * @param bool $priceSet
+   */
   public function _testContributeWithPayLater($pageId, $firstName, $priceSet = FALSE) {
     $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", NULL);
     $this->waitForElementPresent("email-5");
@@ -671,6 +686,14 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//div[@class='help']/div/p", $payLaterInstructionsText);
   }
 
+  /**
+   * Create test user
+   *
+   * @param string $firstName
+   * @param string $lastName
+   *
+   * @return string
+   */
   public function _testCreateUser($firstName, $lastName) {
     $this->open($this->sboxPath . "admin/people/create");
 
