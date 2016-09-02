@@ -370,13 +370,13 @@ ALTER TABLE {$tableName}
   /**
    * @param string $tableName
    * @param string $columnName
-   * @param bool $l10n
+   * @param bool $l18n
    *
    */
-  public static function dropColumn($tableName, $columnName, $l10n = FALSE) {
+  public static function dropColumn($tableName, $columnName, $l18n = FALSE) {
     if (self::checkIfFieldExists($tableName, $columnName)) {
       $sql = "ALTER TABLE $tableName DROP COLUMN $columnName";
-      if ($l10n) {
+      if ($l18n) {
         CRM_Core_DAO::executeQuery($sql);
       }
       else {
