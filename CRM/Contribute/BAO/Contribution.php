@@ -4617,8 +4617,8 @@ LIMIT 1;";
       if (!empty($ids['related_contact'])) {
         $targetContactID = $contribution->contact_id;
         $contribution->contact_id = $ids['related_contact'];
+        CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
       }
-      CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
       // event
     }
     else {
