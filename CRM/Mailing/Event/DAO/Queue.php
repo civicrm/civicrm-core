@@ -33,8 +33,7 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
-class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
-{
+class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
   /**
    * static instance to hold the table name
    *
@@ -120,8 +119,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
    *
    * @return civicrm_mailing_event_queue
    */
-  function __construct()
-  {
+  function __construct() {
     $this->__table = 'civicrm_mailing_event_queue';
     parent::__construct();
   }
@@ -131,8 +129,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
    * @return array
    *   [CRM_Core_Reference_Interface]
    */
-  static function getReferenceColumns()
-  {
+  static function getReferenceColumns() {
     if (!self::$_links) {
       self::$_links = static ::createReferenceColumns(__CLASS__);
       self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'job_id', 'civicrm_mailing_job', 'id');
@@ -147,8 +144,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &fields()
-  {
+  static function &fields() {
     if (!(self::$_fields)) {
       self::$_fields = array(
         'id' => array(
@@ -208,8 +204,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &fieldKeys()
-  {
+  static function &fieldKeys() {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id',
@@ -227,8 +222,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
    *
    * @return string
    */
-  static function getTableName()
-  {
+  static function getTableName() {
     return self::$_tableName;
   }
   /**
@@ -236,8 +230,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
    *
    * @return boolean
    */
-  function getLog()
-  {
+  function getLog() {
     return self::$_log;
   }
   /**
@@ -247,8 +240,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &import($prefix = false)
-  {
+  static function &import($prefix = false) {
     if (!(self::$_import)) {
       self::$_import = array();
       $fields = self::fields();
@@ -271,8 +263,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &export($prefix = false)
-  {
+  static function &export($prefix = false) {
     if (!(self::$_export)) {
       self::$_export = array();
       $fields = self::fields();

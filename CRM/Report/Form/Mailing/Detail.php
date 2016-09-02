@@ -62,7 +62,6 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
         'id' => array(
           'title' => ts('Contact ID'),
           'no_display' => TRUE,
-          'required' => TRUE,
         ),
       ),
       'order_bys' => array(

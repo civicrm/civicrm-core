@@ -368,8 +368,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (isset($params['group_type'])) {
       if (is_array($params['group_type'])) {
         $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-            array_keys($params['group_type'])
+            $params['group_type']
           ) . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+      else {
+        $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['group_type'] . CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
     else {
@@ -387,6 +390,14 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $params['modified_id'] = $cid;
     }
 
+    // CRM-19068.
+    // Validate parents parameter when creating group.
+    if (!empty($params['parents'])) {
+      $parents = is_array($params['parents']) ? array_keys($params['parents']) : (array) $params['parents'];
+      foreach ($parents as $parent) {
+        CRM_Utils_Type::validate($parent, 'Integer');
+      }
+    }
     $group = new CRM_Contact_BAO_Group();
     $group->copyValues($params);
     //@todo very hacky fix for the fact this function wants to receive 'parents' as an array further down but
@@ -506,7 +517,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * and store it for future use
    */
   public function buildClause() {
-    $params = array(array('group', 'IN', array($this->id => 1), 0, 0));
+    $params = array(array('group', 'IN', array($this->id), 0, 0));
 
     if (!empty($params)) {
       $tables = $whereTables = array();
@@ -1304,6 +1315,22 @@ WHERE {$whereClause}";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 
     return CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
+  }
+
+  /**
+   * Assign Test Value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'children' || $fieldName = 'parents') {
+      $this->{$fieldName} = "NULL";
+    }
+    else {
+      parent::assignTestValues($fieldaName, $fieldDef, $counter);
+    }
   }
 
 }

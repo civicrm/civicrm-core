@@ -33,8 +33,7 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
-class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO
-{
+class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
   /**
    * static instance to hold the table name
    *
@@ -151,8 +150,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO
    *
    * @return civicrm_cxn
    */
-  function __construct()
-  {
+  function __construct() {
     $this->__table = 'civicrm_cxn';
     parent::__construct();
   }
@@ -161,8 +159,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &fields()
-  {
+  static function &fields() {
     if (!(self::$_fields)) {
       self::$_fields = array(
         'id' => array(
@@ -253,8 +250,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &fieldKeys()
-  {
+  static function &fieldKeys() {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id',
@@ -277,8 +273,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO
    *
    * @return string
    */
-  static function getTableName()
-  {
+  static function getTableName() {
     return self::$_tableName;
   }
   /**
@@ -286,8 +281,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO
    *
    * @return boolean
    */
-  function getLog()
-  {
+  function getLog() {
     return self::$_log;
   }
   /**
@@ -297,8 +291,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &import($prefix = false)
-  {
+  static function &import($prefix = false) {
     if (!(self::$_import)) {
       self::$_import = array();
       $fields = self::fields();
@@ -321,8 +314,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &export($prefix = false)
-  {
+  static function &export($prefix = false) {
     if (!(self::$_export)) {
       self::$_export = array();
       $fields = self::fields();

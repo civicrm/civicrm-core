@@ -78,8 +78,6 @@ AND    {$this->_componentClause}";
       CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
     }
 
-    // we have all the contribution ids, so now we get the contact ids
-    parent::setContactIDs();
     $this->assign('single', $this->_single);
 
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
@@ -95,7 +93,9 @@ AND    {$this->_componentClause}";
         'title' => ts('Search Results'),
       ),
     );
-
+    CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this, FALSE);
+    // we have all the contribution ids, so now we get the contact ids
+    parent::setContactIDs();
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
   }
@@ -109,7 +109,9 @@ AND    {$this->_componentClause}";
   public function buildQuickForm() {
 
     $this->addElement('radio', 'output', NULL, ts('Email Receipts'), 'email_receipt',
-      array('onClick' => "document.getElementById('selectPdfFormat').style.display = 'none';")
+      array(
+        'onClick' => "document.getElementById('selectPdfFormat').style.display = 'none';
+        document.getElementById('selectEmailFrom').style.display = 'block';")
     );
     $this->addElement('radio', 'output', NULL, ts('PDF Receipts'), 'pdf_receipt',
       array('onClick' => "document.getElementById('selectPdfFormat').style.display = 'block';")
@@ -121,6 +123,8 @@ AND    {$this->_componentClause}";
     );
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
     $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do no email / Do not mail)'), FALSE);
+
+    $this->add('select', 'fromEmailAddress', ts('From Email'), $this->_fromEmails, FALSE, array('class' => 'crm-select2 huge'));
 
     $this->addButtons(array(
         array(
@@ -193,7 +197,18 @@ AND    {$this->_componentClause}";
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
       $values = array();
-      $mail = $elements['baseIPN']->sendMail($input, $ids, $objects, $values, FALSE, $elements['createPdf']);
+
+      if (isset($params['fromEmailAddress']) && !$elements['createPdf']) {
+        // CRM-19129 Allow useres the choice of From Email to send the receipt from.
+        $fromEmail = $params['fromEmailAddress'];
+        $from = CRM_Utils_Array::value($fromEmail, $this->_emails);
+        $fromDetails = explode(' <', $from);
+        $input['receipt_from_email'] = substr(trim($fromDetails[1]), 0, -1);
+        $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
+      }
+
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values, FALSE,
+        $elements['createPdf']);
 
       if ($mail['html']) {
         $message[] = $mail['html'];

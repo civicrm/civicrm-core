@@ -213,17 +213,6 @@ AND    g.refresh_date IS NULL
   }
 
   /**
-   * Fill the group contact cache if it is empty.
-   *
-   * Do this by the expensive operation of loading all groups. Call sparingly.
-   */
-  public static function fillIfEmpty() {
-    if (!CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_group_contact_cache")) {
-      self::loadAll();
-    }
-  }
-
-  /**
    * Build the smart group cache for a given group.
    *
    * @param int $groupID
@@ -237,7 +226,7 @@ AND    g.refresh_date IS NULL
 
     $returnProperties = array('contact_id');
     foreach ($groupID as $gid) {
-      $params = array(array('group', 'IN', array($gid => 1), 0, 0));
+      $params = array(array('group', 'IN', array($gid), 0, 0));
       // the below call updates the cache table as a byproduct of the query
       CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, FALSE);
     }

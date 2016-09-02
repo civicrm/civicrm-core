@@ -49,7 +49,7 @@ include_once 'Beautifier/Exception.php';
 /**
  * Require StreamWrapper
  */
-include_once 'Beautifier/StreamWrapper.php';
+// include_once 'Beautifier/StreamWrapper.php';
 /**
  * PHP_Beautifier
  *
