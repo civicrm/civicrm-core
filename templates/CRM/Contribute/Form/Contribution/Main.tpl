@@ -321,14 +321,9 @@
   </div>
   {/if}
 </div>
-
 <script type="text/javascript">
   {if $isHonor}
   pcpAnonymous();
-  {/if}
-
-  {if $hidePayLater}
-    hidePayLater();
   {/if}
 
   {literal}
@@ -345,13 +340,6 @@
     else {
       cj('#honorType').hide();
     }
-  }
-
-  function hidePayLater() {
-    cj('#billingcheckbox').hide();
-    cj('#billingcheckbox').next('label').hide();
-    cj('input:radio[name="payment_processor_id"][value=0]').hide();
-    cj('input:radio[name="payment_processor_id"][value=0]').next('label').hide();
   }
 
   cj('input[id="is_recur"]').on('change', function() {

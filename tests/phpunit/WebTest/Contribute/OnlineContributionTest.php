@@ -631,7 +631,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isElementPresent("xpath=//div[@class='crm-public-form-item crm-section premium_block-section']"));
     $this->assertFalse($this->isElementPresent("xpath=//div[@class='crm-public-form-item crm-group custom_pre_profile-group']"));
     $this->assertFalse($this->isElementPresent("xpath=//input[@id=email-5]"));
-    $this->assertTrue($this->isElementPresent("xpath=//input[@name='payment_processor_id'][@value=0][@style='display: none;']"));
+    $this->assertFalse($this->isElementPresent("xpath=//input[@name='payment_processor_id'][@value=0]"));
     $this->click("xpath=//input[@name='payment_processor_id'][@value=1]");
     $this->waitForAjaxContent();
 

@@ -79,7 +79,7 @@
         <div>
           {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
             {ts 1=$email 2=$onBehalfEmail}An email receipt has also been sent to %1 and to %2{/ts}
-          {else}
+          {elseif $email}
             {ts 1=$email}An email receipt has also been sent to %1{/ts}
           {/if}
         </div>
