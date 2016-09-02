@@ -13,9 +13,9 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    */
   public function testFormatNullDates() {
     $params = array(
-	    'contact_type' => 'Individual',
-	    'birth_date' => 'null',
-	    'deceased_date' => 'null',
+      'contact_type' => 'Individual',
+      'birth_date' => 'null',
+      'deceased_date' => 'null',
     );
     $contact = new CRM_Contact_DAO_Contact();
 
@@ -24,4 +24,5 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
     $this->assertEmpty($contact->birth_date);
     $this->assertEmpty($contact->deceased_date);
   }
+
 }
