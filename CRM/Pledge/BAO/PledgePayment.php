@@ -528,13 +528,8 @@ WHERE  civicrm_pledge.id = %2
         }
       }
       elseif ($params['frequency_unit'] == 'week') {
-
-        // for week calculate day of week ie. Sunday,Monday etc. as next payment date
-        $dayOfWeek = date('w', mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
-        $frequencyDay = $params['frequency_day'] - $dayOfWeek;
-
         $scheduleDate = explode("-", date('n-j-Y', mktime(0, 0, 0, $date['month'],
-          $date['day'] + $frequencyDay, $date['year']
+          $date['day'], $date['year']
         )));
         $date['month'] = $scheduleDate[0];
         $date['day'] = $scheduleDate[1];
