@@ -62,7 +62,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public function preProcess() {
     parent::preProcess();
 
-    $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
     $this->_paymentProcessors = $this->get('paymentProcessors');
     $this->preProcessPaymentOptions();
 
@@ -341,7 +340,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $hidePayLater = FALSE;
     if (empty($this->_ccid)) {
       $this->add('text', "email-{$this->_bltID}",
         ts('Email Address'),
@@ -353,11 +351,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     else {
       $this->addElement('hidden', "email-{$this->_bltID}", 1);
       $this->add('text', 'total_amount', ts('Total Amount'), array('readonly' => TRUE), FALSE);
-      if (!empty($this->_paymentProcessors[0])) {
-        $hidePayLater = TRUE;
-      }
     }
-    $this->assign('hidePayLater', $hidePayLater);
     $pps = array();
     //@todo - this should be replaced by a check as to whether billing fields are set
     $onlinePaymentProcessorEnabled = FALSE;
