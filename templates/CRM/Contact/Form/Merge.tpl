@@ -247,9 +247,11 @@
    * @param blockName string
    *   The name of the entity.
    * @param blockId int
-   *   The block ID being affected
+   *   The block ID being affected.
+   * @param event object
+   *   The event that triggered the update.
    */
-  function updateMainLocationBlock(blockName, blockId) {
+  function updateMainLocationBlock(blockName, blockId, event) {
 
     // Get type of select list that's been changed (location or type)
     var locTypeId = CRM.$('select#location_blocks_' + blockName + '_' + blockId + '_locTypeId').val();
@@ -368,8 +370,11 @@
    * Called when a 'set primary' checkbox is clicked in order to disable any
    * other 'set primary' checkboxes for blocks of the same entity. So don't let
    * users try to set two different phone numbers as primary on the form.
+   *
+   * @param event object
+   *   The event that triggered the update
    */
-  function updateSetPrimaries() {
+  function updateSetPrimaries(event) {
     var nameSplit = event.target.name.split('[');
     var blockName = nameSplit[1].slice(0, -1);
     var controls = CRM.$('span.location_block_controls[id^="main_' + blockName + '"]');
@@ -414,18 +419,18 @@
     });
 
     // Call mergeBlock whenever a location type is changed
-    $('body').on('change', 'select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]', function(){
+    $('body').on('change', 'select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]', function(event){
 
       // All the information we need is held in the id, separated by underscores
       var nameSplit = this.name.split('[');
 
       // Lookup the main value, if any are available
       if (allBlock[nameSplit[1].slice(0, -1)] != undefined) {
-        updateMainLocationBlock(nameSplit[1].slice(0, -1), nameSplit[2].slice(0, -1));
+        updateMainLocationBlock(nameSplit[1].slice(0, -1), nameSplit[2].slice(0, -1), event);
       }
 
       // Update all 'set primary' checkboxes
-      updateSetPrimaries();
+      updateSetPrimaries(event);
 
     });
 
