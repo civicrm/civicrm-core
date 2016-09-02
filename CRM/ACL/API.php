@@ -87,6 +87,12 @@ class CRM_ACL_API {
    * @param bool $skipDeleteClause
    *   Don't add delete clause if this is true,.
    *   this means it is handled by generating query
+   * @param bool $hurtMyServer
+   *   This (deprecated!) param causes the logged in contact to be potentially added
+   *   in an OR clause. This will probably lead to an unindexed query and can bring strong
+   *   servers to their knees. However, the most damage seems to be done in the cache rebuilding and
+   *   we can easily circumvent that OR from that function. Less easy is the Query Builder (but seemingly
+   *   less damaging too).
    *
    * @return string
    *   the group where clause for this user
@@ -97,7 +103,8 @@ class CRM_ACL_API {
     &$whereTables,
     $contactID = NULL,
     $onlyDeleted = FALSE,
-    $skipDeleteClause = FALSE
+    $skipDeleteClause = FALSE,
+    $hurtMyServer = FALSE
   ) {
     // the default value which is valid for the final AND
     $deleteClause = ' ( 1 ) ';
@@ -135,12 +142,34 @@ class CRM_ACL_API {
     );
 
     // Add permission on self
-    if ($contactID && (CRM_Core_Permission::check('edit my contact') ||
+    if ($hurtMyServer && $contactID && (CRM_Core_Permission::check('edit my contact') ||
       $type == self::VIEW && CRM_Core_Permission::check('view my contact'))
     ) {
       $where = "(contact_a.id = $contactID OR ($where))";
     }
     return $where;
+  }
+
+  /**
+   * Is the user accessing their own record (and permitted to do so).
+   *
+   * This will return true if the 'edit my contact' or 'view my contact' causes other ACLs
+   * to be bypassed.
+   *
+   * @param int $contactID
+   * @param string $operation
+   *
+   * @return bool
+   */
+  public static function isAccessingSelf($contactID, $operation) {
+    $userID = CRM_Core_Session::getLoggedInContactID();
+    if (!$userID || $contactID != $userID) {
+      return FALSE;
+    }
+    if (CRM_Core_Permission::check('edit my contact') ||
+      ($operation == self::VIEW && CRM_Core_Permission::check('view my contact'))) {
+      return TRUE;
+    }
   }
 
   /**
