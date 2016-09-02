@@ -170,7 +170,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
       $checkCid->external_identifier = $this->_params['external_identifier'];
       $checkCid->find(TRUE);
       $formatted['id'] = $checkCid->id;
-    } 
+    }
     else {
       $formatted['id'] = $this->_params['contact_id'];
     }
