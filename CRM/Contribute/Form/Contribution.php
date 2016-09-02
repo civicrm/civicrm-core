@@ -291,6 +291,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Set title
     if ($this->_mode && $this->_id) {
       $this->setPageTitle(ts('Contribution (Pay Now)'));
+      $this->_payNow = TRUE;
+      $this->assign('payNow', $this->_payNow);
     }
     elseif ($this->_mode) {
       $this->setPageTitle($this->_ppID ? ts('Credit Card Pledge Payment') : ts('Credit Card Contribution'));
@@ -1507,7 +1509,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $pId = $contributionDetails['participant'];
         }
       }
-      $this->_params['contribution_id'] = $this->_id;
+      if (!empty($this->_payNow)) {
+        $this->_params['contribution_id'] = $this->_id;
+      }
     }
 
     if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
