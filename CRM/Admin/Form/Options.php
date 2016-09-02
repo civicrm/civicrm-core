@@ -376,7 +376,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
 
-    $optionGroup = self::getOptionGroupDataType($self->_gName);
+    $dataType = self::getOptionGroupDataType($self->_gName);
     if ($dataType) {
       $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
       if (!$validate) {
