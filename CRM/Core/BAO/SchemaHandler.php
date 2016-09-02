@@ -382,6 +382,12 @@ ALTER TABLE {$tableName}
       else {
         CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
       }
+      $domain = new CRM_Core_DAO_Domain();
+      $domain->find(TRUE);
+      if ($domain->locales) {
+        $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+        CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+      }
     }
   }
 
