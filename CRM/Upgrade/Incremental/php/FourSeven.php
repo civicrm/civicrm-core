@@ -786,6 +786,8 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       CRM_Core_DAO::executeQuery('DELETE c1 FROM civicrm_dashboard_contact c1, civicrm_dashboard_contact c2 WHERE c1.contact_id = c2.contact_id AND c1.dashboard_id = c2.dashboard_id AND c1.id > c2.id');
       CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard_contact ADD UNIQUE INDEX index_dashboard_id_contact_id (dashboard_id, contact_id);');
     }
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
     CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'content');
     CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_minimized');
     CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_fullscreen');
@@ -794,6 +796,10 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_minimized');
     CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'column_no');
     CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'weight');
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+    }
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET url = REPLACE(url, "&snippet=5", ""), fullscreen_url = REPLACE(fullscreen_url, "&snippet=5", "")');
 
