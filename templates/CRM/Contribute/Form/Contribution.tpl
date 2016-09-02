@@ -41,7 +41,7 @@
   {if $contributionMode}
   <div class="help">
     {if $contactId}
-      {ts 1=$displayName 2=$contributionMode|upper}Use this form to {if $contribID} edit {else} submit a new {/if} contribution on behalf of %1. <strong>A
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to {if $payNow} edit {else} submit a new {/if} contribution on behalf of %1. <strong>A
         %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {else}
       {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
@@ -103,21 +103,23 @@
       <td class="label">{$form.total_amount.label}</td>
       <td {$valueStyle}>
         <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
-        {if $hasPriceSets}
-          <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
-          <span id='selectPriceSet'>{$form.price_set_id.html}</span>
-          <div id="priceset" class="hiddenElement"></div>
-        {/if}
+        {if !$payNow}
+          {if $hasPriceSets}
+            <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
+            <span id='selectPriceSet'>{$form.price_set_id.html}</span>
+            <div id="priceset" class="hiddenElement"></div>
+          {/if}
 
-        {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
-        <div id="totalAmountBlock">
-          {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
-          <div id="totalTaxAmount" class="label"></div>
-        </div>
+          {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
+          <div id="totalAmountBlock">
+            {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
+            <div id="totalTaxAmount" class="label"></div>
+          </div>
+        {/if}
       </td>
     </tr>
 
-      {if $buildRecurBlock && !$contribID}
+      {if $buildRecurBlock && !$payNow}
       <tr id='recurringPaymentBlock' class='hiddenElement'>
         <td></td>
         <td>
@@ -158,7 +160,7 @@
   {* CRM-7362 --add campaign to contributions *}
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contribution-form-block-campaign_id"}
 
-    {if $contributionMode && !$contribID}
+    {if $contributionMode}
     {if $email and $outBound_option != 2}
      <tr class="crm-contribution-form-block-is_email_receipt">
        <td class="label">{$form.is_email_receipt.label}</td>
@@ -179,7 +181,7 @@
       </td>
     </tr>
     {/if}
-    {if !$contributionMode || $contribID}
+    {if !$contributionMode || $payNow}
       <tr class="crm-contribution-form-block-contribution_status_id">
         <td class="label">{$form.contribution_status_id.label}</td>
         <td>{$form.contribution_status_id.html}
@@ -221,7 +223,7 @@
         </td>
       </tr>
     {/if}
-    {if $form.revenue_recognition_date && !$contribID}
+    {if $form.revenue_recognition_date && !$payNow}
       <tr class="crm-contribution-form-block-revenue_recognition_date">
         <td class="label">{$form.revenue_recognition_date.label}</td>
         <td>{$form.revenue_recognition_date.html}</td>
