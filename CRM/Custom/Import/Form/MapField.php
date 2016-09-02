@@ -6,7 +6,6 @@
 class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
   protected $_parser = 'CRM_Custom_Import_Parser_Api';
   protected $_mappingType = 'Import Multi value custom data';
-//  protected $_highlightedFields = array();
   /**
    * Entity being imported to.
    * @var string

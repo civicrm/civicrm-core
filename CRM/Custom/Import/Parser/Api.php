@@ -170,7 +170,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
       $checkCid->external_identifier = $this->_params['external_identifier'];
       $checkCid->find(TRUE);
       $formatted['id'] = $checkCid->id;
-    } else {
+    } 
+    else {
       $formatted['id'] = $this->_params['contact_id'];
     }
     $setDateFields = array_intersect_key($this->_params, array_flip($this->_dateFields));
