@@ -140,7 +140,7 @@ class CRM_Utils_File {
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
     static $exceptions = array('.', '..');
-    if ($target == '' || $target == '/') {
+    if ($target == '' || $target == '/' || !$target) {
       throw new Exception("Overly broad deletion");
     }
 
