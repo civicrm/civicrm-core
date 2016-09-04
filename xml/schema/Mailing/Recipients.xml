@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>Recipients</class>
+  <name>civicrm_mailing_recipients</name>
+  <comment>Stores information about the recipients of a mailing.</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Mailing Recipients ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>mailing_id</name>
+    <title>Mailing</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>The ID of the mailing this Job will send.</comment>
+  </field>
+  <foreignKey>
+    <name>mailing_id</name>
+    <table>civicrm_mailing</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <title>Mailing Recipient</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Contact</comment>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>email_id</name>
+    <title>Recipient Email</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to Email</comment>
+  </field>
+  <foreignKey>
+    <name>email_id</name>
+    <table>civicrm_email</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>phone_id</name>
+    <title>Recipient Phone</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to Phone</comment>
+  </field>
+  <foreignKey>
+    <name>phone_id</name>
+    <table>civicrm_phone</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

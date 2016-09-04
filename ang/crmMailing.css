@@ -1,0 +1,113 @@
+.crmMailing input[name=subject] {
+  width: 30em;
+}
+.crmMailing select, .crmMailing input[type=text] {
+  width: 36em;
+}
+.crmMailing textarea {
+  margin: 0.5em;
+  width: 95%;
+  height: 20em;
+}
+.crmMailing input.crm-form-date {
+  width: 10em;
+}
+
+.crmMailing-recip-est {
+  background: #ee8;
+  font-size: small;
+  padding: 0.33em;
+  margin: 0 0 0 0.5em;
+  width: 9em;
+  text-align: center;
+}
+
+span.crmMailing-include {
+  color: #060;
+}
+span.crmMailing-exclude {
+  color: #600;
+  text-decoration: line-through;
+}
+span.crmMailing-mandatory {
+  color: #866304;
+}
+
+.crmMailing input[name=preview_test_email], .crmMailing-preview select[name=preview_test_group] {
+  width: 80%;
+}
+
+.crmMailing .preview-popup, .crmMailing .preview-contact, .crmMailing .preview-group {
+  width: 30%;
+  height: 4.5em;
+  margin: 0.5em;
+  text-align: center;
+  vertical-align: middle;
+  float: left;
+}
+.crmMailing .preview-popup, .crmMailing .preview-contact {
+  border-right: 1px solid black;
+}
+.crmMailing .preview-group, .crmMailing .preview-contact {
+}
+
+.crmMailing .crmMailing-schedule-outer {
+  width: 98%
+}
+.crmMailing .crmMailing-schedule-inner {
+  width: 40em;
+  text-align: left;
+  margin: auto;
+}
+
+/* Odd: These placeholder directives break if combined */
+input[name=preview_test_email]:-moz-placeholder {
+  text-align: center;
+}
+input[name=preview_test_email]::-moz-placeholder {
+  text-align: center;
+}
+input[name=preview_test_email]::-webkit-input-placeholder  {
+  text-align: center;
+}
+input[name=preview_test_email]:-ms-input-placeholder {
+  text-align: center;
+}
+.crmMailing-active {
+}
+.crmMailing-inactive {
+  text-decoration: line-through;
+}
+.crm-container a.crmMailing-submit-button {
+  display: inline-block;
+  padding: .2em .4em;
+  margin: 1em auto;
+  border-radius: 5px;
+  font-size: 1.2em;
+  float: none;
+}
+.crm-container a.crmMailing-submit-button div {
+  background: url(../i/check.gif) no-repeat left center;
+  padding-left: 20px;
+}
+.crm-container a.crmMailing-submit-button.disabled,
+.crm-container a.crmMailing-submit-button.blocking {
+  opacity: .6;
+  cursor: default;
+}
+.crm-container a.crmMailing-submit-button.blocking div {
+  background: url(../i/loading-2f2f2e.gif) no-repeat left center;
+}
+
+.crm-container .crm-form-block label {
+  font-size: 13px;
+}
+
+.crm-container .ui-widget-content {
+  background: none;
+}
+
+.crmMailing-error-link {
+  margin: 0.5em;
+  color: red;
+}

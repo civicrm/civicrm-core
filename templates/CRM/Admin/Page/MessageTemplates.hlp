@@ -1,0 +1,64 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{capture assign=tokenDocLink}{docURL page="user/common-workflows/tokens-and-mail-merge"}{/capture}
+{capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
+{capture assign=schedRemURL}{crmURL p='civicrm/admin/scheduleReminders' q="reset=1"}{/capture}
+{capture assign=upgradeTemplatesDocLink}{docURL page="Updating System Workflow Message Templates after Upgrades - method 1 - kdiff" resource="wiki"}{/capture}
+{htxt id="id-intro-title"}
+  {ts}Message Templates{/ts}
+{/htxt}
+{htxt id="id-intro"}
+<p>
+  {ts}Templates allow you to save and re-use messages with layouts. You can use them when sending email or letters to one or more contacts. If you are using CiviMail for enewsletters, newsletter templates take care of the layout so authors can focus on content.</p>{/ts}
+<p>
+  {ts}You may include tokens to represent fields (like a contact's "first name") in the message subject and body. These will be replaced with the actual value of the corresponding field in the outgoing message. Click "Insert Tokens" for a searchable list of available tokens.{/ts} {$tokenDocLink}
+</p>
+<p>
+  {ts 1=$schedRemURL}Messages used for membership renewal reminders, as well as event and activity related reminders generally use tokens specific to membership, participant or activity records. For example, a membership renewal reminder may include the membership type and end date tokens. The <a href="%1">Scheduled Reminders</a> screen includes these tokens in the "Insert Tokens" tool, so it is best to create reminder templates there.{/ts} {$schedRemindersDocLink}
+</p>
+{/htxt}
+
+{htxt id="id-system-workflow-title"}
+  {ts}System Workflow Message Templates{/ts}
+{/htxt}
+{htxt id="id-system-workflow"}
+<p>
+  {ts}System workflow message templates are used to generate the emails sent to consituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts}
+</p>
+<p>
+  {ts}Workflow messages include text AND necessary program logic. Use caution when editing so as not to modify the program logic. Be sure to test the workflow and review the emails sent after making any changes. If you find that your changes have caused problems, errors or missing information - you can always &quot;Revert&quot; to the system default for that workflow.{/ts}
+</p>
+<p>
+  {ts}If your organization has modified the default versions of System Workflow message templates, then the changes and bug fixes included in an upgrade will need to be merged with your modified versions.{/ts} {$upgradeTemplatesDocLink}
+</p>
+{/htxt}
+
+{htxt id="id-view_system_default-title"}
+  {ts}Default{/ts}
+{/htxt}
+{htxt id="id-view_system_default"}
+  {ts}You can view or revert to the default version of any system workflow message template which you've modified. After upgrades OR if you are having issues with your modified version, it is useful to compare your active version to the default code shown on this screen. You can use the 'Select' buttons below (with copy and paste commands) to copy the default code into a text editor and then compare it to your customized version.{/ts}
+{/htxt}

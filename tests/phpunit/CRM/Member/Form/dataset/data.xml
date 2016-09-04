@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: data.xml 43570 2012-11-09 12:03:45Z deepak $ -->
+<dataset>
+  <civicrm_contact
+    id="17"
+    contact_type="Individual"
+    is_opt_out="0"
+    display_name="Joe Blow"
+    sort_name="Blow, Joe"
+    first_name="Joe"
+    last_name="Blow"
+  />
+  <civicrm_contact
+    id="23"
+    contact_type="Organization"
+    is_opt_out="0"
+    display_name="Save The Dollars"
+    organization_name="Save The Dollars"
+  />
+
+  <civicrm_relationship_type
+    id="20"
+    name_a_b="Member of"
+    label_a_b="Member of"
+    name_b_a="Member is"
+    label_b_a="Member is"
+    contact_type_a="Individual"
+    contact_type_b="Organization"
+    is_active="1"
+  />
+  <civicrm_membership_type
+    id="15"
+    domain_id="1"
+    name="AnnualRolling"
+    member_of_contact_id="23"
+    duration_unit="year"
+    duration_interval="1"
+    period_type="rolling"
+    relationship_type_id="20"
+    financial_type_id="2"
+  />
+  <civicrm_membership_type
+    id="25"
+    domain_id="1"
+    name="Lifetime"
+    member_of_contact_id="23"
+    duration_unit="lifetime"
+    relationship_type_id="20"
+    financial_type_id="2"
+   />
+
+</dataset>

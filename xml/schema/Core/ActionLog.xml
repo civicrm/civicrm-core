@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>ActionLog</class>
+  <name>civicrm_action_log</name>
+  <comment>Table to store log for the reminder.</comment>
+  <add>3.4</add>
+  <field>
+    <name>id</name>
+    <title>Action Schedule ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>3.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>Action Schedule Contact ID</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>3.4</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.4</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>entity_id</name>
+    <title>Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to id of the entity that the action was performed on. Pseudo - FK.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>entity_table</name>
+    <type>varchar</type>
+    <title>Entity Table</title>
+    <length>255</length>
+    <comment>name of the entity table for the above id, e.g. civicrm_activity, civicrm_participant</comment>
+    <add>3.4</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>3.4</add>
+  </dynamicForeignKey>
+  <field>
+    <name>action_schedule_id</name>
+    <title>Schedule</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to the action schedule that this action originated from.</comment>
+    <add>3.4</add>
+  </field>
+  <foreignKey>
+    <name>action_schedule_id</name>
+    <table>civicrm_action_schedule</table>
+    <key>id</key>
+    <add>3.4</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>action_date_time</name>
+    <title>Action Date And Time</title>
+    <type>datetime</type>
+    <comment>date time that the action was performed on.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>is_error</name>
+    <title>Error?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Was there any error sending the reminder?</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>message</name>
+    <title>Message</title>
+    <type>text</type>
+    <comment>Description / text in case there was an error encountered.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>repetition_number</name>
+    <title>Repetition Number</title>
+    <type>int unsigned</type>
+    <comment>Keeps track of the sequence number of this repetition.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>reference_date</name>
+    <title>Reference Date</title>
+    <type>date</type>
+    <default>NULL</default>
+    <comment>Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)</comment>
+    <add>4.6</add>
+  </field>
+</table>

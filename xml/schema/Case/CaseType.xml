@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Case</base>
+  <class>CaseType</class>
+  <name>civicrm_case_type</name>
+  <comment>Case type definition</comment>
+  <add>4.5</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Case Type ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Autoincremented type id</comment>
+    <add>4.5</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Case Type Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Machine name for Case Type</comment>
+    <add>4.5</add>
+  </field>
+  <index>
+    <name>case_type_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.5</add>
+  </index>
+  <field>
+    <name>title</name>
+    <title>Case Type Title</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <localizable>true</localizable>
+    <comment>Natural language name for Case Type</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Case Type Description</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Description of the Case Type</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Case Type Is Active</title>
+    <type>boolean</type>
+    <comment>Is this entry active?</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Case Type Is Reserved</title>
+    <type>boolean</type>
+    <comment>Is this case type a predefined system type?</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <title>Order</title>
+    <type>int</type>
+    <required>true</required>
+    <default>1</default>
+    <comment>Ordering of the case types</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>definition</name>
+    <title>Case Type Definition</title>
+    <type>blob</type>
+    <comment>xml definition of case type</comment>
+    <add>4.5</add>
+  </field>
+</table>

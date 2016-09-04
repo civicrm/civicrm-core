@@ -1,0 +1,22 @@
+<extension key='test.extension.manager.paymenttest' type='payment'>
+  <file>main</file>
+  <name>test_extension_manager_paymenttest</name>
+  <description>Sample Payment extension</description>
+  <typeInfo>
+    <userNameLabel>username</userNameLabel>
+    <passwordLabel>password</passwordLabel>
+    <signatureLabel></signatureLabel>
+    <subjectLabel></subjectLabel>
+    <urlSiteDefault>https://example.com/authorize</urlSiteDefault>
+    <urlApiDefault></urlApiDefault>
+    <urlRecurDefault></urlRecurDefault>
+    <urlSiteTestDefault>https://example.com/authorize</urlSiteTestDefault>
+    <urlApiTestDefault>/</urlApiTestDefault>
+    <urlRecurTestDefault></urlRecurTestDefault>
+    <urlButtonDefault></urlButtonDefault>
+    <urlButtonTestDefault></urlButtonTestDefault>
+    <billingMode>form</billingMode>
+    <isRecur>0</isRecur>
+    <paymentType>1</paymentType>
+  </typeInfo>
+</extension>

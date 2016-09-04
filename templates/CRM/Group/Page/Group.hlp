@@ -1,0 +1,74 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="manage_groups-title"}
+  {ts}Groups{/ts}
+{/htxt}
+{htxt id="manage_groups"}
+    <p>{ts}Use Groups to organize contacts (e.g. these contacts are part of our 'Steering Committee'). You can also create <strong>smart groups</strong> based on contact characteristics (e.g. this group consists of all people in our database who live in a specific locality).{/ts} {docURL page="user/organising-your-data/groups-and-tags"}</p>
+    <p>{ts}You can add contacts to a group from any set of search results (or when viewing an individual contact). You can also allow contacts to sign themselves up for certain groups by setting the group visibility to 'Public Pages' (use the <strong>Settings</strong> link), and including the <strong>Groups</strong> element in your CiviCRM Profile.{/ts} {docURL page="user/the-user-interface/profiles"}</p>
+    <p>{ts}Groups which are used as mailing lists should be assigned the 'Mailing List' type.{/ts} {if $config->userFramework neq 'Joomla'}{ts}Groups of contacts which are used for <strong>access control</strong> must be assigned that type.{/ts} {docURL page="user/initial-set-up/access-control"}{/if}</p>
+    <p>{ts}Use <strong>Find Groups</strong> to search by group name, type and visibility.{/ts}{if $config->userFramework neq 'Joomla'} {ts}Group type filtering uses <strong>AND</strong> logic. If you check both 'Mailing List' and 'Access Control' types - only groups which have both types assigned will be returned.{/ts}{/if} {ts}You can also click a letter on the <strong>A-to-Z bar</strong> to quickly find all groups starting with that letter.{/ts}</p> 
+{/htxt}
+
+{htxt id="id-group-type-title"}
+  {ts}Group Type{/ts}
+{/htxt}
+{htxt id="id-group-type"}
+{capture assign=docLinkAccess}{docURL page="user/current/initial-set-up/permissions-and-access-control/"}{/capture}
+{capture assign=docLinkMail}{docURL page="user/email/what-is-civimail" text="CiviMail component"}{/capture}
+<p>{if $config->userFramework neq 'Joomla'}{ts 1=$docLinkAccess}Check 'Access Control' if you want to use this group to assign access permissions to a set of contacts. %1{/ts}{/if} {ts 1=$docLinkMail}Check 'Mailing List' if you are using this group as a mailing list in the %1.{/ts}</p>
+{/htxt} 
+
+{htxt id="id-group-visibility-title"}
+  {ts}Group Visibility{/ts}
+{/htxt}
+{htxt id="id-group-visibility"}
+<p>{ts}Select 'User and User Admin Only' if joining this group is controlled by authorized CiviCRM users only. If you want to allow contacts to join and remove themselves from this group via the Registration and Account Profile forms, select 'Public Pages'.{/ts}</p>
+{/htxt} 
+
+{htxt id="id-group-parent-title"}
+  {ts}Group Nesting{/ts}
+{/htxt}
+{htxt id="id-group-parent"}
+<p>{ts}Some organizations find it useful to create a hierarchy of groups. In CiviCRM, this is done by creating one or more "Parent" groups and then assigning other groups to them. When a user sends a mailing to a "Parent", or searches for contacts in a "Parent" - all contacts in the associated child groups are automatically included.{/ts}</p>
+<p>{ts}EXAMPLE: An organization that has a National office and 5 regional offices puts constituents in each region into their own group. Then they create a "National" group which is assigned as the "Parent" for all regional groups. The National office can now send mailings (for example) to the "National" group - knowing that all contacts in the regional groups will be included.{/ts}</p>
+{/htxt}
+
+{htxt id="id-group-organization-title"}
+  {ts}Group Organization{/ts}
+{/htxt}
+{htxt id="id-group-organization"}
+<p>{ts}Some organizations find it useful to be able to connect Organization contacts to Groups (one-to-one relationship) to represent a multi-org hierarchy. The org contact holds info about the org itself (name, location, etc.) and the group holds other sub-groups/contacts related to that group (employees, alumni, online activists, members, etc.).{/ts}</p>
+{/htxt}
+
+{htxt id="update_smart_groups-title"}
+  {ts}Update Smart Group Counts{/ts}
+{/htxt}
+{htxt id="update_smart_groups"}
+  <p>
+    {ts}Update this page with current statistics on the number of contacts in each smart group.{/ts}
+  </p>
+{/htxt}

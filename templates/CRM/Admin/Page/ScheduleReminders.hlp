@@ -1,0 +1,52 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="limit_to"}
+  <p>{ts}Select 'Limit to' if you want to only send reminders to contacts with the criteria selected above AND who ALSO match this criteria. If you select 'Choose Recipients' - only the chosen contacts will receive the reminder (AND only if they ALSO match the criteria above).{/ts}</p>
+  <p>{ts}Select 'Also include' if you want to also send reminders to contacts who match this criteria. If you select 'Choose Recipients' - the chosen contacts will also receive the reminder (in ADDITION TO the contacts who match the criteria above).{/ts}
+{/htxt}
+
+{htxt id="recipient"}
+  <p>{ts}For Activities, the reminder recipients can be contacts Assigned to the activity, contacts who created the activity (Activity Source), OR contacts whom the activity is with (Activity Targets). Alternatively you can direct the reminder to specific contacts (Choose Recipients), or to a group of contacts.{/ts}</p>
+  <p>{ts}For Events, you can limit or additionally include recipients by participant role (e.g. Volunteer, Speaker, etc.), choose specific contacts, or choose a group.{/ts}</p>
+  <p>{ts}For Membership and Contact reminders, you can limit or additionally include recipients by choosing specific contacts, or choosing a group.{/ts}</p>
+{/htxt}
+
+{htxt id="id-from_name_email-title"}
+  {ts}Specify FROM Name and Email{/ts}
+{/htxt}
+
+{htxt id="id-from_name_email"}
+  {ts}You can set the FROM name and email address for this reminder in these fields. If you leave these fields blank, the default FROM name and email address for your site will be used (Administer > Communications > FROM Email Addresses).{/ts}
+{/htxt}
+
+{htxt id="filter_contact_language"}
+  {ts}You can limit the recipient of the reminder to contacts with the specified preferred language. You can also choose to add contacts that have no preferred language defined.{/ts}
+{/htxt}
+
+{htxt id="communication_language"}
+  {ts}This is the communication language. If there are template translation or tokens, they will be localized accordingly. By default, the system default language will be used.{/ts}
+{/htxt}
+

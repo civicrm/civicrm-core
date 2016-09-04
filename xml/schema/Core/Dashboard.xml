@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Dashboard</class>
+  <name>civicrm_dashboard</name>
+  <comment>Table to store dashboard.</comment>
+  <add>3.1</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>DashletID</title>
+    <required>true</required>
+    <add>3.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <type>int unsigned</type>
+    <title>Dashlet Domain</title>
+    <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Domain for dashboard</comment>
+    <add>3.1</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>3.1</add>
+  </foreignKey>
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <title>Dashlet Name</title>
+    <length>64</length>
+    <comment>Internal name of dashlet.</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>label</name>
+    <type>varchar</type>
+    <title>Dashlet Title</title>
+    <length>255</length>
+    <comment>dashlet title</comment>
+    <localizable>true</localizable>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>url</name>
+    <type>varchar</type>
+    <title>Dashlet URL</title>
+    <length>255</length>
+    <comment>url in case of external dashlet</comment>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>content</name>
+    <type>text</type>
+    <comment>dashlet content</comment>
+    <add>3.1</add>
+    <drop>3.3</drop>
+  </field>
+  <field>
+    <name>permission</name>
+    <type>varchar</type>
+    <title>Dashlet Permission</title>
+    <length>255</length>
+    <comment>Permission for the dashlet</comment>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>permission_operator</name>
+    <type>varchar</type>
+    <title>Dashlet Permission Operator</title>
+    <length>3</length>
+    <comment>Permission Operator</comment>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>column_no</name>
+    <type>boolean</type>
+    <title>Dashlet Column</title>
+    <comment>column no for this dashlet</comment>
+    <default>0</default>
+    <add>3.1</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>is_minimized</name>
+    <type>boolean</type>
+    <title>Minimize Dashlet?</title>
+    <comment>Is Minimized?</comment>
+    <default>0</default>
+    <add>3.1</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>fullscreen_url</name>
+    <type>varchar</type>
+    <title>Fullscreen URL</title>
+    <length>255</length>
+    <comment>fullscreen url for dashlet</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>is_fullscreen</name>
+    <type>boolean</type>
+    <title>Is Fullscreen?</title>
+    <comment>Is Fullscreen?</comment>
+    <default>1</default>
+    <add>3.1</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <title>Is Dashlet Active?</title>
+    <comment>Is this dashlet active?</comment>
+    <default>0</default>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <type>boolean</type>
+    <title>Is Dashlet Reserved?</title>
+    <comment>Is this dashlet reserved?</comment>
+    <default>0</default>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <type>int</type>
+    <title>Order</title>
+    <comment>Ordering of the dashlets.</comment>
+    <default>0</default>
+    <add>3.1</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>cache_minutes</name>
+    <type>int unsigned</type>
+    <title>Cache Minutes</title>
+    <comment>Number of minutes to cache dashlet content in browser localStorage.</comment>
+    <default>60</default>
+    <required>true</required>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <title>Dashlet Created Date</title>
+    <comment>When was content populated</comment>
+    <add>3.1</add>
+    <drop>3.3</drop>
+  </field>
+</table>

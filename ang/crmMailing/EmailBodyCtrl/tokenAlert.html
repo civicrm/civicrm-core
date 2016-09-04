@@ -1,0 +1,76 @@
+<p ng-show="missing['domain.address']">
+  {{ts('The mailing must include the street address of the organization. Please insert the %1 token.', {1:
+  '{domain.address}'})}}
+</p>
+
+<div ng-show="missing['domain.address'] && insertable">
+  <a ng-click="insertToken('domain.address')" class="button"><span><i class="crm-i fa-plus-circle"></i> {{ts('Address')}}</span></a>
+
+  <div class="clear"/>
+</div>
+
+<p ng-show="missing['action.optOut']">
+  {{ts('The mailing must allow recipients to (a) unsubscribe from the mailing-list or (b) completely opt-out from all mailings. Please insert an unsubscribe or opt-out token.')}}
+</p>
+
+<div ng-show="missing['action.optOut'] && insertable">
+  <table>
+    <thead>
+    <tr>
+      <th>{{ts('Via Web')}}</th>
+      <th>{{ts('Via Email')}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>
+        <a ng-click="insertToken('action.unsubscribeUrl')" class="button"><span><i class="crm-i fa-plus-circle"></i> {{ts('Unsubscribe')}}</span></a>
+      </td>
+      <td>
+        <a ng-click="insertToken('action.unsubscribe')" class="button"><span><i class="crm-i fa-plus-circle"></i> {{ts('Unsubscribe')}}</span></a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a ng-click="insertToken('action.optOutUrl')" class="button"><span><i class="crm-i fa-plus-circle"></i> {{ts('Opt-out')}}</span></a>
+      </td>
+      <td>
+        <a ng-click="insertToken('action.optOut')" class="button"><span><i class="crm-i fa-plus-circle"></i> {{ts('Opt-out')}}</span></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div ng-show="missing['action.optOut'] && !insertable">
+  <table>
+    <thead>
+    <tr>
+      <th>{{ts('Via Web')}}</th>
+      <th>{{ts('Via Email')}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>
+        {action.optOutUrl}
+      </td>
+      <td>
+        {action.optOut}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {action.unsubscribeUrl}
+      </td>
+      <td>
+        {action.unsubscribe}
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  {{ts('Alternatively, you may select a header or footer which includes the required tokens.')}}
+</p>

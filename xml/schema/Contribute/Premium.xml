@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contribute</base>
+  <class>Premium</class>
+  <comment>table - settings for the Premiums features for a given contribution page </comment>
+  <name>civicrm_premiums</name>
+  <add>1.4</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Premium ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Premium Entity</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Joins these premium settings to another object. Always civicrm_contribution_page for now.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Premium entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.4</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.4</add>
+  </dynamicForeignKey>
+  <field>
+    <name>premiums_active </name>
+    <title>Is Premium Active?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <comment>Is the Premiums feature enabled for this page?</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>premiums_intro_title</name>
+    <type>varchar</type>
+    <title>Title for Premiums section</title>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Title for Premiums section.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>premiums_intro_text</name>
+    <title>Premium Introductory Text</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Displayed in &lt;div&gt; at top of Premiums section of page. Text and HTML allowed.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>premiums_contact_email</name>
+    <title>Premium Contact Email</title>
+    <type>varchar</type>
+    <length>100</length>
+    <comment>This email address is included in receipts if it is populated and a premium has been selected.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>premiums_contact_phone</name>
+    <title>Premiums Contact Phone</title>
+    <type>varchar</type>
+    <length>50</length>
+    <comment>This phone number is included in receipts if it is populated and a premium has been selected.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>premiums_display_min_contribution</name>
+    <title>Display Minimum Contribution?</title>
+    <type>boolean</type>
+    <required>true</required>
+    <comment>Boolean. Should we automatically display minimum contribution amount text after the premium descriptions.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>premiums_nothankyou_label</name>
+    <title>No Thank-you Text</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Label displayed for No Thank-you option in premiums block (e.g. No thank you)</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>premiums_nothankyou_position</name>
+    <title>No Thank-you Position</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <add>4.3</add>
+  </field>
+</table>

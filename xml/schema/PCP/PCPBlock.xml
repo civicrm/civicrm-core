@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/PCP</base>
+  <class>PCPBlock</class>
+  <name>civicrm_pcp_block</name>
+  <comment>A Personal Campaign Page Block stores admin configurable status options and rules</comment>
+  <add>2.2</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>PCP Block ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>PCP block Id</comment>
+    <add>2.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_contribution_page.id OR civicrm_event.id</comment>
+    <add>2.2</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>2.2</add>
+  </dynamicForeignKey>
+  <foreignKey>
+    <name>entity_id</name>
+    <table>civicrm_contribution_page</table>
+    <key>id</key>
+    <add>2.2</add>
+    <drop>4.1</drop>
+  </foreignKey>
+  <field>
+    <name>target_entity_type</name>
+    <title>Target Entity</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <default>'contribute'</default>
+    <comment>The type of entity that this pcp targets</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>target_entity_id</name>
+    <title>Target Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>The entity that this pcp targets</comment>
+    <add>4.1</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>target_entity_id</idColumn>
+    <!-- FIXME: typename and not tablename? -->
+    <typeColumn>target_entity_type</typeColumn>
+    <add>4.1</add>
+  </dynamicForeignKey>
+  <field>
+    <name>supporter_profile_id</name>
+    <title>Supporter Profile</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_uf_group.id. Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
+    <default>NULL</default>
+    <add>2.2</add>
+  </field>
+  <foreignKey>
+    <name>supporter_profile_id</name>
+    <table>civicrm_uf_group</table>
+    <key>id</key>
+    <add>3.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>owner_notify_id</name>
+    <title>Owner Notification</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>FK to civicrm_option_group with name = PCP owner notifications</comment>
+    <add>4.6</add>
+    <pseudoconstant>
+      <optionGroupName>pcp_owner_notify</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Radio</type>
+    </html>
+  </field>
+  <field>
+    <name>is_approval_needed</name>
+    <title>Approval Required?</title>
+    <type>boolean</type>
+    <comment>Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
+    <default>NULL</default>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>is_tellfriend_enabled</name>
+    <title>Tell a Friend Enabled?</title>
+    <type>boolean</type>
+    <comment>Does Personal Campaign Page allow using tell a friend?</comment>
+    <default>NULL</default>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>tellfriend_limit</name>
+    <title>Tell A Friend Limit</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Maximum recipient fields allowed in tell a friend</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>link_text</name>
+    <title>Link Text</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Link text for PCP.</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Enabled?</title>
+    <type>boolean</type>
+    <comment>Is Personal Campaign Page Block enabled/active?</comment>
+    <default>1</default>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>notify_email</name>
+    <title>Notification Email</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>If set, notification is automatically emailed to this email-address on create/update Personal Campaign Page</comment>
+    <default>NULL</default>
+    <add>2.2</add>
+  </field>
+</table>

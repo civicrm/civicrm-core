@@ -1,0 +1,110 @@
+{htxt id='field_name_0-title'}
+{ts}Field Name{/ts}
+{/htxt}
+{htxt id='field_name_0'}
+  {capture assign="ltURL"}{crmURL p="civicrm/admin/locationType" q="reset=1"}{/capture}
+  <p>
+    {ts}Choose the field to add to the profile.{/ts}<br/>
+    <strong>{ts}Restrictions:{/ts}</strong><br/>
+    {ts}Only one field of each communication type (EG. phone) can use the primary location type.{/ts}
+  </p>
+  <p>
+    {ts 1=$ltURL}When you choose the primary location type the collected data will use the default location type from the <a href="%1">Location types</a> setup.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='label-title'}
+  {ts}Field Label{/ts}
+{/htxt}
+{htxt id='label'}
+  <p>
+    {ts}The field label displayed on the form (over-ride the default field label here, if desired).{/ts}
+  </p>
+{/htxt}
+
+{htxt id='is_multi_summary-title'}
+  {ts}Multi-record listing{/ts}
+{/htxt}
+{htxt id='is_multi_summary'}
+  <p>
+    {ts}Fields which are part of a custom data set that supports multiple records will be listed below the standard single-record fields when in profile edit view. Use this option to determine which fields you want displayed in that listing{/ts}
+  </p>
+{/htxt}
+
+{htxt id='is_required-title'}
+  {ts}Required{/ts}
+{/htxt}
+{htxt id='is_required'}
+  <p>
+    {ts}Are users required to complete this field?{/ts}
+  </p>
+{/htxt}
+
+{htxt id='is_view-title'}
+  {ts}View Only{/ts}
+{/htxt}
+{htxt id='is_view'}
+  <p>
+    {ts}If checked, users can view but not edit this field.{/ts}
+  </p>
+  <p>
+    {ts}NOTE: View Only fields can not be included in Profile Search forms.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='visibility-title'}
+  {ts}Visibility{/ts}
+{/htxt}
+{htxt id='visibility'}
+  <p>
+    {ts}Is this field hidden from public search ('User and User Admin Only'), or is it visible to the public and potentially searchable in the Profile Search form ('Expose Publicly' or 'Expose Publicly and for Listings')?  ('User and User Admin Only') fields can still be used for Edit and Create mode.{/ts}
+  </p>
+  <p>
+    {ts}When visibility is 'Expose Publicly and for Listings', users can also click the field value when viewing a contact in order to locate other contacts with the same value(s) (i.e. other contacts who live in Poland).{/ts}
+  </p>
+{/htxt}
+
+{htxt id='is_searchable-title'}
+  {ts}Searchable{/ts}
+{/htxt}
+{htxt id='is_searchable'}
+  <p>
+    {ts}Do you want to include this field in the Profile's Search form?{/ts}
+  </p>
+{/htxt}
+
+{htxt id='in_selector-title'}
+  {ts}Results Column{/ts}
+{/htxt}
+{htxt id='in_selector'}
+  <p>
+    {ts}Is this field included as a column in the search results table? This setting applies only to fields with 'Public Pages' or 'Public Pages and Listings' visibility.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='help-title'}
+  {ts}Help Text{/ts}
+{/htxt}
+{htxt id='help'}
+  <p>
+    {ts}Explanatory text displayed to users for this field (can include HTML formatting tags).{/ts}
+  </p>
+{/htxt}
+
+{htxt id='weight-title'}
+  {ts}Order{/ts}
+{/htxt}
+{htxt id='weight'}
+  <p>
+    {ts}Weight controls the order in which fields are displayed within a profile. Enter a positive or negative integer - lower numbers are displayed ahead of higher numbers. Note: The field order will not respect non-multi fields interspersed with multi record fields in edit mode.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='is_active-title'}
+  {ts}Active{/ts}
+{/htxt}
+{htxt id='is_active'}
+  <p>
+    {ts}Disable this option to remove the field from the profile without deleting it.{/ts}
+  </p>
+{/htxt}

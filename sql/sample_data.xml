@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sample_data>
+
+  <male_name>
+    <item>Roland</item>
+    <item>Rodrigo</item>
+    <item>Barry</item>
+    <item>Shad</item>
+    <item>Claudio</item>
+    <item>Brzęczysław</item>
+    <item>Sherman</item>
+    <item>Allen</item>
+    <item>Ashley</item>
+    <item>Jay</item>
+    <item>Russell</item>
+    <item>Truman</item>
+    <item>Bob</item>
+    <item>Miguel</item>
+    <item>Irvin</item>
+    <item>Brent</item>
+    <item>Maria</item>
+    <item>Sonny</item>
+    <item>Rolando</item>
+    <item>Craig</item>
+    <item>Jerome</item>
+    <item>Clint</item>
+    <item>Lincoln</item>
+    <item>Toby</item>
+    <item>Carlos</item>
+    <item>Winford</item>
+    <item>Bryon</item>
+    <item>Ray</item>
+    <item>Landon</item>
+    <item>Lawerence</item>
+    <item>Troy</item>
+    <item>Daren</item>
+    <item>Jed</item>
+    <item>Jacob</item>
+    <item>Omar</item>
+    <item>Rosario</item>
+    <item>Jackson</item>
+    <item>Erik</item>
+    <item>Kenny</item>
+    <item>Billy</item>
+    <item>Errol</item>
+    <item>Lou</item>
+    <item>Teddy</item>
+    <item>Maxwell</item>
+    <item>Sanford</item>
+    <item>Allan</item>
+    <item>Norris</item>
+    <item>Andrew</item>
+    <item>Elbert</item>
+    <item>Scott</item>
+  </male_name>
+
+  <female_name>
+    <item>Josefa</item>
+    <item>Tanya</item>
+    <item>Betty</item>
+    <item>Nicole</item>
+    <item>Laree</item>
+    <item>Delana</item>
+    <item>Jina</item>
+    <item>Kandace</item>
+    <item>Angelika</item>
+    <item>Iris</item>
+    <item>Santina</item>
+    <item>Scarlet</item>
+    <item>Valene</item>
+    <item>Ivey</item>
+    <item>Damaris</item>
+    <item>Carylon</item>
+    <item>Elina</item>
+    <item>Junko</item>
+    <item>Alida</item>
+    <item>Juliann</item>
+    <item>Megan</item>
+    <item>Lashawnda</item>
+    <item>Eleonor</item>
+    <item>Shauna</item>
+    <item>Ashlie</item>
+    <item>Bernadette</item>
+    <item>Kathlyn</item>
+    <item>Teresa</item>
+    <item>Kiara</item>
+    <item>Mei</item>
+    <item>Elizabeth</item>
+    <item>Kathleen</item>
+    <item>Sharyn</item>
+    <item>Herminia</item>
+    <item>Kacey</item>
+    <item>Margaret</item>
+    <item>Merrie</item>
+    <item>Justina</item>
+    <item>Princess</item>
+    <item>Brittney</item>
+    <item>Arlyne</item>
+    <item>Alexia</item>
+    <item>Heidi</item>
+    <item>Esta</item>
+    <item>Brigette</item>
+    <item>Beula</item>
+    <item>Felisha</item>
+    <item>Rebekah</item>
+    <item>Magan</item>
+    <item>Ashley</item>
+  </female_name>
+
+  <last_name>
+    <item>Samuels</item>
+    <item>Roberts</item>
+    <item>Adams</item>
+    <item>Jones</item>
+    <item>Zope</item>
+    <item>Smith</item>
+    <item>Patel</item>
+    <item>Jameson</item>
+    <item>Reynolds</item>
+    <item>Wilson</item>
+    <item>Yadav</item>
+    <item>Grant</item>
+    <item>Łąchowski</item>
+    <item>Parker</item>
+    <item>Lee</item>
+    <item>Olsen</item>
+    <item>Deforest</item>
+    <item>McReynolds</item>
+    <item>Prentice</item>
+    <item>Barkley</item>
+    <item>Bachman</item>
+    <item>Cooper</item>
+    <item>Wattson</item>
+    <item>Blackwell</item>
+    <item>Terry</item>
+    <item>Terrell</item>
+    <item>Robertson</item>
+    <item>Samson</item>
+    <item>Wagner</item>
+    <item>Müller</item>
+    <item>Jacobs</item>
+    <item>Dimitrov</item>
+    <item>González</item>
+    <item>Díaz</item>
+    <item>Cruz</item>
+    <item>Jensen</item>
+    <item>Nielsen</item>
+    <item>Ivanov</item>
+  </last_name>
+
+  <street_name>
+    <item>Second</item>
+    <item>Main</item>
+    <item>States</item>
+    <item>Dowlen</item>
+    <item>Maple</item>
+    <item>Pine</item>
+    <item>Bay</item>
+    <item>Woodbridge</item>
+    <item>Martin Luther King</item>
+    <item>Caulder</item>
+    <item>Jackson</item>
+    <item>College</item>
+    <item>El Camino</item>
+    <item>Van Ness</item>
+    <item>Cadell</item>
+    <item>Northpoint</item>
+    <item>Green</item>
+    <item>Beech</item>
+    <item>Lincoln</item>
+  </street_name>
+
+  <street_type>
+    <item>Rd</item>
+    <item>Pl</item>
+    <item>St</item>
+    <item>Ln</item>
+    <item>Ave</item>
+    <item>Way</item>
+    <item>Dr</item>
+    <item>Blvd</item>
+    <item>Path</item>
+  </street_type>
+
+  <supplemental_addresses_1>
+    <item>Attn: Accounting</item>
+    <item>c/o OPDC</item>
+    <item>Urgent</item>
+    <item>c/o PO Plus</item>
+    <item>Cuffe Parade</item>
+    <item>Churchgate</item>
+    <item>Mailstop 101</item>
+    <item>Receiving</item>
+    <item>Subscriptions Dept</item>
+    <item>Editorial Dept</item>
+    <item>Community Relations</item>
+    <item>Attn: Development</item>
+    <item>Disbursements</item>
+    <item>Payables Dept.</item>
+    <item>Donor Relations</item>
+  </supplemental_addresses_1>
+
+  <city>
+    <item>Portland</item>
+    <item>Cleveland</item>
+    <item>Boston</item>
+    <item>Chicago</item>
+    <item>Detroit</item>
+    <item>Des Moines</item>
+    <item>San Francisco</item>
+    <item>New York</item>
+    <item>Seattle</item>
+    <item>Los Angeles</item>
+    <item>Minneapolis</item>
+  </city>
+
+  <address_direction>
+    <item>N</item>
+    <item>W</item>
+    <item>E</item>
+    <item>S</item>
+    <item>NW</item>
+    <item>NE</item>
+    <item>SW</item>
+    <item>SE</item>
+  </address_direction>
+
+  <email_address>
+    <item>info</item>
+    <item>sales</item>
+    <item>contact</item>
+    <item>service</item>
+    <item>feedback</item>
+  </email_address>
+
+  <email_domain>
+    <item>infomail</item>
+    <item>mymail</item>
+    <item>notmail</item>
+    <item>testmail</item>
+    <item>fakemail</item>
+    <item>lol</item>
+    <item>spamalot</item>
+    <item>sample</item>
+    <item>fishmail</item>
+    <item>airmail</item>
+    <item>example</item>
+    <item>testing</item>
+  </email_domain>
+
+  <email_tld>
+    <item>com</item>
+    <item>org</item>
+    <item>net</item>
+    <item>biz</item>
+    <item>info</item>
+    <item>co.in</item>
+    <item>co.pl</item>
+    <item>co.uk</item>
+    <item>co.nz</item>
+  </email_tld>
+
+  <organization_prefix>
+    <item>Community</item>
+    <item>Global</item>
+    <item>Local</item>
+    <item>Sierra</item>
+    <item>United</item>
+    <item>Global</item>
+    <item>Creative</item>
+    <item>Friends</item>
+    <item>Progressive</item>
+    <item>Urban</item>
+    <item>Rural</item>
+  </organization_prefix>
+
+  <organization_name>
+    <item>Arts</item>
+    <item>Poetry</item>
+    <item>Education</item>
+    <item>Software</item>
+    <item>Family</item>
+    <item>Health</item>
+    <item>Wellness</item>
+    <item>Legal</item>
+    <item>Peace</item>
+    <item>Environmental</item>
+    <item>Sustainability</item>
+    <item>Literacy</item>
+    <item>Music</item>
+    <item>Food</item>
+    <item>Agriculture</item>
+    <item>Technology</item>
+    <item>Culture</item>
+    <item>Empowerment</item>
+    <item>Action</item>
+    <item>Advocacy</item>
+    <item>Sports</item>
+    <item>Development</item>
+  </organization_name>
+
+  <organization_suffix>
+    <item>Alliance</item>
+    <item>Partnership</item>
+    <item>Association</item>
+    <item>Fellowship</item>
+    <item>School</item>
+    <item>Trust</item>
+    <item>Services</item>
+    <item>Systems</item>
+    <item>Solutions</item>
+    <item>Center</item>
+    <item>Initiative</item>
+    <item>Collective</item>
+    <item>Partners</item>
+    <item>Network</item>
+    <item>Fund</item>
+    <item>Academy</item>
+  </organization_suffix>
+
+  <group>
+    <item>Newsletter Subscribers</item>
+    <item>Summer Program Volunteers</item>
+    <item>Advisory Board</item>
+  </group>
+
+  <note>
+    <item>Contact the Commissioner of Charities</item>
+    <item>Get the registration done for NGO status</item>
+    <item>Send newsletter for April 2005</item>
+    <item>Organize the Terry Fox run</item>
+    <item>Invite members for the Steve Prefontaine 10k dream run</item>
+    <item>Arrange collection of funds from members</item>
+    <item>Connect for presentation</item>
+    <item>Arrange for cricket match with Sunil Gavaskar</item>
+    <item>Send reminder for annual dinner</item>
+    <item>Chart out route map for next 10k run</item>
+    <item>Reminder screening of "Black" on next Friday</item>
+  </note>
+
+  <activity_type>
+    <item>Dream Run Participant</item>
+    <item>Volunteered for Trek</item>
+    <item>School Repainting</item>
+    <item>Cancer Patient Interaction</item>
+    <item>Handicap Marathon</item>
+  </activity_type>
+
+  <module>
+    <item>Module1</item>
+    <item>Module2</item>
+    <item>Module3</item>
+    <item>Module4</item>
+    <item>Module5</item>
+    <item>Module6</item>
+    <item>Module7</item>
+  </module>
+
+  <callback>
+    <item>Callback1</item>
+    <item>Callback2</item>
+    <item>Callback3</item>
+    <item>Callback4</item>
+    <item>Callback5</item>
+    <item>Callback6</item>
+    <item>Callback7</item>
+  </callback>
+
+
+  <party_registration>
+    <item>BJP</item>
+    <item>Congress(I)</item>
+    <item>BSP</item>
+    <item>Democrat</item>
+    <item>Republican</item>
+    <item>Labour</item>
+    <item>CPI</item>
+  </party_registration>
+
+
+  <degree>
+    <item>B.Tech</item>
+    <item>M.Tech</item>
+    <item>B.Sc</item>
+    <item>B.A</item>
+    <item>M.Sc</item>
+    <item>PhD</item>
+    <item>MCom</item>
+  </degree>
+
+  <school>
+    <item>Brown University</item>
+    <item>VJTI</item>
+    <item>RAIT</item>
+    <item>Princeton University</item>
+    <item>UDCT</item>
+    <item>IIT</item>
+    <item>VIT</item>
+  </school>
+
+  <issue>
+    <item>Edu</item>
+    <item>Env</item>
+    <item>SocJus</item>
+  </issue>
+
+  <gotv>
+     <item>HM</item>
+     <item>PB</item>
+     <item>PW</item>
+     <item>SB</item>
+  </gotv>
+
+  <marital_status>
+     <item>S</item>
+     <item>M</item>
+     <item>D</item>
+     <item>W</item>
+     <item>O</item>
+  </marital_status>
+
+</sample_data>

@@ -1,0 +1,69 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id='icalendar-title'}
+  {ts}ICalendar Downloads and Feeds{/ts}
+{/htxt}
+{htxt id='icalendar'}
+{capture assign=icalPage}{crmURL p='civicrm/event/ical' q="reset=1&list=1"}{/capture}
+{capture assign=rssFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&rss=1"}{/capture}
+{capture assign=htmlFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&html=1"}{/capture}
+{capture assign=icalPageExample}{crmURL p='civicrm/event/ical' q="reset=1&list=1&type=3&start=20070101"}{/capture}
+<p>
+{ts}iCalendar is a standard format for representing information about calendaring and scheduling. CiviEvent allows you to output your current and upcoming 'public' events in the iCalendar format - so this information can be shared with other iCalendar-enabled applications.{/ts}</p>
+
+<p>{ts}Depending on how you want to use the iCalendar data - you can:{/ts}</p>
+<ul>
+<li>{ts}Download an iCalendar file (with a *.ics extension) to your local computer.{/ts}</li>
+<li>{ts}Access the data using an HTTP GET request from a specific URL. (This is the 'ICAL' icon on the Manage Events page.){/ts}</li>
+</ul>
+
+<p>{ts}The iCalendar Feed URL for CiviEvent on this site:{/ts}</p>
+<pre>
+{$icalPage}
+</pre>
+<p>{ts}By default, both methods get all events whose starting date is greater than or equal to the current date. However, you can modify this by passing additional parameters in the URL:{/ts}</p>
+<ul>
+<li>{ts}start=YYYYMMDD - Specify a different starting date range for the events to be listed.{/ts}</li>
+<li>{ts}type=N - Specify a particular Event Type using the event_type_id value. (You can find these values by browsing the listing at Administer &raquo; CiviEvent &raquo; Event Types.){/ts}</li>
+</ul>
+<p>{ts}EXAMPLE: Given the default event types, this URL will retrieve all events with start dates on or after January 1, 2007 whose event type is 'Fundraiser':{/ts}</p>
+<pre>
+{$icalPageExample}
+</pre>
+
+<p><strong>{ts}HTML Listing{/ts}</strong><br />
+{ts}CiviEvent provides a page which lists your current and future public events in a table layout for display in a browser. Point people to this page using the following URL:{/ts}</p>
+<pre>
+{$htmlFeed}
+</pre>
+<p>{ts}You can add links to this page in your Drupal or Joomla menus and on any content page. You can also use the additional parameters shown above to filter the events included on the page.{/ts}</p>
+<p><strong>{ts}RSS 2.0 Feeds{/ts}</strong><br />
+{ts}CiviEvent also creates an RSS 2.0 formatted feed which can be subscribed to people using RSS readers and can be displayed in most modern browsers. The RSS Feed URL for CiviEvent on this site:{/ts}</p>
+<pre>
+{$rssFeed}
+</pre>
+<p>{ts}You can also use the additional parameters shown above to filter the events included in the RSS feed.{/ts}</p>
+{/htxt}

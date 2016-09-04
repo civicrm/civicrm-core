@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Phone</class>
+  <name>civicrm_phone</name>
+  <comment>Phone information for a specific location.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Phone ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Phone ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>Phone Contact</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>location_type_id</name>
+    <title>Phone Location Type</title>
+    <type>int unsigned</type>
+    <comment>Which Location does this phone belong to.</comment>
+    <pseudoconstant>
+      <table>civicrm_location_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>display_name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_location_type</name>
+    <fieldName>location_type_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>is_primary</name>
+    <title>Is Phone Primary?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the primary phone for this contact and location.</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_is_primary</name>
+    <fieldName>is_primary</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>is_billing</name>
+    <title>Is Billing Phone</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the billing?</comment>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_is_billing</name>
+    <fieldName>is_billing</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>mobile_provider_id</name>
+    <title>Mobile Provider</title>
+    <type>int unsigned</type>
+    <comment>Which Mobile Provider does this phone belong to.</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>UI_mobile_provider_id</name>
+    <fieldName>mobile_provider_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>phone</name>
+    <type>varchar</type>
+    <length>32</length>
+    <import>true</import>
+    <headerPattern>/phone/i</headerPattern>
+    <dataPattern>/^[\d\(\)\-\.\s]+$/</dataPattern>
+    <comment>Complete phone number.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>phone_ext</name>
+    <title>Phone Extension</title>
+    <type>varchar</type>
+    <length>16</length>
+    <html>
+      <type>Text</type>
+      <size>4</size>
+    </html>
+    <import>true</import>
+    <export>true</export>
+    <headerPattern>/extension/i</headerPattern>
+    <dataPattern>/^\d+$/</dataPattern>
+    <comment>Optional extension for a phone number.</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>phone_numeric</name>
+    <type>varchar</type>
+    <length>32</length>
+    <comment>Phone number stripped of all whitespace, letters, and punctuation.</comment>
+    <add>4.3</add>
+  </field>
+  <index>
+    <name>index_phone_numeric</name>
+    <fieldName>phone_numeric</fieldName>
+    <add>4.3</add>
+  </index>
+  <field>
+    <name>phone_type</name>
+    <type>enum</type>
+    <values>Phone, Mobile, Fax, Pager</values>
+    <headerPattern>/phone\s+type/i</headerPattern>
+    <dataPattern>/phone|mobile|fax|pager/i</dataPattern>
+    <comment>What type of telecom device is this.</comment>
+    <add>1.1</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>phone_type_id</name>
+    <title>Phone Type</title>
+    <type>int unsigned</type>
+    <comment>Which type of phone does this number belongs.</comment>
+    <pseudoconstant>
+      <optionGroupName>phone_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>2.2</add>
+  </field>
+</table>

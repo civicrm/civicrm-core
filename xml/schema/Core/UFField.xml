@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>UFField</class>
+  <name>civicrm_uf_field</name>
+  <comment>User Framework fields and their properties.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Profile Field ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique table ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>uf_group_id</name>
+    <title>Profile ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Which form does this field belong to.</comment>
+    <add>1.1</add>
+    <pseudoconstant>
+      <table>civicrm_uf_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>uf_group_id</name>
+    <table>civicrm_uf_group</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>field_name</name>
+    <title>Profile Field Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Name for CiviCRM field which is being exposed for sharing.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Profile Field Is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this field currently shareable? If false, hide the field for all sharing contexts.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_view</name>
+    <title>Profile Is View Only</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>the field is view only and not editable in user forms.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_required</name>
+    <title>Profile Field Is Required</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this field required when included in a user or registration form?</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <title>Order</title>
+    <type>int</type>
+    <required>true</required>
+    <default>1</default>
+    <comment>Controls field display order when user framework fields are displayed in registration and account editing forms.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>help_post</name>
+    <title>Profile Field Post Help</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Description and/or help text to display after this field.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>help_pre</name>
+    <title>Profile Field Pre Help</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Description and/or help text to display before this field.</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>is_registration</name>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this field included in new user registration forms?</comment>
+    <add>1.1</add>
+    <drop>1.3</drop>
+  </field>
+  <field>
+    <name>is_match</name>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this field part of the key for matching users to contacts?</comment>
+    <add>1.1</add>
+    <drop>1.3</drop>
+  </field>
+  <field>
+    <name>visibility</name>
+    <title>Profile Field Visibility</title>
+    <type>varchar</type>
+    <length>32</length>
+    <default>'User and User Admin Only'</default>
+    <comment>In what context(s) is this field visible.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::ufVisibility</callback>
+    </pseudoconstant>
+    <add>1.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>listings_title</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Page title for listings page (users who share a common value for this property).</comment>
+    <add>1.1</add>
+    <drop>1.2</drop>
+  </field>
+  <field>
+    <name>in_selector</name>
+    <title>Profile Field Is a Filter</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this field included as a column in the selector table?</comment>
+    <add>1.2</add>
+  </field>
+  <field>
+    <name>is_searchable</name>
+    <title>Profile Field Is Searchable</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this field included search form of profile?</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>location_type_id</name>
+    <title>Profile Field Location Type</title>
+    <type>int unsigned</type>
+    <comment>Location type of this mapping, if required</comment>
+    <add>1.3</add>
+  </field>
+  <foreignKey>
+    <name>location_type_id</name>
+    <table>civicrm_location_type</table>
+    <key>id</key>
+    <add>1.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>phone_type</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Phone type, if required</comment>
+    <add>1.3</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>phone_type_id</name>
+    <title>Profile Field Phone Type</title>
+    <type>int unsigned</type>
+    <comment>Phone Type Id, if required</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>website_type_id</name>
+    <title>Profile Field Website Type</title>
+    <type>int unsigned</type>
+    <comment>Website Type Id, if required</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>label</name>
+    <title>Profile Field Label</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <localizable>true</localizable>
+    <comment>To save label for fields.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>field_type</name>
+    <title>Profile Field Type</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>This field saves field type (ie individual,household.. field etc).</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Profile Field Is Reserved</title>
+    <type>boolean</type>
+    <comment>Is this field reserved for use by some other CiviCRM functionality?</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>is_multi_summary</name>
+    <title>Profile Field Supports Multiple</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Include in multi-record listing?</comment>
+    <add>4.3</add>
+  </field>
+  <index>
+    <name>IX_website_type_id</name>
+    <title>Profile Field Website Type</title>
+    <fieldName>website_type_id</fieldName>
+    <add>4.5</add>
+  </index>
+</table>

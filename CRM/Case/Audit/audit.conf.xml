@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+includeRule can be "include" or "exclude".
+  include means include the fields listed in the region.
+  exclude means include all fields not listed in the region AND not listed in the exclusionCorrespondingRegion.
+
+includeTime is true or false and says whether to include the time component of date fields.
+  It can be overridden at the Field level.
+
+  ifBlank specifies an alternate field to display if the field is blank.
+-->
+
+<regions>
+  <region name="leftpane" includeRule="include" includeTime="false">
+    <fields>
+      <field ifBlank="Due Date">Actual Date</field>
+      <field ifBlank="Activity Type">Subject</field>
+    </fields>
+  </region>
+
+  <region name="rightpaneheader" includeRule="include" includeTime="true">
+    <fields>
+      <field>Activity Type</field>
+      <field>Subject</field>
+      <field>Actual Date</field>
+      <field>Created By</field>
+      <field>Revision</field>
+    </fields>
+  </region>
+
+  <!-- The rightpane body then gets "everything that isn't in the header", EXCEPT
+    the fields you specify here. This seems a good compromise
+    over explicitly having to define which fields we want for each activity type,
+    given that they are custom.
+
+    One future tweak is to improve the way the fields get ordered here. Right now
+    they'll just come out the same order as in the export, which will likely be semi-random.
+  -->
+  <region name="rightpanebody" includeRule="exclude" exclusionCorrespondingRegion="rightpaneheader" includeTime="true">
+    <fields>
+      <field>Some field nobody likes</field>
+    </fields>
+  </region>
+
+  <!-- Haven't decided if this one belongs in here. Probably belongs in yet another config file.
+    This tells us which field has the semantic meaning of "status", and which value indicates "completed".
+  -->
+  <completionStatus>
+    <label>Status</label>
+    <value>Completed</value>
+  </completionStatus>
+  <!-- Similarly this probably doesn't belong in here. This tells what field(s) to sort by.
+  -->
+  <sortByLabels>
+    <label>Actual Date</label> <!-- Sort by this first -->
+    <label>Due Date</label> <!-- Then if equal sort by this -->
+    <label>Date and Time</label>
+  </sortByLabels>
+
+</regions>

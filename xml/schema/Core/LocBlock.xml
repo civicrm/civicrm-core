@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>LocBlock</class>
+  <name>civicrm_loc_block</name>
+  <comment>Define location specific properties</comment>
+  <add>2.0</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Location Block ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique ID</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>address_id</name>
+    <title>Location Block Address</title>
+    <type>int unsigned</type>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>address_id</name>
+    <table>civicrm_address</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>email_id</name>
+    <title>Location Block Email</title>
+    <type>int unsigned</type>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>email_id</name>
+    <table>civicrm_email</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>phone_id</name>
+    <title>Location Block Phone</title>
+    <type>int unsigned</type>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>phone_id</name>
+    <table>civicrm_phone</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>im_id</name>
+    <title>Location Block IM</title>
+    <type>int unsigned</type>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>im_id</name>
+    <table>civicrm_im</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>address_2_id</name>
+    <title>Location Block IM 2</title>
+    <type>int unsigned</type>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>address_2_id</name>
+    <table>civicrm_address</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>email_2_id</name>
+    <type>int unsigned</type>
+    <title>Email 2</title>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>email_2_id</name>
+    <table>civicrm_email</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>phone_2_id</name>
+    <type>int unsigned</type>
+    <title>Phone 2</title>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>phone_2_id</name>
+    <table>civicrm_phone</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>im_2_id</name>
+    <type>int unsigned</type>
+    <title>Instant Messenger 2</title>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>im_2_id</name>
+    <table>civicrm_im</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

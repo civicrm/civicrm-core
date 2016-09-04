@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Activity</base>
+  <class>ActivityTarget</class>
+  <name>civicrm_activity_target</name>
+  <comment>Activity targets</comment>
+  <add>2.0</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Activity Target ID</title>
+    <required>true</required>
+    <comment>Activity target id</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+   <field>
+    <name>activity_id</name>
+    <type>int unsigned</type>
+    <title>Activity ID</title>
+    <required>true</required>
+    <comment>Foreign key to the activity for this target.</comment>
+    <add>2.0</add>
+   </field>
+   <foreignKey>
+    <name>activity_id</name>
+    <table>civicrm_activity</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+   <field>
+    <name>target_contact_id</name>
+    <title>Contact ID (match to contact)</title>
+    <import>true</import>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to the contact for this target.</comment>
+    <add>2.0</add>
+   </field>
+   <foreignKey>
+    <name>target_contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <index>
+       <name>UI_activity_target_contact_id</name>
+       <fieldName>target_contact_id</fieldName>
+       <fieldName>activity_id</fieldName>
+       <unique>true</unique>
+       <add>2.0</add>
+  </index>
+</table>

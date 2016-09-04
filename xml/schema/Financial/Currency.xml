@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financial</base>
+  <class>Currency</class>
+  <name>civicrm_currency</name>
+  <add>1.7</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Currency ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Currency Id</comment>
+    <add>1.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Currency</title>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <comment>Currency Name</comment>
+    <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>symbol</name>
+    <title>Currency Symbol</title>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Currency Symbol</comment>
+    <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>numeric_code</name>
+    <title>Currency Numeric Code</title>
+    <type>varchar</type>
+    <length>3</length>
+    <import>true</import>
+    <comment>Numeric currency code</comment>
+    <add>1.9</add>
+  </field>
+  <field>
+    <name>full_name</name>
+    <title>Full Currency Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Full currency name</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.9</add>
+  </field>
+</table>

@@ -1,0 +1,50 @@
+#!/bin/bash
+set -ex
+
+## Setup a test site based on source code in the Jenkins workspace
+## and run the test suite.
+##
+## To configure a Jenkins job which runs tests and produces code-coverage,
+## put something like this in the job configuration:
+##
+##  [ -d "${WORKSPACE}/build" ] && rm -rf "${WORKSPACE}/build"
+##  mkdir -p "${WORKSPACE}/build" "${WORKSPACE}/build/CodeCoverage"
+##  ${WORKSPACE}/civicrm/tools/scripts/phpunit-jenkins \
+##    --tap \
+##    --coverage-clover "${WORKSPACE}/build/CodeCoverage/clover.xml" \
+##    --coverage-html "${WORKSPACE}/build/CodeCoverage/" \
+##    --log-junit "${WORKSPACE}/build/junit.xml" \
+##    CRM_AllTests
+##
+## To configure a Jenkins job which run tests but omits code-coverage:
+##
+##  [ -d "${WORKSPACE}/build" ] && rm -rf "${WORKSPACE}/build"
+##  mkdir -p "${WORKSPACE}/build"
+##  ${WORKSPACE}/civicrm/tools/scripts/phpunit-jenkins \
+##    --tap \
+##    --log-junit "${WORKSPACE}/build/junit.xml" \
+##    CRM_AllTests
+##
+
+if [ -z "$EXECUTOR_NUMBER" -o -z "$WORKSPACE" ]; then
+  echo "This script requires the following environment variables:"
+  echo "EXECUTOR_NUMBER"
+  echo "WORKSPACE"
+  exit 1
+fi
+
+## Configuration
+OUTPUT="${WORKSPACE}/build"
+DRUPAL_ROOT="/var/www/drupal"
+SITE_URL="jenkins-${EXECUTOR_NUMBER}.localhost"
+SITE_DB="jenkins_${EXECUTOR_NUMBER}"
+export CIVICRM_LOCALES=en_US,fr_FR
+
+## Prepare workspace
+bash "${WORKSPACE}/civicrm/tools/scripts/mk-drupal-test-site" "${SITE_URL}" "${SITE_DB}" "${DRUPAL_ROOT}" "${WORKSPACE}/civicrm/"
+
+## Run tests
+pushd "${DRUPAL_ROOT}/sites/${SITE_URL}/modules/civicrm/tools"
+./scripts/phpunit "$@"
+#  --process-isolation \
+popd

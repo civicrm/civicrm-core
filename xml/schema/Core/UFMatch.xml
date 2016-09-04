@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>UFMatch</class>
+  <name>civicrm_uf_match</name>
+  <comment>The mapping from an user framework (UF) object to a CRM object.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>UF Match ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>System generated ID.</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>UF Match Domain ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Which Domain is this match entry for</comment>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>3.0</add>
+  </foreignKey>
+  <field>
+    <name>uf_id</name>
+    <title>CMS ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>UF ID</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>I_civicrm_uf_match_uf_id</name>
+    <fieldName>uf_id</fieldName>
+    <add>3.3</add>
+  </index>
+  <field>
+    <name>uf_name</name>
+    <title>CMS Unique Identifier</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>UF Name</comment>
+    <add>1.9.kabissa</add>
+  </field>
+  <field>
+    <name>contact_id</name>
+    <title>CiviCRM Contact ID</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>email</name>
+    <type>varchar</type>
+    <length>64</length>
+    <rule>email</rule>
+    <comment>Email address</comment>
+    <add>1.1</add>
+    <drop>2.0</drop>
+  </field>
+  <field>
+    <name>language</name>
+    <title>Preferred Language</title>
+    <type>varchar</type>
+    <length>5</length>
+    <comment>UI language preferred by the given user/contact</comment>
+    <add>2.1</add>
+  </field>
+  <index>
+    <name>UI_uf_id_domain_id</name>
+    <fieldName>uf_id</fieldName>
+    <fieldName>domain_id</fieldName>
+    <unique>true</unique>
+    <add>1.5</add>
+    <drop>1.7</drop>
+  </index>
+  <index>
+    <name>UI_uf_name_domain_id</name>
+    <fieldName>uf_name</fieldName>
+    <fieldName>domain_id</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+  <index>
+    <name>UI_contact_domain_id</name>
+    <fieldName>contact_id</fieldName>
+    <fieldName>domain_id</fieldName>
+    <unique>true</unique>
+    <add>1.6</add>
+  </index>
+</table>

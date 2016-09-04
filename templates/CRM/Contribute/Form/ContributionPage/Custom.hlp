@@ -1,0 +1,48 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="contrib-profile-title"}
+  {ts}Contributor Profiles{/ts}
+{/htxt}
+{htxt id="contrib-profile"}
+<p>
+  {ts}If you want collect additional information from contributors, you can include one or two CiviCRM Profiles - which are collections of standard or custom fields - in this contribution page. For example, you may need to collect information about the person (e.g. name and address if these are not already required by your payment processor, interest in subscribing to a newsletter or volunteering). You might also want to collect information specific to this contribution (e.g. target one or several projects or funds to support with this contribution).{/ts}
+</p>
+<p>
+  {ts}Your site may already have profile(s) which were previously created for this purpose, in which case you can re-use them for any number of online contribution pages.{/ts}
+  {ts}If you haven't already configured custom fields and a profile to collect data you need for this form, you can create them here using the steps below.{/ts}
+</p>
+<ol>
+  <li>{ts}Create a new profile by clicking the 'Create' button next to 'Include Profile' field below. Name your new profile (e.g. 'Contribution Information').{/ts}</li>
+  <li>{ts}Add any existing fields needed by dragging them into the profile form builder.{/ts}</li>
+  <li>{ts}If you need to create new custom fields, you can also do that within the profile editor. Then add the new custom field(s) to this profile by dragging them into the form builder.{/ts}</li>
+  <li>{ts}Save your profile to return to this screen. You can preview it from here by clicking the Preview (microsope) button.{/ts}</li>
+</ol>
+{capture assign=docLinkCustom}{docURL page="user/organising-your-data/custom-fields" text="custom fields"}{/capture}
+{capture assign=docLinkProfile}{docURL page="user/organising-your-data/profiles" text="profiles"}{/capture}
+<p>
+  {ts 1=$docLinkCustom 2=$docLinkProfile}Refer to the online documentation for more details on creating %1 and %2.{/ts}
+</p>
+{/htxt}

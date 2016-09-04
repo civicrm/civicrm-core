@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Timezone</class>
+  <name>civicrm_timezone</name>
+  <add>1.8</add>
+  <field>
+    <name>id</name>
+    <title>Timezone ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Timezone Id</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Timezone Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Timezone full name</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>abbreviation</name>
+    <title>Timezone Abbreviation</title>
+    <type>char</type>
+    <length>3</length>
+    <comment>ISO Code for timezone abbreviation</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>gmt</name>
+    <title>GMT Name of Timezone</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>GMT name of the timezone</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>offset</name>
+    <title>GMT Offset</title>
+    <type>int</type>
+    <comment></comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>country_id</name>
+    <title>Country</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Country Id</comment>
+    <add>1.8</add>
+  </field>
+  <foreignKey>
+    <name>country_id</name>
+    <table>civicrm_country</table>
+    <key>id</key>
+    <add>1.8</add>
+  </foreignKey>
+</table>
+

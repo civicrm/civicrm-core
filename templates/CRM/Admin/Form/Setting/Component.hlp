@@ -1,0 +1,39 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="components-title"}
+  {ts}Components{/ts}
+{/htxt}
+{htxt id="components"}
+<p>{ts}These optional components give you more tools to connect with and engage your supporters.{/ts}</p>
+<p>{ts}<strong>CiviContribute</strong> - An online fundraising and donor management component which enables you to track and manage contributions to your organization. It also allows you to quickly and easily create customized web pages to accept online donations.{/ts} {docURL page="user/contributions/what-is-civicontribute"}</p>
+<p>{ts}<strong>CiviPledge</strong> - Record and track pledges received from contributors. Send pledge acknowledgements and payment reminders. Configure online contribution pages to support self-service pledging and pledge payments.{/ts} {docURL page="user/pledges/what-is-civipledge"}</p>
+<p>{ts}<strong>CiviMail</strong> - A robust mass-mailing component which allows you to engage your constituents with personalized email blasts and newsletters.{/ts} {docURL page="user/email/what-is-civimail"}</p>
+<p>{ts}<strong>CiviMember</strong> - A flexible membership management component which includes convenient online signup and renewal.{/ts} {docURL page="user/membership/introduction-to-memberships/"}</p>
+<p>{ts}<strong>CiviEvent</strong> - Provides integrated online event registration and management for paid and free events. It allows you to quickly and easily create customized web pages to for event registration, and then track participants.{/ts} {docURL page="user/events/what-is-civievent"}</p>
+<p>{ts}<strong>CiviCampaign</strong> - Lets you link together events, mailings, activities, and contributions under one "umbrella" so that you can track the progress of all your efforts towards one programmatic goal or campaign.{/ts} {docURL page="user/campaign/what-is-civicampaign"}</p>
+<p>{ts}<strong>CiviCase</strong> - Integrated case management component, including a dashboard with "my cases", automated case timelines and configurable audit reports.{/ts} {docURL page="user/case-management/what-is-civicase"}</p>
+<p>{ts}<strong>CiviGrant</strong> - Designed to be used by organizations that distribute funds to others, for example foundations, grant givers, etc.{/ts} {docURL page="user/grants/what-is-civigrant"}</p>
+{/htxt}

@@ -1,0 +1,63 @@
+<!--
+Controller: ABListingCtrl
+Required vars: mailingABList
+-->
+
+<span crm-ui-order="{var: 'myOrder', defaults: ['-created_date']}"></span>
+
+<div crm-ui-accordion="{title: ts('Filter'), collapsed: true}">
+  <form name="filterForm">
+    <span>
+      <input class="big crm-form-text" ng-model="filter.name" placeholder="{{ts('Name')}}"/>
+    </span>
+    <span>
+      <select crm-ui-select style="width: 10em;" ng-model="filter.status">
+        <option value="">{{ts('- Status -')}}</option>
+        <option ng-repeat="o in fields.status.options" ng-value="o.key">{{o.value}}</option>
+      </select>
+    </span>
+    <span>
+      <select crm-ui-select style="width: 20em;" ng-model="filter.testing_criteria">
+        <option value="">{{ts('- Test Type -')}}</option>
+        <option ng-repeat="o in fields.testing_criteria.options" ng-value="o.key">{{o.value}}</option>
+      </select>
+    </span>
+  </form>
+</div>
+
+<div ng-show="!$.isEmptyObject(mailingABList)">
+  <table class="display">
+    <thead>
+    <tr>
+      <th><a crm-ui-order-by="[myOrder, 'name']">{{ts('Name')}}</a></th>
+      <th><a crm-ui-order-by="[myOrder, 'status']">{{ts('Status')}}</a></th>
+      <th><a crm-ui-order-by="[myOrder, 'testing_criteria']">{{ts('Test Type')}}</a></th>
+      <th><a crm-ui-order-by="[myOrder, 'created_date']">{{ts('Created')}}</a></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="mailingAB in mailingABList | filter:filter | orderBy:myOrder.get()">
+      <td>{{mailingAB.name}}</td>
+      <td>{{crmMailingABStatus.getByName(mailingAB.status).label}}</td>
+      <td>{{crmMailingABCriteria.get(mailingAB.testing_criteria).label}}</td>
+      <td>{{mailingAB.created_date}}</td>
+      <td>
+        <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}" ng-show="mailingAB.status == 'Draft'">{{ts('Continue')}}</a>
+        <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}" ng-show="mailingAB.status != 'Draft'">{{ts('Results')}}</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div ng-show="$.isEmptyObject(mailingABList)" class="messages status no-popup">
+  <i class="crm-i fa-info-circle"></i>
+  {{ts('You have no A/B mailings')}}
+</div>
+
+
+<div class="crm-submit-buttons">
+  <br>
+  <a ng-href="#/abtest/new" class="button"><span><i class="crm-i fa-bar-chart"></i> {{ts('New A/B Test')}}</span></a>
+</div>

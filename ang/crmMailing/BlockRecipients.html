@@ -1,0 +1,19 @@
+<div ng-controller="EditRecipCtrl">
+  <div style="float: right;">
+    <div class='crmMailing-recip-est'>
+      <a href="" ng-click="previewRecipients()" title="{{ts('Preview a List of Recipients')}}">{{getRecipientsEstimate()}}</a>
+    </div>
+  </div>
+  <select
+    crm-mailing-recipients
+    ng-model="mailing.recipients"
+    crm-mandatory-groups="crmMailingConst.groupNames | filter:{is_hidden:1}"
+    crm-avail-groups="crmMailingConst.groupNames | filter:isMailingList | filter:{is_hidden:0}"
+    crm-avail-mailings="crmMailingConst.civiMails"
+    crm-ui-id="{{crmMailingBlockRecipients.id}}"
+    name="{{crmMailingBlockRecipients.name}}"
+    ng-required="true"
+    multiple>
+  </select>
+  <a crm-icon="fa-wrench" ng-click="editOptions(mailing)" class="crm-hover-button" title="{{ts('Edit Recipient Options')}}"></a>
+</div>

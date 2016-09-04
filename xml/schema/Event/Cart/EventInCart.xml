@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Event/Cart</base>
+  <class>EventInCart</class>
+  <name>civicrm_events_in_carts</name>
+  <field>
+    <name>id</name>
+    <title>Event In Cart</title>
+    <uniqueName>event_in_cart_id</uniqueName>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Event In Cart Id</comment>
+    <add>4.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_id</name>
+    <title>Event</title>
+    <type>int unsigned</type>
+    <comment>FK to Event ID</comment>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>event_id</name>
+    <table>civicrm_event</table>
+    <key>id</key>
+    <add>4.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>event_cart_id</name>
+    <title>Event In Cart</title>
+    <type>int unsigned</type>
+    <comment>FK to Event Cart ID</comment>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>event_cart_id</name>
+    <table>civicrm_event_carts</table>
+    <key>id</key>
+    <add>4.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+</table>
+

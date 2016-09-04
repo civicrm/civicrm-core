@@ -1,0 +1,77 @@
+-- +--------------------------------------------------------------------+
+-- | CiviCRM version 4.7                                                |
+-- +--------------------------------------------------------------------+
+-- | Copyright CiviCRM LLC (c) 2004-2016                                |
+-- +--------------------------------------------------------------------+
+-- | This file is a part of CiviCRM.                                    |
+-- |                                                                    |
+-- | CiviCRM is free software; you can copy, modify, and distribute it  |
+-- | under the terms of the GNU Affero General Public License           |
+-- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+-- |                                                                    |
+-- | CiviCRM is distributed in the hope that it will be useful, but     |
+-- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+-- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+-- | See the GNU Affero General Public License for more details.        |
+-- |                                                                    |
+-- | You should have received a copy of the GNU Affero General Public   |
+-- | License and the CiviCRM Licensing Exception along                  |
+-- | with this program; if not, contact CiviCRM LLC                     |
+-- | at info[AT]civicrm[DOT]org. If you have questions about the        |
+-- | GNU Affero General Public License or the licensing of CiviCRM,     |
+-- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- +--------------------------------------------------------------------+
+INSERT INTO
+   civicrm_option_group (name, description, is_reserved, is_active)
+VALUES
+ ('f1_case_type'           , 'Case Type'            , 1, 1),
+ ('f1_case_sub_type'       , 'Case Sub Type'        , 1, 1),
+ ('f1_case_violation'      , 'Violation Type'       , 1, 1),
+ ('case_activity_type'     , 'Type'                 , 1, 1),
+ ('communication_medium'   , 'Communication Medium' , 1, 1);
+
+
+
+
+SELECT @option_group_id_case_type        := max(id) from civicrm_option_group where name = 'f1_case_type';
+SELECT @option_group_id_case_stype       := max(id) from civicrm_option_group where name = 'f1_case_sub_type';
+SELECT @option_group_id_case_viol        := max(id) from civicrm_option_group where name = 'f1_case_violation';
+SELECT @option_group_id_case_atype       := max(id) from civicrm_option_group where name = 'case_activity_type';
+SELECT @option_group_id_case_comm        := max(id) from civicrm_option_group where name = 'communication_medium';
+
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
+VALUES
+(@option_group_id_case_type, 'Civil & Political'          ,  1, NULL, NULL, 0, 1,  1, NULL, 0, 1, 1),
+(@option_group_id_case_type, 'Economic, Social & Cultural',  2, NULL, NULL, 0, 0,  2, NULL, 0, 1, 1),
+(@option_group_id_case_type, 'Gender Issues'              ,  3, NULL, NULL, 0, 0,  3, NULL, 0, 1, 1),
+(@option_group_id_case_stype,'Labour Rights'              ,  1, NULL, NULL, 0, 1,  1, NULL, 0, 1, 1),
+(@option_group_id_case_stype,'Land Rights'                ,  2, NULL, NULL, 0, 0,  2, NULL, 0, 1, 1),
+(@option_group_id_case_stype,'LGTB Rights'                ,  3, NULL, NULL, 0, 0,  3, NULL, 0, 1, 1),
+(@option_group_id_case_stype,'State Corruption'           ,  4, NULL, NULL, 0, 0,  4, NULL, 0, 1, 1),
+(@option_group_id_case_stype,'Working with IDPs'          ,  5, NULL, NULL, 0, 0,  5, NULL, 0, 1, 1),
+(@option_group_id_case_viol, 'Arrested / Detained'        ,  1, NULL, NULL, 0, 1,  1, NULL, 0, 1, 1),
+(@option_group_id_case_viol, 'Disappeared'                ,  2, NULL, NULL, 0, 0,  2, NULL, 0, 1, 1),
+(@option_group_id_case_viol, 'Harassment'                 ,  3, NULL, NULL, 0, 0,  3, NULL, 0, 1, 1),
+(@option_group_id_case_viol, 'Killed'                     ,  4, NULL, NULL, 0, 0,  4, NULL, 0, 1, 1),
+(@option_group_id_case_viol, 'Legal Action'               ,  5, NULL, NULL, 0, 0,  5, NULL, 0, 1, 1),
+(@option_group_id_case_viol, 'Threats'                    ,  6, NULL, NULL, 0, 0,  6, NULL, 0, 1, 1),
+(@option_group_id_case_viol, 'Tortured / Ill-treatment'   ,  7, NULL, NULL, 0, 0,  7, NULL, 0, 1, 1),
+(@option_group_id_case_viol, 'Violence Against Women'     ,  8, NULL, NULL, 0, 0,  8, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'Source(incoming)'           ,  1, NULL, NULL, 0, 1,  1, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'Incoming correspondence'    ,  2, NULL, NULL, 0, 0,  2, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'Incoming Press Release'     ,  3, NULL, NULL, 0, 0,  3, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'Complaint'                  ,  4, NULL, NULL, 0, 0,  4, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'Urgent Action(incoming)'    ,  5, NULL, NULL, 0, 0,  5, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'Outgoing correspondence'    ,  6, NULL, NULL, 0, 0,  6, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'Outgoing Press Release'     ,  7, NULL, NULL, 0, 0,  7, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'FL Action(outgoing)'        ,  8, NULL, NULL, 0, 0,  8, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'FL Urgent Action(outgoing)' ,  9, NULL, NULL, 0, 0,  9, NULL, 0, 1, 1),
+(@option_group_id_case_atype,'Lobbying(outgoing)'         , 10, NULL, NULL, 0, 0, 10, NULL, 0, 1, 1),
+(@option_group_id_case_comm ,'E-mail'                     ,  1, NULL, NULL, 0, 1,  1, NULL, 0, 1, 1),
+(@option_group_id_case_comm ,'Fax'                        ,  2, NULL, NULL, 0, 0,  2, NULL, 0, 1, 1),
+(@option_group_id_case_comm ,'Letter'                     ,  3, NULL, NULL, 0, 0,  3, NULL, 0, 1, 1),
+(@option_group_id_case_comm ,'Meeting'                    ,  4, NULL, NULL, 0, 0,  4, NULL, 0, 1, 1),
+(@option_group_id_case_comm ,'SMS Message'                ,  5, NULL, NULL, 0, 0,  5, NULL, 0, 1, 1),
+(@option_group_id_case_comm ,'Telephone'                  ,  6, NULL, NULL, 0, 0,  6, NULL, 0, 1, 1),
+(@option_group_id_case_comm ,'Video Conference'           ,  7, NULL, NULL, 0, 0,  7, NULL, 0, 1, 1);

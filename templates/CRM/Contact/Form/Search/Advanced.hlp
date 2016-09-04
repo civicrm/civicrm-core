@@ -1,0 +1,105 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id='id-advanced-intro-title'}
+{ts}Advanced Search{/ts}
+{/htxt}
+{htxt id='id-advanced-intro'}
+  <p>{ts}Use <strong>&#37;</strong> wildcard(s) for partial matches. EXAMPLE: Enter 'Volunteer&#37;' as your Activity Type to match any activity whose type is 'Volunteer' + any other words (e.g. Volunteer for Open House).{/ts}</p>
+  <p>{ts}When multiple options are selected within a search field the selections are combined using <strong>OR</strong> criteria (e.g. selecting both 'Group A' and 'Group B' will find contacts who are either in 'Group A' OR 'Group B' or in both).</p>
+  <p>By default the different search fields are combined using the <strong>AND</strong> Search Operator (e.g. selecting Tag is 'Age' AND Country is 'Canada' returns only those contacts who meet both criteria). You can override the Search Operator default for combining different fields in the Search Settings.{/ts}</p>
+{/htxt}
+
+{htxt id='id-advanced-smart-title'}
+{ts}Smart Group{/ts}
+{/htxt}
+{htxt id='id-advanced-smart'}
+    <p>{ts}If you've changed search criteria for this 'smart group' and want to save your changes, select <strong>Group - update smart group</strong> from the '- more actions -' drop-down menu{/ts}</p>
+{/htxt}
+
+{htxt id="id-privacy-title"}
+{ts}Privacy Options{/ts}
+{/htxt}
+{htxt id="id-privacy"}
+    <p>{ts}Contacts with any of the checked privacy options are EXCLUDED from your search results by default. EXAMPLE: If you select 'Do not phone', and search for contacts with an address in a specific city - then contacts in that city who have 'Do not phone' selected as a privacy option will be excluded from the search results.{/ts}</p>
+    <p>{ts}If you want to FIND (include) contacts with a particular privacy option set, then click the 'Include' radio button.{/ts}</p>
+{/htxt}
+
+{htxt id="privacy-operator-title"}
+{ts}Multiple Privacy Options{/ts}
+{/htxt}
+{htxt id="privacy-operator"}
+    <p>{ts}If you select multiple privacy options, your choices are combined with OR statements by default. EXAMPLE: If you select 'Do not phone' and 'Do not email', results will include contacts who have either or both preferences. If you want to return only contacts with both preferences, select the AND operator.{/ts}</p>
+{/htxt}
+
+{htxt id="id-display-results-title"}
+{ts}Results Display{/ts}
+{/htxt}
+{htxt id="id-display-results"}
+    <p>{ts}Advanced Search returns your results as Contact records by default. However, you may want to get another record type instead. For example, you may want to see all the Activity records which match your search criteria.{/ts}</p>
+{/htxt}
+
+{htxt id="id-search-views-title"}
+{ts}Views For Display Contacts{/ts}
+{/htxt}
+{htxt id="id-search-views"}
+    <p>{ts}If you are displaying the search results as contacts, you can modify the columns displayed by creating a Profile containing a different set of contact fields and then selecting that Profile here. For example you may want to include columns for Gender and Date of Birth, while eliminating Country.{/ts} {docURL page="user/current/organising-your-data/profiles"}</p>
+{/htxt}
+
+{htxt id="id-search-operator-title"}
+{ts}Search Operator{/ts}
+{/htxt}
+{htxt id="id-search-operator"}
+    <p>{ts}Determines whether your criteria are combined with AND statements, or combined with OR statements. For example, you may want to find all individuals who are in the Volunteers group AND who have a Volunteer Training activity recorded for them. In this case use the AND operator. If you need to find everyone who is in the Volunteers group OR has a Volunteer Training activity recorded, use the OR operator.{/ts}</p>
+{/htxt}
+
+{htxt id="id-relationship-target-group-title"}
+{ts}Target Contact Group{/ts}
+{/htxt}
+{htxt id="id-relationship-target-group"}
+    <p>{ts}Use this filter to limit search results to relationships where the related contacts are part of a specific group or groups. For example, you might want to find all individuals who are employees ('Employee of' relationship type) of organizations which are in your 'Corporate Sponsors' group.{/ts}</p>
+{/htxt}
+
+{htxt id="id-all-tags-title"}
+{ts}Tags{/ts}
+{/htxt}
+{htxt id="id-all-tags"}
+    <p>{ts}Find records with tags (regular or tagset tag) which contain a complete or partial word or phrase. EXAMPLE: If you have several tags that contain the word 'Donor', you can find contacts tagged with any of them by entering 'Donor' in this field.{/ts}</p>
+{/htxt}
+
+{htxt id="id-all-tag-types-title"}
+{ts}Include Tags on Other Types of Records{/ts}
+{/htxt}
+{htxt id="id-all-tag-types"}
+  <p>{ts}Check this box if you want to search for tagged activities or cases (in addition to contact records).{/ts}</p>
+{/htxt}
+
+{htxt id="is-test-title"}
+{ts}Test Records{/ts}
+{/htxt}
+{htxt id="is-test"}
+    <p>{ts}In the process of setting up CiviCRM components or configuring pages and profiles, you might have created test contributions, activities, participants, pledges, etc.{/ts}</p>
+    <p>{ts}Once you have finished your testing, it is a good idea to clean up by finding your test records and deleting them.{/ts}</p>
+{/htxt}

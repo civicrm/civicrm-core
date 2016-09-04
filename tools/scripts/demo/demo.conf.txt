@@ -1,0 +1,18 @@
+# tmp dump file
+TMP_DUMP_FILE=
+
+# Define the path for civicrm demo svn source directory here
+CIVI_DEMO_DIR=
+
+# Define drupal-db-name and pristine path along with file-name
+DRUPAL_DEMO_CRM_DBNAME=
+DRUPAL_DEMO_CRM_PRISTINE=
+
+# Define wordpress-db-name and pristine path along with file-name
+WORDPRESS_DEMO_CRM_DBNAME=
+WORDPRESS_DEMO_CRM_PRISTINE=
+
+# Define wordpress-db-name and pristine path along with file-name
+JOOMLA_DEMO_DBNAME=
+JOOMLA_DEMO_PRISTINE=
+

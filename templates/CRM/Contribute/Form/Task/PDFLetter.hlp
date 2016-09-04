@@ -1,0 +1,41 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+
+{htxt id="id-contribution-grouping-title"}
+  {ts}Contribution Grouping{/ts}
+{/htxt}
+{htxt id="id-contribution-grouping"}
+  <p>{ts}You can choose to show contribution data for multiple contributions from the same contact in one location in the body of your letter. This option can be useful for end-of-year thank-you letters, or other situations where you want to acknowledge multiple gifts.{/ts}</p>
+  <p>{ts}If you use this option, you may want to use a table layout to format the output from the contribution token(s). In this case select the 'Table Cell' separator, and each contribution instance will be placed in it's own table cell. Alternatively, you can use the simple 'Comma' separator which will simply separate the contribution amounts and / or dates with commas (e.g. 'Thank you for your generous contributions of $150.00, $200.00, $450.00 this year.').{/ts}
+  </p>
+{/htxt}
+
+{htxt id="id-contribution-email-print-title"}
+  {ts}Print and Email Options{/ts}
+{/htxt}
+{htxt id="id-contribution-email-print"}
+  <p>{ts}You can choose to send thank-you letters as emails to contacts who are able to receive email. If you choose to do this, you can also decide whether to only print PDF's for the remaining contacts OR generate PDF's for all.{/ts}</p>
+{/htxt}

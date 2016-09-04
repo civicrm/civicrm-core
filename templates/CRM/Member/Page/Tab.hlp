@@ -1,0 +1,46 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-status-override-title"}
+  {ts}Override Status{/ts}
+{/htxt}
+{htxt id="id-status-override"}
+  <p>{ts}Membership status is normally assigned and updated automatically based on your configured membership status rules. However, if you want to assign a status manually and bypass automated status setting, check this box. Then you can select from the available status options.{/ts}</p>
+  <p>{ts}The status you assign will remain in force, unless it is again modified on this screen. As long as the Status Override flag is checked, the automated membership status update script will NOT update this membership record.{/ts}</p>
+{/htxt}
+
+{htxt id="id-contribution_contact-title"}
+  {ts}Contributor{/ts}
+{/htxt}
+{htxt id="id-contribution_contact"}
+  <p>{ts}Check this box if someone other than the member is paying for this membership (i.e. a gift membership or gift subscription), and you want to link the payment to the person who is actually paying.  You will be able to select an existing contact or enter a new one. The resulting contribution record will be linked to the payer, and a soft credit for that contribution will be linked to this contact (the member).{/ts}</p>
+{/htxt}
+
+{htxt id="override_end_date-title"}
+  {ts}Override End Date for Auto-renew Memberships{/ts}
+{/htxt}
+{htxt id="override_end_date"}
+  <p>{ts}If CiviCRM's membership end-date is different from when the payment processor will next collect a payment, various problems can occur. Members may experience a gap in their membership, and the renewal date may get changed from what is manually entered. Use care when modifying the End Date value, and check the associated recurring payment in your payment processor system so they always match.{/ts}</p>
+{/htxt}

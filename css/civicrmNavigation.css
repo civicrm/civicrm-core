@@ -1,0 +1,173 @@
+html>body div.outerbox
+{
+  padding: 0 5px 5px 0;
+  z-index:999999;
+  font-size: 13px;
+  margin-top:2px;
+}
+html>body div.outerbox div.shadowbox1
+{
+  position: absolute;
+  right: 0;
+  bottom: 5px;
+  width: 5px;
+  height: 100%;
+  background: url(../i/myshadow.png) no-repeat right top;
+}
+html>body div.outerbox div.shadowbox2
+{
+  position: absolute;
+  bottom: 0;
+  right: 5px;
+  height: 5px;
+  width: 100%;
+  background: url(../i/myshadow.png) left bottom;
+}
+html>body div.outerbox div.shadowbox3
+{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 5px;
+  width: 5px;
+  background: url(../i/myshadow.png) no-repeat right bottom;
+}
+html>body .innerbox
+{
+  margin: 0;
+  z-index:999999;
+  margin-left:10px;
+}
+
+#root-menu-div ul {
+  border: 1px solid #000;
+}
+#root-menu-div li{
+  white-space:nowrap;
+  background-image: none;
+  text-align: left;
+}
+* html #root-menu-div li{
+  height: 1.5em; /* fixing ie6 problem */
+}
+#civicrm-menu,
+#root-menu-div ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background:#5D5D5D;
+  color: white;
+  cursor: default;
+  font-size: 12px;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+}
+
+#civicrm-menu {
+  position:absolute;
+  top:0;
+  left:0;
+  background:#1B1B1B repeat-x;
+  width:100%;
+  height:27px;
+  z-index:99999;
+  overflow: hidden;
+}
+
+li.menu-separator.active{
+  background-color: transparent;
+}
+
+.menu-ul li.active {
+  background-color: #aaa;
+}
+
+#civicrm-menu .activetarget{
+  background-color: #aaa;
+}
+
+#civicrm-menu li a, #root-menu-div li a {
+  color:white;
+  cursor:pointer;
+  display:block;
+  font-weight:normal;
+  text-decoration:none;
+}
+
+* html div.menu-item {
+  display: inline; /* fixes problem in ie6 */
+}
+
+li.menumain {
+  float: left;
+  padding: 3px 10px;
+  background-image: none;
+  border-right: 1px solid #5D5D5D;
+  margin:0;
+}
+
+#root-menu-div .menu-ul li {
+  margin: 0;
+  padding: 0 20px 0 2px;
+}
+
+div.menu-item {
+  padding: 1px 10px 1px 4px;
+  height: auto;
+}
+img.menu-item-arrow{
+  position: absolute;
+  right: 4px;
+  top: 8px;
+}
+li.menu-separator{
+  border-bottom: 1px solid #000;
+  font-size: 0; /* for ie */
+  height: 0;
+  line-height: 0; /* for ie */
+  margin: 2px 0;
+}
+#civicrm-menu .crm-logo-sm {
+  background: url('../i/item_sprites.png') no-repeat scroll -80px -16px;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align:middle;
+}
+
+#civicrm-menu .ui-autocomplete-input,
+.crm-container .ui-autocomplete-input {
+  background: white url("../bower_components/select2/select2.png") no-repeat scroll right -23px;
+  padding-right: 16px;
+  /* so that text doesn't flow on top of icon */
+}
+
+#civicrm-menu #crm-qsearch {
+  padding: 1px 3px 1px 2px;
+  background-color: #000 !important;
+}
+
+#civicrm-menu #crm-qsearch input {
+  background-color: #eaeaea;
+  border: 1px solid black;
+  margin: 0;
+  padding: 2px 16px 3px 2px;
+  height: 16px;
+}
+#civicrm-menu #crm-qsearch input:hover,
+#civicrm-menu #crm-qsearch input:focus,
+#civicrm-menu #crm-qsearch.activetarget input {
+  background-color: #ffffff;
+}
+/* This ensures the drop-down menus appear at the right height */
+#civicrm-menu > li.menumain {
+  height: 19px !important;
+}
+
+/* No results */
+.crm-quickSearch-results.ui-menu-disabled {
+  opacity: .9;
+  background-color: #f8f8f8;
+}
+.crm-quickSearch-results.ui-menu-disabled li {
+  cursor: default;
+}

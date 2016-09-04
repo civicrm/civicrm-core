@@ -1,0 +1,87 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-configure-events-title"}
+  {ts}Event Configuration{/ts}
+{/htxt}
+{htxt id="id-configure-events"}
+<table> 
+<tr>
+    <td><a href="{crmURL p='civicrm/event/manage/settings' q="reset=1&action=update&id=`$params.eventId`"}" id="idEventInformationandSettings">&raquo; {ts}Info &amp; Settings{/ts}</a></td>
+    <td>{ts}Set event title, type (conference, performance etc.), description, start and end dates, maximum number of participants, and activate the event. Enable the public participant listing feature.{/ts}</td>
+</tr>
+<tr>
+    <td><a href="{crmURL p='civicrm/event/manage/location' q="reset=1&action=update&id=`$params.eventId`"}" id="idLocation">&raquo; {ts}Location{/ts}</a></td>
+    <td>{ts}Set event location and event contact information (email and phone).{/ts}</td>
+</tr>
+<tr>
+    <td><a href="{crmURL p='civicrm/event/manage/fee' q="reset=1&action=update&id=`$params.eventId`"}" id="idFee">&raquo; {ts}Fees{/ts}</a></td>
+     <td>{ts}Determine if the event is free or paid. For paid events, set the payment processor, fee level(s) and discounts. Give online registrants the option to 'pay later' (e.g. mail in a check, call in a credit card, etc.).{/ts}</td>
+</tr>
+<tr>
+    <td><a href="{crmURL p='civicrm/event/manage/registration' q="reset=1&action=update&id=`$params.eventId`"}" id="idRegistration">&raquo; {ts}Online Registration{/ts}</a></td>
+    <td>{ts}Determine whether an online registration page is available. If so, configure registration, confirmation and thank you page elements and confirmation email details.{/ts}</td>
+</tr>
+<tr>
+    <td><a href="{crmURL p='civicrm/event/manage/friend' q="reset=1&action=update&id=`$params.eventId`"}" id="idFriend">&raquo; {ts}Tell a Friend{/ts}</a></td>
+    <td>{ts}Make it easy for participants to spread the word about this event to friends and colleagues.{/ts}</td>
+</tr>
+
+{if !$params.isTemplate}
+    <tr>
+    {if $params.participantListingURL}
+        <td><a href="{$params.participantListingURL}" id="idParticipantListing">&raquo; {ts}Participant Listing{/ts}</a></td>
+        {if $config->userSystem->is_drupal}
+          <td>{ts 1=$params.participantListingURL}The following URL will display a list of registered participants for this event to users whose role includes "view event participants" permission: <a href="%1">%1</a>{/ts}</td>
+        {else}
+          <td>{ts 1=$params.participantListingURL}The following URL will display a list of registered participants for this event: <a href="%1">%1</a>{/ts}</td>
+        {/if}
+    {else}
+        <td>&raquo; {ts}Participant Listing{/ts}</td>
+        <td>{ts}Participant Listing is not enabled for this event. You can enable it from{/ts} <a href="{crmURL p='civicrm/event/manage/settings' q="reset=1&action=update&id=`$params.eventId`"}">{ts}Event Information and Settings{/ts}</a>.
+    {/if}
+    </tr>
+
+    <tr>
+        <td><a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$params.eventId`" fe=1}" id="idDisplayEvent">&raquo; {ts}Event Info{/ts}</a></td>
+        <td>{ts}View the Event Information page as it will be displayed to site visitors.{/ts}</td>
+    </tr>
+
+    {if $params.isOnlineRegistration}
+    <tr>
+        <td><a href="{crmURL p='civicrm/event/register' q="reset=1&action=preview&id=`$params.eventId`" a=1 fe=1}" id="idTest-drive">&raquo; {ts}Registration{/ts}</a><br />({ts}test-drive{/ts})</td>
+        <td>{ts}Test-drive the entire online registration process - including custom fields, confirmation, thank-you page, and receipting. Fee payment transactions will be directed to your payment processor's test server. <strong>No live financial transactions will be submitted. However, a contact record will be created or updated and participant and contribution records will be saved to the database. Use obvious test contact names so you can review and delete these records as needed.</strong>{/ts}</td>
+    </tr>
+
+    <tr>
+        <td><a href="{crmURL a=1 fe=1 p='civicrm/event/register' q="reset=1&id=`$params.eventId`"}" id="idLive">&raquo; {ts}Registration{/ts}</a><br />({ts}live{/ts})</td>
+        <td>{ts}Review your customized <strong>LIVE</strong> online event registration page here. Use the following URL in links and buttons on any website to send visitors to this live page{/ts}:<br />
+            <strong>{crmURL a=1 fe=1 p='civicrm/event/register' q="reset=1&id=`$params.eventId`"}</strong>
+        </td>
+    </tr>
+    {/if}
+{/if}
+</table>
+{/htxt}

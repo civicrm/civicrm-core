@@ -1,0 +1,377 @@
+/* joomla.css: Joomla-specific css directives for CiviCRM. */
+
+/*
+** HTML elements
+*/
+div#toolbar-box .icon-48-generic {
+  display: none;
+}
+
+div#toolbar-box {
+  height: 26px;
+}
+
+fieldset {
+  margin-bottom: 1em;
+  padding: .5em;
+}
+form {
+  margin: 0;
+  padding: 0;
+}
+hr {
+  height: 1px;
+  border: 1px solid gray;
+}
+img {
+  border: 0;
+}
+/* Added in CiviCRM 2.0 to alleviate tiny font issues. */
+#crm-container tr, #crm-container tr td {
+  font-size: 1em;
+}
+
+/* Added in CiviCRM 2.1 to overwrite tiny font in TinyMCE editor. */
+#crm-container #content table.mceLayout td {
+  font-size: 0em;
+}
+
+th {
+  text-align: left;
+  padding-right: 1em;
+  border-bottom: 3px solid #ccc;
+  white-space: nowrap;
+}
+th.active img {
+  display: inline;
+}
+tr.dark, tr.light {
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+  padding: 0.1em 0.6em;
+}
+
+td.active {
+  background-color: #ddd;
+}
+
+td.label {
+  background: none;
+  color: #3e3e3e;
+  display: table-cell;
+}
+
+/*
+** Other common styles
+*/
+.breadcrumb {
+  padding-bottom: .5em
+}
+.block ul {
+  margin: 0;
+  padding: 0 0 0.25em 1em;
+}
+br.clear {
+  clear: both;
+  height: 0px;
+}
+.container-inline div {
+  display: inline;
+}
+.container-inline .crm-form-submit {
+  margin: 0;
+}
+.item-list .icon {
+  color: #555;
+  float: right;
+  padding-left: 0.25em;
+  clear: right;
+}
+.item-list .icon a {
+  color: #000;
+  text-decoration: none;
+}
+.item-list .icon a:hover {
+  color: #000;
+  text-decoration: none;
+}
+.item-list .title {
+  font-weight: bold;
+}
+.item-list ul {
+  margin: 0 0 0.75em 0;
+  padding: 0;
+}
+.item-list ul li {
+  margin: 0 0 0.25em 1.5em;
+  padding: 0;
+  list-style: disc;
+}
+/* Override .9em field help size from civicrm.css - CiviCRM 2.0 */
+#crm-container div.description, #crm-container span.description, #crm-container dd.description {
+  font-size: 1em;
+}
+#crm-container div.description, #crm-container span.description {
+  margin: 2px 0 15px 0;
+  display: block;
+}
+.form-item label {
+  font-weight: bold;
+}
+.form-item label.option {
+  font-weight: normal;
+}
+.crm-form-submit {
+  margin: 0.5em 0;
+}
+.marker, .form-required {
+  color: #f00;
+}
+.more-link {
+  text-align: right;
+}
+#pager {
+  clear: both;
+  text-align: center;
+}
+#pager div {
+  padding: 0.5em;
+}
+.tips {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.9em;
+}
+.more-help-link {
+  font-size: 0.85em;
+  text-align: right;
+}
+
+/*
+** Page layout blocks / IDs
+*/
+#header, #content {
+  width: 100%;
+}
+#header {
+  background-color: #69c;
+}
+#logo {
+  vertical-align: middle;
+  border: 0;
+}
+#logo img {
+  float: left;
+  padding: 0em 1.0em 0em 1em;
+  border: 0;
+}
+#menu {
+  padding: 0 0 0 0;
+  vertical-align: middle;
+}
+#primary {
+  font-size: 1.0em;
+  padding: 0em 0.8em 0.5em 0;
+  color: #9cf;
+}
+#primary a {
+  font-weight: bold;
+  color: #fff;
+}
+#secondary {
+  padding: 0 1em 0.5em 0;
+  font-size: 0.8em;
+  color: #9cf;
+}
+#secondary a {
+  font-weight: bold;
+  color: #9cf;
+}
+#search .form-text, #search .crm-form-submit {
+  border: 1px solid #369;
+  font-size: 1.1em;
+}
+#search .form-text {
+  width: 8em;
+  height: 1.4em;
+  padding: 0 0.5em 0 0.5em;
+  margin: 0 0 0.5em 0;
+}
+#search .crm-form-submit {
+  height: 1.5em;
+}
+#main {
+  /* padding in px not ex because IE messes up 100% width tables otherwise */
+  padding: 10px;
+}
+#help {
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+.breadcrumb {
+  margin-bottom: .5em;
+}
+.messages {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 0.3em;
+  margin-bottom: 1em;
+}
+.error {
+  border-color: red;
+  color: red;
+}
+#sidebar-left, #sidebar-right {
+  background-color: #ddd;
+  width: 16em;
+  /* padding in px not ex because IE messes up 100% width tables otherwise */
+  padding: 10px;
+  vertical-align: top;
+}
+
+#content-right {
+  background-color: #FFFFFF;
+}
+
+#footer {
+  padding: 1em;
+  font-size: 0.8em;
+}
+
+/*
+** Common declarations for child classes of node, comment, block, box, etc.
+** If you want any of them styled differently for a specific parent, add
+** additional rules /with only the differing properties!/ to .parent .class.
+** See .comment .title for an example.
+*/
+.title, .title a {
+  font-weight: normal;
+  font-size: 1.6em;
+  color: #666;
+  margin: 0 auto 0 auto;  /* decrease default margins for h<x>.title */
+}
+.block-civicrm #recently-viewed .crm-icon, .crm-icon {
+  margin-top: 0 !important;
+}
+.submitted {
+  color: #999;
+  font-size: 0.8em;
+}
+.links {
+  color: #999;
+}
+.links a {
+  font-weight: bold;
+}
+.block, .box {
+  padding: 0 0 1.5em 0;
+}
+.block {
+  min-height: 25px;
+  border-bottom: 1px solid #bbb;
+  padding-bottom: 0.75em;
+  margin-bottom: 1.5em;
+}
+.block .title {
+  margin-bottom: .25em;
+}
+.box .title {
+  font-size: 1.1em;
+}
+
+#module-status, .version {
+  font-size:11px;
+}
+#module-status a {
+  font-weight: normal;
+}
+.main {
+  text-align:left;
+}
+
+/* Joomla Admin Menu alterations */
+/* Moved from civicrm.css in v3.2 */
+
+ul#civicrm-menu {
+  z-index: 1;
+  position:relative;
+  border: none;
+  left:0px;
+  height:0px;
+  padding: 2px 0px 25px 2px !important;
+  padding-bottom:25px !important; /*moz bottom */
+  padding-bottom:2px; /*ie bottom */
+}
+
+div#toolbar-box div.m {
+  padding: 0px !important;
+  min-height: 0;
+  border: 0;
+  margin-top: 8px;
+}
+
+div#toolbar-box, div#toolbar-box div.m{
+  height: auto;
+}
+
+ul#civicrm-menu li#crm-qsearch {
+  height:0px;
+}
+.crm-tab-button,
+.ui-tabs .ui-tabs-nav li {
+  border: 1px;
+  font-size: 110%;
+}
+.ui-tabs .ui-tabs-nav {
+  padding: 0.2em 3px 1px;
+}
+#mainTabContainer li.crm-tab-button {
+  margin:0 3px 3px 0;
+  border: 1px solid #F5F6F1 !important;
+}
+#mainTabContainer li.crm-tab-button.ui-tabs-selected {
+  padding-bottom: 0;
+  border: 1px solid #999 !important;
+}
+#crm-container {
+  font-size: 11px;
+}
+#crm-container .col1 {
+  margin: 0;
+}
+#crm-container .footer {
+  font-size: 1em;
+}
+.ac_results .ac_odd {
+  background-color: #444;
+}
+
+#crm-notification-container {
+  top: 100px;
+}
+
+.crm-container textarea,
+.crm-container input,
+.crm-container select {
+  font-size: 12px;
+  margin-bottom: auto;
+  margin-right: 4px;
+  width: auto;
+  padding: 2px 4px;
+}
+.crm-container .select2-search input {
+  width: 100%;
+}
+.crm-container textarea,
+.crm-container input {
+  height: auto;
+}
+.crm-container input[type=submit] {
+  height: auto;
+}
+
+.crm-container .disabled {
+  font-weight: normal;
+}

@@ -1,0 +1,70 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="rel-type-title"}
+  {ts}Relationship Type{/ts}
+{/htxt}
+{htxt id="rel-type"}
+<p>{ts}Use this field to configure Membership Types where memberships are automatically granted to related contacts. Examples:{/ts}</p>
+
+<table>
+  <tr>
+    <th>{ts}Relationship Type{/ts}</th>
+    <th>{ts}Direct member is:{/ts}</th>
+    <th>{ts}Membership is automatically granted to:{/ts}</th>
+  </tr>
+  <tr>
+    <td><strong>'{ts}Household Member is{/ts}'</strong></td>
+    <td>{ts}a household{/ts}</td>
+    <td>{ts}'Household Members' of that household{/ts}</td>
+  </tr>
+  <tr>
+    <td><strong>'{ts}Employer of{/ts}'</strong></td>
+    <td>{ts}an organization{/ts}</td>
+    <td>{ts}'Employees' of that organization{/ts}</td>
+  </tr>
+  <tr>
+    <td><strong>'{ts}Parent of{/ts}'</strong></td>
+    <td>{ts}an individual{/ts}</td>
+    <td>{ts}'Children' of that individual{/ts}</td>
+  </tr>
+</table>
+{/htxt}
+
+{htxt id="period-type-title"}
+  {ts}Membership Period{/ts}
+{/htxt}
+{htxt id="period-type"}
+<p>
+{ts}Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date. If membership duration is specified in years, you will be able to specify the exact month and day for memberships to start. If membership duration is specified in months, memberships will start on the 1st of the current month and run for the number of specified months.{/ts}
+</p>
+<p>
+<strong>{ts}EXAMPLES{/ts}</strong><br />
+<ul>
+<li>{ts}<strong>Fixed Membership Period - 1 Year Duration:</strong> Fixed period start date is set to January 1. A person signs up for membership on February 15th, 2008. Their membership start date is set to January 1, 2008 - and the end date is December 31, 2008.{/ts}</li>
+<li>{ts}<strong>Fixed Membership - 3 Months Duration:</strong> A person signs up on February 15th, 2008. Their membership start date is set to February 1, 2008 - and the end date is April 30, 2008.{/ts}</li>
+<li>{ts}<strong>Rolling Membership Period - 1 Year Duration:</strong> A person signs up on February 15th, 2008. Their membership start date is February 15th, 2008 - and the end date is February 14th, 2009.{/ts}</li>
+</ul>
+{/htxt}

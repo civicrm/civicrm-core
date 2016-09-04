@@ -1,0 +1,88 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{capture assign="money_format_help"}
+  {ts}Special symbols include:{/ts}
+  <ul>
+    <li><strong>%c</strong> {ts}currency symbol (e.g. '$'){/ts}</li>
+    <li><strong>%C</strong> {ts}currency ISO code (e.g. 'USD'){/ts}</li>
+    <li><strong>%a</strong> {ts}monetary amount, formatted according to selected Monetary Locale{/ts}</li>
+  </ul>
+  {ts 1='href="http://php.net/manual/en/function.money-format.php"'}For a full list of options see the php <a %1>money_format documentation</a>.{/ts}
+{/capture}
+{htxt id="inheritLocale"}
+  <p>
+    {ts}If checked, CiviCRM will follow CMS language changes.{/ts}
+  </p>
+{/htxt}
+{htxt id="defaultCurrency"}
+  <p>
+    {ts}Default currency assigned to contributions and other monetary transactions.{/ts}
+  </p>
+{/htxt}
+{htxt id="moneyformat"}
+  <p>
+    {ts}Format for displaying monetary amounts with currency symbol.{/ts}
+  </p><p>
+    {$money_format_help}
+  </p>
+{/htxt}
+{htxt id="moneyvalueformat"}
+  <p>
+    {ts}Format for displaying monetary values without the currency symbol.{/ts}
+  </p><p>
+    {$money_format_help}
+  </p>
+{/htxt}
+{htxt id="customTranslateFunction"}
+  <p>
+    {ts}You may override the ts() function in CiviCRM by defining your own translation function.{/ts}
+  </p>
+{/htxt}
+{htxt id="legacyEncoding"}
+  <p>
+    {ts}If import files are NOT encoded as UTF-8, specify an alternate character encoding for these files. The default of <strong>Windows-1252</strong> will work for Excel-created .CSV files on many computers.{/ts}
+  </p>
+{/htxt}
+{htxt id="fieldSeparator"}
+  <p>
+    {ts}Global CSV separator character. Modify this setting to enable import and export of different kinds of CSV files (for example: ',' ';' ':' '|' ).{/ts}
+  </p>
+{/htxt}
+{htxt id="defaultContactCountry"}
+  <p>
+    {ts}This value is selected by default when adding a new contact address.{/ts}
+  </p>
+{/htxt}
+{htxt id="countryLimit"}
+  <p>
+    {ts}Which countries are available in the Country selection field when adding or editing contact addresses. Profile and Custom 'Country' fields also use this setting. To include ALL countries, leave the right-hand box empty.{/ts}
+  </p>
+{/htxt}
+{htxt id="provinceLimit"}
+  <p>
+    {ts}State/province listings are populated dynamically based on the selected Country for all standard contact address editing forms, as well as for <strong>Profile forms which include both a Country and a State/Province field</strong>.  This setting controls which countries' states and/or provinces are available in the State/Province selection field <strong>for Custom Fields</strong> or for Profile forms which do NOT include a Country field.{/ts}
+  </p>
+{/htxt}

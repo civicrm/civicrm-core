@@ -1,0 +1,69 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-dash_welcome-title"}
+  {ts}Dashboard{/ts}
+{/htxt}
+{htxt id="id-dash_welcome"}
+<p>
+  {ts}To include a dashlet report click "Configure Dashboard" and drag the desired dashlet from the "Available Dashlets" block to one of the columns (use the right column for a better fit).{/ts}
+</p>
+<p>
+  {ts}To add reports to your dashboard:{/ts}
+  <ul>
+    <li>{ts}Navigate to a report instance and verify the report filters and display type (Tabular, Bar or Pie Chart). OR create a new report instance from the Reports menu » Create Reports from Templates.{/ts}</li>
+    <li>{ts}Expand the 'Report Settings' section, and click 'Include Report on Dashboard'.{/ts}</li>
+    <li>{ts}Click 'Update Report'.{/ts}</li>
+    <li>{ts}Repeat for each report you want to include on your dashboard.{/ts}</li>
+    <li>{ts}Navigate back to the 'Home' dashboard and click 'Configure Dashboard' again.{/ts}</li>
+    <li>{ts}You can now drag the reports onto the right or left columns and click 'Done' to save your layout.{/ts}</li>
+  </ul>
+</p>
+{/htxt}
+
+{htxt id="id-dash_configure-title"}
+  {ts}Configuration{/ts}
+{/htxt}
+{htxt id="id-dash_configure"}
+<p>
+  {ts}To include a dashlet report drag it from the "Available Dashlets" block to one of the two columns (use the right column for a better fit).{/ts}
+</p>
+<p>
+  {ts}To add reports to your dashboard:{/ts}
+  <ul>
+    <li>{ts}Navigate to a report instance and verify the report filters and display type (Tabular, Bar or Pie Chart). OR create a new report instance from the Reports menu &raquo; Create Reports from Templates.{/ts}</li>
+    <li>{ts}Expand the 'Report Settings' section, and click 'Include Report on Dashboard'.{/ts}</li>
+    <li>{ts}Click 'Update Report'.{/ts}</li>
+    <li>{ts}Repeat for each report your want to include on your dashboard.{/ts}</li>
+    <li>{ts}Navigate back to the 'Home' dashboard and click 'Configure Dashboard' again.{/ts}</li>
+    <li>{ts}You can now drag the reports onto the right or left columns and click 'Done' to save your layout.{/ts}</li>
+  </ul>
+</p>
+{if $params.admin}
+  <p>
+    {ts}If you want to remove dashlets from the set of 'Available Dashlets' you can click the 'x' in the right corner of any dashlet. This will also remove the dashlet from any users' dashboards that currently include it. You can make a dashlet available again by checking the 'Available for Dashboard' box in the Report Settings of the associated report instance.{/ts}
+  </p>
+{/if}
+{/htxt}

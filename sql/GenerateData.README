@@ -1,0 +1,451 @@
+Data is generated at random for the tables in the crm database.
+
+The list below are enums from the database (except the last 2).
+private $preferred_communication_method = array('Phone', 'Email', 'Post');
+private $greeting_type = array('Formal', 'Informal', 'Honorific', 'Custom', 'Other');
+private $contact_type = array('Individual', 'Household', 'Organization');
+private $gender = array('Female', 'Male', 'Transgender');
+private $phone_type = array('Phone', 'Mobile', 'Fax', 'Pager');
+
+// almost enums
+private $prefix = array('Mr', 'Mrs', 'Ms', 'Dr');
+private $suffix = array('Jr', 'Sr');
+
+
+
+The entities below are used for generating names, emails, phones and addresses
+for Individual, household and organization. They are stored in the xml file
+sample_data.xml so please feel free to add names, lastnames to it.
+
+// store names, firstnames, street 1, street2
+private $first_name = array();
+private $last_name = array();
+private $street_name = array();
+private $supplemental_address_1 = array();
+private $address_direction = array();
+private $street_type = array();
+private $email_domain = array();
+private $email_tld = array();
+private $organization_name = array();
+private $organization_field = array();
+private $organization_type = array();
+
+
+
+
+
+Here is some of the sample data id's which are generated.
+
+Domain ID's
+*******************************************************
+domain_array
+Array
+(
+    [0] => 6
+    [1] => 5
+    [2] => 2
+    [3] => 9
+    [4] => 3
+    [5] => 7
+    [6] => 8
+    [7] => 10
+    [8] => 1
+    [9] => 4
+)
+
+
+Contact ID's
+*******************************************************
+contact_array
+Array
+(
+    [0] => 79
+    [1] => 34
+    [2] => 10
+    [3] => 63
+    [4] => 51
+    [5] => 60
+    [6] => 65
+    [7] => 8
+    [8] => 95
+    [9] => 86
+    [10] => 85
+    [11] => 100
+    [12] => 25
+    [13] => 78
+    [14] => 38
+    [15] => 3
+    [16] => 55
+    [17] => 49
+    [18] => 74
+    [19] => 22
+    [20] => 35
+    [21] => 33
+    [22] => 7
+    [23] => 42
+    [24] => 46
+    [25] => 94
+    [26] => 47
+    [27] => 41
+    [28] => 92
+    [29] => 40
+    [30] => 16
+    [31] => 31
+    [32] => 13
+    [33] => 37
+    [34] => 81
+    [35] => 75
+    [36] => 24
+    [37] => 27
+    [38] => 84
+    [39] => 14
+    [40] => 29
+    [41] => 54
+    [42] => 80
+    [43] => 99
+    [44] => 36
+    [45] => 93
+    [46] => 90
+    [47] => 18
+    [48] => 6
+    [49] => 58
+    [50] => 83
+    [51] => 56
+    [52] => 26
+    [53] => 66
+    [54] => 17
+    [55] => 88
+    [56] => 57
+    [57] => 12
+    [58] => 19
+    [59] => 71
+    [60] => 67
+    [61] => 50
+    [62] => 52
+    [63] => 77
+    [64] => 4
+    [65] => 28
+    [66] => 5
+    [67] => 21
+    [68] => 2
+    [69] => 59
+    [70] => 62
+    [71] => 53
+    [72] => 64
+    [73] => 76
+    [74] => 44
+    [75] => 32
+    [76] => 72
+    [77] => 89
+    [78] => 1
+    [79] => 68
+    [80] => 61
+    [81] => 70
+    [82] => 87
+    [83] => 20
+    [84] => 45
+    [85] => 9
+    [86] => 82
+    [87] => 15
+    [88] => 11
+    [89] => 48
+    [90] => 91
+    [91] => 98
+    [92] => 69
+    [93] => 97
+    [94] => 96
+    [95] => 73
+    [96] => 39
+    [97] => 23
+    [98] => 43
+    [99] => 30
+)
+
+
+Individual ID's
+*******************************************************
+individual_array
+Array
+(
+    [0] => 79
+    [1] => 34
+    [2] => 10
+    [3] => 63
+    [4] => 51
+    [5] => 60
+    [6] => 65
+    [7] => 8
+    [8] => 95
+    [9] => 86
+    [10] => 85
+    [11] => 100
+    [12] => 25
+    [13] => 78
+    [14] => 38
+    [15] => 3
+    [16] => 55
+    [17] => 49
+    [18] => 74
+    [19] => 22
+    [20] => 35
+    [21] => 33
+    [22] => 7
+    [23] => 42
+    [24] => 46
+    [25] => 94
+    [26] => 47
+    [27] => 41
+    [28] => 92
+    [29] => 40
+    [30] => 16
+    [31] => 31
+    [32] => 13
+    [33] => 37
+    [34] => 81
+    [35] => 75
+    [36] => 24
+    [37] => 27
+    [38] => 84
+    [39] => 14
+    [40] => 29
+    [41] => 54
+    [42] => 80
+    [43] => 99
+    [44] => 36
+    [45] => 93
+    [46] => 90
+    [47] => 18
+    [48] => 6
+    [49] => 58
+    [50] => 83
+    [51] => 56
+    [52] => 26
+    [53] => 66
+    [54] => 17
+    [55] => 88
+    [56] => 57
+    [57] => 12
+    [58] => 19
+    [59] => 71
+    [60] => 67
+    [61] => 50
+    [62] => 52
+    [63] => 77
+    [64] => 4
+    [65] => 28
+    [66] => 5
+    [67] => 21
+    [68] => 2
+    [69] => 59
+    [70] => 62
+    [71] => 53
+    [72] => 64
+    [73] => 76
+    [74] => 44
+)
+
+
+Household ID's
+*******************************************************
+household_array
+Array
+(
+    [0] => 32
+    [1] => 72
+    [2] => 89
+    [3] => 1
+    [4] => 68
+    [5] => 61
+    [6] => 70
+    [7] => 87
+    [8] => 20
+    [9] => 45
+    [10] => 9
+    [11] => 82
+    [12] => 15
+    [13] => 11
+    [14] => 48
+)
+
+
+Organization ID's
+*******************************************************
+organization_array
+Array
+(
+    [0] => 91
+    [1] => 98
+    [2] => 69
+    [3] => 97
+    [4] => 96
+    [5] => 73
+    [6] => 39
+    [7] => 23
+    [8] => 43
+    [9] => 30
+)
+
+
+
+ID's of individuals with no family's. (TRUE INDIVIDUALS)
+*******************************************************
+strict_individual_array
+Array
+(
+    [0] => 79
+    [1] => 34
+    [2] => 10
+    [3] => 63
+    [4] => 51
+    [5] => 60
+    [6] => 65
+    [7] => 8
+    [8] => 95
+    [9] => 86
+    [10] => 85
+    [11] => 100
+    [12] => 25
+    [13] => 78
+    [14] => 38
+)
+
+
+
+Mapping of Household with Individuals.
+Currently it's a simple mapping of
+each household has 4 members.
+
+1st and 2nd members are spouses
+3rd and 4th members are siblings.
+
+1st member is the head of the household and the rest are members.
+
+*******************************************************
+household_individual_array
+Array
+(
+
+ Household ID's (maps to elements in the household array).
+     |
+     V
+    [32] => Array
+        (
+            [0] => 3     <- head of household
+            [1] => 55    <- member of household, spouse of 1st member
+            [2] => 49    <-         "          , child of 1st and 2nd,
+            [3] => 74    <-         "          ,          "          , sibling of 3rd
+        )
+
+    [72] => Array
+        (
+            [0] => 22
+            [1] => 35
+            [2] => 33
+            [3] => 7
+        )
+
+    [89] => Array
+        (
+            [0] => 42
+            [1] => 46
+            [2] => 94
+            [3] => 47
+        )
+
+    [1] => Array
+        (
+            [0] => 41
+            [1] => 92
+            [2] => 40
+            [3] => 16
+        )
+
+    [68] => Array
+        (
+            [0] => 31
+            [1] => 13
+            [2] => 37
+            [3] => 81
+        )
+
+    [61] => Array
+        (
+            [0] => 75
+            [1] => 24
+            [2] => 27
+            [3] => 84
+        )
+
+    [70] => Array
+        (
+            [0] => 14
+            [1] => 29
+            [2] => 54
+            [3] => 80
+        )
+
+    [87] => Array
+        (
+            [0] => 99
+            [1] => 36
+            [2] => 93
+            [3] => 90
+        )
+
+    [20] => Array
+        (
+            [0] => 18
+            [1] => 6
+            [2] => 58
+            [3] => 83
+        )
+
+    [45] => Array
+        (
+            [0] => 56
+            [1] => 26
+            [2] => 66
+            [3] => 17
+        )
+
+    [9] => Array
+        (
+            [0] => 88
+            [1] => 57
+            [2] => 12
+            [3] => 19
+        )
+
+    [82] => Array
+        (
+            [0] => 71
+            [1] => 67
+            [2] => 50
+            [3] => 52
+        )
+
+    [15] => Array
+        (
+            [0] => 77
+            [1] => 4
+            [2] => 28
+            [3] => 5
+        )
+
+    [11] => Array
+        (
+            [0] => 21
+            [1] => 2
+            [2] => 59
+            [3] => 62
+        )
+
+    [48] => Array
+        (
+            [0] => 53
+            [1] => 64
+            [2] => 76
+            [3] => 44
+        )
+
+)

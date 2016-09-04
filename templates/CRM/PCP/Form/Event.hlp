@@ -1,0 +1,90 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-pcp_intro_help-title"}
+  {ts}Personal Campaign Pages{/ts}
+{/htxt}
+{htxt id="id-pcp_intro_help"}
+{ts}Personal Campaign Pages provide your constituents with the ability to promote this event or a related fundraising effort. When Personal Campaign Pages are enabled constituents will see a link after registering for this event which invites them to create their own page to promote the event (or promote a related online contribution page). Event registration fees (or contributions) from people who come in through a Personal Campaign Page are recorded as "soft credits" for the supporter who created that campaign page.{/ts}
+{/htxt}
+
+{htxt id="id-approval_needed-title"}
+  {ts}Approval Needed{/ts}
+{/htxt}
+{htxt id="id-approval_needed"}
+<p>{ts}If checked, an administrator will need to approve new personal campaign pages before they are available to the public. We recommend using the "Notify Email" feature if you are requiring approval to ensure that the appropriate staff person is informed when a new Personal Campaign page is 'Waiting Review'.{/ts}</p>
+<p>{ts}The person who created the personal campaign page will be automatically notified via email when their page is approved so that they can begin promoting the campaign.{/ts}</p>
+{/htxt}
+
+{htxt id="id-notify-title"}
+  {ts}Email Notification{/ts}
+{/htxt}
+{htxt id="id-notify"}
+<p>{ts}Notification will be sent to this email address whenever a Personal Campaign Page linked to this event is either created or updated. The notification will include links to view the campaign page as well as the contact record of the creator of the page.{/ts}</p>
+<p>{ts}If you want Administrator of your organization to receive each PCP Notification receipt, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org) First Email will be sent to PCP user for support.{/ts}</p>
+{/htxt}   
+
+{htxt id="id-supporter_profile-title"}
+  {ts}Supporter Profile{/ts}
+{/htxt}
+{htxt id="id-supporter_profile"}
+{capture assign="createProfileURL"}{crmURL p="civicrm/admin/uf/group" q="reset=1"}{/capture}
+{ts 1=$createProfileURL}The Supporter Profile is used to collect or update basic information (e.g. name and email address) from users while they are creating a Personal Campaign Page. The profile you select must be configured with 'Account creation required' (under Profile Settings &raquo; Advanced Settings). You must include an Email address field - and you may include any number of other fields in the profile. If you don't yet have an appropriate Profile configured, you will need to <a href='%1'>create one first</a>, and then return to this form to select it.{/ts}
+{/htxt}
+
+{htxt id="id-is_tellfriend-title"}
+  {ts}Tell-a-Friend{/ts}
+{/htxt}
+{htxt id="id-is_tellfriend"}
+{ts}Can the 'owner' of a Personal Campaign Page use the Tell-a-Friend function to send emails to people inviting them to visit their page and register or contribute? NOTE: Tell a Friend emails will automatically include a link to the sender's campaign page.{/ts}
+{/htxt}
+
+{htxt id="id-tellfriend_limit-title"}
+  {ts}Tell-a-Friend Limit{/ts}
+{/htxt}
+{htxt id="id-tellfriend_limit"}
+{ts}How many recipients can they send emails to at one time? You may want to limit this to prevent large mail blasts from being sent.{/ts}
+{/htxt}
+
+{htxt id="id-link_text-title"}
+  {ts}Link Text{/ts}
+{/htxt}
+{htxt id="id-link_text"}
+{ts}Text for the link inviting constituents to create a Personal Campaign Page. This link will appear on the Event registration Thank-you page as well as on each Personal Campaign Page. Leave blank if you do not want constituents to be prompted to create their own Personal Campaign Pages.{/ts}
+{/htxt}
+
+{htxt id="id-target_entity_type-title"}
+  {ts}Entity{/ts}
+{/htxt}
+{htxt id="id-target_entity_type"}
+{ts}Select "Event" if you want your supporters to encourage people in their network to also register for this event. Select "Contribution" if you want supporters to promote a related online fundraising campaign (by linking to an online contribution page).{/ts}
+{/htxt}
+
+{htxt id="id-target_entity_id-title"}
+  {ts}Contribution Page{/ts}
+{/htxt}
+{htxt id="id-target_entity_id"}
+{ts}Select the related online contribution page that supporters of this event are promoting. Visitors to their Personal Campaign pages will be directed to the selected online contribution page to donate money.{/ts}
+{/htxt}

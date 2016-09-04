@@ -1,0 +1,50 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id='upload-title'}
+  {ts}Import File Format{/ts}
+{/htxt}
+{htxt id='upload'}
+    <p>{ts}Files to be imported must be in the 'comma-separated-values' format (CSV). Most applications will allow you to export records in CSV format. Consult the documentation for your application if you're not sure how to do this.{/ts}</p>
+<h1>{ts}Contact Records for Contributors{/ts}</h1>
+    <p>{ts}Contribution import requires that the Contributors already exist as contact records in your CiviCRM database. If you need to import contributions for contributors who haven't been added to CiviCRM yet - you will do this in 2 steps. First, use <strong>Import Contacts</strong> to add the contact records. If possible, include a unique 'External ID' for each new contact which you can then use to match contributions to contributors. Then return to this screen and import the contribution records.{/ts}</p>
+<h1>{ts}Matching Contributions to Contributors{/ts}</h1>
+    <p>{ts}Contribution import files must contain data needed to <strong>match the contribution to the contributor</strong>. This 'matching' can be handled in several different ways:{/ts}</p>
+    <ul>
+    <li>{ts}Include the data fields used for contact 'matching' based on your configured <strong>Unsupervised Duplicate Matching</strong> rules. For the default duplicate matching rules, you would include a column in each row with the contributors' Email Address.{/ts}</li>
+    <li>{ts}If you've stored a unique <strong>External Identifier</strong> for each contact in CiviCRM, you can include that value as a column in your import file. Contributions will then be matched to contributors using their External ID.{/ts}</li>
+    <li>{ts}You can include a column with each contributor's <strong>Internal Contact ID</strong>. This is the unique ID assigned by CiviCRM which is displayed at the bottom of the Contact Summary screen - and can be exported.{/ts}</li>
+    </ul>
+    <p>{ts}Save the CSV file with your contributions and 'contact matching' data to your local hard drive (or an accessible drive on your network) - and you are now ready for step 1 (Upload Data).{/ts}</p>
+{/htxt}
+
+{htxt id="id-onDuplicate-title"}
+  {ts}Matching to Contacts for Inserts and Updates{/ts}
+{/htxt}
+{htxt id="id-onDuplicate"}
+    <p>{ts}For each import, you can either INSERT new contribution records, or UPDATE existing records. You can not do both types of operations in a single import session.{/ts}</p>
+    <p>{ts}If you are INSERTING new contributions, you will need to include a column in your data file containing the values used to link the contribution to an existing contact. You can use the 'Internal Contact ID', an 'External Identifier' (if you are using those in your contact records), OR the property defined in your Unsupervised Duplicate Matching rule (which is Email Address by default).{/ts}</p>
+    <p>{ts}If you are UPDATING existing contributions, you will need to include a unique identifer to match to the existing contribution record. This can be either the CiviCRM-assigned contribution ID, a unique Invoice ID, or a unique Transaction ID.{/ts}</p>
+{/htxt}

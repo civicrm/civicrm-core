@@ -1,0 +1,37 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: activitySet
+-->
+<table>
+  <thead>
+  <tr>
+    <th>{{ts('Activity')}}</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody ui-sortable ng-model="activitySet.activityTypes">
+  <tr ng-repeat="activity in activitySet.activityTypes">
+    <td>
+      <i class="crm-i fa-arrows grip-n-drag"></i>
+      {{ activity.name }}
+    </td>
+    <td>
+      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(activitySet.activityTypes, activity)" title="{{ts('Remove')}}"></a>
+    </td>
+  </tr>
+  </tbody>
+
+  <tfoot>
+  <tr class="addRow">
+    <td colspan="3">
+      <span crm-add-name
+           crm-options="activityTypeNames"
+           crm-var="newActivity"
+           crm-on-add="addActivity(activitySet, newActivity)"
+           placeholder="{{ts('Add activity')}}"
+              />
+    </td>
+  </tr>
+  </tfoot>
+</table>

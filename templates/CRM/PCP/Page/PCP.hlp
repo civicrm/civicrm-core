@@ -1,0 +1,43 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-pcp-intro-title"}
+  {ts}Personal Campaign Pages{/ts}
+{/htxt}
+{htxt id="id-pcp-intro"}
+<p>{ts}Personal Campaign Pages (PCPs) allow your constituents to create their own fundraising page for your organization. This means that a donor, after donating to your organization, can elect to create a page with her own photo, text, and personal information. She can then send a link to the page to her friends, soliciting support for your organization. This is a powerful way to widely and quickly spread the message about your campaign.{/ts}</p>
+
+<p>{ts}When someone donates through a personal campaign page, a soft credit is given to the owner of the page to recognize the role she played in the contribution. CiviContribute has a section that allows you to administer all of the PCPs for your organization. You can require approval before a PCP goes 'live', and disable or delete any campaign pages you don't approve of.{/ts} {docURL page="user/contributions/personal-campaign-pages"}</p>
+
+<p>
+{if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
+  {ts}You can also place additional links (or menu items) allowing constituents to create their own fundraising pages using the following URL:{/ts}<br />
+  <em>{crmURL a=1 fe=1 p='civicrm/contribute/campaign' q="action=add&reset=1&pageId=<id of contribution page or event>&component=<contribute or event>"}</em>
+{elseif $config->userFramework EQ 'Joomla'}
+  {ts}You can also create front-end links (or menu items) allowing constituents to create their own fundraising pages using the Menu Manager. Select <strong>Contributions &raquo; Personal Campaign Pages</strong> and then select this event.{/ts}
+{/if}
+<p>
+{/htxt} 
+

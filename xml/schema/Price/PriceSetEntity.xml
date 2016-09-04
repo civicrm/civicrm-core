@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Price</base>
+  <class>PriceSetEntity</class>
+  <name>civicrm_price_set_entity</name>
+  <add>1.8</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Price Set Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Price Set Entity</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Table which uses this price set</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity IF</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Item in table</comment>
+    <add>1.8</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.8</add>
+  </dynamicForeignKey>
+  <field>
+    <name>price_set_id</name>
+    <title>Price Set</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>price set being used</comment>
+    <add>1.8</add>
+  </field>
+  <foreignKey>
+    <name>price_set_id</name>
+    <table>civicrm_price_set</table>
+    <key>id</key>
+  </foreignKey>
+  <index>
+    <name>UI_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <unique>true</unique>
+    <add>1.8</add>
+  </index>
+</table>
+

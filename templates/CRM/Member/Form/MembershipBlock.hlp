@@ -1,0 +1,45 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-separate-pay-title"}
+  {ts}Separate Payment{/ts}
+{/htxt}
+{htxt id="id-separate-pay"}
+<p>{ts}Check this box if you are including both Membership Signup/Renewal AND a Contribution Amount section, AND you want the membership fee to be handled as a separate transaction.{/ts}</p>
+<p>{ts}With this configuration, the membership fee is automatically charged, and users have an option to make an additional contribution (two separate payment transactions will be generated).{/ts}</p>
+<p>{ts}The contribution amount covering the membership fee will use the financial type configured with the selected membership type (see the membership types configuration tool to review those settings). Any additional contribution will use the financial type configured for this online contribution page.{/ts}</p>
+<p>{ts}If this option is NOT checked and you include a Contribution Amount section, then a single transaction is processed for their contribution amount which must at least cover the selected membership fee.{/ts}</p>
+{/htxt}
+
+{htxt id="id-display-fee-title"}
+  {ts}Display Fee{/ts}
+{/htxt}
+{htxt id="id-display-fee"}
+<p>{ts}When this box is checked, the membership fee is included in the listing of each membership option on the signup and renewal page. This is recommended for most configurations.{/ts}</p>
+<p>{ts}If the page is configured with 'Separate Membership Payment' enabled - then just the fee amount is displayed:{/ts}</p>
+<p><strong> &nbsp; {ts}General Membership - $100.00{/ts}</strong></p>
+<p>{ts}If the page 'Separate Membership Payment' is NOT enabled AND the Contribution Amount is enabled so that user's can opt to give more than the minimum membership fee - then the display looks like this:{/ts}</p>
+<p><strong> &nbsp; {ts}General Membership (contribute at least $100.00 to be eligible for this membership){/ts}</strong></p>
+{/htxt}

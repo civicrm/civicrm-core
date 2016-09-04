@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<tables xmlns:xi="http://www.w3.org/2001/XInclude">
+<xi:include href="Currency.xml"             parse="xml" />
+<xi:include href="EntityFinancialTrxn.xml"  parse="xml" />
+<xi:include href="FinancialAccount.xml"     parse="xml" />
+<xi:include href="FinancialTrxn.xml"        parse="xml" />
+<xi:include href="PaymentProcessor.xml"     parse="xml" />
+<xi:include href="PaymentToken.xml"         parse="xml" />
+<xi:include href="PaymentProcessorType.xml" parse="xml" />
+<xi:include href="FinancialType.xml"          parse="xml" />
+<xi:include href="EntityFinancialAccount.xml" parse="xml" />
+<xi:include href="FinancialItem.xml"          parse="xml" />
+
+</tables>

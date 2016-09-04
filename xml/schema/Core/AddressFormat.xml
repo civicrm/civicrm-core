@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>AddressFormat</class>
+  <name>civicrm_address_format</name>
+  <add>3.2</add>
+  <field>
+    <name>id</name>
+    <title>Address Format ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Address Format Id</comment>
+    <add>3.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>format</name>
+    <title>Address Format</title>
+    <type>text</type>
+    <comment>The format of an address</comment>
+    <add>3.2</add>
+  </field>
+</table>

@@ -1,0 +1,67 @@
+<div class="crm-block" ng-form="setupForm" crm-ui-id-scope>
+  <div class="crm-group">
+    <div class="help" ng-if="fields.help">
+      {{ts('A/B testing allows you to send two test mailings to a random subset of your recipients. After collecting and comparing metrics, the more successful mailing will be sent to the remaining recipients.')}}
+    </div>
+    <div crm-ui-field="{name: 'setupForm.abName', title: ts('Name'), help: hs('name')}" ng-if="fields.abName">
+      <input
+        crm-ui-id="setupForm.abName"
+        name="abName"
+        ng-model="abtest.ab.name"
+        class="crm-form-text"
+        placeholder="A/B Test Name"
+        required/>
+    </div>
+    <div crm-ui-field="{name: 'setupForm.campaign', title: ts('Campaign'), help: hs({id: 'id-campaign_id', file: 'CRM/Campaign/Form/addCampaignToComponent'})}" ng-show="crmMailingConst.campaignEnabled"
+         ng-if="fields.campaign">
+      <input
+        crm-entityref="{entity: 'Campaign', select: {allowClear: true, placeholder: ts('Select Campaign')}}"
+        crm-ui-id="setupForm.campaign"
+        name="campaign"
+        ng-model="abtest.mailings.a.campaign_id"
+        ng-change="abtest.mailings.b.campaign_id=abtest.mailings.a.campaign_id"
+      />
+    </div>
+    <div crm-ui-field="{title: ts('Test Type')}" ng-if="fields.testing_criteria">
+      <div ng-repeat="criteria in crmMailingABCriteria.getAll()">
+        <label>
+          <input name="testing_criteria" ng-model="abtest.ab.testing_criteria" type="radio"
+                 value="{{criteria.value}}" required/>
+          {{criteria.label}}
+        </label>
+      </div>
+    </div>
+    <div crm-ui-field="{name: 'setupForm.recipients', title: ts('Recipients')}" ng-if="fields.recipients">
+      <div crm-mailing-block-recipients="{name: 'recipients', id: 'setupForm.recipients'}" crm-mailing="abtest.mailings.a"></div>
+    </div>
+    <div crm-ui-field="{title: ts('Distribution')}" ng-if="fields.group_percentage">
+      <div crm-mailing-ab-slider ng-model="abtest.ab.group_percentage"></div>
+    </div>
+    <div crm-ui-field="{title: ts('Send')}" ng-if="fields.scheduled_date">
+      <div crm-mailing-radio-date="schedule" ng-model="abtest.mailings.a.scheduled_date">
+          <div>
+            <input ng-model="schedule.mode" type="radio" name="send" value="now" id="schedule-send-now"/>
+            <label for="schedule-send-now">{{ts('Send A/B test immediately')}}</label>
+          </div>
+          <div>
+            <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
+            <label for="schedule-send-at">{{ts('Send A/B test at:')}}</label>
+            <input crm-ui-datepicker ng-model="schedule.datetime"/>
+          </div>
+      </div>
+    </div>
+    <div crm-ui-field="{title: ts('Assess')}" ng-if="fields.declare_winning_time">
+      <div crm-mailing-radio-date="assessSched" ng-model="abtest.ab.declare_winning_time">
+        <div>
+          <input ng-model="assessSched.mode" type="radio" name="assess" value="now" id="schedule-assess-now"/>
+          <label for="schedule-assess-now">{{ts('Assess A/B results on an on-going basis')}}</label>
+        </div>
+        <div>
+          <input ng-model="assessSched.mode" type="radio" name="assess" value="at" id="schedule-assess-at"/>
+          <label for="schedule-assess-at">{{ts('Assess A/B test at:')}}</label>
+          <input crm-ui-datepicker ng-model="assessSched.datetime"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

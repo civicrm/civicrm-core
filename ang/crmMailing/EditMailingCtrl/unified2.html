@@ -1,0 +1,51 @@
+<div crm-ui-debug="mailing"></div>
+
+<div ng-show="isSubmitted()">
+  {{ts('This mailing has been submitted.')}}
+</div>
+
+<form name="crmMailing" novalidate ng-hide="isSubmitted()">
+  <div class="crm-block crm-form-block crmMailing">
+
+    <div crm-mailing-block-summary crm-mailing="mailing"/>
+    <div crm-mailing-block-mailing crm-mailing="mailing"/>
+
+    <div crm-ui-accordion="{title: ts('HTML'), help: hs('html')}" >
+      <div crm-mailing-body-html crm-mailing="mailing"/>
+    </div>
+    <div crm-ui-accordion="{title: ts('Plain Text'), collapsed: !mailing.body_text, help: hs('text')}">
+      <div crm-mailing-body-text crm-mailing="mailing"/>
+    </div>
+    <span ng-model="placeholder" crm-ui-validate="mailing.body_html || mailing.body_text"></span>
+    <div crm-ui-accordion="{title: ts('Header and Footer'), collapsed: true}" id="tab-header" >
+      <div crm-mailing-block-header-footer crm-mailing="mailing"/>
+    </div>
+    <div crm-ui-accordion="{title: ts('Attachments'), collapsed: true}" id="tab-attachment" >
+      <div crm-attachments="attachments"/>
+    </div>
+    <div crm-ui-accordion="{title: ts('Publication'), collapsed: true}" id="tab-pub" >
+      <div crm-mailing-block-publication crm-mailing="mailing"/>
+    </div>
+    <div crm-ui-accordion="{title: ts('Responses'), collapsed: true}" id="tab-response" >
+      <div crm-mailing-block-responses crm-mailing="mailing"/>
+    </div>
+    <div crm-ui-accordion="{title: ts('Tracking'), collapsed: true}" id="tab-tracking" >
+      <div crm-mailing-block-tracking crm-mailing="mailing"/>
+    </div>
+    <div crm-ui-accordion="{title: ts('Preview')}" >
+      <div crm-mailing-block-preview crm-mailing="mailing" on-preview="previewMailing(mailing, preview.mode)" on-send="sendTest(mailing, attachments, preview.recipient)" />
+    </div>
+    <div crm-ui-accordion="{title: ts('Schedule')}" id="tab-schedule" >
+      <div crm-mailing-block-schedule crm-mailing="mailing"/>
+    </div>
+
+    <button crm-icon="fa-paper-plane" ng-disabled="block.check() || crmMailing.$invalid" ng-click="submit()">{{ts('Submit Mailing')}}</button>
+    <button crm-icon="fa-floppy-o" ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
+    <button
+      crm-icon="fa-trash"
+      ng-show="checkPerm('delete in CiviMail')"
+      ng-disabled="block.check()"
+      crm-confirm="{title:ts('Delete Draft'), message:ts('Are you sure you want to permanently delete this mailing?')}"
+      on-yes="delete()">{{ts('Delete Draft')}}</button>
+  </div>
+</form>

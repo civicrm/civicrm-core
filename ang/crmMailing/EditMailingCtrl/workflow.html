@@ -1,0 +1,78 @@
+<div crm-ui-debug="mailing"></div>
+
+<div ng-show="isSubmitted()">
+  {{ts('This mailing has been submitted.')}}
+</div>
+
+<form name="crmMailing" novalidate ng-hide="isSubmitted()">
+  <div class="crm-block crm-form-block crmMailing">
+
+    <div crm-ui-wizard>
+
+      <div crm-ui-wizard-step="10" crm-title="ts('Content')" ng-form="contentForm" ng-if="checkPerm('create mailings') || checkPerm('access CiviMail')">
+        <div crm-mailing-block-summary crm-mailing="mailing"/>
+        <div crm-mailing-block-mailing crm-mailing="mailing"/>
+        <div crm-ui-accordion="{title: ts('HTML'), help: hs('html')}" >
+          <div crm-mailing-body-html crm-mailing="mailing"/>
+        </div>
+        <div crm-ui-accordion="{title: ts('Plain Text'), collapsed: !mailing.body_text, help: hs('text')}">
+          <div crm-mailing-body-text crm-mailing="mailing"/>
+        </div>
+        <span ng-model="placeholder" crm-ui-validate="mailing.body_html || mailing.body_text"></span>
+        <div crm-ui-accordion="{title: ts('Header and Footer'), collapsed: true}">
+          <div crm-mailing-block-header-footer crm-mailing="mailing"/>
+        </div>
+        <div crm-ui-accordion="{title: ts('Attachments'), collapsed: true}">
+          <div crm-attachments="attachments"/>
+        </div>
+        <div crm-ui-accordion="{title: ts('Preview')}" >
+          <div crm-mailing-block-preview crm-mailing="mailing" on-preview="previewMailing(mailing, preview.mode)" on-send="sendTest(mailing, attachments, preview.recipient)" />
+        </div>
+      </div>
+
+      <div crm-ui-wizard-step="20" crm-title="ts('Options')" ng-form="optionsForm" ng-if="checkPerm('create mailings') || checkPerm('access CiviMail')">
+        <div crm-ui-accordion="{title: ts('Responses'), collapsed: true}">
+          <div crm-mailing-block-responses crm-mailing="mailing"/>
+        </div>
+        <div crm-ui-accordion="{title: ts('Tracking'), collapsed: true}">
+          <div crm-mailing-block-tracking crm-mailing="mailing"/>
+        </div>
+        <div crm-ui-accordion="{title: ts('Publication'), collapsed: true}">
+          <div crm-mailing-block-publication crm-mailing="mailing"/>
+        </div>
+      </div>
+
+      <div crm-ui-wizard-step="40" crm-title="ts('Review')" ng-form="schedForm" ng-if="checkPerm('schedule mailings') || checkPerm('access CiviMail')">
+        <div crm-ui-accordion="{title: ts('Review')}" >
+          <div crm-mailing-block-review crm-mailing="mailing" crm-mailing-attachments="attachments"/>
+        </div>
+        <div crm-ui-accordion="{title: ts('Schedule')}" >
+          <div crm-mailing-block-schedule crm-mailing="mailing"/>
+        </div>
+        <div crm-ui-accordion="{title: ts('Approval')}"  ng-if="checkPerm('approve mailings') || checkPerm('access CiviMail')">
+          <div crm-mailing-block-approve crm-mailing="mailing"/>
+        </div>
+        <center ng-if="!checkPerm('approve mailings') && !checkPerm('access CiviMail')">
+          <a class="button crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailing.$invalid}">
+            <div>{{ts('Submit Mailing')}}</div>
+          </a>
+        </center>
+        <center ng-if="checkPerm('approve mailings') || checkPerm('access CiviMail')">
+          <a class="button crmMailing-submit-button" ng-click="approve('Approved')" ng-class="{blocking: block.check(), disabled: crmMailing.$invalid}">
+            <div>{{ts('Submit and Approve Mailing')}}</div>
+          </a>
+        </center>
+      </div>
+
+      <span crm-ui-wizard-buttons style="float:right;">
+        <button
+          crm-icon="fa-trash"
+          ng-show="checkPerm('delete in CiviMail')"
+          ng-disabled="block.check()"
+          crm-confirm="{title:ts('Delete Draft'), message:ts('Are you sure you want to permanently delete this mailing?')}"
+          on-yes="delete()">{{ts('Delete Draft')}}</button>
+        <button crm-icon="fa-floppy-o" ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
+      </span>
+    </div>
+  </div>
+</form>

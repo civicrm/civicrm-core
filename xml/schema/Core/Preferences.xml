@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Preferences</class>
+  <name>civicrm_preferences</name>
+  <comment>Define preferences for the site and users</comment>
+  <add>1.8</add>
+  <drop>4.1</drop>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Which Domain is this menu item for</comment>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>3.0</add>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>1.8</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>1.8</add>
+  </foreignKey>
+  <field>
+    <name>is_domain</name>
+    <type>boolean</type>
+    <comment>Is this the record for the domain setting?</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>location_count</name>
+    <type>int unsigned</type>
+    <comment>Number of locations to be displayed on edit page?</comment>
+    <add>1.8</add>
+    <drop>3.0</drop>
+  </field>
+  <field>
+    <name>contact_view_options</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>What tabs are displayed in the contact summary</comment>
+    <add>1.8</add>
+  </field>
+  <index>
+    <name>index_contact_view_options</name>
+    <fieldName>contact_view_options</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>contact_edit_options</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>What tabs are displayed in the contact edit</comment>
+    <add>1.8</add>
+  </field>
+  <index>
+    <name>index_contact_edit_options</name>
+    <fieldName>contact_edit_options</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>advanced_search_options</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>What tabs are displayed in the advanced search screen</comment>
+    <add>1.8</add>
+  </field>
+  <index>
+    <name>index_advanced_search_options</name>
+    <fieldName>advanced_search_options</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>user_dashboard_options</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>What tabs are displayed in the contact edit</comment>
+    <add>1.8</add>
+  </field>
+  <index>
+    <name>index_user_dashboard_options</name>
+    <fieldName>user_dashboard_options</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>address_options</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>What fields are displayed from the address table</comment>
+    <add>1.8</add>
+  </field>
+  <index>
+    <name>index_address_options</name>
+    <fieldName>address_options</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>address_format</name>
+    <type>text</type>
+    <comment>Format to display the address</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>mailing_format</name>
+    <type>text</type>
+    <comment>Format to display a mailing label</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>display_name_format</name>
+    <type>text</type>
+    <comment>Format to display contact display name</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>sort_name_format</name>
+    <type>text</type>
+    <comment>Format to display contact sort name</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>individual_name_format</name>
+    <type>text</type>
+    <comment>Format to display a individual name</comment>
+    <add>1.8</add>
+    <drop>3.0</drop>
+  </field>
+  <field>
+    <name>address_standardization_provider</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>object name of provider for address standarization</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>address_standardization_userid</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>user id for provider login</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>address_standardization_url</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>url of address standardization service</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>editor_id</name>
+    <type>int unsigned</type>
+    <length>4</length>
+    <comment>ID of the editor</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>mailing_backend</name>
+    <type>text</type>
+    <comment>Smtp Backend configuration.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>navigation</name>
+    <type>text</type>
+    <comment>Store navigation for the Contact</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>contact_autocomplete_options</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>What Autocomplete has to return</comment>
+    <add>3.1</add>
+  </field>
+</table>

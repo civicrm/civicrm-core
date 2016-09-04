@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- a clean environment for the api_v2_UFGroupTest class -->
+<dataset>
+  <civicrm_group
+    id = '2'
+  />
+  <civicrm_contact
+    id = '69'
+  />
+  <civicrm_uf_group
+    id         = '11'
+    group_type = 'Contact'
+    help_pre   = 'Profile to Test API'
+    is_active  = '1'
+    title      = 'Test Profile'
+  />
+  <civicrm_uf_match
+    contact_id = '69'
+    domain_id  = '1'
+    uf_id      = '42'
+  />
+</dataset>

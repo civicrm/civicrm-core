@@ -1,0 +1,8 @@
+<extension key='test.extension.manager.searchtest' type='search'>
+  <file>main</file>
+  <name>test_extension_manager_searchtest</name>
+  <typeInfo>
+    <searchUrl>test/extension/manager/searchtest</searchUrl>
+    <component>CiviContribute</component>
+  </typeInfo>
+</extension>

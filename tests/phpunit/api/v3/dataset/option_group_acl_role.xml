@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_group_acl_role.xml 30511 2010-11-03 11:36:36Z shot $  -->
+<dataset>
+  <table name="civicrm_option_group">
+    <column>id</column>
+    <column>name</column>
+    <column>label</column>
+    <column>description</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <row>
+      <value>8</value>         <!--  id           -->
+      <value>acl_role</value>  <!--  name         -->
+      <null />                 <!--  label        -->
+      <value>ACL Role</value>  <!--  description  -->
+      <value>0</value>         <!--  is_reserved  -->
+      <value>1</value>         <!--  is_active    -->
+   </row>
+  </table>
+</dataset>

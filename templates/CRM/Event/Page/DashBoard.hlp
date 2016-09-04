@@ -1,0 +1,41 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-event-intro-title"}
+  {ts}Event Dashboard{/ts}
+{/htxt}
+{htxt id="id-event-intro"}
+    {capture assign=newEventURL}{crmURL p="civicrm/event/add" q="reset=1"}{/capture}
+    {capture assign=configPagesURL}{crmURL p="civicrm/event/manage" q="reset=1"}{/capture}
+    {capture assign=findContactURL}{crmURL p="civicrm/contact/search/basic" q="reset=1"}{/capture}
+    {capture assign=importURL}{crmURL p="civicrm/event/import" q="reset=1"}{/capture}
+    {capture assign=findEventsURL}{crmURL p="civicrm/event/search/basic" q="reset=1"}{/capture}
+
+    <p>{ts 1=$newEventURL 2=$configPagesURL}CiviEvent allows you to create customized page(s) for constituents to learn about events and optionally register online. You can create <a href='%1'><strong>new events</strong></a> and <a href='%2'><strong>manage existing events</strong></a>.{/ts}</p>
+
+    <p>{ts 1=$findContactURL 2=$importURL}You can also input and track offline Events. To enter events manually for individual contacts, use <a href='%1'>Find Contacts</a> to locate the contact. Then click <strong>View</strong> to go to their summary page and click on the <strong>New Event</strong> link. You can also <a href='%2'><strong>import batches of participants</strong></a> from other sources.{/ts}</p>
+
+    <p>{ts 1=$findEventsURL}The Event Summary table provides a summary of up to ten scheduled and recent <strong>Events</strong>. Click the <strong>Event name</strong> to view the event as it will be displayed to site visitors. Click the <strong>Participants count</strong> to see a list of participants. To run your own customized searches - click <a href='%1'>Find Participants</a>. You can search by Participant Name, Event, Date Range and Status.{/ts}</p>
+{/htxt}

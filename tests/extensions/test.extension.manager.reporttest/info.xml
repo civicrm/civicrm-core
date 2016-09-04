@@ -1,0 +1,8 @@
+<extension key='test.extension.manager.reporttest' type='report'>
+  <file>main</file>
+  <name>test_extension_manager_reporttest</name>
+  <typeInfo>
+    <reportUrl>test/extension/manager/reporttest</reportUrl>
+    <component>CiviContribute</component>
+  </typeInfo>
+</extension>
