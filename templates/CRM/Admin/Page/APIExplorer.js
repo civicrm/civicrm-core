@@ -658,8 +658,8 @@
     $.each(params, function(key, value) {
       var json = JSON.stringify(value),
         // Encourage 'return' to be an array - at least in php & js
-        js = key === 'return' ? JSON.stringify(evaluate(value, true)) : json,
-        php = key === 'return' ? phpFormat(evaluate(value, true)) : phpFormat(value);
+        js = key === 'return' && action !== 'getvalue' ? JSON.stringify(evaluate(value, true)) : json,
+        php = key === 'return' && action !== 'getvalue' ? phpFormat(evaluate(value, true)) : phpFormat(value);
       if (!(i++)) {
         q.php += ", array(\n";
         q.json += ", {\n";
