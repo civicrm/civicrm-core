@@ -2612,7 +2612,7 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_email':
-          $from .= " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) ";
+          $from .= " $side JOIN civicrm_email ON contact_a.id = civicrm_email.contact_id ";
           continue;
 
         case 'civicrm_im':
