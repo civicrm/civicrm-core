@@ -370,11 +370,24 @@ ALTER TABLE {$tableName}
   /**
    * @param string $tableName
    * @param string $columnName
+   * @param bool $l18n
+   *
    */
-  public static function dropColumn($tableName, $columnName) {
+  public static function dropColumn($tableName, $columnName, $l18n = FALSE) {
     if (self::checkIfFieldExists($tableName, $columnName)) {
       $sql = "ALTER TABLE $tableName DROP COLUMN $columnName";
-      CRM_Core_DAO::executeQuery($sql);
+      if ($l18n) {
+        CRM_Core_DAO::executeQuery($sql);
+      }
+      else {
+        CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
+      }
+      $domain = new CRM_Core_DAO_Domain();
+      $domain->find(TRUE);
+      if ($domain->locales) {
+        $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+        CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+      }
     }
   }
 
