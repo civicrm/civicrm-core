@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -1220,10 +1218,10 @@ WHERE      $group.id = {$actionSchedule->group_id}
       $select[] = 'e.id as entity_id';
       $select[] = "'{$mapping->entity}' as entity_table";
       $select[] = "{$actionSchedule->id} as action_schedule_id";
-      $reminderJoinClause = "civicrm_action_log reminder ON reminder.contact_id = {$contactField} AND
-reminder.entity_id          = e.id AND
-reminder.entity_table       = '{$mapping->entity}' AND
-reminder.action_schedule_id = %1";
+      $reminderJoinClause = "civicrm_action_log reminder ON reminder.contact_id = {$contactField}
+      AND reminder.entity_id = e.id
+      AND reminder.entity_table  = '{$mapping->entity}'
+      AND reminder.action_schedule_id = %1";
 
       if ($anniversary) {
         // only consider reminders less than 11 months ago
@@ -1280,8 +1278,9 @@ LEFT JOIN {$reminderJoinClause}
       // criteria  for some schedule reminder so in order to send new reminder we INSERT new reminder with new reference_date
       // value via UNION operation
       // We need to add in reminders that
-      // have not already had a reminder for the current end date and HAVE had a reminder for a prior end date for the same reminder.
-      // These will have been excluded earlier.
+      // have not already had a reminder for the current end date and HAVE had a reminder for a different
+      // end date for the same reminder. These will have been excluded earlier, on the basis of a reminder having gone out
+      // so we want to selectively re-add them.
       if (strpos($selectColumns, 'reference_date') !== FALSE) {
         $referenceQuery = "
 INSERT INTO civicrm_action_log ({$selectColumns})
@@ -1301,7 +1300,7 @@ INSERT INTO civicrm_action_log ({$selectColumns})
  AND reminder.id IS NOT NULL
  AND reminder.reference_date IS NOT NULL
  AND reminder.reference_date <> $dateField
- AND already_sent.entity_id IS NULL
+ AND already_sent.entity_table IS NULL
  GROUP BY e.id
 ";
       }
