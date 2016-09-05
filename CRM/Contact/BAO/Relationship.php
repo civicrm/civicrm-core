@@ -552,7 +552,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
 
     if (empty($contactSubType)) {
-     $contactSubType = '';
+      $contactSubType = '';
     }
     if ($contactId) {
       $contactType = CRM_Contact_BAO_Contact::getContactType($contactId);
