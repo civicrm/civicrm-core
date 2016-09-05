@@ -1254,7 +1254,7 @@ reminder.action_schedule_id = %1";
       }
 
       // ( now >= date_built_from_start_time ) OR ( now = absolute_date )
-      $dateClause = "reminder.id IS NULL AND {$startDate}";
+      $dateClause = $startDate ? " AND {$startDate} " : '';
 
       // start composing query
       $selectClause = 'SELECT ' . implode(', ', $select);
@@ -1272,26 +1272,37 @@ INSERT INTO civicrm_action_log ({$selectColumns})
 {$fromClause}
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
+{$whereClause} AND reminder.id IS NULL {$limitWhereClause} {$dateClause} {$notINClause}
 ";
 
       // In some cases reference_date got outdated due to many reason e.g. In Membership renewal end_date got extended
       // which means reference date mismatches with the end_date where end_date may be used as the start_action_date
       // criteria  for some schedule reminder so in order to send new reminder we INSERT new reminder with new reference_date
       // value via UNION operation
+      // We need to add in reminders that
+      // have not already had a reminder for the current end date and HAVE had a reminder for a prior end date for the same reminder.
+      // These will have been excluded earlier.
       if (strpos($selectColumns, 'reference_date') !== FALSE) {
-        $dateClause = str_replace('reminder.id IS NULL', 'reminder.id IS NOT NULL', $dateClause);
         $referenceQuery = "
 INSERT INTO civicrm_action_log ({$selectColumns})
 {$selectClause}
 {$fromClause}
 {$joinClause}
  LEFT JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhereClause} {$notINClause} AND {$dateClause} AND
- reminder.action_date_time IS NOT NULL AND
- reminder.reference_date IS NOT NULL
-GROUP BY reminder.id, reminder.reference_date
-HAVING reminder.id = MAX(reminder.id) AND reminder.reference_date <> {$dateField}
+ LEFT JOIN (
+  SELECT entity_id, entity_table
+  {$fromClause}
+  {$joinClause}
+  LEFT JOIN {$reminderJoinClause}
+  {$whereClause} {$limitWhereClause} {$dateClause} {$notINClause}
+  AND reminder.reference_date = $dateField
+ ) as already_sent ON e.id = already_sent.entity_id AND already_sent.entity_table = '{$mapping->entity}'
+{$whereClause} {$limitWhereClause} {$notINClause} {$dateClause}
+ AND reminder.id IS NOT NULL
+ AND reminder.reference_date IS NOT NULL
+ AND reminder.reference_date <> $dateField
+ AND already_sent.entity_id IS NULL
+ GROUP BY e.id
 ";
       }
 
