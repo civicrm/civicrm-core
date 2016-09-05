@@ -551,7 +551,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
     }
 
-    $contactSubType = array();
+    if (empty($contactSubType)) $contactSubType = '';
     if ($contactId) {
       $contactType = CRM_Contact_BAO_Contact::getContactType($contactId);
       $contactSubType = CRM_Contact_BAO_Contact::getContactSubType($contactId);
@@ -567,7 +567,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           (!$otherContactType) ||
           $value['contact_type_b'] == $otherContactType
         ) &&
-        (in_array($value['contact_sub_type_a'], $contactSubType) ||
+        ($value['contact_sub_type_a'] == $contactSubType ||
           (!$value['contact_sub_type_a'] && !$onlySubTypeRelationTypes)
         )
       ) {
@@ -581,7 +581,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           (!$otherContactType) ||
           $value['contact_type_a'] == $otherContactType
         ) &&
-        (in_array($value['contact_sub_type_b'], $contactSubType) ||
+        ($value['contact_sub_type_b'] == $contactSubType ||
           (!$value['contact_sub_type_b'] && !$onlySubTypeRelationTypes)
         )
       ) {
