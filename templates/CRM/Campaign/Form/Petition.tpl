@@ -24,9 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 
-{if $cdType }
-   {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 <div class="crm-block crm-form-block crm-campaign-survey-form-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
@@ -119,11 +116,6 @@
           <div class="description">{ts}Is this the default petition?{/ts}</div>
         </td>
       </tr>
-      <tr class="crm-campaign-form-block-custom_data">
-          <td colspan="2">
-              <div id="customData"></div>
-          </td>
-      </tr>
     </table>
     <div id="customData"></div>
     {*include custom data js file*}
@@ -160,14 +152,3 @@
     });
   </script>
 {/literal}
-{include file="CRM/common/customData.tpl" includeWysiwygEditor=true}
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      {/literal}
-        CRM.buildCustomData( 'Survey' );
-      {literal}
-    });
-  </script>
-{/literal}
-{/if}

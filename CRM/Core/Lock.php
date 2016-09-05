@@ -24,6 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
+
 /**
  *
  * @package CRM
@@ -32,6 +33,7 @@
  *
  */
 class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
+
   /**
    * This variable (despite it's name) roughly translates to 'lock that we actually care about'.
    *
@@ -43,9 +45,12 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    * @var bool
    */
   static $jobLog = FALSE;
+
   // lets have a 3 second timeout for now
   const TIMEOUT = 3;
+
   protected $_hasLock = FALSE;
+
   protected $_name;
 
   protected $_id;
@@ -65,6 +70,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
   public static function createGlobalLock($name) {
     return new static($name, NULL, TRUE);
   }
+
   /**
    * Use MySQL's GET_LOCK(), but apply prefixes to the lock names.
    * Locks are unique to each instance of Civi.
@@ -80,6 +86,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
   public static function createScopedLock($name) {
     return new static($name);
   }
+
   /**
    * Use MySQL's GET_LOCK(), but conditionally apply prefixes to the lock names
    * (if civimail_server_wide_lock is disabled).
@@ -97,6 +104,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     $serverWideLock = \Civi::settings()->get('civimail_server_wide_lock');
     return new static($name, NULL, $serverWideLock);
   }
+
   /**
    * Initialize the constants used during lock acquire / release
    *
@@ -132,9 +140,11 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     }
     $this->_timeout = $timeout !== NULL ? $timeout : self::TIMEOUT;
   }
+
   public function __destruct() {
     $this->release();
   }
+
   /**
    * Acquire lock.
    *
@@ -170,6 +180,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
       if (self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
         return $this->hackyHandleBrokenCode(self::$jobLog);
       }
+
       $query = "SELECT GET_LOCK( %1, %2 )";
       $params = array(
         1 => array($this->_id, 'String'),
@@ -193,6 +204,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     }
     return $this->_hasLock;
   }
+
   /**
    * @return null|string
    */
@@ -206,11 +218,13 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
       if (self::$jobLog == $this->_id) {
         self::$jobLog = FALSE;
       }
+
       $query = "SELECT RELEASE_LOCK( %1 )";
       $params = array(1 => array($this->_id, 'String'));
       return CRM_Core_DAO::singleValueQuery($query, $params);
     }
   }
+
   /**
    * @return null|string
    */
@@ -219,12 +233,14 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     $params = array(1 => array($this->_id, 'String'));
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
+
   /**
    * @return bool
    */
   public function isAcquired() {
     return $this->_hasLock;
   }
+
   /**
    * CRM-12856 locks were originally set up for jobs, but the concept was extended to caching & groups without
    * understanding that would undermine the job locks (because grabbing a lock implicitly releases existing ones)

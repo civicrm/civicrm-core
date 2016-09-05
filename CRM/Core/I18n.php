@@ -645,7 +645,11 @@ class CRM_Core_I18n {
   }
 
   /**
-   * Get the current locale
+   * Get the default language for contacts where no language is provided.
+   *
+   * Note that NULL is a valid option so be careful with checking for empty etc.
+   *
+   * NULL would mean 'we don't know & we don't want to hazard a guess'.
    *
    * @return string
    */

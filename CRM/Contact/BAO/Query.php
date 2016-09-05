@@ -2916,7 +2916,6 @@ class CRM_Contact_BAO_Query {
 
     $statii = array();
     $gcsValues = $this->getWhereValues('group_contact_status', $grouping);
-
     if ($gcsValues &&
       is_array($gcsValues[2])
     ) {
@@ -5999,6 +5998,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
+   * Alter value to reflect wildcard settings.
    *
    * The form will have tried to guess whether this is a good field to wildcard but there is
    * also a site-wide setting that specifies whether it is OK to append the wild card to the beginning
@@ -6053,6 +6053,7 @@ AND   displayRelType.is_active = 1
           $formValues[$element] = array('LIKE' => self::getWildCardedValue($isWilcard, 'LIKE', $value));
         }
       }
+    }
   }
 
   /**

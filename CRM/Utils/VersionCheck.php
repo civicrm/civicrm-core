@@ -163,25 +163,6 @@ class CRM_Utils_VersionCheck {
 
 
   /**
-   * Is this the LTS release.
-   *
-   * This function is only really being used in 4.6 & is a bit heavy on the enotice
-   * handling for test reasons
-   */
-  public function isThisReleaseTheLTS() {
-    if (empty($this->versionInfo)) {
-      return FALSE;
-    }
-    if (empty($this->versionInfo[$this->localMajorVersion])) {
-      return FALSE;
-    }
-    if ($this->versionInfo[$this->localMajorVersion]['status'] === 'lts') {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Get the latest version number if it's newer than the local one
    *
    * @return array

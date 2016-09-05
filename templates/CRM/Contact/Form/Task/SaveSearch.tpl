@@ -59,7 +59,7 @@
   </table>
 
   {*CRM-14190*}
-  {include file="CRM/Group/Form/GroupsCommon.tpl"}
+  {include file="CRM/Group/Form/ParentGroups.tpl"}
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

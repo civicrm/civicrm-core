@@ -120,7 +120,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
           $element = str_replace('member_status_id', 'membership_status_id', $element);
           CRM_Contact_BAO_Query::legacyConvertFormValues($element, $value);
           $result[$element] = $value;
-
         }
         // As per the OK (Operator as Key) value format, value array may contain key
         // as an operator so to ensure the default is always set actual value

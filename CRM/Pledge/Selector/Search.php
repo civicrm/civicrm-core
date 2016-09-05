@@ -360,7 +360,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Get qill (display what was searched on).
    *
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function getQILL() {
     return $this->_query->qill();

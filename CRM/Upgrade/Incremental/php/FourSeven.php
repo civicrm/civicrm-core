@@ -99,8 +99,11 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
       $postUpgradeMessage .= '<p>' . ts('The custom fatal error template setting has been removed.') . '</p>';
     }
+    //if ($rev == '4.7.11') {
+    //  $postUpgradeMessage .= '<br /><br />' . ts("WARNING: For increased security, profile submissions embedded in remote sites are no longer allowed to create or edit data by default. If you need to allow users to submit profiles from external sites, you can restore this at Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) > 'Accept profile submissions from external sites'");
+    //}
     if ($rev == '4.7.11') {
-      $postUpgradeMessage .= '<br /><br />' . ts("WARNING: For increased security, profile submissions embedded in remote sites are no longer allowed to create or edit data by default. If you need to allow users to submit profiles from external sites, you can restore this at Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) > 'Accept profile submissions from external sites'");
+      $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly fro SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
     }
   }
 
@@ -232,6 +235,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_11($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Dashboard schema updates', 'dashboardSchemaUpdate');
+    $this->addTask(ts('Fill in setting "remote_profile_submissions"'), 'migrateRemoteSubmissionsSetting');
   }
 
   /*
@@ -458,6 +462,35 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
   }
 
   /**
+   * v4.7.11 adds a new setting "remote_profile_submissions". This is
+   * long-standing feature that existing sites may be using; however, it's
+   * a bit prone to abuse. For new sites, the default is to disable it
+   * (since that is more secure). For existing sites, the default is to
+   * enable it (since that is more compatible).
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function migrateRemoteSubmissionsSetting(CRM_Queue_TaskContext $ctx) {
+    $domains = CRM_Core_DAO::executeQuery("SELECT DISTINCT d.id FROM civicrm_domain d LEFT JOIN civicrm_setting s ON d.id=s.domain_id AND s.name = 'remote_profile_submissions' WHERE s.id IS NULL");
+    while ($domains->fetch()) {
+      CRM_Core_DAO::executeQuery(
+        "INSERT INTO civicrm_setting (`name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
+          VALUES (%2, %3, %4, %5, NULL, NULL, %6, NULL)",
+        array(
+          2 => array('remote_profile_submissions', 'String'),
+          3 => array('s:1:"1";', 'String'),
+          4 => array($domains->id, 'Integer'),
+          5 => array(1, 'Integer'),
+          6 => array(date('Y-m-d H:i:s'), 'String'),
+        )
+      );
+    }
+    return TRUE;
+  }
+
+  /**
    * CRM-11782 - Get rid of VALUE_SEPARATOR character in saved search form values
    *
    * @param \CRM_Queue_TaskContext $ctx
@@ -641,6 +674,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'filter' => 1,
     ));
     return TRUE;
+  }
 
   /**
    * CRM-12252 Add Help Pre and Help Post Fields for Price Field Value Table.

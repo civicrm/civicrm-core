@@ -88,7 +88,18 @@
     </table>
 
   {*CRM-14190*}
-  {include file="CRM/Group/Form/GroupsCommon.tpl"}
+  {include file="CRM/Group/Form/ParentGroups.tpl"}
+
+    {if $form.organization_id}
+  <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
+          <table class="form-layout-compressed">
+        <tr class="crm-group-form-block-organization">
+            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.organization_id.label}</td>
+      <td>{$form.organization_id.html|crmAddClass:huge}
+      </td>
+        </tr>
+    </table>
+    {/if}
 
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     {if $action neq 1}
@@ -107,6 +118,7 @@
       {/if}
   </div>
     {/if}
+</fieldset>
 
 {literal}
 <script type="text/javascript">
