@@ -4578,7 +4578,7 @@ LIMIT 1;";
 
     $contributionParams['id'] = $contribution->id;
 
-    // KG - if you update the contribution here with financial_type_id it can/will mess with $lineItem
+    // CRM-19309 - if you update the contribution here with financial_type_id it can/will mess with $lineItem
     // unsetting it here does NOT cause any other contribution test to fail!
     unset($contributionParams['financial_type_id']);
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
