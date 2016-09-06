@@ -139,7 +139,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $paymentParams['source'] = $paymentParams['contribution_source'];
       }
 
-      if ($form->_params['is_recur'] && $contribution->contribution_recur_id) {
+      if (CRM_Utils_Array::value('is_recur', $form->_params) && $contribution->contribution_recur_id) {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
       if (isset($paymentParams['contribution_source'])) {
