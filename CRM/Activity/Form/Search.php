@@ -199,6 +199,10 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       );
       $changeNames = array('status_id' => 'activity_status_id');
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
+
+      if (!empty($this->_formValues['activity_free_text']) && array_key_exists($this->_formValues['activity_free_text_search'], CRM_Activity_DAO_Activity::getFreeTextFields())) {
+        $this->_formValues['activity_subject'] = CRM_Contact_BAO_Query::processFreeText($this->_formValues['activity_free_text_search'], $this->_formValues['activity_free_text']);
+      }
     }
 
     $this->fixFormValues();

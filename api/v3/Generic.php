@@ -429,7 +429,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
 
   $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
   $options = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
-  if ($options === FALSE) {
+  if ($options === false && $fieldName != 'free_text_search') {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
   }
   // Support 'sequential' output as a non-associative array

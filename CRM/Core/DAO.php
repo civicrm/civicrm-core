@@ -2279,6 +2279,30 @@ SELECT contact_id
               return (sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
             }
             return $escapedCriteria;
+          case 'LENGTH(%s) >':
+          case 'LENGTH(%s) <':
+            return (sprintf($operator . ' %s', $fieldName, CRM_Core_DAO::escapeString($criteria)));
+            break;
+          case 'CONTAINANYWORD':
+            $words = '';
+            foreach (explode(',', $criteria) as $word) {
+              $words .= sprintf(' %s %s "%s" OR', $fieldName, 'LIKE', '%' . CRM_Core_DAO::escapeString($word) . '%');
+            }
+            // Removing last 'OR'
+            $words = substr($words, 0, -2);
+
+            return $words;
+            break;
+          case 'CONTAINALLWORDS':
+            $words = '';
+            foreach (explode(',', $criteria) as $word) {
+              $words .= sprintf(' %s %s "%s" AND', $fieldName, 'LIKE', '%' . CRM_Core_DAO::escapeString($word) . '%');
+            }
+            // Removing last 'AND'
+            $words = substr($words, 0, -3);
+
+            return $words;
+            break;
 
           // binary operators
 
@@ -2316,6 +2340,11 @@ SELECT contact_id
       'NOT BETWEEN',
       'IS NOT NULL',
       'IS NULL',
+      'REGEXP',
+      'LENGTH(%s) >',
+      'LENGTH(%s) <',
+      'CONTAINANYWORD',
+      'CONTAINALLWORDS',
     );
   }
 

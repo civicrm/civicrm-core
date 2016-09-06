@@ -24,6 +24,14 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
+  <td><label>Text Search: </label>
+    {$form.activity_free_text_search.html}
+  </td>
+  <td>
+    {$form.activity_free_text.html}
+  </td>
+</tr>
+<tr>
   <td colspan="2">
     {$form.activity_role.html}
     </span>

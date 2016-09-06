@@ -234,6 +234,13 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'dataPattern' => '',
           'export' => true,
         ) ,
+        'activity_free_text_search' => array(
+            'name' => 'free_text_search',
+            'type' => CRM_Utils_Type::T_STRING,
+            'title' => ts('Activity Free Text Search') ,
+            'description' => 'Activity free text search',
+            'required' => false,
+        ) ,
         'source_record_id' => array(
           'name' => 'source_record_id',
           'type' => CRM_Utils_Type::T_INT,
@@ -578,5 +585,20 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'activity', $prefix, array());
     return $r;
+  }
+
+  /**
+   * Returns the list of free text select fields
+   *
+   * @return array
+   */
+  static function getFreeTextFields()
+  {
+    return array(
+        '='               => ts('Is equal to'), '!=' => ts('Is not equal to'), 'CONTAINS' => ts('Contains'), 'CONTAINANYWORD' => ts('Contains any word'),
+        'CONTAINALLWORDS' => ts('Contains all words'), 'LIKE%' => ts('Start with'),
+        'NOTLIKE%'        => ('Does not Start with'), 'NOT%LIKE%' => ts('Does not contain'),
+        'LENGTH<'         => ts('Length is shorter than'), 'LENGTH>' => ts('Length is longer than'), 'REGEXP' => ts('Regular Expression')
+    );
   }
 }
