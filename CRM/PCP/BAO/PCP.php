@@ -117,7 +117,7 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
     $links = self::pcpLinks();
 
     $query = "
-SELECT * FROM civicrm_pcp pcp
+SELECT pcp.*, block.is_tellfriend_enabled FROM civicrm_pcp pcp
 LEFT JOIN civicrm_pcp_block block ON block.id = pcp.pcp_block_id
 WHERE pcp.is_active = 1
   AND pcp.contact_id = %1
