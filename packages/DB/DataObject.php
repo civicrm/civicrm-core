@@ -1236,13 +1236,6 @@ class DB_DataObject extends DB_DataObject_Overload
                 continue;
             }
 
-             // dont insert data into mysql timestamps
-            // use query() if you really want to do this!!!!
-            if ($v & DB_DATAOBJECT_MYSQLTIMESTAMP) {
-                continue;
-            }
-
-
             if ($settings)  {
                 $settings .= ', ';
             }
@@ -1266,7 +1259,7 @@ class DB_DataObject extends DB_DataObject_Overload
                 $settings .= "$kSql = NULL ";
                 continue;
             }
-          if (($v & DB_DATAOBJECT_DATE) || ($v & DB_DATAOBJECT_TIME)) {
+          if (($v & DB_DATAOBJECT_DATE) || ($v & DB_DATAOBJECT_TIME) || $v & DB_DATAOBJECT_MYSQLTIMESTAMP) {
             if (strpos($this->$k, '-') !== FALSE) {
              /*
               * per CRM-14986 we have been having ongoing problems with the format returned from $dao->find(TRUE) NOT
@@ -2377,6 +2370,7 @@ class DB_DataObject extends DB_DataObject_Overload
         global $_DB_DATAOBJECT, $queries, $user;
         $this->_connect();
 
+        // Logging the query first makes sure it gets logged even if it fails.
         CRM_Core_Error::debug_query($string);
         $DB = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
 
@@ -2438,8 +2432,11 @@ class DB_DataObject extends DB_DataObject_Overload
         for ($tries = 0;$tries < 3;$tries++) {
 
             if ($_DB_driver == 'DB') {
-
+                if ($tries) {
+                  CRM_Core_Error::debug_log_message('Attempt: ' . $tries + 1 . ' at query : ' . $string);
+                }
                 $result = $DB->query($string);
+
             } else {
                 switch (strtolower(substr(trim($string),0,6))) {
 
@@ -2474,6 +2471,21 @@ class DB_DataObject extends DB_DataObject_Overload
             return $this->raiseError($result);
         }
 
+        /* CRM-3225 */
+        if (function_exists('variable_get') && variable_get('dev_query', 0)) {
+            // this is for drupal devel module
+            // If devel.module query logging is enabled, prepend a comment with the username and calling function
+            // to the SQL string.
+            $bt = debug_backtrace();
+            // t() may not be available yet so we don't wrap 'Anonymous'
+            $name = $user->uid ? $user->name : variable_get('anonymous', 'Anonymous');
+            $query = $bt[3]['function'] ."\n/* ". $name .' */ '. str_replace("\n ", '', $string);
+            list($usec, $sec) = explode(' ', microtime());
+            $stop = (float)$usec + (float)$sec;
+            $diff = $stop - $time;
+            $queries[] = array($query, $diff);
+        }
+
         $action = strtolower(substr(trim($string),0,6));
 
         if (!empty($_DB_DATAOBJECT['CONFIG']['debug']) || defined('CIVICRM_DEBUG_LOG_QUERY')) {
@@ -2500,6 +2512,7 @@ class DB_DataObject extends DB_DataObject_Overload
             $this->debug($message, 'query', 1);
           }
         }
+
         switch ($action) {
             case 'insert':
             case 'update':
@@ -4291,7 +4304,30 @@ class DB_DataObject extends DB_DataObject_Overload
     function _get_table() { return $this->table(); }
     function _get_keys()  { return $this->keys();  }
 
-
+  /**
+   * Get a string to append to the query log depending on time taken.
+   *
+   * This is to allow easier grepping for slow queries.
+   *
+   * @param float $timeTaken
+   *
+   * @return string
+   */
+  public function getAlertLevel($timeTaken) {
+    if ($timeTaken >= 20) {
+      return '(very-very-very-slow)';
+    }
+    if ($timeTaken > 10) {
+      return '(very-very-slow)';
+    }
+    if ($timeTaken > 5) {
+      return '(very-slow)';
+    }
+    if ($timeTaken > 1) {
+      return '(slow)';
+    }
+    return '';
+  }
 
 
 }

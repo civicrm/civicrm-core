@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -49,8 +49,6 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
@@ -102,9 +100,6 @@ AND    {$this->_componentClause}";
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -122,7 +117,7 @@ AND    {$this->_componentClause}";
       array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE)
     );
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
-    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do no email / Do not mail)'), FALSE);
+    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
     $this->add('select', 'fromEmailAddress', ts('From Email'), $this->_fromEmails, FALSE, array('class' => 'crm-select2 huge'));
 
@@ -150,9 +145,6 @@ AND    {$this->_componentClause}";
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // get all the details needed to generate a receipt
@@ -192,12 +184,18 @@ AND    {$this->_componentClause}";
       $input['net_amount'] = $contribution->net_amount;
       $input['trxn_id'] = $contribution->trxn_id;
       $input['trxn_date'] = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
+      $input['receipt_update'] = $params['receipt_update'];
+      $input['contribution_status_id'] = $contribution->contribution_status_id;
+      $input['paymentProcessor'] = CRM_Core_DAO::singleValueQuery("SELECT payment_processor_id
+        FROM civicrm_financial_trxn
+        WHERE trxn_id = %1
+        LIMIT 1", array(
+          1 => array($contribution->trxn_id, 'String')));
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
       $values = array();
-
       if (isset($params['fromEmailAddress']) && !$elements['createPdf']) {
         // CRM-19129 Allow useres the choice of From Email to send the receipt from.
         $fromEmail = $params['fromEmailAddress'];
@@ -218,10 +216,6 @@ AND    {$this->_componentClause}";
 
       // reset template values before processing next transactions
       $template->clearTemplateVars();
-      if (!empty($params['receipt_update'])) {
-        $objects['contribution']->receipt_date = date('Y-m-d H-i-s');
-        $objects['contribution']->save();
-      }
     }
 
     if ($elements['createPdf']) {

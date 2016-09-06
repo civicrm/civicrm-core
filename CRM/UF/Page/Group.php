@@ -126,7 +126,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
         ),
       );
-      $allowRemoteSubmit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'remote_profile_submissions');
+      $allowRemoteSubmit = Civi::settings()->get('remote_profile_submissions');
       if ($allowRemoteSubmit) {
         self::$_actionLinks[CRM_Core_Action::PROFILE] = array(
           'name' => ts('HTML Form Snippet'),

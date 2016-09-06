@@ -97,7 +97,7 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
     }
 
     if ($secondArg == 'edit' || $secondArg == 'create') {
-      $allowRemoteSubmit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'remote_profile_submissions');
+      $allowRemoteSubmit = Civi::settings()->get('remote_profile_submissions');
       if ($secondArg == 'edit') {
         $controller = new CRM_Core_Controller_Simple('CRM_Profile_Form_Edit',
           ts('Create Profile'),

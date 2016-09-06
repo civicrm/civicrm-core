@@ -306,7 +306,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    */
   public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE) {
     // first delete all sessions more than 20 minutes old which are related to any potential transaction
-    $timeIntervalMins = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'secure_cache_timeout_minutes');
+    $timeIntervalMins = (int) Civi::settings()->get('secure_cache_timeout_minutes');
     if ($timeIntervalMins && $session) {
       $transactionPages = array(
         'CRM_Contribute_Controller_Contribution',

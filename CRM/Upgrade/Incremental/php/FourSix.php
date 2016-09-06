@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6.alpha1                                         |
+ | CiviCRM version 4.7.alpha1                                         |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,38 +26,9 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
+ * Upgrade logic for 4.6
  */
-class CRM_Upgrade_Incremental_php_FourSix {
-  const BATCH_SIZE = 5000;
-
-  /**
-   * Verify DB state.
-   *
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
-
-  /**
-   * Compute any messages which should be displayed before upgrade.
-   *
-   * Note: This function is called iteratively for each upcoming
-   * revision to the database.
-   *
-   * @param $preUpgradeMessage
-   * @param string $rev
-   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
-   * @param null $currentVer
-   */
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-  }
+class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
 
   /**
    * Compute any messages which should be displayed after upgrade.
@@ -66,7 +37,6 @@ class CRM_Upgrade_Incremental_php_FourSix {
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.6.alpha1') {
@@ -129,7 +99,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
    */
   public function upgrade_4_6_alpha3($rev) {
     // Task to process sql.
-    $this->addTask(ts('Add and update reference_date column for Schedule Reminders'), 'updateReferenceDate');
+    $this->addTask('Add and update reference_date column for Schedule Reminders', 'updateReferenceDate');
   }
 
   /**
@@ -200,7 +170,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
    */
   public function upgrade_4_6_1($rev) {
     // CRM-16289 - Fix invalid data in log_civicrm_case.case_type_id.
-    $this->addTask(ts('Cleanup case type id data in log table.'), 'fixCaseLog');
+    $this->addTask('Cleanup case type id data in log table.', 'fixCaseLog');
   }
 
   /**
@@ -216,7 +186,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
     // CRM-16846 - This sql file may have been previously skipped. No harm in running it again because it's just UPDATE statements.
     $this->addTask('State-province update from 4.4.7', 'task_4_6_x_runOnlySql', '4.4.7');
 
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_6_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
   /**
@@ -251,6 +221,11 @@ class CRM_Upgrade_Incremental_php_FourSix {
    * Queue Task Callback for CRM-16846
    *
    * Run a sql file without resetting locale to that version
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $rev
+   *
+   * @return bool
    */
   public static function task_4_6_x_runOnlySql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -261,75 +236,6 @@ class CRM_Upgrade_Incremental_php_FourSix {
 
     $upgrade->source($smarty->fetch($fileName), TRUE);
 
-    return TRUE;
-  }
-
-
-  /**
-   * Upgrade function.
-   *
-   * @param string $rev
-   */
-  public function upgrade_4_6_12($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_6_x_runSql', $rev);
-    $this->addTask('Add Getting Started dashlet', 'addGettingStartedDashlet', $rev);
-  }
-
-  /**
-   * Upgrade function.
-   *
-   * @param string $rev
-   */
-  public function upgrade_4_6_21($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_6_x_runSql', $rev);
-    $this->addTask('Set Remote Submissions setting', 'setRemoteSubmissionsSetting', $rev);
-  }
-
-  /**
-   * Add Getting Started dashlet to dashboard
-   *
-   * @param \CRM_Queue_TaskContext $ctx
-   *
-   * @return bool
-   */
-  public function addGettingStartedDashlet(CRM_Queue_TaskContext $ctx) {
-    $sql = "SELECT count(*) FROM civicrm_dashboard WHERE name='gettingStarted'";
-    $res = CRM_Core_DAO::singleValueQuery($sql);
-    $domainId = CRM_Core_Config::domainID();
-    if ($res <= 0) {
-      $sql = "INSERT INTO `civicrm_dashboard`
-    ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`) VALUES ( {$domainId}, 'getting-started', 'Getting Started', 'civicrm/dashlet/getting-started?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/getting-started?reset=1&snippet=5&context=dashletFullscreen', 1, 1)";
-      CRM_Core_DAO::executeQuery($sql);
-      // Add default position for Getting Started Dashlet ( left column)
-      $sql = "INSERT INTO `civicrm_dashboard_contact` (dashboard_id, contact_id, column_no, is_active)
-SELECT (SELECT MAX(id) FROM `civicrm_dashboard`), contact_id, 0, IF (SUM(is_active) > 0, 1, 0)
-FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_contact.contact_id = civicrm_contact.id GROUP BY contact_id";
-      CRM_Core_DAO::executeQuery($sql);
-    }
-    return TRUE;
-  }
-
-  /**
-   * Set the setting value for allowing remote submissions.
-   *
-   * @param \CRM_Queue_TaskContext $ctx
-   *
-   * @return bool
-   */
-  public function setRemoteSubmissionsSetting(CRM_Queue_TaskContext $ctx) {
-    $domains = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_domain");
-    while ($domains->fetch()) {
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_setting (`group_name`, `name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
-          VALUES (%1, %2, %3, %4, %5, NULL, NULL, %6, NULL)", array(
-            1 => array('CiviCRM Preferences', 'String'),
-            2 => array('remote_profile_submissions', 'String'),
-            3 => array('s:1:"1";', 'String'),
-            4 => array($domains->id, 'Integer'),
-            5 => array(1, 'Integer'),
-            6 => array(date('Y-m-d H:i:s'), 'String'),
-          )
-      );
-    }
     return TRUE;
   }
 

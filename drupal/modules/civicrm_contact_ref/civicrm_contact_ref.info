@@ -1,6 +1,6 @@
 name = CiviCRM Contact Reference Field
 description = Makes a CiviCRM Contact Reference Field.
-version = 7.x-4.6.24.0
+version = 7.x-4.7.11.0
 core = 7.x
 package = CiviCRM
 project = civicrm
@@ -12,4 +12,3 @@ dependencies[] = list
 files[] = civicrm_contact_ref.install
 files[] = civicrm_contact_ref.module
 files[] = civicrm_contact_ref.feeds.inc
-

@@ -185,7 +185,7 @@ return array(
     'quick_form_type' => 'YesNo',
     'default' => FALSE,
     'html_type' => 'radio',
-    'add' => '4.6',
+    'add' => '4.7',
     'title' => 'Accept profile submissions from external sites',
     'is_domain' => 1,
     'is_contact' => 0,

@@ -62,9 +62,10 @@ class CRM_Core_OptionValue {
    *   Has links like edit, delete, disable ..etc.
    * @param string $orderBy
    *   For orderBy clause.
-   * @param  bool $skipEmptyComponents
+   * @param bool $skipEmptyComponents
    *   Whether to skip OptionValue rows with empty Component name
    *   (i.e. when Extension providing the Component is disabled)
+   *
    * @return array
    *   Array of option-values
    *

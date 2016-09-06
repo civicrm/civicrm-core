@@ -384,7 +384,6 @@ WHERE  title = %1
       }
 
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-      $params['group_type'] = CRM_Utils_Array::value('group_type', $params, array());
 
       $groupTypeIds = array();
       $groupType = CRM_Utils_Array::value('group_type', $params);
@@ -397,7 +396,6 @@ WHERE  title = %1
       }
       $params['group_type'] = $groupTypeIds;
 
-      $customFields = CRM_Core_BAO_CustomField::getFields('Group');
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
         $this->_id,
         'Group'

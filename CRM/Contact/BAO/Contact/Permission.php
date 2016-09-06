@@ -87,15 +87,9 @@ WHERE contact_a.id = %1 AND $permission";
    *   Should we force a recompute.
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
-    // FIXME: maybe find a better way of keeping track of this. @eileen pointed out
-    //   that somebody might flush the cache away from under our feet,
-    //   but the altenative would be a SQL call every time this is called,
-    //   and a complete rebuild if the result was an empty set...
-    static $_processed = array(
-      CRM_Core_Permission::VIEW => array(),
-      CRM_Core_Permission::EDIT => array());
+    static $_processed = array();
 
-    if ($type == CRM_Core_Permission::VIEW) {
+    if ($type = CRM_Core_Permission::VIEW) {
       $operationClause = " operation IN ( 'Edit', 'View' ) ";
       $operation = 'View';
     }
@@ -131,24 +125,20 @@ AND    $operationClause
     $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID, FALSE, FALSE, TRUE);
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
+
     CRM_Core_DAO::executeQuery("
 INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
-SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation
+SELECT      $userID as user_id, contact_a.id as contact_id, '$operation' as operation
          $from
-         LEFT JOIN civicrm_acl_contact_cache ac ON ac.user_id = $userID AND ac.contact_id = contact_a.id AND ac.operation = '{$operation}'
 WHERE    $permission
-AND ac.user_id IS NULL
-");
-    // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
-    // the permission clause.
-    if (CRM_Core_Permission::check('edit my contact') ||
-        ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact'))) {
-      if (!CRM_Core_DAO::singleValueQuery("
-        SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}'", $queryParams)) {
-        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
-      }
-    }
-    $_processed[$type][$userID] = 1;
+GROUP BY contact_a.id
+ON DUPLICATE KEY UPDATE
+         user_id=VALUES(user_id),
+         contact_id=VALUES(contact_id),
+         operation=VALUES(operation)"
+    );
+
+    $_processed[$userID] = 1;
   }
 
   /**
