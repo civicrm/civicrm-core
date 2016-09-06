@@ -126,7 +126,10 @@ function civicrm_api3_membership_status_update($params) {
 function civicrm_api3_membership_status_delete($params) {
 
   $memberStatusDelete = CRM_Member_BAO_MembershipStatus::del($params['id'], TRUE);
-  return $memberStatusDelete ? civicrm_api3_create_error($memberStatusDelete['error_message']) : civicrm_api3_create_success();
+  if ($memberStatusDelete) {
+    throw new API_Exception($memberStatusDelete['error_message']);
+  }
+  return civicrm_api3_create_success();
 }
 
 /**

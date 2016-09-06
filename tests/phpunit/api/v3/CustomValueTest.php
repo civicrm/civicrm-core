@@ -94,7 +94,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     if (!empty($this->optionGroup)) {
       foreach ($this->optionGroup as $type => $value) {
         if (!empty($value['id'])) {
-          $this->callAPISuccess('OptionGroup', 'delete', array('id' => $value['id']));
+          if (!$this->callAPISuccess('optionGroup', 'get', array('id' => $value['id'], 'return' => 'id'))) {
+            $this->callAPISuccess('OptionGroup', 'delete', array('id' => $value['id']));
+          }
         }
       }
     }

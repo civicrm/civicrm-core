@@ -1457,9 +1457,14 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
   _civicrm_api3_check_edit_permissions($bao_name, array('id' => $params['id']));
   $args = array(&$params['id']);
   if (method_exists($bao_name, 'del')) {
-    $bao = call_user_func_array(array($bao_name, 'del'), $args);
-    if ($bao !== FALSE) {
-      return civicrm_api3_create_success(TRUE);
+    $dao = new $bao_name();
+    $dao->id = $params['id'];
+    if ($dao->find()) {
+      $bao = call_user_func_array(array($bao_name, 'del'), $args);
+      if ($bao !== FALSE) {
+        return civicrm_api3_create_success();
+      }
+      throw new API_Exception('Could not delete entity id ' . $params['id']);
     }
     throw new API_Exception('Could not delete entity id ' . $params['id']);
   }
