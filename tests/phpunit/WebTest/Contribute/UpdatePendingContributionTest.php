@@ -47,8 +47,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->clickPopupLink("xpath=//table[@class='selector row-highlight']/tbody//tr/td[8]/span/a[@title='Edit Contribution']");
     $this->waitForElementPresent('financial_type_id');
 
-    $this->clickPopupLink("xpath=//a[contains(text(), 'Pay Now')]");
-    $this->assertElementContainsText("xpath=//span[@class='ui-dialog-title']", "Edit Contribution (Pay Now)");
+    $this->clickPopupLink("xpath=//a[contains(text(), 'Pay with Credit Card')]");
+    $this->assertElementContainsText("xpath=//span[@class='ui-dialog-title']", "Pay with Credit Card");
     $this->assertElementNotPresent("xpath=//select[@id='currency']");
     $this->assertNotEditable('total_amount');
     $this->assertElementNotPresent("xpath=//select[@id='contribution_status_id']");
@@ -56,6 +56,11 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->webtestAddCreditCardDetails();
     $this->webtestAddBillingDetails();
 
+    //return to the edit contrib form
+    $this->clickAjaxLink('_qf_Contribution_upload-bottom');
+    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
+
+    //save the edit form
     $this->clickAjaxLink('_qf_Contribution_upload-bottom');
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
