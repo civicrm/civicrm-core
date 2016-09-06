@@ -184,7 +184,7 @@
         <td>
         {if $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
           {capture assign=payNowLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=update&id=`$contribID`&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
-          <a class="open-inline-noreturn action-item crm-hover-button" href="{$payNowLink}">&raquo; {ts}Pay with Credit Card{/ts}</a>
+          <a class="open-inline action-item crm-hover-button" href="{$payNowLink}">&raquo; {ts}Pay with Credit Card{/ts}</a>
         {/if}
       </td>
       </tr>
