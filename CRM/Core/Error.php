@@ -633,6 +633,23 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * Generate a hash for the logfile.
+   * CRM-13640.
+   */
+  public static function generateLogFileHash($config) {
+    // Use multiple (but stable) inputs for hash information. TMI?
+    $md5inputs = array(
+      defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
+      $config->userFrameworkBaseURL,
+      md5($config->dsn),
+      $config->dsn,
+    );
+    // Trim 8 chars off the string, make it slightly easier to find
+    // but reveals less information from the hash.
+    return substr(md5(var_export($md5inputs, 1)), 8);
+  }
+
+  /**
    * Obtain a reference to the error log.
    *
    * @param string $comp
@@ -651,8 +668,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if ($comp) {
       $comp = $comp . '.';
     }
-
-    $fileName = "{$config->configAndLogDir}CiviCRM." . $comp . md5($config->dsn) . '.log';
+    $hash = self::generateLogFileHash($config);
+    $fileName = "{$config->configAndLogDir}CiviCRM." . $comp . $hash . '.log';
 
     // Roll log file monthly or if greater than 256M
     // note that PHP file functions have a limit of 2G and hence

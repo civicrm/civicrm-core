@@ -74,10 +74,7 @@
  *
  * Package List: PEAR
  * ==================
- * Archive_Tar                   1.3.3      BSD 2-cl.
  * Auth_SASL                     1.0.3      BSD 3-cl.
- * Console_Getopt                1.2.3      PHP 3.0
- * Console_Table                 1.1.3      BSD 3-cl.
  * Contact_Vcard_Build           1.1.2      PHP 3          local changes
  * Contact_Vcard_Parse           1.32.0     PHP 3.0
  * Date                          1.4.7      BSD 3-cl.

@@ -33,8 +33,7 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
-class CRM_Contact_DAO_Group extends CRM_Core_DAO
-{
+class CRM_Contact_DAO_Group extends CRM_Core_DAO {
   /**
    * static instance to hold the table name
    *
@@ -204,8 +203,7 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
    *
    * @return civicrm_group
    */
-  function __construct()
-  {
+  function __construct() {
     $this->__table = 'civicrm_group';
     parent::__construct();
   }
@@ -215,8 +213,7 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
    * @return array
    *   [CRM_Core_Reference_Interface]
    */
-  static function getReferenceColumns()
-  {
+  static function getReferenceColumns() {
     if (!self::$_links) {
       self::$_links = static ::createReferenceColumns(__CLASS__);
       self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'saved_search_id', 'civicrm_saved_search', 'id');
@@ -230,8 +227,7 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &fields()
-  {
+  static function &fields() {
     if (!(self::$_fields)) {
       self::$_fields = array(
         'id' => array(
@@ -329,6 +325,10 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
           'description' => 'FK to group type',
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
+          'pseudoconstant' => array(
+            'optionGroupName' => 'group_type',
+            'optionEditPath' => 'civicrm/admin/options/group_type',
+          )
         ) ,
         'cache_date' => array(
           'name' => 'cache_date',
@@ -391,8 +391,7 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &fieldKeys()
-  {
+  static function &fieldKeys() {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id',
@@ -424,8 +423,7 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
    *
    * @return string
    */
-  static function getTableName()
-  {
+  static function getTableName() {
     return CRM_Core_DAO::getLocaleTableName(self::$_tableName);
   }
   /**
@@ -433,8 +431,7 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
    *
    * @return boolean
    */
-  function getLog()
-  {
+  function getLog() {
     return self::$_log;
   }
   /**
@@ -444,8 +441,7 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &import($prefix = false)
-  {
+  static function &import($prefix = false) {
     if (!(self::$_import)) {
       self::$_import = array();
       $fields = self::fields();
@@ -468,8 +464,7 @@ class CRM_Contact_DAO_Group extends CRM_Core_DAO
    *
    * @return array
    */
-  static function &export($prefix = false)
-  {
+  static function &export($prefix = false) {
     if (!(self::$_export)) {
       self::$_export = array();
       $fields = self::fields();
