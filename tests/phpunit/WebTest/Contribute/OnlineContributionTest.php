@@ -619,7 +619,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     if (empty($priceSet)) {
       $this->waitForElementPresent("total_amount");
-      $this->assertTrue($this->isElementPresent("xpath=//input[@id='total_amount'][@readonly=1][@value=100]"));
+      $this->assertTrue($this->isElementPresent("xpath=//input[@id='total_amount'][@readonly=1][@value='100.00']"));
     }
     else {
       $this->assertElementContainsText("xpath=//div[@class='header-dark']", "Contribution Information");

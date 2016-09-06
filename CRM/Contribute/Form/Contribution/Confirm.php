@@ -496,6 +496,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contribButton = ts('Continue');
       $this->assign('button', ts('Continue'));
     }
+    elseif (!empty($this->_ccid)) {
+      $contribButton = ts('Make Payment');
+      $this->assign('button', ts('Make Payment'));
+    }
     else {
       $contribButton = ts('Make Contribution');
       $this->assign('button', ts('Make Contribution'));
