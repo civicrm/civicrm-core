@@ -1364,8 +1364,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testInvalidID_delete($Entity) {
     // turn test off for now
-    $this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
-    return;
+    //$this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
+    //return;
     if (in_array($Entity, $this->toBeImplemented['delete'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_delete to be implemented");
       return;
