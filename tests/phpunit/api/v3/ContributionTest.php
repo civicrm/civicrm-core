@@ -1844,7 +1844,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test repeat contribution successfully creates line items (plural).
    */
   public function testRepeatTransactionLineItems() {
-    // KG
+    // CRM-19309
     $originalContribution = $this->setUpRepeatTransaction($recurParams = array(), 'multiple');
     $this->callAPISuccess('contribution', 'repeattransaction', array(
       'original_contribution_id' => $originalContribution['id'],
@@ -1883,9 +1883,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     unset($lineItem2['values'][1]['id'], $lineItem2['values'][1]['entity_id']);
     $this->assertEquals($lineItem1['values'][1], $lineItem2['values'][1]);
 
-    // KG ok so we want to:
-    // check that financial_line_items have been created for entity_id 3 and 4; - visually they look good
-    // the first set of line items id 1 and 2 will not create financial_items b/c of how I created them
+    // CRM-19309 so in future we also want to:
+    // check that financial_line_items have been created for entity_id 3 and 4;
 
     $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
     $this->quickCleanUpFinancialEntities();
@@ -2956,9 +2955,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'payment_processor_id' => $paymentProcessorID,
     ), $recurParams));
 
-    $originalContribution=[];
+    $originalContribution = '';
     if ($flag == 'multiple') {
-      // KG create a contribution + also add in line_items (plural):
+      // CRM-19309 create a contribution + also add in line_items (plural):
       $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
           $this->_params,
           array(
