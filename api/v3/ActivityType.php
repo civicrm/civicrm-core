@@ -117,7 +117,9 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  * @deprecated use OptionValue api
  */
 function civicrm_api3_activity_type_delete($params) {
-  $type = civicrm_api3_activity_type_get(array($params['id']));
+  $optionGroup = civicrm_api3('optionGroup', 'get', array('name' => 'activitiy_type'));
+  $type = civicrm_api3('OptionValue', 'get', (array('value' => $params['id'], 'option_group_id' => $optionGroup['id'])));
+  print_r($type);
   if (!(bool) $type['count']) {
     throw new API_Execption('Could not delete activity type ' . $params['id']);
   }

@@ -1458,7 +1458,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
   _civicrm_api3_check_edit_permissions($bao_name, array('id' => $params['id']));
   $args = array(&$params['id']);
   if (method_exists($bao_name, 'del')) {
-    $dao = new $bao_name;
+    $dao = new $bao_name();
     $dao->id = $params['id'];
     if ($dao->find()) {
       $bao = call_user_func_array(array($bao_name, 'del'), $args);
