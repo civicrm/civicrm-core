@@ -390,6 +390,11 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['contribution_status_id'] = array($status => 1);
     }
 
+    $pcpid=CRM_Utils_Request::retrieve('pcpid', 'Positive', $this);
+    if ($pcpid) {
+    	$this->_formValues['contribution_pcp_made_through_id'][0]=$pcpid;
+    }
+
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     if ($cid) {
