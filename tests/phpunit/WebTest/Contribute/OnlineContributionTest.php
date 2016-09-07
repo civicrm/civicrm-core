@@ -505,4 +505,220 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
+  /**
+   * CRM-19263 - Test online pay now functionality
+   */
+  public function testOnlineContributionWithPayNowLink() {
+    $this->webtestLogin();
+    $pageId = 1;
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", 'is_pay_later');
+    $this->check('is_pay_later');
+    $this->type('pay_later_text', "I will send payment by check");
+    $this->fillRichTextField('pay_later_receipt', "I will send payment by check");
+    $this->clickLink("_qf_Amount_upload_done-bottom");
+
+    //add financial type of account type expense
+    $financialType = 'Donation';
+    $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
+    $usedFor = 'Contribution';
+    $setHelp = 'Select your conference options.';
+    $this->_testAddSet($setTitle, $usedFor, $setHelp, $financialType);
+    $sid = $this->urlArg('sid');
+
+    $validateStrings = array();
+    $fields = array(
+      'Full Conference' => 'Text',
+      'Meal Choice' => 'Select',
+      'Pre-conference Meetup?' => 'Radio',
+      'Evening Sessions' => 'CheckBox',
+    );
+
+    $this->_testAddPriceFields($fields, $validateStrings, $financialType);
+
+    //Add profile Details
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $name = $this->_testCreateUser($firstName, $lastName);
+    $this->openCiviPage("admin/synchUser", "reset=1", NULL);
+    $this->clickLink("_qf_CMSUser_next-bottom");
+
+    $this->openCiviPage("admin/setting/preferences/contribute", "reset=1", "deferred_revenue_enabled");
+    $this->check('deferred_revenue_enabled');
+    $this->waitForElementPresent('default_invoice_page');
+    $this->select('default_invoice_page', "value=$pageId");
+    $this->clickLink("_qf_Contribute_next-bottom");
+
+    $this->webtestLogin($name, "Test12345");
+    $this->_testContributeWithPayLater($pageId, $firstName);
+
+    $this->_testContributeWithPayNow($firstName);
+
+    $this->openCiviPage("user", "reset=1");
+    $this->assertFalse($this->isTextPresent("Pay Now"));
+
+    $this->webtestLogin();
+
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", 'price_set_id');
+    $this->select('price_set_id', "value=9");
+    $this->clickLink("_qf_Amount_upload_done-bottom");
+
+    $this->webtestLogin($name, "Test12345");
+
+    $this->_testContributeWithPayLater($pageId, $firstName, TRUE);
+
+    $this->_testContributeWithPayNow($firstName, TRUE);
+
+    $this->openCiviPage("user", "reset=1");
+    $this->assertFalse($this->isTextPresent("Pay Now"));
+
+    // Type search name in autocomplete.
+    $this->webtestLogin();
+    $this->openCiviPage("civicrm/dashboard", "reset=1", 'sort_name_navigation');
+    $this->click('sort_name_navigation');
+    $this->type('css=input#sort_name_navigation', $firstName);
+    $this->typeKeys('css=input#sort_name_navigation', $firstName);
+    $this->waitForElementPresent("css=ul.ui-autocomplete li");
+    $this->clickLink("css=ul.ui-autocomplete li", 'tab_contribute');
+
+    $this->click('css=li#tab_contribute a');
+    $this->waitForElementPresent('link=Record Contribution (Check, Cash, EFT ...)');
+
+    $amountValues = array(
+      1 => '$ 588.50',
+      2 => '$ 98.50',
+    );
+    foreach ($amountValues as $row => $amount) {
+      $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[{$row}]/td[8]/span//a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+
+      // View Contribution Record and test for expected values
+      $expected = array(
+        'From' => "{$firstName} {$lastName}",
+        'Financial Type' => $financialType,
+        'Fee Amount' => '$ 1.50',
+        'Net Amount' => $amount,
+        'Received Into' => 'Payment Processor Account',
+        'Payment Method' => 'Credit Card (Test Processor)',
+        'Contribution Status' => 'Completed',
+      );
+      $this->webtestVerifyTabularData($expected);
+
+      $this->clickAjaxLink("xpath=//span[text()='Done']");
+    }
+  }
+
+  /**
+   * Contribute using pay now link
+   * @param string $firstName
+   * @param bool $priceSet
+   */
+  public function _testContributeWithPayNow($firstName, $priceSet = FALSE) {
+    //user dashboard
+    $this->openCiviPage("user", "reset=1");
+    $this->waitForElementPresent("xpath=//a/span[contains(text(), 'Pay Now')]");
+    $this->clickLink("xpath=//a/span[contains(text(), 'Pay Now')]");
+
+    if (empty($priceSet)) {
+      $this->waitForElementPresent("total_amount");
+      $this->assertTrue($this->isElementPresent("xpath=//input[@id='total_amount'][@readonly=1][@value='100.00']"));
+    }
+    else {
+      $this->assertElementContainsText("xpath=//div[@class='header-dark']", "Contribution Information");
+      $this->assertElementContainsText("xpath=//div[@class='crm-section no-label total_amount-section']", "Contribution Total: $ 590.00");
+    }
+
+    $this->assertFalse($this->isElementPresent("priceset"));
+    $this->assertFalse($this->isElementPresent("xpath=//div[@class='crm-public-form-item crm-section is_pledge-section']"));
+    $this->assertFalse($this->isElementPresent("xpath=//div[@class='crm-public-form-item crm-section premium_block-section']"));
+    $this->assertFalse($this->isElementPresent("xpath=//div[@class='crm-public-form-item crm-group custom_pre_profile-group']"));
+    $this->assertFalse($this->isElementPresent("xpath=//input[@id=email-5]"));
+    $this->assertFalse($this->isElementPresent("xpath=//input[@name='payment_processor_id'][@value=0]"));
+    $this->click("xpath=//input[@name='payment_processor_id'][@value=1]");
+    $this->waitForAjaxContent();
+
+    $this->webtestAddCreditCardDetails();
+    $this->webtestAddBillingDetails();
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+
+    $this->clickLink("_qf_Confirm_next-bottom");
+    $firstName = strtolower($firstName);
+    $emailText = "An email receipt has also been sent to {$firstName}@example.com";
+    $this->waitForTextPresent($emailText);
+
+  }
+
+  /**
+   * Contribute with pay later
+   *
+   * @param int $pageId
+   * @param string $firstName
+   * @param bool $priceSet
+   */
+  public function _testContributeWithPayLater($pageId, $firstName, $priceSet = FALSE) {
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", NULL);
+    $this->waitForElementPresent("email-5");
+
+    $this->type("email-5", $firstName . "@example.com");
+
+    if (empty($priceSet)) {
+      $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
+      $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 100);
+      $this->typeKeys("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 100);
+    }
+    else {
+      $this->type("xpath=//input[@class='four crm-form-text required']", "1");
+      $this->click("xpath=//input[@class='crm-form-radio']");
+      $this->click("xpath=//input[@class='crm-form-checkbox']");
+    }
+
+    $this->waitForTextPresent("Payment Method");
+    $payLaterText = "I will send payment by check";
+    $this->click("xpath=//label[text() = '{$payLaterText}']/preceding-sibling::input[1]");
+
+    $this->waitForAjaxContent();
+    $this->clickLink("_qf_Main_upload-bottom");
+    $this->waitForElementPresent("xpath=//div[@class='bold pay_later_receipt-section']");
+
+    $payLaterInstructionsText = "I will send payment by check";
+    $this->assertElementContainsText("xpath=//div[@class='bold pay_later_receipt-section']/p", $payLaterInstructionsText);
+    $this->clickLink("_qf_Confirm_next-bottom");
+
+    $this->waitForElementPresent("xpath=//div[@class='help']/div/p");
+    $this->assertElementContainsText("xpath=//div[@class='help']/div/p", $payLaterInstructionsText);
+  }
+
+  /**
+   * Create test user
+   *
+   * @param string $firstName
+   * @param string $lastName
+   *
+   * @return string
+   */
+  public function _testCreateUser($firstName, $lastName) {
+    $this->open($this->sboxPath . "admin/people/create");
+
+    $this->waitForElementPresent("edit-submit");
+
+    $name = "TestUser" . substr(sha1(rand()), 0, 4);
+    $this->type("edit-name", $name);
+
+    $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
+    $this->type("edit-mail", $emailId);
+    $this->type("edit-pass-pass1", "Test12345");
+    $this->type("edit-pass-pass2", "Test12345");
+
+    $this->type("first_name", $firstName);
+    $this->type("last_name", $lastName);
+
+    //Address Details
+    $this->type("street_address-1", "902C El Camino Way SW");
+    $this->type("city-1", "Dumfries");
+    $this->type("postal_code-1", "1234");
+    $this->select("state_province-1", "value=1019");
+
+    $this->click("edit-submit");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    return $name;
+  }
+
 }
