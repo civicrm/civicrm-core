@@ -1211,6 +1211,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // required for mailing/template display ..etc
       $values['related_contact'] = $contactID;
 
+      //CRM-19172: Create CMS user for individual on whose behalf organization is doing contribution
+      $params['onbehalf_contact_id'] = $contactID;
+
       //make this employee of relationship as current
       //employer / employee relationship,  CRM-3532
       if ($isNotCurrentEmployer &&
