@@ -1541,35 +1541,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
       }
       if ($this->_mode) {
-        if (!empty($params['billing_first_name'])) {
-          $name = $params['billing_first_name'];
-        }
-
-        if (!empty($params['billing_middle_name'])) {
-          $name .= " {$params['billing_middle_name']}";
-        }
-
-        if (!empty($params['billing_last_name'])) {
-          $name .= " {$params['billing_last_name']}";
-        }
-        $this->assign('billingName', $name);
-
-        // assign the address formatted up for display
-        $addressParts = array(
-          "street_address-{$this->_bltID}",
-          "city-{$this->_bltID}",
-          "postal_code-{$this->_bltID}",
-          "state_province-{$this->_bltID}",
-          "country-{$this->_bltID}",
-        );
-        $addressFields = array();
-        foreach ($addressParts as $part) {
-          list($n, $id) = explode('-', $part);
-          if (isset($this->_params['billing_' . $part])) {
-            $addressFields[$n] = $this->_params['billing_' . $part];
-          }
-        }
-        $this->assign('address', CRM_Utils_Address::format($addressFields));
+        $this->assignBillingName($params);
+        $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
+          $this->_params,
+          $this->_bltID
+        ));
 
         $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
         $date = CRM_Utils_Date::mysqlToIso($date);
