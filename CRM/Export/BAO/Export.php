@@ -810,10 +810,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             elseif ($field == 'provider_id' || $field == 'im_provider') {
               $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
             }
-            elseif ($field == 'master_id') {
+            elseif (strstr($field, 'master_id')) {
               $masterAddressId = NULL;
-              if (isset($iterationDAO->master_id)) {
-                $masterAddressId = $iterationDAO->master_id;
+              if (isset($iterationDAO->$field)) {
+                $masterAddressId = $iterationDAO->$field;
               }
               // get display name of contact that address is shared.
               $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId, $iterationDAO->contact_id);
@@ -1127,14 +1127,16 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       if (empty($exportParams['suppress_csv_for_testing'])) {
         self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode);
       }
+      else {
+        // return tableName and sqlColumns in test context
+        return array($exportTempTable, $sqlColumns);
+      }
 
       // delete the export temp table and component table
       $sql = "DROP TABLE IF EXISTS {$exportTempTable}";
       CRM_Core_DAO::executeQuery($sql);
-      // Do not exit in test context.
-      if (empty($exportParams['suppress_csv_for_testing'])) {
-        CRM_Utils_System::civiExit();
-      }
+
+      CRM_Utils_System::civiExit();
     }
     else {
       CRM_Core_Error::fatal(ts('No records to export'));
