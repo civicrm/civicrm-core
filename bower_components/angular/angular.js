@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.3.18
+ * @license AngularJS v1.3.20
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -54,7 +54,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message = message + '\nhttp://errors.angularjs.org/1.3.18/' +
+    message = message + '\nhttp://errors.angularjs.org/1.3.20/' +
       (module ? module + '/' : '') + code;
     for (i = 2; i < arguments.length; i++) {
       message = message + (i == 2 ? '?' : '&') + 'p' + (i - 2) + '=' +
@@ -2139,11 +2139,11 @@ function toDebugString(obj) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.3.18',    // all of these placeholder strings will be replaced by grunt's
+  full: '1.3.20',    // all of these placeholder strings will be replaced by grunt's
   major: 1,    // package task
   minor: 3,
-  dot: 18,
-  codeName: 'collective-penmanship'
+  dot: 20,
+  codeName: 'shallow-translucence'
 };
 
 
@@ -6518,14 +6518,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     return bindings;
   }
 
-  function assertValidDirectiveName(name) {
-    var letter = name.charAt(0);
-    if (!letter || letter !== lowercase(letter)) {
-      throw $compileMinErr('baddir', "Directive name '{0}' is invalid. The first character must be a lowercase letter", name);
-    }
-    return name;
-  }
-
   /**
    * @ngdoc method
    * @name $compileProvider#directive
@@ -6544,7 +6536,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    this.directive = function registerDirective(name, directiveFactory) {
     assertNotHasOwnProperty(name, 'directive');
     if (isString(name)) {
-      assertValidDirectiveName(name);
       assertArg(directiveFactory, 'directiveFactory');
       if (!hasDirectives.hasOwnProperty(name)) {
         hasDirectives[name] = [];
@@ -9740,8 +9731,8 @@ function $HttpProvider() {
        * Resolves the raw $http promise.
        */
       function resolvePromise(response, status, headers, statusText) {
-        // normalize internal statuses to 0
-        status = Math.max(status, 0);
+        //status: HTTP response status code, 0, -1 (aborted by timeout / promise)
+        status = status >= -1 ? status : 0;
 
         (isSuccess(status) ? deferred.resolve : deferred.reject)({
           data: response,
@@ -10664,12 +10655,12 @@ function serverBase(url) {
  *
  * @constructor
  * @param {string} appBase application base URL
+ * @param {string} appBaseNoFile application base URL stripped of any filename
  * @param {string} basePrefix url path prefix
  */
-function LocationHtml5Url(appBase, basePrefix) {
+function LocationHtml5Url(appBase, appBaseNoFile, basePrefix) {
   this.$$html5 = true;
   basePrefix = basePrefix || '';
-  var appBaseNoFile = stripFile(appBase);
   parseAbsoluteUrl(appBase, this);
 
 
@@ -10743,10 +10734,10 @@ function LocationHtml5Url(appBase, basePrefix) {
  *
  * @constructor
  * @param {string} appBase application base URL
+ * @param {string} appBaseNoFile application base URL stripped of any filename
  * @param {string} hashPrefix hashbang prefix
  */
-function LocationHashbangUrl(appBase, hashPrefix) {
-  var appBaseNoFile = stripFile(appBase);
+function LocationHashbangUrl(appBase, appBaseNoFile, hashPrefix) {
 
   parseAbsoluteUrl(appBase, this);
 
@@ -10855,13 +10846,12 @@ function LocationHashbangUrl(appBase, hashPrefix) {
  *
  * @constructor
  * @param {string} appBase application base URL
+ * @param {string} appBaseNoFile application base URL stripped of any filename
  * @param {string} hashPrefix hashbang prefix
  */
-function LocationHashbangInHtml5Url(appBase, hashPrefix) {
+function LocationHashbangInHtml5Url(appBase, appBaseNoFile, hashPrefix) {
   this.$$html5 = true;
   LocationHashbangUrl.apply(this, arguments);
-
-  var appBaseNoFile = stripFile(appBase);
 
   this.$$parseLinkUrl = function(url, relHref) {
     if (relHref && relHref[0] === '#') {
@@ -11398,7 +11388,9 @@ function $LocationProvider() {
       appBase = stripHash(initialUrl);
       LocationMode = LocationHashbangUrl;
     }
-    $location = new LocationMode(appBase, '#' + hashPrefix);
+    var appBaseNoFile = stripFile(appBase);
+
+    $location = new LocationMode(appBase, appBaseNoFile, '#' + hashPrefix);
     $location.$$parseLinkUrl(initialUrl, initialUrl);
 
     $location.$$state = $browser.state();
@@ -11478,6 +11470,13 @@ function $LocationProvider() {
 
     // update $location when $browser url changes
     $browser.onUrlChange(function(newUrl, newState) {
+
+      if (isUndefined(beginsWith(appBaseNoFile, newUrl))) {
+        // If we are navigating outside of the app then force a reload
+        $window.location.href = newUrl;
+        return;
+      }
+
       $rootScope.$evalAsync(function() {
         var oldUrl = $location.absUrl();
         var oldState = $location.$$state;
@@ -11760,6 +11759,25 @@ function ensureSafeMemberName(name, fullExpression) {
       || name === "__proto__") {
     throw $parseMinErr('isecfld',
         'Attempting to access a disallowed field in Angular expressions! '
+        + 'Expression: {0}', fullExpression);
+  }
+  return name;
+}
+
+function getStringValue(name, fullExpression) {
+  // From the JavaScript docs:
+  // Property names must be strings. This means that non-string objects cannot be used
+  // as keys in an object. Any non-string object, including a number, is typecasted
+  // into a string via the toString method.
+  //
+  // So, to ensure that we are checking the same `name` that JavaScript would use,
+  // we cast it to a string, if possible.
+  // Doing `name + ''` can cause a repl error if the result to `toString` is not a string,
+  // this is, this will handle objects that misbehave.
+  name = name + '';
+  if (!isString(name)) {
+    throw $parseMinErr('iseccst',
+        'Cannot convert object to primitive value! '
         + 'Expression: {0}', fullExpression);
   }
   return name;
@@ -12406,7 +12424,7 @@ Parser.prototype = {
 
     return extend(function $parseObjectIndex(self, locals) {
       var o = obj(self, locals),
-          i = indexFn(self, locals),
+          i = getStringValue(indexFn(self, locals), expression),
           v;
 
       ensureSafeMemberName(i, expression);
@@ -12415,7 +12433,7 @@ Parser.prototype = {
       return v;
     }, {
       assign: function(self, value, locals) {
-        var key = ensureSafeMemberName(indexFn(self, locals), expression);
+        var key = ensureSafeMemberName(getStringValue(indexFn(self, locals), expression), expression);
         // prevent overwriting of Function.constructor which would break ensureSafeObject check
         var o = ensureSafeObject(obj(self, locals), expression);
         if (!o) obj.assign(self, o = {}, locals);
@@ -26364,8 +26382,9 @@ var patternDirective = function() {
         ctrl.$validate();
       });
 
-      ctrl.$validators.pattern = function(value) {
-        return ctrl.$isEmpty(value) || isUndefined(regexp) || regexp.test(value);
+      ctrl.$validators.pattern = function(modelValue, viewValue) {
+        // HTML5 pattern constraint validates the input value, so we validate the viewValue
+        return ctrl.$isEmpty(viewValue) || isUndefined(regexp) || regexp.test(viewValue);
       };
     }
   };

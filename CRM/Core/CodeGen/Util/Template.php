@@ -29,8 +29,6 @@ class CRM_Core_CodeGen_Util_Template {
       $this->beautifier = new PHP_Beautifier();
       $this->beautifier->addFilter('ArrayNested');
       // add one or more filters
-      $this->beautifier->addFilter('Pear');
-      // add one or more filters
       $this->beautifier->addFilter('NewLines', array('after' => 'class, public, require, comment'));
       $this->beautifier->setIndentChar(' ');
       $this->beautifier->setIndentNumber(2);

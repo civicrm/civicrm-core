@@ -31,13 +31,11 @@
  * $Id$
  *
  */
-class CRM_Core_DAO_AllCoreTables
-{
+class CRM_Core_DAO_AllCoreTables {
   static private $tables = null;
   static private $daoToClass = null;
   static private $entityTypes = null;
-  static public function init($fresh = FALSE)
-  {
+  static public function init($fresh = FALSE) {
     static $init = FALSE;
     if ($init && !$fresh) return;
     $entityTypes = array(
@@ -809,8 +807,7 @@ class CRM_Core_DAO_AllCoreTables
   /**
    * (Quasi-Private) Do not call externally (except for unit-testing)
    */
-  static public function registerEntityType($daoName, $className, $tableName)
-  {
+  static public function registerEntityType($daoName, $className, $tableName) {
     self::$daoToClass[$daoName] = $className;
     self::$tables[$tableName] = $className;
     self::$entityTypes[$className] = array(
@@ -819,59 +816,47 @@ class CRM_Core_DAO_AllCoreTables
       'table' => $tableName,
     );
   }
-  static public function get()
-  {
+  static public function get() {
     self::init();
     return self::$entityTypes;
   }
-  static public function tables()
-  {
+  static public function tables() {
     self::init();
     return self::$tables;
   }
-  static public function daoToClass()
-  {
+  static public function daoToClass() {
     self::init();
     return self::$daoToClass;
   }
-  static public function getCoreTables()
-  {
+  static public function getCoreTables() {
     return self::tables();
   }
-  static public function isCoreTable($tableName)
-  {
+  static public function isCoreTable($tableName) {
     return FALSE !== array_search($tableName, self::tables());
   }
-  static public function getCanonicalClassName($className)
-  {
+  static public function getCanonicalClassName($className) {
     return str_replace('_BAO_', '_DAO_', $className);
   }
-  static public function getClasses()
-  {
+  static public function getClasses() {
     return array_values(self::daoToClass());
   }
-  static public function getClassForTable($tableName)
-  {
+  static public function getClassForTable($tableName) {
     return CRM_Utils_Array::value($tableName, self::tables());
   }
-  static public function getFullName($daoName)
-  {
+  static public function getFullName($daoName) {
     return CRM_Utils_Array::value($daoName, self::daoToClass());
   }
-  static public function getBriefName($className)
-  {
+  static public function getBriefName($className) {
     return CRM_Utils_Array::value($className, array_flip(self::daoToClass()));
   }
   /**
    * @param string $className DAO or BAO name
    * @return string|FALSE SQL table name
    */
-  static public function getTableForClass($className)
-  {
+  static public function getTableForClass($className) {
     return array_search(self::getCanonicalClassName($className) , self::tables());
   }
-  static public function reinitializeCache($fresh = FALSE)
-  {
+  static public function reinitializeCache($fresh = FALSE) {
     self::init($fresh);
   }
 }

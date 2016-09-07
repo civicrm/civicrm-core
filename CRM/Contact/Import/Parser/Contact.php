@@ -2159,7 +2159,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Get the possible contact Matches.
+   * Get the possible contact matches.
    *
    * 1) the chosen dedupe rule falling back to
    * 2) a check for the external ID.

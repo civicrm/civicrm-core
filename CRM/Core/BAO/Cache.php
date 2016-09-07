@@ -297,39 +297,16 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * Also delete all session cache entries which are a couple of days old.
    * This keeps the session cache to a manageable size
+   * Delete Contribution page session caches more energetically.
    *
    * @param bool $session
    * @param bool $table
    * @param bool $prevNext
    */
   public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE) {
-    // clean up the session cache every $cacheCleanUpNumber probabilistically
-    $cleanUpNumber = 757;
-
-    // clean up all sessions older than $cacheTimeIntervalDays days
-    $timeIntervalDays = 2;
-    $timeIntervalMins = 30;
-
-    if (mt_rand(1, 100000) % $cleanUpNumber == 0) {
-      $session = $table = $prevNext = TRUE;
-    }
-
-    if (!$session && !$table && !$prevNext) {
-      return;
-    }
-
-    if ($prevNext) {
-      // delete all PrevNext caches
-      CRM_Core_BAO_PrevNextCache::cleanupCache();
-    }
-
-    if ($table) {
-      CRM_Core_Config::clearTempTables($timeIntervalDays . ' day');
-    }
-
-    if ($session) {
-      // first delete all sessions which are related to any potential transaction
-      // page
+    // first delete all sessions more than 20 minutes old which are related to any potential transaction
+    $timeIntervalMins = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'secure_cache_timeout_minutes');
+    if ($timeIntervalMins && $session) {
       $transactionPages = array(
         'CRM_Contribute_Controller_Contribution',
         'CRM_Event_Controller_Registration',
@@ -352,6 +329,31 @@ WHERE       group_name = 'CiviCRM Session'
 AND         created_date <= %1
 AND         (" . implode(' OR ', $where) . ")";
       CRM_Core_DAO::executeQuery($sql, $params);
+    }
+    // clean up the session cache every $cacheCleanUpNumber probabilistically
+    $cleanUpNumber = 757;
+
+    // clean up all sessions older than $cacheTimeIntervalDays days
+    $timeIntervalDays = 2;
+
+    if (mt_rand(1, 100000) % $cleanUpNumber == 0) {
+      $session = $table = $prevNext = TRUE;
+    }
+
+    if (!$session && !$table && !$prevNext) {
+      return;
+    }
+
+    if ($prevNext) {
+      // delete all PrevNext caches
+      CRM_Core_BAO_PrevNextCache::cleanupCache();
+    }
+
+    if ($table) {
+      CRM_Core_Config::clearTempTables($timeIntervalDays . ' day');
+    }
+
+    if ($session) {
 
       $sql = "
 DELETE FROM civicrm_cache

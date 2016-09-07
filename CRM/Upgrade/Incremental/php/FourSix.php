@@ -75,6 +75,12 @@ class CRM_Upgrade_Incremental_php_FourSix {
     if ($rev == '4.6.alpha3') {
       $postUpgradeMessage .= '<br /><br />' . ts('A new permission has been added for editing message templates. Previously, users needed the "administer CiviCRM" permission. Now, users need the new permission called "edit message templates." Please check your CMS permissions to ensure that users who should be able to edit message templates are assigned this new permission.');
     }
+    // if ($rev == '4.6.21') {
+    //   $postUpgradeMessage .= '<br /><br />' . ts("WARNING: For increased security, profile submissions embedded in remote sites are no longer allowed to create or edit data by default. If you need to allow users to submit profiles from external sites, you can restore this at Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) > 'Accept profile submissions from external sites'");
+    // }
+    if ($rev == '4.6.21') {
+      $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly fro SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
+    }
   }
 
 
@@ -270,6 +276,16 @@ class CRM_Upgrade_Incremental_php_FourSix {
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_6_21($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_6_x_runSql', $rev);
+    $this->addTask('Set Remote Submissions setting', 'setRemoteSubmissionsSetting', $rev);
+  }
+
+  /**
    * Add Getting Started dashlet to dashboard
    *
    * @param \CRM_Queue_TaskContext $ctx
@@ -289,6 +305,30 @@ class CRM_Upgrade_Incremental_php_FourSix {
 SELECT (SELECT MAX(id) FROM `civicrm_dashboard`), contact_id, 0, IF (SUM(is_active) > 0, 1, 0)
 FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_contact.contact_id = civicrm_contact.id GROUP BY contact_id";
       CRM_Core_DAO::executeQuery($sql);
+    }
+    return TRUE;
+  }
+
+  /**
+   * Set the setting value for allowing remote submissions.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function setRemoteSubmissionsSetting(CRM_Queue_TaskContext $ctx) {
+    $domains = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_domain");
+    while ($domains->fetch()) {
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_setting (`group_name`, `name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
+          VALUES (%1, %2, %3, %4, %5, NULL, NULL, %6, NULL)", array(
+            1 => array('CiviCRM Preferences', 'String'),
+            2 => array('remote_profile_submissions', 'String'),
+            3 => array('s:1:"1";', 'String'),
+            4 => array($domains->id, 'Integer'),
+            5 => array(1, 'Integer'),
+            6 => array(date('Y-m-d H:i:s'), 'String'),
+          )
+      );
     }
     return TRUE;
   }
