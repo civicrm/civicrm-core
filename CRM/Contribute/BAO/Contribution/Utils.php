@@ -327,7 +327,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     $created = TRUE;
 
     if (!empty($params['cms_create_account'])) {
-      $params['contactID'] = $contactID;
+      $params['contactID'] = !empty($params['onbehalf_contact_id']) ? $params['onbehalf_contact_id'] : $contactID;
       if (!CRM_Core_BAO_CMSUser::create($params, $mail)) {
         CRM_Core_Error::statusBounce(ts('Your profile is not saved and Account is not created.'));
       }
