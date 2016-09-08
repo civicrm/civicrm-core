@@ -394,7 +394,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if ($pcpid) {
     	// Add new pcpid to the tail of the array...
     	foreach ($pcpid as $pcpIdList) {
-    		$this->_formValues['contribution_pcp_made_through_id'][]=$pcpIdList; $n++;
+    		$this->_formValues['contribution_pcp_made_through_id'][]=$pcpIdList;
     	}
     	// and avoid any duplicate
     	$this->_formValues['contribution_pcp_made_through_id']=array_unique($this->_formValues['contribution_pcp_made_through_id']);
