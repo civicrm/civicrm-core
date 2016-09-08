@@ -591,6 +591,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
                       LIMIT 1";
     }
     else {
+      $mg = CRM_Mailing_DAO_MailingGroup::getTableName();
       $query = "SELECT entity_id
                       FROM   $mg
                       WHERE  mailing_id = {$this->id}
