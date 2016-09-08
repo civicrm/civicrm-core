@@ -1875,6 +1875,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->_fields['billing_last_name'] = 1;
     // CRM-18854 - Set form values to allow pledge to be created for api test.
     if (CRM_Utils_Array::value('pledge_block_id', $params)) {
+      $form->_values['pledge_id'] = CRM_Utils_Array::value('pledge_id', $params, NULL);
       $form->_values['pledge_block_id'] = $params['pledge_block_id'];
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($params['id']);
       $form->_values['max_reminders'] = $pledgeBlock['max_reminders'];
