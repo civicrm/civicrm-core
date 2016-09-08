@@ -248,7 +248,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     else {
       $setting = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($values['user_dashboard_options'], 1, -1));
       $invoiceKey = array_search($setKey, $setting);
-      if (!empty($invoiceKey)) {
+      if ($invoiceKey !== FALSE) {
         unset($setting[$invoiceKey]);
       }
       $settingName = CRM_Core_DAO::VALUE_SEPARATOR .
