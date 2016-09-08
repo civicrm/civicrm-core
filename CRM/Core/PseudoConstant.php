@@ -100,12 +100,6 @@ class CRM_Core_PseudoConstant {
   private static $group;
 
   /**
-   * GroupIterator
-   * @var mixed
-   */
-  private static $groupIterator;
-
-  /**
    * RelationshipType
    * @var array
    */
@@ -922,28 +916,6 @@ WHERE  id = %1";
       self::populate(self::$group[$groupKey], 'CRM_Contact_DAO_Group', FALSE, 'title', 'is_active', $condition);
     }
     return self::$group[$groupKey];
-  }
-
-  /**
-   * Create or get groups iterator (iterates over nested groups in a
-   * logical fashion)
-   *
-   * The GroupNesting instance is returned; it's created if this is being
-   * called for the first time
-   *
-   *
-   *
-   * @param bool $styledLabels
-   *
-   * @return CRM_Contact_BAO_GroupNesting
-   */
-  public static function &groupIterator($styledLabels = FALSE) {
-    if (!self::$groupIterator) {
-      // When used as an object, GroupNesting implements Iterator
-      // and iterates nested groups in a logical manner for us
-      self::$groupIterator = new CRM_Contact_BAO_GroupNesting($styledLabels);
-    }
-    return self::$groupIterator;
   }
 
   /**
@@ -1828,15 +1800,32 @@ WHERE  id = %1
   public static function getTaxRates() {
     if (!isset(Civi::$statics[__CLASS__]['taxRates'])) {
       Civi::$statics[__CLASS__]['taxRates'] = array();
+      $option = civicrm_api3('option_value', 'get', array(
+        'sequential' => 1,
+        'option_group_id' => 'account_relationship',
+        'name' => 'Sales Tax Account is',
+      ));
+      $value = array();
+      if ($option['count'] !== 0) {
+        if ($option['count'] > 1) {
+          foreach ($option['values'] as $opt) {
+            $value[] = $opt['value'];
+          }
+        }
+        else {
+          $value[] = $option['values'][0]['value'];
+        }
+        $where = 'AND efa.account_relationship IN (' . implode(', ', $value)  . ' )';
+      }
+      else {
+        $where = '';
+      }
       $sql = "
         SELECT fa.tax_rate, efa.entity_id
         FROM civicrm_entity_financial_account efa
         INNER JOIN civicrm_financial_account fa ON fa.id = efa.financial_account_id
-        INNER JOIN civicrm_option_value cov ON cov.value = efa.account_relationship
-        INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
         WHERE efa.entity_table = 'civicrm_financial_type'
-        AND cov.name = 'Sales Tax Account is'
-        AND cog.name = 'account_relationship'
+        {$where}
         AND fa.is_active = 1";
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {

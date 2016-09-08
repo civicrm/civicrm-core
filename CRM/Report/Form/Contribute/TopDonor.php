@@ -41,6 +41,19 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     'Contribution',
   );
 
+  /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   protected $_charts = array(
@@ -164,7 +177,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -277,7 +290,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     }
     $this->_selectClauses = $select;
 
-    $this->_select = " SELECT * FROM ( SELECT " . implode(', ', $select) . " ";
+    $this->_select = " SELECT " . implode(', ', $select) . " ";
   }
 
   /**
@@ -391,7 +404,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $setVariable = " SET @rows:=0, @rank=0 ";
     CRM_Core_DAO::singleValueQuery($setVariable);
 
-    $sql = " {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
+    $sql = "SELECT * FROM ( {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
                      ORDER BY civicrm_contribution_total_amount_sum DESC
                  ) as abc {$this->_outerCluase} $this->_limit
                ";

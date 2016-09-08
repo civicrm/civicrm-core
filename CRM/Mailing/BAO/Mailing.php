@@ -591,6 +591,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
                       LIMIT 1";
     }
     else {
+      $mg = CRM_Mailing_DAO_MailingGroup::getTableName();
       $query = "SELECT entity_id
                       FROM   $mg
                       WHERE  mailing_id = {$this->id}
@@ -634,7 +635,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     $patterns[] = '\\\\\{\w+\.\w+\\\\\}|\{\{\w+\.\w+\}\}';
     $patterns[] = '\{\w+\.\w+\}';
 
-    $patterns = '{' . implode('|', $patterns) . '}im';
+    $patterns = '{' . implode('|', $patterns) . '}imu';
 
     return $patterns;
   }
@@ -3181,6 +3182,20 @@ AND        m.id = %1
     );
     // Identical keys & values
     return array_combine($tables, $tables);
+  }
+
+  /**
+   * Get the public view url.
+   *
+   * @param int $id
+   * @param bool $absolute
+   *
+   * @return string
+   */
+  public static function getPublicViewUrl($id, $absolute = TRUE) {
+    if ((civicrm_api3('Mailing', 'getvalue', array('id' => $id, 'return' => 'visibility'))) === 'Public Pages') {
+      return CRM_Utils_System::url('civicrm/mailing/view', array('id' => $id), $absolute, NULL, TRUE, TRUE);
+    }
   }
 
 }

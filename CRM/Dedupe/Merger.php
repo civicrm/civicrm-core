@@ -963,7 +963,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (in_array($field, $keysToIgnore)) {
         continue;
       }
-      if (!empty($value) && $mainAddress[$field] != $value) {
+      if (!empty($value) && isset($mainAddress[$field]) && $mainAddress[$field] != $value) {
         return FALSE;
       }
     }
@@ -1597,30 +1597,36 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               $existingValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $customfieldValues[$key]);
               if (is_array($existingValue) && !empty($existingValue)) {
                 $mergeValue = $submmtedCustomValue = array();
-                if ($value) {
-                  $submmtedCustomValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-                }
-
-                //hack to remove null and duplicate values from array.
-                foreach (array_merge($submmtedCustomValue, $existingValue) as $k => $v) {
-                  if ($v != '' && !in_array($v, $mergeValue)) {
-                    $mergeValue[] = $v;
-                  }
-                }
-
-                //keep state and country as array format.
-                //for checkbox and m-select format w/ VALUE_SEPARATOR
-                if (in_array($htmlType, array(
-                  'CheckBox',
-                  'Multi-Select',
-                  'AdvMulti-Select',
-                ))) {
-                  $submitted[$key] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                      $mergeValue
-                    ) . CRM_Core_DAO::VALUE_SEPARATOR;
+                if ($value == 'null') {
+                  // CRM-19074 if someone has deliberately chosen to overwrite with 'null', respect it.
+                  $submitted[$key] = $value;
                 }
                 else {
-                  $submitted[$key] = $mergeValue;
+                  if ($value) {
+                    $submmtedCustomValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+                  }
+
+                  //hack to remove null and duplicate values from array.
+                  foreach (array_merge($submmtedCustomValue, $existingValue) as $k => $v) {
+                    if ($v != '' && !in_array($v, $mergeValue)) {
+                      $mergeValue[] = $v;
+                    }
+                  }
+
+                  //keep state and country as array format.
+                  //for checkbox and m-select format w/ VALUE_SEPARATOR
+                  if (in_array($htmlType, array(
+                    'CheckBox',
+                    'Multi-Select',
+                    'AdvMulti-Select',
+                  ))) {
+                    $submitted[$key] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
+                        $mergeValue
+                      ) . CRM_Core_DAO::VALUE_SEPARATOR;
+                  }
+                  else {
+                    $submitted[$key] = $mergeValue;
+                  }
                 }
               }
             }

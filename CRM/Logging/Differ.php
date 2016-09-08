@@ -244,7 +244,7 @@ WHERE lt.log_conn_id = %1
         // we need to make sure separators are trimmed
         if ($diff == 'case_type_id') {
           foreach (array('original', 'changed') as $var) {
-            if (!empty($$var[$diff])) {
+            if (!empty(${$var[$diff]})) {
               $holder =& $$var;
               $val = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $holder[$diff]);
               $holder[$diff] = CRM_Utils_Array::value(1, $val);

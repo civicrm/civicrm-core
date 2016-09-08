@@ -500,6 +500,32 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test target contact count.
+   */
+  public function testTargetCountforContactSummary() {
+    $targetCount = 5;
+    $contactId = $this->individualCreate();
+    for ($i = 0; $i < $targetCount; $i++) {
+      $targetContactIDs[] = $this->individualCreate(array(), $i);
+    }
+    // create activities with 5 target contacts
+    $activityParams = array(
+      'source_contact_id' => $contactId,
+      'target_contact_id' => $targetContactIDs,
+    );
+    $this->activityCreate($activityParams);
+
+    $params = array(
+      'contact_id' => $contactId,
+      'context' => 'activity',
+    );
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+
+    //verify target count
+    $this->assertEquals($targetCount, $activities[1]['target_contact_counter']);
+  }
+
+  /**
    * Test getActivities BAO method.
    */
   public function testGetActivitiesforContactSummary() {

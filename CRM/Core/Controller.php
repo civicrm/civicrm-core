@@ -220,7 +220,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       ));
     }
 
-    $this->HTML_QuickForm_Controller($name, $modal);
+    parent::__construct($name, $modal);
 
     $snippet = CRM_Utils_Array::value('snippet', $_REQUEST);
     if ($snippet) {

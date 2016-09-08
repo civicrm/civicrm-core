@@ -33,9 +33,9 @@
  *
  */
 class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
+
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array(

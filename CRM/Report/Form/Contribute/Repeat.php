@@ -83,6 +83,15 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   protected $contributionJoinTableColumn;
 
   /**
+   * This report has been optimised for group filtering.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = FALSE;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -399,10 +408,11 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
    * @return mixed|string
    */
   public function fromContribution($replaceAliasWith = 'contribution1') {
-    $from = " FROM civicrm_contribution {$replaceAliasWith} ";
+    $this->setFromBase('civicrm_contribution', 'contact_id', $replaceAliasWith);
+
     $temp = $this->_aliases['civicrm_contribution'];
     $this->_aliases['civicrm_contribution'] = $replaceAliasWith;
-    $this->_from = $from;
+    $from = $this->_from;
     $from .= (string) $this->getPermissionedFTQuery($this, 'civicrm_line_item_report', TRUE);
     $this->_aliases['civicrm_contribution'] = $temp;
     $this->_where = '';
@@ -725,23 +735,23 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     //display percentages for new, lapsed, upgraded, downgraded, and maintained contributors
     $statistics['counts']['count_new'] = array(
       'value' => $new,
-      'title' => '% New Donors',
+      'title' => ts('% New Donors'),
     );
     $statistics['counts']['count_lapsed'] = array(
       'value' => $lapsed,
-      'title' => '% Lapsed Donors',
+      'title' => ts('% Lapsed Donors'),
     );
     $statistics['counts']['count_upgraded'] = array(
       'value' => $upgraded,
-      'title' => '% Upgraded Donors',
+      'title' => ts('% Upgraded Donors'),
     );
     $statistics['counts']['count_downgraded'] = array(
       'value' => $downgraded,
-      'title' => '% Downgraded Donors',
+      'title' => ts('% Downgraded Donors'),
     );
     $statistics['counts']['count_maintained'] = array(
       'value' => $maintained,
-      'title' => '% Maintained Donors',
+      'title' => ts('% Maintained Donors'),
     );
 
     $select = "
@@ -777,36 +787,36 @@ GROUP BY    currency
       $count2 += $dao->count2;
     }
 
-    $statistics['counts']['range_one_title'] = array('title' => 'Initial Date Range:');
+    $statistics['counts']['range_one_title'] = array('title' => ts('Initial Date Range:'));
     $statistics['counts']['amount'] = array(
       'value' => implode(',  ', $amount),
-      'title' => 'Total Amount',
+      'title' => ts('Total Amount'),
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['count'] = array(
       'value' => $count,
-      'title' => 'Total Donations',
+      'title' => ts('Total Donations'),
     );
     $statistics['counts']['avg'] = array(
       'value' => implode(',  ', $average),
-      'title' => 'Average',
+      'title' => ts('Average'),
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['range_two_title'] = array(
-      'title' => 'Second Date Range:',
+      'title' => ts('Second Date Range:'),
     );
     $statistics['counts']['amount2'] = array(
       'value' => implode(',  ', $amount2),
-      'title' => 'Total Amount',
+      'title' => ts('Total Amount'),
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['count2'] = array(
       'value' => $count2,
-      'title' => 'Total Donations',
+      'title' => ts('Total Donations'),
     );
     $statistics['counts']['avg2'] = array(
       'value' => implode(',  ', $average2),
-      'title' => 'Average',
+      'title' => ts('Average'),
       'type' => CRM_Utils_Type::T_STRING,
     );
 
@@ -862,7 +872,7 @@ GROUP BY    currency
       }
     }
     $this->_columnHeaders['change'] = array(
-      'title' => '% Change',
+      'title' => ts('% Change'),
       'type' => CRM_Utils_Type::T_INT,
     );
 

@@ -61,6 +61,7 @@ function civicrm_api3_dashboard_create($params) {
  *   array of parameters determined by getfields.
  */
 function _civicrm_api3_dashboard_create_spec(&$params) {
+  $params['is_active']['api.default'] = 1;
   unset($params['version']);
 }
 

@@ -47,6 +47,16 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   /**
+   * This report has been optimised for group filtering.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = FALSE;
+
+  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_rollup = 'WITH ROLLUP';
@@ -108,7 +118,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'grouping' => 'contact-fields',
         'order_bys' => array(
           'sort_name' => array(
             'title' => ts('Last Name, First Name'),
@@ -281,7 +290,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
 
               $this->_columnHeaders["civicrm_upto_{$upTo_year}"]['type'] = $field['type'];
-              $this->_columnHeaders["civicrm_upto_{$upTo_year}"]['title'] = "Up To $upTo_year";
+              $this->_columnHeaders["civicrm_upto_{$upTo_year}"]['title'] = ts("Up To %1", array(1 => $upTo_year));
 
               $this->_columnHeaders["year_{$previous_ppyear}"]['type'] = $field['type'];
               $this->_columnHeaders["year_{$previous_ppyear}"]['title'] = $previous_ppyear;
@@ -293,7 +302,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               $this->_columnHeaders["year_{$previous_year}"]['title'] = $previous_year;
 
               $this->_columnHeaders["civicrm_life_time_total"]['type'] = $field['type'];
-              $this->_columnHeaders["civicrm_life_time_total"]['title'] = 'LifeTime';;
+              $this->_columnHeaders["civicrm_life_time_total"]['title'] = ts('LifeTime');
             }
             elseif ($fieldName == 'receive_date') {
               $select[] = self::fiscalYearOffset($field['dbAlias']) .
@@ -317,9 +326,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   public function from() {
-
-    $this->_from = "
-        FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
+    $this->setFromBase('civicrm_contribution', 'contact_id');
+    $this->_from .= "
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
              {$this->_aclFrom}";
@@ -398,7 +406,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->assign('chartSupported', TRUE);
     $fiscalYearOffset = self::fiscalYearOffset("{$this->_aliases['civicrm_contribution']}.receive_date");
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contribution']}.contact_id, {$fiscalYearOffset}";
-    $this->appendSelect($this->_selectClauses, array("{$this->_aliases['civicrm_contribution']}.contact_id", $fiscalYearOffset));
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, array("{$this->_aliases['civicrm_contribution']}.contact_id", $fiscalYearOffset));
     $this->_groupBy .= " {$this->_rollup}";
   }
 
@@ -420,7 +428,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       if ($dao->fetch()) {
         $statistics['counts']['amount'] = array(
           'value' => $dao->amount,
-          'title' => 'Total LifeTime',
+          'title' => ts('Total LifeTime'),
           'type' => CRM_Utils_Type::T_MONEY,
         );
       }
@@ -526,17 +534,13 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
     foreach ($rows as $key => $row) {
       $display["upto_{$upto}"]
-        = CRM_Utils_Array::value("upto_{$upto}", $display)
-        + CRM_Utils_Array::value("civicrm_upto_{$upto}", $row);
+        = CRM_Utils_Array::value("upto_{$upto}", $display) + CRM_Utils_Array::value("civicrm_upto_{$upto}", $row);
       $display[$previous_year]
-        = CRM_Utils_Array::value($previous_year, $display)
-        + CRM_Utils_Array::value($previous_year, $row);
+        = CRM_Utils_Array::value($previous_year, $display) + CRM_Utils_Array::value($previous_year, $row);
       $display[$previous_two_year]
-        = CRM_Utils_Array::value($previous_two_year, $display)
-        + CRM_Utils_Array::value($previous_two_year, $row);
+        = CRM_Utils_Array::value($previous_two_year, $display) + CRM_Utils_Array::value($previous_two_year, $row);
       $display[$previous_three_year]
-        = CRM_Utils_Array::value($previous_three_year, $display)
-        + CRM_Utils_Array::value($previous_three_year, $row);
+        = CRM_Utils_Array::value($previous_three_year, $display) + CRM_Utils_Array::value($previous_three_year, $row);
     }
 
     $graphRows['value'] = $display;

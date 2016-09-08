@@ -153,6 +153,26 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_groupFilter = FALSE;
 
   /**
+   * Has the report been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it.
+   *
+   * This property exists to highlight the reports which are still using the
+   * slow method & allow group filtering to still work for them until they
+   * can be migrated.
+   *
+   * In order to protect extensions we have to default to TRUE - but I have
+   * separately marked every class with a groupFilter in the hope that will trigger
+   * people to fix them as they touch them.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
    * Navigation fields
    *
    * @var array
@@ -218,6 +238,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_rowsFound = NULL;
   protected $_selectAliases = array();
   protected $_rollup = NULL;
+
+  /**
+   * Table containing list of contact IDs within the group filter.
+   *
+   * @var string
+   */
+  protected $groupTempTable = '';
 
   /**
    * @var array
@@ -448,7 +475,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       if (array_key_exists('civicrm_contact', $this->_columns)) {
         $this->_columns['civicrm_contact']['fields']['exposed_id'] = array(
           'name' => 'id',
-          'title' => 'Contact ID',
+          'title' => ts('Contact ID'),
           'no_repeat' => TRUE,
         );
       }
@@ -1223,13 +1250,13 @@ class CRM_Report_Form extends CRM_Core_Form {
 
           case CRM_Report_Form::OP_DATE:
             // build datetime fields
-            CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from', '_to', 'From:', FALSE, $operations);
+            CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from', '_to', ts('From:'), FALSE, $operations);
             $count++;
             break;
 
           case CRM_Report_Form::OP_DATETIME:
             // build datetime fields
-            CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from', '_to', 'From:', FALSE, $operations, 'searchDate', TRUE);
+            CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from', '_to', ts('From:'), FALSE, $operations, 'searchDate', TRUE);
             $count++;
             break;
 
@@ -1304,15 +1331,16 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $this->assignTabs();
     $this->sqlArray[] = $sql;
-    foreach (array('LEFT JOIN') as $term) {
-      $sql = str_replace($term, '<br>&nbsp&nbsp' . $term, $sql);
+    foreach ($this->sqlArray as $sql) {
+      foreach (array('LEFT JOIN') as $term) {
+        $sql = str_replace($term, '<br>&nbsp&nbsp' . $term, $sql);
+      }
+      foreach (array('FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';') as $term) {
+        $sql = str_replace($term, '<br><br>' . $term, $sql);
+      }
+      $this->sqlFormattedArray[] = $sql;
+      $this->assign('sql', implode(';<br><br><br><br>', $this->sqlFormattedArray));
     }
-    foreach (array('FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';') as $term) {
-      $sql = str_replace($term, '<br><br>' . $term, $sql);
-    }
-    $this->sql .= $sql . "<br>";
-
-    $this->assign('sql', $this->sql);
   }
 
   /**
@@ -1447,8 +1475,8 @@ class CRM_Report_Form extends CRM_Core_Form {
       for ($i = 1; $i <= 5; $i++) {
         $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
         $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array(
-          'ASC' => 'Ascending',
-          'DESC' => 'Descending',
+          'ASC' => ts('Ascending'),
+          'DESC' => ts('Descending'),
         ));
         $this->addElement('checkbox', "order_bys[{$i}][section]", ts('Order by Section'), FALSE, array('id' => "order_by_section_$i"));
         $this->addElement('checkbox', "order_bys[{$i}][pageBreak]", ts('Page Break'), FALSE, array('id' => "order_by_pagebreak_$i"));
@@ -1517,7 +1545,17 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected function getActions($instanceId) {
     $actions = CRM_Report_BAO_ReportInstance::getActionMetadata();
     if (empty($instanceId)) {
-      $actions['report_instance.save']['title'] = ts('Create Report');
+      $actions['report_instance.save'] = array(
+        'title' => ts('Create Report'),
+        'data' => array(
+          'is_confirm' => TRUE,
+          'confirm_title' => ts('Create Report'),
+          'confirm_refresh_fields' => json_encode(array(
+            'title' => array('selector' => '.crm-report-instanceForm-form-block-title', 'prepend' => ''),
+            'description' => array('selector' => '.crm-report-instanceForm-form-block-description', 'prepend' => ''),
+          )),
+        ),
+      );
     }
 
     if (!$this->_csvSupported) {
@@ -1847,7 +1885,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       case 'in':
       case 'notin':
-        if (is_string($value) && strlen($value)) {
+        if ((is_string($value) || is_numeric($value)) && strlen($value)) {
           $value = explode(',', $value);
         }
         if ($value !== NULL && is_array($value) && count($value) > 0) {
@@ -2052,6 +2090,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       return;
     }
 
+    $customFields = array();
     $customFieldIds = array();
     foreach ($this->_params['fields'] as $fieldAlias => $value) {
       if ($fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldAlias)) {
@@ -2135,7 +2174,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       }
       elseif (isset($this->_columnHeaders[$colName])) {
         if ($subtotal) {
-          $row[$colName] = "Subtotal";
+          $row[$colName] = 'Subtotal';
           $subtotal = FALSE;
         }
         else {
@@ -2559,7 +2598,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     elseif ($this->_outputMode == 'copy' && $this->_criteriaForm) {
       $this->_createNew = TRUE;
     }
-    $this->assign('outputMode', $this->_outputMode);
 
     $this->assign('outputMode', $this->_outputMode);
     $this->assign('printOnly', $printOnly);
@@ -2602,13 +2640,16 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       CRM_Report_BAO_ReportInstance::doFormDelete($this->_id, 'civicrm/report/list?reset=1', 'civicrm/report/list?reset=1');
     }
 
+    $this->_formValues = $this->_params;
+
     $this->beginPostProcessCommon();
   }
 
   /**
    * BeginPostProcess function run in both report mode and non-report mode (api).
    */
-  public function beginPostProcessCommon() {}
+  public function beginPostProcessCommon() {
+  }
 
   /**
    * Build the report query.
@@ -2618,6 +2659,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @return string
    */
   public function buildQuery($applyLimit = TRUE) {
+    $this->buildGroupTempTable();
     $this->select();
     $this->from();
     $this->customDataFrom();
@@ -2642,35 +2684,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
     $this->addToDeveloperTab($sql);
     return $sql;
-  }
-
-  /**
-   * append select with ANY_VALUE() keyword.
-   *
-   * @param array $selectClauses
-   * @param array $groupBy - Columns already included in GROUP By clause.
-   */
-  public function appendSelect($selectClauses, $groupBy) {
-    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
-    $sqlMode = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
-
-    // Disable only_full_group_by mode for lower sql versions.
-    if (version_compare($mysqlVersion, '5.7', '<') || (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', $sqlMode))) {
-      $key = array_search('ONLY_FULL_GROUP_BY', $sqlMode);
-      unset($sqlMode[$key]);
-      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlMode) . "'");
-      return;
-    }
-    $groupBy = array_map('trim', (array) $groupBy);
-    $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
-    foreach ($selectClauses as $key => &$val) {
-      list($selectColumn, $alias) = array_pad(preg_split('/ as /i', $val), 2, NULL);
-      // append ANY_VALUE() keyword
-      if (!in_array($selectColumn, $groupBy) && preg_match($aggregateFunctions, trim($selectColumn)) !== 1) {
-        $val = str_replace($selectColumn, "ANY_VALUE({$selectColumn})", $val);
-      }
-    }
-    $this->_select = "SELECT " . implode(', ', $selectClauses) . " ";
   }
 
   /**
@@ -2846,7 +2859,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
       $this->_select = "SELECT " . implode(", ", $ifnulls);
-      $this->appendSelect($ifnulls, $sectionAliases);
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       // Group (un-limited) report by all aliases and get counts. This might
       // be done more efficiently when the contents of $sql are known, ie. by
@@ -3171,7 +3184,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         else {
           CRM_Core_Session::setStatus(ts("Report mail could not be sent."), ts('Mail Error'), 'error');
         }
-        return TRUE;
+        return;
       }
       elseif ($this->_outputMode == 'print') {
         echo $content;
@@ -3381,7 +3394,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Build where clause for groups.
+   * Build a group filter with contempt for large data sets.
+   *
+   * This function has been retained as it takes time to migrate the reports over
+   * to the new method which will not crash on large datasets.
+   *
+   * @deprecated
    *
    * @param string $field
    * @param mixed $value
@@ -3389,8 +3407,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    *
    * @return string
    */
-  public function whereGroupClause($field, $value, $op) {
-
+  public function legacySlowGroupFilterClause($field, $value, $op) {
     $smartGroupQuery = "";
 
     $group = new CRM_Contact_DAO_Group();
@@ -3431,6 +3448,83 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                           FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
                           WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added'
                           {$smartGroupQuery} ) ";
+  }
+
+  /**
+   * Build where clause for groups.
+   *
+   * @param string $field
+   * @param mixed $value
+   * @param string $op
+   *
+   * @return string
+   */
+  public function whereGroupClause($field, $value, $op) {
+    if ($this->groupFilterNotOptimised) {
+      return $this->legacySlowGroupFilterClause($field, $value, $op);
+    }
+    if ($op === 'notin') {
+      return " group_temp_table.id IS NULL ";
+    }
+    // We will have used an inner join instead.
+    return "1";
+  }
+
+
+  /**
+   * Create a table of the contact ids included by the group filter.
+   *
+   * This function is called by both the api (tests) and the UI.
+   */
+  public function buildGroupTempTable() {
+    if (!empty($this->groupTempTable) || empty ($this->_params['gid_value']) || $this->groupFilterNotOptimised) {
+      return;
+    }
+    $filteredGroups = (array) $this->_params['gid_value'];
+
+    $groups = civicrm_api3('Group', 'get', array(
+      'is_active' => 1,
+      'id' => array('IN' => $filteredGroups),
+      'saved_search_id' => array('>' => 0),
+      'return' => 'id',
+    ));
+    $smartGroups = array_keys($groups['values']);
+
+    $query = "
+       SELECT group_contact.contact_id as id
+       FROM civicrm_group_contact group_contact
+       WHERE group_contact.group_id IN (" . implode(', ', $filteredGroups) . ")
+       AND group_contact.status = 'Added' ";
+
+    if (!empty($smartGroups)) {
+      CRM_Contact_BAO_GroupContactCache::check($smartGroups);
+      $smartGroups = implode(',', $smartGroups);
+      $query .= "
+        UNION DISTINCT
+        SELECT smartgroup_contact.contact_id as id
+        FROM civicrm_group_contact_cache smartgroup_contact
+        WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
+    }
+
+    $this->groupTempTable = 'civicrm_report_temp_group_' . date('Ymd_') . uniqid();
+    $this->executeReportQuery("
+      CREATE TEMPORARY TABLE $this->groupTempTable
+      $query
+    ");
+    CRM_Core_DAO::executeQuery("ALTER TABLE $this->groupTempTable ADD INDEX i_id(id)");
+  }
+
+  /**
+   * Execute query and add it to the developer tab.
+   *
+   * @param string $query
+   * @param array $params
+   *
+   * @return \CRM_Core_DAO|object
+   */
+  protected function executeReportQuery($query, $params = array()) {
+    $this->addToDeveloperTab($query);
+    return CRM_Core_DAO::executeQuery($query, $params);
   }
 
   /**
@@ -3605,8 +3699,7 @@ ORDER BY cg.weight, cf.weight";
 
         case 'Boolean':
           $curFilters[$fieldName]['operatorType'] = CRM_Report_Form::OP_SELECT;
-          $curFilters[$fieldName]['options'] = array('' => ts('- select -'))
-            + CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $customDAO->cf_id, array(), 'search');
+          $curFilters[$fieldName]['options'] = array('' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $customDAO->cf_id, array(), 'search');
           $curFilters[$fieldName]['type'] = CRM_Utils_Type::T_INT;
           break;
 
@@ -4094,7 +4187,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if ($orderBy) {
       $addressFields['civicrm_address']['order_bys'] = array(
         'street_name' => array('title' => ts('Street Name')),
-        'street_number' => array('title' => 'Odd / Even Street Number'),
+        'street_number' => array('title' => ts('Odd / Even Street Number')),
         'street_address' => NULL,
         'city' => NULL,
         'postal_code' => NULL,
@@ -4415,6 +4508,72 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Get a standard set of contact filters.
+   *
+   * @return array
+   */
+  public function getBasicContactFilters() {
+    return array(
+      'sort_name' => array(
+        'title' => ts('Contact Name'),
+      ),
+      'source' => array(
+        'title' => ts('Contact Source'),
+        'type' => CRM_Utils_Type::T_STRING,
+      ),
+      'id' => array(
+        'title' => ts('Contact ID'),
+        'no_display' => TRUE,
+      ),
+      'gender_id' => array(
+        'title' => ts('Gender'),
+        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+      ),
+      'birth_date' => array(
+        'title' => ts('Birth Date'),
+        'operatorType' => CRM_Report_Form::OP_DATE,
+      ),
+      'contact_type' => array(
+        'title' => ts('Contact Type'),
+      ),
+      'contact_sub_type' => array(
+        'title' => ts('Contact Subtype'),
+      ),
+      'modified_date' => array(
+        'title' => ts('Contact Modified'),
+        'operatorType' => CRM_Report_Form::OP_DATE,
+        'type' => CRM_Utils_Type::T_DATE,
+      ),
+      'is_deceased' => array(
+        'title' => ts('Deceased'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'default' => 0,
+      ),
+      'do_not_email' => array(
+        'title' => ts('Do not email'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_phone' => array(
+        'title' => ts('Do not phone'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_mail' => array(
+        'title' => ts('Do not mail'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'do_not_sms' => array(
+        'title' => ts('Do not SMS'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'is_opt_out' => array(
+        'title' => ts('Do not bulk email'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+    );
+  }
+
+  /**
    * Add contact to group.
    *
    * @param int $groupID
@@ -4687,6 +4846,48 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
           ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id)
           AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
+    }
+  }
+
+  /**
+   * Set the base table for the FROM clause.
+   *
+   * Sets up the from clause, allowing for the possibility it might be a
+   * temp table pre-filtered by groups if a group filter is in use.
+   *
+   * @param string $baseTable
+   * @param string $field
+   * @param null $tableAlias
+   */
+  public function setFromBase($baseTable, $field = 'id', $tableAlias = NULL) {
+    if (!$tableAlias) {
+      $tableAlias = $this->_aliases[$baseTable];
+    }
+    $this->_from = $this->_from = " FROM $baseTable $tableAlias ";
+    $this->joinGroupTempTable($baseTable, $field, $tableAlias);
+    $this->_from .= " {$this->_aclFrom} ";
+  }
+
+  /**
+   * Join the temp table contacting contacts who are members of the filtered groups.
+   *
+   * If we are using an IN filter we use an inner join, otherwise a left join.
+   *
+   * @param string $baseTable
+   * @param string $field
+   * @param string $tableAlias
+   */
+  public function joinGroupTempTable($baseTable, $field, $tableAlias) {
+    if ($this->groupTempTable) {
+      if ($this->_params['gid_op'] == 'in') {
+        $this->_from = " FROM $this->groupTempTable group_temp_table INNER JOIN $baseTable $tableAlias
+        ON group_temp_table.id = $tableAlias.{$field} ";
+      }
+      else {
+        $this->_from .= "
+          LEFT JOIN $this->groupTempTable group_temp_table
+          ON $tableAlias.{$field} = group_temp_table.id ";
+      }
     }
   }
 

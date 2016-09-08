@@ -54,6 +54,9 @@
       {if $entityID}
         dataUrl += '&entityID=' + '{$entityID}';
       {/if}
+      {if $qfKey}
+        dataUrl += '&qf=' + '{$qfKey}';
+      {/if}
       {literal}
 
       if (!cgCount) {

@@ -65,11 +65,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   protected $contactTempTable = '';
 
   /**
-   * Table containing list of contact IDs.
+   * This report has been optimised for group filtering.
    *
-   * @var string
+   * CRM-19170
+   *
+   * @var bool
    */
-  protected $groupTempTable = '';
+  protected $groupFilterNotOptimised = FALSE;
 
   /**
    * Class constructor.
@@ -252,11 +254,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
         'title' => ts('Campaign'),
         'default' => 'false',
+        'type' => CRM_Utils_Type::T_INT,
       );
       $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
     }
 
@@ -336,12 +340,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->addAddressFromClause();
     }
     else {
-      if ($this->groupTempTable) {
-        $this->_from .= "FROM $this->groupTempTable {$this->_aliases['civicrm_contact']}";
-      }
-      else {
-        $this->_from .= "FROM civicrm_contact {$this->_aliases['civicrm_contact']}";
-      }
+      $this->setFromBase('civicrm_contact');
 
       $this->_from .= " INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} ";
       if (!$this->groupTempTable) {
@@ -389,75 +388,16 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         $this->_whereClauses[] = "cont_exclude.id IS NULL";
       }
     }
+    // Group filtering is already done so skip.
+    elseif (!empty($field['group']) && $this->contactTempTable) {
+      return 1;
+    }
     else {
       $clause = parent::whereClause($field, $op, $value, $min, $max);
     }
     return $clause;
   }
 
-  /**
-   * Build where clause for groups.
-   *
-   * This has been overridden in order to:
-   *  1) only build the group clause when filtering
-   *  2) render the id field as id rather than contact_id in
-   *   order to allow us to join on hte created temp table as if it
-   *   were the contact table.
-   *
-   * Further refactoring could break down the parent function so it can be selectively
-   * leveraged.
-   *
-   * @param string $field
-   * @param mixed $value
-   * @param string $op
-   *
-   * @return string
-   */
-  public function whereGroupClause($field, $value, $op) {
-    if ($op == 'notin') {
-      // We do not have an optimisation for this scenario at this stage. Use
-      // parent.
-      return parent::whereGroupClause($field, $value, $op);
-    }
-
-    if (empty($this->groupTempTable)) {
-      $group = new CRM_Contact_DAO_Group();
-      $group->is_active = 1;
-      $group->find();
-      $smartGroups = array();
-      while ($group->fetch()) {
-        if (in_array($group->id, $this->_params['gid_value']) &&
-          $group->saved_search_id
-        ) {
-          $smartGroups[] = $group->id;
-        }
-      }
-
-      CRM_Contact_BAO_GroupContactCache::check($smartGroups);
-
-      $smartGroupQuery = '';
-      if (!empty($smartGroups)) {
-        $smartGroups = implode(',', $smartGroups);
-        $smartGroupQuery = " UNION DISTINCT
-                  SELECT DISTINCT smartgroup_contact.contact_id as id
-                  FROM civicrm_group_contact_cache smartgroup_contact
-                  WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
-      }
-
-      $sqlOp = $this->getSQLOperator($op);
-      if (!is_array($value)) {
-        $value = array($value);
-      }
-      $clause = "{$field['dbAlias']} IN (" . implode(', ', $value) . ")";
-
-      $query = "SELECT DISTINCT {$this->_aliases['civicrm_group']}.contact_id as id
-                 FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
-                 WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added'
-                 {$smartGroupQuery}  ";
-      $this->buildGroupTempTable($query);
-    }
-    return "1";
-  }
   /**
    * Generate where clause for last calendar year or fiscal year.
    *
@@ -550,7 +490,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
-    $this->appendSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
     $this->assign('chartSupported', TRUE);
   }
 
@@ -619,35 +559,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       CREATE TEMPORARY TABLE $this->contactTempTable
       SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}
       GROUP BY {$this->_aliases['civicrm_contact']}.id";
-    $this->addToDeveloperTab($getContacts);
-    CRM_Core_DAO::executeQuery($getContacts);
+    $this->executeReportQuery($getContacts);
     if (empty($this->_params['charts'])) {
       $this->setPager();
     }
 
     // Reset where clauses to be regenerated in postProcess.
     $this->_whereClauses = array();
-  }
-
-  /**
-   * This function is called by both the api (tests) and the UI.
-   *
-   * @todo consider moving this to the parent class & reusing the filter then render logic.
-   *
-   * (this approach is taken to it's extreme in the extended reports extension with it's 'preconstrain'
-   * concept).
-   *
-   * @param string $clause
-   */
-  public function buildGroupTempTable($clause) {
-    if (empty($this->groupTempTable)) {
-      $this->groupTempTable = 'civicrm_report_temp_lybunt_g_' . date('Ymd_') . uniqid();
-      CRM_Core_DAO::executeQuery("
-        CREATE TEMPORARY TABLE $this->groupTempTable
-        $clause
-      ");
-      CRM_Core_DAO::executeQuery("ALTER TABLE $this->groupTempTable ADD INDEX i_id(id)");
-    }
   }
 
   /**
@@ -662,7 +580,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * @return string
    */
   public function buildQuery($applyLimit = TRUE) {
-
+    $this->buildGroupTempTable();
     // Calling where & select before FROM allows us to build temp tables to use in from.
     $this->where();
     $this->select();

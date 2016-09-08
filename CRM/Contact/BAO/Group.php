@@ -107,11 +107,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $query = "DELETE FROM civicrm_acl_entity_role where entity_table = 'civicrm_group' AND entity_id = %1";
     CRM_Core_DAO::executeQuery($query, $params);
 
-    if (Civi::settings()->get('is_enabled')) {
-      // clear any descendant groups cache if exists
-      CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
-    }
-
     // delete from group table
     $group = new CRM_Contact_DAO_Group();
     $group->id = $id;
@@ -365,8 +360,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (isset($params['group_type'])) {
       if (is_array($params['group_type'])) {
         $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-            array_keys($params['group_type'])
+            $params['group_type']
           ) . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+      else {
+        $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['group_type'] . CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
     else {
@@ -384,6 +382,14 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $params['modified_id'] = $cid;
     }
 
+    // CRM-19068.
+    // Validate parents parameter when creating group.
+    if (!empty($params['parents'])) {
+      $parents = is_array($params['parents']) ? array_keys($params['parents']) : (array) $params['parents'];
+      foreach ($parents as $parent) {
+        CRM_Utils_Type::validate($parent, 'Integer');
+      }
+    }
     $group = new CRM_Contact_BAO_Group();
     $group->copyValues($params);
     //@todo very hacky fix for the fact this function wants to receive 'parents' as an array further down but
@@ -445,9 +451,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         }
       }
 
-      // clear any descendant groups cache if exists
-      $finalGroups = CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
-
       // this is always required, since we don't know when a
       // parent group is removed
       CRM_Contact_BAO_GroupNestingCache::update();
@@ -465,6 +468,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Contact_BAO_GroupOrganization::add($groupOrg);
     }
 
+    CRM_Utils_System::flushCache();
     CRM_Contact_BAO_GroupContactCache::add($group->id);
 
     if (!empty($params['id'])) {
@@ -756,7 +760,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $value['class'] = array_diff($value['class'], array('crm-row-parent'));
       }
       $group['DT_RowId'] = 'row_' . $value['id'];
-      if (!$params['parentsOnly']) {
+      if (empty($params['parentsOnly'])) {
         foreach ($value['class'] as $id => $class) {
           if ($class == 'crm-group-parent') {
             unset($value['class'][$id]);
@@ -1318,6 +1322,22 @@ WHERE {$whereClause}";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 
     return CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
+  }
+
+  /**
+   * Assign Test Value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'children' || $fieldName == 'parents') {
+      $this->{$fieldName} = "NULL";
+    }
+    else {
+      parent::assignTestValues($fieldName, $fieldDef, $counter);
+    }
   }
 
 }

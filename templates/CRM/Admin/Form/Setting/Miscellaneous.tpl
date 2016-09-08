@@ -25,13 +25,6 @@
 *}
 <div class="crm-block crm-form-block crm-miscellaneous-form-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-    <table class="form-layout">
-        <tr class="crm-miscellaneous-form-block-dashboardCacheTimeout">
-            <td class="label">{$form.dashboardCacheTimeout.label}</td>
-            <td>{$form.dashboardCacheTimeout.html}<br />
-                <span class="description">{ts}The number of minutes to cache dashlet content on dashboard.{/ts}</span></td>
-        </tr>
-    </table>
 
     <table class="form-layout">
         <tr class="crm-miscellaneous-form-block-checksum_timeout">
@@ -80,9 +73,16 @@
             </td>
           </tr>
         {/foreach}
-
+        <tr class="crm-miscellaneous-form-block-remote_profile_submissions_allowed">
+          <td class="label">{$form.remote_profile_submissions.label}</td>
+          <td>{$form.remote_profile_submissions.html}<br />
+            <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles from external sites. This is disabled by default to limit abuse.{/ts}</p>
+          </td>
+        </tr>
     </table>
-<h3>{ts}reCAPTCHA Keys{/ts}</h3>
+
+    <h3>{ts}reCAPTCHA Keys{/ts}</h3>
+
     <div class="description">
         {ts 1="https://www.google.com/recaptcha"}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use reCAPTCHA on public-facing CiviCRM forms: sign up at <a href="%1" "target=_blank">Google's reCaptcha site</a>; enter the provided public and private reCAPTCHA keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
     </div>

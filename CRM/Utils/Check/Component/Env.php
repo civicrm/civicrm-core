@@ -97,6 +97,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
    */
   public function checkMysqlTime() {
+    //CRM-19115 - Always set MySQL time before checking it.
+    CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     $messages = array();
 
     $phpNow = date('Y-m-d H:i');

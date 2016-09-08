@@ -99,6 +99,12 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
       $postUpgradeMessage .= '<p>' . ts('The custom fatal error template setting has been removed.') . '</p>';
     }
+    //if ($rev == '4.7.11') {
+    //  $postUpgradeMessage .= '<br /><br />' . ts("WARNING: For increased security, profile submissions embedded in remote sites are no longer allowed to create or edit data by default. If you need to allow users to submit profiles from external sites, you can restore this at Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) > 'Accept profile submissions from external sites'");
+    //}
+    if ($rev == '4.7.11') {
+      $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly fro SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
+    }
   }
 
   /**
@@ -219,6 +225,17 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Upgrade Add Help Pre and Post Fields to price value table'), 'addHelpPreAndHelpPostFieldsPriceFieldValue');
     $this->addTask(ts('Alter index and type for image URL'), 'alterIndexAndTypeForImageURL');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_11($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Dashboard schema updates', 'dashboardSchemaUpdate');
+    $this->addTask(ts('Fill in setting "remote_profile_submissions"'), 'migrateRemoteSubmissionsSetting');
   }
 
   /*
@@ -441,6 +458,35 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       }
     }
 
+    return TRUE;
+  }
+
+  /**
+   * v4.7.11 adds a new setting "remote_profile_submissions". This is
+   * long-standing feature that existing sites may be using; however, it's
+   * a bit prone to abuse. For new sites, the default is to disable it
+   * (since that is more secure). For existing sites, the default is to
+   * enable it (since that is more compatible).
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function migrateRemoteSubmissionsSetting(CRM_Queue_TaskContext $ctx) {
+    $domains = CRM_Core_DAO::executeQuery("SELECT DISTINCT d.id FROM civicrm_domain d LEFT JOIN civicrm_setting s ON d.id=s.domain_id AND s.name = 'remote_profile_submissions' WHERE s.id IS NULL");
+    while ($domains->fetch()) {
+      CRM_Core_DAO::executeQuery(
+        "INSERT INTO civicrm_setting (`name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
+          VALUES (%2, %3, %4, %5, NULL, NULL, %6, NULL)",
+        array(
+          2 => array('remote_profile_submissions', 'String'),
+          3 => array('s:1:"1";', 'String'),
+          4 => array($domains->id, 'Integer'),
+          5 => array(1, 'Integer'),
+          6 => array(date('Y-m-d H:i:s'), 'String'),
+        )
+      );
+    }
     return TRUE;
   }
 
@@ -724,6 +770,46 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
 
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
 
+    return TRUE;
+  }
+
+  /**
+   * CRM-17663 - Dashboard schema changes
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function dashboardSchemaUpdate(CRM_Queue_TaskContext $ctx) {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_dashboard_contact', 'index_dashboard_id_contact_id')) {
+      // Delete any stray duplicate rows and add unique index to prevent new dupes and enable INSERT/UPDATE combo query
+      CRM_Core_DAO::executeQuery('DELETE c1 FROM civicrm_dashboard_contact c1, civicrm_dashboard_contact c2 WHERE c1.contact_id = c2.contact_id AND c1.dashboard_id = c2.dashboard_id AND c1.id > c2.id');
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard_contact ADD UNIQUE INDEX index_dashboard_id_contact_id (dashboard_id, contact_id);');
+    }
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'content');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_minimized');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_fullscreen');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'created_date');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_fullscreen');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_minimized');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'column_no');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'weight');
+
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET url = REPLACE(url, "&snippet=5", ""), fullscreen_url = REPLACE(fullscreen_url, "&snippet=5", "")');
+
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_dashboard', 'cache_minutes')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard ADD COLUMN cache_minutes int unsigned NOT NULL DEFAULT 60 COMMENT "Number of minutes to cache dashlet content in browser localStorage."',
+         array(), TRUE, NULL, FALSE, FALSE);
+    }
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+    }
+
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 1440 WHERE name = "blog"');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 7200 WHERE name IN ("activity","getting-started")');
     return TRUE;
   }
 

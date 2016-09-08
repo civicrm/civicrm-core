@@ -93,6 +93,9 @@ function civicrm_api3_navigation_get($params) {
  * @param array $params
  */
 function _civicrm_api3_navigation_create_spec(&$params) {
+  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
+  $params['domain_id']['type'] = CRM_Utils_Type::T_INT;
+  $params['domain_id']['title'] = 'Domain ID';
 }
 
 /**
@@ -105,6 +108,7 @@ function _civicrm_api3_navigation_create_spec(&$params) {
  *   API result array.
  */
 function civicrm_api3_navigation_create($params) {
+  civicrm_api3_verify_one_mandatory($params, NULL, array('name', 'label'));
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 

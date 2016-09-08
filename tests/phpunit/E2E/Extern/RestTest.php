@@ -24,14 +24,14 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviSeleniumTestCase.php';
-
 /**
  * Verify that the REST API bindings correctly parse and authenticate requests.
+ *
+ * @group e2e
  */
-class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
+class E2E_Extern_RestTest extends CiviEndToEndTestCase {
   protected $url;
-  protected $api_key;
+  protected static $api_key;
   protected $session_id;
   protected $nocms_contact_id;
   protected $old_api_keys;
@@ -45,29 +45,30 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
-    $this->assertEquals($cmpvar, $apiResult['is_error'], $prefix . (empty($apiResult['error_message']) ? '' : $apiResult['error_message']));
+    $this->assertEquals($cmpvar, $apiResult['is_error'],
+      $prefix . (empty($apiResult['error_message']) ? '' : $apiResult['error_message']));
     //$this->assertEquals($cmpvar, $apiResult['is_error'], $prefix . print_r($apiResult, TRUE));
   }
 
   protected function setUp() {
     parent::setUp();
-    //URL should eventually be adapted for multisite
-    $this->url = "{$this->settings->sandboxURL}/{$this->sboxPath}sites/all/modules/civicrm/extern/rest.php";
 
-    if (!property_exists($this->settings, 'siteKey') || empty($this->settings->siteKey)) {
-      $this->markTestSkipped('CiviSeleniumSettings is missing siteKey');
-    }
-    if (!property_exists($this->settings, 'adminApiKey') || empty($this->settings->adminApiKey)) {
-      $this->markTestSkipped('CiviSeleniumSettings is missing adminApiKey');
+    if (empty($GLOBALS['_CV']['CIVI_SITE_KEY'])) {
+      $this->markTestSkipped('Missing siteKey');
     }
 
     $this->old_api_keys = array();
   }
 
+  protected function getRestUrl() {
+    return CRM_Core_Resources::singleton()
+      ->getUrl('civicrm', 'extern/rest.php');
+  }
+
   protected function tearDown() {
     if (!empty($this->old_api_keys)) {
       foreach ($this->old_api_keys as $cid => $apiKey) {
-        $this->webtest_civicrm_api('Contact', 'create', array(
+        civicrm_api3('Contact', 'create', array(
           'id' => $cid,
           'api_key' => $apiKey,
         ));
@@ -79,7 +80,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
         "id" => $this->nocms_contact_id,
         "skip_undelete" => 1,
       );
-      $res = $this->webtest_civicrm_api("Contact", "delete", $deleteParams);
+      $res = civicrm_api3("Contact", "delete", $deleteParams);
       unset($this->nocms_contact_id);
     }
   }
@@ -98,7 +99,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       array(// query
         "entity" => "Contact",
         "action" => "get",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
       ),
       1, // is_error
@@ -109,9 +110,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       array(// query
         "entity" => "Contact",
         "action" => "get",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
-        "api_key" => $this->settings->adminApiKey,
+        "api_key" => self::getApiKey(),
       ),
       0, // is_error
     );
@@ -121,9 +122,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       array(// query
         "entity" => "Contact",
         "action" => "get",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
-        "api_key" => 'garbage_' . $this->settings->adminApiKey,
+        "api_key" => 'garbage_' . self::getApiKey(),
       ),
       1, // is_error
     );
@@ -133,9 +134,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       array(// query
         "entity" => "Contactses",
         "action" => "get",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
-        "api_key" => $this->settings->adminApiKey,
+        "api_key" => self::getApiKey(),
       ),
       1, // is_error
     );
@@ -144,7 +145,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $cases[] = array(
       array(// query
         "q" => "civicrm/contact/get",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
       ),
       1, // is_error
@@ -154,9 +155,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $cases[] = array(
       array(// query
         "q" => "civicrm/contact/get",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
-        "api_key" => $this->settings->adminApiKey,
+        "api_key" => self::getApiKey(),
       ),
       0, // is_error
     );
@@ -165,9 +166,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $cases[] = array(
       array(// query
         "q" => "civicrm/contact/get",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
-        "api_key" => 'garbage_' . $this->settings->adminApiKey,
+        "api_key" => 'garbage_' . self::getApiKey(),
       ),
       1, // is_error
     );
@@ -176,9 +177,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $cases[] = array(
       array(// query
         "q" => "civicrm/contactses/get",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
-        "api_key" => $this->settings->adminApiKey,
+        "api_key" => self::getApiKey(),
       ),
       1, // is_error
     );
@@ -188,9 +189,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $cases[] = array(
       array(// query
         "q" => "civicrm/ping",
-        "key" => $this->settings->siteKey,
+        "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
-        "api_key" => $this->settings->adminApiKey,
+        "api_key" => self::getApiKey(),
       ),
       0, // is_error
     );
@@ -207,11 +208,15 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $this->updateAdminApiKey();
 
     $client = CRM_Utils_HttpClient::singleton();
-    list($status, $data) = $client->post($this->url, $query);
+    list($status, $data) = $client->post($this->getRestUrl(), $query);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $result = json_decode($data, TRUE);
     if ($result === NULL) {
-      $msg = print_r(array('query' => $query, 'response data' => $data), TRUE);
+      $msg = print_r(array(
+        'restUrl' => $this->getRestUrl(),
+        'query' => $query,
+        'response data' => $data,
+      ), TRUE);
       $this->assertNotNull($result, $msg);
     }
     $this->assertAPIErrorCode($result, $is_error);
@@ -231,18 +236,18 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       "contact_type" => "Individual",
       "first_name" => "RestTester1",
     );
-    $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
+    $contact = civicrm_api3("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
 
     // The key associates with a real contact but not a real user
     $params = array(
       "entity" => "Contact",
       "action" => "get",
-      "key" => $this->settings->siteKey,
+      "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
       "json" => "1",
       "api_key" => $test_key,
     );
-    list($status, $data) = $client->post($this->url, $params);
+    list($status, $data) = $client->post($this->getRestUrl(), $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $result = json_decode($data, TRUE);
     $this->assertNotNull($result);
@@ -263,17 +268,17 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       "contact_type" => "Individual",
       "first_name" => "RestTester1",
     );
-    $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
+    $contact = civicrm_api3("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
 
     // The key associates with a real contact but not a real user
     $params = array(
       "q" => "civicrm/contact/get",
-      "key" => $this->settings->siteKey,
+      "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
       "json" => "1",
       "api_key" => $test_key,
     );
-    list($status, $data) = $client->post($this->url, $params);
+    list($status, $data) = $client->post($this->getRestUrl(), $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $result = json_decode($data, TRUE);
     $this->assertNotNull($result);
@@ -281,23 +286,33 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   protected function updateAdminApiKey() {
-    $this->webtestLogin($this->settings->adminUsername, $this->settings->adminPassword);
-    $adminContact = $this->webtestGetLoggedInContact();
-    $this->webtestLogout();
-
-    $this->old_api_keys[$adminContact['id']] = CRM_Core_DAO::singleValueQuery('SELECT api_key FROM civicrm_contact WHERE id = %1', array(
-      1 => array($adminContact['id'], 'Positive'),
+    /** @var int $adminContactId */
+    $adminContactId = civicrm_api3('contact', 'getvalue', array(
+      'id' => '@user:' . $GLOBALS['_CV']['ADMIN_USER'],
+      'return' => 'id',
     ));
 
-    //$this->old_admin_api_key = $this->webtest_civicrm_api('Contact', 'get', array(
-    //  'id' => $adminContact['id'],
+    $this->old_api_keys[$adminContactId] = CRM_Core_DAO::singleValueQuery('SELECT api_key FROM civicrm_contact WHERE id = %1',
+      array(
+        1 => array($adminContactId, 'Positive'),
+      ));
+
+    //$this->old_admin_api_key = civicrm_api3('Contact', 'get', array(
+    //  'id' => $adminContactId,
     //  'return' => 'api_key',
     //));
 
-    $this->webtest_civicrm_api('Contact', 'create', array(
-      'id' => $adminContact['id'],
-      'api_key' => $this->settings->adminApiKey,
+    civicrm_api3('Contact', 'create', array(
+      'id' => $adminContactId,
+      'api_key' => self::getApiKey(),
     ));
+  }
+
+  protected static function getApiKey() {
+    if (empty(self::$api_key)) {
+      self::$api_key = mt_rand() . mt_rand();
+    }
+    return self::$api_key;
   }
 
 }

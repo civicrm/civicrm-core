@@ -45,6 +45,19 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
    * This will be a_b or b_a.
    *
    * @var string
@@ -231,9 +244,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Relationship Status'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array(
-              '' => '- Any -',
-              1 => 'Active',
-              0 => 'Inactive',
+              '' => ts('- Any -'),
+              1 => ts('Active'),
+              0 => ts('Inactive'),
             ),
             'type' => CRM_Utils_Type::T_INT,
           ),
@@ -522,8 +535,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         //for displaying relationship type filter
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
-          $op = CRM_Utils_Array::value('relationship_type_id_op', $this->_params) == 'in' ?
-            ts('Is one of') . ' ' : ts('Is not one of') . ' ';
+          $op = CRM_Utils_Array::value('relationship_type_id_op', $this->_params) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
           $relationshipTypes = array();
           foreach ($this->_params['relationship_type_id_value'] as $relationship) {
             $relationshipTypes[] = $relTypes[$relationship]['label_' . $this->relationType];

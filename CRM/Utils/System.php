@@ -1369,43 +1369,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Execute external or internal URLs and return server response.
-   *
-   * @param string $url
-   *   Request URL.
-   * @param bool $addCookie
-   *   Whether to provide a cookie. Should be true to access internal URLs.
-   *
-   * @return string
-   *   Response from URL.
-   */
-  public static function getServerResponse($url, $addCookie = TRUE) {
-    CRM_Core_TemporaryErrorScope::ignoreException();
-    require_once 'HTTP/Request.php';
-    $request = new HTTP_Request($url);
-
-    if ($addCookie) {
-      foreach ($_COOKIE as $name => $value) {
-        $request->addCookie($name, $value);
-      }
-    }
-
-    if (isset($_SERVER['AUTH_TYPE'])) {
-      $request->setBasicAuth($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
-    }
-
-    $config = CRM_Core_Config::singleton();
-    if ($config->userFramework == 'WordPress') {
-      session_write_close();
-    }
-
-    $request->sendRequest();
-    $response = $request->getResponseBody();
-
-    return $response;
-  }
-
-  /**
    * Exit with provided exit code.
    *
    * @param int $status

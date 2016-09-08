@@ -676,6 +676,7 @@ class CRM_Utils_REST {
     // Proceed with bootstrap for "?q=civicrm/X/Y" but not "?q=civicrm/ping"
     if (!empty($q)) {
       if (count($args) == 2 && $args[1] == 'ping') {
+        CRM_Utils_System::loadBootStrap(array(), FALSE, FALSE);
         return NULL; // this is pretty wonky but maybe there's some reason I can't see
       }
       if (count($args) != 3) {
@@ -691,6 +692,7 @@ class CRM_Utils_REST {
       // FIXME: At time of writing, this doesn't actually do anything because
       // authenticateKey abends, but that's a bad behavior which sends a
       // malformed response.
+      CRM_Utils_System::loadBootStrap(array(), FALSE, FALSE);
       return self::error('Failed to authenticate key');
     }
 
@@ -699,6 +701,7 @@ class CRM_Utils_REST {
       $store = NULL;
       $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
       if (empty($api_key)) {
+        CRM_Utils_System::loadBootStrap(array(), FALSE, FALSE);
         return self::error("FATAL: mandatory param 'api_key' (user key) missing");
       }
       $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
@@ -718,6 +721,7 @@ class CRM_Utils_REST {
       return NULL;
     }
     else {
+      CRM_Utils_System::loadBootStrap(array(), FALSE, FALSE);
       return self::error('ERROR: No CMS user associated with given api-key');
     }
   }

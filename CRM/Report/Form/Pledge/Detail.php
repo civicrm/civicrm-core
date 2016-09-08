@@ -40,8 +40,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
 
@@ -52,6 +50,19 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     'Pledge',
     'Individual',
   );
+
+  /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
 
   /**
    * Class constructor.
@@ -137,7 +148,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
         ),
         'filters' => array(
           'pledge_create_date' => array(
-            'title' => 'Pledge Made Date',
+            'title' => ts('Pledge Made Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'pledge_amount' => array(
@@ -145,7 +156,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_INT,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -189,7 +200,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     $this->_tagFilter = TRUE;
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_pledge']['fields']['campaign_id'] = array(
-        'title' => 'Campaign',
+        'title' => ts('Campaign'),
         'default' => 'false',
       );
       $this->_columns['civicrm_pledge']['filters']['campaign_id'] = array(
@@ -435,11 +446,11 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     // Add Special headers
     $this->_columnHeaders['scheduled_date'] = array(
       'type' => CRM_Utils_Type::T_DATE,
-      'title' => 'Next Payment Due',
+      'title' => ts('Next Payment Due'),
     );
     $this->_columnHeaders['scheduled_amount'] = array(
       'type' => CRM_Utils_Type::T_MONEY,
-      'title' => 'Next Payment Amount',
+      'title' => ts('Next Payment Amount'),
     );
     $this->_columnHeaders['status_id'] = NULL;
 

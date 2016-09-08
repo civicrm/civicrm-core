@@ -79,15 +79,12 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
    *    - displaying elements for saving the search
    */
   public function buildQuickForm() {
-    // get the qill
+    // @todo sync this more with CRM_Group_Form_Edit.
     $query = new CRM_Contact_BAO_Query($this->get('queryParams'));
-    $qill = $query->qill();
+    $this->assign('qill', $query->qill());
 
     // Values from the search form
     $formValues = $this->controller->exportValues();
-
-    // need to save qill for the smarty template
-    $this->assign('qill', $qill);
 
     // the name and description are actually stored with the group and not the saved search
     $this->add('text', 'title', ts('Name'),
@@ -231,7 +228,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
 
-    $group = CRM_Contact_BAO_Group::create($params);
+    CRM_Contact_BAO_Group::create($params);
 
     // CRM-9464
     $this->_id = $savedSearch->id;

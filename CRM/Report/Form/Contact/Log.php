@@ -29,16 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
 

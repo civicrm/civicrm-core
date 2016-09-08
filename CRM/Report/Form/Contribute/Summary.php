@@ -51,10 +51,20 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   protected $_groupByDateFreq = array(
     'MONTH' => 'Month',
     'YEARWEEK' => 'Week',
+    'DATE' => 'Day',
     'QUARTER' => 'Quarter',
     'YEAR' => 'Year',
     'FISCALYEAR' => 'Fiscal Year',
   );
+
+  /**
+   * This report has been optimised for group filtering.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = FALSE;
 
   /**
    * Class constructor.
@@ -154,7 +164,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -241,7 +251,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'title' => ts('Soft Credit Amount'),
           ),
           'soft_credit_type_id' => array(
-            'title' => 'Soft Credit Type',
+            'title' => ts('Soft Credit Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
             'default' => NULL,
@@ -272,7 +282,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
-        'title' => 'Campaign',
+        'title' => ts('Campaign'),
         'default' => 'false',
       );
       $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
@@ -308,14 +318,14 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEARWEEK({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "WEEKOFYEAR({$field['dbAlias']}) AS {$tableName}_{$fieldName}_interval";
-                $field['title'] = 'Week';
+                $field['title'] = ts('Week Beginning');
                 break;
 
               case 'YEAR':
                 $select[] = "MAKEDATE(YEAR({$field['dbAlias']}), 1)  AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEAR({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "YEAR({$field['dbAlias']}) AS {$tableName}_{$fieldName}_interval";
-                $field['title'] = 'Year';
+                $field['title'] = ts('Year Beginning');
                 break;
 
               case 'FISCALYEAR':
@@ -326,14 +336,19 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 $select[] = "DATE_ADD(MAKEDATE({$fiscal}, 1), INTERVAL ({$fy{'M'}})-1 MONTH) AS {$tableName}_{$fieldName}_start";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_interval";
-                $field['title'] = 'Fiscal Year';
+                $field['title'] = ts('Fiscal Year Beginning');
                 break;
 
               case 'MONTH':
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL (DAYOFMONTH({$field['dbAlias']})-1) DAY) as {$tableName}_{$fieldName}_start";
                 $select[] = "MONTH({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "MONTHNAME({$field['dbAlias']}) AS {$tableName}_{$fieldName}_interval";
-                $field['title'] = 'Month';
+                $field['title'] = ts('Month Beginning');
+                break;
+
+              case 'DATE':
+                $select[] = "DATE({$field['dbAlias']}) as {$tableName}_{$fieldName}_start";
+                $field['title'] = ts('Date');
                 break;
 
               case 'QUARTER':
@@ -344,8 +359,8 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 break;
             }
             if (!empty($this->_params['group_bys_freq'][$fieldName])) {
-              $this->_interval = $field['title'];
-              $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'] . ' Beginning';
+              $this->_interval = $this->_params['group_bys_freq'][$fieldName];
+              $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
 
@@ -437,6 +452,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    * Set from clause.
    *
    * @param string $entity
+   *
+   * @todo fix function signature to match parent. Remove hacky passing of $entity
+   * to acheive unclear results.
    */
   public function from($entity = NULL) {
     $softCreditJoinType = "LEFT";
@@ -453,8 +471,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $softCreditJoin .= " AND {$this->_aliases['civicrm_contribution_soft']}.id = (SELECT MIN(id) FROM civicrm_contribution_soft cs WHERE cs.contribution_id = {$this->_aliases['civicrm_contribution']}.id) ";
     }
 
-    $this->_from = "
-        FROM civicrm_contact  {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
+    $this->setFromBase('civicrm_contact');
+
+    $this->_from .= "
              INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                         {$this->_aliases['civicrm_contribution']}.is_test = 0
@@ -469,13 +488,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                      ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                         {$this->_aliases['civicrm_phone']}.is_primary = 1)";
 
-    if ($this->_addressField) {
-      $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                         ON {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_address']}.contact_id AND
-                            {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
+    $this->addAddressFromClause();
     if (!empty($this->_params['batch_id_value'])) {
       $this->_from .= "
                  LEFT JOIN civicrm_entity_financial_trxn eft
@@ -553,7 +566,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     }
     $this->_groupBy .= $this->_rollup;
     // append select with ANY_VALUE() keyword
-    $this->appendSelect($this->_selectClauses, $groupBy);
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBy);
   }
 
   /**

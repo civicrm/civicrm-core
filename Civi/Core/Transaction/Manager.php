@@ -163,7 +163,7 @@ class Manager {
    * @return \Civi\Core\Transaction\Frame
    */
   protected function createBaseFrame() {
-    return new Frame($this->dao, 'BEGIN', 'COMMIT', 'ROLLBACK');;
+    return new Frame($this->dao, 'BEGIN', 'COMMIT', 'ROLLBACK');
   }
 
   /**

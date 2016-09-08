@@ -447,6 +447,15 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("onbehalf_state_province-3");
 
+    $this->_fillOnbehalfForm();
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+
+    $this->click("_qf_Confirm_next-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+  }
+
+  public function _fillOnbehalfForm() {
     $this->waitForElementPresent("onbehalf_phone-3-1");
     $this->type("onbehalf_phone-3-1", 9999999999);
     $this->waitForElementPresent("onbehalf_email-3");
@@ -458,13 +467,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select("onbehalf_country-3", "label=UNITED STATES");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
-
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
-    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
-
-    $this->click("_qf_Confirm_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
   }
 
   /**
@@ -1176,7 +1178,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $firstName = 'John_x_' . substr(sha1(rand()), 0, 7);
     $lastName = 'Anderson_c_' . substr(sha1(rand()), 0, 7);
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Edit_next");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
@@ -1376,6 +1377,102 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//*[@id='select2-chosen-2']");
     $sel = $this->getText("xpath=//*[@id='select2-chosen-2']");
     $this->assertEquals($sel, 'On Behalf Of Organization');
+  }
+
+  public function testOnBehalfOfOrganizationWithCustomFields() {
+    $this->webtestLogin();
+    $pageId = 1;
+    //enable on behalf for contribution page.
+    $this->openCiviPage('admin/contribute/settings', "reset=1&action=update&id={$pageId}");
+    $this->click('is_organization');
+    $this->select("xpath=//*[@class='crm-contribution-onbehalf_profile_id']//span[@class='crm-profile-selector-select']//select", 'label=On Behalf Of Organization');
+    $this->click('CIVICRM_QFID_2_4');
+    $this->clickLink('_qf_Settings_upload_done-bottom');
+
+    //create custom group
+    $this->openCiviPage('admin/custom/group', "reset=1");
+    $this->clickLink('newCustomDataGroup', '');
+    $customGroupTitle = "custom_" . substr(sha1(rand()), 0, 4);
+    $this->type("title", $customGroupTitle);
+    $this->click("extends[0]");
+    $this->select("extends[0]", "value=Contact");
+    $this->click("//option[@value='Contact']");
+    $this->clickLink("_qf_Group_next-bottom");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForElementPresent("label");
+
+    //create custom field checkbox
+    $checkboxFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
+    $this->type("label", $checkboxFieldLabel);
+    $this->select("data_type[1]", "value=CheckBox");
+    $checkboxOptionLabel1 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
+    $this->type("option_label_1", $checkboxOptionLabel1);
+    $checkboxOptionLabel2 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
+    $this->type("option_label_2", $checkboxOptionLabel2);
+    $this->clickAjaxLink("_qf_Field_next_new-bottom", "data_type[1]");
+
+    //create custom field radio
+    $this->select("data_type[1]", "value=Radio");
+    $radioFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
+    $this->type("label", $radioFieldLabel);
+    $radioOptionLabel1 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
+    $this->type("option_label_1", $radioOptionLabel1);
+    $radioOptionLabel2 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
+    $this->type("option_label_2", $radioOptionLabel2);
+    $this->clickAjaxLink("_qf_Field_done-bottom", 'newCustomField');
+
+    $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
+    $custom2 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[2]/td[8]/span/a[text()='Edit Field']/@href"));
+    $checkboxFieldId = $custom1[1];
+    $radioFieldId = $custom2[1];
+
+    //Add this fields to organization profile
+    $this->openCiviPage("admin/uf/group", "reset=1");
+    $this->waitForElementPresent("link=Reserved Profiles");
+    $this->click("link=Reserved Profiles");
+    $this->waitForElementPresent("xpath=//div[@id='reserved-profiles']/div/div/table/tbody//tr/td[1][text()='On Behalf Of Organization']");
+    $this->click("xpath=//div[@id='reserved-profiles']/div/div/table/tbody//tr/td[1][text()='On Behalf Of Organization']/../td[7]/span/a[text()='Fields']");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->clickPopupLink("link=Add Field", '_qf_Field_next-bottom');
+    $this->select('field_name[0]', 'value=Contact');
+
+    $label = "{$checkboxFieldLabel} :: {$customGroupTitle}";
+    $this->select('field_name[1]', "label={$label}");
+    $this->waitForAjaxContent();
+    $this->clickAjaxLink('_qf_Field_next_new-bottom', 'field_name[0]');
+    $this->select('field_name[0]', 'value=Contact');
+    $this->waitForAjaxContent();
+    $label2 = "{$radioFieldLabel} :: {$customGroupTitle}";
+    $this->select('field_name[1]', "label={$label2}");
+    $this->clickAjaxLink('_qf_Field_next-bottom');
+
+    //Open Live Contribution Page
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", '_qf_Main_upload-bottom');
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $orgName = 'org_11_' . substr(sha1(rand()), 0, 7);
+    $this->type("email-5", $firstName . "@example.com");
+
+    $this->type("onbehalf_organization_name", $orgName);
+    $this->_fillOnbehalfForm();
+    $this->click("xpath=//label[text()='{$checkboxOptionLabel1}']");
+    $this->click("xpath=//label[text()='{$checkboxOptionLabel2}']");
+    $this->click("xpath=//label[text()='{$radioOptionLabel2}']");
+
+    // Credit Card Info
+    $this->webtestAddCreditCardDetails();
+    $this->webtestAddBillingDetails($firstName, $lastName);
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+
+    //assert custom radio and checkbox are correctly submitted
+    $this->assertElementNotContainsText("editrow-custom_{$checkboxFieldId}", '[ ]');
+    $this->assertElementContainsText("editrow-custom_{$checkboxFieldId}", '[x]');
+    $this->assertElementContainsText("editrow-custom_{$radioFieldId}", '( )');
+    $this->assertElementContainsText("editrow-custom_{$radioFieldId}", '(x)');
+
+    $this->click("_qf_Confirm_next-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
 }
