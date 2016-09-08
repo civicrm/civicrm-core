@@ -280,3 +280,7 @@ UPDATE civicrm_country SET name = "Algeria" WHERE lower(name) = lower("Algeria")
 
 ALTER TABLE `civicrm_financial_trxn`
   ADD `credit_card_type` INT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';
+
+-- CRM-16189 - Store last 4 digits of credit card
+ALTER TABLE civicrm_financial_trxn ADD credit_card_number INT UNSIGNED NULL COMMENT 'Last 4 digits of credit card.' AFTER check_number;
+

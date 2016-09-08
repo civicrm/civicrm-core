@@ -264,4 +264,11 @@
     <fieldName>check_number</fieldName>
     <add>4.3</add>
   </index>
+  <field>
+    <name>credit_card_number</name>
+    <title>Credit Card Number</title>
+    <type>int unsigned</type>
+    <comment>Last 4 digits of credit card</comment>
+    <add>4.7</add>
+  </field>
 </table>
