@@ -1733,6 +1733,12 @@ class CRM_Contact_BAO_Query {
     ) {
       $result = array($id, 'IN', $values, 0, $wildcard);
     }
+    // Hack for CRM-19325. This is ugly because it creates a dependency
+    // to the form, that returns the string 'NULL' if the user wants
+    // contributions that are not contained in any batch.
+    else if ($id == 'contribution_batch_id' && $values == 'NULL') {
+      $result = array($id, 'IS', 'NULL', 0, 0);
+    }
     else {
       $result = array($id, '=', $values, 0, $wildcard);
     }
