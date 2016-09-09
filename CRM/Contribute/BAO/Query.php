@@ -154,6 +154,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         || substr($query->_params[$id][0], 0, 10) == 'financial_'
         || substr($query->_params[$id][0], 0, 8) == 'payment_'
         || $query->_params[$id][0] == 'credit_card_type'
+        || $query->_params[$id][0] == 'credit_card_number'
       ) {
         if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
@@ -485,6 +486,13 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_tables['civicrm_financial_trxn'] = $query->_whereTables['civicrm_financial_trxn'] = 1;
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Financial_DAO_FinancialTrxn', 'credit_card_type', $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => ts('Credit Card Type'), 2 => $op, 3 => $value));
+        return;
+
+      case 'credit_card_number':
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_financial_trxn.credit_card_number", $op, $value);
+        $query->_tables['civicrm_financial_trxn'] = $query->_whereTables['civicrm_financial_trxn'] = 1;
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Financial_DAO_FinancialTrxn', 'credit_card_number', $value, $op);
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => ts('Credit Card Number'), 2 => $op, 3 => $value));
         return;
 
       default:
@@ -1009,6 +1017,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->addSelect('credit_card_type',
       array('entity' => 'financialTrxn', 'multiple' => 'multiple', 'label' => ts('Credit Card Type'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
+    $form->addElement('text', 'credit_card_number', ts('Credit Card Number'));
+
     // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
     $form->add('select', 'contribution_product_id',
       ts('Premium'),

@@ -50,6 +50,9 @@
     <div class="float-left" id="credit_card_type_wrapper">
       {$form.credit_card_type.label} <br />
       {$form.credit_card_type.html}
+    <div class="float-left" id="credit_card_number_wrapper">
+      {$form.credit_card_number.label} <br />
+      {$form.credit_card_number.html}
     </div>
   </td>
   <td>
