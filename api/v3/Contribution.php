@@ -533,6 +533,8 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     $input['fee_amount'] = $params['fee_amount'];
   }
   $input['credit_card_type'] = CRM_Utils_Array::value('credit_card_type', $params);
+  $ccNumber = CRM_Utils_Array::value('credit_card_number', $params);
+  $input['credit_card_number'] = substr($ccNumber, -4);
   return _ipn_process_transaction($params, $contribution, $input, $ids);
 
 }
