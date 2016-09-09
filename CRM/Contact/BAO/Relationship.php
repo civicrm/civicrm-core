@@ -509,7 +509,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param string $column
    *   Name/label that going to retrieve from db.
    * @param bool $biDirectional
-   * @param string $contactSubType
+   * @param array $contactSubType
    *   Includes relationship types between this subtype.
    * @param bool $onlySubTypeRelationTypes
    *   If set only subtype which is passed by $contactSubType
@@ -552,7 +552,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
 
     if (empty($contactSubType)) {
-      $contactSubType = '';
+      $contactSubType = array();
     }
     if ($contactId) {
       $contactType = CRM_Contact_BAO_Contact::getContactType($contactId);
@@ -569,7 +569,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           (!$otherContactType) ||
           $value['contact_type_b'] == $otherContactType
         ) &&
-        ($value['contact_sub_type_a'] == $contactSubType ||
+        (in_array($value['contact_sub_type_a'], $contactSubType) ||
           (!$value['contact_sub_type_a'] && !$onlySubTypeRelationTypes)
         )
       ) {
@@ -583,7 +583,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           (!$otherContactType) ||
           $value['contact_type_a'] == $otherContactType
         ) &&
-        ($value['contact_sub_type_b'] == $contactSubType ||
+        ((in_array($value['contact_sub_type_b'], $contactSubType) ||
           (!$value['contact_sub_type_b'] && !$onlySubTypeRelationTypes)
         )
       ) {
