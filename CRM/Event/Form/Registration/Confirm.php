@@ -970,6 +970,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
+      'credit_card_number' => CRM_Utils_Array::value('credit_card_number', $params, NULL),
     );
 
     if (empty($params['is_pay_later'])) {
