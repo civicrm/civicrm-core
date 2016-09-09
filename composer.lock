@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "baf8f68bc4f49a16303e46b3f8e16aeb",
-    "content-hash": "7e35d1e9e89d95420b11a198878dee3e",
+    "hash": "a0837dd64bed6ca00c62e373ed2c365e",
+    "content-hash": "3475b3f4ae0936e68714b9f94d44f709",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -165,16 +165,16 @@
         },
         {
             "name": "pear/validate_finance_creditcard",
-            "version": "0.6.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Validate_Finance_CreditCard.git",
-                "reference": "601ab381ce7397a53d2641beed40f73ab4311b26"
+                "reference": "c3689983257d73ac70ec7e355fadf895ba40d4ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Validate_Finance_CreditCard/zipball/601ab381ce7397a53d2641beed40f73ab4311b26",
-                "reference": "601ab381ce7397a53d2641beed40f73ab4311b26",
+                "url": "https://api.github.com/repos/pear/Validate_Finance_CreditCard/zipball/c3689983257d73ac70ec7e355fadf895ba40d4ed",
+                "reference": "c3689983257d73ac70ec7e355fadf895ba40d4ed",
                 "shasum": ""
             },
             "require": {
@@ -205,7 +205,7 @@
                 }
             ],
             "description": "Validation class for credit cards.",
-            "time": "2016-01-28 20:34:49"
+            "time": "2016-09-08 09:27:24"
         },
         {
             "name": "phenx/php-font-lib",
@@ -1037,7 +1037,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "zetacomponents/mail": 20
+        "zetacomponents/mail": 20,
+        "pear/validate_finance_creditcard": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
