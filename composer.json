@@ -22,7 +22,7 @@
     "zetacomponents/base": "1.7.*",
     "zetacomponents/mail": "dev-1.7-civi",
     "phpoffice/phpword": "^0.12.1",
-    "pear/Validate_Finance_CreditCard": "0.6.0"
+    "pear/Validate_Finance_CreditCard": "dev-master"
   },
   "repositories": [
     {
