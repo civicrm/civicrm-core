@@ -1247,6 +1247,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         'campaign_id',
         'receive_date',
         'credit_card_type',
+        'credit_card_number',
       );
 
       foreach ($recordContribution as $f) {
@@ -1446,6 +1447,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         array('labelColumn' => 'name', 'flip' => TRUE)
       );
       $params['credit_card_type'] = CRM_Utils_Array::value(CRM_Utils_Array::value('credit_card_type', $formValues), $creditCardType);
+      $params['credit_card_number'] = CRM_Utils_Array::value('credit_card_number', $formValues);
       $params['is_test'] = ($this->_mode == 'live') ? 0 : 1;
       if (!empty($formValues['send_receipt'])) {
         $params['receipt_date'] = $now;
