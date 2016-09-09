@@ -252,8 +252,13 @@
   </index>
   <field>
     <name>credit_card_number</name>
+    <uniqueName>financial_trxn_credit_card_number</uniqueName>
     <title>Credit Card Number</title>
     <type>int unsigned</type>
+    <html>
+      <type>Text</type>
+      <size>6</size>
+    </html>
     <comment>Last 4 digits of credit card</comment>
     <add>4.7</add>
   </field>
