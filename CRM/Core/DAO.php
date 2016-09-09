@@ -32,6 +32,10 @@
  * @copyright CiviCRM LLC (c) 2004-2016
  */
 
+if (!defined('DB_DSN_MODE')) {
+  define('DB_DSN_MODE', 'auto');
+}
+
 require_once 'PEAR.php';
 require_once 'DB/DataObject.php';
 
