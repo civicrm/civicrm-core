@@ -460,8 +460,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       }
 
       if (!empty($this->_subtypes)) {
-        $subtypesToBeRemoved = array_diff($this->_subtypes, array_intersect($this->_subtypes, $params['extends'][1]));
-        CRM_Contact_BAO_ContactType::deleteCustomRowsOfSubtype($this->_id, $subtypesToBeRemoved);
+        $subtypesToBeRemoved = array();
+        $subtypesToPreserve = $params['extends'][1];
+        // Don't remove any value if group is extended to -any- subtype
+        if (!empty($subtypesToPreserve[0])) {
+          $subtypesToBeRemoved = array_diff($this->_subtypes, array_intersect($this->_subtypes, $subtypesToPreserve));
+        }
+        CRM_Contact_BAO_ContactType::deleteCustomRowsOfSubtype($this->_id, $subtypesToBeRemoved, $subtypesToPreserve);
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {

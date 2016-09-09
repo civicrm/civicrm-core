@@ -203,7 +203,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'start_date' => '2008-12-20',
       'is_active' => 1,
     );
-    $this->callAPIFailure('relationship', 'create', $params, 'Relationship already exists');
+    $this->callAPIFailure('relationship', 'create', $params, 'Duplicate Relationship');
 
     $params['id'] = $relationship['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
@@ -550,7 +550,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPIFailure('relationship', 'delete', $params, 'Mandatory key(s) missing from params array: id');
 
     $params['id'] = "Invalid";
-    $this->callAPIFailure('relationship', 'delete', $params, 'Invalid value for relationship ID');
+    $this->callAPIFailure('relationship', 'delete', $params, 'id is not a valid integer');
   }
 
   /**
@@ -611,7 +611,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 0,
     );
 
-    $this->callAPIFailure('relationship', 'create', $params, 'Relationship already exists');
+    $this->callAPIFailure('relationship', 'create', $params, 'Duplicate Relationship');
 
     $this->callAPISuccess('relationship', 'delete', array('id' => $result['id']));
     $this->relationshipTypeDelete($this->_relTypeID);

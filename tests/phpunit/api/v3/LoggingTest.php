@@ -307,7 +307,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       'Logging',
       'revert',
       array('log_conn_id' => 'Wopity woot'),
-      'Failure in api call for Logging revert:  The connection date must be passed in to disambiguate this logging entry per CRM-18193'
+      'The connection date must be passed in to disambiguate this logging entry per CRM-18193'
     );
   }
 

@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
@@ -48,8 +46,20 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   public $_drilldownReport = array('member/detail' => 'Link to Detail Report');
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
    */
+  protected $groupFilterNotOptimised = TRUE;
+
   /**
+   * Class constructor.
    */
   public function __construct() {
 
@@ -71,7 +81,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
         'grouping' => 'member-fields',
         'fields' => array(
           'membership_type_id' => array(
-            'title' => 'Membership Type',
+            'title' => ts('Membership Type'),
             'required' => TRUE,
           ),
         ),
@@ -120,7 +130,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
             'type' => 12,
           ),
           'membership_type_id' => array(
-            'title' => 'Membership Type',
+            'title' => ts('Membership Type'),
             'default' => TRUE,
             'chart' => TRUE,
           ),
@@ -159,7 +169,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
         ),
         'filters' => array(
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -179,7 +189,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_membership']['fields']['campaign_id'] = array(
-        'title' => 'Campaign',
+        'title' => ts('Campaign'),
         'default' => 'false',
       );
       $this->_columns['civicrm_membership']['filters']['campaign_id'] = array(
@@ -323,6 +333,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       unset($select['joinDate']);
       unset($this->_columnHeaders["civicrm_membership_member_join_date"]);
     }
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -362,13 +373,14 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
                 !empty($this->_params['group_bys_freq'][$fieldName])
               ) {
 
-                $append = "YEAR({$field['dbAlias']}),";
+                $append = "YEAR({$field['dbAlias']})";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
                   array('year')
                 )) {
                   $append = '';
                 }
-                $this->_groupBy[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                $this->_groupBy[] = $append;
+                $this->_groupBy[] = "{$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
                 $append = TRUE;
               }
               else {
@@ -380,11 +392,12 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       }
 
       $this->_rollup = ' WITH ROLLUP';
-      $this->_groupBy = 'GROUP BY ' . implode(', ', $this->_groupBy) .
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, array_filter($this->_groupBy));
+      $this->_groupBy = 'GROUP BY ' . implode(', ', array_filter($this->_groupBy)) .
         " {$this->_rollup} ";
     }
     else {
-      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_membership']}.join_date";
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_membership']}.join_date");
     }
   }
 
@@ -622,7 +635,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
         !$row['civicrm_membership_membership_type_id']
       ) {
         $this->fixSubTotalDisplay($rows[$rowNum], $this->_statFields, FALSE);
-        $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>SubTotal</b>';
+        $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>' . ts('Subtotal') . '</b>';
         $entryFound = TRUE;
       }
 

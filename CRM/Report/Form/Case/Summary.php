@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
@@ -41,8 +39,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   protected $_customGroupExtends = array('Case');
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->case_types = CRM_Case_PseudoConstant::caseType();
@@ -215,6 +212,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -265,7 +263,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
     else {
       $this->_from = "
-            FROM civicrm_contact $c, civicrm_case $cc
+            FROM civicrm_case $cc
 inner join civicrm_case_contact $ccc on ${ccc}.case_id = ${cc}.id
 inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
 ";
@@ -332,7 +330,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_c2']}.id";
+    $this->_groupBy = "";
   }
 
   public function postProcess() {

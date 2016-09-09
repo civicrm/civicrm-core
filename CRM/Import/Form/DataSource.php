@@ -152,8 +152,11 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
    * Common form postProcess.
    *
    * @param string $parserClassName
+   *
+   * @param string|null $entity
+   *   Entity to set for paraser currently only for custom import
    */
-  protected function submitFileForMapping($parserClassName) {
+  protected function submitFileForMapping($parserClassName, $entity = NULL) {
     $this->controller->resetPage('MapField');
 
     $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
@@ -167,6 +170,9 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
     $mapper = array();
 
     $parser = new $parserClassName($mapper);
+    if ($entity) {
+      $parser->setEntity($this->get($entity));
+    }
     $parser->setMaxLinesToProcess(100);
     $parser->run($fileName,
       $separator,

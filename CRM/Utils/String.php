@@ -657,7 +657,12 @@ class CRM_Utils_String {
       return $string;
     }
     else {
-      return substr($string, 0, $maxLen - 3) . '...';
+      $end = $maxLen - 3;
+      while (strlen($string) > $maxLen - 3) {
+        $string = mb_substr($string, 0, $end, 'UTF-8');
+        $end = $end - 1;
+      }
+      return $string . '...';
     }
   }
 

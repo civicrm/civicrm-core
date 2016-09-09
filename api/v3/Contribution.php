@@ -80,10 +80,6 @@ function civicrm_api3_contribution_create(&$params) {
   }
   _civicrm_api3_contribution_create_legacy_support_45($params);
 
-  // Make sure tax calculation is handled via api.
-  // @todo this belongs in the BAO NOT the api.
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
-
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
 
@@ -629,6 +625,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   }
   if (!empty($params['trxn_date'])) {
     $input['trxn_date'] = $params['trxn_date'];
+  }
+  if (!empty($params['receive_date'])) {
+    $input['receive_date'] = $params['receive_date'];
   }
   if (empty($contribution->contribution_page_id)) {
     static $domainFromName;

@@ -99,7 +99,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   public function testCreateWithMissingRequired() {
     $params = array('title' => 'Does not make sense');
-    $result = $this->callAPIFailure('membership_status', 'create', $params);
+    $this->callAPIFailure('membership_status', 'create', $params, 'Mandatory key(s) missing from params array: name');
   }
 
   public function testCreate() {

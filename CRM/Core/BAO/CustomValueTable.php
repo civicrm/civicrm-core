@@ -142,7 +142,7 @@ class CRM_Core_BAO_CustomValueTable {
                       CRM_Core_PseudoConstant::countryIsoCode(), TRUE
                     );
                   }
-                  $validCountries[] = CRM_Utils_Array::value('country_id', $states);
+                  $validCountries[] = CRM_Utils_Array::value('country_id', $countries);
                 }
                 $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
                   $validCountries
@@ -468,8 +468,17 @@ AND    $cond
       $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;
     }
 
-    $result = array();
+    $result = $sortedResult = array();
     foreach ($select as $tableName => $clauses) {
+      if (!empty($DTparams['sort'])) {
+        $query = CRM_Core_DAO::executeQuery("SELECT id FROM {$tableName} WHERE entity_id = {$entityID}");
+        $count = 1;
+        while ($query->fetch()) {
+          $sortedResult["{$query->id}"] = $count;
+          $count++;
+        }
+      }
+
       $query = "SELECT SQL_CALC_FOUND_ROWS id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
       $dao = CRM_Core_DAO::executeQuery($query);
       if (!empty($DTparams)) {
@@ -491,6 +500,9 @@ AND    $cond
           }
         }
       }
+    }
+    if (!empty($sortedResult)) {
+      $result['sortedResult'] = $sortedResult;
     }
     return $result;
   }

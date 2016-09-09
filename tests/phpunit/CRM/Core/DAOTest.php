@@ -249,4 +249,14 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test the function designed to find myIsam tables.
+   */
+  public function testMyISAMCheck() {
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
+    CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_my_isam (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM');
+    $this->assertEquals(1, CRM_Core_DAO::isDBMyISAM());
+    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_my_isam');
+  }
+
 }

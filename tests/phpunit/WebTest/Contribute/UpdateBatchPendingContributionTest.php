@@ -44,6 +44,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "Individual");
+    $this->waitForElementPresent("contribution_status_id");
     $this->multiselect2('contribution_status_id', array("Pending"));
     $this->clickLink("_qf_Search_refresh");
 
@@ -51,6 +52,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForAjaxContent();
     $this->select('task', "label=Update pending contribution status");
     $this->waitForAjaxContent();
+    $this->waitForElementPresent("contribution_status_id");
     $this->select('contribution_status_id', 'label=Completed');
     $this->waitForAjaxContent();
     $this->click('_qf_Status_next');
@@ -60,6 +62,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForElementPresent("contribution_date_low");
 
     $this->type("sort_name", "Individual");
+    $this->waitForElementPresent("contribution_status_id");
     $this->multiselect2('contribution_status_id', array("Completed"));
     $this->click("_qf_Search_refresh");
 
@@ -93,8 +96,8 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     // Search the participants
     $this->openCiviPage("event/search", "reset=1", '_qf_Search_refresh');
 
-    $eventName = 'Rain';
-    $this->select2("event_id", $eventName);
+    $eventName = 'Rain-forest Cup Youth Soccer Tournament';
+    $this->select2("event_id", $eventName, TRUE);
     $this->click('_qf_Search_refresh');
 
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
@@ -200,6 +203,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->select("financial_type_id", "value=1");
 
     //Contribution status
+    $this->waitForElementPresent("contribution_status_id");
     $this->select("contribution_status_id", "label=Pending");
 
     // total amount

@@ -374,7 +374,7 @@ class CRM_GCD {
 
     // number of seconds per year
     $numSecond = 31536000;
-    $dateFormat = "Ymdhis";
+    $dateFormat = "YmdHis";
     $today = time();
 
     // both are defined
@@ -1976,22 +1976,6 @@ AND    a.details = 'Participant Payment'
     $this->_query($sql);
   }
 
-}
-
-/**
- * @param null $str
- *
- * @return bool
- */
-function user_access($str = NULL) {
-  return TRUE;
-}
-
-/**
- * @return array
- */
-function module_list() {
-  return array();
 }
 
 echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");

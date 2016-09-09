@@ -141,7 +141,6 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction();
 
-    require_once 'CiviTest/CiviMailUtils.php';
     $this->mut = new \CiviMailUtils($this, TRUE);
 
     $this->cronSchedule = array(

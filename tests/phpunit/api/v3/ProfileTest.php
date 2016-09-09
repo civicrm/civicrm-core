@@ -416,8 +416,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       $updateParams
     );
 
-    $result = $this->callAPIFailure('profile', 'submit', $params,
-      "Missing required parameters for profile id $this->_profileID: email-Primary"
+    $this->callAPIFailure('profile', 'submit', $params,
+      "Mandatory key(s) missing from params array: email-primary"
     );
   }
 

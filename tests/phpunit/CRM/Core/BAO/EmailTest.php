@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/Contact.php';
-
 /**
  * Class CRM_Core_BAO_EmailTest
  * @group headless
@@ -17,7 +15,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    * Add() method (create and update modes)
    */
   public function testAdd() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array();
     $params = array(
@@ -50,16 +48,15 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     );
     $this->assertEquals($isBulkMail, 1, 'Verify bulkmail value is 1.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
    * HoldEmail() method (set and reset on_hold condition)
    */
   public function testHoldEmail() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
-    $params = array();
     $params = array(
       'email' => 'jane.doe@example.com',
       'is_primary' => 1,
@@ -123,7 +120,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'Compare reset_date (' . $resetDate . ') in DB to current year.'
     );
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -133,12 +130,12 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $contactParams = array(
       'first_name' => 'Alan',
       'last_name' => 'Smith',
-      'email-1' => 'alan.smith1@example.com',
-      'email-2' => 'alan.smith2@example.com',
-      'email-3' => 'alan.smith3@example.com',
+      'email' => 'alan.smith1@example.com',
+      'api.email.create.0' => array('email' => 'alan.smith2@example.com', 'location_type_id' => 'Home'),
+      'api.email.create.1' => array('email' => 'alan.smith3@example.com', 'location_type_id' => 'Main'),
     );
 
-    $contactId = Contact::createIndividual($contactParams);
+    $contactId = $this->individualCreate($contactParams);
 
     $emails = CRM_Core_BAO_Email::allEmails($contactId);
 
@@ -149,7 +146,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $this->assertEquals('alan.smith1@example.com', $firstEmailValue[0]['email'], 'Confirm primary email address value.');
     $this->assertEquals(1, $firstEmailValue[0]['is_primary'], 'Confirm first email address is primary.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 }

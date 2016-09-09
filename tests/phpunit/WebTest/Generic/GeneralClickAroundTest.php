@@ -313,7 +313,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
     // Verify activity types
     $this->assertTextPresent("Meeting");
-    $this->assertTextPresent("Print PDF Letter");
+    $this->assertTextPresent("Print/Merge Document");
     $this->assertTextPresent("Event Registration");
     $this->assertTextPresent("Contribution");
     $this->assertTextPresent("Membership Signup");

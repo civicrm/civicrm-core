@@ -317,7 +317,7 @@
     <name>postal_code</name>
     <title>Postal Code</title>
     <type>varchar</type>
-    <length>12</length>
+    <length>64</length>
     <import>true</import>
     <headerPattern>/postal|zip/i</headerPattern>
     <dataPattern>/\d?\d{4}(-\d{4})?/</dataPattern>

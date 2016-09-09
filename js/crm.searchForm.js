@@ -100,6 +100,10 @@
 
   $(function() {
     initForm();
+
+    // Focus first search field
+    $('.crm-form-text:input:visible:first', 'form.crm-search-form').focus();
+
     // Handle user interactions with search results
     $('#crm-container')
       // When toggling between "all records" and "selected records only"
@@ -128,14 +132,50 @@
         }
       })
       // When selecting a task
-      .on('change', 'select#task', function() {
+      .on('change', 'select#task', function(e) {
         var $form = $(this).closest('form'),
-          $go = $('input.crm-search-go-button', $form);
-        if (1) {
+        $go = $('input.crm-search-go-button', $form);
+        var $selectedOption = $(this).find(':selected');
+        if (!$selectedOption.val()) {
+          // do not blank refresh the empty option.
+          return;
+        }
+        if ($selectedOption.data('is_confirm')) {
+          var confirmed = false;
+          var refresh_fields = $selectedOption.data('confirm_refresh_fields');
+          var $message = '<tr>' + (($selectedOption.data('confirm_message') !== undefined) ? $selectedOption.data('confirm_message') : '') + '</tr>';
+          if (refresh_fields === undefined) {
+            refresh_fields = {};
+          }
+          $.each(refresh_fields, function (refreshIndex, refreshValue) {
+            var $refresh_field = $(refreshValue.selector);
+            var prependText = (refreshValue.prepend !== undefined) ? refreshValue.prepend : '';
+            var existingInput = $refresh_field.find('input').val();
+            $message = $message + '<tr>' + $refresh_field.html().replace(existingInput, prependText + existingInput) + '</tr>';
+          });
+
+          CRM.confirm({
+            title: $selectedOption.data('confirm_title') ? $selectedOption.data('confirm_title') : ts('Confirm action'),
+            message: '<table class="form-layout">' + $message + '</table>'
+          })
+          .on('crmConfirm:yes', function() {
+            confirmed = true;
+            $.each(refresh_fields, function (refreshIndex, refreshValue) {
+              $('#' + refreshIndex).val($('.crm-confirm #' + refreshIndex).val());
+            });
+            $go.click();
+          })
+          .on('crmConfirm:no', function() {
+            $('#task').val('').change();
+            return;
+          });
+        }
+        else if (!$(this).find(':selected').data('supports_modal')) {
           $go.click();
+          $('#task').val('').select2('val', '');
         }
         // The following code can load the task in a popup, however not all tasks function correctly with this
-        // So it's disabled pending a per-task opt-in mechanism
+        // So it's a per-task opt-in mechanism.
         else {
           var data = $form.serialize() + '&' + $go.attr('name') + '=' + $go.attr('value');
           var url = $form.attr('action');

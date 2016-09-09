@@ -166,8 +166,6 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->_searchBuilder('Email', NULL, NULL, 'IS NULL');
-    $this->type('CRM_Contact_Form_Search_Builder-rows-per-page-select', '100');
-    $this->waitForElementPresent('CRM_Contact_Form_Search_Builder-rows-per-page-select');
     $names = array(
       1 => $firstName1,
       2 => $firstName2,
@@ -183,8 +181,6 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
     //searching contacts whose phone field is not empty
     $this->_searchBuilder('Phone', NULL, $firstName, 'IS NOT EMPTY');
-    $this->type('CRM_Contact_Form_Search_Builder-rows-per-page-select', '100');
-    $this->waitForElementPresent('CRM_Contact_Form_Search_Builder-rows-per-page-select');
     $this->assertTrue($this->isTextPresent($firstName));
 
     $firstName4 = "AB" . substr(sha1(rand()), 0, 7);
@@ -459,9 +455,11 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName1);
 
     // fill in Membership Organization
+    $this->waitForElementPresent("membership_type_id[0]");
     $this->select("membership_type_id[0]", "label={$membershipTypes['member_of_contact']}");
 
     // select membership type
+    $this->waitForElementPresent("membership_type_id[1]");
     $this->select("membership_type_id[1]", "label={$membershipTypes['membership_type']}");
 
     // fill in Source
@@ -498,23 +496,27 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->enterValues(1, 1, 'Membership', 'Membership Type', NULL, '=', array($membershipTypes['membership_type']));
 
     $this->clickLink('_qf_Builder_refresh');
-    $this->waitForText('search-status', "2 Contacts");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "2 Contacts");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, '=', array('New'));
     $this->clickLink('_qf_Builder_refresh');
-    $this->waitForText('search-status', "1 Contact");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "1 Contact");
 
     $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, '=', array('Grace'));
     $this->clickLink('_qf_Builder_refresh');
-    $this->waitForText('search-status', "1 Contact");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "1 Contact");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->waitForElementPresent("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
     $this->click("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
     $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('New', 'Grace'));
     $this->clickLink('_qf_Builder_refresh');
-    $this->waitForText('search-status', "2 Contacts");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "2 Contacts");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->waitForElementPresent("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
@@ -527,12 +529,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "_qf_Search_refresh");
     $this->select2('membership_type_id', $membershipTypes['membership_type'], TRUE);
     $this->clickLink('_qf_Search_refresh');
-    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->multiselect2("membership_status_id", array("New", "Grace"));
     $this->clickLink('_qf_Search_refresh');
-    $this->waitForText('search-status', "2 Results");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "2 Results");
 
     $this->openCiviPage("member/search", "reset=1", "_qf_Search_refresh");
     $this->waitForAjaxContent();
@@ -540,7 +543,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->select2('membership_type_id', $membershipTypes['membership_type'], TRUE);
     $this->multiselect2("membership_status_id", array("New"));
     $this->click('_qf_Search_refresh');
-    $this->waitForText('search-status', "1 Result");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "1 Result");
   }
 
 }

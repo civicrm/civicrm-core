@@ -79,14 +79,14 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       )
     ) {
       $dsnArray = DB::parseDSN($config->dsn);
-      $tableNames = CRM_Core_DAO::GetStorageValues(NULL, 0, 'Name');
+      $tableNames = CRM_Core_DAO::getTableNames();
       $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= array(';
       $tablePrefixes .= "\n  'default' => '$drupal_prefix',"; // add default prefix: the drupal database prefix
       $prefix = "";
       if ($config->dsn != $config->userFrameworkDSN) {
         $prefix = "`{$dsnArray['database']}`.";
       }
-      foreach ($tableNames as $tableName => $value) {
+      foreach ($tableNames as $tableName) {
         $tablePrefixes .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
       }
       $tablePrefixes .= "\n);";

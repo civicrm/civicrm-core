@@ -32,7 +32,6 @@
 /**
  * Include class definitions
  */
-require_once 'CiviTest/CiviCaseTestCase.php';
 
 /**
  *  Test APIv3 civicrm_case_* functions

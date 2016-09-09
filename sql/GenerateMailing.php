@@ -54,7 +54,7 @@ $tables = array(
 );
 foreach ($tables as $t) {
   $query = "DELETE FROM $t";
-  CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+  CRM_Core_DAO::executeQuery($query);
 }
 
 $prefix = 'Automated Mailing Gen: ';

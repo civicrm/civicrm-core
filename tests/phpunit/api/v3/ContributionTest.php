@@ -541,6 +541,22 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test retrieval by total_amount works.
+   *
+   * @throws Exception
+   */
+  public function testGetContributionByTotalAmount() {
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, array('total_amount' => '5')));
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, array('total_amount' => '10')));
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => 10), 1);
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => array('>' => 6)), 1);
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => array('>' => 0)), 2);
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => array('>' => -5)), 2);
+    $this->callAPISuccessGetCount('Contribution', array('total_amount' => array('<' => 0)), 0);
+    $this->callAPISuccessGetCount('Contribution', array(), 2);
+  }
+
+  /**
    * Create test with unique field name on source.
    */
   public function testCreateContributionSource() {
@@ -1604,6 +1620,67 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test to ensure mail is sent on chosing pay later
+   */
+  public function testpayLater() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->swapMessageTemplateForTestTemplate();
+    $this->createLoggedInUser();
+
+    // create contribution page first
+    $contributionPageParams = array(
+      'title' => 'Help Support CiviCRM!',
+      'financial_type_id' => 1,
+      'is_monetary' => TRUE,
+      'is_pay_later' => 1,
+      'is_quick_config' => TRUE,
+      'pay_later_text' => 'I will send payment by check',
+      'pay_later_receipt' => 'This is a pay later reciept',
+      'is_allow_other_amount' => 1,
+      'min_amount' => 10.00,
+      'max_amount' => 10000.00,
+      'goal_amount' => 100000.00,
+      'is_email_receipt' => 1,
+      'is_active' => 1,
+      'amount_block_is_active' => 1,
+      'currency' => 'USD',
+      'is_billing_required' => 0,
+    );
+    $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', $contributionPageParams);
+
+    // submit form values
+    $priceSet = $this->callAPISuccess('price_set', 'getsingle', array('name' => 'default_contribution_amount'));
+    $params = array(
+      'id' => $contributionPageResult['id'],
+      'contact_id' => $this->_individualId,
+      'email-5' => 'anthony_anderson@civicrm.org',
+      'payment_processor_id' => 0,
+      'amount' => 100.00,
+      'tax_amount' => '',
+      'currencyID' => 'USD',
+      'is_pay_later' => 1,
+      'invoiceID' => 'f28e1ddc86f8c4a0ff5bcf46393e4bc8',
+      'is_quick_config' => 1,
+      'description' => 'Online Contribution: Help Support CiviCRM!',
+      'price_set_id' => $priceSet['id'],
+    );
+    $this->callAPISuccess('contribution_page', 'submit', $params);
+
+    $mut->checkMailLog(array(
+      'is_pay_later:::1',
+      'email:::anthony_anderson@civicrm.org',
+      'pay_later_receipt:::' . $contributionPageParams['pay_later_receipt'],
+      'displayName:::Mr. Anthony Anderson II',
+      'contributionPageId:::' . $contributionPageResult['id'],
+      'title:::' . $contributionPageParams['title'],
+      'amount:::' . $params['amount'],
+    ));
+    $mut->stop();
+    $this->revertTemplateToReservedTemplate();
+  }
+
+
+  /**
    * Test to check whether contact billing address is used when no contribution address
    */
   public function testBillingAddress() {
@@ -1682,6 +1759,50 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19126 Add test to verify when complete transaction is called tax amount is not changed
+   */
+  public function testCheckTaxAmount() {
+    $contact = $this->createLoggedInUser();
+    $financialType = $this->callAPISuccess('financial_type', 'create', array(
+      'name' => 'Test taxable financial Type',
+      'is_reserved' => 0,
+      'is_active' => 1,
+    ));
+    $financialAccount = $this->callAPISuccess('financial_account', 'create', array(
+       'name' => 'Test Tax financial account ',
+       'contact_id' => $contact,
+       'financial_account_type_id' => 2,
+       'is_tax' => 1,
+       'tax_rate' => 5.00,
+       'is_reserved' => 0,
+       'is_active' => 1,
+       'is_default' => 0,
+    ));
+    $financialTypeId = $financialType['id'];
+    $financialAccountId = $financialAccount['id'];
+    $financialAccountParams = array(
+      'entity_table' => 'civicrm_financial_type',
+      'entity_id' => $financialTypeId,
+      'account_relationship' => 10,
+      'financial_account_id' => $financialAccountId,
+    );
+    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    $params = array_merge($this->_params, array('contribution_status_id' => 2, 'financial_type_id' => $financialTypeId));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution1 = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'return' => 'tax_amount', 'sequential' => 1));
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+       'id' => $contribution['id'],
+       'trxn_id' => '777788888',
+       'fee_amount' => '6.00',
+    ));
+    $contribution2 = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'return' => array('tax_amount', 'fee_amount', 'net_amount'), 'sequential' => 1));
+    $this->assertEquals($contribution1['values'][0]['tax_amount'], $contribution2['values'][0]['tax_amount']);
+    $this->assertEquals('6.00', $contribution2['values'][0]['fee_amount']);
+    $this->assertEquals('99.00', $contribution2['values'][0]['net_amount']);
+  }
+
+  /**
    * Test repeat contribution successfully creates line items.
    */
   public function testRepeatTransaction() {
@@ -1716,7 +1837,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     unset($lineItem1['values'][0]['id'], $lineItem1['values'][0]['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
-
+    $this->_checkFinancialRecords(array('id' => $originalContribution['id'] + 1), 'online');
     $this->quickCleanUpFinancialEntities();
   }
 
@@ -2728,102 +2849,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, CRM_Core_DAO::$_nullArray);
     $this->assertNotEmpty($optionValue['values'][$optionValue['id']]['value']);
     return $optionValue['values'][$optionValue['id']]['value'];
-  }
-
-  /**
-   * @param array $params
-   * @param $context
-   */
-  public function _checkFinancialRecords($params, $context) {
-    $entityParams = array(
-      'entity_id' => $params['id'],
-      'entity_table' => 'civicrm_contribution',
-    );
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $params['id']));
-    $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
-    if ($context == 'pending') {
-      $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
-      $this->assertNull($trxn, 'No Trxn to be created until IPN callback');
-      return;
-    }
-    $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
-    $trxnParams = array(
-      'id' => $trxn['financial_trxn_id'],
-    );
-    if ($context != 'online' && $context != 'payLater') {
-      $compareParams = array(
-        'to_financial_account_id' => 6,
-        'total_amount' => 100,
-        'status_id' => 1,
-      );
-    }
-    if ($context == 'feeAmount') {
-      $compareParams['fee_amount'] = 50;
-    }
-    elseif ($context == 'online') {
-      $compareParams = array(
-        'to_financial_account_id' => 12,
-        'total_amount' => 100,
-        'status_id' => 1,
-      );
-    }
-    elseif ($context == 'payLater') {
-      $compareParams = array(
-        'to_financial_account_id' => 7,
-        'total_amount' => 100,
-        'status_id' => 2,
-      );
-    }
-    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
-    $entityParams = array(
-      'financial_trxn_id' => $trxn['financial_trxn_id'],
-      'entity_table' => 'civicrm_financial_item',
-    );
-    $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
-    $fitemParams = array(
-      'id' => $entityTrxn['entity_id'],
-    );
-    $compareParams = array(
-      'amount' => 100,
-      'status_id' => 1,
-      'financial_account_id' => 1,
-    );
-    if ($context == 'payLater') {
-      $compareParams = array(
-        'amount' => 100,
-        'status_id' => 3,
-        'financial_account_id' => 1,
-      );
-    }
-    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
-    if ($context == 'feeAmount') {
-      $maxParams = array(
-        'entity_id' => $params['id'],
-        'entity_table' => 'civicrm_contribution',
-      );
-      $maxTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($maxParams, TRUE));
-      $trxnParams = array(
-        'id' => $maxTrxn['financial_trxn_id'],
-      );
-      $compareParams = array(
-        'to_financial_account_id' => 5,
-        'from_financial_account_id' => 6,
-        'total_amount' => 50,
-        'status_id' => 1,
-      );
-      $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['id'], 'DESC');
-      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
-      $fitemParams = array(
-        'entity_id' => $trxnId['financialTrxnId'],
-        'entity_table' => 'civicrm_financial_trxn',
-      );
-      $compareParams = array(
-        'amount' => 50,
-        'status_id' => 1,
-        'financial_account_id' => 5,
-      );
-      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
-    }
   }
 
   /**

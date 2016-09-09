@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/Contact.php';
-
 /**
  *  Include dataProvider for tests
  * @group headless
@@ -178,7 +176,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       'contact_sub_type' => 1,
       'sort_name' => 1,
     );
-    $expectedSQL = "SELECT contact_a.id as contact_id, contact_a.contact_type  as `contact_type`, contact_a.contact_sub_type  as `contact_sub_type`, contact_a.sort_name  as `sort_name`, civicrm_address.id as address_id, civicrm_address.city as `city`  FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) WHERE  (  ( LOWER(civicrm_address.city) = 'cool city' )  )  AND (contact_a.is_deleted = 0)    ORDER BY contact_a.sort_name asc, contact_a.id ";
+    $expectedSQL = "SELECT contact_a.id as contact_id, contact_a.contact_type  as `contact_type`, contact_a.contact_sub_type  as `contact_sub_type`, contact_a.sort_name  as `sort_name`, civicrm_address.id as address_id, civicrm_address.city as `city`  FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) WHERE  (  ( LOWER(civicrm_address.city) = 'cool city' )  )  AND (contact_a.is_deleted = 0)    ORDER BY `contact_a`.`sort_name` asc, `contact_a`.`id` ";
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
       $this->assertEquals($expectedSQL, $queryObj->searchQuery(0, 0, NULL,
@@ -275,6 +273,46 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
     $this->assertEquals(1, $result->N);
 
+  }
+
+  /**
+   * Test the group contact clause does not contain an OR.
+   *
+   * The search should return 3 contacts - 2 households in the smart group of
+   * Contact Type = Household and one Individual hard-added to it. The
+   * Household that meets both criteria should be returned once.
+   */
+  public function testGroupClause() {
+    $this->householdCreate();
+    $householdID = $this->householdCreate();
+    $individualID = $this->individualCreate();
+    $groupID = $this->smartGroupCreate();
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $individualID, 'status' => 'Added'));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $householdID, 'status' => 'Added'));
+
+    // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
+    CRM_Contact_BAO_GroupContactCache::remove($groupID, FALSE);
+
+    $sql = CRM_Contact_BAO_Query::getQuery(
+      array(array('group', 'IN', array($groupID), 0, 0)),
+      array('contact_id')
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->assertEquals(3, $dao->N);
+    $this->assertFalse(strstr($sql, ' OR '));
+
+    $sql = CRM_Contact_BAO_Query::getQuery(
+      array(array('group', 'IN', array($groupID), 0, 0)),
+      array('contact_id' => 1, 'group' => 1)
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->assertEquals(3, $dao->N);
+    $this->assertFalse(strstr($sql, ' OR '), 'Query does not include or');
+    while ($dao->fetch()) {
+      $this->assertTrue(($dao->groups == $groupID || $dao->groups == ',' . $groupID), $dao->groups . ' includes ' . $groupID);
+    }
   }
 
 }

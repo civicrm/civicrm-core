@@ -117,7 +117,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
       $this->selectFrame("xpath=//iframe[@id='{$fieldName}_ifr']");
     }
 
-    $this->verifyText('//html/body', preg_quote("{$signature}"));
+    $this->assertElementContainsText("//html/body", "$signature");
     $this->selectFrame('relative=top');
   }
 

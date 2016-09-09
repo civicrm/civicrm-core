@@ -33,7 +33,6 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    require_once 'CRM/Queue/Service.php';
     $this->queueService = CRM_Queue_Service::singleton(TRUE);
     $this->queue = $this->queueService->create(array(
       'type' => 'Sql',

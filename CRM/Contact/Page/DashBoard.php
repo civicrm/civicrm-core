@@ -44,16 +44,11 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $resources = CRM_Core_Resources::singleton();
     $resources->addScriptFile('civicrm', 'js/jquery/jquery.dashboard.js', 0, 'html-header', FALSE);
     $resources->addStyleFile('civicrm', 'css/dashboard.css');
-
-    $resetCache = CRM_Utils_Request::retrieve('resetCache', 'Positive', CRM_Core_DAO::$_nullObject);
+    $this->assign('contactDashlets', CRM_Core_BAO_Dashboard::getContactDashletsForJS());
 
     CRM_Utils_System::setTitle(ts('CiviCRM Home'));
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
-
-    if ($resetCache) {
-      CRM_Core_BAO_Dashboard::resetDashletCache($contactID);
-    }
 
     // call hook to get html from other modules
     // ignored but needed to prevent warnings

@@ -54,6 +54,9 @@
       {if $entityID}
         dataUrl += '&entityID=' + '{$entityID}';
       {/if}
+      {if $qfKey}
+        dataUrl += '&qf=' + '{$qfKey}';
+      {/if}
       {literal}
 
       if (!cgCount) {
@@ -80,7 +83,7 @@
         fname += subName;
       }
 
-      CRM.loadPage(dataUrl, {target: fname});
+      return CRM.loadPage(dataUrl, {target: fname});
     };
   })(CRM.$);
 </script>

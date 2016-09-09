@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviCaseTestCase.php';
-
 /**
  * Class api_v3_CaseTypeTest
  * @group headless

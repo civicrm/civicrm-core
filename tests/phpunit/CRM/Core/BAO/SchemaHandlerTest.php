@@ -122,4 +122,54 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('hash')));
   }
 
+  /**
+   * @return array
+   */
+  public function columnTests() {
+    $columns = array();
+    $columns[] = array('civicrm_contribution', 'total_amount');
+    $columns[] = array('civicrm_contact', 'first_name');
+    $columns[] = array('civicrm_contact', 'xxxx');
+    return $columns;
+  }
+
+  /**
+   * @param $tableName
+   * @param $columnName
+   *
+   * @dataProvider columnTests
+   */
+  public function testCheckIfColumnExists($tableName, $columnName) {
+    if ($columnName == 'xxxx') {
+      $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $columnName));
+    }
+    else {
+      $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $columnName));
+    }
+  }
+
+  /**
+   * @return array
+   */
+  public function foreignKeyTests() {
+    $keys = array();
+    $keys[] = array('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id');
+    $keys[] = array('civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_id');
+    return $keys;
+  }
+
+  /**
+   * Test to see if we can drop foreign key
+   *
+   * @dataProvider foreignKeyTests
+   */
+  public function testSafeDropForeignKey($tableName, $key) {
+    if ($key == 'FK_civicrm_mailing_recipients_id') {
+      $this->assertFalse(CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', $key));
+    }
+    else {
+      $this->assertTrue(CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', $key));
+    }
+  }
+
 }

@@ -62,6 +62,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'fixed_period_start_day' => '301',
       // Ie. 11 Nov.
       'fixed_period_rollover_day' => '1111',
+      'name' => 'Another one',
     ));
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
 
@@ -129,6 +130,37 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   public function testMembershipDeleteWithInvalidMembershipId() {
     $membershipId = 'membership';
     $this->callAPIFailure('membership', 'delete', $membershipId);
+  }
+
+  /**
+   * Test membership deletion and with the preserve contribution param.
+   */
+  public function testMembershipDeletePreserveContribution() {
+    $membershipID = $this->contactMembershipCreate($this->_params); //DELETE
+    $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID); //DELETE
+    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', array(
+      'sequential' => 1,
+      'financial_type_id' => "Member Dues",
+      'total_amount' => 100,
+      'contact_id' => $this->_params['contact_id'],
+    ));
+    $membershipPaymentCreate = $this->callAPISuccess('MembershipPayment', 'create', array(
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['values'][0]['id'],
+      'membership_id' => $membershipID,
+    ));
+    $memParams = array(
+      'id' => $membershipID,
+      'preserve_contribution' => 1,
+    );
+    $contribParams = array(
+      'id' => $ContributionCreate['values'][0]['id'],
+    );
+    $this->callAPIAndDocument('membership', 'delete', $memParams, __FUNCTION__, __FILE__);
+    $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
+    $this->assertDBRowExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
+    $this->callAPISuccess('Contribution', 'delete', $contribParams);
+    $this->assertDBRowNotExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
   }
 
   /**
@@ -531,7 +563,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $OrganizationMembershipID,
       'max_related' => 3,
     );
-    $this->contactMembershipCreate($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
     // Check that the employee inherited the membership
     $params = array(
@@ -1398,7 +1430,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testGetOptionsMembershipTypeID() {
     $options = $this->callAPISuccess('Membership', 'getoptions', array('field' => 'membership_type_id'));
-    $this->assertEquals('General', array_pop($options['values']));
+    $this->assertEquals('Another one', array_pop($options['values']));
     $this->assertEquals('General', array_pop($options['values']));
     $this->assertEquals(NULL, array_pop($options['values']));
   }

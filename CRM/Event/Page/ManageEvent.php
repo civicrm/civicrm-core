@@ -554,7 +554,7 @@ SELECT count(id)
    SELECT DISTINCT UPPER(LEFT(title, 1)) as sort_name
      FROM civicrm_event
     WHERE $whereClause
- ORDER BY LEFT(title, 1)
+ ORDER BY UPPER(LEFT(title, 1))
 ";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 

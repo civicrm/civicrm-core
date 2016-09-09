@@ -46,11 +46,21 @@ class CRM_Group_Page_AJAX {
       $params['page'] = 1;
       $params['rp'] = 0;
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-
-      CRM_Utils_JSON::output($groups);
     }
     else {
+      $requiredParams = array();
+      $optionalParams = array(
+        'title' => 'String',
+        'created_by' => 'String',
+        'group_type' => 'String',
+        'visibility' => 'String',
+        'status' => 'Integer',
+        'parentsOnly' => 'Integer',
+        'showOrgInfo' => 'Boolean',
+        // Ignore 'parent_id' as that case is handled above
+      );
       $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+      $params += CRM_Core_Page_AJAX::validateParams($requiredParams, $optionalParams);
 
       // get group list
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
@@ -66,9 +76,13 @@ class CRM_Group_Page_AJAX {
           $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
         }
       }
-
-      CRM_Utils_JSON::output($groups);
     }
+
+    if (!empty($_GET['is_unit_test'])) {
+      return $groups;
+    }
+
+    CRM_Utils_JSON::output($groups);
   }
 
 }

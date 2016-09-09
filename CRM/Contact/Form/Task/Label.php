@@ -169,7 +169,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $locName = $locType[$fv['location_type_id']];
       $location = array('location' => array("{$locName}" => $address));
       $returnProperties = array_merge($returnProperties, $location);
-      $params[] = array('location_type', '=', array($fv['location_type_id'] => 1), 0, 0);
+      $params[] = array('location_type', '=', array(1 => $fv['location_type_id']), 0, 0);
     }
     else {
       $returnProperties = array_merge($returnProperties, $address);

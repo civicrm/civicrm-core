@@ -75,12 +75,20 @@
     };
 
     $scope.register = function(appMeta) {
-      var reg = crmApi('Cxn', 'register', {app_guid: appMeta.appId}).then($scope.refreshCxns);
+      var reg = crmApi('Cxn', 'register', {app_guid: appMeta.appId}).then($scope.refreshCxns).then(function() {
+        if (appMeta.links.welcome) {
+          return $scope.openLink(appMeta, 'welcome', {title: ts('%1: Welcome (External)', {1: appMeta.title})});
+        }
+      });
       return block(crmStatus({start: ts('Connecting...'), success: ts('Connected')}, reg));
     };
 
     $scope.reregister = function(appMeta) {
-      var reg = crmApi('Cxn', 'register', {app_guid: appMeta.appId}).then($scope.refreshCxns);
+      var reg = crmApi('Cxn', 'register', {app_guid: appMeta.appId}).then($scope.refreshCxns).then(function() {
+        if (appMeta.links.welcome) {
+          return $scope.openLink(appMeta, 'welcome', {title: ts('%1: Welcome (External)', {1: appMeta.title})});
+        }
+      });
       return block(crmStatus({start: ts('Reconnecting...'), success: ts('Reconnected')}, reg));
     };
 

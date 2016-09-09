@@ -1129,7 +1129,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     if (empty($params['contact_type'])) {
       $params['contact_type'] = 'Individual';
     }
-    $customFields = CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, FALSE, $csType);
+
+    // get array of subtypes - CRM-18708
+    if (in_array($csType, array('Individual', 'Organization', 'Household'))) {
+      $csType = self::getSubtypes($params['contact_type']);
+    }
+
+    if (is_array($csType)) {
+      // fetch custom fields for every subtype and add it to $customFields array
+      // CRM-18708
+      $customFields = array();
+      foreach ($csType as $cType) {
+        $customFields += CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, FALSE, $cType);
+      }
+    }
+    else {
+      $customFields = CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, FALSE, $csType);
+    }
 
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
     $customFields = $customFields + $addressCustomFields;
@@ -2137,6 +2153,24 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
 
     return $allowToCreate;
+  }
+
+  /**
+   * get subtypes given the contact type
+   *
+   * @param string $contactType
+   * @return array $subTypes
+   */
+  public static function getSubtypes($contactType) {
+    $subTypes = array();
+    $types = CRM_Contact_BAO_ContactType::subTypeInfo($contactType);
+
+    if (count($types) > 0) {
+      foreach ($types as $type) {
+        $subTypes[] = $type['name'];
+      }
+    }
+    return $subTypes;
   }
 
   /**

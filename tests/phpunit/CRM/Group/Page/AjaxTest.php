@@ -3,7 +3,6 @@
 /**
  * Class CRM_Group_Page_AjaxTest
  * @group headless
- * @group ornery
  */
 class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   /**
@@ -79,6 +78,30 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     CRM_Contact_BAO_Group::getPermissionClause(TRUE);
     global $_REQUEST;
     $_REQUEST = $this->_params;
+  }
+
+  /**
+   * CRM-18528 - Retrieve groups with filter
+   */
+  public function testGroupListWithFilter() {
+    $this->setPermissionAndRequest(array('view all contacts', 'edit groups'));
+
+    $_GET = $this->_params;
+    $obj = new CRM_Group_Page_AJAX();
+
+    //filter with title
+    $_GET['title'] = "not-me-active";
+    $groups = $obj->getGroupList();
+    $this->assertEquals(1, $groups['recordsTotal']);
+    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
+    unset($_GET['title']);
+
+    // check on status
+    $_GET['status'] = 2;
+    $groups = $obj->getGroupList();
+    foreach ($groups['data'] as $key => $val) {
+      $this->assertEquals('crm-entity disabled', $val['DT_RowClass']);
+    }
   }
 
   /**

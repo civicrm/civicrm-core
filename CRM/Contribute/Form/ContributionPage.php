@@ -293,9 +293,26 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         'max_reminders',
         'initial_reminder_day',
         'additional_reminder_day',
+        'pledge_start_date',
+        'is_pledge_start_date_visible',
+        'is_pledge_start_date_editable',
       );
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
+        if ($key == 'pledge_start_date' && CRM_Utils_Array::value($key, $pledgeBlockDefaults)) {
+          $defaultPledgeDate = (array) json_decode($pledgeBlockDefaults['pledge_start_date']);
+          $pledgeDateFields = array(
+            'pledge_calendar_date' => 'calendar_date',
+            'pledge_calendar_month' => 'calendar_month',
+          );
+          $defaults['pledge_default_toggle'] = key($defaultPledgeDate);
+          foreach ($pledgeDateFields as $key => $value) {
+            if (array_key_exists($value, $defaultPledgeDate)) {
+              $defaults[$key] = reset($defaultPledgeDate);
+              $this->assign($key, reset($defaultPledgeDate));
+            }
+          }
+        }
       }
       if (!empty($pledgeBlockDefaults['pledge_frequency_unit'])) {
         $defaults['pledge_frequency_unit'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,

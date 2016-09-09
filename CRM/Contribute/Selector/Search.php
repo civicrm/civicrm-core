@@ -418,6 +418,12 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
 
       if ($result->is_pay_later && CRM_Utils_Array::value('contribution_status_name', $row) == 'Pending') {
         $row['contribution_status'] .= ' (' . ts('Pay Later') . ')';
+        $links[CRM_Core_Action::ADD] = array(
+          'name' => ts('Pay with Credit Card'),
+          'url' => 'civicrm/contact/view/contribution',
+          'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%&mode=live',
+          'title' => ts('Pay with Credit Card'),
+        );
       }
       elseif (CRM_Utils_Array::value('contribution_status_name', $row) == 'Pending') {
         $row['contribution_status'] .= ' (' . ts('Incomplete Transaction') . ')';

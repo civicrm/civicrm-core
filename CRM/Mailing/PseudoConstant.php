@@ -196,7 +196,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
                 FROM    civicrm_mailing_component
                 WHERE   is_active = 1
                 AND     is_default = 1
-                GROUP BY component_type";
+                GROUP BY component_type, id";
 
       $dao = CRM_Core_DAO::executeQuery($queryDefaultComponents);
 

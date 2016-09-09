@@ -227,7 +227,7 @@ class CRM_Activity_Page_AJAX {
         $contactType = $contactType == 'Contact' ? '' : $contactType;
         switch ($row['source']) {
           case 'caseRel':
-            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<i class="crm-i fa-pencil"></i>' .
               '</a>' .
               '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
@@ -396,6 +396,8 @@ class CRM_Activity_Page_AJAX {
 
     $optionalParameters = array(
       'context' => 'String',
+      'activity_type_id' => 'Integer',
+      'activity_type_exclude_id' => 'Integer',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
@@ -408,6 +410,10 @@ class CRM_Activity_Page_AJAX {
 
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
+
+    if (!empty($_GET['is_unit_test'])) {
+      return $activities;
+    }
 
     foreach ($activities['data'] as $key => $value) {
       // Check if recurring activity.

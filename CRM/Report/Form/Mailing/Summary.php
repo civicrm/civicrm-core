@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
@@ -50,8 +48,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   public $campaignEnabled = FALSE;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array();
@@ -153,7 +150,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'title' => ts('Delivered'),
         ),
         'accepted_rate' => array(
-          'title' => 'Accepted Rate',
+          'title' => ts('Accepted Rate'),
           'statistics' => array(
             'calc' => 'PERCENTAGE',
             'top' => 'civicrm_mailing_event_delivered.delivered_count',
@@ -171,7 +168,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'title' => ts('Bounce'),
         ),
         'bounce_rate' => array(
-          'title' => 'Bounce Rate',
+          'title' => ts('Bounce Rate'),
           'statistics' => array(
             'calc' => 'PERCENTAGE',
             'top' => 'civicrm_mailing_event_bounce.bounce_count',
@@ -191,7 +188,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'title' => ts('Unique Opens'),
         ),
         'unique_open_rate' => array(
-          'title' => 'Unique Open Rate',
+          'title' => ts('Unique Open Rate'),
           'statistics' => array(
             'calc' => 'PERCENTAGE',
             'top' => 'civicrm_mailing_event_opened.unique_open_count',
@@ -203,7 +200,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'title' => ts('Total Opens'),
         ),
         'open_rate' => array(
-          'title' => 'Total Open Rate',
+          'title' => ts('Total Open Rate'),
           'statistics' => array(
             'calc' => 'PERCENTAGE',
             'top' => 'civicrm_mailing_event_opened.open_count',
@@ -221,7 +218,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'title' => ts('Clicks'),
         ),
         'CTR' => array(
-          'title' => 'Click through Rate',
+          'title' => ts('Click through Rate'),
           'default' => 0,
           'statistics' => array(
             'calc' => 'PERCENTAGE',
@@ -230,7 +227,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           ),
         ),
         'CTO' => array(
-          'title' => 'Click to Open Rate',
+          'title' => ts('Click to Open Rate'),
           'default' => 0,
           'statistics' => array(
             'calc' => 'PERCENTAGE',
@@ -255,6 +252,17 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'title' => ts('Opt-outs'),
           'alias' => 'mailing_event_optout_civireport',
           'dbAlias' => 'mailing_event_optout_civireport.event_queue_id',
+        ),
+      ),
+    );
+    $this->_columns['civicrm_mailing_group'] = array(
+      'dao' => 'CRM_Mailing_DAO_MailingGroup',
+      'filters' => array(
+        'entity_id' => array(
+          'title' => ts('Groups Included in Mailing'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'type' => CRM_Utils_Type::T_INT,
+          'options' => CRM_Core_PseudoConstant::group(),
         ),
       ),
     );
@@ -351,6 +359,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       }
     }
 
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
     //print_r($this->_select);
   }
@@ -377,6 +386,11 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       LEFT JOIN civicrm_mailing_event_unsubscribe mailing_event_optout_civireport
         ON mailing_event_optout_civireport.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id AND mailing_event_optout_civireport.org_unsubscribe = 1";
 
+    if ($this->isTableSelected('civicrm_mailing_group')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_mailing_group {$this->_aliases['civicrm_mailing_group']}
+    ON {$this->_aliases['civicrm_mailing_group']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id";
+    }
     if ($this->campaignEnabled) {
       $this->_from .= "
         LEFT JOIN civicrm_campaign {$this->_aliases['civicrm_campaign']}
@@ -442,7 +456,11 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_mailing']}.id";
+    $groupBy = array(
+      "{$this->_aliases['civicrm_mailing']}.id",
+      "{$this->_aliases['civicrm_mailing_job']}.end_date",
+    );
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {
@@ -559,26 +577,26 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     foreach ($rows as $row) {
       $chartInfo['values'][$row['civicrm_mailing_name']] = array();
       if ($plotCount) {
-        foreach ($criteria['count'] as $criteria => $label) {
-          if (isset($row[$criteria])) {
-            $chartInfo['values'][$row['civicrm_mailing_name']][$label] = $row[$criteria];
+        foreach ($criteria['count'] as $criteriaName => $label) {
+          if (isset($row[$criteriaName])) {
+            $chartInfo['values'][$row['civicrm_mailing_name']][$label] = $row[$criteriaName];
             $chartInfo['tip'][$label] = "{$label} #val#";
             $plotRate = FALSE;
           }
-          elseif (isset($criteria['count'][$criteria])) {
-            unset($criteria['count'][$criteria]);
+          elseif (isset($criteria['count'][$criteriaName])) {
+            unset($criteria['count'][$criteriaName]);
           }
         }
       }
       if ($plotRate) {
-        foreach ($criteria['rate'] as $criteria => $label) {
+        foreach ($criteria['rate'] as $criteriaName => $label) {
           if (isset($row[$criteria])) {
-            $chartInfo['values'][$row['civicrm_mailing_name']][$label] = $row[$criteria];
+            $chartInfo['values'][$row['civicrm_mailing_name']][$label] = $row[$criteriaName];
             $chartInfo['tip'][$label] = "{$label} #val#";
             $plotCount = FALSE;
           }
-          elseif (isset($criteria['rate'][$criteria])) {
-            unset($criteria['rate'][$criteria]);
+          elseif (isset($criteria['rate'][$criteriaName])) {
+            unset($criteria['rate'][$criteriaName]);
           }
         }
       }

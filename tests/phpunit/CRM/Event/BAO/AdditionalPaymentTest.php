@@ -33,8 +33,9 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->_contactId = Contact::createIndividual();
-    $this->_eventId = Event::create($this->_contactId);
+    $this->_contactId = $this->individualCreate();
+    $event = $this->eventCreate();
+    $this->_eventId = $event['id'];
   }
 
   public function tearDown() {

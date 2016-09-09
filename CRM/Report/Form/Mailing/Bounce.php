@@ -52,6 +52,20 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   );
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array();
@@ -268,6 +282,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       $this->_columnHeaders["civicrm_mailing_bounce_count"]['title'] = ts('Bounce Count');
     }
 
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -358,11 +373,12 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
 
   public function groupBy() {
     if (!empty($this->_params['charts'])) {
-      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_mailing']}.id";
+      $groupBy = "{$this->_aliases['civicrm_mailing']}.id";
     }
     else {
-      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_mailing_event_bounce']}.id";
+      $groupBy = "{$this->_aliases['civicrm_mailing_event_bounce']}.id";
     }
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function postProcess() {
@@ -410,7 +426,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
    */
   public function bounce_type() {
 
-    $data = array('' => '--Please Select--');
+    $data = array('' => ts('--Please Select--'));
 
     $bounce_type = new CRM_Mailing_DAO_BounceType();
     $query = "SELECT name FROM civicrm_mailing_bounce_type";
