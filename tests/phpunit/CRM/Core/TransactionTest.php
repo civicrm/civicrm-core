@@ -362,16 +362,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     if ($insert == 'sql-insert') {
       $r = CRM_Core_DAO::executeQuery("INSERT INTO civicrm_contact(first_name,last_name) VALUES ('ff', 'll')");
-      $mysqlFunction = strstr(CRM_Core_Config::singleton()->dsn, 'mysqli') ? 'mysqli_insert_id' : 'mysql_insert_id';
-      if ($mysqlFunction == 'mysql_insert_id' && phpversion() >= 7) {
-        CRM_Core_Exception('Current DSN in compatible with the PHP version, need to update to use mysqli');
-      }
-      if ($mysqlFunction == 'mysqli_insert_id') {
-        $cid = mysqli_insert_id($r->getConnection()->connection);
-      }
-      else {
-        $cid = mysql_insert_id();
-      }
+      $cid = $r->getConnection()->lastInsertId();
     }
     elseif ($insert == 'bao-create') {
       $params = array(
