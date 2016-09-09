@@ -41,15 +41,13 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
     $optionGroups  = civicrm_api3('OptionGroup', 'get', array(
       'sequential' => 1,
       'data_type' => array('IS NOT NULL' => 1),
+      'options' => array('limit' => 0),
     ));
     if ($optionGroups['count'] > 0) {
       foreach ($optionGroups['values'] as $optionGroup) {
-        $values = civicrm_api3('OptionValue', 'get', array(
-          'sequential' => 1,
-          'option_group_id' => $optionGroup['name'],
-        ));
-        if ($values['count'] > 0) {
-          foreach ($values['values'] as $value) {
+        $values = CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroup['id']);
+        if (count($values) > 0) {
+          foreach ($values as $value) {
             $validate = CRM_Utils_Type::validate($value['value'], $optionGroup['data_type'], FALSE);
             if (!$validate) {
               $problemValues[] = array(

@@ -377,7 +377,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
 
     $dataType = self::getOptionGroupDataType($self->_gName);
-    if ($dataType) {
+    if ($dataType && $self->_gName !== 'activity_type') {
       $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
       if (!$validate) {
         CRM_Core_Session::setStatus(
@@ -396,12 +396,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @return string|null
    */
   public static function getOptionGroupDataType($optionGroupName) {
-    $optionGroup = civicrm_api3('OptionGroup', 'get', array(
-      'sequential' => 1,
-      'name' => $optionGroupName,
-    ));
+    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name');
 
-    $dataType = CRM_Core_BAO_OptionGroup::getDataType($optionGroup['id']);
+    $dataType = CRM_Core_BAO_OptionGroup::getDataType($optionGroupId);
     return $dataType;
   }
 
