@@ -46,6 +46,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('context', $context);
 
     $values = CRM_Contribute_BAO_Contribution::getValuesWithMappings($params);
+    $ccNumber = CRM_Core_BAO_FinancialTrxn::getCreditCardNumber($id);
+    if ($ccNumber) {
+      $values['credit_card_number'] = $ccNumber;
+    }
 
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::VIEW) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
