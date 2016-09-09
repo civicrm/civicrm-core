@@ -583,7 +583,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           (!$otherContactType) ||
           $value['contact_type_a'] == $otherContactType
         ) &&
-        ((in_array($value['contact_sub_type_b'], $contactSubType) ||
+        (in_array($value['contact_sub_type_b'], $contactSubType) ||
           (!$value['contact_sub_type_b'] && !$onlySubTypeRelationTypes)
         )
       ) {
