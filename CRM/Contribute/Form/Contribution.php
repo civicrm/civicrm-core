@@ -392,6 +392,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['credit_card_type'] = CRM_Core_BAO_FinancialTrxn::getCreditCardType($this->_id);
     }
 
+    if ($this->_id) {
+      $defaults['credit_card_number'] = "**** **** **** " . CRM_Core_BAO_FinancialTrxn::getCreditCardNumber($this->_id);
+    }
+
     if (!empty($defaults['is_test'])) {
       $this->assign('is_test', TRUE);
     }
@@ -660,6 +664,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $creditCardType = $this->addSelect('credit_card_type',
         array('entity' => 'financialTrxn', 'label' => ts('Credit Card Type'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
       );
+
+      $creditCardNumber = $this->addElement('text', 'credit_card_number', ts('Credit Card Number'));
+      $creditCardNumber->freeze();
     }
     if ($this->_id) {
       $creditCardType->freeze();
@@ -1294,6 +1301,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'is_transactional' => FALSE,
               'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
               'credit_card_type' => CRM_Utils_Array::value(CRM_Utils_Array::value('credit_card_type', $result), $creditCardType),
+              'credit_card_number' => CRM_Utils_Array::value('credit_card_number', $paymentParams),
             ));
             // This has now been set to 1 in the DB - declare it here also
             $contribution->contribution_status_id = 1;
@@ -1664,6 +1672,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'source',
         'check_number',
         'credit_card_type',
+        'credit_card_number',
       );
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
