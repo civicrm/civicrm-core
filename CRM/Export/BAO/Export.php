@@ -713,7 +713,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       if (strpos('contact_a.id', $order) === FALSE) {
         $order .= ", contact_a.id";
       }
-      
+
       list($field, $dir) = explode(' ', $order, 2);
       $field = trim($field);
       if (!empty($returnProperties[$field])) {
