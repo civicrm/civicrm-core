@@ -26,64 +26,23 @@
  */
 
 /**
- * This api exposes CiviCRM p_c_p records.
+ * This api exposes CiviCRM PCP records.
  *
- * @note p_c_p component must be enabled.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Create/update p_c_p.
- *
- * This API is used to create new p_c_p or update any of the existing
- * In case of updating existing p_c_p, id of that particular p_c_p must
- * be in $params array.
- *
- * @param array $params
- *
- * @return array
- */
-function civicrm_api3_p_c_p_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'p_c_p');
-}
-
-/**
- * Adjust Metadata for Create action.
- *
- * The metadata is used for setting defaults, documentation & validation.
- *
- * @param array $params
- *   Array of parameters determined by getfields.
- */
-function _civicrm_api3_p_c_p_create_spec(&$params) {
-  $params['title']['api.required'] = 1;
-}
-
-/**
- * Returns array of p_c_ps matching a set of one or more properties.
+ * Returns array of pcps matching a set of one or more properties.
  *
  * @param array $params
  *   Array per getfields
  *
  * @return array
- *   Array of matching p_c_ps
+ *   Array of matching pcps
  */
 function civicrm_api3_p_c_p_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'p_c_p');
+
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'PCP');
 }
 
-/**
- * Delete an existing p_c_p.
- *
- * This method is used to delete any existing p_c_p.
- * Id of the p_c_p to be deleted is required field in $params array
- *
- * @param array $params
- *   array containing id of the group to be deleted
- *
- * @return array
- */
-function civicrm_api3_p_c_p_delete($params) {
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
