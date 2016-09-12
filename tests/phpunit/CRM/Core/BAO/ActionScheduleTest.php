@@ -1003,9 +1003,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
 
     $this->assertTrue(is_numeric($membership->id));
-    $result = $this->callAPISuccess('Email', 'create', array(
-      'contact_id' => $membership->contact_id,
-      'email' => 'member@example.com',
+    $this->callAPISuccess('Email', 'create', array(
+        'contact_id' => $membership->contact_id,
+        'email' => 'member@example.com',
     ));
 
     $result = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
@@ -1051,6 +1051,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'time' => '2012-04-12 01:00:00',
         'recipients' => array(array('member@example.com')),
       ),
+    ));
+    $this->assertCronRuns(array(
+        array(
+          // It should not re-send on the same day
+          'time' => '2012-04-12 01:00:00',
+          'recipients' => array(),
+        ),
     ));
   }
 
