@@ -185,8 +185,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
 
     // Enforce unique gender ids - CRM-19346
-    if ($this->_gName == 'gender')
-    {
+    if ($this->_gName == 'gender') {
       $this->addRule('value',
         ts('This Value already exists in the database for this option group. Please select a different Value.'),
         'optionExists',
