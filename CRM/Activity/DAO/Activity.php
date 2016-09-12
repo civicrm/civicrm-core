@@ -234,13 +234,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'dataPattern' => '',
           'export' => true,
         ) ,
-        'activity_free_text_search' => array(
-            'name' => 'free_text_search',
-            'type' => CRM_Utils_Type::T_STRING,
-            'title' => ts('Activity Free Text Search') ,
-            'description' => 'Activity free text search',
-            'required' => false,
-        ) ,
         'source_record_id' => array(
           'name' => 'source_record_id',
           'type' => CRM_Utils_Type::T_INT,
