@@ -71,7 +71,6 @@
       var table = CRM.$('table#dedupeExceptions').DataTable();
       // apply the search
       $('#searchOptions input').on( 'keyup change', function () {
-        console.log(this.value);
         table
           .column($(this).attr('search-column'))
           .search(this.value)
