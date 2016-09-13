@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a0837dd64bed6ca00c62e373ed2c365e",
+    "hash": "647671f50570fcf03087cf4719750895",
     "content-hash": "3475b3f4ae0936e68714b9f94d44f709",
     "packages": [
         {
@@ -169,12 +169,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Validate_Finance_CreditCard.git",
-                "reference": "c3689983257d73ac70ec7e355fadf895ba40d4ed"
+                "reference": "a74da657d7a6f24b7e669294b32812e9a947519f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Validate_Finance_CreditCard/zipball/c3689983257d73ac70ec7e355fadf895ba40d4ed",
-                "reference": "c3689983257d73ac70ec7e355fadf895ba40d4ed",
+                "url": "https://api.github.com/repos/pear/Validate_Finance_CreditCard/zipball/a74da657d7a6f24b7e669294b32812e9a947519f",
+                "reference": "a74da657d7a6f24b7e669294b32812e9a947519f",
                 "shasum": ""
             },
             "require": {
@@ -205,7 +205,7 @@
                 }
             ],
             "description": "Validation class for credit cards.",
-            "time": "2016-09-08 09:27:24"
+            "time": "2016-09-12 08:01:21"
         },
         {
             "name": "phenx/php-font-lib",

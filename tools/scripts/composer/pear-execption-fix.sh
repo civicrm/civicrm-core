@@ -16,8 +16,6 @@ function simple_replace() {
 
 
 # add in class_exists test as per CRM-8921.
-simple_replace vendor/pear/pear_exception/PEAR/Exception.php '^\<\?php^' '<?php
-  // CRM-8921
-  if ( class_exists( "'"PEAR_Exception"'" ) ) {
-     return; 
-  }' /home/seamus/test.php
+if ! grep -q 'CRM-8921' vendor/pear/pear_exception/PEAR/Exception.php; then
+simple_replace vendor/pear/pear_exception/PEAR/Exception.php '^\<\?php^' '<?php if (class_exists("'"PEAR_Exception"'")) return; /* CRM-8921 */'
+fi
