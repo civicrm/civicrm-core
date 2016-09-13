@@ -284,7 +284,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // data cleanup only: all verifications on number of related memberships are done upstream in:
     // CRM_Member_BAO_Membership::createRelatedMemberships()
     // CRM_Contact_BAO_Relationship::relatedMemberships()
-    if (isset($params['owner_membership_id'])) {
+    if (!empty($params['owner_membership_id'])) {
       unset($params['max_related']);
     }
     else {
