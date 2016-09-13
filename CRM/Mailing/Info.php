@@ -136,6 +136,17 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'check_permissions' => TRUE,
       'return' => array('title', 'visibility', 'group_type', 'is_hidden'),
     ));
+    
+    // CRM-19311 - Add own hidden smart groups to list of groups
+    $hiddenSearchGroupNames = civicrm_api3('Group', 'get', $params + array(
+      'is_active' => 1,
+      'is_hidden' => 1,
+      'saved_search_id' => array('IS NOT NULL' => 1),
+      'created_id' => $contactID,
+      'check_permissions' => FALSE,
+      'return' => array('title', 'visibility', 'group_type', 'is_hidden'),
+    ));
+
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + array(
       'is_active' => 1,
       'return' => array('name', 'component_type', 'is_default', 'body_html', 'body_text'),
@@ -166,7 +177,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'crmMailing' => array(
           'civiMails' => $civiMails['values'],
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
-          'groupNames' => $groupNames['values'],
+          'groupNames' => array_merge($groupNames['values'], $hiddenSearchGroupNames['values']),
           'headerfooterList' => $headerfooterList['values'],
           'mesTemplate' => $mesTemplate['values'],
           'emailAdd' => $emailAdd['values'],
