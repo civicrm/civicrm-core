@@ -84,7 +84,7 @@
               {foreach from=$headers key=recId item=head}
                 <th>{ts}{$head}{/ts}</th>
               {/foreach}
-              <th></th>
+              
               {foreach from=$dateFields key=fieldId item=v}
                 <th class='hiddenElement'></th>
               {/foreach}
