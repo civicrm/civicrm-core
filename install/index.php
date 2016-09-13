@@ -118,13 +118,18 @@ else {
 }
 
 if ($installType == 'wordpress') {
-  //WP Database Data
+  // Load WP database config
+  if (isset($_POST['mysql'])) {
+    $databaseConfig = $_POST['mysql'];
+  }
+  else {
   $databaseConfig = array(
     "server"   => DB_HOST,
     "username" => DB_USER,
     "password" => DB_PASSWORD,
     "database" => DB_NAME,
   );
+  }
 }
 
 if ($installType == 'drupal') {
