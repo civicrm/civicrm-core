@@ -123,12 +123,12 @@ if ($installType == 'wordpress') {
     $databaseConfig = $_POST['mysql'];
   }
   else {
-  $databaseConfig = array(
-    "server"   => DB_HOST,
-    "username" => DB_USER,
-    "password" => DB_PASSWORD,
-    "database" => DB_NAME,
-  );
+    $databaseConfig = array(
+      "server"   => DB_HOST,
+      "username" => DB_USER,
+      "password" => DB_PASSWORD,
+      "database" => DB_NAME,
+    );
   }
 }
 
