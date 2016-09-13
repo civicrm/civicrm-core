@@ -312,6 +312,11 @@
     </html>
     <add>3.2</add>
   </field>
+  <index>
+    <name>index_preferred_language</name>
+    <fieldName>preferred_language</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>preferred_mail_format</name>
     <type>varchar</type>

@@ -238,6 +238,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Fill in setting "remote_profile_submissions"'), 'migrateRemoteSubmissionsSetting');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_12($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add Index to civicrm_contact.preferred_language', 'addIndexContactPreferredLanguage');
+  }
+
   /*
    * Important! All upgrade functions MUST call the 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -825,6 +835,18 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $length['civicrm_contact']['image_URL'] = 128;
     CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('image_URL')), 'index', $length);
 
+    return TRUE;
+  }
+
+  /**
+   * CRM-19350 Add index to civicrm_contact Preferred Language.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addIndexContactPreferredLanguage(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('preferred_language')));
     return TRUE;
   }
 
