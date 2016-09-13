@@ -579,19 +579,4 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'activity', $prefix, array());
     return $r;
   }
-
-  /**
-   * Returns the list of free text select fields
-   *
-   * @return array
-   */
-  static function getFreeTextFields()
-  {
-    return array(
-        '='               => ts('Is equal to'), '!=' => ts('Is not equal to'), 'CONTAINS' => ts('Contains'), 'CONTAINANYWORD' => ts('Contains any word'),
-        'CONTAINALLWORDS' => ts('Contains all words'), 'LIKE%' => ts('Start with'),
-        'NOTLIKE%'        => ('Does not Start with'), 'NOT%LIKE%' => ts('Does not contain'),
-        'LENGTH<'         => ts('Length is shorter than'), 'LENGTH>' => ts('Length is longer than'), 'REGEXP' => ts('Regular Expression')
-    );
-  }
 }

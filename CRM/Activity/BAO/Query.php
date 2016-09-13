@@ -414,7 +414,7 @@ class CRM_Activity_BAO_Query {
       array('entity' => 'activity', 'label' => ts('Activity Type(s)'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
-    $searchOptions = CRM_Activity_DAO_Activity::getFreeTextFields();
+    $searchOptions = CRM_Activity_BAO_Activity::getFreeTextFields();
 
     $form->add('select', 'activity_free_text_search', ts("Select condition"),
         $searchOptions, FALSE,
