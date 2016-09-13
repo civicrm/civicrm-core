@@ -136,7 +136,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'check_permissions' => TRUE,
       'return' => array('title', 'visibility', 'group_type', 'is_hidden'),
     ));
-    
+
     // CRM-19311 - Add own hidden smart groups to list of groups
     $hiddenSearchGroupNames = civicrm_api3('Group', 'get', $params + array(
       'is_active' => 1,
