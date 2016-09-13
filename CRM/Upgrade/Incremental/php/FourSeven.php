@@ -238,6 +238,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Fill in setting "remote_profile_submissions"'), 'migrateRemoteSubmissionsSetting');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_12($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
+  }
+
   /*
    * Important! All upgrade functions MUST call the 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -825,6 +835,27 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $length['civicrm_contact']['image_URL'] = 128;
     CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('image_URL')), 'index', $length);
 
+    return TRUE;
+  }
+
+  /**
+   * CRM-18651 Add DataType column to Option Group Table
+   * @return bool
+   */
+  public static function addDataTypeColumnToOptionGroupTable() {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_option_group', 'data_type')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_option_group` ADD COLUMN `data_type` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL comment 'Data Type of Option Group.'",
+         array(), TRUE, NULL, FALSE, FALSE);
+    }
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+    }
+
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `data_type` = 'Integer'
+      WHERE name IN ('activity_type', 'gender', 'payment_instrument', 'participant_role', 'event_type')");
     return TRUE;
   }
 
