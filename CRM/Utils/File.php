@@ -324,7 +324,7 @@ class CRM_Utils_File {
 
     // get rid of comments starting with # and --
 
-    $string = preg_replace("/^(#|--)[^\R]*$/m", "", $string);
+    $string = preg_replace("/^(#|--).*\R*/m", "", $string);
 
     $queries = preg_split('/;\s*$/m', $string);
     foreach ($queries as $query) {
