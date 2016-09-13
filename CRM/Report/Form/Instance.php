@@ -221,8 +221,7 @@ class CRM_Report_Form_Instance {
     $navigationDefaults = array();
 
     if (!isset($defaults['permission'])) {
-      $permissions = array_flip(CRM_Core_Permission::basicPermissions());
-      $defaults['permission'] = $permissions['CiviReport: access CiviReport'];
+      $defaults['permission'] = 'access CiviReport';
     }
 
     $userFrameworkResourceURL = CRM_Core_Config::singleton()->userFrameworkResourceURL;
