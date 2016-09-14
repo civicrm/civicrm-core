@@ -98,7 +98,7 @@ class SettingsBag {
    *
    * @param array $defaults
    *   Array(string $settingName => mixed $value).
-   * @return $this
+   * @return SettingsBag
    */
   public function loadDefaults($defaults) {
     $this->defaults = $defaults;
@@ -111,7 +111,7 @@ class SettingsBag {
    *
    * @param array $mandatory
    *   Array(string $settingName => mixed $value).
-   * @return $this
+   * @return SettingsBag
    */
   public function loadMandatory($mandatory) {
     $this->mandatory = $mandatory;
@@ -122,7 +122,7 @@ class SettingsBag {
   /**
    * Load all explicit settings that apply to this domain or contact.
    *
-   * @return $this
+   * @return SettingsBag
    */
   public function loadValues() {
     // Note: Don't use DAO child classes. They require fields() which require
@@ -162,7 +162,7 @@ class SettingsBag {
    *
    * @param array $settings
    *   Array(string $settingName => mixed $settingValue).
-   * @return $this
+   * @return SettingsBag
    */
   public function add(array $settings) {
     foreach ($settings as $key => $value) {
@@ -251,7 +251,7 @@ class SettingsBag {
    *
    * @param string $key
    *   The simple name of the setting.
-   * @return $this
+   * @return SettingsBag
    */
   public function revert($key) {
     // It might be better to DELETE (to avoid long-term leaks),
@@ -266,7 +266,7 @@ class SettingsBag {
    *   The simple name of the setting.
    * @param mixed $value
    *   The new, explicit value of the setting.
-   * @return $this
+   * @return SettingsBag
    */
   public function set($key, $value) {
     $this->setDb($key, $value);

@@ -88,7 +88,7 @@ class TokenProcessor {
    *   Ex: '<p>Hello {contact.name}</p>'.
    * @param string $format
    *   Ex: 'text/html'.
-   * @return $this
+   * @return TokenProcessor
    */
   public function addMessage($name, $value, $format) {
     $this->messages[$name] = array(
@@ -121,7 +121,7 @@ class TokenProcessor {
    *    - entity: string, e.g. "profile".
    *    - field: string, e.g. "viewUrl".
    *    - label: string, e.g. "Default Profile URL (View Mode)".
-   * @return $this
+   * @return TokenProcessor
    */
   public function addToken($params) {
     $key = $params['entity'] . '.' . $params['field'];
