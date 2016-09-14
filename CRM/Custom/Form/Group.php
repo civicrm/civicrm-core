@@ -530,7 +530,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   public static function getFormattedList(&$list) {
     $relName = array();
 
-    foreach ($list as $listItemKey => $itemValue) {
+    foreach ($list as $listItemKey => &$itemValue) {
       // Extract the relationship ID.
       $key = substr($listItemKey, 0, strpos($listItemKey, '_'));
       if (isset($list["{$key}_b_a"])) {
