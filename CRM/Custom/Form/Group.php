@@ -544,8 +544,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       }
       else {
         // If no '_b_a' label exists save the '_a_b' one and unset it from the list
-        $relName["{$key}"] = $list["{$key}_a_b"];
-        unset($list["{$key}_a_b"]);
+        if (isset($list["{$key}_a_b"])) {
+          $relName["{$key}"] = $list["{$key}_a_b"];
+          unset($list["{$key}_a_b"]);
+        }
       }
     }
     return $relName;
