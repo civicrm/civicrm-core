@@ -111,7 +111,7 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
         'CRM_Event_Form_Task_PDF'
       );
 
-      if (empty(CRM_Utils_Array::first($tokenDetails))) {
+      if (!CRM_Utils_Array::first($tokenDetails)) {
         continue;
       }
       $contact = CRM_Utils_Array::first(CRM_Utils_Array::first($tokenDetails));
