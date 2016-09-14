@@ -210,4 +210,55 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(array('data' => array(), 'recordsTotal' => 0, 'recordsFiltered' => 0), $result);
   }
 
+  /**
+   * Test to check contact reference field
+   */
+  public function testContactReference() {
+    //create group
+    $groupId1 = $this->groupCreate();
+    $groupId2 = $this->groupCreate(array(
+      'name' => 'Test Group 2',
+      'domain_id' => 1,
+      'title' => 'New Test Group2 Created',
+      'description' => 'New Test Group2 Created',
+      'is_active' => 1,
+      'visibility' => 'User and User Admin Only',
+    ));
+
+    $contactIds = array();
+    foreach (array($groupId1, $groupId2) as $groupId) {
+      $this->groupContactCreate($groupId);
+      $contactIds = array_merge($contactIds, CRM_Contact_BAO_Group::getGroupContacts($groupId));
+    }
+    $contactIds = array_column($contactIds, 'contact_id');
+
+    // create custom group with contact reference field
+    $customGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'select_test_group'));
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'Worker_Lookup',
+      'label' => 'Worker Lookup',
+      // limit this field to two groups created above
+      'filter' => "action=lookup&group={$groupId1},{$groupId2}",
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'ContactReference',
+      'weight' => 4,
+      'is_searchable' => 1,
+      'is_active' => 1,
+    );
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+
+    $_GET = array(
+      'id' => $customField['id'],
+      'is_unit_test' => TRUE,
+    );
+    $contactList = CRM_Contact_Page_AJAX::contactReference();
+    $contactList = array_column($contactList, 'id');
+
+    //assert each returned contact id to be present in group contact
+    foreach ($contactList as $contactId) {
+      $this->assertTrue(in_array($contactId, $contactIds));
+    }
+  }
+
 }

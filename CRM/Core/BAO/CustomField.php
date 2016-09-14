@@ -1030,6 +1030,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
         }
         if ($field->data_type == 'ContactReference') {
+          // break if contact does not have permission to access ContactReference
+          if (!CRM_Core_Permission::check('access contact reference fields')) {
+            break;
+          }
           $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] . ' ' : '') . 'crm-form-contact-reference huge';
           $attributes['data-api-entity'] = 'Contact';
           $element = $qf->add('text', $elementName, $label, $attributes, $useRequired && !$search);
