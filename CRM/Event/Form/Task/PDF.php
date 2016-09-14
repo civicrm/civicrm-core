@@ -77,7 +77,66 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    CRM_Event_Form_Task_PDFLetterCommon::postProcess($this);
+    // I think the most important thing the two lines below do, is returning
+    // $html_message. But it also takes care of saving a new template.
+    $formValues = $this->controller->exportValues($this->getName());
+
+    // This creates a dependency to CRM_Contact_Form_TAsk_PDFLetterCommon.
+    // Not sure how bad this is...
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
+
+    $skipOnHold = isset($this->skipOnHold) ? $this->skipOnHold : FALSE;
+    $skipDeceased = isset($this->skipDeceased) ? $this->skipDeceased : TRUE;
+
+    foreach ($this->_participantIds as $participantID) {
+      $participant_result = civicrm_api3('Participant', 'get', array(
+        'id' => $participantID,
+        'api.Event.getsingle' => array('id' => '$value.event_id'),
+      ));
+      $participant = CRM_Utils_Array::first($participant_result['values']);
+      $event = $participant['api.Event.getsingle'];
+
+      // get contact information
+      // Use 'getTokenDetails' so that hook_civicrm_tokenValues is called.
+      $contactId = $participant['contact_id'];
+      $tokenDetails = CRM_Utils_Token::getTokenDetails(array($contactId),
+        $returnProperties,
+        $skipOnHold,
+        $skipDeceased,
+        NULL,
+        $messageToken,
+        'CRM_Event_Form_Task_PDF'
+      );
+
+      if (empty(CRM_Utils_Array::first($tokenDetails))) {
+        continue;
+      }
+      $contact = CRM_Utils_Array::first(CRM_Utils_Array::first($tokenDetails));
+
+      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
+      $tokenHtml = CRM_Utils_Token::replaceEntityTokens('event', $event, $tokenHtml, $messageToken);
+      $tokenHtml = CRM_Utils_Token::replaceEntityTokens('participant', $participant, $tokenHtml, $messageToken);
+      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact, $categories, TRUE);
+
+      if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
+        $smarty = CRM_Core_Smarty::singleton();
+        // also add the contact tokens to the template
+        $smarty->assign_by_ref('contact', $contact);
+        $smarty->assign_by_ref('event', $event);
+        $smarty->assign_by_ref('participant', $participant);
+        $tokenHtml = $smarty->fetch("string:$tokenHtml");
+      }
+
+      $html[] = $tokenHtml;
+    }
+
+    CRM_Contact_Form_Task_PDFLetterCommon::createActivities($this, $html_message, $this->_contactIds);
+
+    CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+
+    $this->postProcessHook();
+
+    CRM_Utils_System::civiExit(1);
   }
 
   /**
