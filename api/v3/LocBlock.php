@@ -45,10 +45,20 @@
  */
 function civicrm_api3_loc_block_create($params) {
   $entities = array();
-  civicrm_api3_verify_one_mandatory($params, NULL, array('address', 'address_id', 'phone', 'phone_id', 'im', 'im_id', 'email', 'email_id'));
-  // Call the appropriate api to create entities if any are passed in the params
+  $any_mandatory = array(
+    'address',
+    'address_id',
+    'phone',
+    'phone_id',
+    'im',
+    'im_id',
+    'email',
+    'email_id'
+  );
+  civicrm_api3_verify_one_mandatory($params, NULL, $any_mandatory);
+  // Call the appropriate api to create entities if any are passed in the params.
   // This is basically chaining but in reverse - we create the sub-entities first
-  // This exists because chainging does not work in reverse, or with keys like 'email_2'
+  // because chaining does not work in reverse, or with keys like 'email_2'.
   $items = array('address', 'email', 'phone', 'im');
   foreach ($items as $item) {
     foreach (array('', '_2') as $suf) {
