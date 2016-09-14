@@ -263,7 +263,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *   Posted values of the form.
    * @param array $files
    *   List of errors to be posted back to the form.
-   * @param array $self
+   * @param \CRM_Batch_Form_Entry $self
    *   Form object.
    *
    * @return array
