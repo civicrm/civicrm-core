@@ -1009,6 +1009,24 @@ FROM   civicrm_domain
   }
 
   /**
+   * Get all the result records as mapping between columns.
+   *
+   * @param string $keyColumn
+   *   Ex: "name"
+   * @param string $valueColumn
+   *   Ex: "label"
+   * @return array
+   *   Ex: ["foo" => "The Foo Bar", "baz" => "The Baz Qux"]
+   */
+  public function fetchMap($keyColumn, $valueColumn) {
+    $result = array();
+    while ($this->fetch()) {
+      $result[$this->{$keyColumn}] = $this->{$valueColumn};
+    }
+    return $result;
+  }
+
+  /**
    * Given a DAO name, a column name and a column value, find the record and GET the value of another column in that record
    *
    * @param string $daoName
