@@ -382,11 +382,18 @@ ALTER TABLE {$tableName}
       else {
         CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
       }
+      $logTableName = "log_" . $tableName;
       $domain = new CRM_Core_DAO_Domain();
       $domain->find(TRUE);
       if ($domain->locales) {
         $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
         CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+      }
+      // drop the column from log table too IF logging is enabled
+      elseif (Civi::settings()->get('logging') &&
+        self::checkIfFieldExists($logTableName, $columnName)
+      ) {
+        CRM_Core_DAO::executeQuery(sprintf("ALTER TABLE %s DROP COLUMN %s ", $logTableName, $columnName));
       }
     }
   }

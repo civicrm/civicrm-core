@@ -246,6 +246,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_12($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
+    $this->addTask('Dashboard schema updates for its log tables', 'dashboardLogTableUpdate');
   }
 
   /*
@@ -820,6 +821,42 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 1440 WHERE name = "blog"');
     CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 7200 WHERE name IN ("activity","getting-started")');
+    return TRUE;
+  }
+
+  /**
+   * CRM-19341 - Dashboard schema updates for its log tables
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function dashboardLogTableUpdate(CRM_Queue_TaskContext $ctx) {
+    // Check if logging is enabled
+    if (Civi::settings()->get('logging')) {
+      $logTableColumns = array(
+        'log_civicrm_dashboard_contact' => array(
+          'content',
+          'is_minimized',
+          'is_fullscreen',
+          'created_date',
+        ),
+        'log_civicrm_dashboard' => array(
+          'is_fullscreen',
+          'is_minimized',
+          'column_no',
+          'weight',
+        ),
+      );
+      foreach ($logTableColumns as $logTable => $columns) {
+        foreach ($columns as $column) {
+          if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($logTable, $column)) {
+            CRM_Core_DAO::executeQuery(sprintf("ALTER TABLE %s DROP COLUMN %s ", $logTable, $columnName));
+          }
+        }
+      }
+    }
+
     return TRUE;
   }
 
