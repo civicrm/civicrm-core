@@ -463,7 +463,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param bool $hook
    *
-   * @return $this
+   * @return CRM_Core_DAO
    */
   public function save($hook = TRUE) {
     if (!empty($this->id)) {
