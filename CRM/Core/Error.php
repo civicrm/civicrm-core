@@ -124,8 +124,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $log = CRM_Core_Config::getLog();
     $this->setLogger($log);
 
-    // set up error handling for Pear Error Stack
-    $this->setDefaultCallback(array($this, 'handlePES'));
+    // PEAR<=1.9.0 does not declare "static" properly.
+    if (!is_callable(array('PEAR', '__callStatic'))) {
+      $this->setDefaultCallback(array($this, 'handlePES'));
+    }
+    else {
+      PEAR_ErrorStack::setDefaultCallback(array($this, 'handlePES'));
+    }
   }
 
   /**
@@ -647,6 +652,23 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * Generate a hash for the logfile.
+   * CRM-13640.
+   */
+  public static function generateLogFileHash($config) {
+    // Use multiple (but stable) inputs for hash information.
+    $md5inputs = array(
+      defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
+      $config->userFrameworkBaseURL,
+      md5($config->dsn),
+      $config->dsn,
+    );
+    // Trim 8 chars off the string, make it slightly easier to find
+    // but reveals less information from the hash.
+    return substr(md5(var_export($md5inputs, 1)), 8);
+  }
+
+  /**
    * Generate the name of the logfile to use and store it as a static.
    *
    * This function includes poor man's log file management and a check as to whether the file exists.
@@ -659,7 +681,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       $prefixString = $prefix ? ($prefix . '.') : '';
 
-      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . md5($config->dsn) . '.log';
+      $hash = self::generateLogFileHash($config);
+      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . '.log';
 
       // Roll log file monthly or if greater than 256M
       // note that PHP file functions have a limit of 2G and hence

@@ -69,6 +69,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->_participantID2 = $this->participantCreate(array(
         'contact_id' => $this->_contactID2,
         'event_id' => $this->_eventID,
+        'registered_by_id' => $this->_participantID,
       ));
     $this->_participantID3 = $this->participantCreate(array(
         'contact_id' => $this->_contactID2,
@@ -341,6 +342,19 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccess('participant', 'get', $params);
 
     $this->assertEquals($participant['count'], 2);
+  }
+
+  /**
+   * Test search by lead booker (registered by ID)
+   */
+  public function testSearchByRegisteredById() {
+    $params = array(
+      'registered_by_id' => $this->_participantID,
+    );
+    $participant = $this->callAPISuccess('participant', 'get', $params);
+
+    $this->assertEquals($participant['count'], 1);
+    $this->assertEquals($participant['id'], $this->_participantID2);
   }
 
   ///////////////// civicrm_participant_create methods

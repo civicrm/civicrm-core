@@ -260,15 +260,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
     $this->buildCustom($this->_values['custom_post_id'], 'customPost');
 
-    if (!empty($this->_fields) && !empty($this->_values['custom_pre_id'])) {
-      $profileAddressFields = array();
-      foreach ($this->_fields as $key => $value) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array(
-          'uf_group_id' => $this->_values['custom_pre_id'],
-        ));
-      }
-      $this->set('profileAddressFields', $profileAddressFields);
-    }
+    // CRM-18399: used by template to pass pre profile id as a url arg
+    $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
 
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
@@ -1210,7 +1203,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
               $registerUrl .= '&pcpId=' . $self->_pcpId;
             }
 
-            $status = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've gotten this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', array(1 => $registerUrl));
+            $status = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', array(1 => $registerUrl));
             $session->setStatus($status, ts('Oops.'), 'alert');
             $url = CRM_Utils_System::url('civicrm/event/info',
               "reset=1&id={$self->_values['event']['id']}&noFullMsg=true"
@@ -1227,7 +1220,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           }
 
           if ($isAdditional) {
-            $status = ts("It looks like this participant is already registered for this event. If you want to change your registration, or you feel that you've gotten this message in error, please contact the site administrator.");
+            $status = ts("It looks like this participant is already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
             $session->setStatus($status, ts('Oops.'), 'alert');
             return $participant->id;
           }

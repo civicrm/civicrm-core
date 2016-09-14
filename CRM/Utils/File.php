@@ -310,6 +310,9 @@ class CRM_Utils_File {
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
       $db->query('SET SESSION sql_mode = STRICT_TRANS_TABLES');
     }
+    $db->query('SET NAMES utf8');
+    $transactionId = CRM_Utils_Type::escape(CRM_Utils_Request::id(), 'String');
+    $db->query('SET @uniqueID = ' . "'$transactionId'");
 
     if (!$isQueryString) {
       $string = $prefix . file_get_contents($fileName);
@@ -764,6 +767,21 @@ HTACCESS;
       return FALSE;
     }
     return TRUE;
+  }
+
+  public static function formatFile(&$param, $fileName, $extraParams = array()) {
+    if (empty($param[$fileName])) {
+      return;
+    }
+
+    $fileParams = array(
+      'uri' => $param[$fileName]['name'],
+      'type' => $param[$fileName]['type'],
+      'location' => $param[$fileName]['name'],
+      'upload_date' => date('YmdHis'),
+    ) + $extraParams;
+
+    $param[$fileName] = $fileParams;
   }
 
 }

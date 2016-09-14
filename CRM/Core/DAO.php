@@ -147,26 +147,26 @@ class CRM_Core_DAO extends DB_DataObject {
       if ($fkDAO->find(TRUE)) {
         $this->$dbName = $fkDAO->id;
       }
-      unset($fkDAO);
+      $fkDAO->free();
     }
 
     elseif (in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)) {
       $depObject = new $FKClassName();
       $depObject->find(TRUE);
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
     elseif ($daoName == 'CRM_Member_DAO_MembershipType' && $fieldName == 'member_of_contact_id') {
       // FIXME: the fields() metadata is not specific enough
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, array('contact_type' => 'Organization'));
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
     else {
       //if it is required we need to generate the dependency object first
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, CRM_Utils_Array::value($dbName, $params, 1));
       $this->$dbName = $depObject->id;
-      unset($depObject);
+      $depObject->free();
     }
   }
 
@@ -520,6 +520,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
     \Civi::service('dispatcher')->dispatch("DAO::post-delete", $event);
+    $this->free();
 
     return $result;
   }
@@ -765,48 +766,22 @@ LIKE %1
   }
 
   /**
-   * Returns the storage engine used by given table-name(optional).
-   * Otherwise scans all the tables and return an array of all the
-   * distinct storage engines being used.
-   *
-   * @param string $tableName
-   *
-   * @param int $maxTablesToCheck
-   * @param string $fieldName
+   * Scans all the tables using a slow query and table name.
    *
    * @return array
    */
-  public static function getStorageValues($tableName = NULL, $maxTablesToCheck = 10, $fieldName = 'Engine') {
-    $values = array();
-    $query = "SHOW TABLE STATUS LIKE %1";
+  public static function getTableNames() {
+    $dao = CRM_Core_DAO::executeQuery(
+      "SELECT TABLE_NAME
+       FROM information_schema.TABLES
+       WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+         AND TABLE_NAME LIKE 'civicrm_%'
+         AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
+         AND TABLE_NAME NOT LIKE '%temp'
+      ");
 
-    $params = array();
-
-    if (isset($tableName)) {
-      $params = array(1 => array($tableName, 'String'));
-    }
-    else {
-      $params = array(1 => array('civicrm_%', 'String'));
-    }
-
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    $count = 0;
     while ($dao->fetch()) {
-      if (isset($values[$dao->$fieldName]) ||
-        // ignore import and other temp tables
-        strpos($dao->Name, 'civicrm_import_job_') !== FALSE ||
-        strpos($dao->Name, '_temp') !== FALSE
-      ) {
-        continue;
-      }
-      $values[$dao->$fieldName] = 1;
-      $count++;
-      if ($maxTablesToCheck &&
-        $count >= $maxTablesToCheck
-      ) {
-        break;
-      }
+      $values[] = $dao->TABLE_NAME;
     }
     $dao->free();
     return $values;
@@ -818,12 +793,25 @@ LIKE %1
    * @return bool
    */
   public static function isDBMyISAM($maxTablesToCheck = 10) {
-    // show error if any of the tables, use 'MyISAM' storage engine.
-    $engines = self::getStorageValues(NULL, $maxTablesToCheck);
-    if (array_key_exists('MyISAM', $engines)) {
-      return TRUE;
-    }
-    return FALSE;
+    return CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*)
+       FROM information_schema.TABLES
+       WHERE ENGINE = 'MyISAM'
+         AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+         AND TABLE_NAME LIKE 'civicrm_%'
+         AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
+         AND TABLE_NAME NOT LIKE '%temp'
+      ");
+  }
+
+  /**
+   * Get the name of the CiviCRM database.
+   *
+   * @return string
+   */
+  public static function getDatabaseName() {
+    $daoObj = new CRM_Core_DAO();
+    return $daoObj->database();
   }
 
   /**
@@ -1896,8 +1884,8 @@ SELECT contact_id
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
     if ($view) {
-      $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
-      if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
+      $result = $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
+      if (PEAR::getStaticProperty('DB_DataObject', 'lastError') || is_a($result, 'DB_Error')) {
         return FALSE;
       }
     }
@@ -2136,6 +2124,7 @@ SELECT contact_id
 
   /**
    * Get options for the called BAO object's field.
+   *
    * This function can be overridden by each BAO to add more logic related to context.
    * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
    *

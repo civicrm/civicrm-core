@@ -133,7 +133,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
     $locationType->copyValues($params);
     if (!empty($params['is_default'])) {
       $query = "UPDATE civicrm_location_type SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     $locationType->save();

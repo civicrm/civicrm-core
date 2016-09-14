@@ -1,76 +1,35 @@
-/**
- +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
- *
- * Copyright (C) 2009 Bevan Rudge
- * Licensed to CiviCRM under the Academic Free License version 3.0.
- *
- * @file Defines the jQuery.dashboard() plugin.
- *
- * Uses jQuery 1.3, jQuery UI 1.6 and several jQuery UI extensions, most of all Sortable
- *    http://visualjquery.com/
- *    http://docs.jquery.com/UI/Sortable
- *    http://ui.jquery.com/download
- *      Sortable
- *      Draggable
- *      UI Core
- *
- * NOTE: This file is viewed as "legacy" and shouldn't be used to
- * develop new functionality. Its lint problems are grandfathered
- * (although if someone wants to cleanup+test, please feel welcome).
- */
-/* jshint ignore:start */
-(function($) { // Create closure.
+// https://civicrm.org/licensing
+/* global CRM, ts */
+/*jshint loopfunc: true */
+(function($) {
+  'use strict';
   // Constructor for dashboard object.
   $.fn.dashboard = function(options) {
     // Public properties of dashboard.
     var dashboard = {};
     dashboard.element = this.empty();
     dashboard.ready = false;
-    dashboard.columns = Array();
-    dashboard.widgets = Array();
-    // End of public properties of dashboard.
+    dashboard.columns = [];
+    dashboard.widgets = {};
 
     /**
      * Public methods of dashboard.
      */
 
     // Saves the order of widgets for all columns including the widget.minimized status to options.ajaxCallbacks.saveColumns.
-    dashboard.saveColumns = function() {
+    dashboard.saveColumns = function(showStatus) {
       // Update the display status of the empty placeholders.
-      for (var c in dashboard.columns) {
-        var col = dashboard.columns[c];
-       if ( typeof col == 'object' ) {
-			// Are there any visible children of the column (excluding the empty placeholder)?
-			if (col.element.children(':visible').not(col.emptyPlaceholder).length > 0) {
-			  col.emptyPlaceholder.hide();
-			}
-			else {
-			  col.emptyPlaceholder.show();
-			}
-		}
-	  }
+      $.each(dashboard.columns, function(c, col) {
+        if ( typeof col == 'object' ) {
+          // Are there any visible children of the column (excluding the empty placeholder)?
+          if (col.element.children(':visible').not(col.emptyPlaceholder).length > 0) {
+            col.emptyPlaceholder.hide();
+          }
+          else {
+            col.emptyPlaceholder.show();
+          }
+        }
+      });
 
       // Don't save any changes to the server unless the dashboard has finished initiating.
       if (!dashboard.ready) {
@@ -81,77 +40,36 @@
       var params = {};
 
       // For each column...
-      for (var c2 in dashboard.columns) {
+      $.each(dashboard.columns, function(c, col) {
 
         // IDs of the sortable elements in this column.
-        var ids = (typeof dashboard.columns[c2] == 'object') ? dashboard.columns[c2].element.sortable('toArray') : undefined;
+        var ids = (typeof col == 'object') ? col.element.sortable('toArray') : [];
 
         // For each id...
-        for (var w in ids) {
-          // Chop 'widget-' off of the front so that we have the real widget id.
-          var id = (typeof ids[w] == 'string') ? ids[w].substring('widget-'.length) : undefined;
-
-          // Add one flat property to the params object that will look like an array element to the PHP server.
-          // Unfortunately jQuery doesn't do this for us.
-          if ( typeof dashboard.widgets[id] == 'object' ) params['columns[' + c2 + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
-        }
-      }
+        $.each(ids, function(w, id) {
+          if (typeof id == 'string') {
+            // Chop 'widget-' off of the front so that we have the real widget id.
+            id = id.substring('widget-'.length);
+            // Add one flat property to the params object that will look like an array element to the PHP server.
+            // Unfortunately jQuery doesn't do this for us.
+            if (typeof dashboard.widgets[id] == 'object') params['columns[' + c + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
+          }
+        });
+      });
 
       // The ajaxCallback settings overwrite any duplicate properties.
       $.extend(params, opts.ajaxCallbacks.saveColumns.data);
-      $.post(opts.ajaxCallbacks.saveColumns.url, params, function(response, status) {
+      var post = $.post(opts.ajaxCallbacks.saveColumns.url, params, function() {
         invokeCallback(opts.callbacks.saveColumns, dashboard);
       });
+      if (showStatus !== false) {
+        CRM.status({}, post);
+      }
     };
-
-    // Puts the dashboard into full screen mode, saving element for when the user exits full-screen mode.
-    // Does not add element to the DOM – this is the caller's responsibility.
-    // Does show and hide element though.
-    dashboard.enterFullscreen = function(element) {
-      // Hide the columns.
-      for (var c in dashboard.columns) {
-       if ( typeof dashboard.columns[c] == 'object' ) dashboard.columns[c].element.hide();
-      }
-
-      if (!dashboard.fullscreen) {
-        // Initialize.
-        var markup = '<a id="full-screen-header" class="full-screen-close-icon">' + opts.fullscreenHeaderInner + '</a>';
-        dashboard.fullscreen = {
-          headerElement: $(markup).prependTo(dashboard.element).click(dashboard.exitFullscreen).hide()
-        };
-      }
-
-      dashboard.fullscreen.headerElement.slideDown();
-      dashboard.fullscreen.currentElement = element.show();
-      dashboard.fullscreen.displayed = true;
-      invokeCallback(opts.callbacks.enterFullscreen, dashboard, dashboard.fullscreen.currentElement);
-    };
-
-    // Takes the dashboard out of full screen mode, hiding the active fullscreen element.
-    dashboard.exitFullscreen = function() {
-      if (!dashboard.fullscreen.displayed) {
-        return;
-      }
-
-      dashboard.fullscreen.headerElement.slideUp();
-      dashboard.fullscreen.currentElement.hide();
-      dashboard.fullscreen.displayed = false;
-
-      // Show the columns.
-      for (var c in dashboard.columns) {
-          if ( typeof dashboard.columns[c] == 'object' ) dashboard.columns[c].element.show();
-      }
-
-      invokeCallback(opts.callbacks.exitFullscreen, dashboard, dashboard.fullscreen.currentElement);
-    };
-    // End of public methods of dashboard.
 
     /**
      * Private properties of dashboard.
      */
-
-    // Used to determine whether there are any incomplete ajax requests pending initialization of the dashboard.
-    var asynchronousRequestCounter = 0;
 
     // Used to determine whether two resort events are resulting from the same UI event.
     var currentReSortEvent = null;
@@ -159,21 +77,18 @@
     // Merge in the caller's options with the defaults.
     var opts = $.extend({}, $.fn.dashboard.defaults, options);
 
-    // Execution 'forks' here and restarts in init().  Tell the user we're busy with a throbber.
-    var throbber = $(opts.throbberMarkup).appendTo(dashboard.element);
-    $.getJSON(opts.ajaxCallbacks.getWidgetsByColumn.url, opts.ajaxCallbacks.getWidgetsByColumn.data, init);
-    asynchronousRequestCounter++;
+    var localCache = window.localStorage && localStorage.dashboard ? JSON.parse(localStorage.dashboard) : {};
+
+    init(opts.widgetsByColumn);
+
     return dashboard;
-    // End of constructor and private properties for dashboard object.
 
     /**
      * Private methods of dashboard.
      */
 
-    // Ajax callback for getWidgetsByColumn.
-    function init(widgets, status) {
-      asynchronousRequestCounter--;
-      throbber.remove();
+    // Initialize widget columns.
+    function init(widgets) {
       var markup = '<li class="empty-placeholder">' + opts.emptyPlaceholderInner + '</li>';
 
       // Build the dashboard in the DOM.  For each column...
@@ -182,7 +97,7 @@
       for (var c = 0; c < opts.columns; c++) {
           // Save the column to both the public scope for external accessibility and the local scope for readability.
           var col = dashboard.columns[c] = {
-              initialWidgets: Array(),
+              initialWidgets: [],
               element: $('<ul id="column-' + c + '" class="column column-' + c + '"></ul>').appendTo(dashboard.element)
           };
 
@@ -190,23 +105,20 @@
           col.emptyPlaceholder = $(markup).appendTo(col.element).hide();
 
           // For each widget in this column.
-          for (var id in widgets[c]) {
-              var widgetID = id.split('-');
-              // Build a new widget object and save it to various publicly accessible places.
-              col.initialWidgets[id] = dashboard.widgets[widgetID[1]] = widget({
-                  id: widgetID[1],
-                  element: $('<li class="widget"></li>').appendTo(col.element),
-                  initialColumn: col,
-                  minimized: ( widgets[c][widgetID[1]] > 0  ? true : false )
-              });
-
-              //set empty Dashboard to false
-              emptyDashboard = false;
-          }
+          $.each(widgets[c], function(num, item) {
+            var id = (num+1) + '-' + item.id;
+            col.initialWidgets[id] = dashboard.widgets[item.id] = widget($.extend({
+              element: $('<li class="widget"></li>').appendTo(col.element),
+              initialColumn: col
+            }, item));
+            emptyDashboard = false;
+          });
       }
 
-      if ( emptyDashboard ) {
-          emptyDashboardCondition( );
+      if (emptyDashboard) {
+        emptyDashboardCondition();
+      } else {
+        completeInit();
       }
 
       invokeCallback(opts.callbacks.init, dashboard);
@@ -214,14 +126,29 @@
 
     // function that is called when dashboard is empty
     function emptyDashboardCondition( ) {
-        cj(".show-refresh").hide( );
-        cj("#empty-message").show( );
+        $(".show-refresh").hide( );
+        $("#empty-message").show( );
+    }
+
+    // Cache dashlet info in localStorage
+    function saveLocalCache() {
+      localCache = {};
+      $.each(dashboard.widgets, function(id, widget) {
+        localCache[id] = {
+          content: widget.content,
+          lastLoaded: widget.lastLoaded,
+          minimized: widget.minimized
+        };
+      });
+      if (window.localStorage) {
+        localStorage.dashboard = JSON.stringify(localCache);
+      }
     }
 
     // Contructors for each widget call this when initialization has finished so that dashboard can complete it's intitialization.
     function completeInit() {
-      // Don't do anything if any widgets are waiting for ajax requests to complete in order to finish initialization.
-      if (asynchronousRequestCounter > 0) {
+      // Only do this once.
+      if (dashboard.ready) {
           return;
       }
 
@@ -235,8 +162,9 @@
         // The class of placeholder elements (the 'ghost' widget showing where the dragged item would land if released now.)
         placeholder: 'placeholder',
         activate: function(event, ui) {
-		  var h= cj(ui.item).height();
-		  $('.placeholder').css('height', h +'px'); },
+          var h= $(ui.item).height();
+          $('.placeholder').css('height', h +'px');
+        },
 
         opacity: 0.2,
 
@@ -254,6 +182,17 @@
       dashboard.saveColumns();
       dashboard.ready = true;
       invokeCallback(opts.callbacks.ready, dashboard);
+
+      // Auto-refresh widgets when content is stale
+      window.setInterval(function() {
+        if (!document.hasFocus || document.hasFocus()) {
+          $.each(dashboard.widgets, function (i, widget) {
+            if (!widget.cacheIsFresh()) {
+              widget.reloadContent();
+            }
+          });
+        }
+      }, 5000);
     }
 
     // Callback for when any list has changed (and the user has finished resorting).
@@ -289,7 +228,7 @@
      */
     function widget(widget) {
       // Merge default options with the options defined for this widget.
-      widget = $.extend({}, $.fn.dashboard.widget.defaults, widget);
+      widget = $.extend({}, $.fn.dashboard.widget.defaults, localCache[widget.id] || {}, widget);
 
       /**
        * Public methods of widget.
@@ -305,19 +244,27 @@
         }
 
         widget.hideSettings();
-        dashboard.saveColumns();
       };
       widget.minimize = function() {
         $('.widget-content', widget.element).slideUp(opts.animationSpeed);
-        $(widget.controls.minimize.element).addClass( 'fa-caret-right' );
-        $(widget.controls.minimize.element).removeClass( 'fa-caret-down' );
+        $(widget.controls.minimize.element)
+          .addClass('fa-caret-right')
+          .removeClass('fa-caret-down')
+          .attr('title', ts('Expand'));
         widget.minimized = true;
+        saveLocalCache();
       };
       widget.maximize = function() {
-        $('.widget-content', widget.element).slideDown(opts.animationSpeed);
-        $(widget.controls.minimize.element).removeClass( 'fa-caret-right' );
-        $(widget.controls.minimize.element).addClass( 'fa-caret-down' );
+        $(widget.controls.minimize.element)
+          .removeClass( 'fa-caret-right' )
+          .addClass( 'fa-caret-down' )
+          .attr('title', ts('Collapse'));
         widget.minimized = false;
+        saveLocalCache();
+        if (!widget.contentLoaded) {
+          loadContent();
+        }
+        $('.widget-content', widget.element).slideDown(opts.animationSpeed);
       };
 
       // Toggles whether the widget is in settings-display mode or not.
@@ -360,12 +307,11 @@
         var params = {};
         // serializeArray() returns an array of objects.  Process it.
         var fields = widget.settings.element.serializeArray();
-        for (var i in fields) {
-            var field = fields[i];
+        $.each(fields, function(i, field) {
             // Put the values into flat object properties that PHP will parse into an array server-side.
             // (Unfortunately jQuery doesn't do this)
             params['settings[' + field.name + ']'] = field.value;
-        }
+        });
 
         // Things get messy here.
         // @todo Refactor to use currentState and targetedState properties to determine what needs
@@ -411,16 +357,9 @@
 
       widget.enterFullscreen = function() {
         // Make sure the widget actually supports full screen mode.
-        if (!widget.fullscreenUrl) {
-          return;
+        if (widget.fullscreenUrl) {
+          CRM.loadPage(widget.fullscreenUrl);
         }
-        CRM.loadPage(widget.fullscreenUrl);
-      };
-
-      // Exit fullscreen mode.
-      widget.exitFullscreen = function() {
-        // This is just a wrapper for dashboard.exitFullscreen() which does the heavy lifting.
-        dashboard.exitFullscreen();
       };
 
       // Adds controls to a widget.  id is for internal use and image file name in images/dashboard/ (a .gif).
@@ -429,24 +368,35 @@
           control.element = $(markup).prependTo($('.widget-controls', widget.element)).click(control.callback);
       };
 
-      // An external method used only by and from external scripts to reload content.  Not invoked or used internally.
-      // The widget must provide the script that executes this, as well as the script that invokes it.
+      // Fetch remote content.
       widget.reloadContent = function() {
-          getJavascript(widget.reloadContentScript);
-          invokeCallback(opts.widgetCallbacks.reloadContent, widget);
+        // If minimized, we'll reload later
+        if (widget.minimized) {
+          widget.contentLoaded = false;
+          widget.lastLoaded = 0;
+        } else {
+          CRM.loadPage(widget.url, {target: widget.contentElement});
+        }
       };
 
       // Removes the widget from the dashboard, and saves columns.
       widget.remove = function() {
-          if ( confirm( 'Are you sure you want to remove "' + widget.title + '"?') ) {
-              invokeCallback(opts.widgetCallbacks.remove, widget);
-              widget.element.fadeOut(opts.animationSpeed, function() {
-                  $(this).remove();
-                  dashboard.saveColumns();
-              });
-          }
+        invokeCallback(opts.widgetCallbacks.remove, widget);
+        widget.element.fadeOut(opts.animationSpeed, function() {
+          $(this).remove();
+          delete(dashboard.widgets[widget.id]);
+          dashboard.saveColumns(false);
+        });
+        CRM.alert(
+          ts('You can re-add it by clicking the "Configure Your Dashboard" button.'),
+          ts('"%1" Removed', {1: widget.title}),
+          'success'
+        );
       };
-      // End public methods of widget.
+
+      widget.cacheIsFresh = function() {
+        return (((widget.cacheMinutes * 60000 + widget.lastLoaded) > $.now()) && widget.content);
+      };
 
       /**
        * Public properties of widget.
@@ -460,14 +410,14 @@
           icon: 'fa-wrench'
         },
         minimize: {
-          description: ts('Collapse or expand'),
+          description: widget.minimized ? ts('Expand') : ts('Collapse'),
           callback: widget.toggleMinimize,
-          icon: 'fa-caret-down',
+          icon: widget.minimized ? 'fa-caret-right' : 'fa-caret-down'
         },
         fullscreen: {
           description: ts('View fullscreen'),
           callback: widget.enterFullscreen,
-          icon: 'fa-expand',
+          icon: 'fa-expand'
         },
         close: {
           description: ts('Remove from dashboard'),
@@ -475,55 +425,58 @@
           icon: 'fa-times'
         }
       };
-      // End public properties of widget.
+      widget.contentLoaded = false;
 
-      /**
-       * Private properties of widget.
-       */
-
-      // We're gonna 'fork' execution again, so let's tell the user to hold with us till the AJAX callback gets invoked.
-      var throbber = $(opts.throbberMarkup).appendTo(widget.element);
-      var params = $.extend({}, opts.ajaxCallbacks.getWidget.data, {id: widget.id});
-      $.getJSON(opts.ajaxCallbacks.getWidget.url, params, init);
-
-      // Help dashboard track whether we've got any outstanding requests on which initialization is pending.
-      asynchronousRequestCounter++;
+      init();
       return widget;
-      // End of private properties of widget.
 
       /**
        * Private methods of widget.
        */
 
-      // Ajax callback for widget initialization.
-      function init(data, status) {
-        asynchronousRequestCounter--;
-        $.extend(widget, data);
+      function loadContent() {
+        var loadFromCache = widget.cacheIsFresh();
+        if (loadFromCache) {
+          widget.contentElement.html(widget.content).trigger('crmLoad', widget);
+        }
+        widget.contentElement.off('crmLoad').on('crmLoad', function(event, data) {
+          if ($(event.target).is(widget.contentElement)) {
+            widget.content = data.content;
+            // Cache for one day
+            widget.lastLoaded = $.now();
+            saveLocalCache();
+            invokeCallback(opts.widgetCallbacks.get, widget);
+          }
+        });
+        if (!loadFromCache) {
+          widget.reloadContent();
+        }
+        widget.contentLoaded = true;
+      }
 
+      // Build widget & load content.
+      function init() {
         // Delete controls that don't apply to this widget.
         if (!widget.settings) {
           delete widget.controls.settings;
+          widget.settings = {};
         }
         if (!widget.fullscreenUrl) {
           delete widget.controls.fullscreen;
         }
-
-        widget.element.attr('id', 'widget-' + widget.id).addClass(widget.classes);
-        throbber.remove();
+        var cssClass = 'widget-' + widget.name.replace('/', '-');
+        widget.element.attr('id', 'widget-' + widget.id).addClass(cssClass);
         // Build and add the widget's DOM element.
-        $(widget.element).append(widgetHTML()).trigger('crmLoad');
+        $(widget.element).append(widgetHTML());
         // Save the content element so that external scripts can reload it easily.
         widget.contentElement = $('.widget-content', widget.element);
         $.each(widget.controls, widget.addControl);
 
-        // Switch the initial state so that it initializes to the correct state.
-        widget.minimized = !widget.minimized;
-        widget.toggleMinimize();
-        getJavascript(widget.initScript);
-        invokeCallback(opts.widgetCallbacks.get, widget);
-
-        // completeInit() is a private method of the dashboard.  Let it complete initialization of the dashboard.
-        completeInit();
+        if (widget.minimized) {
+          widget.contentElement.hide();
+        } else {
+          loadContent();
+        }
       }
 
       // Builds inner HTML for widgets.
@@ -531,7 +484,7 @@
         var html = '';
         html += '<div class="widget-wrapper">';
         html += '  <div class="widget-controls"><h3 class="widget-header">' + widget.title + '</h3></div>';
-        html += '  <div class="widget-content crm-ajax-container">' + widget.content + '</div>';
+        html += '  <div class="widget-content"></div>';
         html += '</div>';
         return html;
       }
@@ -607,9 +560,8 @@
   // Public static properties of dashboard.  Default settings.
   $.fn.dashboard.defaults = {
     columns: 2,
-    emptyPlaceholderInner: ts('There are no dashlets in this column of your dashboard.'),
-    fullscreenHeaderInner: ts('Back to dashboard mode'),
-    throbberMarkup: '<div class="crm-loading-element">' + ts('Loading') + '...</div>',
+    emptyPlaceholderInner: '',
+    throbberMarkup: '',
     animationSpeed: 200,
     callbacks: {},
     widgetCallbacks: {}
@@ -619,8 +571,10 @@
   $.fn.dashboard.widget = {
     defaults: {
       minimized: false,
-      settings: false,
-      fullscreen: false
+      content: null,
+      lastLoaded: 0,
+      settings: false
+      // id, url, fullscreenUrl, title, name, cacheMinutes
     }
   };
 })(jQuery);

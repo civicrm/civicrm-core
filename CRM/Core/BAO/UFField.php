@@ -796,7 +796,7 @@ SELECT  id
       if (in_array($field['field_name'], $validBillingFields)) {
         $validProfileFields[] = $field['field_name'];
       }
-      if ($field['is_required']) {
+      if (CRM_Utils_Array::value('is_required', $field)) {
         $requiredProfileFields[] = $field['field_name'];
       }
     }
@@ -807,7 +807,7 @@ SELECT  id
 
     if (!empty($index) && (
         // it's empty so we set it OR
-        !CRM_Utils_array::value($prefixName, $profileAddressFields)
+        !CRM_Utils_Array::value($prefixName, $profileAddressFields)
         //we are dealing with billing id (precedence)
         || $index == $billing_id
         // we are dealing with primary & billing not set
@@ -1124,6 +1124,10 @@ SELECT  id
         'contribution_status_id' => array(
           'name' => 'contribution_status_id',
           'title' => ts('Contribution Status'),
+        ),
+        'trxn_id' => array(
+          'name' => 'contribution_trxn_id',
+          'title' => ts('Contribution Transaction ID'),
         ),
       );
     }

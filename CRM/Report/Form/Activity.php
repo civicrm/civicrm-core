@@ -40,12 +40,27 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_nonDisplayFields = array();
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
     // There could be multiple contacts. We not clear on which contact id to display.
     // Lets hide it for now.
     $this->_exposeContactID = FALSE;
+    // if navigated from count link of activity summary reports.
+    $this->_resetDateFilter = CRM_Utils_Request::retrieve('resetDateFilter', 'Boolean', CRM_Core_DAO::$_nullObject);
 
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
@@ -296,7 +311,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       // Add display column and filter for Survey Results, Campaign and Engagement Index if CiviCampaign is enabled
 
       $this->_columns['civicrm_activity']['fields']['result'] = array(
-        'title' => 'Survey Result',
+        'title' => ts('Survey Result'),
         'default' => 'false',
       );
       $this->_columns['civicrm_activity']['filters']['result'] = array(
@@ -306,7 +321,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       );
       if (!empty($this->activeCampaigns)) {
         $this->_columns['civicrm_activity']['fields']['campaign_id'] = array(
-          'title' => 'Campaign',
+          'title' => ts('Campaign'),
           'default' => 'false',
         );
         $this->_columns['civicrm_activity']['filters']['campaign_id'] = array(
@@ -318,7 +333,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
       if (!empty($this->engagementLevels)) {
         $this->_columns['civicrm_activity']['fields']['engagement_level'] = array(
-          'title' => 'Engagement Index',
+          'title' => ts('Engagement Index'),
           'default' => 'false',
         );
         $this->_columns['civicrm_activity']['filters']['engagement_level'] = array(
@@ -580,7 +595,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op && ($op != 'nnll' || $op != 'nll')) {
+            if ($op && ($op != 'nnll' && $op != 'nll')) {
               $clause = $this->whereClause($field,
                 $op,
                 CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
@@ -644,7 +659,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    * Override group by function.
    */
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id";
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_activity']}.id");
   }
 
   /**
@@ -745,7 +760,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
 
   public function postProcess() {
     //reset value of activity_date
-    if (!empty($this->_force)) {
+    if (!empty($this->_resetDateFilter)) {
       $this->_formValues["activity_date_time_relative"] = NULL;
     }
     $this->beginPostProcess();
@@ -829,9 +844,10 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       }
     }
     $this->limit();
+    $groupByFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, 'civicrm_activity_id');
     $sql = "{$this->_select}
 FROM civireport_activity_temp_target tar
-GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}";
+{$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
     $this->buildRows($sql, $rows);
 
     // format result set.
@@ -1031,8 +1047,10 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
+      $this->_select = "SELECT " . implode(", ", $ifnulls);
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
-      $query = "select " . implode(", ", $ifnulls) .
+      $query = $this->_select .
         ", count(DISTINCT civicrm_activity_id) as ct from civireport_activity_temp_target group by " .
         implode(", ", $sectionAliases);
 

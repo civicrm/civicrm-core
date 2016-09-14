@@ -366,6 +366,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -479,7 +480,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contribution']}.contact_id, YEAR({$this->_aliases['civicrm_contribution']}.receive_date)";
+    $groupBy = array(
+      "{$this->_aliases['civicrm_contribution']}.contact_id",
+      "YEAR({$this->_aliases['civicrm_contribution']}.receive_date)",
+    );
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   /**
@@ -750,7 +755,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     }
     $sqlRelationship = "SELECT {$this->_aliases['civicrm_relationship']}.relationship_type_id as relationship_type_id, {$this->_aliases['civicrm_relationship']}.contact_id_a as contact_id_a, {$this->_aliases['civicrm_relationship']}.contact_id_b as contact_id_b {$addRelSelect} FROM civicrm_contact {$relContactAlias} {$this->_relationshipFrom} WHERE {$relContactAlias}.id IN (" .
       implode(',', $contactIds) .
-      ") AND {$this->_aliases['civicrm_relationship']}.is_active = 1 {$this->_relationshipWhere} GROUP BY {$this->_aliases['civicrm_relationship']}.contact_id_a, {$this->_aliases['civicrm_relationship']}.contact_id_b";
+      ") AND {$this->_aliases['civicrm_relationship']}.is_active = 1 {$this->_relationshipWhere} GROUP BY {$this->_aliases['civicrm_relationship']}.contact_id_a, {$this->_aliases['civicrm_relationship']}.contact_id_b, {$this->_aliases['civicrm_relationship']}.relationship_type_id";
     $relationshipTypes = CRM_Core_PseudoConstant::relationshipType();
 
     $dao = CRM_Core_DAO::executeQuery($sqlRelationship);

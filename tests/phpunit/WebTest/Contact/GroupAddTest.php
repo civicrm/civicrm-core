@@ -75,9 +75,9 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->type('title', $params['name']);
     $this->click('title');
     $this->waitForAjaxContent();
-    $this->waitForElementPresent("xpath=//table/tbody/tr/td/div[contains(text(), '{$params['name']}')]");
-    $createdBy = $this->getText("xpath=//table/tbody/tr/td[3]/a");
-    $this->click("xpath=//table/tbody/tr/td[7]//span/a[text()='Settings']");
+    $this->waitForElementPresent("xpath=//table/tbody//tr/td/div[contains(text(), '{$params['name']}')]");
+    $createdBy = $this->getText("xpath=//table/tbody//tr/td[3]/a");
+    $this->click("xpath=//table/tbody//tr/td[7]//span/a[text()='Settings']");
     $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[1]/tbody/tr[2]/td[contains(text(), '{$createdBy}')]");
     $this->openCiviPage('group', 'reset=1');
 
@@ -278,6 +278,43 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_Basic_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']"));
+  }
+
+  /**
+   * CRM-18585 - test to check OR operator on Smart Groups
+   */
+  public function testAddSmartGroup() {
+    $this->webtestLogin();
+    $this->openCiviPage('contact/search/advanced', 'reset=1');
+    $this->click("xpath=//input[@value='OR']");
+    $this->select('group', 'Advisory Board');
+    $this->select('contact_tags', 'Major Donor');
+    $this->clickLink("_qf_Advanced_refresh");
+    $this->waitForElementPresent("task");
+    $count = trim($this->getText("//div[@id='search-status']/table/tbody/tr/td"));
+
+    //create smart group for contacts resulted from OR operator search.
+    $this->click('radio_ts', 'ts_all');
+    $this->click('task');
+    $this->select('task', 'label=Group - create smart group');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $smartGroupTitle = "SmartGroup" . substr(sha1(rand()), 0, 4);
+    $this->type("title", $smartGroupTitle);
+    $this->clickLink("_qf_SaveSearch_next-bottom");
+    $this->waitForText('crm-notification-container', "Your smart group has been saved as '$smartGroupTitle'");
+    $this->clickLink("_qf_Result_done");
+    $expectedCount = explode('-', $this->getText("//div[@id='search-status']/table/tbody/tr/td"));
+    $this->assertEquals($count, trim($expectedCount[1]));
+
+    //Assert the count from Contacts link in Manage Group Page.
+    $this->openCiviPage('group', 'reset=1');
+    $this->waitForElementPresent("xpath=//table/tbody//tr//td/div[contains(text(), \"{$smartGroupTitle} (Smart Group)\")]");
+    $this->clickLink("xpath=//table/tbody//tr//td/div[contains(text(), \"{$smartGroupTitle} (Smart Group)\")]/../../td[@class='crm-group-group_links']/span/a[contains(text(), 'Contacts')]");
+    $this->waitForElementPresent("xpath=//span[contains(text(), \"Edit Smart Group Search Criteria for {$smartGroupTitle}\")]");
+    $this->clickLink("xpath=//a/span[contains(text(), \"Edit Smart Group Search Criteria for {$smartGroupTitle}\")]/");
+    $this->waitForElementPresent('search-status');
+    $expectedCount = explode('-', $this->getText("//div[@id='search-status']/table/tbody/tr/td"));
+    $this->assertEquals($count, trim($expectedCount[1]));
   }
 
 }

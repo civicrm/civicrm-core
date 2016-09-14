@@ -89,9 +89,10 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
-    if ($isPaymentTransaction) {
 
+    if ($isPaymentTransaction) {
       $contributionParams = array(
+        'id' => CRM_Utils_Array::value('contribution_id', $paymentParams),
         'contact_id' => $contactID,
         'line_item' => $lineItems,
         'is_test' => $isTest,
@@ -120,11 +121,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $paymentParams['contributionTypeID'] = $contributionTypeId;
       $paymentParams['item_name'] = $form->_params['description'];
 
-      if ($contribution && $form->_values['is_recur'] && $contribution->contribution_recur_id
-      ) {
-        $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
-      }
-
       $paymentParams['qfKey'] = $form->controller->_key;
       if ($component == 'membership') {
         return array('contribution' => $contribution);
@@ -141,6 +137,18 @@ class CRM_Contribute_BAO_Contribution_Utils {
       if ($form->_values['is_recur'] && $contribution->contribution_recur_id) {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
+      if (isset($paymentParams['contribution_source'])) {
+        $form->_params['source'] = $paymentParams['contribution_source'];
+      }
+
+      // get the price set values for receipt.
+      if ($form->_priceSetId && $form->_lineItem) {
+        $form->_values['lineItem'] = $form->_lineItem;
+        $form->_values['priceSetID'] = $form->_priceSetId;
+      }
+
+      $form->_values['contribution_id'] = $contribution->id;
+      $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
 
       if (!empty($form->_paymentProcessor)) {
         try {
@@ -160,6 +168,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
             $contribution->payment_status_id = $result['payment_status_id'];
           }
           $result['contribution'] = $contribution;
+          if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution',
+            'status_id', 'Pending') && $payment->isSendReceiptForPending()) {
+            CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
+              $form->_values,
+              $contribution->is_test
+            );
+          }
           return $result;
         }
         catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
@@ -179,22 +194,10 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
     }
 
-    // Only pay later or unpaid should reach this point. The theory is that paylater should get a receipt now &
-    // processor
-    // transaction receipts should be outcome driven.
+    // Only pay later or unpaid should reach this point, although pay later likely does not & is handled via the
+    // manual processor, so it's unclear what this set is for and whether the following send ever fires.
     $form->set('params', $form->_params);
-    if (isset($paymentParams['contribution_source'])) {
-      $form->_params['source'] = $paymentParams['contribution_source'];
-    }
 
-    // get the price set values for receipt.
-    if ($form->_priceSetId && $form->_lineItem) {
-      $form->_values['lineItem'] = $form->_lineItem;
-      $form->_values['priceSetID'] = $form->_priceSetId;
-    }
-
-    $form->_values['contribution_id'] = $contribution->id;
-    $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
     if ($form->_params['amount'] == 0) {
       // This is kind of a back-up for pay-later $0 transactions.
       // In other flows they pick up the manual processor & get dealt with above (I
@@ -204,6 +207,10 @@ class CRM_Contribute_BAO_Contribution_Utils {
         'contribution' => $contribution,
         'payment_processor_id' => 0,
       );
+    }
+    elseif (empty($form->_values['amount'])) {
+      // If the amount is not in _values[], set it
+      $form->_values['amount'] = $form->_params['amount'];
     }
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $form->_values,
@@ -220,11 +227,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @return bool
    */
   static protected function isPaymentTransaction($form) {
-    if (!empty($form->_values['is_monetary']) && $form->_amount >= 0.0) {
-      return TRUE;
-    }
-    return FALSE;
-
+    return ($form->_amount >= 0.0) ? TRUE : FALSE;
   }
 
   /**
@@ -325,7 +328,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     $created = TRUE;
 
     if (!empty($params['cms_create_account'])) {
-      $params['contactID'] = $contactID;
+      $params['contactID'] = !empty($params['onbehalf_contact_id']) ? $params['onbehalf_contact_id'] : $contactID;
       if (!CRM_Core_BAO_CMSUser::create($params, $mail)) {
         CRM_Core_Error::statusBounce(ts('Your profile is not saved and Account is not created.'));
       }

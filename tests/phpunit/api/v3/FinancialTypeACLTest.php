@@ -25,10 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/CiviMailUtils.php';
-
-
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -266,7 +262,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'add contributions of type Donation',
       'delete contributions of type Donation',
     );
-    $contribution = $this->callAPIFailure('contribution', 'create', $params, 'You do not have permission to create this line item');
+    $contribution = $this->callAPIFailure('contribution', 'create', $params, 'Error in call to LineItem_create : You do not have permission to create this line item');
 
     // Check that the entire contribution has rolled back.
     $contribution = $this->callAPISuccess('contribution', 'get', array());

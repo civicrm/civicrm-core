@@ -242,7 +242,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->_name = CRM_Utils_String::getClassName(CRM_Utils_System::getClassName($this));
     }
 
-    $this->HTML_QuickForm_Page($this->_name, $method);
+    parent::__construct($this->_name, $method);
 
     $this->_state =& $state;
     if ($this->_state) {
@@ -2168,6 +2168,45 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // quirk in our patched version of HTML_QuickForm_select, this doesn't happen if the options are NULL
     // which seems a bit dirty but it allows our dynamically-popuplated select element to function as expected.
     return $this->add('select', $elementName, $settings['label'], NULL, $settings['required'], $props);
+  }
+
+  /**
+   * Add actions menu to results form.
+   *
+   * @param array $tasks
+   */
+  public function addTaskMenu($tasks) {
+    if (is_array($tasks) && !empty($tasks)) {
+      // Set constants means this will always load with an empty value, not reloading any submitted value.
+      // This is appropriate as it is a pseudofield.
+      $this->setConstants(array('task' => ''));
+      $this->assign('taskMetaData', $tasks);
+      $select = $this->add('select', 'task', NULL, array('' => ts('Actions')), FALSE, array(
+        'class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions')
+      );
+      foreach ($tasks as $key => $task) {
+        $attributes = array();
+        if (isset($task['data'])) {
+          foreach ($task['data'] as $dataKey => $dataValue) {
+            $attributes['data-' . $dataKey] = $dataValue;
+          }
+        }
+        $select->addOption($task['title'], $key, $attributes);
+      }
+      if (empty($this->_actionButtonName)) {
+        $this->_actionButtonName = $this->getButtonName('next', 'action');
+      }
+      $this->assign('actionButtonName', $this->_actionButtonName);
+      $this->add('submit', $this->_actionButtonName, ts('Go'), array('class' => 'hiddenElement crm-search-go-button'));
+
+      // Radio to choose "All items" or "Selected items only"
+      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
+      $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
+      $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
+      $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
+
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
+    }
   }
 
   /**

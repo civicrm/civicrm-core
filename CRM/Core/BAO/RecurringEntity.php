@@ -842,8 +842,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           }
 
           $linkedDao = new $daoName();
-          $linkedDao->$linfo['entity_id_col'] = $entityId;
-          $linkedDao->$linfo['entity_table_col'] = $entityTable;
+          $linkedDao->{$linfo['entity_id_col']} = $entityId;
+          $linkedDao->{$linfo['entity_table_col']} = $entityTable;
           $linkedDao->find();
           while ($linkedDao->fetch()) {
             CRM_Core_BAO_RecurringEntity::delEntity($linkedDao->id, $linkedTable, FALSE);

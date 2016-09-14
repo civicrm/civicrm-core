@@ -155,7 +155,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
       LEFT JOIN civicrm_event ON civicrm_event.id = cp.event_id
       WHERE cp.id = {$this->_participant_id}";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $details['status']  = $dao->status;
       $details['role'] = $dao->role;
@@ -171,7 +171,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       CRM_Utils_System::redirect($url);
     }
     $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $this->_event_id;
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $time_limit  = $dao->time;
       $start_date = $dao->start;

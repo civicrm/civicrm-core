@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/Contact.php';
-
 /**
  * Class CRM_Activity_BAO_ActivityTest
  * @group headless
@@ -21,7 +19,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test case for create() method.
    */
   public function testCreate() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -52,7 +50,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
     $this->assertEquals($activityTypeId, 3, 'Verify activity type id is 3.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -61,12 +59,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * getContactActivity() method get activities detail for given target contact id.
    */
   public function testGetContactActivity() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -76,7 +74,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_date_time' => date('Ymd'),
     );
 
-    CRM_Activity_BAO_Activity::create($params);
+    $this->callAPISuccess('Activity', 'create', $params);
 
     $activityId = $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting',
       'id',
@@ -87,8 +85,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $this->assertEquals($activities[$activityId]['subject'], 'Scheduling Meeting', 'Verify activity subject is correct.');
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
@@ -98,12 +96,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *                              and set defaults.
    */
   public function testRetrieve() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -136,8 +134,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $this->assertEquals($defaults['target_contact'][0], $targetContactId, 'Verify target contact id is correct.');
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
@@ -146,12 +144,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * deleteActivity($params) method deletes activity for given params.
    */
   public function testDeleteActivity() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -179,13 +177,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => 2,
     );
 
-    $result = CRM_Activity_BAO_Activity::deleteActivity($params);
+    CRM_Activity_BAO_Activity::deleteActivity($params);
 
-    $activityId = $this->assertDBNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
+    $this->assertDBNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
       'subject', 'Database check for deleted activity.'
     );
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
@@ -194,12 +192,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * deleteActivityTarget($activityId) method deletes activity target for given activity id.
    */
   public function testDeleteActivityTarget() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -226,8 +224,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'contact_id', 'Database check for deleted activity target.'
     );
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
@@ -236,12 +234,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * deleteActivityAssignment($activityId) method deletes activity assignment for given activity id.
    */
   public function testDeleteActivityAssignment() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $assigneeContactId = Contact::createIndividual($params);
+    $assigneeContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -268,8 +266,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'contact_id', 'Database check for deleted activity assignment.'
     );
 
-    Contact::delete($contactId);
-    Contact::delete($assigneeContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($assigneeContactId);
   }
 
   /**
@@ -358,6 +356,41 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // 5 activities, Contact Summary should show all activities
     $count = 5;
     $this->assertEquals($count, $activityCount);
+  }
+
+  /**
+   * CRM-18706 - Test Include/Exclude Activity Filters
+   */
+  public function testActivityFilters() {
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      $this->createFlatXMLDataSet(
+        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
+      )
+    );
+
+    global $_GET;
+    $_GET = array(
+      'cid' => 9,
+      'context' => 'activity',
+      'activity_type_id' => 1,
+      'is_unit_test' => 1,
+    );
+    $obj = new CRM_Activity_Page_AJAX();
+
+    $activities = $obj->getContactActivity();
+    // This should include activities of type Meeting only.
+    foreach ($activities['data'] as $key => $value) {
+      $this->assertEquals('Meeting', $value['activity_type']);
+    }
+    unset($_GET['activity_type_id']);
+
+    $_GET['activity_type_exclude_id'] = 1;
+    $activities = $obj->getContactActivity();
+    // None of the activities should be of type Meeting.
+    foreach ($activities['data'] as $key => $value) {
+      $this->assertNotEquals('Meeting', $value['activity_type']);
+    }
   }
 
   /**
@@ -464,6 +497,32 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertArrayHasKey($contactID, $value['assignee_contact_name']);
       }
     }
+  }
+
+  /**
+   * Test target contact count.
+   */
+  public function testTargetCountforContactSummary() {
+    $targetCount = 5;
+    $contactId = $this->individualCreate();
+    for ($i = 0; $i < $targetCount; $i++) {
+      $targetContactIDs[] = $this->individualCreate(array(), $i);
+    }
+    // create activities with 5 target contacts
+    $activityParams = array(
+      'source_contact_id' => $contactId,
+      'target_contact_id' => $targetContactIDs,
+    );
+    $this->activityCreate($activityParams);
+
+    $params = array(
+      'contact_id' => $contactId,
+      'context' => 'activity',
+    );
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+
+    //verify target count
+    $this->assertEquals($targetCount, $activities[1]['target_contact_counter']);
   }
 
   /**

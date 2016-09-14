@@ -348,7 +348,7 @@ class Kernel {
     if ($msg == 'DB Error: constraint violation' || substr($msg, 0, 9) == 'DB Error:' || $msg == 'DB Error: already exists') {
       try {
         $fields = _civicrm_api3_api_getfields($apiRequest);
-        _civicrm_api3_validate_fields($apiRequest['entity'], $apiRequest['action'], $apiRequest['params'], $fields, TRUE);
+        _civicrm_api3_validate_foreign_keys($apiRequest['entity'], $apiRequest['action'], $apiRequest['params'], $fields);
       }
       catch (\Exception $e) {
         $msg = $e->getMessage();

@@ -137,7 +137,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     CRM_Member_BAO_MembershipLog::add($membershipLog, CRM_Core_DAO::$_nullArray);
 
     // reset the group contact cache since smart groups might be affected due to this
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if ($id) {
       if ($membership->status_id != $oldStatus) {
@@ -603,10 +603,10 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @return int
    *   Id of deleted Membership on success, false otherwise.
    */
-  public static function del($membershipId) {
+  public static function del($membershipId, $preserveContrib = FALSE) {
     //delete related first and then delete parent.
     self::deleteRelatedMemberships($membershipId);
-    return self::deleteMembership($membershipId);
+    return self::deleteMembership($membershipId, $preserveContrib);
   }
 
   /**
@@ -618,7 +618,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @return int
    *   Id of deleted Membership on success, false otherwise.
    */
-  public static function deleteMembership($membershipId) {
+  public static function deleteMembership($membershipId, $preserveContrib = FALSE) {
     // CRM-12147, retrieve membership data before we delete it for hooks
     $params = array('id' => $membershipId);
     $memValues = array();
@@ -654,7 +654,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $params['source_record_id'] = $membershipId;
       CRM_Activity_BAO_Activity::deleteActivity($params);
     }
-    self::deleteMembershipPayment($membershipId);
+    self::deleteMembershipPayment($membershipId, $preserveContrib);
 
     $results = $membership->delete();
     $transaction->commit();
@@ -1308,7 +1308,7 @@ FROM   civicrm_membership, civicrm_contact
 WHERE  civicrm_membership.contact_id = civicrm_contact.id
   AND  civicrm_membership.id = {$id}
 ";
-    return CRM_Core_DAO::singleValueQuery($query, CRM_Core_DAO::$_nullArray);
+    return CRM_Core_DAO::singleValueQuery($query);
   }
 
   /**
@@ -1500,14 +1500,16 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @return object
    *   $membershipPayment deleted membership payment object
    */
-  public static function deleteMembershipPayment($membershipId) {
+  public static function deleteMembershipPayment($membershipId, $preserveContrib = FALSE) {
 
     $membershipPayment = new CRM_Member_DAO_MembershipPayment();
     $membershipPayment->membership_id = $membershipId;
     $membershipPayment->find();
 
     while ($membershipPayment->fetch()) {
-      CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
+      if (!$preserveContrib) {
+        CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
+      }
       CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
       $membershipPayment->delete();
       CRM_Utils_Hook::post('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);

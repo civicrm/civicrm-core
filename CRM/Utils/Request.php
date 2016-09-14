@@ -94,15 +94,15 @@ class CRM_Utils_Request {
     $value = NULL;
     switch ($method) {
       case 'GET':
-        $value = CRM_Utils_Array::value($name, $_GET);
+        $value = self::getValue($name, $_GET);
         break;
 
       case 'POST':
-        $value = CRM_Utils_Array::value($name, $_POST);
+        $value = self::getValue($name, $_POST);
         break;
 
       default:
-        $value = CRM_Utils_Array::value($name, $_REQUEST);
+        $value = self::getValue($name, $_REQUEST);
         break;
     }
 
@@ -134,6 +134,34 @@ class CRM_Utils_Request {
     }
 
     return $value;
+  }
+
+  /**
+   * @param string $name
+   *   Name of the variable to be retrieved.
+   *
+   * @param array $method - '$_GET', '$_POST' or '$_REQUEST'.
+   *
+   * @return mixed
+   *    The value of the variable
+   */
+  public static function getValue($name, $method) {
+    if (isset($method[$name])) {
+      return $method[$name];
+    }
+    // CRM-18384 - decode incorrect keys generated when &amp; is present in url
+    foreach ($method as $key => $value) {
+      if (strpos($key, 'amp;') !== FALSE) {
+        $method[str_replace('amp;', '', $key)] = $method[$key];
+        if (isset($method[$name])) {
+          return $method[$name];
+        }
+        else {
+          continue;
+        }
+      }
+    }
+    return NULL;
   }
 
   /**

@@ -56,16 +56,8 @@
         {/if}
       </div> {* end mainTabContainer *}
 
-      {assign var=save value="_qf_"|cat:$form.formName|cat:"_submit_save"}
-      {assign var=next value="_qf_"|cat:$form.formName|cat:"_submit_next"}
       <div class="crm-submit-buttons">
         {$form.buttons.html}
-        {if $instanceForm}
-          {$form.$save.html}
-        {/if}
-        {if $mode neq 'template' && $form.$next}
-          {$form.$next.html}
-        {/if}
       </div>
     </div> {* criteria section ends *}
   {/if}

@@ -169,4 +169,26 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('OptionGroup', 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
   }
 
+  /**
+   * Ensure only one option value exists after calling ensureOptionValueExists.
+   */
+  public function testEnsureOptionGroupExistsExistingValue() {
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array('name' => 'participant_role'));
+    $this->callAPISuccessGetSingle('OptionGroup', array('name' => 'participant_role'));
+  }
+
+  /**
+   * Ensure only one option value exists adds a new value.
+   */
+  public function testEnsureOptionGroupExistsNewValue() {
+    $optionGroupID = CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array(
+      'name' => 'Bombed',
+      'title' => ts('Catastrophy'),
+      'description' => ts('blah blah'),
+      'is_reserved' => 1,
+    ));
+    $optionGroup = $this->callAPISuccessGetSingle('OptionGroup', array('name' => 'Bombed'));
+    $this->assertEquals($optionGroupID, $optionGroup['id']);
+  }
+
 }

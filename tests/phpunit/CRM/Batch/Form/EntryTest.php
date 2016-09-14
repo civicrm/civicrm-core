@@ -174,14 +174,15 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d', strtotime('07/22/2013')), $result['values'][1]['join_date']);
     $this->assertEquals(date('Y-m-d', strtotime('07/03/2013')), $result['values'][2]['join_date']);
     $this->assertEquals(date('Y-m-d', strtotime('now')), $result['values'][3]['join_date']);
-    $result = $this->callAPISuccess('contribution', 'get', array('return' => 'total_amount'));
+    $result = $this->callAPISuccess('contribution', 'get', array('return' => array('total_amount', 'trxn_id')));
     $this->assertEquals(3, $result['count']);
-    foreach ($result['values'] as $contribution) {
+    foreach ($result['values'] as $key => $contribution) {
       $this->assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
         'contribution_id' => $contribution['id'],
         'return' => 'line_total',
 
       )), $contribution['total_amount']);
+      $this->assertEquals($params['field'][$key]['trxn_id'], $contribution['trxn_id']);
     }
   }
 
@@ -274,6 +275,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'receive_date' => '07/24/2013',
           'receive_date_time' => NULL,
           'payment_instrument' => 1,
+          'trxn_id' => 'TX101',
           'check_number' => NULL,
           'contribution_status_id' => 1,
         ),
@@ -288,6 +290,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'receive_date' => '07/17/2013',
           'receive_date_time' => NULL,
           'payment_instrument' => NULL,
+          'trxn_id' => 'TX102',
           'check_number' => NULL,
           'contribution_status_id' => 1,
         ),
@@ -303,6 +306,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'receive_date' => '07/17/2013',
           'receive_date_time' => NULL,
           'payment_instrument' => NULL,
+          'trxn_id' => 'TX103',
           'check_number' => NULL,
           'contribution_status_id' => 1,
         ),

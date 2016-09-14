@@ -56,7 +56,7 @@
   </div>
 
   <div class="action-link">
-    <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">
+    <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{$browseUrl}' );return false;">
       <i class="crm-i fa-times-circle"></i>
       {ts}Mark this pair as not a duplicate.{/ts}
     </a>
@@ -134,12 +134,12 @@
             <td>
               {* Display location for fields with locations *}
               {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
-                {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
+                {$form.location_blocks.$blockName.$blockId.locTypeId.html}&nbsp;
               {/if}
 
               {* Display other_type_id for websites, ims and phones *}
               {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
-                {$form.location.$blockName.$blockId.typeTypeId.html}&nbsp;
+                {$form.location_blocks.$blockName.$blockId.typeTypeId.html}&nbsp;
               {/if}
 
               {* Display the overwrite/add/add new label *}
@@ -147,7 +147,7 @@
                 {if $row.main}
                   <span class="action_label">({ts}overwrite{/ts})</span>&nbsp;
                    {if $blockName eq 'email' || $blockName eq 'phone' }
-                     {$form.location.$blockName.$blockId.operation.html}&nbsp;
+                     {$form.location_blocks.$blockName.$blockId.operation.html}&nbsp;
                    {/if}
                    <br />
                 {else}
@@ -217,8 +217,25 @@
 {literal}
 <script type="text/javascript">
 
+  var locationBlockInfo = {/literal}{$locationBlockInfo}{literal};
+  var allBlock = {/literal}{$mainLocBlock}{literal};
+
+  /**
+   * Triggered when a 'location' or 'type' destination is changed.
+   * Check to see if the 'main' contact record has a corresponding location
+   * block when the destination of a field is changed. Allow existing location
+   * fields to be overwritten with data from the 'other' contact.
+   *
+   * @param blockname string
+   *   The name of the entity.
+   * @param element object
+   *   The element that was changed (location or type dropdown)
+   * @param blockId int
+   *   The block ID being affected
+   * @param type string
+   *   Location or type (locTypeId / typeTypeId)
+   */
   function mergeBlock(blockname, element, blockId, type) {
-    var allBlock = {/literal}{$mainLocBlock}{literal};
 
     // Get type of select list that's been changed (location or type)
     var locTypeId = '';
@@ -227,50 +244,81 @@
     // If the location was changed, lookup the type if it exists
     if (type == 'locTypeId') {
       locTypeId = element.value;
-      typeTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_typeTypeId' ).val();
+      typeTypeId = CRM.$( 'select#location_blocks_' + blockname + '_' + blockId + '_typeTypeId' ).val();
     }
 
     // Otherwise the type was changed, lookup the location if it exists
     else {
-      locTypeId = CRM.$( 'select#location_' + blockname + '_' + blockId + '_locTypeId' ).val();
+      locTypeId = CRM.$( 'select#location_blocks_' + blockname + '_' + blockId + '_locTypeId' ).val();
       typeTypeId = element.value;
     }
 
     // @todo Fix this 'special handling' for websites (no location id)
     if (!locTypeId) { locTypeId = 0; }
 
-    // Get the matching block, based on location and type, from the main contact record
-    var blockQuery = "allBlock.main_" + blockname + "_" + locTypeId;
-    if (typeTypeId) {
-      blockQuery += "_" + typeTypeId;
-    }
-    var block = eval( blockQuery );
+    // Look for a matching block on the main contact
     var mainBlockId = 0;
     var mainBlockDisplay = '';
+    var mainBlock = findBlock(allBlock, blockname, locTypeId, typeTypeId);
 
     // Create appropriate label / add new link after changing the block
-    if (typeof block == 'undefined') {
+    if (mainBlock == false) {
       label = '<span class="action_label">({/literal}{ts}add{/ts}{literal})</span>';
     }
     else {
 
       // Set display and ID
-      mainBlockDisplay = block['display'];
-      mainBlockId = block['id'];
+      mainBlockDisplay = mainBlock['display'];
+      mainBlockId = mainBlock['id'];
 
       // Set label
       var label = '<span class="action_label">({/literal}{ts}overwrite{/ts}{literal})</span> ';
       if (blockname == 'email' || blockname == 'phone') {
-        var opLabel = 'location[' + blockname + '][' + blockId + '][operation]';
+        var opLabel = 'location_blocks[' + blockname + '][' + blockId + '][operation]';
         label += '<input id="' + opLabel + '" name="' + opLabel + '" type="checkbox" value="1" class="crm-form-checkbox"> <label for="' + opLabel + '">{/literal}{ts}add new{/ts}{literal}</label><br />';
       }
       label += '<br>';
     }
 
     // Update DOM
-    CRM.$( "input[name='location[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
+    CRM.$( "input[name='location_blocks[" + blockname + "][" + blockId + "][mainContactBlockId]']" ).val( mainBlockId );
     CRM.$( "#main_" + blockname + "_" + blockId ).html( mainBlockDisplay );
     CRM.$( "#main_" + blockname + "_" + blockId + "_overwrite" ).html( label );
+  }
+
+  /**
+   * Look for a matching 'main' contact location block by entity, location and
+   * type
+   *
+   * @param allBlock array
+   *   All location blocks on the main contact record.
+   * @param entName string
+   *   The entity name to lookup.
+   * @param locationID int
+   *   The location ID to lookup.
+   * @param typeID int
+   *   The type ID to lookup.
+   *
+   * @returns boolean|object
+   *   Returns false if no match, otherwise an object with the location ID and
+   *   display value.
+   */
+  function findBlock(allBlock, entName, locationID, typeID) {
+    var entityArray = allBlock[entName];
+    var result = false;
+    for (var i = 0; i < entityArray.length; i++) {
+      // Match based on location and type ID, depending on the entity info
+      if (locationBlockInfo[entName]['hasLocation'] == false || locationID == entityArray[i]['location_type_id']) {
+        if (locationBlockInfo[entName]['hasType'] == false || typeID == entityArray[i][locationBlockInfo[entName]['hasType']]) {
+          result = {
+            display: entityArray[i][locationBlockInfo[entName]['displayField']],
+            id: entityArray[i]['id']
+          };
+          break;
+        }
+      }
+    }
+    return result;
   }
 
   CRM.$(function($) {

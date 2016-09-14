@@ -65,8 +65,25 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     if (empty($params['id']) && empty($params['name'])) {
       $params['name'] = CRM_Utils_String::munge($params['title'], '_', 242);
     }
+    $priceSetID = NULL;
+    $validatePriceSet = TRUE;
     if (!empty($params['extends']) && is_array($params['extends'])) {
+      if (!array_key_exists(CRM_Core_Component::getComponentID('CiviEvent'), $params['extends'])
+        || !array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $params['extends'])
+      ) {
+        $validatePriceSet = FALSE;
+      }
       $params['extends'] = CRM_Utils_Array::implodePadded($params['extends']);
+    }
+    else {
+      $priceSetID = CRM_Utils_Array::value('id', $params);
+    }
+    // CRM-16189
+    if ($validatePriceSet && !empty($params['financial_type_id'])) {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType(
+        $params['financial_type_id'],
+        $priceSetID
+      );
     }
     $priceSetBAO = new CRM_Price_BAO_PriceSet();
     $priceSetBAO->copyValues($params);
@@ -747,13 +764,25 @@ WHERE  id = %1";
    *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
    *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
    */
-  public static function processAmount($fields, &$params, &$lineItem, $component = '') {
+  public static function processAmount($fields, &$params, &$lineItem, $component = '', $priceSetID = NULL) {
     // using price set
     $totalPrice = $totalTax = 0;
-    $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
+    // CRM-18701 Sometimes the amount in the price set is overridden by the amount on the form.
+    // This is notably the case with memberships and we need to put this amount
+    // on the line item rather than the calculated amount.
+    // This seems to only affect radio link items as that is the use case for the 'quick config'
+    // set up (which allows a free form field).
+    $amount_override = NULL;
+
     if ($component) {
       $autoRenew = array();
       $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
+    }
+    if ($priceSetID) {
+      $priceFields = self::filterPriceFieldsFromParams($priceSetID, $params);
+      if (count($priceFields) == 1 && !empty($params['total_amount'])) {
+        $amount_override = $params['total_amount'];
+      }
     }
     foreach ($fields as $id => $field) {
       if (empty($params["price_{$id}"]) ||
@@ -792,18 +821,8 @@ WHERE  id = %1";
           }
           $params["price_{$id}"] = array($params["price_{$id}"] => 1);
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
-          $optionLabel = CRM_Utils_Array::value('label', $field['options'][$optionValueId]);
-          $params['amount_priceset_level_radio'] = array();
-          $params['amount_priceset_level_radio'][$optionValueId] = $optionLabel;
-          if (isset($radioLevel)) {
-            $radioLevel = array_merge($radioLevel,
-              array_keys($params['amount_priceset_level_radio'])
-            );
-          }
-          else {
-            $radioLevel = array_keys($params['amount_priceset_level_radio']);
-          }
-          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
+
+          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
             $totalTax += $field['options'][$optionValueId]['tax_amount'];
@@ -826,15 +845,7 @@ WHERE  id = %1";
         case 'Select':
           $params["price_{$id}"] = array($params["price_{$id}"] => 1);
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
-          $optionLabel = $field['options'][$optionValueId]['label'];
-          $params['amount_priceset_level_select'] = array();
-          $params['amount_priceset_level_select'][CRM_Utils_Array::key(1, $params["price_{$id}"])] = $optionLabel;
-          if (isset($selectLevel)) {
-            $selectLevel = array_merge($selectLevel, array_keys($params['amount_priceset_level_select']));
-          }
-          else {
-            $selectLevel = array_keys($params['amount_priceset_level_select']);
-          }
+
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
@@ -851,24 +862,9 @@ WHERE  id = %1";
           break;
 
         case 'CheckBox':
-          $params['amount_priceset_level_checkbox'] = $optionIds = array();
-          foreach ($params["price_{$id}"] as $optionId => $option) {
-            $optionIds[] = $optionId;
-            $optionLabel = $field['options'][$optionId]['label'];
-            $params['amount_priceset_level_checkbox']["{$field['options'][$optionId]['id']}"] = $optionLabel;
-            if (isset($checkboxLevel)) {
-              $checkboxLevel = array_unique(array_merge(
-                  $checkboxLevel,
-                  array_keys($params['amount_priceset_level_checkbox'])
-                )
-              );
-            }
-            else {
-              $checkboxLevel = array_keys($params['amount_priceset_level_checkbox']);
-            }
-          }
+
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
-          foreach ($optionIds as $optionId) {
+          foreach ($params["price_{$id}"] as $optionId => $option) {
             if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionId])) {
               $lineItem = self::setLineItem($field, $lineItem, $optionId);
               $totalTax += $field['options'][$optionId]['tax_amount'];
@@ -1058,7 +1054,7 @@ WHERE  id = %1";
     }
 
     // Mark which field should have the auto-renew checkbox, if any. CRM-18305
-    if (is_array($form->_membershipTypeValues)) {
+    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
       $autoRenewMembershipTypes = array();
       foreach ($form->_membershipTypeValues as $membershiptTypeValue) {
         if ($membershiptTypeValue['auto_renew']) {
@@ -1068,7 +1064,7 @@ WHERE  id = %1";
       foreach ($form->_priceSet['fields'] as &$field) {
         if (array_key_exists('options', $field) && is_array($field['options'])) {
           foreach ($field['options'] as $option) {
-            if ($option['membership_type_id']) {
+            if (!empty($option['membership_type_id'])) {
               if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
                 $form->_priceSet['auto_renew_membership_field'] = $field['id'];
                 // Only one field can offer auto_renew memberships, so break here.
@@ -1678,6 +1674,59 @@ WHERE       ps.id = %1
     $lineItem[$optionValueId]['tax_rate'] = $taxRate;
 
     return $lineItem;
+  }
+
+  /**
+   * Get the first price set value IDs from a parameters array.
+   *
+   * In practice this is really used when we only expect one to exist.
+   *
+   * @param array $params
+   *
+   * @return array
+   *   Array of the ids of the price set values.
+   */
+  public static function parseFirstPriceSetValueIDFromParams($params) {
+    $priceSetValueIDs = self::parsePriceSetValueIDsFromParams($params);
+    return reset($priceSetValueIDs);
+  }
+
+  /**
+   * Get the price set value IDs from a set of parameters
+   *
+   * @param array $params
+   *
+   * @return array
+   *   Array of the ids of the price set values.
+   */
+  public static function parsePriceSetValueIDsFromParams($params) {
+    $priceSetParams = self::parsePriceSetArrayFromParams($params);
+    $priceSetValueIDs = array();
+    foreach ($priceSetParams as $priceSetParam) {
+      foreach (array_keys($priceSetParam) as $priceValueID) {
+        $priceSetValueIDs[] = $priceValueID;
+      }
+    }
+    return $priceSetValueIDs;
+  }
+
+  /**
+   * Get the price set value IDs from a set of parameters
+   *
+   * @param array $params
+   *
+   * @return array
+   *   Array of price fields filtered from the params.
+   */
+  public static function parsePriceSetArrayFromParams($params) {
+    $priceSetParams = array();
+    foreach ($params as $field => $value) {
+      $parts = explode('_', $field);
+      if (count($parts) == 2 && $parts[0] == 'price' && is_numeric($parts[1])) {
+        $priceSetParams[$field] = $value;
+      }
+    }
+    return $priceSetParams;
   }
 
 }

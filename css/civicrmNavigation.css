@@ -59,7 +59,7 @@ html>body .innerbox
   color: white;
   cursor: default;
   font-size: 12px;
-  font-family: Tahoma, Verdana, Arial, Sans;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
 }
 
 #civicrm-menu {
@@ -161,4 +161,13 @@ li.menu-separator{
 /* This ensures the drop-down menus appear at the right height */
 #civicrm-menu > li.menumain {
   height: 19px !important;
+}
+
+/* No results */
+.crm-quickSearch-results.ui-menu-disabled {
+  opacity: .9;
+  background-color: #f8f8f8;
+}
+.crm-quickSearch-results.ui-menu-disabled li {
+  cursor: default;
 }

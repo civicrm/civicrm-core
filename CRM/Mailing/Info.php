@@ -187,6 +187,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       ))
       ->addPermissions(array(
         'view all contacts',
+        'edit all contacts',
         'access CiviMail',
         'create mailings',
         'schedule mailings',
@@ -249,20 +250,14 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     );
 
     if (self::workflowEnabled() || $getAllUnconditionally) {
-      $permissions[] = array(
-        'create mailings' => array(
-          ts('create mailings'),
-        ),
+      $permissions['create mailings'] = array(
+        ts('create mailings'),
       );
-      $permissions[] = array(
-        'schedule mailings' => array(
-          ts('schedule mailings'),
-        ),
+      $permissions['schedule mailings'] = array(
+        ts('schedule mailings'),
       );
-      $permissions[] = array(
-        'approve mailings' => array(
-          ts('approve mailings'),
-        ),
+      $permissions['approve mailings'] = array(
+        ts('approve mailings'),
       );
     }
 

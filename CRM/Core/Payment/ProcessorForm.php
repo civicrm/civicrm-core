@@ -73,6 +73,19 @@ class CRM_Core_Payment_ProcessorForm {
       $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL(NULL, NULL, 'cancel');
     }
 
+    if (!empty($form->_values['custom_pre_id'])) {
+      $profileAddressFields = array();
+      $fields = CRM_Core_BAO_UFGroup::getFields($form->_values['custom_pre_id'], FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
+        NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
+
+      foreach ((array) $fields as $key => $value) {
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array('uf_group_id' => $form->_values['custom_pre_id']));
+      }
+      if (count($profileAddressFields)) {
+        $form->set('profileAddressFields', $profileAddressFields);
+      }
+    }
+
     //checks after setting $form->_paymentProcessor
     // we do this outside of the above conditional to avoid
     // saving the country/state list in the session (which could be huge)

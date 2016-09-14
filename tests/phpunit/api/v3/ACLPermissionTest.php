@@ -64,6 +64,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_contribution',
       'civicrm_participant',
       'civicrm_uf_match',
+      'civicrm_activity',
+      'civicrm_activity_contact',
     );
     $this->quickCleanup($tablesToTruncate);
     $config = CRM_Core_Config::singleton();
@@ -289,7 +291,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         'api.pledge.get' => 1,
         'sequential' => 1,
       ),
-      'Error in call to pledge_get : API permission check failed for pledge/get call; missing permission: access CiviCRM.'
+      'Error in call to Pledge_get : API permission check failed for Pledge/get call; insufficient permission: require access CiviCRM and access CiviPledge'
     );
   }
 
@@ -348,7 +350,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEntitiesGetCoreACLLimitingCheck($entity) {
-    $this->markTestIncomplete('this does not work in 4.4 but can be enabled in 4.5 or a security release of 4.4 including the important security fix CRM-14877');
     $this->setupCoreACL();
     $this->setUpEntities($entity);
     $result = $this->callAPISuccess($entity, 'get', array(
@@ -450,6 +451,134 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   public function aclWhereOnlyOne($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " contact_a.id = " . $this->allowedContactId;
+  }
+
+  /**
+   * Basic check that an unpermissioned call keeps working and permissioned call fails.
+   */
+  public function testGetActivityNoPermissions() {
+    $this->setPermissions(array());
+    $this->callAPISuccess('Activity', 'get', array());
+    $this->callAPIFailure('Activity', 'get', array('check_permissions' => 1));
+  }
+
+  /**
+   * View all activities is enough regardless of contact ACLs.
+   */
+  public function testGetActivityViewAllActivitiesEnoughWithOrWithoutID() {
+    $activity = $this->activityCreate();
+    $this->setPermissions(array('view all activities', 'access CiviCRM'));
+    $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+    $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1));
+  }
+
+  /**
+   * View all activities is required unless id is passed in.
+   */
+  public function testGetActivityViewAllContactsNotEnoughWIthoutID() {
+    $this->setPermissions(array('view all contacts', 'access CiviCRM'));
+    $this->callAPIFailure('Activity', 'get', array('check_permissions' => 1));
+  }
+
+  /**
+   * View all activities is required unless id is passed in, in which case ACLs are used.
+   */
+  public function testGetActivityViewAllContactsEnoughWIthID() {
+    $activity = $this->activityCreate();
+    $this->setPermissions(array('view all contacts', 'access CiviCRM'));
+    $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+  }
+
+  /**
+   * View all activities is required unless id is passed in, in which case ACLs are used.
+   */
+  public function testGetActivityAccessCiviCRMNotEnough() {
+    $activity = $this->activityCreate();
+    $this->setPermissions(array('access CiviCRM'));
+    $this->callAPIFailure('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+  }
+
+  /**
+   * Check that activities can be retrieved by ACL.
+   *
+   * The activities api applies ACLs in a very limited circumstance, if id is passed in.
+   * Otherwise it sticks with the blunt original permissions.
+   */
+  public function testGetActivityByACL() {
+    $this->setPermissions(array('access CiviCRM'));
+    $activity = $this->activityCreate();
+
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+  }
+
+  /**
+   * To leverage ACL permission to view an activity you must be able to see all of the contacts.
+   */
+  public function testGetActivityByAclCannotViewAllContacts() {
+    $activity = $this->activityCreate();
+    $contacts = $this->getActivityContacts($activity);
+    $this->setPermissions(array('access CiviCRM'));
+
+    foreach ($contacts as $contact_id) {
+      $this->allowedContactId = $contact_id;
+      $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlyOne'));
+      $this->callAPIFailure('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+    }
+  }
+
+  /**
+   * Check that if the source contact is deleted but we can view the others we can see the activity.
+   *
+   * CRM-18409.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetActivityACLSourceContactDeleted() {
+    $this->setPermissions(array('access CiviCRM', 'delete contacts'));
+    $activity = $this->activityCreate();
+    $contacts = $this->getActivityContacts($activity);
+
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    $this->contactDelete($contacts['source_contact_id']);
+    $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+  }
+
+  /**
+   * Get the contacts for the activity.
+   *
+   * @param $activity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getActivityContacts($activity) {
+    $contacts = array();
+
+    $activityContacts = $this->callAPISuccess('ActivityContact', 'get', array(
+        'activity_id' => $activity['id'],
+      )
+    );
+
+    $activityRecordTypes = $this->callAPISuccess('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
+    foreach ($activityContacts['values'] as $activityContact) {
+      $type = $activityRecordTypes['values'][$activityContact['record_type_id']];
+      switch ($type) {
+        case 'Activity Source':
+          $contacts['source_contact_id'] = $activityContact['contact_id'];
+          break;
+
+        case 'Activity Targets':
+          $contacts['target_contact_id'] = $activityContact['contact_id'];
+          break;
+
+        case 'Activity Assignees':
+          $contacts['assignee_contact_id'] = $activityContact['contact_id'];
+          break;
+
+      }
+    }
+    return $contacts;
   }
 
 }

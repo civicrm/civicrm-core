@@ -55,7 +55,8 @@
   <field>
     <name>modified_date</name>
     <title>Cache Modified Date</title>
-    <type>date</type>
+    <type>timestamp</type>
+    <required>false</required>
     <comment>When was this cache entry last modified</comment>
     <add>1.6</add>
   </field>

@@ -48,13 +48,14 @@ if (empty($_GET)) {
 }
 else {
   $log->alert('payment_notification PayPal_Standard', $_REQUEST);
-  $paypalIPN = new CRM_Core_Payment_PayPalIPN();
+  $paypalIPN = new CRM_Core_Payment_PayPalIPN($_REQUEST);
   // @todo upgrade standard per Pro
 }
 try {
   //CRM-18245
-  CRM_Utils_System::loadBootStrap();
-
+  if ($config->userFramework == 'Joomla') {
+    CRM_Utils_System::loadBootStrap();
+  }
   $paypalIPN->main();
 }
 catch (CRM_Core_Exception $e) {

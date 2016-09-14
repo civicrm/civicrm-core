@@ -346,8 +346,11 @@ class CRM_Core_Payment_BaseIPN {
             'labelColumn' => 'name',
             'flip' => 1,
           ));
+        // Cancel only Pending memberships
+        // CRM-18688
+        $pendingStatusId = $membershipStatuses['Pending'];
         foreach ($memberships as $membership) {
-          if ($membership) {
+          if ($membership && ($membership->status_id == $pendingStatusId)) {
             $membership->status_id = $membershipStatuses['Cancelled'];
             $membership->save();
 

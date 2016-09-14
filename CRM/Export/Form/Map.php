@@ -246,7 +246,8 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       $this->get('componentTable'),
       $this->get('mergeSameAddress'),
       $this->get('mergeSameHousehold'),
-      $exportParams
+      $exportParams,
+      $this->get('queryOperator')
     );
   }
 

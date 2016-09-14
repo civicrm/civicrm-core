@@ -159,6 +159,10 @@ function verify( ) {
                <td class="description label">{$form.newGroupDesc.label}</td>
                <td>{$form.newGroupDesc.html}</td>
              </tr>
+             <tr>
+               <td class="description label">{$form.newGroupType.label}</td>
+               <td>{$form.newGroupType.html}</td>
+             </tr>
             </table>
  </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->

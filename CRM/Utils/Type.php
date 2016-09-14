@@ -49,7 +49,10 @@ class CRM_Utils_Type {
     T_CCNUM = 8192,
     T_MEDIUMBLOB = 16384;
 
-  // @todo What's the point of these constants? Backwards compatibility?
+  // @TODO What's the point of these constants? Backwards compatibility?
+  //
+  // These are used for field size (<input type=text size=2>), but redundant TWO=2
+  // usages are rare and should be eliminated. See CRM-18810.
   const
     TWO = 2,
     FOUR = 4,
@@ -148,6 +151,18 @@ class CRM_Utils_Type {
   public static function escapeAll($data, $type, $abort = TRUE) {
     foreach ($data as $key => $value) {
       $data[$key] = CRM_Utils_Type::escape($value, $type, $abort);
+    }
+    return $data;
+  }
+
+  /**
+   * Helper function to call validate on arrays
+   *
+   * @see validate
+   */
+  public static function validateAll($data, $type, $abort = TRUE) {
+    foreach ($data as $key => $value) {
+      $data[$key] = CRM_Utils_Type::validate($value, $type, $abort);
     }
     return $data;
   }
@@ -256,21 +271,29 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnNameLoose':
-        if (CRM_Utils_Rule::mysqlColumnNameLoose($data)) {
-          return str_replace('`', '', $data);
-        }
-        break;
+      case 'MysqlColumnNameOrAlias':
+        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
+          $data = str_replace('`', '', $data);
+          $parts = explode('.', $data);
+          $data = '`' . implode('`.`', $parts) . '`';
 
-      case 'MysqlColumnName':
-        if (CRM_Utils_Rule::mysqlColumnName($data)) {
           return $data;
         }
         break;
 
       case 'MysqlOrderByDirection':
         if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
-          return $data;
+          return strtolower($data);
+        }
+        break;
+
+      case 'MysqlOrderBy':
+        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
+          $parts = explode(',', $data);
+          foreach ($parts as &$part) {
+            $part = preg_replace_callback('/^(?:(?:((?:`[\w-]{1,64}`|[\w-]{1,64}))(?:\.))?(`[\w-]{1,64}`|[\w-]{1,64})(?: (asc|desc))?)$/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
+          }
+          return implode(', ', $parts);
         }
         break;
 
@@ -377,6 +400,24 @@ class CRM_Utils_Type {
         }
         break;
 
+      case 'MysqlColumnNameOrAlias':
+        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
+          return $data;
+        }
+        break;
+
+      case 'MysqlOrderByDirection':
+        if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
+          return strtolower($data);
+        }
+        break;
+
+      case 'MysqlOrderBy':
+        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
+          return $data;
+        }
+        break;
+
       default:
         CRM_Core_Error::fatal("Cannot recognize $type for $data");
         break;
@@ -388,6 +429,31 @@ class CRM_Utils_Type {
     }
 
     return NULL;
+  }
+
+  /**
+   * preg_replace_callback for MysqlOrderBy escape.
+   */
+  public static function mysqlOrderByCallback($matches) {
+    $output = '';
+    $matches = str_replace('`', '', $matches);
+
+    // Table name.
+    if (isset($matches[1]) && $matches[1]) {
+      $output .= '`' . $matches[1] . '`.';
+    }
+
+    // Column name.
+    if (isset($matches[2]) && $matches[2]) {
+      $output .= '`' . $matches[2] . '`';
+    }
+
+    // Sort order.
+    if (isset($matches[3]) && $matches[3]) {
+      $output .= ' ' . $matches[3];
+    }
+
+    return $output;
   }
 
 }

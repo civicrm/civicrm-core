@@ -119,19 +119,24 @@
     <title>Group Type</title>
     <length>128</length>
     <comment>FK to group type</comment>
+    <pseudoconstant>
+      <optionGroupName>group_type</optionGroupName>
+    </pseudoconstant>
     <add>1.9</add>
   </field>
   <field>
     <name>cache_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
     <title>Group Cache Date</title>
+    <required>false</required>
     <comment>Date when we created the cache for a smart group</comment>
     <add>2.1</add>
   </field>
   <field>
     <name>refresh_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
     <title>Next Group Refresh Time</title>
+    <required>false</required>
     <comment>Date and time when we need to refresh the cache next.</comment>
     <add>4.3</add>
   </field>

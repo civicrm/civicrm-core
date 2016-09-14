@@ -1,8 +1,6 @@
 <?php
 namespace Civi\CCase;
 
-require_once 'CiviTest/CiviCaseTestCase.php';
-
 /**
  * Class SequenceListenerTest
  *

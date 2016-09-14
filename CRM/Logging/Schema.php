@@ -874,7 +874,7 @@ COLS;
         // We tried setting the @uniqueID in the trigger but it was unreliable.
         // An external interaction could split over 2 connections & it seems worth blocking the revert on
         // these reports & adding extra permissioning to the api for this.
-        $connectionSQLString = "COALESCE(@uniqueID, LEFT(CONCAT('con_', unix_timestamp()/3600, CONNECTION_ID()), 17))";
+        $connectionSQLString = "COALESCE(@uniqueID, LEFT(CONCAT('c_', unix_timestamp()/3600, CONNECTION_ID()), 17))";
       }
       else {
         // The log tables have not yet been converted to have varchar(17) fields for log_conn_id.

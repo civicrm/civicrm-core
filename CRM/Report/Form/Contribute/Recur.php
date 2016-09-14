@@ -35,6 +35,19 @@
 class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -158,7 +171,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -174,7 +187,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'title' => ts('Frequency Unit'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('recur_frequency_units'),
-            'type' => CRM_Utils_Type::T_INT,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'frequency_interval' => array(
             'title' => ts('Frequency Interval'),
@@ -253,7 +266,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY " . $this->_aliases['civicrm_contribution_recur'] . ".id";
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_contribution_recur']}.id");
   }
 
   public function where() {

@@ -1075,4 +1075,30 @@ class CRM_Core_SelectValues {
     );
   }
 
+  /**
+   * Exportable document formats.
+   *
+   * @return array
+   */
+  public static function documentFormat() {
+    return array(
+      'pdf' => ts('Portable Document Format (.pdf)'),
+      'docx' => ts('MS Word (.docx)'),
+      'odt' => ts('Open Office (.odt)'),
+      'html' => ts('Webpage (.html)'),
+    );
+  }
+
+  /**
+   * Application type of document.
+   *
+   * @return array
+   */
+  public static function documentApplicationType() {
+    return array(
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'odt' => 'application/vnd.oasis.opendocument.text',
+    );
+  }
+
 }

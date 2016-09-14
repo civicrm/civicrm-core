@@ -75,7 +75,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
     $this->initialize($params);
 
-    $this->Pager_Sliding($params);
+    parent::__construct($params);
 
     list($offset, $limit) = $this->getOffsetAndRowCount();
     $start = $offset + 1;

@@ -520,7 +520,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param array $params
    */
   public static function addBillingNameFieldsIfOtherwiseNotSet(&$params) {
-    $nameFields = array('first_name', 'middle_name', 'last_name');
+    $nameFields = array('first_name', 'middle_name', 'last_name', 'nick_name', 'prefix_id', 'suffix_id');
     foreach ($nameFields as $field) {
       if (!empty($params[$field])) {
         return;
@@ -935,7 +935,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_acl_contact_cache WHERE contact_id = %1', array(1 => array($contactID, 'Integer')));
     }
     else {
-      CRM_Contact_BAO_GroupContactCache::remove();
+      CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
     }
   }
 
@@ -956,7 +956,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 UPDATE civicrm_contact
 SET image_URL=NULL
 WHERE id={$id}; ";
-    CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    CRM_Core_DAO::executeQuery($query);
     return TRUE;
   }
 
@@ -1932,8 +1932,7 @@ ORDER BY civicrm_email.is_primary DESC";
       CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $addToGroupID);
     }
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if ($editHook) {
       CRM_Utils_Hook::post('edit', 'Profile', $contactID, $params);
@@ -2051,11 +2050,7 @@ ORDER BY civicrm_email.is_primary DESC";
     $primaryPhoneLoc = NULL;
     $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
-      $locTypeId = $typeId = NULL;
       list($fieldName, $locTypeId, $typeId) = CRM_Utils_System::explode('-', $key, 3);
-
-      //store original location type id
-      $actualLocTypeId = $locTypeId;
 
       if ($locTypeId == 'Primary') {
         if ($contactID) {
@@ -2240,12 +2235,7 @@ ORDER BY civicrm_email.is_primary DESC";
           else {
             $type = $data['contact_type'];
             if (!empty($data['contact_sub_type'])) {
-              $type = $data['contact_sub_type'];
-              $type = CRM_Utils_Array::explodePadded($type);
-              // generally a contact even if, has multiple subtypes the parent-type is going to be one only
-              // and since formatCustomField() would be interested in parent type, lets consider only one subtype
-              // as the results going to be same.
-              $type = $type[0];
+              $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
             }
           }
 
@@ -2254,7 +2244,9 @@ ORDER BY civicrm_email.is_primary DESC";
             $value,
             $type,
             $valueId,
-            $contactID
+            $contactID,
+            FALSE,
+            FALSE
           );
         }
         elseif ($key == 'edit') {
@@ -3286,8 +3278,9 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     // Update phone table to populate phone_numeric field
     if (!$tableName || $tableName == 'civicrm_phone') {
       // Define stored sql function needed for phones
-      CRM_Core_DAO::executeQuery(self::DROP_STRIP_FUNCTION_43);
-      CRM_Core_DAO::executeQuery(self::CREATE_STRIP_FUNCTION_43);
+      $sqlTriggers = Civi::service('sql_triggers');
+      $sqlTriggers->enqueueQuery(self::DROP_STRIP_FUNCTION_43);
+      $sqlTriggers->enqueueQuery(self::CREATE_STRIP_FUNCTION_43);
       $info[] = array(
         'table' => array('civicrm_phone'),
         'when' => 'BEFORE',

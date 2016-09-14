@@ -32,7 +32,6 @@ use Civi\Payment\System;
  *  Include class definitions
  */
 require_once 'api/api.php';
-require_once 'CRM/Financial/BAO/FinancialType.php';
 define('API_LATEST_VERSION', 3);
 
 /**
@@ -132,6 +131,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @var CRM_Extension_System
    */
   protected $origExtensionSystem;
+
+  /**
+   * Array of IDs created during test setup routine.
+   *
+   * The cleanUpSetUpIds method can be used to clear these at the end of the test.
+   *
+   * @var array
+   */
+  public $setupIDs = array();
 
   /**
    *  Constructor.
@@ -968,7 +976,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       );
     }
     $result = $this->civicrm_api($entity, $action, $params);
-    $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success");
+    $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success", $expectedErrorMessage);
     return $result;
   }
 
@@ -1138,7 +1146,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function membershipTypeCreate($params = array()) {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
-    $memberOfOrganization = $this->organizationCreate();
+    $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge(array(
       'name' => 'General',
       'duration_unit' => 'year',
@@ -1166,16 +1174,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return mixed
    */
   public function contactMembershipCreate($params) {
-    $pre = array(
+    $params = array_merge(array(
       'join_date' => '2007-01-21',
       'start_date' => '2007-01-21',
       'end_date' => '2007-12-21',
       'source' => 'Payment',
-    );
-
-    foreach ($pre as $key => $val) {
-      if (!isset($params[$key])) {
-        $params[$key] = $val;
+      'membership_type_id' => 'General',
+    ), $params);
+    if (!is_numeric($params['membership_type_id'])) {
+      $membershipTypes = $this->callAPISuccess('Membership', 'getoptions', array('action' => 'create', 'field' => 'membership_type_id'));
+      if (!in_array($params['membership_type_id'], $membershipTypes['values'])) {
+        $this->membershipTypeCreate(array('name' => $params['membership_type_id']));
       }
     }
 
@@ -1388,20 +1397,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return array
    *   Array of contribution page
    */
-  public function contributionPageCreate($params) {
-    $this->_pageParams = array(
+  public function contributionPageCreate($params = array()) {
+    $this->_pageParams = array_merge(array(
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
       'financial_account_id' => 1,
-      'payment_processor' => $params['processor_id'],
       'is_active' => 1,
       'is_allow_other_amount' => 1,
       'min_amount' => 10,
       'max_amount' => 1000,
-    );
-    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
-    return $contributionPage;
+    ), $params);
+    return $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
   }
 
   /**
@@ -1789,6 +1796,25 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $result['id'];
   }
 
+  /**
+   * Create a smart group.
+   *
+   * By default it will be a group of households.
+   *
+   * @param array $smartGroupParams
+   * @param array $groupParams
+   * @return int
+   */
+  public function smartGroupCreate($smartGroupParams = array(), $groupParams = array()) {
+    $smartGroupParams = array_merge(array(
+      'formValues' => array('contact_type' => array('IN' => array('Household'))),
+    ),
+    $smartGroupParams);
+    $savedSearch = CRM_Contact_BAO_SavedSearch::create($smartGroupParams);
+
+    $groupParams['saved_search_id'] = $savedSearch->id;
+    return $this->groupCreate($groupParams);
+  }
 
   /**
    * Function to add a Group.
@@ -1941,40 +1967,37 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @return array|int
    */
-  public function activityCreate($params = NULL) {
-
-    if ($params === NULL) {
-      $individualSourceID = $this->individualCreate();
-
-      $contactParams = array(
+  public function activityCreate($params = array()) {
+    $params = array_merge(array(
+      'subject' => 'Discussion on warm beer',
+      'activity_date_time' => date('Ymd'),
+      'duration_hours' => 30,
+      'duration_minutes' => 20,
+      'location' => 'Baker Street',
+      'details' => 'Lets schedule a meeting',
+      'status_id' => 1,
+      'activity_name' => 'Meeting',
+    ), $params);
+    if (!isset($params['source_contact_id'])) {
+      $params['source_contact_id'] = $this->individualCreate();
+    }
+    if (!isset($params['target_contact_id'])) {
+      $params['target_contact_id'] = $this->individualCreate(array(
         'first_name' => 'Julia',
         'Last_name' => 'Anderson',
         'prefix' => 'Ms.',
         'email' => 'julia_anderson@civicrm.org',
         'contact_type' => 'Individual',
-      );
-
-      $individualTargetID = $this->individualCreate($contactParams);
-
-      $params = array(
-        'source_contact_id' => $individualSourceID,
-        'target_contact_id' => array($individualTargetID),
-        'assignee_contact_id' => array($individualTargetID),
-        'subject' => 'Discussion on warm beer',
-        'activity_date_time' => date('Ymd'),
-        'duration_hours' => 30,
-        'duration_minutes' => 20,
-        'location' => 'Baker Street',
-        'details' => 'Lets schedule a meeting',
-        'status_id' => 1,
-        'activity_name' => 'Meeting',
-      );
+      ));
+    }
+    if (!isset($params['assignee_contact_id'])) {
+      $params['assignee_contact_id'] = $params['target_contact_id'];
     }
 
     $result = $this->callAPISuccess('Activity', 'create', $params);
 
-    $result['target_contact_id'] = $individualTargetID;
-    $result['assignee_contact_id'] = $individualTargetID;
+    $result['target_contact_id'] = $params['target_contact_id'];
+    $result['assignee_contact_id'] = $params['assignee_contact_id'];
     return $result;
   }
 
@@ -2077,6 +2100,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $customField = $this->customFieldCreate(array(
       'custom_group_id' => $ids['custom_group_id'],
       'label' => 'field_1' . $ids['custom_group_id'],
+      'in_selector' => 1,
     ));
 
     $ids['custom_field_id'][] = $customField['id'];
@@ -2085,6 +2109,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'custom_group_id' => $ids['custom_group_id'],
       'default_value' => '',
       'label' => 'field_2' . $ids['custom_group_id'],
+      'in_selector' => 1,
     ));
     $ids['custom_field_id'][] = $customField['id'];
 
@@ -2092,6 +2117,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'custom_group_id' => $ids['custom_group_id'],
       'default_value' => '',
       'label' => 'field_3' . $ids['custom_group_id'],
+      'in_selector' => 1,
     ));
     $ids['custom_field_id'][] = $customField['id'];
 
@@ -2270,8 +2296,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     global $civicrm_root;
     if (file_exists($civicrm_root . '/tests/templates/documentFunction.tpl')) {
-      if (!is_dir($civicrm_root . '/api/v3/examples/$entity')) {
-        mkdir($civicrm_root . '/api/v3/examples/$entity');
+      if (!is_dir($civicrm_root . "/api/v3/examples/$entity")) {
+        mkdir($civicrm_root . "/api/v3/examples/$entity");
       }
       $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.php", "w+b");
       fwrite($f, $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl'));
@@ -3065,6 +3091,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'class_name' => 'Payment_PayPalImpl',
         'billing_mode' => 3,
         'financial_type_id' => 1,
+        'financial_account_id' => 12,
       ),
       $params);
     if (!is_numeric($params['payment_processor_type_id'])) {
@@ -3308,8 +3335,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   protected function createParticipantWithContribution() {
     // creating price set, price field
-    $this->_contactId = Contact::createIndividual();
-    $this->_eventId = Event::create($this->_contactId);
+    $this->_contactId = $this->individualCreate();
+    $event = $this->eventCreate();
+    $this->_eventId = $event['id'];
     $eventParams = array(
       'id' => $this->_eventId,
       'financial_type_id' => 4,
@@ -3467,6 +3495,127 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     $this->flushFinancialTypeStatics();
     CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+  }
+
+  /**
+   * @param array $params
+   * @param $context
+   */
+  public function _checkFinancialRecords($params, $context) {
+    $entityParams = array(
+      'entity_id' => $params['id'],
+      'entity_table' => 'civicrm_contribution',
+    );
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $params['id']));
+    $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
+    if ($context == 'pending') {
+      $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
+      $this->assertNull($trxn, 'No Trxn to be created until IPN callback');
+      return;
+    }
+    $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $trxnParams = array(
+      'id' => $trxn['financial_trxn_id'],
+    );
+    if ($context != 'online' && $context != 'payLater') {
+      $compareParams = array(
+        'to_financial_account_id' => 6,
+        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'status_id' => 1,
+      );
+    }
+    if ($context == 'feeAmount') {
+      $compareParams['fee_amount'] = 50;
+    }
+    elseif ($context == 'online') {
+      $compareParams = array(
+        'to_financial_account_id' => 12,
+        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'status_id' => 1,
+        'payment_instrument_id' => 1,
+      );
+    }
+    elseif ($context == 'payLater') {
+      $compareParams = array(
+        'to_financial_account_id' => 7,
+        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'status_id' => 2,
+      );
+    }
+    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
+    $entityParams = array(
+      'financial_trxn_id' => $trxn['financial_trxn_id'],
+      'entity_table' => 'civicrm_financial_item',
+    );
+    $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $fitemParams = array(
+      'id' => $entityTrxn['entity_id'],
+    );
+    $compareParams = array(
+      'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+      'status_id' => 1,
+      'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
+    );
+    if ($context == 'payLater') {
+      $compareParams = array(
+        'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'status_id' => 3,
+        'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
+      );
+    }
+    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
+    if ($context == 'feeAmount') {
+      $maxParams = array(
+        'entity_id' => $params['id'],
+        'entity_table' => 'civicrm_contribution',
+      );
+      $maxTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($maxParams, TRUE));
+      $trxnParams = array(
+        'id' => $maxTrxn['financial_trxn_id'],
+      );
+      $compareParams = array(
+        'to_financial_account_id' => 5,
+        'from_financial_account_id' => 6,
+        'total_amount' => 50,
+        'status_id' => 1,
+      );
+      $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['id'], 'DESC');
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
+      $fitemParams = array(
+        'entity_id' => $trxnId['financialTrxnId'],
+        'entity_table' => 'civicrm_financial_trxn',
+      );
+      $compareParams = array(
+        'amount' => 50,
+        'status_id' => 1,
+        'financial_account_id' => 5,
+      );
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
+    }
+    // This checks that empty Sales tax rows are not being created. If for any reason it needs to be removed the
+    // line should be copied into all the functions that call this function & evaluated there
+    // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
+    // when calling completeTransaction or repeatTransaction.
+    $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
+  }
+
+  /**
+   * Cleanup function for contents of $this->ids.
+   *
+   * This is a best effort cleanup to use in tear downs etc.
+   *
+   * It will not fail if the data has already been removed (some tests may do
+   * their own cleanup).
+   */
+  protected function cleanUpSetUpIDs() {
+    foreach ($this->setupIDs as $entity => $id) {
+      try {
+        civicrm_api3($entity, 'delete', array('id' => $id, 'skip_undelete' => 1));
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        // This is a best-effort cleanup function, ignore.
+      }
+    }
   }
 
 }

@@ -133,6 +133,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * form fields based on their requirement
    */
   public function setFields() {
+    // Remove print document activity type
+    $unwanted = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, "AND v.name = 'Print PDF Letter'");
+    $activityTypes = array_diff_key(CRM_Core_PseudoConstant::ActivityType(FALSE), $unwanted);
+
     $this->_fields = array(
       'subject' => array(
         'type' => 'text',
@@ -198,7 +202,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'followup_activity_type_id' => array(
         'type' => 'select',
         'label' => ts('Followup Activity'),
-        'attributes' => array('' => '- ' . ts('select activity') . ' -') + CRM_Core_PseudoConstant::ActivityType(FALSE),
+        'attributes' => array('' => '- ' . ts('select activity') . ' -') + $activityTypes,
         'extra' => array('class' => 'crm-select2'),
       ),
       // Add optional 'Subject' field for the Follow-up Activiity, CRM-4491
@@ -210,12 +214,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         ),
       ),
     );
-
-    if (($this->_context == 'standalone') &&
-      ($printPDF = CRM_Utils_Array::key('Print PDF Letter', $this->_fields['followup_activity_type_id']['attributes']))
-    ) {
-      unset($this->_fields['followup_activity_type_id']['attributes'][$printPDF]);
-    }
   }
 
   /**
@@ -379,7 +377,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       // Get the tree of custom fields.
-      $this->_groupTree = &CRM_Core_BAO_CustomGroup::getTree('Activity', $this,
+      $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', $this,
         $this->_activityId, 0, $this->_activityTypeId
       );
     }

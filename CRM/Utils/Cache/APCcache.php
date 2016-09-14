@@ -87,7 +87,7 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
    *
    * @return mixed
    */
-  public function &get($key) {
+  public function get($key) {
     return apc_fetch($this->_prefix . $key);
   }
 

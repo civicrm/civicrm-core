@@ -66,7 +66,7 @@
       {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
-          {if $field.name|substr:0:11 ne 'soft_credit'}
+          {if $field.name|substr:0:11 ne 'soft_credit' and $field.name ne 'trxn_id'}
           <img src="{$config->resourceBase}i/copy.png"
                alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}"
                fname="{$field.name}" class="action-icon"
@@ -104,8 +104,8 @@
               {$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:big}
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
             </div>
-            <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
           {elseif $n eq 'soft_credit_type'}
+            <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
           {elseif $n eq 'contribution_soft_credit_pcp_id'}
             <div class="compressed crm-grid-cell">
               <div>{$form.pcp_made_through_id.$rowNumber.html}{$form.pcp_made_through.$rowNumber.html}</div>

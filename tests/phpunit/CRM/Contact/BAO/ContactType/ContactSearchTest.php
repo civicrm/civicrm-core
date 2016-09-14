@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/Contact.php';
-
 /**
  * Class CRM_Contact_BAO_ContactType_ContactSearchTest
  * @group headless
@@ -18,7 +16,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     );
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::add($params);
     $this->student = $params['name'];
 
     $parents = 'indivi_parent' . substr(sha1(rand()), 0, 7);
@@ -29,7 +27,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     );
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::add($params);
     $this->parent = $params['name'];
 
     $orgs = 'org_sponsor' . substr(sha1(rand()), 0, 7);
@@ -40,7 +38,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     );
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::add($params);
     $this->sponsor = $params['name'];
 
     $this->indiviParams = array(
@@ -48,15 +46,15 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
       'last_name' => 'Grant',
       'contact_type' => 'Individual',
     );
-    $this->individual = Contact::create($this->indiviParams);
+    $this->individual = $this->individualCreate($this->indiviParams);
 
-    $this->indiviStudentParams = array(
+    $this->individualStudentParams = array(
       'first_name' => 'Bill',
       'last_name' => 'Adams',
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->student,
     );
-    $this->indiviStudent = Contact::create($this->indiviStudentParams);
+    $this->individualStudent = $this->individualCreate($this->individualStudentParams);
 
     $this->indiviParentParams = array(
       'first_name' => 'Alen',
@@ -64,26 +62,26 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->parent,
     );
-    $this->indiviParent = Contact::create($this->indiviParentParams);
+    $this->indiviParent = $this->individualCreate($this->indiviParentParams);
 
     $this->organizationParams = array(
       'organization_name' => 'Compumentor',
       'contact_type' => 'Organization',
     );
-    $this->organization = Contact::create($this->organizationParams);
+    $this->organization = $this->organizationCreate($this->organizationParams);
 
     $this->orgSponsorParams = array(
       'organization_name' => 'Conservation Corp',
       'contact_type' => 'Organization',
       'contact_sub_type' => $this->sponsor,
     );
-    $this->orgSponsor = Contact::create($this->orgSponsorParams);
+    $this->orgSponsor = $this->organizationCreate($this->orgSponsorParams);
 
     $this->householdParams = array(
       'household_name' => "John Doe's home",
       'contact_type' => 'Household',
     );
-    $this->household = Contact::create($this->householdParams);
+    $this->household = $this->householdCreate($this->householdParams);
   }
 
   /**
@@ -98,7 +96,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $result = civicrm_api('contact', 'get', $params);
 
     $individual = $result['values'][$this->individual];
-    $indiviStudent = $result['values'][$this->indiviStudent];
+    $individualStudent = $result['values'][$this->individualStudent];
     $indiviParent = $result['values'][$this->indiviParent];
 
     //asserts for type:Individual
@@ -108,10 +106,10 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $this->assertNotContains('contact_sub_type', $individual);
 
     //asserts for type:Individual subtype:Student
-    $this->assertEquals($indiviStudent['contact_id'], $this->indiviStudent);
-    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name']);
-    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type']);
-    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type']);
+    $this->assertEquals($individualStudent['contact_id'], $this->individualStudent);
+    $this->assertEquals($individualStudent['first_name'], $this->individualStudentParams['first_name']);
+    $this->assertEquals($individualStudent['contact_type'], $this->individualStudentParams['contact_type']);
+    $this->assertEquals(end($individualStudent['contact_sub_type']), $this->individualStudentParams['contact_sub_type']);
 
     //asserts for type:Individual subtype:Parent
     $this->assertEquals($indiviParent['contact_id'], $this->indiviParent);
@@ -162,13 +160,13 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $params = array('contact_sub_type' => $this->student, 'version' => 3);
     $result = civicrm_api('contact', 'get', $params);
 
-    $indiviStudent = $result['values'][$this->indiviStudent];
+    $individualStudent = $result['values'][$this->individualStudent];
 
     //asserts for type:Individual subtype:Student
-    $this->assertEquals($indiviStudent['contact_id'], $this->indiviStudent);
-    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name']);
-    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type']);
-    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type']);
+    $this->assertEquals($individualStudent['contact_id'], $this->individualStudent);
+    $this->assertEquals($individualStudent['first_name'], $this->individualStudentParams['first_name']);
+    $this->assertEquals($individualStudent['contact_type'], $this->individualStudentParams['contact_type']);
+    $this->assertEquals(end($individualStudent['contact_sub_type']), $this->individualStudentParams['contact_sub_type']);
 
     //all other contact(rather than subtype:student) should not
     //exists
@@ -193,7 +191,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     //all other contact(rather than subtype:Sponsor) should not
     //exists
     $this->assertNotContains($this->individual, $result['values']);
-    $this->assertNotContains($this->indiviStudent, $result['values']);
+    $this->assertNotContains($this->individualStudent, $result['values']);
     $this->assertNotContains($this->indiviParent, $result['values']);
     $this->assertNotContains($this->organization, $result['values']);
     $this->assertNotContains($this->household, $result['values']);
@@ -210,13 +208,13 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $params = array('contact_sub_type' => $this->student, 'version' => 3);
     $result = civicrm_api('contact', 'get', $params);
 
-    $indiviStudent = $result['values'][$this->indiviStudent];
+    $individualStudent = $result['values'][$this->individualStudent];
 
     //asserts for type:Individual subtype:Student
-    $this->assertEquals($indiviStudent['contact_id'], $this->indiviStudent);
-    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name']);
-    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type']);
-    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type']);
+    $this->assertEquals($individualStudent['contact_id'], $this->individualStudent);
+    $this->assertEquals($individualStudent['first_name'], $this->individualStudentParams['first_name']);
+    $this->assertEquals($individualStudent['contact_type'], $this->individualStudentParams['contact_type']);
+    $this->assertEquals(end($individualStudent['contact_sub_type']), $this->individualStudentParams['contact_sub_type']);
 
     //all other contact(rather than subtype:student) should not
     //exists
@@ -241,7 +239,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     //all other contact(rather than subtype:Sponsor) should not
     //exists
     $this->assertNotContains($this->individual, $result['values']);
-    $this->assertNotContains($this->indiviStudent, $result['values']);
+    $this->assertNotContains($this->individualStudent, $result['values']);
     $this->assertNotContains($this->indiviParent, $result['values']);
     $this->assertNotContains($this->organization, $result['values']);
     $this->assertNotContains($this->household, $result['values']);

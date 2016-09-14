@@ -43,7 +43,6 @@
 /**
  * CiviCRM Installer
  */
-
 ini_set('max_execution_time', 3000);
 
 if (stristr(PHP_OS, 'WIN')) {
@@ -85,7 +84,7 @@ global $installURLPath;
 
 $installType = strtolower($_SESSION['civicrm_install_type']);
 
-if ($installType == 'drupal') {
+if ($installType == 'drupal' || $installType == 'backdrop') {
   $crmPath = dirname(dirname($_SERVER['SCRIPT_FILENAME']));
   $installDirPath = $installURLPath = '';
 }
@@ -143,6 +142,21 @@ if ($installType == 'drupal') {
   }
 }
 
+if ($installType == 'backdrop') {
+  // Load backdrop database config
+  if (isset($_POST['backdrop'])) {
+    $backdropConfig = $_POST['backdrop'];
+  }
+  else {
+    $backdropConfig = array(
+      "server" => "localhost",
+      "username" => "backdrop",
+      "password" => "",
+      "database" => "backdrop",
+    );
+  }
+}
+
 $loadGenerated = 0;
 if (isset($_POST['loadGenerated'])) {
   $loadGenerated = 1;
@@ -164,6 +178,7 @@ foreach ($langs as $locale => $_) {
 $installTypeToUF = array(
   'wordpress' => 'WordPress',
   'drupal' => 'Drupal',
+  'backdrop' => 'Backdrop',
 );
 
 $uf = (isset($installTypeToUF[$installType]) ? $installTypeToUF[$installType] : 'Drupal');
@@ -206,6 +221,12 @@ if ($installType == 'drupal') {
     'civicrm.settings.php'
   );
 }
+elseif ($installType == 'backdrop') {
+  $object = new CRM_Utils_System_Backdrop();
+  $cmsPath = $object->cmsRootPath();
+  $siteDir = getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
+  $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .     'civicrm.settings.php');
+}
 elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
   $upload_dir = wp_upload_dir();
@@ -232,6 +253,18 @@ if ($installType == 'drupal') {
   }
 }
 
+if ($installType == 'backdrop') {
+  // Lets check only /modules/.
+  $pattern = '/' . preg_quote(CIVICRM_DIRECTORY_SEPARATOR . 'modules', CIVICRM_DIRECTORY_SEPARATOR) . '/';
+
+  if (!preg_match($pattern, str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME']))) {
+    $directory = 'modules';
+    $errorTitle = ts("Oops! Please correct your install location");
+    $errorMsg = ts("Please untar (uncompress) your downloaded copy of CiviCRM in the <strong>%1</strong> directory below your Drupal root directory.", array(1 => $directory));
+    errorDisplayPage($errorTitle, $errorMsg);
+  }
+}
+
 // Exit with error if CiviCRM has already been installed.
 if ($alreadyInstalled) {
   $errorTitle = ts("Oops! CiviCRM is already installed");
@@ -241,6 +274,12 @@ if ($alreadyInstalled) {
     $settings_directory = implode(CIVICRM_DIRECTORY_SEPARATOR, array(
       ts('[your Drupal root directory]'),
       'sites',
+      $siteDir,
+    ));
+  }
+  if ($installType == 'backdrop') {
+    $settings_directory = implode(CIVICRM_DIRECTORY_SEPARATOR, array(
+      ts('[your Backdrop root directory]'),
       $siteDir,
     ));
   }
@@ -286,6 +325,31 @@ if ($installType == 'drupal') {
     errorDisplayPage($errorTitle, $errorMsg);
   }
 }
+elseif ($installType == 'backdrop') {
+  // Ensure that they have downloaded the correct version of CiviCRM
+  if ($civicrm_version['cms'] != 'Backdrop') {
+    $errorTitle = ts("Oops! Incorrect CiviCRM version");
+    $errorMsg = ts("This installer can only be used for the Backdrop version of CiviCRM.");
+    errorDisplayPage($errorTitle, $errorMsg);
+  }
+
+  define('BACKDROP_ROOT', $cmsPath);
+
+  $backdropVersionFiles = array(
+    // Backdrop
+    implode(CIVICRM_DIRECTORY_SEPARATOR, array($cmsPath, 'core', 'includes', 'bootstrap.inc')),
+  );
+  foreach ($backdropVersionFiles as $backdropVersionFile) {
+    if (file_exists($backdropVersionFile)) {
+      require_once $backdropVersionFile;
+    }
+  }
+  if (!defined('BACKDROP_VERSION') or version_compare(BACKDROP_VERSION, '1.0') < 0) {
+    $errorTitle = ts("Oops! Incorrect Backdrop version");
+    $errorMsg = ts("This version of CiviCRM can only be used with Backdrop 1.x. Please ensure that '%1' exists if you are running Backdrop 1.0 and over.", array(1 => implode("' or '", $backdropVersionFiles)));
+    errorDisplayPage($errorTitle, $errorMsg);
+  }
+}
 elseif ($installType == 'wordpress') {
   //HACK for now
   $civicrm_version['cms'] = 'WordPress';
@@ -311,6 +375,9 @@ if ($databaseConfig) {
   $dbReq->checkdatabase($databaseConfig, 'CiviCRM');
   if ($installType == 'drupal') {
     $dbReq->checkdatabase($drupalConfig, 'Drupal');
+  }
+  if ($installType == 'backdrop') {
+    $dbReq->checkdatabase($backdropConfig, 'Backdrop');
   }
 }
 
@@ -419,7 +486,7 @@ class InstallRequirements {
           )
         );
       }
-      $onlyRequire = ($dbName == 'Drupal') ? TRUE : FALSE;
+      $onlyRequire = ($dbName == 'Drupal' || $dbName == 'Backdrop') ? TRUE : FALSE;
       $this->requireDatabaseOrCreatePermissions(
         $databaseConfig['server'],
         $databaseConfig['username'],
@@ -432,7 +499,7 @@ class InstallRequirements {
         ),
         $onlyRequire
       );
-      if ($dbName != 'Drupal') {
+      if ($dbName != 'Drupal' && $dbName != 'Backdrop') {
         $this->requireMySQLInnoDB($databaseConfig['server'],
           $databaseConfig['username'],
           $databaseConfig['password'],
@@ -538,6 +605,15 @@ class InstallRequirements {
         $cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
         'sites' . CIVICRM_DIRECTORY_SEPARATOR .
         $siteDir,
+      );
+    }
+    elseif ($installType == 'backdrop') {
+
+      // make sure that we can write to sites/default and files/
+      $writableDirectories = array(
+        $cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
+        'files',
+        $cmsPath,
       );
     }
     elseif ($installType == 'wordpress') {
@@ -1430,6 +1506,90 @@ class Installer extends InstallRequirements {
         $output .= '</html>';
         echo $output;
       }
+      elseif (
+        $installType == 'backdrop'
+      ) {
+
+        // clean output
+        @ob_clean();
+
+        $output .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
+        $output .= '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
+        $output .= '<head>';
+        $output .= '<title>' . ts('CiviCRM Installed') . '</title>';
+        $output .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+        $output .= '<link rel="stylesheet" type="text/css" href="template.css" />';
+        $output .= '</head>';
+        $output .= '<body>';
+        $output .= '<div style="padding: 1em;"><p class="good">' . ts('CiviCRM has been successfully installed') . '</p>';
+        $output .= '<ul>';
+
+        $backdropURL = civicrm_cms_base();
+        $backdropPermissionsURL = "{$backdropURL}index.php?q=admin/config/people/permissions";
+        $backdropURL .= "index.php?q=civicrm/admin/configtask&reset=1";
+
+        $output .= "<li>" . ts("Backdrop user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", array(1 => "target='_blank' href='{$backdropPermissionsURL}'", 2 => "target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'")) . "</li>";
+        $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$backdropURL'")) . "</li>";
+        $output .= $commonOutputMessage;
+
+        // automatically enable CiviCRM module once it is installed successfully.
+        // so we need to Bootstrap Drupal, so that we can call drupal hooks.
+        global $cmsPath, $crmPath;
+
+        // relative / abosolute paths are not working for drupal, hence using chdir()
+        chdir($cmsPath);
+
+        // Force the re-initialisation of the config singleton on the next call
+        // since so far, we had used the Config object without loading the DB.
+        $c = CRM_Core_Config::singleton(FALSE);
+        $c->free();
+
+        include_once "./core/includes/bootstrap.inc";
+        include_once "./core/includes/unicode.inc";
+
+        backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
+
+        // prevent session information from being saved.
+        backdrop_save_session(FALSE);
+
+        // Force the current user to anonymous.
+        $original_user = $GLOBALS['user'];
+        $GLOBALS['user'] = backdrop_anonymous_user();
+
+        // explicitly setting error reporting, since we cannot handle drupal related notices
+        error_reporting(1);
+
+        // rebuild modules, so that civicrm is added
+        system_rebuild_module_data();
+
+        // now enable civicrm module.
+        module_enable(array('civicrm', 'civicrmtheme'));
+
+        // clear block, page, theme, and hook caches
+        backdrop_flush_all_caches();
+
+        //add basic backdrop permissions
+        civicrm_install_set_backdrop_perms();
+
+        // restore the user.
+        $GLOBALS['user'] = $original_user;
+        backdrop_save_session(TRUE);
+
+        //change the default language to one chosen
+        if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
+          civicrm_api3('Setting', 'create', array(
+              'domain_id' => 'current_domain',
+              'lcMessages' => $config['seedLanguage'],
+            )
+          );
+        }
+
+        $output .= '</ul>';
+        $output .= '</div>';
+        $output .= '</body>';
+        $output .= '</html>';
+        echo $output;
+      }
       elseif ($installType == 'drupal' && version_compare(VERSION, '6.0') >= 0) {
         // clean output
         @ob_clean();
@@ -1548,6 +1708,36 @@ function civicrm_install_set_drupal_perms() {
     user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, $perms);
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, $perms);
   }
+}
+
+function civicrm_install_set_backdrop_perms() {
+  $perms = array(
+    'access all custom data',
+    'access uploaded files',
+    'make online contributions',
+    'profile create',
+    'profile edit',
+    'profile view',
+    'register for events',
+    'view event info',
+    'view event participants',
+    'access CiviMail subscribe/unsubscribe pages',
+  );
+
+  // Adding a permission that has not yet been assigned to a module by
+  // a hook_permission implementation results in a database error.
+  // CRM-9042
+  $allPerms = array_keys(module_invoke_all('permission'));
+  foreach (array_diff($perms, $allPerms) as $perm) {
+    watchdog('civicrm',
+      'Cannot grant the %perm permission because it does not yet exist.',
+      array('%perm' => $perm),
+      WATCHDOG_ERROR
+    );
+  }
+  $perms = array_intersect($perms, $allPerms);
+  user_role_grant_permissions(BACKDROP_AUTHENTICATED_ROLE, $perms);
+  user_role_grant_permissions(BACKDROP_ANONYMOUS_ROLE, $perms);
 }
 
 /**

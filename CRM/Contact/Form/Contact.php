@@ -312,13 +312,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $this->assign('contactType', $this->_contactType);
     $this->assign('contactSubType', $this->_contactSubType);
 
-    //build contact subtype form element, CRM-6864
-    $buildContactSubType = TRUE;
-    if ($this->_contactSubType && ($this->_action & CRM_Core_Action::ADD)) {
-      $buildContactSubType = FALSE;
-    }
-    $this->assign('buildContactSubType', $buildContactSubType);
-
     // get the location blocks.
     $this->_blocks = $this->get('blocks');
     if (CRM_Utils_System::isNull($this->_blocks)) {
@@ -355,7 +348,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           //loop the group
           for ($i = 0; $i <= $groupCount; $i++) {
             CRM_Custom_Form_CustomData::preProcess($this, NULL, $contactSubType,
-              $i, $this->_contactType
+              $i, $this->_contactType, $this->_contactId
             );
             CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
           }
@@ -807,7 +800,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Contact_Form_Location::buildQuickForm($this);
 
     // add attachment
-    $this->addField('image_URL', array('maxlength' => '60', 'label' => ts('Browse/Upload Image')));
+    $this->addField('image_URL', array('maxlength' => '255', 'label' => ts('Browse/Upload Image')));
 
     // add the dedupe button
     $this->addElement('submit',
@@ -1288,6 +1281,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             'street_unit',
           ))) {
             $streetAddress .= ' ';
+          }
+          // CRM-17619 - if the street number suffix begins with a number, add a space
+          $thesuffix = CRM_Utils_Array::value('street_number_suffix', $address);
+          if ($fld === 'street_number_suffix' && $thesuffix) {
+            if (ctype_digit(substr($thesuffix, 0, 1))) {
+              $streetAddress .= ' ';
+            }
           }
           $streetAddress .= CRM_Utils_Array::value($fld, $address);
         }

@@ -899,6 +899,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     for ($i = 0; $i < 30; $i++) {
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
       $ids[] = $baoObj->id;
+      $baoObj->free();
     }
 
     // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
@@ -945,6 +946,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       for ($i = 0; $i < 3 - $totalEntities; $i++) {
         $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
         $ids[] = $baoObj->id;
+        $baoObj->free();
       }
       $totalEntities = 3;
     }
@@ -1072,30 +1074,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
-   * @expectedException PHPUnit_Framework_Error
+   * @expectedException CiviCRM_API3_Exception
    * @param $Entity
    */
   public function testWithoutParam_create($Entity) {
-    // should create php complaining that a param is missing
-    $result = civicrm_api($Entity, 'Create');
-  }
-
-  /**
-   * @dataProvider entities_create
-   * @param $Entity
-   * @throws \PHPUnit_Framework_IncompleteTestError
-   */
-  public function testEmptyParam_create($Entity) {
-    $this->markTestIncomplete("fixing this test to test the api functions fails on numerous tests
-      which will either create a completely blank entity (batch, participant status) or
-      have a damn good crack at it (e.g mailing job). Marking this as incomplete beats false success");
-    return;
-    if (in_array($Entity, $this->toBeImplemented['create'])) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
-      return;
+    if ($Entity === 'Setting') {
+      $this->markTestSkipped('It seems OK for setting to skip here as it silently sips invalid params');
     }
-    $result = $this->callAPIFailure($Entity, 'Create', array());
-    $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
+    // should create php complaining that a param is missing
+    civicrm_api3($Entity, 'Create');
   }
 
   /**

@@ -46,28 +46,21 @@ class CRM_Group_Page_AJAX {
       $params['page'] = 1;
       $params['rp'] = 0;
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-
-      CRM_Utils_JSON::output($groups);
     }
     else {
-
-      $sortMapper = array();
-      $columns = CRM_Utils_Array::value('columns', $params, array());
-      foreach ($columns as $key => $value) {
-        $sortMapper[$key] = $value['data'];
-      }
-
-      $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-      $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-      $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-      $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
-
-      if ($sort && $sortOrder) {
-        $params['sortBy'] = $sort . ' ' . $sortOrder;
-      }
-
-      $params['page'] = ($offset / $rowCount) + 1;
-      $params['rp'] = $rowCount;
+      $requiredParams = array();
+      $optionalParams = array(
+        'title' => 'String',
+        'created_by' => 'String',
+        'group_type' => 'String',
+        'visibility' => 'String',
+        'status' => 'Integer',
+        'parentsOnly' => 'Integer',
+        'showOrgInfo' => 'Boolean',
+        // Ignore 'parent_id' as that case is handled above
+      );
+      $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+      $params += CRM_Core_Page_AJAX::validateParams($requiredParams, $optionalParams);
 
       // get group list
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
@@ -83,9 +76,13 @@ class CRM_Group_Page_AJAX {
           $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
         }
       }
-
-      CRM_Utils_JSON::output($groups);
     }
+
+    if (!empty($_GET['is_unit_test'])) {
+      return $groups;
+    }
+
+    CRM_Utils_JSON::output($groups);
   }
 
 }

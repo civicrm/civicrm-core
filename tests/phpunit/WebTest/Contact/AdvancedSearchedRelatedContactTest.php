@@ -153,6 +153,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
     $this->select("event_type_id", "value=1");
+    $this->waitForAjaxContent();
 
     // Attendee role s/b selected now.
     $this->select("default_role_id", "value=1");
@@ -188,6 +189,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->type("address_1_city", "San Francisco");
     $this->type("address_1_postal_code", "94117");
     $this->select('address_1_country_id', 'UNITED STATES');
+    $this->waitForAjaxContent();
     $this->select("address_1_state_province_id", "value=1004");
     $this->type("email_1_email", "info@civicrm.org");
 
@@ -246,7 +248,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->clickLink("_qf_Basic_refresh", "//div[@class='crm-search-results']/table[@class='selector row-highlight']/tbody/tr/", FALSE);
 
     // click through to the Contribution view screen
-    $this->click("xpath=//div[@class='crm-search-results']/table[@class='selector row-highlight']/tbody/tr/td[11]//span/a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr/td[11]//span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("css=li#tab_rel a");
@@ -304,7 +306,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->select2("event_type_id", "Conference");
     $this->click("_qf_Advanced_refresh");
     $this->waitForElementPresent("xpath=//div[@class='crm-content-block']//div[@id='search-status']");
-    $this->assertElementContainsText("xpath=//div[@class='crm-content-block']//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Contacts");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Contacts");
   }
 
   public function testAdvanceSearchForLog() {

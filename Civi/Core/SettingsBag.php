@@ -378,7 +378,7 @@ class SettingsBag {
       $dao->group_name = 'placeholder';
     }
 
-    $dao->created_date = \CRM_Utils_Time::getTime('Ymdhis');
+    $dao->created_date = \CRM_Utils_Time::getTime('YmdHis');
 
     $session = \CRM_Core_Session::singleton();
     if (\CRM_Contact_BAO_Contact_Utils::isContactId($session->get('userID'))) {

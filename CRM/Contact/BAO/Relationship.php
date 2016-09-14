@@ -595,14 +595,44 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
 
     if ($biDirectional) {
-      // lets clean up the data and eliminate all duplicate values
-      // (i.e. the relationship is bi-directional)
-      $relationshipType = array_unique($relationshipType);
+      $relationshipType = self::removeRelationshipTypeDuplicates($relationshipType, $contactSuffix);
     }
 
     // sort the relationshipType in ascending order CRM-7736
     asort($relationshipType);
     return $relationshipType;
+  }
+
+  /**
+   * Given a list of relationship types, return the list with duplicate types
+   * removed, being careful to retain only the duplicate which matches the given
+   * 'a_b' or 'b_a' suffix.
+   *
+   * @param array $relationshipTypeList A list of relationship types, in the format
+   *   returned by self::getContactRelationshipType().
+   * @param string $suffix Either 'a_b' or 'b_a'; defaults to 'a_b'
+   *
+   * @return array The modified value of $relationshipType
+   */
+  public static function removeRelationshipTypeDuplicates($relationshipTypeList, $suffix = NULL) {
+    if (empty($suffix)) {
+      $suffix = 'a_b';
+    }
+
+    // Find those labels which are listed more than once.
+    $duplicateValues = array_diff_assoc($relationshipTypeList, array_unique($relationshipTypeList));
+
+    // For each duplicate label, find its keys, and remove from $relationshipType
+    // the key which does not match $suffix.
+    foreach ($duplicateValues as $value) {
+      $keys = array_keys($relationshipTypeList, $value);
+      foreach ($keys as $key) {
+        if (substr($key, -3) != $suffix) {
+          unset($relationshipTypeList[$key]);
+        }
+      }
+    }
+    return $relationshipTypeList;
   }
 
   /**
@@ -1274,8 +1304,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           elseif ($status == self::DISABLED) {
             $mask |= CRM_Core_Action::ENABLE;
           }
-          $mask = $mask & $permissionMask;
         }
+        // temporary hold the value of $mask.
+        $tempMask = $mask;
       }
 
       while ($relationship->fetch()) {
@@ -1286,6 +1317,17 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           (!CRM_Contact_BAO_Contact_Permission::allow($cid))
         ) {
           continue;
+        }
+        if ($status != self::INACTIVE && $links) {
+          // assign the original value to $mask
+          $mask = $tempMask;
+          // display action links if $cid has edit permission for the relationship.
+          if (!($permissionMask & CRM_Core_Permission::EDIT) && CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
+            $permissions[] = CRM_Core_Permission::EDIT;
+            $permissions[] = CRM_Core_Permission::DELETE;
+            $permissionMask = CRM_Core_Action::mask($permissions);
+          }
+          $mask = $mask & $permissionMask;
         }
         $values[$rid]['id'] = $rid;
         $values[$rid]['cid'] = $cid;
@@ -1785,7 +1827,7 @@ FROM civicrm_contact
 WHERE id IN ( {$contacts} )
 ";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
     $currentEmployer = array();
     while ($dao->fetch()) {
       $currentEmployer[$dao->id]['org_id'] = $dao->employer_id;

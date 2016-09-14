@@ -48,20 +48,38 @@ class CRM_Dedupe_Finder {
    * @param array $cids
    *   Contact ids to limit the search to.
    *
+   * @param bool $checkPermissions
+   *   Respect logged in user permissions.
+   *
+   * @param int $limit
+   *   Optional limit. This limits the number of contacts for which the code will
+   *   attempt to find matches.
+   *
    * @return array
-   *   array of (cid1, cid2, weight) dupe triples
+   *   Array of (cid1, cid2, weight) dupe triples
+   *
+   * @throws CiviCRM_API3_Exception
+   * @throws Exception
    */
-  public static function dupes($rgid, $cids = array()) {
+  public static function dupes($rgid, $cids = array(), $checkPermissions = TRUE, $limit = NULL) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
       CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
     }
+    if (empty($rgBao->contactIds) && !empty($limit)) {
+      $limitedContacts = civicrm_api3('Contact', 'get', array(
+        'return' => 'id',
+        'contact_type' => $rgBao->contact_type,
+        'options' => array('limit' => $limit),
+      ));
+      $rgBao->contactIds = array_keys($limitedContacts['values']);
+    }
 
     $rgBao->fillTable();
     $dao = new CRM_Core_DAO();
-    $dao->query($rgBao->thresholdQuery());
+    $dao->query($rgBao->thresholdQuery($checkPermissions));
     $dupes = array();
     while ($dao->fetch()) {
       $dupes[] = array($dao->id1, $dao->id2, $dao->weight);
@@ -149,11 +167,12 @@ class CRM_Dedupe_Finder {
    * @param int $gid
    *   Contact group id (currently, works only with non-smart groups).
    *
+   * @param int $limit
    * @return array
    *   array of (cid1, cid2, weight) dupe triples
    */
-  public static function dupesInGroup($rgid, $gid) {
-    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid));
+  public static function dupesInGroup($rgid, $gid, $limit = NULL) {
+    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, $limit));
     if (!empty($cids)) {
       return self::dupes($rgid, $cids);
     }
@@ -327,6 +346,63 @@ class CRM_Dedupe_Finder {
       }
     }
     return $params;
+  }
+
+  /**
+   * Parse duplicate pairs into a standardised array and store in the prev_next_cache.
+   *
+   * @param array $foundDupes
+   * @param string $cacheKeyString
+   *
+   * @return array Dupe pairs with the keys
+   *   Dupe pairs with the keys
+   *   -srcID
+   *   -srcName
+   *   -dstID
+   *   -dstName
+   *   -weight
+   *   -canMerge
+   *
+   * @throws CRM_Core_Exception
+   */
+  public static function parseAndStoreDupePairs($foundDupes, $cacheKeyString) {
+    $cids = array();
+    foreach ($foundDupes as $dupe) {
+      $cids[$dupe[0]] = 1;
+      $cids[$dupe[1]] = 1;
+    }
+    $cidString = implode(', ', array_keys($cids));
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name");
+    $displayNames = array();
+    while ($dao->fetch()) {
+      $displayNames[$dao->id] = $dao->display_name;
+    }
+
+    $userId = CRM_Core_Session::singleton()->getLoggedInContactID();
+    foreach ($foundDupes as $dupes) {
+      $srcID = $dupes[1];
+      $dstID = $dupes[0];
+      // The logged in user should never be the src (ie. the contact to be removed).
+      if ($srcID == $userId) {
+        $srcID = $dstID;
+        $dstID = $userId;
+      }
+
+      $mainContacts[] = $row = array(
+        'dstID' => $dstID,
+        'dstName' => $displayNames[$dstID],
+        'srcID' => $srcID,
+        'srcName' => $displayNames[$srcID],
+        'weight' => $dupes[2],
+        'canMerge' => TRUE,
+      );
+
+      $data = CRM_Core_DAO::escapeString(serialize($row));
+      $values[] = " ( 'civicrm_contact', $dstID, $srcID, '$cacheKeyString', '$data' ) ";
+    }
+    CRM_Core_BAO_PrevNextCache::setItem($values);
+    return $mainContacts;
   }
 
 }
