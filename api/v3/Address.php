@@ -116,6 +116,7 @@ function _civicrm_api3_address_create_spec(&$params) {
     'type' => CRM_Utils_Type::T_TEXT,
   );
 }
+
 /**
  * Adjust Metadata for Get action.
  *
