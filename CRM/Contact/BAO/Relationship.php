@@ -551,11 +551,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
     }
 
-    $contactSubType = array();
     if ($contactId) {
       $contactType = CRM_Contact_BAO_Contact::getContactType($contactId);
       $contactSubType = CRM_Contact_BAO_Contact::getContactSubType($contactId);
     }
+
+    $contactSubType = (array) $contactSubType;
 
     foreach ($allRelationshipType as $key => $value) {
       // the contact type is required or matches
