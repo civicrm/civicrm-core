@@ -230,7 +230,9 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       $this->groupContactCreate($groupId);
       $contactIds = array_merge($contactIds, CRM_Contact_BAO_Group::getGroupContacts($groupId));
     }
-    $contactIds = array_column($contactIds, 'contact_id');
+    $contactIds = array_map(function($element) {
+      return $element['contact_id'];
+    }, $contactIds);
 
     // create custom group with contact reference field
     $customGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'select_test_group'));
