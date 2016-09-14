@@ -54,10 +54,12 @@ class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLette
 
     foreach ($form->_participantIds as $participantID) {
 
-      $participant = civicrm_api3('participant', 'get', array('participant_id' => $participantID));
-      $participant = $participant['values'][$participantID];
-      $event = civicrm_api3('event', 'get', array('id' => $participant['event_id']));
-      $event = $event['values'][$participant['event_id']];
+      $participant_result = civicrm_api3('Participant', 'get', array(
+        'id' => $participantID,
+        'api.Event.getsingle' => array('id' => '$value.event_id'),
+      ));
+      $participant = CRM_Utils_Array::first($participant_result['values']);
+      $event = $participant['api.Event.getsingle'];
 
       // get contact information
       // Use 'getTokenDetails' so that hook_civicrm_tokenValues is called.
