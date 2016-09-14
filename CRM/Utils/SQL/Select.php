@@ -179,7 +179,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    * @param CRM_Utils_SQL_Select $other
    * @param array|NULL $parts
    *   ex: 'joins', 'wheres'
-   * @return $this
+   * @return CRM_Utils_SQL_Select
    */
   public function merge($other, $parts = NULL) {
     if ($other === NULL) {
@@ -340,7 +340,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    * @param array|string $keys
    *   Key name, or an array of key-value pairs.
    * @param null|mixed $value
-   * @return $this
+   * @return \CRM_Utils_SQL_Select
    */
   public function param($keys, $value = NULL) {
     if ($this->mode === self::INTERPOLATE_AUTO) {
@@ -389,7 +389,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    *   The name of the other table (which receives new data).
    * @param array $fields
    *   The fields to fill in the other table (in order).
-   * @return $this
+   * @return CRM_Utils_SQL_Select
    * @see insertIntoField
    */
   public function insertInto($table, $fields = array()) {
@@ -401,7 +401,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   /**
    * @param array $fields
    *   The fields to fill in the other table (in order).
-   * @return $this
+   * @return CRM_Utils_SQL_Select
    */
   public function insertIntoField($fields) {
     $fields = (array) $fields;
@@ -449,7 +449,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    * In strict mode, unknown variables will generate exceptions.
    *
    * @param bool $strict
-   * @return $this
+   * @return CRM_Utils_SQL_Select
    */
   public function strict($strict = TRUE) {
     $this->strict = $strict;
