@@ -71,7 +71,7 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   /**
    * The actual memcache object.
    *
-   * @var resource
+   * @var Memcache
    */
   protected $_cache;
 
