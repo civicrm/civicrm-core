@@ -24,7 +24,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Basic test to ensure the exportComponents function completes without error.
    */
   public function testExportComponentsNull() {
-    CRM_Export_BAO_Export::exportComponents(
+    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       array(),
       array(),
@@ -41,6 +41,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'suppress_csv_for_testing' => TRUE,
       )
     );
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
@@ -59,7 +63,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       array('Individual', 'email', 1),
       array('Contribution', 'trxn_id'),
     );
-    CRM_Export_BAO_Export::exportComponents(
+
+    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       $this->contributionIDs,
       array(),
@@ -76,6 +81,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'suppress_csv_for_testing' => TRUE,
       )
     );
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
   }
   /**
    * Test the function that extracts the arrays used to structure the output.
@@ -156,6 +165,63 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function setUpContactExportData() {
     $this->contactIDs[] = $this->individualCreate();
+  }
+
+  public function testExportMasterAddress() {
+    $contactA = $this->individualCreate(array(), 0);
+    $contactB = $this->individualCreate(array(), 1);
+
+    //create address for contact A
+    $params = array(
+      'contact_id' => $contactA,
+      'location_type_id' => 'Home',
+      'street_address' => 'Ambachtstraat 23',
+      'postal_code' => '6971 BN',
+      'country_id' => '1152',
+      'city' => 'Brummen',
+      'is_primary' => 1,
+    );
+    $result = $this->callAPISuccess('address', 'create', $params);
+    $addressId = $result['id'];
+
+    //share address with contact B
+    $result = $this->callAPISuccess('address', 'create', array(
+      'contact_id' => $contactB,
+      'location_type_id' => "Home",
+      'master_id' => $addressId,
+    ));
+
+    //export the master address for contact B
+    $selectedFields = array(
+      array('Individual', 'master_id', 1),
+    );
+    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+      TRUE,
+      array($contactB),
+      array(),
+      NULL,
+      $selectedFields,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      "contact_a.id IN ({$contactB})",
+      NULL,
+      FALSE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+    $field = key($sqlColumns);
+
+    //assert the exported result
+    $masterName = CRM_Core_DAO::singleValueQuery("SELECT {$field} FROM {$tableName}");
+    $displayName = CRM_Contact_BAO_Contact::getMasterDisplayName(NULL, $contactB);
+    $this->assertEquals($displayName, $masterName);
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
 }
