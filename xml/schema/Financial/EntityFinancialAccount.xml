@@ -79,5 +79,13 @@
     <add>4.3</add>
     <onDelete>RESTRICT</onDelete>
   </foreignKey>
+  <index>
+    <name>civicrm_entity_financial_account_natural_key</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <fieldName>account_relationship</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
 </table>
 
