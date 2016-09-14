@@ -858,6 +858,7 @@ class CRM_Utils_Token {
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);
     }
+
     return $value;
   }
 
