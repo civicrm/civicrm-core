@@ -130,7 +130,7 @@ function _civicrm_api3_report_template_getrows($params) {
     $params['report_id'] = civicrm_api3('report_instance', 'getvalue', array('id' => $params['instance_id'], 'return' => 'report_id'));
   }
 
-  $class = civicrm_api3('option_value', 'getvalue', array(
+  $class = (string) civicrm_api3('option_value', 'getvalue', array(
     'option_group_name' => 'report_template',
     'return' => 'name',
     'value' => $params['report_id'],
