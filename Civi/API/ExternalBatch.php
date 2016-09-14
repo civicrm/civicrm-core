@@ -58,7 +58,7 @@ class ExternalBatch {
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @return $this
+   * @return ExternalBatch
    */
   public function addCall($entity, $action, $params = array()) {
     $params = array_merge($this->defaultParams, $params);

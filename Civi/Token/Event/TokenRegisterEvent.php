@@ -50,7 +50,7 @@ class TokenRegisterEvent extends TokenEvent {
    *
    * @param array|string $paramsOrField
    * @param NULL|string $label
-   * @return $this
+   * @return TokenRegisterEvent
    */
   public function register($paramsOrField, $label = NULL) {
     if (is_array($paramsOrField)) {
