@@ -44,8 +44,10 @@ class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLette
    * @access public
    */
   public static function postProcess(&$form) {
-
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
+    // I think the most important thing the two lines below do, is returning
+    // $html_message. But it also takes care of saving a new template.
+    $formValues = $form->controller->exportValues($form->getName());
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
 
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
