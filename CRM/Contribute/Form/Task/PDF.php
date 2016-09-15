@@ -191,7 +191,7 @@ AND    {$this->_componentClause}";
           FROM civicrm_financial_trxn
           WHERE trxn_id = %1
           LIMIT 1", array(
-          1 => array($contribution->trxn_id, 'String')));
+            1 => array($contribution->trxn_id, 'String')));
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
