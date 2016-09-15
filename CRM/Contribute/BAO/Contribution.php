@@ -4059,7 +4059,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         SELECT GROUP_CONCAT(fa.`name`) as financial_account,
           ft.total_amount,
           ft.payment_instrument_id,
-          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, con.currency
+          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, con.currency, ft.credit_card_number, ft.credit_card_type
 
         FROM civicrm_contribution con
           LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
@@ -4081,6 +4081,10 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       while ($resultDAO->fetch()) {
         $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
         $paidByName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
+        if ($resultDAO->credit_card_type) {
+          $creditCardType = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'credit_card_type', $resultDAO->credit_card_type);
+          $paidByLabel .= " ({$creditCardType} : {$resultDAO->credit_card_number})";
+        }
         $val = array(
           'total_amount' => $resultDAO->total_amount,
           'financial_type' => $resultDAO->financial_account,
