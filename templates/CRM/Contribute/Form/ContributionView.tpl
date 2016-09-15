@@ -167,6 +167,12 @@
     <td class="label">{ts}Payment Method{/ts}</td>
     <td>{$payment_instrument}{if $payment_processor_name} ({$payment_processor_name}){/if}</td>
   </tr>
+  {if $credit_card_number}
+  <tr>
+    <td class="label">{ts}Credit Card Number{/ts}</td>
+    <td>**** **** **** {$credit_card_number}</td>
+  </tr>
+  {/if}
 
   {if $payment_instrument eq 'Check'|ts}
     <tr>

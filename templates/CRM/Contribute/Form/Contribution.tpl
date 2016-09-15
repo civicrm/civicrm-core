@@ -316,6 +316,11 @@
             <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
+          <tr class="crm-contribution-form-block-credit_card_number">
+            <td class="label">{$form.credit_card_number.label}</td>
+            <td {$valueStyle}>{$form.credit_card_number.html}</td>
+            </td>
+          </tr>
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-contribution-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
