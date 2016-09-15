@@ -180,6 +180,9 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
   if (!$entity || $entity === strtolower($entity)) {
     return $entity;
   }
+  elseif ($entity == 'PCP') {
+    return 'pcp';
+  }
   else {
     $entity = ltrim(strtolower(str_replace('U_F',
           'uf',
