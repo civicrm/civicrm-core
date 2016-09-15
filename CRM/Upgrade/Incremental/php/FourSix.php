@@ -79,7 +79,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
     //   $postUpgradeMessage .= '<br /><br />' . ts("WARNING: For increased security, profile submissions embedded in remote sites are no longer allowed to create or edit data by default. If you need to allow users to submit profiles from external sites, you can restore this at Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) > 'Accept profile submissions from external sites'");
     // }
     if ($rev == '4.6.21') {
-      $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly for SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
+      $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
     }
   }
 
