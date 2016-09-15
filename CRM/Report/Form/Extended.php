@@ -171,7 +171,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     foreach ($rows as $index => & $row) {
       foreach ($row as $selectedfield => $value) {
         if (array_key_exists($selectedfield, $alterfunctions)) {
-          $rows[$index][$selectedfield] = $this->$alterfunctions[$selectedfield]($value, $row, $selectedfield, $altermap[$selectedfield]);
+          $rows[$index][$selectedfield] = $this->{$alterfunctions[$selectedfield]}($value, $row, $selectedfield, $altermap[$selectedfield]);
         }
       }
     }
