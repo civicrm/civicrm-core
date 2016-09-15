@@ -62,7 +62,7 @@
   cursor: move;
   margin: 0 50px 0 0;
   padding: 0;
-  color: #fff;
+  color: #fcfcfc;
 }
 
 /* widget content / body*/
@@ -133,11 +133,11 @@
   font-weight: normal;
   float: left;
   cursor: pointer;
-  color: #fff;
+  color: #fcfcfc;
   opacity: .7;
 }
 
-#crm-container .widget-controls .crm-i:hover {
+#crm-container .widget-controls:hover .crm-i {
   opacity: 1;
 }
 
