@@ -142,9 +142,6 @@ class Request {
     if ($version <= 3) {
       // APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
       // We normalize entity to be CamelCase.
-      if ($entity == 'pcp') {
-        return 'pcp';
-      }
       return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
     }
     else {
