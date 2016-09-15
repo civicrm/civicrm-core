@@ -42,8 +42,8 @@
  * many generic patterns are tested in the syntax conformance test
  *
  * @author eileen
- *        
- *         @group headless
+ *
+ * @group headless
  */
 class api_v3_PcpTest extends CiviUnitTestCase {
   protected $params;
@@ -51,19 +51,11 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   public $DBResetRequired = TRUE;
 
   public function setUp() {
-    $this->params = array ('title' => "Pcp title", 
-        // 'status_id' => 0,
-        'contact_id' => 1, 'page_id' => 1, 'pcp_block_id' => 1);
-    /*
-     * echo "===================================================\n";
-     * $dao=_civicrm_api3_get_DAO('PCP');
-     * echo $dato,"\n";
-     * $d = new $dao();
-     * echo "---------------------------------------------------\n";
-     * print_r($d->fields());
-     * echo "===================================================\n";
-     * die();
-     */
+    $this->params = array(
+      'title' => "Pcp title",
+      'contact_id' => 1,
+      'page_id' => 1,
+      'pcp_block_id' => 1);
     parent::setUp();
   }
 
@@ -71,7 +63,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
    * Test create function succeeds.
    */
   public function testCreatePcp() {
-    $result = $this->callAPIAndDocument('Pcp', 'create', $this->params, 
+    $result = $this->callAPIAndDocument('Pcp', 'create', $this->params,
         __FUNCTION__, __FILE__);
     $this->getAndCheck($this->params, $result['id'], $this->entity);
   }
@@ -85,7 +77,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
    */
   public function testGetPcp() {
     $this->createTestEntity();
-    $result = $this->callAPIAndDocument('Pcp', 'get', $this->params, 
+    $result = $this->callAPIAndDocument('Pcp', 'get', $this->params,
         __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
@@ -96,13 +88,13 @@ class api_v3_PcpTest extends CiviUnitTestCase {
    */
   public function testDeletePcp() {
     $entity = $this->createTestEntity();
-    $checkCreated = $this->callAPISuccess($this->entity, 'get', 
-        array ('id' => $entity['id']));
+    $checkCreated = $this->callAPISuccess($this->entity, 'get',
+      array('id' => $entity['id']));
     $this->assertEquals(1, $checkCreated['count']);
-    $result = $this->callAPIAndDocument('Pcp', 'delete', 
-        array ('id' => $entity['id']), __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->entity, 'get', 
-        array ('id' => $entity['id']));
+    $result = $this->callAPIAndDocument('Pcp', 'delete',
+        array('id' => $entity['id']), __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->entity, 'get',
+        array('id' => $entity['id']));
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
@@ -116,10 +108,11 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   public function testGetPcpChainDelete() {
     $description = "Demonstrates get + delete in the same call.";
     $subfile = 'ChainedGetDelete';
-    $params = array ('title' => "Pcp title", 'api.Pcp.delete' => 1);
+    $params = array('title' => "Pcp title", 'api.Pcp.delete' => 1);
     $result = $this->callAPISuccess('Pcp', 'create', $this->params);
-    $result = $this->callAPIAndDocument('Pcp', 'get', $params, __FUNCTION__, 
+    $result = $this->callAPIAndDocument('Pcp', 'get', $params, __FUNCTION__,
         __FILE__, $description, $subfile);
-    $this->assertEquals(0, $this->callAPISuccess('Pcp', 'getcount', array ()));
+    $this->assertEquals(0, $this->callAPISuccess('Pcp', 'getcount', array()));
   }
+
 }
