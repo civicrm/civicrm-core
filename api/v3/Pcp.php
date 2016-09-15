@@ -37,12 +37,11 @@
  *
  * @param array $params
  *          Array per getfields metadata.
- *          
+ *
  * @return array api result array
  */
 function civicrm_api3_pcp_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), 
-      $params, 'Pcp');
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Pcp');
 }
 
 /**
@@ -65,12 +64,11 @@ function _civicrm_api3_pcp_create_spec(&$params) {
  *
  * @param array $params
  *          Array per getfields
- *          
+ *
  * @return array Array of matching pcps
  */
 function civicrm_api3_pcp_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 
-      TRUE, 'Pcp');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Pcp');
 }
 
 /**
@@ -80,10 +78,9 @@ function civicrm_api3_pcp_get($params) {
  *
  * @param array $params
  *          [id]
- *          
+ *
  * @return array api result array
  */
 function civicrm_api3_pcp_delete($params) {
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), 
-      $params);
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
