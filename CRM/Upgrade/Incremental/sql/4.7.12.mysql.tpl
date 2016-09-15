@@ -8,3 +8,6 @@ SELECT @option_group_id_fat := max(id) from civicrm_option_group where name = 'f
 
 UPDATE civicrm_option_value SET {localize field="description"}description = 'Things you owe, like a grant still to be disbursed'{/localize}
   WHERE name = 'Liability' AND option_group_id = @option_group_id_fat;
+
+ALTER TABLE `civicrm_financial_trxn`
+  ADD `credit_card_type` INT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';
