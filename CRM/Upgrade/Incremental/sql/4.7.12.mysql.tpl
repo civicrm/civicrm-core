@@ -10,4 +10,5 @@ UPDATE civicrm_option_value SET {localize field="description"}description = 'Thi
   WHERE name = 'Liability' AND option_group_id = @option_group_id_fat;
 
 ALTER TABLE `civicrm_financial_trxn`
-  ADD `credit_card_type` INT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';
+  ADD `credit_card_type` INT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values' AFTER payment_instrument_id,
+  ADD credit_card_number INT UNSIGNED NULL COMMENT 'Last 4 digits of credit card.' AFTER check_number;

@@ -277,7 +277,3 @@ UPDATE civicrm_country SET name = "Saint Martin (French part)" WHERE lower(name)
 UPDATE civicrm_country SET name = "Afghanistan" WHERE lower(name) = lower("Afghanistan");
 UPDATE civicrm_country SET name = "Albania" WHERE lower(name) = lower("Albania");
 UPDATE civicrm_country SET name = "Algeria" WHERE lower(name) = lower("Algeria");
-
--- CRM-16189 - Store last 4 digits of credit card
-ALTER TABLE civicrm_financial_trxn ADD credit_card_number INT UNSIGNED NULL COMMENT 'Last 4 digits of credit card.' AFTER check_number;
-
