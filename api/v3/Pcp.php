@@ -24,7 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
- 
+
 /**
  * This api exposes CiviCRM PCPs.
  *
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  */
- 
+
 /**
  * Get PCPs.
  *
@@ -55,7 +55,7 @@ function civicrm_api3_pcp_get($params) {
 function civicrm_api3_pcp_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
- 
+
 /**
  * Delete an existing PCP.
  *
