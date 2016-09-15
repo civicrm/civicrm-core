@@ -234,7 +234,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     }
     $this->callAPISuccessGetCount('Contribution', array(
       'contact_id' => $this->_individualId,
-      'contribution_status_id' => 'Pending',
+      'contribution_status_id' => 'Completed',
     ), 1);
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));
