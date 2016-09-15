@@ -622,6 +622,28 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Return the values from a single column in the input array.
+   *
+   * @param array $input
+   *   A list of records.
+   * @param int|string $columnKey
+   *   The column of values to return.
+   * @param int|string $indexKey
+   *   An optional column to use as the index/keys for the returned array.
+   *
+   * @return array
+   *   values representing a single column from the input array.
+   */
+  public static function crmArrayColumn($input, $columnKey, $indexKey = NULL) {
+    // use alternate collect() if `array_column` does not exist
+    if (!function_exists('array_column')) {
+      return self::collect($columnKey, $input);
+    }
+
+    return array_column($input, $columnKey, $indexKey);
+  }
+
+  /**
    * Iterates over a list of objects and executes some method on each.
    *
    * Comparison:
