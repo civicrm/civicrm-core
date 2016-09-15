@@ -641,26 +641,29 @@ cj("#currency").on("change",function(){
   cj('#total_amount').trigger("change");
 })
 
-onPaymentMethodChange();
-cj("#payment_instrument_id").on("change",function(){
+CRM.$(function($) {
   onPaymentMethodChange();
+  $("#payment_instrument_id").on("change",function(){
+    onPaymentMethodChange();
+  });
+
+  function onPaymentMethodChange() {
+    var paymentInstrument = $('#payment_instrument_id').val();
+    if (paymentInstrument == 4) {
+      $('tr#checkNumber').show();
+      $('tr#creditCardType').hide();
+    }
+    else if (paymentInstrument == 1 || paymentInstrument == 2) {
+      $('tr#creditCardType').show();
+      $('tr#checkNumber').hide();
+    }
+    else {
+      $('tr#checkNumber').hide();
+      $('tr#creditCardType').hide();
+    }
+  }
 });
 
-function onPaymentMethodChange() {
-  var paymentInstrument = cj('#payment_instrument_id').val();
-  if (paymentInstrument == 4) {
-    cj('tr#checkNumber').show();
-    cj('tr#creditCardType').hide();
-  }
-  else if (paymentInstrument == 1 || paymentInstrument == 2) {
-    cj('tr#creditCardType').show();
-    cj('tr#checkNumber').hide();
-  }
-  else {
-    cj('tr#checkNumber').hide();
-    cj('tr#creditCardType').hide();
-  }
-}
 {/literal}{if $taxRates && $invoicing}{literal}
 CRM.$(function($) {
   $('#total_amount').on("change",function(event) {
