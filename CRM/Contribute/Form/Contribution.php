@@ -666,10 +666,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
 
       $creditCardNumber = $this->addElement('text', 'credit_card_number', ts('Credit Card Number'));
-      $creditCardNumber->freeze();
-    }
-    if ($this->_id) {
-      $creditCardType->freeze();
+      if ($this->_id) {
+        $creditCardNumber->freeze();
+        $creditCardType->freeze();
+      }
     }
     $trxnId = $this->add('text', 'trxn_id', ts('Transaction ID'), array('class' => 'twelve') + $attributes['trxn_id']);
 
