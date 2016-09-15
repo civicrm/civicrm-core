@@ -3462,6 +3462,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $itemAmount = $params['trxnParams']['total_amount'] + $cancelledTaxAmount;
     }
     elseif ($context == 'changePaymentInstrument') {
+      $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'];
       $deferredFinancialAccount = CRM_Utils_Array::value('deferred_financial_account_id', $params);
       if (empty($deferredFinancialAccount)) {
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Deferred Revenue Account is' "));
@@ -3482,7 +3483,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       else {
         if ($params['total_amount'] < 0) {
-          $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'];
           $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
           $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
         }
