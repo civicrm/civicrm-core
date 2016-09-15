@@ -1285,17 +1285,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
          */
         if ($result['payment_status_id'] == array_search('Completed', $statuses)) {
           try {
-            $creditCardType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn',
-              'credit_card_type',
-              array('labelColumn' => 'name', 'flip' => TRUE)
-            );
             civicrm_api3('contribution', 'completetransaction', array(
               'id' => $contribution->id,
               'trxn_id' => $result['trxn_id'],
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
               'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-              'credit_card_type' => CRM_Utils_Array::value(CRM_Utils_Array::value('credit_card_type', $result), $creditCardType),
+              'credit_card_type' => CRM_Utils_Array::value('credit_card_type', $result),
               'credit_card_number' => CRM_Utils_Array::value('credit_card_number', $paymentParams),
             ));
             // This has now been set to 1 in the DB - declare it here also

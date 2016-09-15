@@ -3086,7 +3086,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     else {
       $update = TRUE;
     }
-
+    CRM_Core_BAO_FinancialTrxn::formatCreditCardDetails($params);
     $statusId = $params['contribution']->contribution_status_id;
     // CRM-13964 partial payment
     if ($contributionStatus == 'Partially paid'

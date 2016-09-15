@@ -2438,7 +2438,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             'is_transactional' => FALSE,
             'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
             'receive_date' => CRM_Utils_Array::value('receive_date', $result),
-            'credit_card_type' => CRM_Utils_Array::value(CRM_Utils_Array::value('credit_card_type', $result), $creditCardType),
+            'credit_card_type' => CRM_Utils_Array::value('credit_card_type', $result),
             'credit_card_number' => CRM_Utils_Array::value('credit_card_number', $result),
           )
         );
