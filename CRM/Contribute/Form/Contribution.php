@@ -389,11 +389,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
     if ($this->_id) {
-      $defaults['credit_card_type'] = CRM_Core_BAO_FinancialTrxn::getCreditCardType($this->_id);
-    }
-
-    if ($this->_id) {
-      $defaults['credit_card_number'] = "**** **** **** " . CRM_Core_BAO_FinancialTrxn::getCreditCardNumber($this->_id);
+      $creditCardDetails = CRM_Core_BAO_FinancialTrxn::getCreditCardDetails($this->_id);
+      $defaults = array_merge($defaults, $creditCardDetails);
     }
 
     if (!empty($defaults['is_test'])) {
@@ -665,9 +662,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         array('entity' => 'financialTrxn', 'label' => ts('Credit Card Type'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
       );
 
-      $creditCardNumber = $this->addElement('text', 'credit_card_number', ts('Credit Card Number'));
       if ($this->_id) {
-        $creditCardNumber->freeze();
         $creditCardType->freeze();
       }
     }
