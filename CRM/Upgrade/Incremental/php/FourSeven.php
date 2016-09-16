@@ -421,7 +421,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $ufGroupDAO->module = 'OnBehalf';
     $ufGroupDAO->find(TRUE);
 
-    $forOrgColums = array();
+    $forOrgColums = array('is_for_organization');
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       foreach ($locales as $locale) {
