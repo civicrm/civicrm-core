@@ -991,12 +991,10 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
     $sourceWhere = $targetWhere = $assigneeWhere = $caseWhere = 1;
 
     $config = CRM_Core_Config::singleton();
-    if (!CRM_Utils_Array::value('admin', $input, FALSE)) {
-      $sourceWhere = ' ac.contact_id = %1 ';
-      $caseWhere = ' civicrm_case_contact.contact_id = %1 ';
+    $sourceWhere = ' ac.contact_id = %1 ';
+    $caseWhere = ' civicrm_case_contact.contact_id = %1 ';
 
-      $params = array(1 => array($input['contact_id'], 'Integer'));
-    }
+    $params = array(1 => array($input['contact_id'], 'Integer'));
 
     $commonClauses = array(
       "civicrm_option_group.name = 'activity_type'",
@@ -1429,7 +1427,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
 
     // get token details for contacts, call only if tokens are used
     $details = array();
-    if (!empty($returnProperties) || !empty($tokens)) {
+    if (!empty($returnProperties) && !empty($tokens)) {
       list($details) = CRM_Utils_Token::getTokenDetails($contactIds,
         $returnProperties,
         NULL, NULL, FALSE,

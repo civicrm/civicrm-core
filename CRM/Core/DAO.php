@@ -1654,16 +1654,16 @@ SELECT contact_id
     if (!$_dao) {
       // If this is an atypical case (e.g. preparing .sql files
       // before Civi has been installed), then we fallback to
-      // DB-less escaping helper (mysql_real_escape_string).
+      // DB-less escaping helper (mysql_escape_string).
       // Note: In typical usage, escapeString() will only
       // check one conditional ("if !$_dao") rather than
       // two conditionals ("if !defined(DSN)")
       if (!defined('CIVICRM_DSN')) {
-        if (function_exists('mysql_real_escape_string')) {
-          return mysql_real_escape_string($string);
+        if (function_exists('mysql_escape_string')) {
+          return mysql_escape_string($string);
         }
         else {
-          throw new CRM_Core_Exception("Cannot generate SQL. \"mysql_real_escape_string\" is missing. Have you installed PHP \"mysql\" extension?");
+          throw new CRM_Core_Exception("Cannot generate SQL. \"mysql_escape_string\" is missing. Have you installed PHP \"mysql\" extension?");
         }
       }
 

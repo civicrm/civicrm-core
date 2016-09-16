@@ -262,6 +262,9 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   public function checkRemoteProfile() {
     $messages = array();
 
+    // Disabled by PTP
+    return $messages;
+
     if (Civi::settings()->get('remote_profile_submissions')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
