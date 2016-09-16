@@ -568,4 +568,83 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return $siteName;
   }
 
+  /**
+  * @var $basepath String cached basepath to prevent having to parse it repeatedly.
+  **/
+  protected $basepath;
+
+  /**
+  * @var $filesUrl String holds resolved path.
+  **/
+  protected $filesUrl;
+
+  /**
+  *  checkBasePath - Returns root directory with respect to $civicrm_root
+  *
+  * @param $root String
+  * @param $seek String
+  **/
+  public function checkBasePath($root, $seek = "/sites/")
+  {
+    if(!isset($this->basepath)) {
+      $this->basepath = substr($root, 0, stripos($root, $seek)+1);
+    }
+
+    return $this->basepath;
+  }
+
+  /**
+  * check if files exist in path.  Just a simple helper function for viewing
+  * existence of sites.
+  *
+  * @param $basepath string
+  * @param $basepath string
+  **/
+  private function checkFilesExists($basepath, $folder) {
+    return file_exists("{$basepath}sites/$folder/files/civicrm/");
+  }
+
+  /**
+  * Returns the concatenated url for existing path.
+  *
+  * @param $baseUrl string
+  * @param $folder string
+  **/
+  private function getUrl($baseUrl, $folder) {
+    return "{$baseUrl}sites/$folder/files/civicrm/";
+  }
+
+  /**
+  * Returns the location of /sites/SITENAME/files/civicrm depending
+  * on system configuration.
+  *
+  * @fixed CRM-19303
+  * @param $root string
+  * @param $baseUrl string
+  * @param $default string
+  **/
+  public function checkMultisite($root, $baseUrl, $default = "default") {
+    if(isset($this->filesUrl)) return $this->filesUrl;
+
+    $basepath = $this->checkBasePath($root);
+    $correct = null;
+    if($this->checkFilesExists($root, $default)) {
+      $correct = $default;
+    }
+    else {
+      //Check for any other directories if default doesn't exist.
+      $folders = scandir($basepath.'sites/');
+      foreach($folders as $folder) {
+        //Ignore hidden directories/files...
+        if(strpos($folder,'.') === 0 || $folder == 'all') continue;
+        //Check if it is a directory
+        if(!is_dir($basepath.'sites/'.$folder)) continue;
+
+        //Check if files path exists...
+        if($this->checkFilesExists($basepath, $folder)) {
+          $correct = $folder;
+          break;
+        }
+      }
+  }
 }
