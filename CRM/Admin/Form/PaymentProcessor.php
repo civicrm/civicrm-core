@@ -213,7 +213,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     // is this processor active ?
     $this->add('checkbox', 'is_active', ts('Is this Payment Processor active?'));
     $this->add('checkbox', 'is_default', ts('Is this Payment Processor the default?'));
-
+    $creditCardTypes = CRM_Contribute_PseudoConstant::creditCard();
+    $this->addCheckBox('accept_credit_cards', ts('Select Credit Card Types that this payment processor can accept'),
+      $creditCardTypes, NULL, NULL, NULL, NULL, '&nbsp;&nbsp;&nbsp;');
     foreach ($this->_fields as $field) {
       if (empty($field['label'])) {
         continue;
@@ -329,7 +331,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if ($this->_ppType) {
       $defaults['payment_processor_type_id'] = $this->_ppType;
     }
-
+    $defaults['accept_credit_cards'] = json_decode(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
+          $this->_id,
+          'accepted_credit_cards'
+        ), TRUE);
+    unset($defaults['accepted_credit_cards']);
     // now get testID
     $testDAO = new CRM_Financial_DAO_PaymentProcessor();
     $testDAO->name = $dao->name;
@@ -385,6 +391,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         $values[$field] = empty($values["test_{$field}"]) ? CRM_Utils_Array::value($field, $values) : $values["test_{$field}"];
       }
     }
+    $creditCards = empty($values['accept_credit_cards']) ? "NULL" : json_encode($values['accept_credit_cards']);
     $params  = array_merge(array(
       'id' => $test ? $this->_testID : $this->_id,
       'domain_id' => $domainID,
@@ -397,6 +404,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_type' => $this->_ppDAO->payment_type,
       'payment_instrument_id' => $this->_ppDAO->payment_instrument_id,
       'financial_account_id' => $values['financial_account_id'],
+      'accepted_credit_cards' => $creditCards,
     ), $values);
 
     civicrm_api3('PaymentProcessor', 'create', $params);
