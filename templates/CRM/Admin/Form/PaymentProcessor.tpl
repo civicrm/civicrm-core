@@ -65,6 +65,9 @@
     <tr class="crm-paymentProcessor-form-block-is_default">
         <td></td><td>{$form.is_default.html}&nbsp;{$form.is_default.label}</td>
     </tr>
+    <tr class="crm-paymentProcessor-form-block-accept_credit_cards">
+        <td class="label">{$form.accept_credit_cards.label}</td><td>{$form.accept_credit_cards.html}</td>
+    </tr>
   </table>
 <fieldset>
 <legend>{ts}Processor Details for Live Payments{/ts}</legend>
