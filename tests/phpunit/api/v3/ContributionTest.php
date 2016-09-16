@@ -1803,11 +1803,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test repeat contribution successfully creates line items.
+   * Test repeat contribution successfully creates line item.
    */
   public function testRepeatTransaction() {
-    $originalContribution = $this->setUpRepeatTransaction();
-
+    $originalContribution = $this->setUpRepeatTransaction($recurParams = array(), 'single');
     $this->callAPISuccess('contribution', 'repeattransaction', array(
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Completed',
@@ -1842,11 +1841,61 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test repeat contribution successfully creates line items.
+   * Test repeat contribution successfully creates line items (plural).
+   */
+  public function testRepeatTransactionLineItems() {
+    // CRM-19309
+    $originalContribution = $this->setUpRepeatTransaction($recurParams = array(), 'multiple');
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+
+    $lineItemParams = array(
+      'entity_id' => $originalContribution['id'],
+      'sequential' => 1,
+      'return' => array(
+        'entity_table',
+        'qty',
+        'unit_price',
+        'line_total',
+        'label',
+        'financial_type_id',
+        'deductible_amount',
+        'price_field_value_id',
+        'price_field_id',
+      ),
+    );
+    $lineItem1 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
+      'entity_id' => $originalContribution['id'],
+    )));
+    $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
+      'entity_id' => $originalContribution['id'] + 1,
+    )));
+
+    // unset id and entity_id for all of them to be able to compare the lineItems:
+    unset($lineItem1['values'][0]['id'], $lineItem1['values'][0]['entity_id']);
+    unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
+    $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
+
+    unset($lineItem1['values'][1]['id'], $lineItem1['values'][1]['entity_id']);
+    unset($lineItem2['values'][1]['id'], $lineItem2['values'][1]['entity_id']);
+    $this->assertEquals($lineItem1['values'][1], $lineItem2['values'][1]);
+
+    // CRM-19309 so in future we also want to:
+    // check that financial_line_items have been created for entity_id 3 and 4;
+
+    $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
+    $this->quickCleanUpFinancialEntities();
+  }
+
+  /**
+   * Test repeat contribution successfully creates is_test transaction.
    */
   public function testRepeatTransactionIsTest() {
     $this->_params['is_test'] = 1;
-    $originalContribution = $this->setUpRepeatTransaction(array('is_test' => 1));
+    $originalContribution = $this->setUpRepeatTransaction(array('is_test' => 1), 'single');
 
     $this->callAPISuccess('contribution', 'repeattransaction', array(
       'original_contribution_id' => $originalContribution['id'],
@@ -1860,7 +1909,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test repeat contribution passed in status.
    */
   public function testRepeatTransactionPassedInStatus() {
-    $originalContribution = $this->setUpRepeatTransaction();
+    $originalContribution = $this->setUpRepeatTransaction($recurParams = array(), 'single');
 
     $this->callAPISuccess('contribution', 'repeattransaction', array(
       'original_contribution_id' => $originalContribution['id'],
@@ -1929,6 +1978,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => '400',
       'fee_amount' => 50,
     ));
+
     $lineItemParams = array(
       'entity_id' => $originalContribution['id'],
       'sequential' => 1,
@@ -1962,6 +2012,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
       'entity_id' => $originalContribution['id'] + 1,
     )));
+
     unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
@@ -2890,7 +2941,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function setUpRepeatTransaction($recurParams = array()) {
+  protected function setUpRepeatTransaction($recurParams = array(), $flag) {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
       'contact_id' => $this->_individualId,
@@ -2903,10 +2954,42 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'payment_processor_id' => $paymentProcessorID,
     ), $recurParams));
-    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
-      $this->_params,
-      array('contribution_recur_id' => $contributionRecur['id']))
-    );
+
+    $originalContribution = '';
+    if ($flag == 'multiple') {
+      // CRM-19309 create a contribution + also add in line_items (plural):
+      $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+          $this->_params,
+          array(
+            'contribution_recur_id' => $contributionRecur['id'],
+            'skipLineItem' => 1,
+            'api.line_item.create' => array(
+              array(
+                'price_field_id' => 1,
+                'qty' => 2,
+                'line_total' => '20',
+                'unit_price' => '10',
+                'financial_type_id' => 1,
+              ),
+              array(
+                'price_field_id' => 1,
+                'qty' => 1,
+                'line_total' => '80',
+                'unit_price' => '80',
+                'financial_type_id' => 2,
+              ),
+            ),
+          )
+        )
+      );
+    }
+    elseif ($flag == 'single') {
+      $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+          $this->_params,
+          array('contribution_recur_id' => $contributionRecur['id']))
+      );
+    }
+
     return $originalContribution;
   }
 
