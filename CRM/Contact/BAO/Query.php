@@ -4299,7 +4299,8 @@ civicrm_relationship.is_permission_a_b = 0
     $count = FALSE,
     $skipPermissions = TRUE,
     $mode = 1,
-    $apiEntity = NULL
+    $apiEntity = NULL,
+    $groupBy = NULL
   ) {
 
     $query = new CRM_Contact_BAO_Query(
@@ -4335,7 +4336,9 @@ civicrm_relationship.is_permission_a_b = 0
     $sql = "$select $from $where $having";
 
     // add group by
-    if ($query->_useGroupBy) {
+    if(!empty($groupBy))
+      $sql .= self::getGroupByFromSelectColumns($query->_select, $groupBy);
+    else if ($query->_useGroupBy) {
       $sql .= self::getGroupByFromSelectColumns($query->_select, 'contact_a.id');
     }
     if (!empty($sort)) {

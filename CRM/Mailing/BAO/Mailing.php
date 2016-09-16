@@ -542,7 +542,7 @@ WHERE  mailing_id = %1
       $groupBy = $groupJoin = '';
       if ($dedupeEmail) {
         $groupJoin = " INNER JOIN civicrm_email e ON e.id = i.email_id";
-        $groupBy = " GROUP BY e.email, i.contact_id ";
+        $groupBy = " GROUP BY e.email";
       }
 
       $sql = "
@@ -924,11 +924,18 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     $senderId = $session->get('userID');
     list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($senderId);
 
+    $m = new CRM_Mailing_DAO_Mailing();
+    $m->id = $testParams['mailing_id'];
+    $m->find(TRUE);
+
+    $dedupeEmailTest = $m->dedupe_email == 1 ? 'email' : '';
+
     if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', array(
           'version' => 3,
           'group' => $testParams['test_group'],
-          'return' => 'id',
+          'return' => 'id, display_name, email',
+          'group_by' => $dedupeEmailTest,
           'options' => array(
             'limit' => 100000000000,
           ),

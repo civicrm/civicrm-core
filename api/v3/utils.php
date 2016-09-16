@@ -618,6 +618,8 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
 
   $skipPermissions = !empty($params['check_permissions']) ? 0 : 1;
 
+  $groupBy = isset($params['group_by']) ? $params['group_by'] : '';
+
   list($entities) = CRM_Contact_BAO_Query::apiQuery(
     $newParams,
     $returnProperties,
@@ -629,7 +631,8 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $getCount,
     $skipPermissions,
     $mode,
-    $entity
+    $entity,
+    $groupBy
   );
 
   return $entities;
