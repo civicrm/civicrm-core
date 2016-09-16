@@ -350,7 +350,7 @@ class CRM_Utils_File {
    * @param string $string
    *
    * @return string
-   *  stripped string
+   *   stripped string
    */
   public static function stripComments($string) {
     return preg_replace("/^(#|--).*\R*/m", "", $string);
