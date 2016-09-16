@@ -104,6 +104,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   protected $_unparsedStreetAddressContacts;
 
   /**
+  * @var Array Array of preprocessed regex.  Helps reduce the number of regex
+  *      passes per import.
+  */
+  protected static $regexCache = array();
+
+  /**
    * Class constructor.
    *
    * @param array $mapperKeys
@@ -1514,12 +1520,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           //check for any error in email/postal greeting, addressee,
           //custom email/postal greeting, custom addressee, CRM-4575
 
+          //Fixed errors on trying to validate greetings imported from
+          //csv.  The exported values came out as strings without tokens
+          //whereas the greetings were trying to compare to tokens, CRM-19360
           case 'email_greeting':
             $emailGreetingFilter = array(
               'contact_type' => $this->_contactType,
               'greeting_type' => 'email_greeting',
             );
-            if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($emailGreetingFilter))) {
+            $emailGreeting = self::greeting_to_regex($emailGreetingFilter);
+            if (!self::validate_greeting($value, $emailGreeting, $params)) {
               self::addToErrorMsg(ts('Email Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Email Greetings for valid values'), $errorMessage);
             }
             break;
@@ -1529,7 +1539,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               'contact_type' => $this->_contactType,
               'greeting_type' => 'postal_greeting',
             );
-            if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($postalGreetingFilter))) {
+            $postalGreeting = self::greeting_to_regex($postalGreetingFilter);
+            if (!self::validate_greeting($value, $postalGreeting, $params)) {
               self::addToErrorMsg(ts('Postal Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Postal Greetings for valid values'), $errorMessage);
             }
             break;
@@ -1539,7 +1550,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               'contact_type' => $this->_contactType,
               'greeting_type' => 'addressee',
             );
-            if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($addresseeFilter))) {
+            $addressee = self::greeting_to_regex($addresseeFilter);
+            if (!self::validate_greeting($value, $addressee, $params)) {
               self::addToErrorMsg(ts('Addressee must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Addressee for valid values'), $errorMessage);
             }
             break;
@@ -1612,6 +1624,65 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         }
       }
     }
+  }
+
+  /**
+  * greeting_to_regex converts first pass to replace optional whitespace parts
+  * for the greetings which would otherwise be repeated unnecessarily.
+  * @issue CRM-19360
+  * @param greeting Filter for pulling a pseudoconstant greeting.
+  */
+  public static function greeting_to_regex($greeting)
+  {
+    $type = isset($greeting['greeting_type']) ? $greeting['greeting_type'] : 'unkwn';
+    if(!isset(self::$regexCache[$type])) {
+      $res = CRM_Core_PseudoConstant::greeting($greeting);
+      self::$regexCache[$type] =
+          preg_replace(array('/\{\s+\}/','/\s+/'),'\s*', $res);
+    }
+    return self::$regexCache[$type];
+  }
+
+  /**
+  *  Check if the value present is a valid processed greeting expression.
+  *  Converts greeting into regex and returns true if it matches.
+  *
+  *  @issue CRM-19360
+  *  @param $expectedValue String Value from import
+  *  @param $greeting String Tokenized string from configuration
+  *  @param $params Reference to Param Array to lookup values
+  **/
+  public static function validate_greeting($expectedValue,$greeting, &$params)
+  {
+    //Convert expected value to lowercase to compare to our regex.
+    $expectedValue = strtolower(trim($expectedValue));
+    //If empty field is invalid? Maybe only if there isn't a blank greeting?
+    if(empty($expectedValue)) return false;
+    //If customized then this is valid because then the *_custom field should
+    //be reviewed
+    if($expectedValue == "customized") return true;
+    //Replace all tokens with their respective values(if available) from the
+    //current row. Since we aren't certain if the field is absolutely included.
+    //The test data sometimes had a middle initial, the regex portion is
+    //return as optional.
+    $result = preg_replace_callback('/\{\w+\.([\w_]+)\}/',
+    function($matches) use ($params){
+      return isset($matches[1]) &&
+             isset($params[$matches[1]]) &&
+             !empty($params[$matches[1]]) ?
+             '('.$params[$matches[1]].')?' : '';
+    }, $greeting);
+
+    //Finally we compare each greeting regex to the value imported to See
+    //if it is valid. If true, we can go home early. Otherwise try the next.
+    foreach($result as &$res) {
+      $res = strtolower($res);
+      if(preg_match('/'.$res.'/',$expectedValue))
+        return true;
+    }
+
+    //No match
+    return false;
   }
 
   /**
