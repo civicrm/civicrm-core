@@ -91,7 +91,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Retieve array of allowed credit cards for this payment processor.
+   * Retrieve array of allowed credit cards for this payment processor.
    * @param interger|null $paymentProcessorID id of processor.
    * @return array
    */
