@@ -331,10 +331,15 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if ($this->_ppType) {
       $defaults['payment_processor_type_id'] = $this->_ppType;
     }
-    $defaults['accept_credit_cards'] = json_decode(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
+    $cards = json_decode(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
           $this->_id,
           'accepted_credit_cards'
         ), TRUE);
+    $acceptedCards = array();
+    foreach ($cards as $card => $val) {
+      $acceptedCards[$card] = 1;
+    }
+    $defaults['accept_credit_cards'] = $acceptedCards;
     unset($defaults['accepted_credit_cards']);
     // now get testID
     $testDAO = new CRM_Financial_DAO_PaymentProcessor();
@@ -391,7 +396,20 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         $values[$field] = empty($values["test_{$field}"]) ? CRM_Utils_Array::value($field, $values) : $values["test_{$field}"];
       }
     }
-    $creditCards = empty($values['accept_credit_cards']) ? "NULL" : json_encode($values['accept_credit_cards']);
+    if (!empty($values['accept_credit_cards'])) {
+      $creditCards = array();
+      $accptedCards = array_keys($values['accept_credit_cards']);
+      $creditCardTypes = CRM_Contribute_PseudoConstant::creditCard();
+      foreach ($creditCardTypes as $type => $val) {
+        if (in_array($type, $accptedCards)) {
+          $creditCards[$type] = $creditCardTypes[$type];
+        }
+      }
+      $creditCards = json_encode($creditCards);
+    }
+    else {
+      $creditCards = "NULL";
+    }
     $params  = array_merge(array(
       'id' => $test ? $this->_testID : $this->_id,
       'domain_id' => $domainID,
