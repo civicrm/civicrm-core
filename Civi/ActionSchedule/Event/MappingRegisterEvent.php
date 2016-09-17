@@ -23,7 +23,7 @@ class MappingRegisterEvent extends Event {
    *
    * @param MappingInterface $mapping
    *   The new mapping.
-   * @return $this
+   * @return MappingRegisterEvent
    */
   public function register(MappingInterface $mapping) {
     $this->mappings[$mapping->getId()] = $mapping;

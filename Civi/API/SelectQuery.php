@@ -318,7 +318,7 @@ class SelectQuery {
 
   /**
    * @param \CRM_Utils_SQL_Select $sqlFragment
-   * @return $this
+   * @return SelectQuery
    */
   public function merge($sqlFragment) {
     $this->query->merge($sqlFragment);
