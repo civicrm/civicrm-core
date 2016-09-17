@@ -644,7 +644,7 @@ class DB_Table extends DB_Table_Base
      * @return object DB_Table
      * @access public
      */
-    function DB_Table(&$db, $table = null, $create = false)
+    function __construct(&$db, $table = null, $create = false)
     {
         // Identify the class for error handling by parent class
         $this->_primary_subclass = 'DB_TABLE';

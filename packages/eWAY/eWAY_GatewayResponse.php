@@ -54,7 +54,7 @@ class GatewayResponse
 	var $txError               = "";
     var $txBeagleScore         = "";
 
-	function GatewayResponse()
+	function __construct()
 	{
 	   // Empty Constructor
     }

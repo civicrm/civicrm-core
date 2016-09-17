@@ -622,7 +622,7 @@ class DB_Table_Database extends DB_Table_Base
      * @return object DB_Table_Database
      * @access public
      */
-    function DB_Table_Database(&$db, $name)
+    function __construct(&$db, $name)
     {
         // Is $db an DB/MDB2 object or null?
         if (is_a($db, 'db_common')) {

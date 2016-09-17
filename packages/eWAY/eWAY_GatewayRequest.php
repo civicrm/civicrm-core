@@ -79,7 +79,7 @@ class GatewayRequest
 
     var $txCustomerIPAddress = "";
 
-   function GatewayRequest()   
+   function __construct()
    {
       // Empty Constructor
    }

@@ -3,7 +3,7 @@
 
 class legend
 {
-	function legend(){}
+	function __construct(){}
 	
 	function set_position( $position )
 	{

@@ -2,7 +2,7 @@
 
 class scatter_line
 {
-	function scatter_line( $colour, $width  )
+	function __construct( $colour, $width  )
 	{
 		$this->type      = "scatter_line";
 		$this->set_colour( $colour );

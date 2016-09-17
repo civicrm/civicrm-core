@@ -89,7 +89,6 @@
  * Pager                         2.4.8      BSD 3-cl.
  * PEAR                          1.9.0      PHP 3.0
  * PHP_Beautifier                0.1.14     PHP 3.0
- * Services_JSON                 1.0.1      BSD 2-cl.
  * Services_Twilio               3.10.0     MIT
  * Structures_Graph              1.0.2      LGPL 2.1+
  * System_Command                1.0.6      PHP 2

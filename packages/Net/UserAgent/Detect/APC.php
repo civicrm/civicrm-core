@@ -56,7 +56,7 @@ class Net_UserAgent_Detect_APC extends Net_UserAgent_Detect
      * @param mixed  $in_detect       (optional) The level of checking to do. 
      * @param mixed  $ua_cache_window Unknown
      */
-    function Net_UserAgent_Detect_APC($in_userAgent = null, $in_detect = null,
+    function __construct($in_userAgent = null, $in_detect = null,
                                       $ua_cache_window = 600)
     {
         $data     = '';

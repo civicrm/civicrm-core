@@ -97,13 +97,15 @@ class HTML_QuickForm_group extends HTML_QuickForm_element
      * @param     bool      $appendName     (optional)whether to change elements' names to
      *                                      the form $groupName[$elementName] or leave
      *                                      them as is.
+     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string
+     *                                      or an associative array. Date format is passed along the attributes.
      * @since     1.0
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_group($elementName=null, $elementLabel=null, $elements=null, $separator=null, $appendName = true)
+    function __construct($elementName=null, $elementLabel=null, $elements=null, $separator=null, $appendName = true, $attributes = null)
     {
-        $this->HTML_QuickForm_element($elementName, $elementLabel);
+        parent::__construct($elementName, $elementLabel, $attributes);
         $this->_type = 'group';
         if (isset($elements) && is_array($elements)) {
             $this->setElements($elements);

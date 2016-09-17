@@ -378,7 +378,8 @@ LIMIT 1";
     }
     $recognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $params);
     if (!(!CRM_Utils_System::isNull($recognitionDate)
-      || ($contributionID && !CRM_Utils_System::isNull($params['prevContribution']->revenue_recognition_date)))
+      || ($contributionID && isset($params['prevContribution'])
+      && !CRM_Utils_System::isNull($params['prevContribution']->revenue_recognition_date)))
     ) {
       return FALSE;
     }
@@ -443,18 +444,16 @@ LIMIT 1";
       return FALSE;
     }
     if ($entityID) {
-      $query = ' SELECT ps.extends FROM civicrm_price_set ps %3 WHERE %1.id = %2';
+      $query = ' SELECT ps.extends FROM civicrm_price_set ps';
       $params = array(
         1 => array('ps', 'Text'),
         2 => array($entityID, 'Integer'),
       );
       if ($entity == 'PriceField') {
         $params[1] = array('pf', 'Text');
-        $params[3] = array(
-          ' INNER JOIN civicrm_price_field pf ON pf.price_set_id = ps.id ',
-          'Text',
-        );
+        $query .= ' INNER JOIN civicrm_price_field pf ON pf.price_set_id = ps.id ';
       }
+      $query .= ' WHERE %1.id = %2';
       $extends = CRM_Core_DAO::singleValueQuery($query, $params);
       $extends = explode('', $extends);
       if (!(in_array(CRM_Core_Component::getComponentID('CiviEvent'), $extends)

@@ -66,7 +66,7 @@ class HTML_QuickForm_checkbox extends HTML_QuickForm_input
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_checkbox($elementName=null, $elementLabel=null, $text='', $attributes=null)
+    function __construct($elementName=null, $elementLabel=null, $text='', $attributes=null)
     {
         //hack to add 'id' for checkbox
         if ( !$attributes ) {
@@ -78,7 +78,7 @@ class HTML_QuickForm_checkbox extends HTML_QuickForm_input
             }
         }
 
-        HTML_QuickForm_input::HTML_QuickForm_input($elementName, $elementLabel, $attributes);
+        parent::__construct($elementName, $elementLabel, $attributes);
         $this->_persistantFreeze = true;
         $this->_text = $text;
         $this->setType('checkbox');

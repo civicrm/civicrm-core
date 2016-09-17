@@ -413,6 +413,7 @@ CREATE TABLE `civicrm_option_group` (
      `name` varchar(64) NOT NULL   COMMENT 'Option group name. Used as selection key by class properties which lookup options in civicrm_option_value.',
      `title` varchar(255)    COMMENT 'Option Group title.',
      `description` varchar(255)    COMMENT 'Option group description.',
+     `data_type` varchar(128)    COMMENT 'Option group description.',
      `is_reserved` tinyint   DEFAULT 1 COMMENT 'Is this a predefined system option group (i.e. it can not be deleted)?',
      `is_active` tinyint    COMMENT 'Is this option group active?',
      `is_locked` tinyint    COMMENT 'A lock to remove the ability to add new options via the UI.' 
@@ -3926,7 +3927,7 @@ CREATE TABLE `civicrm_action_schedule` (
      `entity_status` varchar(64)    COMMENT 'Entity status',
      `start_action_offset` int unsigned    COMMENT 'Reminder Interval.',
      `start_action_unit` varchar(8)    COMMENT 'Time units for reminder.',
-     `start_action_condition` varchar(32)    COMMENT 'Reminder Action',
+     `start_action_condition` varchar(64)    COMMENT 'Reminder Action',
      `start_action_date` varchar(64)    COMMENT 'Entity date',
      `is_repeat` tinyint   DEFAULT 0 ,
      `repetition_frequency_unit` varchar(8)    COMMENT 'Time units for repetition of reminder.',

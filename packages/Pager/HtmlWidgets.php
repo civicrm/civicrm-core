@@ -57,7 +57,7 @@ class Pager_HtmlWidgets
      *
      * @param object &$pager Pager instance
      */
-    function Pager_HtmlWidgets(&$pager)
+    function __construct(&$pager)
     {
         $this->pager =& $pager;
     }

@@ -354,7 +354,7 @@ function _civicrm_api3_get_DAO($name) {
     return 'CRM_SMS_DAO_Provider';
   }
   // FIXME: DAO names should follow CamelCase convention
-  if ($name == 'Im' || $name == 'Acl') {
+  if ($name == 'Im' || $name == 'Acl' || $name == 'Pcp') {
     $name = strtoupper($name);
   }
   $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);

@@ -243,12 +243,12 @@ class Mail_smtpmx extends Mail {
      * @access public
      * @param array Hash containing any parameters different from the defaults
      * @see __construct()
-     */
+     *
     function Mail_smtpmx($params)
     {
         $this->__construct($params);
         register_shutdown_function(array(&$this, '__destruct'));
-    }
+    }*/
 
     /**
      * Destructor implementation to ensure that we disconnect from any

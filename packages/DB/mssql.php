@@ -183,9 +183,9 @@ class DB_mssql extends DB_common
      *
      * @return void
      */
-    function DB_mssql()
+    function __construct()
     {
-        $this->DB_common();
+        parent::__construct();
     }
 
     // }}}

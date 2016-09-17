@@ -369,7 +369,7 @@ class DB_Table_Generator
      * @return object DB_Table_Generator
      * @access public
      */
-    function DB_Table_Generator(&$db, $name)
+    function __construct(&$db, $name)
     {
         // Is $db an DB/MDB2 object or null?
         if (is_a($db, 'db_common')) {

@@ -189,8 +189,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // CRM-16189
     CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contributionID);
 
-    if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) || isset
-      ($params['financial_type_id']))) {
+    if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) ||
+     isset($params['financial_type_id']))) {
       $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
     }
 
@@ -3462,21 +3462,34 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $itemAmount = $params['trxnParams']['total_amount'] + $cancelledTaxAmount;
     }
     elseif ($context == 'changePaymentInstrument') {
+      $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'];
+      $deferredFinancialAccount = CRM_Utils_Array::value('deferred_financial_account_id', $params);
+      if (empty($deferredFinancialAccount)) {
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Deferred Revenue Account is' "));
+        $deferredFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['prevContribution']->financial_type_id, $relationTypeId);
+      }
+      $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
       if ($params['trxnParams']['total_amount'] < 0) {
-        $deferredFinancialAccount = CRM_Utils_Array::value('deferred_financial_account_id', $params);
-        if (empty($deferredFinancialAccount)) {
-          $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Deferred Revenue Account is' "));
-          $deferredFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['prevContribution']->financial_type_id, $relationTypeId);
-        }
-        $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
         if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
-          $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
-          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+          if ($params['total_amount'] > 0) {
+            $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
+            $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+          }
+          else {
+            $params['trxnParams']['to_financial_account_id'] = $params['to_financial_account_id'];
+            $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
+          }
         }
       }
       else {
-        $params['trxnParams']['to_financial_account_id'] = $params['to_financial_account_id'];
-        $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
+        if ($params['total_amount'] < 0) {
+          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+          $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
+        }
+        else {
+          $params['trxnParams']['to_financial_account_id'] = $params['to_financial_account_id'];
+          $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
+        }
       }
     }
 
@@ -3522,7 +3535,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         return;
       }
     }
-
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     $params['entity_id'] = $trxn->id;
     if ($context != 'changePaymentInstrument') {
@@ -3589,6 +3601,28 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       foreach ($params['line_item'] as &$lineItems) {
         foreach ($lineItems as &$line) {
           $line['financial_type_id'] = $params['financial_type_id'];
+        }
+      }
+    }
+    if ($context == 'changePaymentInstrument') {
+      foreach ($params['line_item'] as $lineitems) {
+        foreach ($lineitems as $fieldValueId => $fieldValues) {
+          $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($fieldValues['id']);
+          if (!CRM_Utils_Rule::currencyCode($trxn->currency)) {
+            $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
+          }
+
+          // save to entity_financial_trxn table
+          $entityFinancialTrxnParams = array(
+            'entity_table' => "civicrm_financial_item",
+            'entity_id' => $prevFinancialItem->id,
+            'financial_trxn_id' => $trxn->id,
+            'amount' => $trxn->total_amount,
+            'currency' => $trxn->currency,
+          );
+          $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+          $entityTrxn->copyValues($entityFinancialTrxnParams);
+          $entityTrxn->save();
         }
       }
     }
@@ -4066,14 +4100,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 
         WHERE con.id = %1 AND ft.to_financial_account_id <> %3
         GROUP BY ft.id";
-
       $queryParams = array(
         1 => array($contributionId, 'Integer'),
         2 => array($feeFinancialAccount, 'Integer'),
         3 => array($arAccount, 'Integer'),
       );
       $resultDAO = CRM_Core_DAO::executeQuery($sql, $queryParams);
-
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
 
       while ($resultDAO->fetch()) {
@@ -4593,6 +4625,9 @@ LIMIT 1;";
 
     $contributionParams['id'] = $contribution->id;
 
+    // CRM-19309 - if you update the contribution here with financial_type_id it can/will mess with $lineItem
+    // unsetting it here does NOT cause any other contribution test to fail!
+    unset($contributionParams['financial_type_id']);
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
     // Add new soft credit against current $contribution.

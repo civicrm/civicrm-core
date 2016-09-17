@@ -4261,13 +4261,6 @@ class DB_DataObject extends DB_DataObject_Overload
     {
         global $_DB_DATAOBJECT;
 
-        if (isset($_DB_DATAOBJECT['RESULTS'][$this->_DB_resultid])) {
-            if ( is_resource( $_DB_DATAOBJECT['RESULTS'][$this->_DB_resultid]->result ) ) {
-                mysql_free_result( $_DB_DATAOBJECT['RESULTS'][$this->_DB_resultid]->result );
-            }
-            unset($_DB_DATAOBJECT['RESULTS'][$this->_DB_resultid]);
-        }
-
         if (isset($_DB_DATAOBJECT['RESULTFIELDS'][$this->_DB_resultid])) {
             unset($_DB_DATAOBJECT['RESULTFIELDS'][$this->_DB_resultid]);
         }
@@ -4279,6 +4272,17 @@ class DB_DataObject extends DB_DataObject_Overload
         // this is a huge bug in DB!
         if (isset($_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5])) {
             $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5]->num_rows = array();
+        }
+        if (is_array($this->_link_loaded)) {
+            foreach ($this->_link_loaded as $do) {
+                if (
+                        !empty($this->{$do}) &&
+                        is_object($this->{$do}) &&
+                       method_exists($this->{$do}, 'free')
+                    ) {
+                    $this->{$do}->free();
+                }
+            }
         }
 
     }
@@ -4314,6 +4318,10 @@ class DB_DataObject extends DB_DataObject_Overload
     return '';
   }
 
+  public function lastInsertId() {
+    $DB = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
+    return $DB->lastInsertId();
+  }
 
 }
 // technially 4.3.2RC1 was broken!!

@@ -197,6 +197,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // current contribution page id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
     if (!$this->_id) {
       // seems like the session is corrupted and/or we lost the id trail
       // lets just bump this to a regular session error and redirect user to main page
@@ -291,6 +292,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // check for is_monetary status
       $isMonetary = CRM_Utils_Array::value('is_monetary', $this->_values);
       $isPayLater = CRM_Utils_Array::value('is_pay_later', $this->_values);
+      if (!empty($this->_ccid) && $isPayLater) {
+        $isPayLater = FALSE;
+        $this->_values['is_pay_later'] = FALSE;
+      }
 
       if ($isMonetary &&
         (!$isPayLater || !empty($this->_values['payment_processor']))

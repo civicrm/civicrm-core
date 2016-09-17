@@ -186,6 +186,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // lineItem isn't set until Register postProcess
     $this->_lineItem = $this->get('lineItem');
+    $this->_ccid = $this->get('ccid');
     $this->_paymentProcessor = $this->get('paymentProcessor');
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
@@ -389,7 +390,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $params = $this->_params;
     // make sure we have values for it
-    if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
+    if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id']) && empty($this->_ccid)) {
       $honorName = NULL;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
@@ -432,7 +433,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->set('option', $option);
     }
     $config = CRM_Core_Config::singleton();
-    if (in_array('CiviMember', $config->enableComponents)) {
+    if (in_array('CiviMember', $config->enableComponents) && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
         $params['selectMembership'] != 'no_thanks'
       ) {
@@ -450,14 +451,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->assign('membershipBlock', FALSE);
       }
     }
-    $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
-    $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
+    if (empty($this->_ccid)) {
+      $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
+      $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
+    }
 
     if (!empty($this->_values['onbehalf_profile_id']) &&
       !empty($params['onbehalf']) &&
       ($this->_values['is_for_organization'] == 2 ||
         !empty($params['is_for_organization'])
-      )
+      ) && empty($this->_ccid)
     ) {
       $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
@@ -492,6 +495,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     ) {
       $contribButton = ts('Continue');
       $this->assign('button', ts('Continue'));
+    }
+    elseif (!empty($this->_ccid)) {
+      $contribButton = ts('Make Payment');
+      $this->assign('button', ts('Make Payment'));
     }
     else {
       $contribButton = ts('Make Contribution');
@@ -1210,6 +1217,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // required for mailing/template display ..etc
       $values['related_contact'] = $contactID;
+
+      //CRM-19172: Create CMS user for individual on whose behalf organization is doing contribution
+      $params['onbehalf_contact_id'] = $contactID;
 
       //make this employee of relationship as current
       //employer / employee relationship,  CRM-3532
@@ -1939,6 +1949,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (isset($this->_params['payment_processor_id']) && $this->_params['payment_processor_id'] === 0) {
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
     }
+
+    if (!empty($this->_ccid)) {
+      $this->_params['contribution_id'] = $this->_ccid;
+    }
     // add a description field at the very beginning
     $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
 
@@ -1992,7 +2006,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // organization params in a separate variable, to make sure
     // normal behavior is continued. And use that variable to
     // process on-behalf-of functionality.
-    if (!empty($this->_values['onbehalf_profile_id'])) {
+    if (!empty($this->_values['onbehalf_profile_id']) && empty($this->_ccid)) {
       $behalfOrganization = array();
       $orgFields = array('organization_name', 'organization_id', 'org_option');
       foreach ($orgFields as $fld) {

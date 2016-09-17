@@ -1,0 +1,32 @@
+{
+    "authors": [
+        {
+            "email": "Philippe.Jausions@11abacus.com",
+            "name": "Philippe Jausions",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Validate": "./"
+        }
+    },
+    "description": "Validation class for credit cards.",
+    "include-path": [
+        "./"
+    ],
+    "license": "New BSD",
+    "name": "pear/validate_finance_creditcard",
+    "support": {
+        "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Validate_Finance_CreditCard",
+        "source": "https://github.com/pear/Validate_Finance_CreditCard"
+    },
+    "type": "library",
+    "require": {
+        "php": ">=5.2.1",
+        "pear/pear_exception": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}

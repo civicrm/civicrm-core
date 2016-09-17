@@ -107,7 +107,7 @@ class DB_Table_Date {
      * @access public
      * @param string $date A date in ISO 8601 format.
      */
-    function DB_Table_Date($date)
+    function __construct($date)
     {
 		// This regex is very loose and accepts almost any butchered
 		// format you could throw at it.  e.g. 2003-10-07 19:45:15 and

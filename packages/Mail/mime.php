@@ -172,7 +172,7 @@ class Mail_mime
      * @return void
      * @access public
      */
-    function Mail_mime($params = array())
+    function __construct($params = array())
     {
         // Backward-compatible EOL setting
         if (is_string($params)) {

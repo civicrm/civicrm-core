@@ -113,7 +113,7 @@ class Net_DIME_Record {
 						  NET_DIME_TYPE => '',
 						  NET_DIME_DATA => '');
 
-    function Net_DIME_Record($debug = false)
+    function __construct($debug = false)
     {
         $this->debug = $debug;
         if ($debug) {
@@ -392,7 +392,7 @@ class Net_DIME_Message {
      * @param integer $record_size
      * @param boolean $debug
      */
-    function Net_DIME_Message($stream = null, $record_size = 4096,
+    function __construct($stream = null, $record_size = 4096,
                               $debug = false)
     {
         $this->stream = $stream;

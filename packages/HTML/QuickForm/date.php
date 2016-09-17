@@ -117,7 +117,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
     * @param    array   Options to control the element's display
     * @param    mixed   Either a typical HTML attribute string or an associative array
     */
-    function HTML_QuickForm_date($elementName = null, $elementLabel = null, $options = array(), $attributes = null)
+    function __construct($elementName = null, $elementLabel = null, $options = array(), $attributes = null)
     {
         $this->_locale = array( 
                                'weekdays_short'=> CRM_Utils_Date::getAbbrWeekdayNames(), 
@@ -125,7 +125,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                                'months_short'  => CRM_Utils_Date::getAbbrMonthNames(), 
                                'months_long'   => CRM_Utils_Date::getFullMonthNames() 
                                );
-        $this->HTML_QuickForm_element($elementName, $elementLabel, $attributes);
+        parent::__construct($elementName, $elementLabel, null, null, null, $attributes);
         $this->_persistantFreeze = true;
         $this->_appendName = true;
         $this->_type = 'date';

@@ -56,7 +56,7 @@ define('NET_USERAGENT_DETECT_ALL',      'all');
 class Net_UserAgent_Detect {
     // {{{ constructor
 
-    function Net_UserAgent_Detect($in_userAgent = null, $in_detect = null)
+    function __construct($in_userAgent = null, $in_detect = null)
     {
         $this->detect($in_userAgent, $in_detect);
     }

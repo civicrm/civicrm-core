@@ -136,9 +136,9 @@ class HTML_QuickForm_Renderer_ArraySmarty extends HTML_QuickForm_Renderer_Array
     * @param  bool    true: collect all hidden elements into string; false: process them as usual form elements
     * @access public
     */
-    function HTML_QuickForm_Renderer_ArraySmarty(&$tpl, $staticLabels = false, $collectHidden = true)
+    function __construct(&$tpl, $staticLabels = false, $collectHidden = true)
     {
-        $this->HTML_QuickForm_Renderer_Array($collectHidden, $staticLabels);
+        parent::__construct($collectHidden, $staticLabels);
         $this->_tpl =& $tpl;
     } // end constructor
 

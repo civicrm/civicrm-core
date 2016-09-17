@@ -9,7 +9,7 @@ header("Pragma: no-cache");
  */
 class inner_bg_grad
 {
-	function inner_bg_grad()
+	function __construct()
 	{
 		$this->alpha    = array(1,1);
 		$this->ratio    = array(0,255);

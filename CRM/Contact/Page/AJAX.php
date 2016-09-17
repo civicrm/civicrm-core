@@ -69,11 +69,12 @@ class CRM_Contact_Page_AJAX {
       parse_str($cf['filter'], $filterParams);
 
       $action = CRM_Utils_Array::value('action', $filterParams);
-
-      if (!empty($action) &&
-        !in_array($action, array('get', 'lookup'))
-      ) {
+      if (!empty($action) && !in_array($action, array('get', 'lookup'))) {
         CRM_Utils_System::civiExit('error');
+      }
+
+      if (!empty($filterParams['group'])) {
+        $filterParams['group'] = explode(',', $filterParams['group']);
       }
     }
 
@@ -149,6 +150,9 @@ class CRM_Contact_Page_AJAX {
       $contactList[] = array('id' => $value['id'], 'text' => implode(' :: ', $view));
     }
 
+    if (!empty($_GET['is_unit_test'])) {
+      return $contactList;
+    }
     CRM_Utils_JSON::output($contactList);
   }
 

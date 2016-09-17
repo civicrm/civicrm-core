@@ -167,7 +167,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $params['is_approval_needed'] = CRM_Utils_Array::value('is_approval_needed', $params, FALSE);
     $params['is_tellfriend_enabled'] = CRM_Utils_Array::value('is_tellfriend_enabled', $params, FALSE);
 
-    $dao = CRM_PCP_BAO_PCP::add($params);
+    CRM_PCP_BAO_PCPBlock::create($params);
 
     parent::endPostProcess();
   }
