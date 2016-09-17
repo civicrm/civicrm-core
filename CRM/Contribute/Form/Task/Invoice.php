@@ -653,7 +653,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $options  = new Options();
     $options->set('isRemoteEnabled', TRUE);
 
-    $doc = new DOMPDF();
+    $doc = new DOMPDF($options);
     $doc->load_html($html);
     $doc->render();
     $html = $doc->output();

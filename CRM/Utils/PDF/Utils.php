@@ -202,7 +202,7 @@ class CRM_Utils_PDF_Utils {
     $options = new Options();
     $options->set('isRemoteEnabled', TRUE);
 
-    $dompdf = new DOMPDF();
+    $dompdf = new DOMPDF($options);
     $dompdf->set_paper($paper_size, $orientation);
     $dompdf->load_html($html);
     $dompdf->render();
@@ -211,6 +211,8 @@ class CRM_Utils_PDF_Utils {
       return $dompdf->output();
     }
     else {
+      // CRM-19183 remove .pdf extension from filename
+      $fileName = basename($fileName, ".pdf");
       $dompdf->stream($fileName);
     }
   }
