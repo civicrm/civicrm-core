@@ -452,6 +452,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if ($contribPageId) {
       $this->_formValues['contribution_page_id'] = $contribPageId;
     }
+    
+    //Check for personal campaign page id
+    $pcp = CRM_Utils_Request::retrieve('pcp_id', 'Positive', $this);
+    if ($pcp) {
+      $this->_formValues['contribution_pcp_made_through_id'] = $pcp;
+    }
 
     //give values to default.
     $this->_defaults = $this->_formValues;
