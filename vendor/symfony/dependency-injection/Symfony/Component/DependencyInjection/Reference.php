@@ -15,8 +15,6 @@ namespace Symfony\Component\DependencyInjection;
  * Reference represents a service reference.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Reference
 {
@@ -25,8 +23,6 @@ class Reference
     private $strict;
 
     /**
-     * Constructor.
-     *
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
      * @param bool   $strict          Sets how this reference is validated
@@ -41,8 +37,6 @@ class Reference
     }
 
     /**
-     * __toString.
-     *
      * @return string The service identifier
      */
     public function __toString()
@@ -61,7 +55,7 @@ class Reference
     }
 
     /**
-     * Returns true when this Reference is strict
+     * Returns true when this Reference is strict.
      *
      * @return bool
      */

@@ -94,7 +94,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         $command->setErrorHandler(
             $this->ignoreUnreadableDirs
                 // If directory is unreadable and finder is set to ignore it, `stderr` is ignored.
-                ? function ($stderr) { return; }
+                ? function ($stderr) { }
                 : function ($stderr) { throw new AccessDeniedException($stderr); }
         );
 
@@ -272,7 +272,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         foreach ($dates as $i => $date) {
             $command->add($i > 0 ? '-and' : null);
 
-            $mins = (int) round((time()-$date->getTarget()) / 60);
+            $mins = (int) round((time() - $date->getTarget()) / 60);
 
             if (0 > $mins) {
                 // mtime is in the future

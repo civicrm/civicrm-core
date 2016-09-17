@@ -20,17 +20,15 @@ namespace Symfony\Component\EventDispatcher;
  * You can call the method stopPropagation() to abort the execution of
  * further listeners in your event listener.
  *
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
- * @author  Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author Jonathan Wage <jonwage@gmail.com>
+ * @author Roman Borschel <roman@code-factory.org>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class Event
 {
     /**
-     * @var bool    Whether no further event listeners should be triggered
+     * @var bool Whether no further event listeners should be triggered
      */
     private $propagationStopped = false;
 
@@ -47,10 +45,9 @@ class Event
     /**
      * Returns whether further event listeners should be triggered.
      *
-     * @see Event::stopPropagation
-     * @return bool Whether propagation was already stopped for this event.
+     * @see Event::stopPropagation()
      *
-     * @api
+     * @return bool Whether propagation was already stopped for this event.
      */
     public function isPropagationStopped()
     {
@@ -63,8 +60,6 @@ class Event
      * If multiple event listeners are connected to the same event, no
      * further event listener will be triggered once any trigger calls
      * stopPropagation().
-     *
-     * @api
      */
     public function stopPropagation()
     {
@@ -72,11 +67,9 @@ class Event
     }
 
     /**
-     * Stores the EventDispatcher that dispatches this Event
+     * Stores the EventDispatcher that dispatches this Event.
      *
      * @param EventDispatcherInterface $dispatcher
-     *
-     * @api
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
@@ -84,11 +77,9 @@ class Event
     }
 
     /**
-     * Returns the EventDispatcher that dispatches this Event
+     * Returns the EventDispatcher that dispatches this Event.
      *
      * @return EventDispatcherInterface
-     *
-     * @api
      */
     public function getDispatcher()
     {
@@ -99,8 +90,6 @@ class Event
      * Gets the event's name.
      *
      * @return string
-     *
-     * @api
      */
     public function getName()
     {
@@ -111,8 +100,6 @@ class Event
      * Sets the event's name property.
      *
      * @param string $name The event name.
-     *
-     * @api
      */
     public function setName($name)
     {

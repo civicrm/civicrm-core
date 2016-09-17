@@ -40,42 +40,6 @@
         ]
     },
     {
-        "name": "phenx/php-font-lib",
-        "version": "0.2.2",
-        "version_normalized": "0.2.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/PhenX/php-font-lib.git",
-            "reference": "c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82",
-            "reference": "c30c7fc00a6b0d863e9bb4c5d5dd015298b2dc82",
-            "shasum": ""
-        },
-        "time": "2014-02-01 15:22:28",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "classes/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Ménager",
-                "email": "fabien.menager@gmail.com"
-            }
-        ],
-        "description": "A library to read, parse, export and make subsets of different types of font files.",
-        "homepage": "https://github.com/PhenX/php-font-lib"
-    },
-    {
         "name": "totten/ca-config",
         "version": "v13.02.0",
         "version_normalized": "13.02.0.0",
@@ -113,264 +77,6 @@
         ],
         "description": "Default configuration for certificate authorities",
         "homepage": "https://github.com/totten/ca_config"
-    },
-    {
-        "name": "symfony/dependency-injection",
-        "version": "v2.3.23",
-        "version_normalized": "2.3.23.0",
-        "target-dir": "Symfony/Component/DependencyInjection",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/DependencyInjection.git",
-            "reference": "f165ee0e0b3522b5158def22622b2f171a8ecd59"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/DependencyInjection/zipball/f165ee0e0b3522b5158def22622b2f171a8ecd59",
-            "reference": "f165ee0e0b3522b5158def22622b2f171a8ecd59",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "symfony/config": "~2.2",
-            "symfony/yaml": "~2.0"
-        },
-        "suggest": {
-            "symfony/config": "",
-            "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
-            "symfony/yaml": ""
-        },
-        "time": "2014-12-02 19:42:47",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.3-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\DependencyInjection\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            },
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            }
-        ],
-        "description": "Symfony DependencyInjection Component",
-        "homepage": "http://symfony.com"
-    },
-    {
-        "name": "symfony/event-dispatcher",
-        "version": "v2.3.23",
-        "version_normalized": "2.3.23.0",
-        "target-dir": "Symfony/Component/EventDispatcher",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/EventDispatcher.git",
-            "reference": "36a40695d94e948d7a85347db0b12ba446c400fa"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/36a40695d94e948d7a85347db0b12ba446c400fa",
-            "reference": "36a40695d94e948d7a85347db0b12ba446c400fa",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "symfony/dependency-injection": "~2.0"
-        },
-        "suggest": {
-            "symfony/dependency-injection": "",
-            "symfony/http-kernel": ""
-        },
-        "time": "2014-11-30 13:33:44",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.3-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\EventDispatcher\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            },
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            }
-        ],
-        "description": "Symfony EventDispatcher Component",
-        "homepage": "http://symfony.com"
-    },
-    {
-        "name": "symfony/finder",
-        "version": "v2.3.23",
-        "version_normalized": "2.3.23.0",
-        "target-dir": "Symfony/Component/Finder",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/Finder.git",
-            "reference": "d533aea3400dc463c4d0ba9c3ecf40bd80d49dbd"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/Finder/zipball/d533aea3400dc463c4d0ba9c3ecf40bd80d49dbd",
-            "reference": "d533aea3400dc463c4d0ba9c3ecf40bd80d49dbd",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "time": "2014-12-02 19:42:47",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.3-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\Finder\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            },
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            }
-        ],
-        "description": "Symfony Finder Component",
-        "homepage": "http://symfony.com"
-    },
-    {
-        "name": "symfony/process",
-        "version": "v2.3.28",
-        "version_normalized": "2.3.28.0",
-        "target-dir": "Symfony/Component/Process",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/Process.git",
-            "reference": "a8fe947ac58e081f8773e0d160807dcffbff7ed8"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/Process/zipball/a8fe947ac58e081f8773e0d160807dcffbff7ed8",
-            "reference": "a8fe947ac58e081f8773e0d160807dcffbff7ed8",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "symfony/phpunit-bridge": "~2.7"
-        },
-        "time": "2015-05-01 14:06:45",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.3-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\Process\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony Process Component",
-        "homepage": "https://symfony.com"
-    },
-    {
-        "name": "dompdf/dompdf",
-        "version": "v0.6.2",
-        "version_normalized": "0.6.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/dompdf/dompdf.git",
-            "reference": "cc06008f75262510ee135b8cbb14e333a309f651"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/dompdf/dompdf/zipball/cc06008f75262510ee135b8cbb14e333a309f651",
-            "reference": "cc06008f75262510ee135b8cbb14e333a309f651",
-            "shasum": ""
-        },
-        "require": {
-            "phenx/php-font-lib": "0.2.*"
-        },
-        "time": "2015-12-07 04:07:13",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "include/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Ménager",
-                "email": "fabien.menager@gmail.com"
-            },
-            {
-                "name": "Brian Sweeney",
-                "email": "eclecticgeek@gmail.com"
-            }
-        ],
-        "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
-        "homepage": "https://github.com/dompdf/dompdf"
     },
     {
         "name": "phpseclib/phpseclib",
@@ -578,5 +284,364 @@
             "pdf417",
             "qrcode"
         ]
+    },
+    {
+        "name": "phenx/php-svg-lib",
+        "version": "0.1",
+        "version_normalized": "0.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/PhenX/php-svg-lib.git",
+            "reference": "b419766515b3426c6da74b0e29e93d71c4f17099"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/b419766515b3426c6da74b0e29e93d71c4f17099",
+            "reference": "b419766515b3426c6da74b0e29e93d71c4f17099",
+            "shasum": ""
+        },
+        "time": "2015-05-06 18:49:49",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Svg\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Ménager",
+                "email": "fabien.menager@gmail.com"
+            }
+        ],
+        "description": "A library to read, parse and export to PDF SVG files.",
+        "homepage": "https://github.com/PhenX/php-svg-lib"
+    },
+    {
+        "name": "phenx/php-font-lib",
+        "version": "0.4",
+        "version_normalized": "0.4.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/PhenX/php-font-lib.git",
+            "reference": "b8af0cacdc3cbf1e41a586fcb78f506f4121a088"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/b8af0cacdc3cbf1e41a586fcb78f506f4121a088",
+            "reference": "b8af0cacdc3cbf1e41a586fcb78f506f4121a088",
+            "shasum": ""
+        },
+        "time": "2015-05-06 20:02:39",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "FontLib\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Ménager",
+                "email": "fabien.menager@gmail.com"
+            }
+        ],
+        "description": "A library to read, parse, export and make subsets of different types of font files.",
+        "homepage": "https://github.com/PhenX/php-font-lib"
+    },
+    {
+        "name": "dompdf/dompdf",
+        "version": "v0.7.0",
+        "version_normalized": "0.7.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/dompdf/dompdf.git",
+            "reference": "5c98652b1a5beb7e3cc8ec35419b2828dd63ab14"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/dompdf/dompdf/zipball/5c98652b1a5beb7e3cc8ec35419b2828dd63ab14",
+            "reference": "5c98652b1a5beb7e3cc8ec35419b2828dd63ab14",
+            "shasum": ""
+        },
+        "require": {
+            "ext-dom": "*",
+            "ext-gd": "*",
+            "ext-mbstring": "*",
+            "phenx/php-font-lib": "0.4.*",
+            "phenx/php-svg-lib": "0.1.*",
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "3.7.*"
+        },
+        "time": "2016-05-11 00:36:29",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-develop": "0.7-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Dompdf\\": "src/"
+            },
+            "classmap": [
+                "lib/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-2.1"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Ménager",
+                "email": "fabien.menager@gmail.com"
+            },
+            {
+                "name": "Brian Sweeney",
+                "email": "eclecticgeek@gmail.com"
+            },
+            {
+                "name": "Gabriel Bull",
+                "email": "me@gabrielbull.com"
+            }
+        ],
+        "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
+        "homepage": "https://github.com/dompdf/dompdf"
+    },
+    {
+        "name": "symfony/dependency-injection",
+        "version": "v2.3.42",
+        "version_normalized": "2.3.42.0",
+        "target-dir": "Symfony/Component/DependencyInjection",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/dependency-injection.git",
+            "reference": "06265ee128644eb70356bd72ab28c9ded6618d19"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/06265ee128644eb70356bd72ab28c9ded6618d19",
+            "reference": "06265ee128644eb70356bd72ab28c9ded6618d19",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "symfony/config": "~2.2",
+            "symfony/yaml": "~2.1"
+        },
+        "suggest": {
+            "symfony/config": "",
+            "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
+            "symfony/yaml": ""
+        },
+        "time": "2016-05-30 08:31:06",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.3-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\DependencyInjection\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony DependencyInjection Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "symfony/event-dispatcher",
+        "version": "v2.3.42",
+        "version_normalized": "2.3.42.0",
+        "target-dir": "Symfony/Component/EventDispatcher",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/event-dispatcher.git",
+            "reference": "fd6d162d97bf3e6060622e5c015af39ca72e33bc"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/fd6d162d97bf3e6060622e5c015af39ca72e33bc",
+            "reference": "fd6d162d97bf3e6060622e5c015af39ca72e33bc",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "symfony/dependency-injection": "~2.0,>=2.0.5"
+        },
+        "suggest": {
+            "symfony/dependency-injection": "",
+            "symfony/http-kernel": ""
+        },
+        "time": "2016-04-04 09:22:54",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.3-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\EventDispatcher\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony EventDispatcher Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "symfony/finder",
+        "version": "v2.3.42",
+        "version_normalized": "2.3.42.0",
+        "target-dir": "Symfony/Component/Finder",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/finder.git",
+            "reference": "dce4b58434fc1cbd66e3006e539bb53074dfea82"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/finder/zipball/dce4b58434fc1cbd66e3006e539bb53074dfea82",
+            "reference": "dce4b58434fc1cbd66e3006e539bb53074dfea82",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2016-05-13 14:58:35",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.3-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\Finder\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony Finder Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "symfony/process",
+        "version": "v2.3.42",
+        "version_normalized": "2.3.42.0",
+        "target-dir": "Symfony/Component/Process",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/process.git",
+            "reference": "89aced1438655ad81fc828c2e2e555e9b88fef3b"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/process/zipball/89aced1438655ad81fc828c2e2e555e9b88fef3b",
+            "reference": "89aced1438655ad81fc828c2e2e555e9b88fef3b",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2016-03-31 08:39:43",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.3-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\Process\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony Process Component",
+        "homepage": "https://symfony.com"
     }
 ]

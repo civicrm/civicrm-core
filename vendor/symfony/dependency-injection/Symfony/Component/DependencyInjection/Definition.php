@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  * Definition represents a service definition.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Definition
 {
@@ -42,12 +40,8 @@ class Definition
     protected $arguments;
 
     /**
-     * Constructor.
-     *
      * @param string $class     The service class
      * @param array  $arguments An array of arguments to pass to the service constructor
-     *
-     * @api
      */
     public function __construct($class = null, array $arguments = array())
     {
@@ -71,8 +65,6 @@ class Definition
      * @param string $factoryClass The factory class name
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setFactoryClass($factoryClass)
     {
@@ -85,8 +77,6 @@ class Definition
      * Gets the factory class.
      *
      * @return string The factory class name
-     *
-     * @api
      */
     public function getFactoryClass()
     {
@@ -99,8 +89,6 @@ class Definition
      * @param string $factoryMethod The factory method name
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setFactoryMethod($factoryMethod)
     {
@@ -113,8 +101,6 @@ class Definition
      * Gets the factory method.
      *
      * @return string The factory method name
-     *
-     * @api
      */
     public function getFactoryMethod()
     {
@@ -127,8 +113,6 @@ class Definition
      * @param string $factoryService The factory service id
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setFactoryService($factoryService)
     {
@@ -141,8 +125,6 @@ class Definition
      * Gets the factory service id.
      *
      * @return string The factory service id
-     *
-     * @api
      */
     public function getFactoryService()
     {
@@ -155,8 +137,6 @@ class Definition
      * @param string $class The service class
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setClass($class)
     {
@@ -169,8 +149,6 @@ class Definition
      * Gets the service class.
      *
      * @return string The service class
-     *
-     * @api
      */
     public function getClass()
     {
@@ -183,8 +161,6 @@ class Definition
      * @param array $arguments An array of arguments
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setArguments(array $arguments)
     {
@@ -193,9 +169,6 @@ class Definition
         return $this;
     }
 
-    /**
-     * @api
-     */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
@@ -203,17 +176,11 @@ class Definition
         return $this;
     }
 
-    /**
-     * @api
-     */
     public function getProperties()
     {
         return $this->properties;
     }
 
-    /**
-     * @api
-     */
     public function setProperty($name, $value)
     {
         $this->properties[$name] = $value;
@@ -227,8 +194,6 @@ class Definition
      * @param mixed $argument An argument
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function addArgument($argument)
     {
@@ -238,7 +203,7 @@ class Definition
     }
 
     /**
-     * Sets a specific argument
+     * Sets a specific argument.
      *
      * @param int   $index
      * @param mixed $argument
@@ -246,8 +211,6 @@ class Definition
      * @return Definition The current instance
      *
      * @throws OutOfBoundsException When the replaced argument does not exist
-     *
-     * @api
      */
     public function replaceArgument($index, $argument)
     {
@@ -264,8 +227,6 @@ class Definition
      * Gets the arguments to pass to the service constructor/factory method.
      *
      * @return array The array of arguments
-     *
-     * @api
      */
     public function getArguments()
     {
@@ -280,8 +241,6 @@ class Definition
      * @return mixed The argument value
      *
      * @throws OutOfBoundsException When the argument does not exist
-     *
-     * @api
      */
     public function getArgument($index)
     {
@@ -298,8 +257,6 @@ class Definition
      * @param array $calls An array of method calls
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setMethodCalls(array $calls = array())
     {
@@ -320,8 +277,6 @@ class Definition
      * @return Definition The current instance
      *
      * @throws InvalidArgumentException on empty $method param
-     *
-     * @api
      */
     public function addMethodCall($method, array $arguments = array())
     {
@@ -339,8 +294,6 @@ class Definition
      * @param string $method The method name to remove
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function removeMethodCall($method)
     {
@@ -360,8 +313,6 @@ class Definition
      * @param string $method The method name to search for
      *
      * @return bool
-     *
-     * @api
      */
     public function hasMethodCall($method)
     {
@@ -378,8 +329,6 @@ class Definition
      * Gets the methods to call after service initialization.
      *
      * @return array An array of method calls
-     *
-     * @api
      */
     public function getMethodCalls()
     {
@@ -387,13 +336,11 @@ class Definition
     }
 
     /**
-     * Sets tags for this definition
+     * Sets tags for this definition.
      *
      * @param array $tags
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setTags(array $tags)
     {
@@ -406,8 +353,6 @@ class Definition
      * Returns all tags.
      *
      * @return array An array of tags
-     *
-     * @api
      */
     public function getTags()
     {
@@ -420,8 +365,6 @@ class Definition
      * @param string $name The tag name
      *
      * @return array An array of attributes
-     *
-     * @api
      */
     public function getTag($name)
     {
@@ -435,8 +378,6 @@ class Definition
      * @param array  $attributes An array of attributes
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function addTag($name, array $attributes = array())
     {
@@ -446,13 +387,11 @@ class Definition
     }
 
     /**
-     * Whether this definition has a tag with the given name
+     * Whether this definition has a tag with the given name.
      *
      * @param string $name
      *
      * @return bool
-     *
-     * @api
      */
     public function hasTag($name)
     {
@@ -468,9 +407,7 @@ class Definition
      */
     public function clearTag($name)
     {
-        if (isset($this->tags[$name])) {
-            unset($this->tags[$name]);
-        }
+        unset($this->tags[$name]);
 
         return $this;
     }
@@ -479,8 +416,6 @@ class Definition
      * Clears the tags for this definition.
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function clearTags()
     {
@@ -495,8 +430,6 @@ class Definition
      * @param string $file A full pathname to include
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setFile($file)
     {
@@ -509,8 +442,6 @@ class Definition
      * Gets the file to require before creating the service.
      *
      * @return string The full pathname to include
-     *
-     * @api
      */
     public function getFile()
     {
@@ -518,13 +449,11 @@ class Definition
     }
 
     /**
-     * Sets the scope of the service
+     * Sets the scope of the service.
      *
      * @param string $scope Whether the service must be shared or not
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setScope($scope)
     {
@@ -534,11 +463,9 @@ class Definition
     }
 
     /**
-     * Returns the scope of the service
+     * Returns the scope of the service.
      *
      * @return string
-     *
-     * @api
      */
     public function getScope()
     {
@@ -551,8 +478,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setPublic($boolean)
     {
@@ -562,11 +487,9 @@ class Definition
     }
 
     /**
-     * Whether this service is public facing
+     * Whether this service is public facing.
      *
      * @return bool
-     *
-     * @api
      */
     public function isPublic()
     {
@@ -579,8 +502,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setSynchronized($boolean)
     {
@@ -593,8 +514,6 @@ class Definition
      * Whether this service is synchronized.
      *
      * @return bool
-     *
-     * @api
      */
     public function isSynchronized()
     {
@@ -632,8 +551,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setSynthetic($boolean)
     {
@@ -647,8 +564,6 @@ class Definition
      * container, but dynamically injected.
      *
      * @return bool
-     *
-     * @api
      */
     public function isSynthetic()
     {
@@ -662,8 +577,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setAbstract($boolean)
     {
@@ -677,8 +590,6 @@ class Definition
      * template for other definitions.
      *
      * @return bool
-     *
-     * @api
      */
     public function isAbstract()
     {
@@ -691,8 +602,6 @@ class Definition
      * @param callable $callable A PHP callable
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setConfigurator($callable)
     {
@@ -705,8 +614,6 @@ class Definition
      * Gets the configurator to call after the service is fully initialized.
      *
      * @return callable The PHP callable to call
-     *
-     * @api
      */
     public function getConfigurator()
     {

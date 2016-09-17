@@ -17,7 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
 /**
@@ -73,11 +75,11 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
+        return is_string($resource) && in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true);
     }
 
     /**
-     * Parses all imports
+     * Parses all imports.
      *
      * @param array  $content
      * @param string $file
@@ -92,18 +94,19 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The "imports" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
+        $defaultDirectory = dirname($file);
         foreach ($content['imports'] as $import) {
             if (!is_array($import)) {
                 throw new InvalidArgumentException(sprintf('The values in the "imports" key should be arrays in %s. Check your YAML syntax.', $file));
             }
 
-            $this->setCurrentDir(dirname($file));
+            $this->setCurrentDir($defaultDirectory);
             $this->import($import['resource'], null, isset($import['ignore_errors']) ? (bool) $import['ignore_errors'] : false, $file);
         }
     }
 
     /**
-     * Parses definitions
+     * Parses definitions.
      *
      * @param array  $content
      * @param string $file
@@ -242,6 +245,10 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key for service "%s" in %s.', $id, $file));
                 }
 
+                if (!is_string($tag['name']) || '' === $tag['name']) {
+                    throw new InvalidArgumentException(sprintf('The tag name for service "%s" in %s must be a non-empty string.', $id, $file));
+                }
+
                 $name = $tag['name'];
                 unset($tag['name']);
 
@@ -269,6 +276,10 @@ class YamlFileLoader extends FileLoader
      */
     protected function loadFile($file)
     {
+        if (!class_exists('Symfony\Component\Yaml\Parser')) {
+            throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
+        }
+
         if (!stream_is_local($file)) {
             throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
         }
@@ -281,7 +292,13 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new YamlParser();
         }
 
-        return $this->validate($this->yamlParser->parse(file_get_contents($file)), $file);
+        try {
+            $configuration = $this->yamlParser->parse(file_get_contents($file));
+        } catch (ParseException $e) {
+            throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $file), 0, $e);
+        }
+
+        return $this->validate($configuration, $file);
     }
 
     /**
@@ -304,7 +321,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The service file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
         }
 
-        foreach (array_keys($content) as $namespace) {
+        foreach ($content as $namespace => $data) {
             if (in_array($namespace, array('imports', 'parameters', 'services'))) {
                 continue;
             }
@@ -363,7 +380,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Loads from Extensions
+     * Loads from Extensions.
      *
      * @param array $content
      */
