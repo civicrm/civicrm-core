@@ -205,11 +205,11 @@ class Requirements {
     $results = array(
       'title' => 'CiviCRM MySQL check',
       'severity' => $this::REQUIREMENT_OK,
-      'details' => 'Function mysql_connect() found',
+      'details' => 'Function mysqli_connect() found',
     );
-    if (!function_exists('mysql_connect')) {
+    if (!function_exists('mysqli_connect')) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
-      $results['details'] = 'Function mysql_connect() does not exist';
+      $results['details'] = 'Function mysqli_connect() does not exist';
     }
 
     return $results;
@@ -227,16 +227,16 @@ class Requirements {
       'details' => "Connected",
     );
 
-    $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
 
     if (!$conn) {
-      $results['details'] = mysql_error();
+      $results['details'] = mysqli_connect_error();
       $results['severity'] = $this::REQUIREMENT_ERROR;
       return $results;
     }
 
-    if (!@mysql_select_db($db_config['database'], $conn)) {
-      $results['details'] = mysql_error();
+    if (!@mysqli_select_db($conn, $db_config['database'])) {
+      $results['details'] = mysqli_error($conn);
       $results['severity'] = $this::REQUIREMENT_ERROR;
       return $results;
     }
@@ -256,8 +256,8 @@ class Requirements {
       'severity' => $this::REQUIREMENT_OK,
     );
 
-    $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
-    if (!$conn || !($info = mysql_get_server_info($conn))) {
+    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    if (!$conn || !($info = mysqli_get_server_info($conn))) {
       $results['severity'] = $this::REQUIREMENT_WARNING;
       $results['details'] = "Cannot determine the version of MySQL installed. Please ensure at least version {$min} is installed.";
       return $results;
@@ -285,14 +285,14 @@ class Requirements {
       'details' => 'Could not determine if MySQL has InnoDB support. Assuming none.',
     );
 
-    $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       return $results;
     }
 
     $innodb_support = FALSE;
-    $result = mysql_query("SHOW ENGINES", $conn);
-    while ($values = mysql_fetch_array($result)) {
+    $result = mysqli_query($conn, "SHOW ENGINES");
+    while ($values = mysqli_fetch_array($result)) {
       if ($values['Engine'] == 'InnoDB') {
         if (strtolower($values['Support']) == 'yes' || strtolower($values['Support']) == 'default') {
           $innodb_support = TRUE;
@@ -320,27 +320,27 @@ class Requirements {
       'details' => 'MySQL server supports temporary tables',
     );
 
-    $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = "Could not connect to database";
       return $results;
     }
 
-    if (!@mysql_select_db($db_config['database'], $conn)) {
+    if (!@mysqli_select_db($conn, $db_config['database'])) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = "Could not select the database";
       return $results;
     }
 
-    $r = mysql_query('CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)', $conn);
+    $r = mysqli_query($conn, 'CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)');
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = "Database does not support creation of temporary tables";
       return $results;
     }
 
-    mysql_query('DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+    mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
     return $results;
   }
 
@@ -356,36 +356,36 @@ class Requirements {
       'details' => 'Database supports MySQL triggers',
     );
 
-    $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
       return $results;
     }
 
-    if (!@mysql_select_db($db_config['database'], $conn)) {
+    if (!@mysqli_select_db($conn, $db_config['database'])) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = "Could not select the database";
       return $results;
     }
 
-    $r = mysql_query('CREATE TABLE civicrm_install_temp_table_test (test text)', $conn);
+    $r = mysqli_query($conn, 'CREATE TABLE civicrm_install_temp_table_test (test text)');
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not create a table to run test';
       return $results;
     }
 
-    $r = mysql_query('CREATE TRIGGER civicrm_install_temp_table_test_trigger BEFORE INSERT ON civicrm_install_temp_table_test FOR EACH ROW BEGIN END');
+    $r = mysqli_query($conn, 'CREATE TRIGGER civicrm_install_temp_table_test_trigger BEFORE INSERT ON civicrm_install_temp_table_test FOR EACH ROW BEGIN END');
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Database does not support creation of triggers';
     }
     else {
-      mysql_query('DROP TRIGGER civicrm_install_temp_table_test_trigger');
+      mysqli_query($conn, 'DROP TRIGGER civicrm_install_temp_table_test_trigger');
     }
 
-    mysql_query('DROP TABLE civicrm_install_temp_table_test');
+    mysqli_query($conn, 'DROP TABLE civicrm_install_temp_table_test');
     return $results;
   }
 
@@ -401,21 +401,21 @@ class Requirements {
       'details' => 'MySQL server auto_increment_increment is 1',
     );
 
-    $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
       return $results;
     }
 
-    $r = mysql_query("SHOW variables like 'auto_increment_increment'", $conn);
+    $r = mysqli_query($conn, "SHOW variables like 'auto_increment_increment'");
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not query database server variables';
       return $results;
     }
 
-    $values = mysql_fetch_row($r);
+    $values = mysqli_fetch_row($r);
     if ($values[1] != 1) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'MySQL server auto_increment_increment is not 1';
@@ -437,26 +437,26 @@ class Requirements {
       'details' => 'MySQL thread_stack is OK',
     );
 
-    $conn = @mysql_connect($db_config['server'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($db_config['server'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
       return $results;
     }
 
-    if (!@mysql_select_db($db_config['database'], $conn)) {
+    if (!@mysqli_select_db($conn, $db_config['database'])) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not select the database';
       return $results;
     }
 
-    $r = mysql_query("SHOW VARIABLES LIKE 'thread_stack'", $conn); // bytes => kb
+    $r = mysqli_query($conn, "SHOW VARIABLES LIKE 'thread_stack'"); // bytes => kb
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not query thread_stack value';
     }
     else {
-      $values = mysql_fetch_row($r);
+      $values = mysqli_fetch_row($r);
       if ($values[1] < (1024 * $min_thread_stack)) {
         $results['severity'] = $this::REQUIREMENT_ERROR;
         $results['details'] = 'MySQL thread_stack is ' . ($values[1] / 1024) . "kb (minimum required is {$min_thread_stack} kb";
@@ -478,43 +478,43 @@ class Requirements {
       'details' => 'Can successfully lock and unlock tables',
     );
 
-    $conn = @mysql_connect($db_config['server'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($db_config['server'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
       return $results;
     }
 
-    if (!@mysql_select_db($db_config['database'], $conn)) {
+    if (!@mysqli_select_db($conn, $db_config['database'])) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not select the database';
-      mysql_close($conn);
+      mysqli_close($conn);
       return $results;
     }
 
-    $r = mysql_query('CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)', $conn);
+    $r = mysqli_query($conn, 'CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)');
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not create a table';
-      mysql_close($conn);
+      mysqli_close($conn);
       return $results;
     }
 
-    $r = mysql_query('LOCK TABLES civicrm_install_temp_table_test WRITE', $conn);
+    $r = mysqli_query($conn, 'LOCK TABLES civicrm_install_temp_table_test WRITE');
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not obtain a write lock';
-      mysql_close($conn);
+      mysqli_close($conn);
       return $results;
     }
 
-    $r = mysql_query('UNLOCK TABLES', $conn);
+    $r = mysqli_query($conn, 'UNLOCK TABLES');
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not release table lock';
     }
 
-    mysql_close($conn);
+    mysqli_close($conn);
     return $results;
   }
 

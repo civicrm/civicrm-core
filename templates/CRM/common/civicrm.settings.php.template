@@ -103,6 +103,14 @@ if (!defined('CIVICRM_DSN')) {
 }
 
 /**
+ * CiviCRM DSN Mode
+ * Used to determine if you want CiviCRM to automatically change the dsn to mysqli if its avaliable.
+ * Uncomment and edit below as necessary
+ */
+// define ('DB_DSN_MODE', 'auto');
+
+
+/**
  * CiviCRM Logging Database
  *
  * Used to point to a different database to use for logging (if desired). If unset defaults to equal CIVICRM_DSN.
