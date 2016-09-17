@@ -8,7 +8,7 @@
   },
   "include-path": ["vendor/tecnickcom"],
   "require": {
-    "dompdf/dompdf" : "0.6.*",
+    "dompdf/dompdf" : "0.7.*",
     "symfony/dependency-injection": "2.3.*",
     "symfony/event-dispatcher": "2.3.*",
     "symfony/process": "2.3.*",

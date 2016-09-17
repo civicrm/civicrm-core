@@ -25,10 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
-// CRM-12165 - Remote file support required for image handling.
-define("DOMPDF_ENABLE_REMOTE", TRUE);
-define('DOMPDF_ENABLE_AUTOLOAD', FALSE);
-
+use Dompdf\Dompdf;
+use Dompdf\Options;
 /**
  *
  * @package CRM
@@ -200,7 +198,9 @@ class CRM_Utils_PDF_Utils {
    * @return string
    */
   public static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
-    require_once 'vendor/dompdf/dompdf/dompdf_config.inc.php';
+    // CRM-12165 - Remote file support needed for image handling
+    $options = new Options();
+    $options->set('isRemoteEnabled', TRUE);
 
     $dompdf = new DOMPDF();
     $dompdf->set_paper($paper_size, $orientation);
