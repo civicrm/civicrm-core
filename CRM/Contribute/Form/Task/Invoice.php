@@ -643,7 +643,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *   Name of file which is in pdf format
    */
   static public function putFile($html, $name = 'Invoice.pdf') {
-    $doc = new DOMPDF();
+    $options = new Options;
+    $options->set('isRemoteEnabled', TRUE);
+    
+    $doc = new DOMPDF($options);
     $doc->load_html($html);
     $doc->render();
     $html = $doc->output();
