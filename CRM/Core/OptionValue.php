@@ -259,6 +259,8 @@ class CRM_Core_OptionValue {
    * @param string $fieldName
    *   The name of the field in the DAO.
    * @param bool $domainSpecific
+   *   Dos this option groujp allow for duplicate options that are
+   *   in separate domain.
    *
    * @return bool
    *   true if object exists
