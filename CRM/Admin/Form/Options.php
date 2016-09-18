@@ -177,8 +177,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         'addressee',
       )) && !$isReserved
     ) {
-      $domainSepcificOptionGroups = array('from_email_address');
-      $domainSpecific = in_array($this->_gName, $domainSepcificOptionGroups) ? TRUE : FALSE;
+      $domainSpecificOptionGroups = array('from_email_address');
+      $domainSpecific = in_array($this->_gName, $domainSpecificOptionGroups) ? TRUE : FALSE;
       $this->addRule('label',
         ts('This Label already exists in the database for this option group. Please select a different Value.'),
         'optionExists',
