@@ -25,21 +25,21 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   }
   public function testStripComment() {
     $strings = array(
-        "\nab\n-- cd\nef" => "\nab\nef",
-        "ab\n-- cd\nef" => "ab\nef",
-        "ab\n-- cd\nef\ngh" => "ab\nef\ngh",
-        "ab\n--cd\nef" => "ab\nef",
-        "ab\n--cd\nef\n" => "ab\nef\n",
-        "ab\n#cd\nef\n" => "ab\nef\n",
-        "ab\n--cd\nef" => "ab\nef",
-        "ab\n#cd\nef" => "ab\nef",
-        "ab\nfoo#cd\nef" => "ab\nfoo#cd\nef",
-        "ab\r\n--cd\r\nef" => "ab\r\nef",
-        "ab\r\n#cd\r\nef" => "ab\r\nef",
-        "ab\r\nfoo#cd\r\nef" => "ab\r\nfoo#cd\r\nef",
+      "\nab\n-- cd\nef" => "\nab\nef",
+      "ab\n-- cd\nef" => "ab\nef",
+      "ab\n-- cd\nef\ngh" => "ab\nef\ngh",
+      "ab\n--cd\nef" => "ab\nef",
+      "ab\n--cd\nef\n" => "ab\nef\n",
+      "ab\n#cd\nef\n" => "ab\nef\n",
+      "ab\n--cd\nef" => "ab\nef",
+      "ab\n#cd\nef" => "ab\nef",
+      "ab\nfoo#cd\nef" => "ab\nfoo#cd\nef",
+      "ab\r\n--cd\r\nef" => "ab\r\nef",
+      "ab\r\n#cd\r\nef" => "ab\r\nef",
+      "ab\r\nfoo#cd\r\nef" => "ab\r\nfoo#cd\r\nef",
     );
     foreach ($strings as $string => $check) {
-      $test=CRM_Utils_File::stripComments($string);
+      $test = CRM_Utils_File::stripComments($string);
       $this->assertEquals($test,
           $check,
           sprintf("original=[%s]\nstripped=[%s]\nexpected=[%s]",
