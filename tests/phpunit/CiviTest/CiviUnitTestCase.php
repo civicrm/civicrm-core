@@ -3305,7 +3305,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'is_active' => array('1' => 1),
       'price_set_id' => $priceset->id,
       'is_enter_qty' => 1,
-      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     );
     CRM_Price_BAO_PriceField::create($paramsField);
 
@@ -3423,7 +3423,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'is_active' => array('1' => 1, '2' => 1),
       'price_set_id' => $priceSet['id'],
       'is_enter_qty' => 1,
-      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     );
     $priceField = CRM_Price_BAO_PriceField::create($paramsField);
     if ($componentId) {
@@ -3597,6 +3597,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
     // when calling completeTransaction or repeatTransaction.
     $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
+  }
+
+  /**
+   * Return financial type id on basis of name
+   *
+   * @param string $name Financial type m/c name
+   *
+   * @return int
+   */
+  public function getFinancialTypeId($name) {
+    return CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $name, 'id', 'name');
   }
 
   /**
