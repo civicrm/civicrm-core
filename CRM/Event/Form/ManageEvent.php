@@ -56,7 +56,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    */
   protected $_single;
 
-  protected $_action;
+  public $_action;
 
   /**
    * Are we actually managing an event template?
