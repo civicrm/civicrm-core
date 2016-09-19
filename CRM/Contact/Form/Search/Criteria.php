@@ -158,8 +158,13 @@ class CRM_Contact_Form_Search_Criteria {
     );
 
     $componentModes = CRM_Contact_Form_Search::getModeSelect();
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
 
-    self::validatePossibleComponents($componentModes);
+    // unset disabled components that must should have been enabled
+    // to the option be viable
+    if (!array_key_exists('CiviMail', $enabledComponents)) {
+        unset($componentModes['8']);
+    }
 
     // unset contributions or participants if user does not have
     // permission on them
@@ -539,21 +544,6 @@ class CRM_Contact_Form_Search_Criteria {
     //Looks like obsolete code, since CiviCase is a component, but might be used by HRD
     $form->add('hidden', 'hidden_CiviCase', 1);
     CRM_Case_BAO_Query::buildSearchForm($form);
-  }
-
-  public static function getEnabledComponents() {
-    $apiResult = civicrm_api3('Setting', 'Get', array());
-    return $apiResult['values'][1]['enable_components'];
-  }
-
-  //the idea is to validate everything in here and remove based on possible situations
-  public static function validatePossibleComponents(&$componentModes) {
-    $enabledComponents = self::getEnabledComponents();
-
-    //e.g. this validation that removes the 'Mailing' option if CiviMail is not enabled
-    if (!in_array('CiviMail', $enabledComponents)) {
-      unset($componentModes['8']);
-    }
   }
 
 }
