@@ -411,9 +411,14 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
     $config = CRM_Core_Config::singleton();
-    $seperator = $config->fieldSeparator;
+      /* CRM - 19192 */
+      $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
+      if(is_null($seperator)) {
+          $seperator = $config->fieldSeparator;
+      }
 
-    $mapperKeys = array();
+
+      $mapperKeys = array();
     $mapper = array();
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = array();
