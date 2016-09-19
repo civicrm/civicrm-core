@@ -88,7 +88,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    * @var string
    */
-  protected $_action;
+  public $_action;
   /**
    * participant object
    *

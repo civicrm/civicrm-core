@@ -56,7 +56,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
    *
    * @var int
    */
-  protected $_action;
+  public $_action;
 
   /**
    * Set variables up before form is built.
