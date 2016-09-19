@@ -866,8 +866,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_id' => $contactId,
       'receive_date' => '2010-01-20',
       'total_amount' => 300,
-      'financial_type_id' => 4,
-      'contribution_status_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
+      'contribution_status_id' => 'Completed',
     );
     $priceFields = $this->createPriceSet('event', $event['id']);
     foreach ($priceFields['values'] as $key => $priceField) {
@@ -902,8 +902,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_id' => $contactId,
       'receive_date' => '2010-01-20',
       'total_amount' => 200,
-      'financial_type_id' => 2,
-      'contribution_status_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeId('Member Dues'),
+      'contribution_status_id' => 'Completed',
     );
     $membershipType = $this->membershipTypeCreate();
     $priceFields = $this->createPriceSet();
