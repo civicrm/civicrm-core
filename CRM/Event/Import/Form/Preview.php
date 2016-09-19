@@ -119,9 +119,14 @@ class CRM_Event_Import_Form_Preview extends CRM_Import_Form_Preview {
     $onDuplicate = $this->get('onDuplicate');
 
     $config = CRM_Core_Config::singleton();
-    $seperator = $config->fieldSeparator;
+      /* CRM - 19192 */
+      $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
+      if (is_null($seperator)) {
+          $seperator = $config->fieldSeparator;
+      }
 
-    $mapper = $this->controller->exportValue('MapField', 'mapper');
+
+      $mapper = $this->controller->exportValue('MapField', 'mapper');
     $mapperKeys = array();
 
     foreach ($mapper as $key => $value) {
