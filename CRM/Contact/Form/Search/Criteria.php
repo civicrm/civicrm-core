@@ -163,7 +163,7 @@ class CRM_Contact_Form_Search_Criteria {
     // unset disabled components that must should have been enabled
     // to the option be viable
     if (!array_key_exists('CiviMail', $enabledComponents)) {
-        unset($componentModes['8']);
+      unset($componentModes['8']);
     }
 
     // unset contributions or participants if user does not have
