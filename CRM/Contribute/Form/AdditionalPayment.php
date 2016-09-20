@@ -100,12 +100,17 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
     $enitityType = NULL;
+    $enitityType = 'contribution';
     if ($this->_component == 'event') {
       $enitityType = 'participant';
       $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
+      $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
+      $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($eventId);
     }
-    $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
-    $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($eventId);
+    else {
+      $this->_contributionId = $this->_id;
+      $this->_fromEmails['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
+    }
 
     $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $enitityType);
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
@@ -369,17 +374,27 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   public function postProcess() {
     $participantId = NULL;
+    $childTab = 'contribute';
     if ($this->_component == 'event') {
       $participantId = $this->_id;
+      $childTab = 'participant';
     }
     $submittedValues = $this->controller->exportValues($this->_name);
     $submittedValues['confirm_email_text'] = CRM_Utils_Array::value('receipt_text', $submittedValues);
-
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution',
+      'contribution_status_id',
+      array('labelColumn' => 'name')
+    );
+    $contributionStatusID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'contribution_status_id');
+    if ($contributionStatuses[$contributionStatusID] == 'Pending') {
+      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'contribution_status_id', array_search('Partially paid', $contributionStatuses));
+    }
     $submittedValues['trxn_date'] = CRM_Utils_Date::processDate($submittedValues['trxn_date'], $submittedValues['trxn_date_time']);
     if ($this->_mode) {
       // process credit card
       $this->assign('contributeMode', 'direct');
       $this->processCreditCard($submittedValues);
+      $submittedValues = $this->_params;
     }
     else {
       $defaults = array();
@@ -413,7 +428,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-        "reset=1&cid={$this->_contactId}&selectedChild=participant"
+        "reset=1&cid={$this->_contactId}&selectedChild={$childTab}"
       ));
     }
   }
@@ -601,29 +616,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         'sort_name'
       );
       $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
-    }
-
-    // process the additional payment
-    $participantId = NULL;
-    if ($this->_component == 'event') {
-      $participantId = $this->_id;
-    }
-    $trxnRecord = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
-
-    if ($trxnRecord->id && !empty($this->_params['is_email_receipt'])) {
-      $sendReceipt = $this->emailReceipt($this->_params);
-    }
-
-    if ($trxnRecord->id) {
-      $statusMsg = ts('The payment record has been processed.');
-      if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
-        $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
-      }
-
-      CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-        "reset=1&cid={$this->_contactId}&selectedChild=participant"
-      ));
     }
   }
 

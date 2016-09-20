@@ -219,13 +219,21 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       NULL,
       $recentOther
     );
-
-    $participantID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-      $values['id'], 'participant_id', 'contribution_id'
-    );
-    $this->assign('contactId', $values['contact_id']);
-    $this->assign('hasPayment', $values['id']);
-    $this->assign('participantId', $participantID);
+    $contributionStatus = $status[$values['contribution_status_id']];
+    if (in_array($contributionStatus, array('Partially paid', 'Pending refund'))
+        || ($contributionStatus == 'Pending' && $values['is_pay_later'])
+        ) {
+      if ($contributionStatus == 'Pending refund') {
+        $this->assign('paymentButtonName', ts('Record Refund'));
+      }
+      else {
+        $this->assign('paymentButtonName', ts('Record Payment'));
+      }
+      $this->assign('addRecordPayment', TRUE);
+      $this->assign('contactId', $values['contact_id']);
+      $this->assign('componentId', $id);
+      $this->assign('component', 'contribution');
+    }
   }
 
   /**
