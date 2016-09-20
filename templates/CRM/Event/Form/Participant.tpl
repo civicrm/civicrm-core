@@ -330,7 +330,7 @@
   {* JS block for ADD or UPDATE actions only *}
   {if $action eq 1 or $action eq 2}
     {if $participantId and $hasPayment}
-      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
     {/if}
 
     {*include custom data js file*}

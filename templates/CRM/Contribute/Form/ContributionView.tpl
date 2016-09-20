@@ -35,6 +35,9 @@
       <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span>
           <i class="crm-i fa-pencil"></i> {ts}Edit{/ts}</span>
       </a>
+      {if $paymentButtonName}
+        <a class="button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}'><i class="crm-i fa-plus-circle"></i> {ts}{$paymentButtonName}{/ts}</a>
+      {/if}
     {/if}
     {if (call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute') && call_user_func(array('CRM_Core_Permission', 'check'), "delete contributions of type $financial_type") && $canDelete)     || (call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute') && $noACL)}
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}
@@ -227,7 +230,7 @@
       <td>{$thankyou_date|crmDate}</td>
     </tr>
   {/if}
-  {if $participantId and $hasPayment}
+  {if $addRecordPayment}
     <tr>
       <td class='label'>{ts}Fees{/ts}</td>
       <td id='payment-info'></td>
@@ -328,8 +331,8 @@
     </div>
   </fieldset>
 {/if}
-{if $participantId and $hasPayment}
-  {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+{if $addRecordPayment}
+  {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
 {/if}
 
 <div class="crm-submit-buttons">
@@ -340,6 +343,9 @@
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
     {/if}
     <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil"></i> {ts}Edit{/ts}</span></a>
+    {if $paymentButtonName}
+      <a class="button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}'><i class="crm-i fa-plus-circle"></i> {ts}{$paymentButtonName}{/ts}</a>
+    {/if}
   {/if}
   {if (call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute') && call_user_func(array('CRM_Core_Permission', 'check'), "delete contributions of type $financial_type") && $canDelete)     || (call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute') && $noACL)}
     {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}

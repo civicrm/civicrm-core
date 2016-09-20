@@ -3939,6 +3939,10 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $entityObj = CRM_Event_BAO_Participant::getValues($inputParams, $values, $ids);
         $entityObj = $entityObj[$participantId];
       }
+      else {
+        $entityObj = $contributionDAO;
+        $component = 'contribution';
+      }
       $activityType = ($paymentType == 'refund') ? 'Refund' : 'Payment';
 
       self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
@@ -3957,14 +3961,17 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    */
   public static function addActivityForPayment($entityObj, $trxnObj, $activityType, $component, $contributionId) {
     if ($component == 'event') {
-      $date = CRM_Utils_Date::isoToMysql($trxnObj->trxn_date);
-      $paymentAmount = CRM_Utils_Money::format($trxnObj->total_amount, $trxnObj->currency);
-      $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Event', $entityObj->event_id, 'title');
-      $subject = "{$paymentAmount} - Offline {$activityType} for {$eventTitle}";
-      $targetCid = $entityObj->contact_id;
-      // source record id would be the contribution id
-      $srcRecId = $contributionId;
+      $title = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Event', $entityObj->event_id, 'title');
     }
+    else {
+      $title = ts('Contribution');
+    }
+    $paymentAmount = CRM_Utils_Money::format($trxnObj->total_amount, $trxnObj->currency);
+    $subject = "{$paymentAmount} - Offline {$activityType} for {$title}";
+    $date = CRM_Utils_Date::isoToMysql($trxnObj->trxn_date);
+    $targetCid = $entityObj->contact_id;
+    // source record id would be the contribution id
+    $srcRecId = $contributionId;
 
     // activity params
     $activityParams = array(
@@ -4032,17 +4039,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $baseTrxnId = $baseTrxnId['financialTrxnId'];
     }
     if (!CRM_Utils_Array::value('total_amount', $total) || $usingLineTotal) {
-      // for additional participants
-      if ($entityTable == 'civicrm_participant') {
-        $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
-        $total = 0;
-        foreach ($ids as $val) {
-          $total += CRM_Price_BAO_LineItem::getLineTotal($val, $entityTable);
-        }
-      }
-      else {
-        $total = CRM_Price_BAO_LineItem::getLineTotal($id, $entityTable);
-      }
+      $total = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     }
     else {
       $baseTrxnId = $total['trxn_id'];
