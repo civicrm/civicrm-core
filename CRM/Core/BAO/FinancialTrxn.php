@@ -507,7 +507,7 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
         }
         elseif ($paymentVal > 0) {
           $value['amount_owed'] = $paymentVal;
-          }
+        }
         elseif ($lineItemTotal == $ftTotalAmt) {
           $value['full_paid'] = $ftTotalAmt;
         }
