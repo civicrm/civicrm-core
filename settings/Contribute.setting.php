@@ -174,7 +174,7 @@ return array(
     'quick_form_type' => 'Element',
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Always post to Accounts Receivable',
+    'title' => 'Always post to Accounts Receivable?',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
