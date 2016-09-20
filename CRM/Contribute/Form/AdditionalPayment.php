@@ -387,7 +387,13 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     );
     $contributionStatusID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'contribution_status_id');
     if ($contributionStatuses[$contributionStatusID] == 'Pending') {
-      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'contribution_status_id', array_search('Partially paid', $contributionStatuses));
+      civicrm_api3('Contribution', 'create',
+        array(
+          'id' => $this->_contributionId,
+          'contribution_status_id' => array_search('Partially paid', $contributionStatuses),
+          'is_pay_later' => 0,
+        )
+      );
     }
     $submittedValues['trxn_date'] = CRM_Utils_Date::processDate($submittedValues['trxn_date'], $submittedValues['trxn_date_time']);
     if ($this->_mode) {
