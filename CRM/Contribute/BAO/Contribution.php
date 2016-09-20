@@ -188,7 +188,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // CRM-16189
     CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contributionID);
-    if ($contributionID && !empty($params['revenue_recognition_date'])
+    if ($contributionID && !empty($params['revenue_recognition_date']) && !empty($params['prevContribution'])
       && !($contributionStatus[$params['prevContribution']->contribution_status_id] == 'Pending')
       && !self::allowUpdateRevenueRecognitionDate($contributionID)
     ) {
