@@ -169,7 +169,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
           'data' => $dataSerialized,
           'created_date' => $now,
         ));
-      $dao = CRM_Core_DAO::executeQuery($insert->toSQL(), TRUE, NULL, FALSE, FALSE);
+      $dao = CRM_Core_DAO::executeQuery($insert->toSQL(), array(), TRUE, NULL, FALSE, FALSE);
     }
 
     $lock->release();
