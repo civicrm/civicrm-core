@@ -108,7 +108,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       'contact_id' => $contactID,
       'is_active' => 1,
       'dashboard_id.is_active' => 1,
-      'options' => array('sort' => 'weight'),
+      'options' => array('sort' => 'weight', 'limit' => 0),
       'return' => array(
         'id',
         'weight',
