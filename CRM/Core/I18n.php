@@ -568,9 +568,6 @@ class CRM_Core_I18n {
    *   True if the domain was changed for an extension.
    */
   public function setLocale($language) {
-
-    $config = CRM_Core_Config::singleton();
-
     // Change the language of the CMS as well, for URLs.
     CRM_Utils_System::setUFLocale($language);
 
@@ -583,7 +580,7 @@ class CRM_Core_I18n {
       setlocale(LC_MESSAGES, $locale);
       setlocale(LC_CTYPE, $locale);
 
-      bindtextdomain('civicrm', $config->gettextResourceDir);
+      bindtextdomain('civicrm', CRM_Core_I18n::getResourceDir());
       bind_textdomain_codeset('civicrm', 'UTF-8');
       textdomain('civicrm');
 
@@ -595,7 +592,7 @@ class CRM_Core_I18n {
       require_once 'PHPgettext/streams.php';
       require_once 'PHPgettext/gettext.php';
 
-      $mo_file = $config->gettextResourceDir . $language . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      $mo_file = CRM_Core_I18n::getResourceDir() . $language . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
 
       $streamer = new FileReader($mo_file);
       $this->_phpgettext = new gettext_reader($streamer);
