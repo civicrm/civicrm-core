@@ -136,11 +136,9 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     }
 
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
+    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_entity = $this->controller->exportValue('DataSource', 'entity');
-
-    $config = CRM_Core_Config::singleton();
-    $separator = $config->fieldSeparator;
 
     $mapperKeys = array();
     $mapper = array();
