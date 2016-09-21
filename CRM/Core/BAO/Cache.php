@@ -71,8 +71,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         $table = self::getTableName();
         $where = self::whereCache($group, $path, $componentID);
         $rawData = CRM_Core_DAO::singleValueQuery("SELECT data FROM $table WHERE $where");
-        $data = $rawData ? unserialize($rawData) : NULL;
-
+          $data = $rawData ? unserialize($rawData) : NULL;
+          
         self::$_cache[$argString] = $data;
         $cache->set($argString, self::$_cache[$argString]);
       }
@@ -154,11 +154,12 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     // "INSERT ... ON DUPE". Instead, use SELECT+(INSERT|UPDATE).
     if ($id) {
       $sql = "UPDATE $table SET data = %1, created_date = %2 WHERE id = %3";
-      $dao = CRM_Core_DAO::executeQuery($sql, array(
+      $args = array(
         1 => array($dataSerialized, 'String'),
         2 => array($now, 'String'),
-        3 => array($id, 'Int'),
-      ));
+        3 => array($id, 'Int')
+      );
+      $dao = CRM_Core_DAO::executeQuery($sql, $args, TRUE, NULL, FALSE, FALSE);
     }
     else {
       $insert = CRM_Utils_SQL_Insert::into($table)
@@ -169,7 +170,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
           'data' => $dataSerialized,
           'created_date' => $now,
         ));
-      $dao = CRM_Core_DAO::executeQuery($insert->toSQL());
+      $dao = CRM_Core_DAO::executeQuery($insert->toSQL(), TRUE, NULL, FALSE, FALSE);
     }
 
     $lock->release();
@@ -187,7 +188,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $argString = "CRM_CT_CI_{$group}_{$componentID}";
     unset(self::$_cache[$argString]);
     $cache->delete($argString);
-  }
+    }
 
   /**
    * Delete all the cache elements that belong to a group OR delete the entire cache if group is not specified.
