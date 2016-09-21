@@ -114,7 +114,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         }
         if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
           $result[$id] = date($dateFormat, strtotime($value));
-          $entityName = CRM_Utils_Array::value(0, explode('_', $id));
+          $entityName = strstr($id, '_date', TRUE);
           $result["{$entityName}_date_relative"] = 0;
         }
         else {
