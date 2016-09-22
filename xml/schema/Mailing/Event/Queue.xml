@@ -62,6 +62,9 @@
     <required>true</required>
     <title>Security Hash</title>
     <comment>Security hash</comment>
+    <index>
+      <name>index_hash</name>
+    </index>
   </field>
   <field>
     <name>phone_id</name>

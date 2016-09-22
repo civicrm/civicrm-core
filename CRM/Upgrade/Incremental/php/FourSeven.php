@@ -248,6 +248,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_13($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Add Index to event_queue table for the hash field'), 'addEventQueueHashIndex');
+  }
+
   /*
    * Important! All upgrade functions MUST call the 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -600,6 +610,17 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_BAO_SchemaHandler::createIndexes(array(
       'civicrm_financial_item' => array(array('entity_id', 'entity_table')),
     ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-19383 Add index on field hash for table civicrm_mailing_event_queue.
+   *
+   * @return bool
+   */
+  public static function addEventQueueHashIndex() {
+    CRM_Core_BAO_SchemaHandler::createIndexes(array(
+      'civicrm_mailing_event_queue' => 'hash'));
     return TRUE;
   }
 
