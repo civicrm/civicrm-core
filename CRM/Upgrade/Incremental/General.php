@@ -38,7 +38,7 @@
  */
 class CRM_Upgrade_Incremental_General {
   const MIN_RECOMMENDED_PHP_VER = '5.5';
-
+  const BARE_MIN_PHP_VER = '5.3.23';
   /**
    * Compute any messages which should be displayed before upgrade.
    *
