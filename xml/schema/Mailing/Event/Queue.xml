@@ -62,9 +62,6 @@
     <required>true</required>
     <title>Security Hash</title>
     <comment>Security hash</comment>
-    <index>
-      <name>index_hash</name>
-    </index>
   </field>
   <field>
     <name>phone_id</name>
@@ -79,4 +76,9 @@
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <index>
+    <name>index_hash</name>
+    <fieldName>hash</fieldName>
+    <add>4.7</add>
+  </index>
 </table>
