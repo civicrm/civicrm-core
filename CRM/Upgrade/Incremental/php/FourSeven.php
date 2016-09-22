@@ -620,7 +620,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    */
   public static function addEventQueueHashIndex() {
     CRM_Core_BAO_SchemaHandler::createIndexes(array(
-      'civicrm_mailing_event_queue' => 'hash'));
+      'civicrm_mailing_event_queue' => array('hash')));
     return TRUE;
   }
 
