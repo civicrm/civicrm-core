@@ -41,10 +41,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
+        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility. The bare minimum php version is %3',
           array(
             1 => phpversion(),
             2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            3 => CRM_Upgrade_Incremental_General::BARE_MIN_PHP_VER,
           )),
         ts('PHP Out-of-Date'),
         \Psr\Log\LogLevel::NOTICE,
