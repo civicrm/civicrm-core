@@ -65,7 +65,7 @@ CRM.$(function($) {
     <td class='right'>
       {if $paymentInfo.paid > 0}
         {$paymentInfo.paid|crmMoney}
-       	{if  !$hideButtonLinks}
+        {if !$hideButtonLinks}
           <br/>
           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
             <i class="crm-i fa-list"></i>

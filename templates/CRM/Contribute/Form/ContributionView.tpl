@@ -235,7 +235,7 @@
       <td class='label'>{ts}Fees{/ts}</td>
       <td id='payment-info'></td>
     </tr>
-  {/if}	
+  {/if}
 </table>
 
 {if count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
