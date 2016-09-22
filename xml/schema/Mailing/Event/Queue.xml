@@ -76,4 +76,9 @@
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <index>
+    <name>index_hash</name>
+    <fieldName>hash</fieldName>
+    <add>4.7</add>
+  </index>
 </table>
