@@ -246,6 +246,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_12($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
+    $this->addTask(ts('Update FK_civicrm_entity_financial_trxn_financial_trxn_id to CASCADE ON DELETE'), 'upgradeFinancialTrxnFK');    
   }
 
   /*
@@ -856,6 +857,31 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
 
     CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `data_type` = 'Integer'
       WHERE name IN ('activity_type', 'gender', 'payment_instrument', 'participant_role', 'event_type')");
+    return TRUE;
+  }
+
+    /**
+   * CRM-19366 When deleting contributions, some records are left behind. Changing
+   * FK_civicrm_entity_financial_trxn_financial_trxn_id to cascade on delete
+   * @return bool
+   */
+  public static function upgradeFinancialTrxnFK(CRM_Queue_TaskContext $ctx) {
+
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_entity_financial_trxn', 'FK_civicrm_entity_financial_trxn_financial_trxn_id');
+
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_entity_financial_trxn`
+        ADD CONSTRAINT `FK_civicrm_entity_financial_trxn_financial_trxn_id`
+        FOREIGN KEY (`financial_trxn_id`)
+        REFERENCES `civicrm_financial_trxn`(`id`)
+        ON DELETE CASCADE
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+
     return TRUE;
   }
 
