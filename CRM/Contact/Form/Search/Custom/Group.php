@@ -274,7 +274,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
         $xGroups = 0;
       }
 
-      $sql = "CREATE TEMPORARY TABLE Xg_{$this->_tableName} ( contact_id int primary key) ENGINE=MyISAM";
+      $sql = "CREATE TEMPORARY TABLE Xg_{$this->_tableName} ( contact_id int primary key) ENGINE=InnoDB";
       CRM_Core_DAO::executeQuery($sql);
 
       //used only when exclude group is selected
@@ -312,7 +312,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
 
       $sql = "CREATE TEMPORARY TABLE Ig_{$this->_tableName} ( id int PRIMARY KEY AUTO_INCREMENT,
                                                                    contact_id int,
-                                                                   group_names varchar(64)) ENGINE=MyISAM";
+                                                                   group_names varchar(64)) ENGINE=InnoDB";
 
       CRM_Core_DAO::executeQuery($sql);
 
@@ -414,7 +414,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
         $xTags = 0;
       }
 
-      $sql = "CREATE TEMPORARY TABLE Xt_{$this->_tableName} ( contact_id int primary key) ENGINE=MyISAM";
+      $sql = "CREATE TEMPORARY TABLE Xt_{$this->_tableName} ( contact_id int primary key) ENGINE=InnoDB";
       CRM_Core_DAO::executeQuery($sql);
 
       //used only when exclude tag is selected
@@ -432,7 +432,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
 
       $sql = "CREATE TEMPORARY TABLE It_{$this->_tableName} ( id int PRIMARY KEY AUTO_INCREMENT,
                                                                contact_id int,
-                                                               tag_names varchar(64)) ENGINE=MyISAM";
+                                                               tag_names varchar(64)) ENGINE=InnoDB";
 
       CRM_Core_DAO::executeQuery($sql);
 
