@@ -69,8 +69,8 @@ function dm_install_core() {
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
-  dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,README,CONTRIBUTORS}.txt
-  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php
+  dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,CONTRIBUTORS}.txt
+  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php README.md
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null
