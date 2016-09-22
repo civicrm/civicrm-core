@@ -565,7 +565,7 @@ class InstallRequirements {
     ));
 
     // Check that we can identify the root folder successfully
-    $this->requireFile($crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'README.txt',
+    $this->requireFile($crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'README.md',
       array(
         ts("File permissions"),
         ts("Does the webserver know where files are stored?"),
