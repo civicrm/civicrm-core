@@ -532,8 +532,10 @@ if (!CRM.vars) CRM.vars = {};
           $('#select2-drop')
             .off('.crmEntity')
             .on('click.crmEntity', 'a.crm-add-entity', function(e) {
+              var extra = $el.data('api-params').extra,
+                formUrl = $(this).attr('href') + (extra ? ('&returnExtra=' + extra) : '');
               $el.select2('close');
-              CRM.loadForm($(this).attr('href'), {
+              CRM.loadForm(formUrl, {
                 dialog: {width: 500, height: 220}
               }).on('crmFormSuccess', function(e, data) {
                 if (data.status === 'success' && data.id) {
