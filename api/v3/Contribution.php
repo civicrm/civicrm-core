@@ -570,7 +570,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
   $original_contribution = clone $contribution;
   $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', array(
     'return' => 'payment_processor_id',
-    'id' => $params['contribution_recur_id'],
+    'id' => $contribution->contribution_recur_id,
   ));
   try {
     if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
