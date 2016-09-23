@@ -87,7 +87,7 @@ CREATE TEMPORARY TABLE emails (
                                contact_id2 int,
                                INDEX(contact_id1),
                                INDEX(contact_id2)
-                              ) ENGINE=MyISAM
+                              ) ENGINE=InnoDB
 ";
     CRM_Core_DAO::executeQuery($sql);
 
