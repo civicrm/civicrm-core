@@ -75,7 +75,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     }
 
     // CRM-11989
-    $params['bounce_reason'] = substr($params['bounce_reason'], 0, 254);
+    $params['bounce_reason'] = mb_strcut($params['bounce_reason'], 0, 254);
 
     $bounce->copyValues($params);
     $bounce->save();
