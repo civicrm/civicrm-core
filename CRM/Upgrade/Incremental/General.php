@@ -37,8 +37,25 @@
  * This class contains generic upgrade logic which runs regardless of version.
  */
 class CRM_Upgrade_Incremental_General {
+
+  /**
+   * The recommended PHP version.
+   */
   const MIN_RECOMMENDED_PHP_VER = '5.5';
-  const BARE_MIN_PHP_VER = '5.3.23';
+
+  /**
+   * The minimum PHP version required to install Civi.
+   *
+   * @see install/index.php
+   */
+  const MIN_INSTALL_PHP_VER = '5.3.4';
+
+  /**
+   * The minimum PHP version required to avoid known
+   * limits or defects.
+   */
+  const MIN_DEFECT_PHP_VER = '5.3.23';
+
   /**
    * Compute any messages which should be displayed before upgrade.
    *
