@@ -342,6 +342,27 @@ function civicrm_api3_extension_get($params) {
 }
 
 /**
+ * Get a list of remotely available extensions.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API result
+ */
+function civicrm_api3_extension_getremote($params) {
+  $extensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
+  $result = array();
+  $id = 0;
+  foreach ($extensions as $key => $obj) {
+    $info = array();
+    $info['id'] = $id++; // backward compatibility with indexing scheme
+    $info = array_merge($info, (array) $obj);
+    $result[] = $info;
+  }
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', CRM_Utils_Array::value('return', $params, array()));
+}
+
+/**
  * Determine the list of extension keys.
  *
  * @param array $params
