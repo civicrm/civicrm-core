@@ -93,7 +93,7 @@
         {/if}
         {foreach from=$fields item=field key=fieldName}
           {assign var=n value=$field.name}
-          {if ( $fields.$n.data_type eq 'Date') or ( in_array( $n, array( 'thankyou_date', 'cancel_date', 'receipt_date', 'receive_date', 'join_date', 'membership_start_date', 'membership_end_date' ) ) ) }
+          {if in_array( $n, array( 'thankyou_date', 'cancel_date', 'receipt_date', 'receive_date', 'join_date', 'membership_start_date', 'membership_end_date' ) ) }
             <div class="compressed crm-grid-cell">
               <span class="crm-batch-{$n}-{$rowNumber}">
                 {include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$rowNumber batchUpdate=1}
