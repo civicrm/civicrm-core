@@ -4437,6 +4437,33 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Get a set of required contact type fields.
+   *
+   * @return array
+   */
+  public function getBasicContactTypeFields() {
+    return array(
+      'label' => array(
+        'title' => ts('Contact Subtype'),
+      )
+    );
+  }
+
+  /**
+   * Get a set of required contact type filters.
+   *
+   * @return array
+   */
+  public function getBasicContactTypeFilters() {
+    return array(
+      'label' => array(
+        'title' => ts('Contact Subtype'),
+        'type' => CRM_Utils_Type::T_STRING,
+      )
+    );
+  }
+
+  /**
    * Get a standard set of contact fields.
    *
    * @return array
@@ -4475,9 +4502,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'addressee_display' => array('title' => ts('Addressee')),
       'contact_type' => array(
         'title' => ts('Contact Type'),
-      ),
-      'contact_sub_type' => array(
-        'title' => ts('Contact Subtype'),
       ),
       'gender_id' => array(
         'title' => ts('Gender'),
@@ -4536,9 +4560,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ),
       'contact_type' => array(
         'title' => ts('Contact Type'),
-      ),
-      'contact_sub_type' => array(
-        'title' => ts('Contact Subtype'),
       ),
       'modified_date' => array(
         'title' => ts('Contact Modified'),

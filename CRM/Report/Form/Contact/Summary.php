@@ -101,10 +101,17 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           'contact_type' => array(
             'title' => ts('Contact Type'),
           ),
-          'contact_sub_type' => array(
+        ),
+      ),
+      'civicrm_contact_type' => array(
+        'dao' => 'CRM_Contact_DAO_ContactType',
+        'fields' => $this->getBasicContactTypeFields(),
+        'filters' => $this->getBasicContactTypeFilters(),
+        'order_bys' => array(
+          'label' => array(
             'title' => ts('Contact Subtype'),
           ),
-        ),
+        )
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
@@ -189,6 +196,8 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   public function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
+            LEFT JOIN civicrm_contact_type {$this->_aliases['civicrm_contact_type']}
+                   ON ({$this->_aliases['civicrm_contact']}.contact_sub_type = {$this->_aliases['civicrm_contact_type']}.name)
             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
                    ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
                       {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
