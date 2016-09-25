@@ -150,7 +150,8 @@ class CRM_Core_Config_Defaults {
       elseif ($config->userFramework == 'WordPress') {
         if (defined( 'CIVICRM_PLUGIN_URL')) {
           $defaults['userFrameworkResourceURL'] = CIVICRM_PLUGIN_URL . "civicrm/";
-        } else {
+        }
+        else {
           $defaults['userFrameworkResourceURL'] = $baseURL . "wp-content/plugins/civicrm/civicrm/";
         }
       }
@@ -207,7 +208,8 @@ class CRM_Core_Config_Defaults {
         if (defined('CIVICRM_PLUGIN_DIR')) {
           // CIVICRM_PLUGIN_DIR points to: wp-content/plugins/civicrm/ or similar (with trailing '/')
           $defaults['imageUploadURL'] = str_replace('civicrm', 'files/civicrm', CIVICRM_PLUGIN_DIR) . 'persist/contribute/';
-        } else {
+        }
+        else {
           $defaults['imageUploadURL'] = $baseURL . "wp-content/plugins/files/civicrm/persist/contribute/";
         }
       }
