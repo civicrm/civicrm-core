@@ -1,0 +1,127 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-template-title-title"}
+  {ts}Title{/ts}
+{/htxt}
+{htxt id="id-template-title"}
+{ts}This is the title that users will see when they are selecting an event template to clone for a new event. It is <em>not</em> the title of the event itself.{/ts}
+{/htxt}
+
+{htxt id="id-select-template-title"}
+  {ts}Template{/ts}
+{/htxt}
+{htxt id="id-select-template"}
+{if $params.isTemplate}
+    {ts}You can select an existing Event Template as the basis for the new template you are creating, or you can create the template from scratch.{/ts}
+{else}
+    {ts}You can select a pre-configured Event Template to streamline setting up your new event. The information and configuration settings from the selected template will be automatically copied to this new event. You can then add and modify as needed for this specific event instance. Event templates do NOT store the event date and time - so you will definitely need to set those on this page.{/ts}
+{/if}
+{/htxt}
+
+{htxt id="id-participant-role-title"}
+  {ts}Participant Role{/ts}
+{/htxt}
+{htxt id="id-participant-role"}
+    <p>{ts}The Role you select here is automatically assigned to people when they register online for this event (usually the default 'Attendee' role).{/ts}</p>
+    <p>{ts}You can also allow people to choose a Role by creating a Profile with the Participant Role field. Then include that Profile when you configure the Online Registration page for this event.{/ts}</p>
+{/htxt}
+
+{htxt id="id-listing-title"}
+  {ts}Participant Listing{/ts}
+{/htxt}
+{htxt id="id-listing"}
+    {ts}To allow users to see a listing of participants, set this field to 'Name' (list names only), 'Name and Email', or 'Name, Status and Register Date'.{/ts}
+    {if !$params.isTemplate}
+      {ts}You will need to set Access Control permissions to include 'view event participants' for any Roles you want to access this listing.{/ts}
+      {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
+        {if $params.action eq 2 AND $params.entityId}
+          {ts}Create links to the listing page by copying the following URL, and adding it to the Event Description below and / or as a menu item or links elsewhere on your site:{/ts}<br />
+          <em>{crmURL a=1 p='civicrm/event/participant' q="reset=1&id=`$params.entityId`"}</em>
+        {else} {* Creating new event *}
+          {ts}After adding your event, create links to the listing page by copying the URL provided in the 'Participant Listing' section of the Configure Event page.{/ts}
+        {/if}
+      {elseif $config->userFramework EQ 'Joomla'}
+          {ts 1=$params.entityId}Then create front-end links to the Participant Listing page using the Menu Manager. Select <strong>Participant Listing Page</strong> and enter <strong>%1</strong> for the Event ID.{/ts}
+      {/if}
+    {/if}
+{/htxt}
+
+{htxt id="id-max_participants-title"}
+  {ts}Maximum Participants{/ts}
+{/htxt}
+{htxt id="id-max_participants"}
+<p>{ts}Optionally set a maximum number of participants for this event.{/ts}</p>
+<p>{if $params.waitlist}
+  {ts}You may allow users to join a waitlist when the event is full (by checking the box below).{/ts}
+{else}
+  {ts}You may allow users to join a waitlist when the event is full. To enable this feature you must first enable the Participant Statuses used by the waitlist work-flow (click the pencil icon, or navigate to Administer » CiviEvent » Participant Statuses). Then reload this form and check 'Offer a Waitlist?'.{/ts}
+{/if}</p>
+<p>{ts}Otherwise, the registration link is hidden and the &quot;Event Full Message&quot' is displayed when the maximum number of registrations is reached. Only participants with status types marked as 'counted' are included when checking if the event is full.{/ts}</p>
+{/htxt}
+
+{htxt id="id-event_full_text-title"}
+  {ts}Event-Full Message{/ts}
+{/htxt}
+{htxt id="id-event_full_text"}
+{ts}Text displayed on the Event Information page when the maximum number of registrations is reached (unless you are offering a waitlist). If online registration is enabled, this message will also be displayed if users attempt to register.{/ts}
+{/htxt}
+
+{htxt id="id-has_waitlist-title"}
+  {ts}Waitlist{/ts}
+{/htxt}
+{htxt id="id-has_waitlist"}
+{ts}Check this box to allow users to join a waitlist if the event is full. If a space becomes available, the first participant from the waitlist will move to 'Pending from waitlist' status, and will be sent an email with a link to complete their registration (including paying event fees - if any).{/ts}
+{/htxt}
+
+{htxt id="id-help-waitlist_text-title"}
+  {ts}Waitlist Text{/ts}
+{/htxt}
+{htxt id="id-help-waitlist_text"}
+{ts}This message is displayed on the event information and event registration pages when the event is full AND the waitlist feature is enabled.{/ts} 
+{/htxt}
+
+{htxt id="id-is_map-title"}
+  {ts}Map{/ts}
+{/htxt}
+{htxt id="id-is_map"}
+{capture assign=mapURL}{crmURL p='civicrm/admin/setting/mapping' q="reset=1"}{/capture} 
+{ts 1=$mapURL}Include map presenting event location on event information page? (A map provider must be configured under <a href='%1'>Administer > System Settings > Mapping and Geocoding</a>){/ts}
+{/htxt}
+
+{htxt id="id-is_public-title"}
+  {ts}Public Events{/ts}
+{/htxt}
+{htxt id="id-is_public"}
+<p>{ts}When enabled, this event will be included in iCalendar feeds and displayed on your site's "Upcoming Events" block.{/ts}</p>
+{/htxt}
+
+{htxt id="id-is_share-title"}
+  {ts}Social Sharing{/ts}
+{/htxt}
+{htxt id="id-is_share"}
+<p>{ts}When enabled, links allowing people to share this event with their social network will be displayed (e.g. Facebook "Like", Google+, and Twitter).{/ts}</p>
+<p>{ts}Social media links will be included on the Event Info page, Thank-you page, Tell-a-Friend page (if enabled), and in event confirmation emails.{/ts}</p>
+{/htxt}

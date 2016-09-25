@@ -1,0 +1,109 @@
+-- +--------------------------------------------------------------------+
+-- | CiviCRM version 4.7                                                |
+-- +--------------------------------------------------------------------+
+-- | Copyright CiviCRM LLC (c) 2004-2016                                |
+-- +--------------------------------------------------------------------+
+-- | This file is a part of CiviCRM.                                    |
+-- |                                                                    |
+-- | CiviCRM is free software; you can copy, modify, and distribute it  |
+-- | under the terms of the GNU Affero General Public License           |
+-- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+-- |                                                                    |
+-- | CiviCRM is distributed in the hope that it will be useful, but     |
+-- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+-- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+-- | See the GNU Affero General Public License for more details.        |
+-- |                                                                    |
+-- | You should have received a copy of the GNU Affero General Public   |
+-- | License and the CiviCRM Licensing Exception along                  |
+-- | with this program; if not, contact CiviCRM LLC                     |
+-- | at info[AT]civicrm[DOT]org. If you have questions about the        |
+-- | GNU Affero General Public License or the licensing of CiviCRM,     |
+-- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- +--------------------------------------------------------------------+
+
+
+-- /*******************************************************
+-- *
+-- * Sample Custom Data
+-- *
+-- *******************************************************/
+
+-- /*******************************************************
+-- *
+-- * create custom group
+-- *
+-- *******************************************************/
+INSERT INTO `civicrm_custom_group` (`name`, `title`, `extends`, `style`, `collapse_display`, `help_pre`, `weight`, `is_active`, `table_name`, `is_multiple`) VALUES ( 'constituent_information', 'Constituent Information', 'Individual', 'Inline', 1, 'Please enter additional constituent information as data becomes available for this contact.', 1, 1,'civicrm_value_constituent_information_1', 0);
+
+
+
+-- /*******************************************************
+-- *
+-- * create option group for storing custom options for custom fields
+-- *
+-- *******************************************************/
+INSERT INTO  `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`) VALUES ('custom_most_important_issue', 'Most Important Issue', 1, 1), ( 'custom_marital_status', 'Marital Status', 1, 1);
+
+SELECT @option_most_id    := max(id) from civicrm_option_group where name = 'custom_most_important_issue';
+SELECT @option_marital_id := max(id) from civicrm_option_group where name = 'custom_marital_status';
+
+
+
+-- /*******************************************************
+-- *
+-- * create option values (custom options for custom fields)
+-- *
+-- *******************************************************/
+INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `weight`, `is_active`, `is_default`) VALUES (@option_most_id   , 'Education', 'Edu', 1, 1,0), (@option_most_id   , 'Environment', 'Env', 2, 1,0), (@option_most_id   , 'Social Justice', 'SocJus', 3, 1,0),(@option_marital_id, 'Single', 'S', 1, 1,0),(@option_marital_id, 'Married', 'M', 2, 1,0), (@option_marital_id, 'Domestic Partner', 'D', 3, 1,0), (@option_marital_id, 'Widowed', 'W', 4, 1,0), (@option_marital_id, 'Other', 'O', 5, 1,0);
+
+
+-- /*******************************************************
+-- *
+-- * create custom field
+-- *
+-- *******************************************************/
+INSERT INTO `civicrm_custom_field` (`custom_group_id`, `name`, `label`, `data_type`, `html_type`, `text_length`, `is_required`, `weight`, `help_post`, `is_active`, `is_view`, `is_searchable`, `options_per_line`, `column_name`, `option_group_id`, `start_date_years`, `end_date_years`, `date_format`, `time_format` ) VALUES (1, 'Most_Important_Issue', 'Most Important Issue', 'String', 'Radio', 255, 0, 1, '', 1, 0, 1, NULL, 'most_important_issue_1', @option_most_id, NULL, NULL, NULL, NULL), (1, 'Marital_Status', 'Marital Status', 'String', 'Select', 255, 0, 2, '', 1, 0, 1, NULL, 'marital_status_2', @option_marital_id, NULL, NULL, NULL, NULL), (1, 'Marriage_Date', 'Marriage Date', 'Date', 'Select Date', NULL, 0, 3, '', 1, 0, 1, NULL, 'marriage_date_3', NULL, 30, 0, 'mm/dd/yy', 0);
+
+
+-- /*******************************************************
+-- *
+-- * create table to store custom values of a custom group
+-- *
+-- *******************************************************/
+DROP TABLE IF EXISTS `civicrm_value_constituent_information_1`;
+CREATE TABLE `civicrm_value_constituent_information_1` (`id` int(10) unsigned NOT NULL auto_increment, `entity_id` int(10) unsigned NOT NULL,  `most_important_issue_1` varchar(255) default NULL,  `marital_status_2` varchar(255) default NULL, `marriage_date_3` datetime default NULL, PRIMARY KEY  (`id`), UNIQUE KEY `unique_entity_id` (`entity_id`), INDEX `INDEX_most_important_issue_1` (`most_important_issue_1`), INDEX `INDEX_marital_status_2` (`marital_status_2`), INDEX `INDEX_marriage_date_3` (`marriage_date_3`), CONSTRAINT `FK_civicrm_value_constituent_information_1_entity_id` FOREIGN KEY (`entity_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+
+-- Fall Fundraiser Dinner participants’ custom data
+
+INSERT INTO civicrm_option_group  ( name, title, is_active, is_reserved ) VALUES  ('soup_selection', 'Soup Selection', 1, 1);
+SELECT @ogid := MAX(id) FROM civicrm_option_group;
+
+INSERT INTO civicrm_custom_group ( name, title,  extends, extends_entity_column_id, extends_entity_column_value, style, is_active, table_name) VALUES ('Food_Preference', 'Food Preference', 'Participant', 2, '1', 'Inline', 1, 'civicrm_value_food_preference_2');
+SELECT @cgid := MAX(id) FROM civicrm_custom_group;
+
+INSERT INTO civicrm_custom_field ( custom_group_id, label, name, data_type, html_type, is_active, text_length, note_columns, note_rows, column_name, option_group_id, is_searchable ) VALUES  ( @cgid, 'Soup Selection', 'Soup_Selection', 'String',  'Radio',   1,  255, 60, 4, 'soup_selection_4', @ogid, 1);
+
+INSERT INTO civicrm_option_value ( option_group_id, label, value, name, weight ) VALUES  ( @ogid, 'Bean Broth', 'bean', 'Bean_Broth', 1 ), ( @ogid, 'Chicken Combo', 'chicken', 'Chicken_Combo', 2), ( @ogid, 'Salmon Stew',  'salmon', 'Salmon_Stew',   3);
+
+DROP TABLE IF EXISTS `civicrm_value_food_preference_2`;
+CREATE TABLE civicrm_value_food_preference_2 ( id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Default MySQL primary key', entity_id INT(10) UNSIGNED NOT NULL COMMENT 'Table that this extends', soup_selection_4 VARCHAR(255) DEFAULT NULL, PRIMARY KEY (id), UNIQUE KEY unique_entity_id (entity_id), CONSTRAINT `FK_civicrm_value_food_preference_2_entity_id` FOREIGN KEY (`entity_id`) REFERENCES `civicrm_participant` (`id`) ON DELETE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- Donors’ custom data
+
+INSERT INTO `civicrm_custom_group` (`name`, `title`, `extends`, `extends_entity_column_id`, `extends_entity_column_value`, `style`, `is_active`, `table_name`) VALUES ('Donor_Information', 'Donor Information', 'Contribution', NULL, NULL, 'Inline', 1, 'civicrm_value_donor_information_3');
+
+SELECT @cgid_contribution := MAX(id) FROM civicrm_custom_group;
+
+INSERT INTO civicrm_option_group  ( name, title, is_active ) VALUES ('how_long_have_you_been_a_donor', 'How long have you been a donor?', 1);
+
+SELECT @ogid_contribution := MAX(id) FROM civicrm_option_group;
+
+INSERT INTO `civicrm_custom_field` (`custom_group_id`, `label`, `name`, `data_type`, `html_type`, `is_active`,  `text_length`,`note_columns`, `note_rows`, `column_name`, `option_group_id`) VALUES (@cgid_contribution, 'Known areas of interest', 'Known_areas_of_interest', 'Memo', 'TextArea', 1, 255, 60, 4, 'known_areas_of_interest_5', NULL),(@cgid_contribution, 'How long have you been a donor?', 'How_long_have_you_been_a_donor_', 'String', 'Radio', 1, 255, 60, 4, 'how_long_have_you_been_a_donor_6', @ogid_contribution);
+
+INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `weight`) VALUES (@ogid_contribution, 'Less than 1 year', '1', 'Less_than_1_year', 1), (@ogid_contribution, '1-3 years', '2', '1_3_years', 2),(@ogid_contribution, '4-6 years', '3', '4_6_years', 3),(@ogid_contribution, '7-9 years', '4', '7_9_years', 4),(@ogid_contribution, 'More than 9 years', '5', 'More_than_9_years', 5);
+
+DROP TABLE IF EXISTS `civicrm_value_donor_information_3`;
+CREATE TABLE IF NOT EXISTS `civicrm_value_donor_information_3` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Default MySQL primary key',  `entity_id` int(10) unsigned NOT NULL COMMENT 'Table that this extends', `known_areas_of_interest_5` text COLLATE utf8_unicode_ci, `how_long_have_you_been_a_donor_6` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE KEY `unique_entity_id` (`entity_id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

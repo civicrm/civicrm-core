@@ -1,0 +1,4 @@
+/*
+ * Copyright (C) 20xx author-name(s)
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ */

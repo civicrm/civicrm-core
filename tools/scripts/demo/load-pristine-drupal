@@ -1,0 +1,28 @@
+#!/usr/bin/env /bin/bash
+
+source `dirname $0`/demo.conf
+
+pushd .
+
+# load drupal demo pristines
+if [ $DRUPAL_DEMO_CRM_DBNAME ]; then
+  mysqladmin -f drop $DRUPAL_DEMO_CRM_DBNAME
+  echo "Creating civicrm-drupal-demo db.."
+  mysqladmin create $DRUPAL_DEMO_CRM_DBNAME
+  if [ -f $DRUPAL_DEMO_CRM_PRISTINE ]; then
+    echo "Reloading civicrm-drupal-demo db from pristine.."
+    mysql $DRUPAL_DEMO_CRM_DBNAME < $DRUPAL_DEMO_CRM_PRISTINE
+  fi
+fi
+
+if [ $DRUPAL_DEMO_CMS_DBNAME ]; then
+  mysqladmin -f drop $DRUPAL_DEMO_CMS_DBNAME
+  echo "Creating drupal-demo db.."
+  mysqladmin create $DRUPAL_DEMO_CMS_DBNAME
+  if [ -f $DRUPAL_DEMO_CMS_PRISTINE ]; then
+    echo "Reloading drupal-demo db from pristine.."
+    mysql $DRUPAL_DEMO_CMS_DBNAME < $DRUPAL_DEMO_CMS_PRISTINE
+  fi
+fi
+
+popd

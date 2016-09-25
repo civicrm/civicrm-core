@@ -1,0 +1,52 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="debug-title"}
+  {ts}Debugging{/ts}
+{/htxt}
+{htxt id="debug"}
+<p>{ts}Set this value to <strong>Yes</strong> if you want to use one of CiviCRM's debugging tools.{/ts} <strong>{ts}This feature should NOT be enabled for production sites.{/ts}</strong></p>
+<p>{ts}Debug output is triggered by adding specific name-value pairs to the CiviCRM query string:{/ts}<br />
+<ul>
+<li><strong>{ts}Smarty Debug Window{/ts}</strong> - {ts}Loads all variables available to the current page template into a pop-up window. To trigger, add <em>&smartyDebug=1</em> to any CiviCRM URL query string. Make sure you have pop-up blocking disabled in your browser for the CiviCRM site URL.{/ts}</li>
+<li><strong>{ts}Session Reset{/ts}</strong> - {ts 1='&sessionReset=2'}Resets all values in your client session. To trigger, add <em>%1</em>{/ts}</li>
+<li><strong>{ts}Directory Cleanup{/ts}</strong> -{ts}Empties template cache and/or temporary upload file folders.{/ts}
+<ul>
+<li>{ts 1='&directoryCleanup=1'}To empty template cache (civicrm/templates_c folder), add <em>%1</em>{/ts}</li>
+<li>{ts 1='&directoryCleanup=2'}To remove temporary upload files (civicrm/upload folder), add <em>%1</em>{/ts}</li>
+<li>{ts 1='&directoryCleanup=3'}To cleanup both, add <em>%1</em>{/ts}</li>
+</ul></li>
+<li><strong>{ts}Stack Trace{/ts}</strong> - {ts 1='&backtrace=1'}To display a stack trace listing at the top of a page, add <em>%1</em>{/ts}</li>
+</ul>
+</p>
+{/htxt}
+
+{htxt id="userFrameworkLogging-title"}
+  {ts}Logging{/ts}
+{/htxt}
+{htxt id="userFrameworkLogging"}
+<p>{ts}Set this value to <strong>Yes</strong> if you want CiviCRM error/debugging messages the appear in your CMS' error log.{/ts}</strong></p>
+<p>{ts}In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled){/ts}</p>
+{/htxt}

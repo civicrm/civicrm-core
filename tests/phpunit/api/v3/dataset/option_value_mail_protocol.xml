@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>component_id</column>
+    <column>visibility_id</column>
+    <row>
+      <value>239</value>  <!--  id  -->
+      <value>37</value>  <!--  option_group_id  -->
+      <value>IMAP</value>  <!--  label  -->
+      <value>1</value>  <!--  value  -->
+      <value>IMAP</value>  <!--  name  -->
+      <null />  <!--  grouping  -->
+      <value>0</value>  <!--  filter  -->
+      <null />  <!--  is_default  -->
+      <value>1</value>  <!--  weight  -->
+      <null />  <!--  description  -->
+      <value>0</value>  <!--  is_optgroup  -->
+      <value>0</value>  <!--  is_reserved  -->
+      <value>1</value>  <!--  is_active  -->
+      <null />  <!--  component_id  -->
+      <null />  <!--  visibility_id  -->
+    </row>
+    <row>
+      <value>240</value>  <!--  id  -->
+      <value>37</value>  <!--  option_group_id  -->
+      <value>Maildir</value>  <!--  label  -->
+      <value>2</value>  <!--  value  -->
+      <value>Maildir</value>  <!--  name  -->
+      <null />  <!--  grouping  -->
+      <value>0</value>  <!--  filter  -->
+      <null />  <!--  is_default  -->
+      <value>2</value>  <!--  weight  -->
+      <null />  <!--  description  -->
+      <value>0</value>  <!--  is_optgroup  -->
+      <value>0</value>  <!--  is_reserved  -->
+      <value>1</value>  <!--  is_active  -->
+      <null />  <!--  component_id  -->
+      <null />  <!--  visibility_id  -->
+    </row>
+    <row>
+      <value>241</value>  <!--  id  -->
+      <value>37</value>  <!--  option_group_id  -->
+      <value>POP3</value>  <!--  label  -->
+      <value>3</value>  <!--  value  -->
+      <value>POP3</value>  <!--  name  -->
+      <null />  <!--  grouping  -->
+      <value>0</value>  <!--  filter  -->
+      <null />  <!--  is_default  -->
+      <value>3</value>  <!--  weight  -->
+      <null />  <!--  description  -->
+      <value>0</value>  <!--  is_optgroup  -->
+      <value>0</value>  <!--  is_reserved  -->
+      <value>1</value>  <!--  is_active  -->
+      <null />  <!--  component_id  -->
+      <null />  <!--  visibility_id  -->
+    </row>
+    <row>
+      <value>242</value>  <!--  id  -->
+      <value>37</value>  <!--  option_group_id  -->
+      <value>Localdir</value>  <!--  label  -->
+      <value>4</value>  <!--  value  -->
+      <value>Localdir</value>  <!--  name  -->
+      <null />  <!--  grouping  -->
+      <value>0</value>  <!--  filter  -->
+      <null />  <!--  is_default  -->
+      <value>4</value>  <!--  weight  -->
+      <null />  <!--  description  -->
+      <value>0</value>  <!--  is_optgroup  -->
+      <value>0</value>  <!--  is_reserved  -->
+      <value>1</value>  <!--  is_active  -->
+      <null />  <!--  component_id  -->
+      <null />  <!--  visibility_id  -->
+    </row>
+  </table>
+</dataset>

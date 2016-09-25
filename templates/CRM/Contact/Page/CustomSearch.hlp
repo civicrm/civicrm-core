@@ -1,0 +1,38 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-custom-searches-title"}
+  {ts}Custom Search{/ts}
+{/htxt}
+{htxt id="id-custom-searches"}
+<p>
+  {ts}These are developed and contributed by members of the CiviCRM community. Consider adding any custom searches which you use often to your Search menu (from Administer > Customize Data and Screens > Navigation Menu). As new custom searches become available they can be viewed (and installed if useful) from Administer > System Settings > Manage Extensions.{/ts}
+</p>
+<p>{docURL page="Create a Custom-Search Extension" resource="wiki"}</p>
+</p>
+<p>
+  {ts}NOTE: Some of these searches may rely on specific site configurations - and may not work as expected on your site.{/ts}
+</p>
+{/htxt}

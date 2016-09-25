@@ -1,0 +1,43 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-contactSubtype-intro-title"}
+  {ts}Contact Types{/ts}
+{/htxt}
+{htxt id="id-contactSubtype-intro"}
+{ts}CiviCRM comes with 3 basic (built-in) contact types: Individual, Household, and Organization. You can create additional contact types based on these basic types to further differentiate contacts (for example you might create Student, Parent, Staff, and /or Volunteer "subtypes" from the basic Individual type...). You can also re-name the built-in types. Contact subtypes are especially useful when you need to collect and display different sets of custom data for different types of contacts.{/ts}
+{/htxt}
+
+{htxt id="id-image_URL-title"}
+  {ts}Contact Type Icon{/ts}
+{/htxt}
+{htxt id="id-image_URL"}
+<div>{ts 1='<span class="font-italic">sites/.../files</span>' 2='<span class="font-italic">media</span>'}Use this field to set your own icon for this Contact Type. Icon images should be 16 x 16 pixels for best fit. Enter a relative or complete URL to the image file location. Use a location outside of your CiviCRM code directory to reduce the likelihood of losing your image files during an upgrade. (For Drupal sites, you might want to use the %1 directory. For Joomla sites, the consider using the %2 directory.){/ts}</div>
+ Examples:
+  <ul>
+    <li>{ts}Relative URL for a default Drupal site:{/ts}<br /><span class="font-italic">../../../default/files/volunteer_contact_icon.png</span></li>
+    <li>{ts}Complete URL for icon accessible from an external location:{/ts}<br /><span class="font-italic">http://www.example.com/images/new_icon.gif</span></li>
+  </ul>
+{/htxt}

@@ -1,0 +1,34 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-intro-title"}
+  {ts}Widget{/ts}
+{/htxt}
+{htxt id="id-intro"}
+<p>{ts}Enabling a widget for this contribution page allows you and your supporters to easily promote a fund-raising campaign by embedding a chunk of dynamic content in any web page. CiviContribute widgets display real-time progress toward your fund-raising goals, and include a 'Contribute' button which links people directly to the associated online contribution page.{/ts}</p>
+<p>{ts}Use the form below to configure a Widget Title (with optional logo), your contribute button text, a short description of this fund-raising campaign, and a link to your organizations home page (for folks who want to learn more). You can also modify the default color-scheme by expanding the 'Edit Widget Colors' section of the form.{/ts}</p>
+<p>{ts}Check the 'Enable Widget' box. Then review and modify the form values as needed. Save your settings and preview the current appearance of the widget by clicking the 'Save and Preview' button. Then 'Select' and copy the 'Widget Code' into any web page.{/ts}</p>
+<p>{ts}If this campaign has specific start and end dates, embedded widgets will display the link to your Home Page instead of the Contribute button once the campaign is over.{/ts}</p>
+{/htxt}

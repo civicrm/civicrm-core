@@ -1,0 +1,33 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                               |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="acl_financial_type-title"}
+  {ts}Access Control by Financial Type{/ts}
+{/htxt}
+{htxt id="acl_financial_type"}
+<p>{ts}Enabling Access Control by Financial Types is only required if you need users in one role to access some financial transactions but not ones with certain financial types.</p>
+<p>For example, Planned Giving bequests may be highly confidential and not appropriate for staff organizing events to see, even though they need to be able to administer the payments for ticket purchases.</p>
+<p>After enabling, you will be able to set create, view, edit, and delete permissions separately for each financial type by navigating to Administer > Users and Permissions > Permissions (Access Control), and clicking on the Access Control link for your CMS.{/ts}</p>
+{/htxt}

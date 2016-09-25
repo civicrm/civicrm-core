@@ -1,0 +1,77 @@
+/* CSS rules for Angular module "statuspage" */
+
+#crm-status-list h3 {
+  color: white;
+  opacity: .85;
+}
+
+#crm-status-list h3:hover,
+#crm-status-list h3.menuopen {
+  opacity: 1;
+}
+
+/* Error Severity */
+#crm-status-list .crm-severity-emergency,
+#crm-status-list .crm-severity-alert,
+#crm-status-list .crm-severity-critical,
+#crm-status-list .crm-severity-error{
+  background-color: #E43D2B;
+}
+
+/* Warning Severity */
+#crm-status-list .crm-severity-warning {
+  background-color: #eba12d;
+}
+
+/* Not Okay - Not Warning */
+#crm-status-list .crm-severity-notice {
+  background-color: #4d90eb;
+}
+
+/* All OK Severity */
+#crm-status-list .crm-severity-info,
+#crm-status-list .crm-severity-debug {
+  background-color: #00994D;
+}
+
+#crm-status-list .crm-status-message-body {
+  margin: 1em 0;
+}
+
+#crm-status-list .hidden-until {
+  font-weight: normal;
+  font-size: .8em;
+  margin-right: 1em;
+}
+
+#tab-status-visible-1 .hush-menu > div {
+  width: 20em; /* determines max-width of popup menu */
+}
+
+#crm-status-list .hush-menu > div {
+  position: relative;
+  font-size: .8em;
+  top: -2px;
+}
+
+#crm-status-list .hush-menu button {
+  float: right;
+  cursor: pointer;
+  line-height: 1em;
+}
+
+#crm-status-list .hush-menu ul {
+  position: absolute;
+  top: 1.5em;
+  right: 0;
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+#crm-status-list .hush-menu li {
+  padding: 0.2em 0.5em;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 99999;
+  font-weight: normal;
+}

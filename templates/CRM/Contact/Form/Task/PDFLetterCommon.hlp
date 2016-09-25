@@ -1,0 +1,62 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright (C) 2011 Marty Wright                                    |
+ | Licensed to CiviCRM under the Academic Free License version 3.0.   |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{php}$this->assign('uploadFormatsSupported', '.' . implode(', .', array_keys(CRM_Utils_PDF_Document::$ooxmlMap)));{/php}
+{htxt id="template"}
+  <p>
+    {ts}Select a pre-existing template, or upload a document for mail merge.{/ts}
+  </p>
+  <p>
+    {ts 1=$uploadFormatsSupported}Supported file formats: %1{/ts}
+  </p>
+{/htxt}
+
+{htxt id="id-pdf-format-title"}
+  {ts}Page Format{/ts}
+{/htxt}
+{htxt id="id-pdf-format"}
+  <p>{ts}Select a page format from the list or configure your own format in the settings below.{/ts}</p>
+  {capture assign="pdfFormatsURL"}{crmURL p="civicrm/admin/pdfFormats" q="reset=1"}{/capture}
+  <p>{ts 1=$pdfFormatsURL}Go to <strong><a href="%1">Administer CiviCRM &raquo; Communications &raquo; Print Page (PDF) Formats</a></strong> to add or edit formats or set the default format.{/ts}</p>
+{/htxt}
+
+{htxt id="id-msg-template-title"}
+  {ts}Page Format{/ts}
+{/htxt}
+{htxt id="id-msg-template"}
+  <p>{ts}Select a page format for PDF files created using this template if you wish to override the default format. Page formats define the paper size and margins.{/ts}</p>
+  {capture assign="pdfFormatsURL"}{crmURL p="civicrm/admin/pdfFormats" q="reset=1"}{/capture}
+  <p>{ts 1=$pdfFormatsURL}Go to <strong><a href="%1">Administer CiviCRM &raquo; Communications &raquo; Print Page (PDF) Formats</a></strong> to add or edit formats or set the default format.{/ts}</p>
+{/htxt}
+
+{htxt id="id-contribution-receipt-title"}
+  {ts}Page Format{/ts}
+{/htxt}
+{htxt id="id-contribution-receipt"}
+  <p>{ts}Select a page format to use for the PDF file. Page formats define the paper size and margins.{/ts}</p>
+  {capture assign="pdfFormatsURL"}{crmURL p="civicrm/admin/pdfFormats" q="reset=1"}{/capture}
+  <p>{ts 1=$pdfFormatsURL}Go to <strong><a href="%1">Administer CiviCRM &raquo; Communications &raquo; Print Page (PDF) Formats</a></strong> to add or edit formats or set the default format.{/ts}</p>
+{/htxt}

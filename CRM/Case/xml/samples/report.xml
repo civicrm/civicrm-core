@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Case>
+  <Client>Jack Smith, M.D.</Client>
+  <CaseType>Substance Abuse</CaseType>
+  <CaseSubject>Acute morphine addiction</CaseSubject>
+  <CaseStatus>Ongoing</CaseStatus>
+  <CaseOpen>2008-09-12</CaseOpen>
+  <CaseClose></CaseClose>
+  <ActivitySet>
+    <Label>15 Day Review</Label>
+    <IncludeActivities>All</IncludeActivities>
+    <Redact>false</Redact>
+    <Activity>
+      <EditURL>http://drupal.demo.civicrm.org/civicrm/activity?action=update&amp;id=13&amp;cid=201&amp;reset=1</EditURL>
+      <Fields>
+          <Field>
+            <Label>Activity Type</Label>
+            <Category>Case History</Category>
+            <Value>Open Case</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Created By</Label>
+            <Value>Ann Jones</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Reporter</Label>
+            <Value>Ann Jones</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Due Date</Label>
+            <Value>2008-09-12T11:00</Value>
+            <Type>Date</Type>
+          </Field>
+          <Field>
+            <Label>Activity Date</Label>
+            <Value>2008-09-12T11:00</Value>
+            <Type>Date</Type>
+          </Field>
+          <Field>
+            <Label>Subject</Label>
+            <Value>Opened the case during inbound phone call.</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Medium</Label>
+            <Value>Phone</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Duration</Label>
+            <Value>15</Value>
+            <Type>Int</Type>
+          </Field>
+          <Field>
+            <Label>Details</Label>
+            <Value>Client called very distressed and with suicidal thoughts.</Value>
+            <Type>Memo</Type>
+          </Field>
+          <Field>
+            <Label>Status</Label>
+            <Value>Completed</Value>
+            <Type>String</Type>
+          </Field>
+      </Fields>
+    </Activity>
+    <Activity>
+      <EditURL>http://drupal.demo.civicrm.org/civicrm/activity?action=update&amp;id=14&amp;cid=201&amp;reset=1</EditURL>
+      <Fields>
+          <Field>
+            <Label>Activity Type</Label>
+            <Category>Case History</Category>
+            <Value>Presenting Problem</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Created By</Label>
+            <Value>Ann Jones</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Reporter</Label>
+            <Value>Jack Smith, M.D.</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Due Date</Label>
+            <Value>2008-09-12</Value>
+            <Type>Date</Type>
+          </Field>
+          <Field>
+            <Label>Activity Date</Label>
+            <Value>2008-09-12T11:00</Value>
+            <Type>Date</Type>
+          </Field>
+          <Field>
+            <Label>Summary</Label>
+            <Value>Defined the problem as seen by the client.</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Medium</Label>
+            <Value>Phone</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Duration</Label>
+            <Value>30</Value>
+            <Type>Int</Type>
+          </Field>
+          <Field>
+            <Label>Details</Label>
+            <Value>Client admitted to heavy drug use and said he really needed help kicking the habit. Problem started after cycling accident in 2006.</Value>
+            <Type>Memo</Type>
+          </Field>
+          <Field>
+            <Label>Date First Noticed</Label>
+            <Value>2006-09-01</Value>
+            <Type>Date</Type>
+          </Field>
+          <Field>
+            <Label>Status</Label>
+            <Value>Completed</Value>
+            <Type>String</Type>
+          </Field>
+      </Fields>
+    </Activity>
+    <Activity>
+      <EditURL>http://drupal.demo.civicrm.org/civicrm/activity?action=update&amp;id=15&amp;cid=201&amp;reset=1</EditURL>
+      <Fields>
+          <Field>
+            <Label>Activity Type</Label>
+            <Category>Medications and Substance Use</Category>
+            <Value>Medication and Drug Use</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Created By</Label>
+            <Value>Ann Jones</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Reported By</Label>
+            <Value>Jack Smith, M.D.</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Due Date</Label>
+            <Value>2008-09-17</Value>
+            <Type>Date</Type>
+          </Field>
+          <Field>
+            <Label>Actual Date</Label>
+            <Value>2008-09-17T10:00</Value>
+            <Type>Date</Type>
+          </Field>
+          <Field>
+            <Label>Duration</Label>
+            <Value>50</Value>
+            <Type>Int</Type>
+          </Field>
+          <Field>
+            <Label>Details</Label>
+            <Value>Went through a list of all the client's prescribed and non-prescribed medication and drug usage, focusing on the last 2 years. Usage trends are significantly upward for the primary problem drug.</Value>
+            <Type>Memo</Type>
+          </Field>
+          <Field>
+            <Label>Medium</Label>
+            <Value>In-Person</Value>
+            <Type>String</Type>
+          </Field>
+          <Field>
+            <Label>Prescribed Medication Listing</Label>
+            <Value>http://drupal.demo.civicrm.org/civicrm/file?reset=1&amp;id=1&amp;eid=102</Value>
+            <Type>File</Type>
+          </Field>
+          <CustomGroup>
+            <GroupName>Drug Usage</GroupName>
+            <Field>
+              <Label>Drug 1 - Drug Name</Label>
+              <Value>Morphine</Value>
+              <Type>String</Type>
+            </Field>
+            <Field>
+              <Label>Drug 1 - Preferred Drug</Label>
+              <Value>Yes</Value>
+              <Type>Boolean</Type>
+            </Field>
+            <Field>
+              <Label>Drug 1 - Date First Used</Label>
+              <Value>2006-09-01</Value>
+              <Type>Date</Type>
+            </Field>
+            <Field>
+              <Label>Drug 1 -Date Most Recently Used</Label>
+              <Value>2008-09-15</Value>
+              <Type>Date</Type>
+            </Field>
+          </CustomGroup>
+          <Field>
+            <Label>Status</Label>
+            <Value>Completed</Value>
+            <Type>String</Type>
+          </Field>
+      </Fields>
+    </Activity>
+  </ActivitySet>
+</Case>

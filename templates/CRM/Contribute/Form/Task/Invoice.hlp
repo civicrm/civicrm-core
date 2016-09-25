@@ -1,0 +1,63 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id ="id-from_email-title"}
+  {ts}From Address{/ts}
+{/htxt}
+{htxt id ="id-from_email"}
+<p>{ts}Select the "FROM" Email Address for this mailing from the dropdown list. Available email addresses are configurable by users with Administer CiviCRM permission. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
+{if $params.isAdmin}
+    {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
+    <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
+{else}
+    {ts}Contact your site administrator if you need to use a "FROM" Email Address which is not in the dropdown list.{/ts}
+{/if}
+{/htxt}
+
+{htxt id="content-intro-title"}
+  {ts}Message Formats{/ts}
+{/htxt}
+{htxt id="content-intro"}
+<p>{ts}You can choose to send BOTH an <strong>HTML</strong> and a plain <strong>TEXT</strong> version of your mailing, OR you can send a <strong>TEXT</strong> version only.{/ts}</p>
+<p>{ts}If you create only an <strong>HTML</strong> version, CiviMail will automatically create a <strong>TEXT</strong> version for your recipients who have chosen NOT to receive HTML email.{/ts}</p>
+<h1>{ts}Required Elements{/ts}</h1>
+<p>{ts}CiviMail email messages must include an <strong>opt-out</strong> link ("Opt out via web page"), and the <strong>postal address</strong> of your organization. These elements help reduce the chances of your email being categorized as SPAM. They can be included in the main message body OR in a re-usable <strong>message footer</strong>. Refer to the online documentation for details on how to include required links and contact information as well as sample messages.{/ts} {docURL page="Sample CiviMail Messages" resource="wiki"}</p>
+{/htxt}
+
+{htxt id="upload-compose-title"}
+  {ts}Upload or Compose On-screen{/ts}
+{/htxt}
+{htxt id="upload-compose"}
+<p>{ts}You can use your favorite editor to create content on your local computer and then <strong>Upload</strong> the files. OR you can <strong>Compose</strong> content directly on the screen.{/ts}</p>
+<p>{ts}If you choose to compose on the screen, a basic WYSIWYG (what-you-see-is-what-you-get) editor is provided which you can use create simple HTML messages. However, if you are planning on creating HTML messages with complex layouts - it is best to use an HTML editor on your local computer. Then locate and upload the saved file(s) by clicking the <strong>Browse</strong> button.{/ts}</p>
+{/htxt}
+
+{htxt id="id-message-text-title"}
+  {ts}Text Message{/ts}
+{/htxt}
+{htxt id="id-message-text"}
+<p>{ts}You can send your email as a simple text-only message, as an HTML formatted message, or both. Text-only messages are sufficient for most email communication - and some recipients may prefer not to receive HTML formatted messages.{/ts}</p>
+<p>{ts}HTML messages have more visual impact, allow you to include images, and may be more readable if you are including links to website pages. However, different email programs may interpret HTML formats differently - so use this option cautiously unless you have a template format that has been tested with different web and desktop email programs.{/ts}</p>
+{/htxt}

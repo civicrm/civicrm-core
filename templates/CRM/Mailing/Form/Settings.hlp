@@ -1,0 +1,40 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="mailing-visibility-title"}
+  {ts}Visibility{/ts}
+{/htxt}
+{htxt id="mailing-visibility"}
+<p>
+{assign var=hlpViewURL value="mailing.viewUrl"}
+{ts 1=$hlpViewURL}This option makes it possible to make the contents of the email accessible to users as a web page. This option is only relevant if you insert the Mailing permalink token %1 in your message in the next step. This token generates a URL on which the message can be viewed (remember to insert the code in the appropriate HTML tags).{/ts}
+</p><p>
+{ts}You have two options to specify the visibility of the mailing{/ts}:
+</p><p>
+{ts}"public pages" will make the content of this mailing be viewable as a web page by everyone who has the permission of "view public CiviMail content"{/ts}
+</p><p>
+{ts}"user and user admin" only means that only users that received the mailing or administrators can view the content of this email as a web page; the recipients will have to log in to be able to view the message{/ts}
+<p></p>
+{/htxt}

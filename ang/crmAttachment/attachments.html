@@ -1,0 +1,46 @@
+<div nv-file-drop nv-file-over uploader="att.uploader" class="crm-attachments">
+  <table>
+    <tbody>
+    <!-- Files from DB -->
+    <tr ng-repeat="file in att.files">
+      <td class="filename filename-existing">
+        <a ng-href="{{file.url}}" target="_blank">{{file.name}}</a>
+      </td>
+      <td>
+        <input ng-model="file.description" class="crm-form-text" placeholder="{{ts('Description')}}"/>
+      </td>
+      <td>
+        <a
+          crm-icon="fa-trash"
+          crm-confirm="{message: ts('Deleting an attachment will completely remove it from server.')}" on-yes="att.deleteFile(file)"
+          title="{{ts('Delete attachment')}}"
+          class="crm-hover-button">
+        </a>
+      </td>
+    </tr>
+    <!-- Newly selected files -->
+    <!-- This is fairly minimal. For examples with progress-bars and file-sizes, see https://github.com/nervgh/angular-file-upload/blob/master/examples/simple/index.html -->
+    <tr ng-repeat="item in att.uploader.queue" ng-class="{nvReady: item.isReady, nvUploading:item.isUploading, nvUploaded:item.isUploaded,nvSuccess:item.isSuccess,nvCancel:item.isCancel,nvError:item.isError}">
+      <td class="filename filename-new">{{item.file.name}}</td>
+      <td>
+        <input ng-model="item.crmData.description" class="crm-form-text" placeholder="{{ts('Description')}}"/>
+        <!-- item.isReady item.isUploading item.isUploaded item.isSuccess item.isCancel item.isError -->
+      </td>
+      <td>
+        <a crm-icon="fa-times" ng-click="item.remove()" class="crm-hover-button" title="{{ts('Remove unsaved attachment')}}"></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!--
+  WISHLIST Improve styling of the 'Add file' / 'Browse' button
+  e.g. http://www.quirksmode.org/dom/inputfile.html
+  -->
+  <div>
+    {{ts('Add file:')}} <input type="file" nv-file-select uploader="att.uploader" multiple/><br/>
+  </div>
+  <div>
+    {{ts('Alternatively, you may add new files using drag/drop.')}}
+  </div>
+</div>

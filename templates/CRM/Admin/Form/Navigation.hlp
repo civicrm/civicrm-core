@@ -1,0 +1,59 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-menu_url-title"}
+  {ts}Destination{/ts}
+{/htxt}
+{htxt id="id-menu_url"}
+{ts}Enter the destination URL. Generally you should use relative URLs for CiviCRM pages (e.g. links to profiles). Use complete URLs for external pages. Leave this field empty if you are creating a menu section that does not have a clickable destination.{/ts}
+{/htxt}
+
+{htxt id="id-parent-title"}
+  {ts}Parent Section{/ts}
+{/htxt}
+{htxt id="id-parent"}
+{ts}Select the menu item corresponding to the section this item should be placed in. If this is a top-level menu, leave this field empty.{/ts}
+{/htxt}
+
+{htxt id="id-has_separator-title"}
+  {ts}Separators{/ts}
+{/htxt}
+{htxt id="id-has_separator"}
+{ts}Check this box to add a separator line between this menu item and the one below it.{/ts}
+{/htxt}
+
+{htxt id="id-menu_permission-title"}
+  {ts}Permissions{/ts}
+{/htxt}
+{htxt id="id-menu_permission"}
+{ts}You can assign one or more permissions to this menu item. Multiple permissions are additive by default. EXAMPLE: If you assign <em>access CiviContribute</em> and <em>administer CiviCRM</em> to a menu item, a user will need to have BOTH permissions to access it. You can change this behavior to "either / or" by changing the Operator below.{/ts}
+{/htxt}
+
+{htxt id="id-permission_operator-title"}
+  {ts}Permission Operator{/ts}
+{/htxt}
+{htxt id="id-permission_operator"}
+{ts}Set the Operator to "OR" if you've assigned multiple permissions and want access to be granted for any one of them. EXAMPLE: If you assign <em>access CiviContribute</em> and <em>administer CiviCRM</em> to a menu item, and set the Operator to "OR", users who have either of those permissions will have access.{/ts}
+{/htxt}

@@ -1,0 +1,4 @@
+#!/usr/bin/env php
+<?php
+require_once dirname(dirname(__DIR__)) . '/tests/phpunit/CiviTest/bootstrap.php';
+\Civi\CiUtil\Command\AntagonistCommand::main($argv);

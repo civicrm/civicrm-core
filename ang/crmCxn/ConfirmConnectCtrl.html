@@ -1,0 +1,15 @@
+<div ng-controller="CrmCxnConfirmConnectCtrl">
+  <p>{{ts('The application, \"%1\", requests permission to access your system.', {1: appMeta.title})}}</p>
+  <div crm-ui-accordion="{title: ts('About'), collapsed: true}">
+    <div ng-bind-html="appMeta.desc"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Permissions: Summary'), collapsed: true}">
+    <div ng-bind-html="appMeta.perm.desc"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Permissions: Details'), collapsed: true}">
+    <div crm-cxn-perm-table="{perm: appMeta.perm}"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Advanced'), collapsed: true}">
+    <div crm-cxn-adv-table="{appMeta: appMeta}"></div>
+  </div>
+</div>

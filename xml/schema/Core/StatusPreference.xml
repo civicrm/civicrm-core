@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>StatusPreference</class>
+  <name>civicrm_status_pref</name>
+  <comment>Preferences controlling status checks called in system.check.</comment>
+  <add>4.7</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Status Preference ID</title>
+    <required>true</required>
+    <comment>Unique Status Preference ID</comment>
+    <add>4.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>Setting Domain</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this Status Preference for</comment>
+    <add>4.7</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>4.7</add>
+  </foreignKey>
+  <field>
+    <name>name</name>
+    <title>Status Check Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <required>true</required>
+    <comment>Name of the status check this preference references.</comment>
+    <add>4.7</add>
+  </field>
+  <index>
+    <name>UI_status_pref_name</name>
+    <fieldName>name</fieldName>
+    <add>4.7</add>
+  </index>
+  <field>
+    <name>hush_until</name>
+    <title>Snooze Status Notifications Until</title>
+    <type>date</type>
+    <import>true</import>
+    <comment>expires ignore_severity.  NULL never hushes.</comment>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>ignore_severity</name>
+    <title>Ignore Severity</title>
+    <type>int unsigned</type>
+    <import>true</import>
+    <comment>Hush messages up to and including this severity.</comment>
+    <default>1</default>
+    <add>4.7</add>
+    <pseudoconstant>
+      <callback>CRM_Utils_Check::getSeverityList</callback>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>prefs</name>
+    <title>Status Preferences</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>These settings are per-check, and can't be compared across checks.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>check_info</name>
+    <title>Check Info</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>These values are per-check, and can't be compared across checks.</comment>
+    <add>4.7</add>
+  </field>
+</table>

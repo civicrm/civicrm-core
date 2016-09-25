@@ -1,0 +1,67 @@
+-- +--------------------------------------------------------------------+
+-- | CiviCRM version 4.7                                                |
+-- +--------------------------------------------------------------------+
+-- | Copyright CiviCRM LLC (c) 2004-2016                                |
+-- +--------------------------------------------------------------------+
+-- | This file is a part of CiviCRM.                                    |
+-- |                                                                    |
+-- | CiviCRM is free software; you can copy, modify, and distribute it  |
+-- | under the terms of the GNU Affero General Public License           |
+-- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+-- |                                                                    |
+-- | CiviCRM is distributed in the hope that it will be useful, but     |
+-- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+-- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+-- | See the GNU Affero General Public License for more details.        |
+-- |                                                                    |
+-- | You should have received a copy of the GNU Affero General Public   |
+-- | License and the CiviCRM Licensing Exception along                  |
+-- | with this program; if not, contact CiviCRM LLC                     |
+-- | at info[AT]civicrm[DOT]org. If you have questions about the        |
+-- | GNU Affero General Public License or the licensing of CiviCRM,     |
+-- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- +--------------------------------------------------------------------+
+
+DELIMITER |
+
+CREATE TRIGGER   civicrm_contact_ad
+BEFORE DELETE ON civicrm_contact
+FOR EACH ROW
+BEGIN
+  -- we delete the corresponding entity_id/entity_table entries
+  -- from all the linked tables (note, log etc)
+  DELETE FROM civicrm_note
+        WHERE entity_id    = OLD.id
+          AND entity_table = 'civicrm_contact';
+  DELETE FROM civicrm_log
+        WHERE entity_id    = OLD.id
+          AND entity_table = 'civicrm_contact';
+  DELETE FROM civicrm_task_status
+        WHERE responsible_entity_id    = OLD.id
+          AND responsible_entity_table = 'civicrm_contact';
+
+END;
+
+CREATE TRIGGER   civicrm_contribution_ad
+BEFORE DELETE ON civicrm_contribution
+FOR EACH ROW
+BEGIN
+  -- we delete the corresponding entity_id/entity_table entries
+  -- from all the linked tables (note, log etc)
+  DELETE FROM civicrm_note WHERE entity_id = OLD.id AND entity_table = 'civicrm_contribution';
+END;
+
+CREATE TRIGGER   civicrm_participant_ad
+BEFORE DELETE ON civicrm_participant
+FOR EACH ROW
+BEGIN
+  -- we delete the corresponding entity_id/entity_table entries
+  -- from all the linked tables (note, log etc)
+  DELETE FROM civicrm_note WHERE entity_id = OLD.id AND entity_table = 'civicrm_participant';
+  DELETE FROM civicrm_log  WHERE entity_id = OLD.id AND entity_table = 'civicrm_participant';
+END;
+
+|
+
+DELIMITER ;
+

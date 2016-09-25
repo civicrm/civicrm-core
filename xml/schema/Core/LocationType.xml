@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>LocationType</class>
+  <name>civicrm_location_type</name>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Location Type ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Location Type ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Location Type</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Location Type Name.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>display_name</name>
+    <title>Display Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Location Type Display Name.</comment>
+    <localizable>true</localizable>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>vcard_name</name>
+    <title>vCard Location Type</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>vCard Location Type Name.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Location Type Description.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Location Type is Reserved?</title>
+    <type>boolean</type>
+    <comment>Is this location type a predefined system location?</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Location Type is Active?</title>
+    <type>boolean</type>
+    <comment>Is this property active?</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_default</name>
+    <title>Default Location Type?</title>
+    <type>boolean</type>
+    <comment>Is this location type the default?</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+</table>

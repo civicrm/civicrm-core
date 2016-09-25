@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Country</class>
+  <name>civicrm_country</name>
+  <add>1.1</add>
+  <field>
+    <name>id</name>
+    <title>Country ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Country Id</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Country</title>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/country/i</headerPattern>
+    <dataPattern>/^[A-Z][a-z]+\.?(\s+[A-Z][a-z]+){0,3}$/</dataPattern>
+    <comment>Country Name</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>iso_code</name>
+    <title>Country ISO Code</title>
+    <type>char</type>
+    <length>2</length>
+    <comment>ISO Code</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>country_code</name>
+    <title>Country Phone Prefix</title>
+    <type>varchar</type>
+    <length>4</length>
+    <comment>National prefix to be used when dialing TO this country.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>address_format_id</name>
+    <title>Address Format</title>
+    <type>int unsigned</type>
+    <comment>Foreign key to civicrm_address_format.id.</comment>
+    <add>3.2</add>
+  </field>
+  <foreignKey>
+    <name>address_format_id</name>
+    <table>civicrm_address_format</table>
+    <key>id</key>
+    <add>3.2</add>
+  </foreignKey>
+  <field>
+    <name>idd_prefix</name>
+    <title>Outgoing Phone Prefix</title>
+    <type>varchar</type>
+    <length>4</length>
+    <comment>International direct dialing prefix from within the country TO another country</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>ndd_prefix</name>
+    <title>Area Code</title>
+    <type>varchar</type>
+    <length>4</length>
+    <comment>Access prefix to call within a country to a different area</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>region_id</name>
+    <title>Region</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to civicrm_worldregion.id.</comment>
+    <add>1.8</add>
+  </field>
+  <foreignKey>
+    <name>region_id</name>
+    <table>civicrm_worldregion</table>
+    <key>id</key>
+    <add>1.8</add>
+  </foreignKey>
+  <field>
+    <name>is_province_abbreviated</name>
+    <title>Abbreviate Province?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should state/province be displayed as abbreviation for contacts from this country?</comment>
+    <add>3.1</add>
+  </field>
+  <index>
+    <name>UI_name_iso_code</name>
+    <fieldName>name</fieldName>
+    <fieldName>iso_code</fieldName>
+    <unique>true</unique>
+    <add>1.1</add>
+  </index>
+</table>

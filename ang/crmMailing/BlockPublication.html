@@ -1,0 +1,16 @@
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="{name: 'subform.visibility', title: ts('Mailing Visibility'), help: hs('visibility')}">
+      <select
+        crm-ui-id="subform.visibility"
+        name="visibility"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="mailing.visibility"
+        ng-options="v.key as v.value for v in crmMailingConst.visibility"
+        required
+        >
+      </select>
+    </div>
+  </div>
+</div>

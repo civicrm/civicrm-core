@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>ContactType</class>
+  <name>civicrm_contact_type</name>
+  <comment>Provide type information for contacts</comment>
+  <add>3.1</add>
+  <field>
+    <name>id</name>
+    <title>Contact Type ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Contact Type ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Internal name of Contact Type (or Subtype).</comment>
+    <add>3.1</add>
+  </field>
+  <index>
+    <name>contact_type</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>3.1</add>
+  </index>
+  <field>
+    <name>label</name>
+    <title>Contact Type Label</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>localized Name of Contact Type.</comment>
+    <localizable>true</localizable>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Contact Type Description</title>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <comment>localized Optional verbose description of the type.</comment>
+    <localizable>true</localizable>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>image_URL</name>
+    <title>Contact Type Image URL</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>URL of image if any.</comment>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>parent_id</name>
+    <title>Contact Type Parent</title>
+    <type>int unsigned</type>
+    <comment>Optional FK to parent contact type.</comment>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NULL</condition>
+    </pseudoconstant>
+    <add>3.1</add>
+  </field>
+  <foreignKey>
+    <name>parent_id</name>
+    <table>civicrm_contact_type</table>
+    <key>id</key>
+    <add>3.1</add>
+  </foreignKey>
+  <field>
+    <name>is_active</name>
+    <title>Contact Type Is Active?</title>
+    <type>boolean</type>
+    <comment>Is this entry active?</comment>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Contact Type is Reserved?</title>
+    <type>boolean</type>
+    <comment>Is this contact type a predefined system type</comment>
+    <add>3.1</add>
+  </field>
+</table>

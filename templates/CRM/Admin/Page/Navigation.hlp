@@ -1,0 +1,44 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-navigation-title"}
+  {ts}Navigation Menu{/ts}
+{/htxt}
+{htxt id="id-navigation"}
+<p>
+  {ts}This screen shows the current CiviCRM navigation menu for your site - viewed as a 'tree'. The top-level menu items are listed vertically. Click the triangle to the left of any top-level item ('branch') to expand it and see the menu items underneath it. Remember that some menu items shown here will not be displayed in the live menu bar which appears at the top of each CiviCRM screen. Users will only see menu items which they have permissions for, and menu items associated with disabled components will also be hidden.{/ts}
+</p>
+<p>
+  {ts}You can customize the CiviCRM navigation menu bar to better meet the needs of your users. You can:{/ts}
+</p>
+<ul>
+  <li>{ts}Add menu items at any level to support specific work-flows. For example, if your organization uses profile(s) for data entry, you can add menu items linking to those profiles. New menu items can also link to external (non-CiviCRM) web pages and web applications. Click 'New Menu Item' to add an item at any level.{/ts}</li>
+  <li>{ts}Rename menu items. Move your cursor over the menu item and right-click with your mouse. Then select 'Rename'.{/ts}</li>
+  <li>{ts}Delete menu items that you don't use. Right-click and select 'Delete'.{/ts}</li>
+  <li>{ts}Change the permissions for a menu item. Right-click and select 'Edit'.{/ts}</li>
+  <li>{ts}Re-order menu items (including moving them from one branch of the menu 'tree' to another. Simply use your mouse to 'drag and drop' the menu item to the new location.{/ts}</li>
+</ul>
+<p><em>{ts}Changes you make to the menu are saved immediately. However, you will need reload this page to see your changes in the menu bar above.{/ts}</em></p>
+{/htxt}

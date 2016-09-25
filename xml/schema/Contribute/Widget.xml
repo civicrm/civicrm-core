@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contribute</base>
+  <class>Widget</class>
+  <name>civicrm_contribution_widget</name>
+  <comment>A Widget object to store meta information about a single customized contribution widget</comment>
+  <add>2.0</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Widget ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Contribution Id</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contribution_page_id</name>
+    <title>Contribution Page</title>
+    <type>int unsigned</type>
+    <comment>The Contribution Page which triggered this contribution</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>contribution_page_id</name>
+    <table>civicrm_contribution_page</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_active</name>
+    <title>Enabled?</title>
+    <type>boolean</type>
+    <comment>Is this property active?</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>title</name>
+    <title>Widget Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Widget title.</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>url_logo</name>
+    <title>Widget Image Url</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>URL to Widget logo</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>button_title</name>
+    <title>Button Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Button title.</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>about</name>
+    <title>Description</title>
+    <type>text</type>
+    <comment>About description.</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>url_homepage</name>
+    <title>Homepage Url</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>URL to Homepage.</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_title</name>
+    <title>Title Color</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_button</name>
+    <title>Button Colour</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_bar</name>
+    <title>Bar Color</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_main_text</name>
+    <title>Main Text Color</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_main</name>
+    <title>Main Colour</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_main_bg</name>
+    <title>Backgroup Color</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_bg</name>
+    <title>Other Backgroun Colour</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_about_link</name>
+    <title>About Link Colour</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>color_homepage_link</name>
+    <title>Homepage Link Colour</title>
+    <type>varchar</type>
+    <length>10</length>
+    <add>2.0</add>
+  </field>
+</table>

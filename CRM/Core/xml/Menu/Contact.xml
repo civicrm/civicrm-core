@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm</path>
+     <title>CiviCRM</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <page_callback>CRM_Contact_Page_DashBoard</page_callback>
+     <page_arguments>null</page_arguments>
+     <is_ssl>false</is_ssl>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/dashboard</path>
+     <title>CiviCRM Home</title>
+     <page_type>1</page_type>
+     <page_callback>CRM_Contact_Page_DashBoard</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/dashlet</path>
+     <title>CiviCRM Dashlets</title>
+     <page_type>1</page_type>
+     <page_callback>CRM_Contact_Page_Dashlet</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <weight>1</weight>
+  </item>
+  <item>
+     <path>civicrm/contact/search</path>
+     <title>Find Contacts</title>
+     <page_callback>CRM_Contact_Controller_Search</page_callback>
+     <page_arguments>mode=256</page_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
+     <weight>10</weight>
+     <page_type>1</page_type>
+  </item>
+  <item>
+    <path>civicrm/contact/image</path>
+    <title>Process Uploaded Images</title>
+    <page_callback>CRM_Contact_BAO_Contact::processImage</page_callback>
+    <access_arguments>access uploaded files</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/imagefile</path>
+     <title>Get Image File</title>
+     <page_callback>CRM_Contact_Page_ImageFile</page_callback>
+     <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/search/basic</path>
+     <title>Find Contacts</title>
+     <page_arguments>mode=256</page_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/search/advanced</path>
+     <title>Advanced Search</title>
+     <page_arguments>mode=512</page_arguments>
+     <page_type>1</page_type>
+     <weight>12</weight>
+  </item>
+  <item>
+     <path>civicrm/contact/search/builder</path>
+     <title>Search Builder</title>
+     <page_arguments>mode=8192</page_arguments>
+     <page_type>1</page_type>
+     <weight>14</weight>
+  </item>
+  <item>
+     <path>civicrm/contact/search/custom</path>
+     <page_arguments>mode=16384</page_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/search/custom/list</path>
+     <title>Custom Searches</title>
+     <page_callback>CRM_Contact_Page_CustomSearch</page_callback>
+     <page_type>1</page_type>
+     <weight>16</weight>
+  </item>
+  <item>
+     <path>civicrm/contact/add</path>
+     <title>New Contact</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM;edit my contact;view my contact</access_arguments>
+     <page_callback>CRM_Contact_Form_Contact</page_callback>
+     <page_arguments>addSequence=1</page_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/add/individual</path>
+     <title>New Individual</title>
+     <page_callback>CRM_Contact_Form_Contact</page_callback>
+     <page_arguments>addSequence=1</page_arguments>
+     <path_arguments>ct=Individual</path_arguments>
+     <access_arguments>access CiviCRM,add contacts</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/add/household</path>
+     <title>New Household</title>
+     <page_callback>CRM_Contact_Form_Contact</page_callback>
+     <page_arguments>addSequence=1</page_arguments>
+     <path_arguments>ct=Household</path_arguments>
+     <access_arguments>access CiviCRM,add contacts</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/add/organization</path>
+     <title>New Organization</title>
+     <page_callback>CRM_Contact_Form_Contact</page_callback>
+     <page_arguments>addSequence=1</page_arguments>
+     <path_arguments>ct=Organization</path_arguments>
+     <access_arguments>access CiviCRM,add contacts</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/relatedcontact</path>
+     <title>Edit Related Contact</title>
+     <page_callback>CRM_Contact_Form_RelatedContact</page_callback>
+     <access_arguments>access Contact Dashboard</access_arguments>
+   <is_public>true</is_public>
+  </item>
+  <item>
+     <path>civicrm/contact/merge</path>
+     <title>Merge Contact</title>
+     <page_callback>CRM_Contact_Form_Merge</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/email</path>
+     <title>Email a Contact</title>
+     <page_callback>CRM_Contact_Form_Task_Email</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/map</path>
+     <title>Map Location(s)</title>
+     <is_public>true</is_public>
+     <page_callback>CRM_Contact_Form_Task_Map</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/map/event</path>
+     <title>Map Event Location</title>
+     <is_public>true</is_public>
+     <page_callback>CRM_Contact_Form_Task_Map</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view</path>
+     <path_arguments>cid=%%cid%%</path_arguments>
+     <title>Contact Summary</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM;edit my contact;view my contact</access_arguments>
+     <page_callback>CRM_Contact_Page_View_Summary</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/delete</path>
+     <title>Delete Contact</title>
+     <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/activity</path>
+     <path_arguments>show=1,cid=%%cid%%</path_arguments>
+     <title>Activities</title>
+     <page_callback>CRM_Activity_Page_Tab</page_callback>
+  </item>
+  <item>
+     <path>civicrm/activity/add</path>
+     <path_arguments>action=add</path_arguments>
+     <title>Activities</title>
+     <page_callback>CRM_Activity_Form_Activity</page_callback>
+  </item>
+   <item>
+     <path>civicrm/activity/email/add</path>
+     <path_arguments>action=add</path_arguments>
+     <title>Activities</title>
+     <page_callback>CRM_Contact_Form_Task_Email</page_callback>
+  </item>
+  <item>
+     <path>civicrm/activity/pdf/add</path>
+     <path_arguments>action=add</path_arguments>
+     <title>Activities</title>
+     <page_callback>CRM_Contact_Form_Task_PDF</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/rel</path>
+     <path_arguments>cid=%%cid%%</path_arguments>
+     <title>Relationships</title>
+     <page_callback>CRM_Contact_Page_View_Relationship</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/group</path>
+     <path_arguments>cid=%%cid%%</path_arguments>
+     <title>Groups</title>
+     <page_callback>CRM_Contact_Page_View_GroupContact</page_callback>
+  </item>
+  <item>
+    <path>civicrm/contact/view/smartgroup</path>
+    <path_arguments>cid=%%cid%%</path_arguments>
+    <title>Smart Groups</title>
+    <page_callback>CRM_Contact_Page_View_ContactSmartGroup</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/note</path>
+     <path_arguments>cid=%%cid%%</path_arguments>
+     <title>Notes</title>
+     <page_callback>CRM_Contact_Page_View_Note</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/tag</path>
+     <path_arguments>cid=%%cid%%</path_arguments>
+     <title>Tags</title>
+     <page_callback>CRM_Contact_Page_View_Tag</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/cd</path>
+     <page_callback>CRM_Contact_Page_View_CustomData</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/cd/edit</path>
+     <page_callback>CRM_Contact_Form_CustomData</page_callback>
+     <page_arguments>addSequence=1</page_arguments>
+  </item>
+  <item>
+     <path>civicrm/contact/view/vcard</path>
+     <page_callback>CRM_Contact_Page_View_Vcard</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/print</path>
+     <page_callback>CRM_Contact_Page_View_Print</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/log</path>
+     <page_callback>CRM_Contact_Page_View_Log</page_callback>
+  </item>
+  <item>
+     <path>civicrm/user</path>
+     <title>Contact Dashboard</title>
+     <access_arguments>access Contact Dashboard</access_arguments>
+     <page_callback>CRM_Contact_Page_View_UserDashBoard</page_callback>
+     <is_public>true</is_public>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/dashlet/activity</path>
+     <title>Activity Dashlet</title>
+     <page_callback>CRM_Dashlet_Page_Activity</page_callback>
+  </item>
+  <item>
+     <path>civicrm/dashlet/blog</path>
+     <title>CiviCRM Blog</title>
+     <page_callback>CRM_Dashlet_Page_Blog</page_callback>
+  </item>
+  <item>
+     <path>civicrm/dashlet/getting-started</path>
+     <title>CiviCRM Resources</title>
+     <page_callback>CRM_Dashlet_Page_GettingStarted</page_callback>
+  </item>
+
+<item>
+     <path>civicrm/ajax/relation</path>
+     <page_callback>CRM_Contact_Page_AJAX::relationship</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <page_type>3</page_type>
+</item>
+<item>
+     <path>civicrm/ajax/groupTree</path>
+     <page_callback>CRM_Contact_Page_AJAX::groupTree</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/custom</path>
+     <page_callback>CRM_Contact_Page_AJAX::customField</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/customvalue</path>
+     <page_callback>CRM_Contact_Page_AJAX::deleteCustomValue</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <page_type>3</page_type>
+</item>
+<item>
+     <path>civicrm/ajax/cmsuser</path>
+     <page_callback>CRM_Contact_Page_AJAX::checkUserName</page_callback>
+     <access_callback>1</access_callback>
+</item>
+<item>
+     <path>civicrm/ajax/checkemail</path>
+     <page_callback>CRM_Contact_Page_AJAX::getContactEmail</page_callback>
+     <access_callback>1</access_callback>
+</item>
+<item>
+     <path>civicrm/ajax/checkphone</path>
+     <page_callback>CRM_Contact_Page_AJAX::getContactPhone</page_callback>
+     <access_callback>1</access_callback>
+</item>
+<item>
+     <path>civicrm/ajax/subtype</path>
+     <page_callback>CRM_Contact_Page_AJAX::buildSubTypes</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/dashboard</path>
+     <page_callback>CRM_Contact_Page_AJAX::dashboard</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <page_type>3</page_type>
+</item>
+<item>
+     <path>civicrm/ajax/signature</path>
+     <page_callback>CRM_Contact_Page_AJAX::getSignature</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/pdfFormat</path>
+     <page_callback>CRM_Contact_Page_AJAX::pdfFormat</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/paperSize</path>
+     <page_callback>CRM_Contact_Page_AJAX::paperSize</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/contactref</path>
+     <page_callback>CRM_Contact_Page_AJAX::contactReference</page_callback>
+     <access_arguments>access contact reference fields; access CiviCRM</access_arguments>
+</item>
+<item>
+   <path>civicrm/dashlet/myCases</path>
+   <title>Case Dashlet</title>
+   <page_callback>CRM_Dashlet_Page_MyCases</page_callback>
+</item>
+<item>
+   <path>civicrm/dashlet/allCases</path>
+   <title>All Cases Dashlet</title>
+   <page_callback>CRM_Dashlet_Page_AllCases</page_callback>
+   <access_arguments>access all cases and activities</access_arguments>
+</item>
+<item>
+   <path>civicrm/dashlet/casedashboard</path>
+   <title>Case Dashboard Dashlet</title>
+   <page_callback>CRM_Dashlet_Page_CaseDashboard</page_callback>
+</item>
+<item>
+   <path>civicrm/contact/deduperules</path>
+   <title>Find and Merge Duplicate Contacts</title>
+   <desc>Manage the rules used to identify potentially duplicate contact records. Scan for duplicates using a selected rule and merge duplicate contact data as needed.</desc>
+   <page_callback>CRM_Contact_Page_DedupeRules</page_callback>
+   <access_arguments>administer dedupe rules;merge duplicate contacts</access_arguments>
+   <adminGroup>Manage</adminGroup>
+   <icon>admin/small/duplicate_matching.png</icon>
+   <weight>105</weight>
+</item>
+<item>
+   <path>civicrm/contact/dedupefind</path>
+   <title>Find and Merge Duplicate Contacts</title>
+   <page_callback>CRM_Contact_Page_DedupeFind</page_callback>
+   <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
+   <path>civicrm/ajax/dedupefind</path>
+   <page_callback>CRM_Contact_Page_AJAX::getDedupes</page_callback>
+   <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
+  <path>civicrm/contact/dedupemerge</path>
+   <title>Batch Merge Duplicate Contacts</title>
+   <page_callback>CRM_Contact_Page_DedupeMerge</page_callback>
+   <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
+   <path>civicrm/dedupe/exception</path>
+   <title>Dedupe Exceptions</title>
+   <adminGroup>Manage</adminGroup>
+   <page_callback>CRM_Contact_Page_DedupeException</page_callback>
+   <weight>110</weight>
+</item>
+<item>
+     <path>civicrm/ajax/dedupeRules</path>
+     <page_callback>CRM_Contact_Page_AJAX::buildDedupeRules</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+    <path>civicrm/contact/view/useradd</path>
+    <path_arguments>cid=%%cid%%</path_arguments>
+    <title>Add User</title>
+    <page_callback>CRM_Contact_Page_View_Useradd</page_callback>
+</item>
+<item>
+     <path>civicrm/ajax/markSelection</path>
+     <page_callback>CRM_Contact_Page_AJAX::selectUnselectContacts</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/toggleDedupeSelect</path>
+     <page_callback>CRM_Contact_Page_AJAX::toggleDedupeSelect</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/flipDupePairs</path>
+     <page_callback>CRM_Contact_Page_AJAX::flipDupePairs</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
+  <path>civicrm/activity/sms/add</path>
+  <path_arguments>action=add</path_arguments>
+  <title>Activities</title>
+  <page_callback>CRM_Contact_Form_Task_SMS</page_callback>
+</item>
+  <item>
+    <path>civicrm/ajax/contactrelationships</path>
+    <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>
+    <access_arguments>access CiviCRM;view my contact</access_arguments>
+  </item>
+</menu>

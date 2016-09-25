@@ -1,0 +1,62 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="domain-name-title"}
+{ts}Domain Name{/ts}
+{/htxt}
+{htxt id="domain-name"}
+{ts 1='&#123;domain.name&#125;'}Enter the name of the organization or entity which owns this CiviCRM domain. Use the %1 token to include this value in mailing content. It is used in the default Opt-out Message.{/ts}
+{/htxt}
+
+
+{htxt id="from-name-title"}
+{ts}From Name{/ts}
+{/htxt}
+{htxt id="from-name"}
+{ts}The FROM Name and Email Address are used when automated emails are sent from this domain (e.g. subscribe and unsubscribe confirmations...). This Name and Email Address are also used as the default 'sender' values when you create a new CiviMail Mailing.{/ts}
+{/htxt}
+
+{htxt id="from-email-title"}
+{ts}From Address{/ts}
+{/htxt}
+{htxt id="from-email"}
+{ts}The FROM Name and Email Address are used when automated emails are sent from this domain (e.g. subscribe and unsubscribe confirmations...). This Name and Email Address are also used as the default 'sender' values when you create a new CiviMail Mailing.{/ts}
+{/htxt}
+
+{htxt id="return-path-title"}
+{ts}Return Path{/ts}
+{/htxt}
+{htxt id="return-path"}
+{ts}Use this field if you need to populate the <code>Return-Path</code> mail header element with a fixed value (e.g., <code>myuser@example.org</code>). Enter a fully qualified email address which belongs to a valid SMTP account in your domain. This address will not be seen by 'typical' email clients. Consult with your SMTP provider what address to put in here so that the SMTP server accepts outgoing mail from CiviMail. If this field is left blank, the <code>From</code> email address will be used as the <code>Return-Path</code>.{/ts}
+{/htxt}
+
+{htxt id="additional-contact-title"}
+{ts}Additional Fields{/ts}
+{/htxt}
+{htxt id="additional-contact"}
+{capture assign=componentUrl}{crmURL p="civicrm/admin/component" q="reset=1"}{/capture}
+{ts 1=$componentUrl 2='&#123;domain.email&#125;' 3='&#123;domain.phone&#125;'}You can also include general email and/or phone contact information in mailings by filling in the fields below, and then using the %2 and %3 tokens in your mailings. These are particularly useful for inclusion in pre-configured mailing <a href='%1'>Headers or Footers</a>.{/ts}
+{/htxt}
+

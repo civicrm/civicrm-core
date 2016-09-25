@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sample_data>
+
+  <first_names>
+    <first_name>Anna</first_name>
+    <first_name>Zbigniew</first_name>
+    <first_name>Telimena</first_name>
+    <first_name>Andrzej</first_name>
+    <first_name>Alicja</first_name>
+    <first_name>Paulina</first_name>
+    <first_name>Henryk</first_name>
+    <first_name>Jerzy</first_name>
+    <first_name>Łucja</first_name>
+    <first_name>Dżordż</first_name>
+    <first_name>Ludmiła</first_name>
+    <first_name>Izabela</first_name>
+    <first_name>Rafał</first_name>
+    <first_name>Piotr</first_name>
+    <first_name>Damian</first_name>
+    <first_name>Paweł</first_name>
+    <first_name>Michał</first_name>
+    <first_name>Scholastyka</first_name>
+    <first_name>Ernest</first_name>
+    <first_name>Rajmund</first_name>
+    <first_name>Izaura</first_name>
+    <first_name>Nepomucen</first_name>
+    <first_name>Hermenegilda</first_name>
+    <first_name>Rebeka</first_name>
+    <first_name>Danuta</first_name>
+    <first_name>Mściwój</first_name>
+    <first_name>Brzęczysław</first_name>
+  </first_names>
+
+  <last_names>
+    <last_name>Rębałkiewicz</last_name>
+    <last_name>Krzewski</last_name>
+    <last_name>Nowak</last_name>
+    <last_name>Kowalski</last_name>
+    <last_name>Fąfara</last_name>
+    <last_name>Brzęczyszykiewicz</last_name>
+    <last_name>Żółwiński</last_name>
+    <last_name>Pączek</last_name>
+    <last_name>Śledziewicz</last_name>
+    <last_name>Warszawski</last_name>
+    <last_name>Mickiewicz</last_name>
+    <last_name>Żeromski</last_name>
+    <last_name>Łąchowski</last_name>
+  </last_names>
+
+  <street_names>
+    <street_name>Kukułki</street_name>
+    <street_name>Marszałkowska</street_name>
+    <street_name>Krakowska</street_name>
+    <street_name>Mozarta</street_name>
+    <street_name>Jana</street_name>
+    <street_name>Roentgena</street_name>
+    <street_name>Indiry Gandhi</street_name>
+    <street_name>Barbary</street_name>
+    <street_name>Jana Pawła</street_name>
+    <street_name>Inwalidów</street_name>
+    <street_name>Konstytucji</street_name>
+    <street_name>Dżochara Dudajewa</street_name>
+    <street_name>Bohaterów Westerplatte</street_name>
+    <street_name>Encyklopedyczna</street_name>
+    <street_name>Oleńki</street_name>
+    <street_name>Niedźwiedzia</street_name>
+    <street_name>Niepodległości</street_name>
+    <street_name>Odyńca</street_name>
+    <street_name>Łyczakowska</street_name>
+  </street_names>
+
+  <street_types>
+    <street_type>al.</street_type>
+    <street_type>ul.</street_type>
+    <street_type>plac</street_type>
+  </street_types>
+
+  <supplemental_addresses_1>
+    <supplemental_address_1>Attn: Accounting</supplemental_address_1>
+    <supplemental_address_1>c/o OPDC</supplemental_address_1>
+    <supplemental_address_1>Powai</supplemental_address_1>
+    <supplemental_address_1>Colaba</supplemental_address_1>
+    <supplemental_address_1>Cuffe Parade</supplemental_address_1>
+    <supplemental_address_1>Churchgate</supplemental_address_1>
+    <supplemental_address_1>Vile Parle</supplemental_address_1>
+    <supplemental_address_1>Chandivali</supplemental_address_1>
+    <supplemental_address_1>Subscriptions Dept</supplemental_address_1>
+    <supplemental_address_1>Editorial Dept</supplemental_address_1>
+    <supplemental_address_1>dadar</supplemental_address_1>
+    <supplemental_address_1>mahim</supplemental_address_1>
+    <supplemental_address_1>kurla</supplemental_address_1>
+    <supplemental_address_1>khar</supplemental_address_1>
+    <supplemental_address_1>Donor Relations</supplemental_address_1>
+  </supplemental_addresses_1>
+
+  <cities>
+    <city>Łąck</city>
+    <city>Płock</city>
+    <city>Kraków</city>
+    <city>Będzin</city>
+    <city>Modlin</city>
+    <city>Warszawa</city>
+    <city>Kozie Trąbki</city>
+    <city>Zakopane</city>
+    <city>Jelenia Góra</city>
+    <city>Łódź</city>
+    <city>Wrocław</city>
+  </cities>
+
+  <address_directions>
+    <address_direction>Pn</address_direction>
+    <address_direction>Pd</address_direction>
+    <address_direction>W</address_direction>
+    <address_direction>Z</address_direction>
+    <address_direction>Pn-Z</address_direction>
+    <address_direction>Pn-W</address_direction>
+    <address_direction>Pł-Z</address_direction>
+    <address_direction>Pł-W</address_direction>
+  </address_directions>
+
+  <email_domains>
+    <email_domain>yahoo</email_domain>
+    <email_domain>gmail</email_domain>
+    <email_domain>hotmail</email_domain>
+    <email_domain>redimail</email_domain>
+    <email_domain>indiatimes</email_domain>
+    <email_domain>brown</email_domain>
+    <email_domain>tsec</email_domain>
+    <email_domain>webaccess</email_domain>
+    <email_domain>amazon</email_domain>
+    <email_domain>ebay</email_domain>
+    <email_domain>paypal</email_domain>
+  </email_domains>
+
+  <email_tlds>
+    <email_tld>com</email_tld>
+    <email_tld>org</email_tld>
+    <email_tld>net</email_tld>
+    <email_tld>pl</email_tld>
+    <email_tld>org</email_tld>
+    <email_tld>net</email_tld>
+    <email_tld>co.jp</email_tld>
+    <email_tld>com.pl</email_tld>
+    <email_tld>edu</email_tld>
+    <email_tld>edu.pl</email_tld>
+    <email_tld>net.pl</email_tld>
+  </email_tlds>
+
+  <organization_names>
+    <organization_name>Polski Czerwony Krzyż</organization_name>
+    <organization_name>Stowarzyszenie Rowerzystów Górskich</organization_name>
+    <organization_name>Fundacja „Źródła wiedzy”</organization_name>
+    <organization_name>Wielka Orkiestra Świątecznej Pomocy</organization_name>
+    <organization_name>Fundacja im. Stefana Batorego</organization_name>
+    <organization_name>Resursa Pozarządowa</organization_name>
+    <organization_name>Polskie Koleje Państwowe</organization_name>
+    <organization_name>Sprzątanie i spółka</organization_name>
+    <organization_name>Korporacja Taxi</organization_name>
+    <organization_name>United Parcel Service</organization_name>
+    <organization_name>Stolica</organization_name>
+    <organization_name>Międzynarodowe Targi Łódzkie</organization_name>
+  </organization_names>
+
+  <organization_fields>
+    <organization_field>Software</organization_field>
+    <organization_field>Agro</organization_field>
+    <organization_field>Environmental Defense</organization_field>
+    <organization_field>Electronics</organization_field>
+    <organization_field>Motors</organization_field>
+    <organization_field>Steel</organization_field>
+    <organization_field>Education</organization_field>
+    <organization_field>Construction</organization_field>
+    <organization_field>Arts Alliance</organization_field>
+    <organization_field>Device Drivers</organization_field>
+    <organization_field>Advertising</organization_field>
+    <organization_field>Hospital</organization_field>
+  </organization_fields>
+
+  <organization_types>
+    <organization_type>Assoc.</organization_type>
+    <organization_type>Partnership</organization_type>
+    <organization_type>Inc.</organization_type>
+    <organization_type>Ltd.</organization_type>
+    <organization_type>PSU</organization_type>
+    <organization_type>MNC</organization_type>
+    <organization_type>NGO</organization_type>
+  </organization_types>
+
+  <groups>
+    <group>Newsletter Subscribers</group>
+    <group>Summer Program Volunteers</group>
+    <group>Advisory Board</group>
+  </groups>
+
+  <notes>
+    <note>Contact the Commissioner of Charities</note>
+    <note>Get the registration done for NGO status</note>
+    <note>Send newsletter for April 2005</note>
+    <note>Organize the Terry Fox run</note>
+    <note>Invite members for the Steve Prefontaine 10k dream run</note>
+    <note>Arrange collection of funds from members</note>
+    <note>Connect for presentation</note>
+    <note>Arrange for cricket match with Sunil Gavaskar</note>
+    <note>Send reminder for annual dinner</note>
+    <note>Chart out route map for next 10k run</note>
+    <note>Reminder screening of "Black" on next Friday</note>
+  </notes>
+
+
+</sample_data>

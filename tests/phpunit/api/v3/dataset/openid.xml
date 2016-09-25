@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id  -->
+<dataset>
+  <civicrm_openid
+    contact_id="1"
+    openid="http://www.phpunit.de"
+    allowed_to_login="1"
+   />
+</dataset>

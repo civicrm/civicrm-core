@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: group_contact_admins_1.xml 30511 2010-11-03 11:36:36Z shot $  -->
+<dataset>
+  <table name="civicrm_group_contact">
+    <column>id</column>
+    <column>group_id</column>
+    <column>contact_id</column>
+    <column>status</column>
+    <column>location_id</column>
+    <column>email_id</column>
+    <row>
+      <value>1</value>      <!--  id  -->
+      <value>1</value>      <!--  group_id  -->
+      <value>1</value>      <!--  contact_id  -->
+      <value>Added</value>  <!--  status  -->
+      <null />              <!--  location_id  -->
+      <null />              <!--  email_id  -->
+    </row>
+  </table>
+</dataset>

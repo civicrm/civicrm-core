@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Case</base>
+  <class>CaseActivity</class>
+  <name>civicrm_case_activity</name>
+  <comment>Joining table for case-activity associations.</comment>
+  <add>1.8</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Case Activity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique case-activity association id</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>case_id</name>
+    <title>Case</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Case ID of case-activity association.</comment>
+    <add>1.8</add>
+  </field>
+  <foreignKey>
+    <name>case_id</name>
+    <table>civicrm_case</table>
+    <key>id</key>
+    <add>1.8</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>activity_id</name>
+    <title>Activity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Activity ID of case-activity association.</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>activity_id</name>
+    <table>civicrm_activity</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>UI_case_activity_id</name>
+    <fieldName>case_id</fieldName>
+    <fieldName>activity_id</fieldName>
+    <add>2.0</add>
+  </index>
+
+  <field>
+   <name>activity_entity_table</name>
+   <type>varchar</type>
+   <length>64</length>
+   <required>true</required>
+   <comment>Name of table where item being referenced is stored (activity, phonecall or meeting).</comment>
+   <add>1.8</add>
+   <drop>2.0</drop>
+  </field>
+
+  <field>
+   <name>activity_entity_id</name>
+   <type>int unsigned</type>
+   <required>true</required>
+   <comment>Entity (activity, phonecall or meeting) id for which the assigment is created</comment>
+   <add>1.8</add>
+   <drop>2.0</drop>
+  </field>
+
+  <dynamicForeignKey>
+   <idColumn>activity_entity_id</idColumn>
+   <typeColumn>activity_entity_table</typeColumn>
+   <add>1.8</add>
+   <drop>2.0</drop>
+  </dynamicForeignKey>
+
+</table>

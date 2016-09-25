@@ -1,0 +1,42 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="adjust-payment-amount-title"}
+  {ts}Payment Amount{/ts}
+{/htxt}
+{htxt id="adjust-payment-amount"}
+{ts}If you enter an amount which is different than the current scheduled amount, choose one of these options:{/ts}
+<p>
+<strong>{ts}Adjust Pledge Payment Schedule{/ts}</strong><br />
+{ts}The next scheduled payment will be adjusted up or down to make up the difference.{/ts}<br />
+<em>{ts}Example: If you enter a payment of 60 when the scheduled amount is 50, the next scheduled payment is adjusted to 40.{/ts}</em>
+</p>
+<p>
+<strong>{ts}Adjust Total Pledge Amount{/ts}</strong><br />
+{ts}The total amount of the pledge will be adjusted up or down to make up the difference. The payment schedule ( amounts / dates for future pending pledge payments ) is not changed.{/ts}<br />
+<em>{ts}Example: If you enter a payment of 60 when the scheduled amount is 50, the total pledge amount will be increased by 10.{/ts}</em>
+</p>
+{/htxt}
+

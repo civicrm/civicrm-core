@@ -1,0 +1,116 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{capture assign=multiURL}{crmURL p="civicrm/import/custom" q="reset=1"}{/capture}
+{htxt id='choose-data-source-intro-title'}
+  {ts}Import Wizard{/ts}
+{/htxt}
+{htxt id='choose-data-source-intro'}
+  <p>
+    {ts}The Import Wizard allows you to easily upload contact records from other applications into CiviCRM. For example, if your organization has contacts in MS Access&copy; or Excel&copy;, and you want to start using CiviCRM to store these contacts, you can 'import' them here.{/ts}
+  </p>
+  <p>
+    {ts}You can import records from a <strong>comma-separated-values format (CSV)</strong> file, or using a <strong>SQL query</strong>. See "Choose Data Source" help below for more information.{/ts}
+  </p>
+  <p>
+    {ts}After importing contacts, you may also want to import <strong>contributions, membership info and/or event participation</strong> data for these contacts. If so, first make sure that the corresponding CiviCRM component is enabled from Administer CiviCRM &raquo; System Settings &raquo; Enable CiviCRM Components. Enable CiviContribute, CiviMember, and/or CiviEvent. Then navigate to the Import option found in each component's menu (e.g. CiviContribute &raquo; Import Contributions).{/ts}
+  </p>
+  <p>
+    {ts 1=$multiURL}If you need to import <strong>Multi-value Custom Data</strong> for contacts (such as employment or education history), you will need to do that as a separate step from <a href="%1">here</a>.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='contact-type-title'}
+  {ts}Contact Type{/ts}
+{/htxt}
+{htxt id='contact-type'}
+  <p>{ts}Select <strong>Individual</strong> for Contact Type if each record in your file represents an individual person - even if the file also contains related Organization data (e.g. Employer Name, Employer Address, etc.).{/ts}</p>
+  <p>{ts}Select <strong>Organization</strong> or <strong>Household</strong> if each record in your file represents a contact of that type. (NOTE: Some built-in contact types may not be enabled for your site.){/ts}</p>
+  <p>{ts}<strong>Importing Contact Subtypes</strong> - If your file contains a mix of "subtypes" belonging to a built-in type, select the built-in ("parent") type here. You will then be able to map a Contact Subtype field from your file which sets the subtype for each row. EXAMPLE: If you are importing a mixture of Individuals who are "Students" and "Parents" and "Staff" subtypes, select "Individual" here AND include a column in your import file which contains the subtype for each row.{/ts}</p>
+  <p>{ts}If all records in the file belong to the same subtype, then select that subtype from the "Subtype" field. All records will be automatically assigned to that subtype. In this case you do NOT need to include a Subtype column in the file.{/ts}</p>
+{/htxt}
+
+{htxt id='contact-sub-type-title'}
+  {ts}Sub-Type{/ts}
+{/htxt}
+{htxt id='contact-sub-type'}
+<p>{ts}Select a specific Contact Subtype here ONLY if all you want all records in this import to be assigned to that subtype. EXAMPLE: If all records are of the <strong>Student</strong>, select that subtype here and it will be assigned to all import records.{/ts}</p>
+<p>{ts}Do NOT select a Contact Subtype if your import file contains a mixture of subtypes. In that case, select the built-in ("parent") type, and make sure you'll file includes include a column which sets the subtype for each row.{/ts}</p>
+{/htxt}
+
+{htxt id='dupes-title'}
+  {ts}Duplicate Matching{/ts}
+{/htxt}
+{htxt id='dupes'}
+  <p>
+    {ts}If a contact in the import file appears to be a duplicate of an existing CiviCRM contact...{/ts}
+  </p>
+  <ul>
+    <li>
+      {ts}<strong>Skip:</strong> Reports and then Skips duplicate import file rows - leaving the matching record in the database as-is (default).{/ts}
+    </li>
+    <li>
+      {ts}<strong>Update:</strong> Updates database fields with available import data. Fields in the database which are NOT included in the import row are left as-is.{/ts}
+    </li>
+    <li>
+      {ts}<strong>Fill:</strong> Fills in additional contact data only. Database fields which currently have values are left as-is.{/ts}
+    </li>
+    <li>
+      {ts}<strong>No Duplicate Checking:</strong> Inserts all valid records without comparing them to existing contact records for possible duplicates.{/ts}
+    </li>
+  </ul>
+{/htxt}
+
+{htxt id='data-source-selection-title'}
+  {ts}Data Source{/ts}
+{/htxt}
+{htxt id='data-source-selection'}
+  <p>
+    {ts}Select the source of the imported data. By default the following choices are possible:{/ts}
+    <table>
+      <tr><td><strong>{ts}Comma-Separated Values (CSV){/ts}</strong></td></tr>
+      <tr><td>{ts}A spreadsheet-like file with the contact data in each row. Data fields are separated by commas. You can export to a "CSV" file from most spreadsheet applications, many database managers, as well as other contact management and address book applications. Consult the documentation for your application if you're not sure how to do this. Save this file to your local hard drive (or an accessible drive on your network) - and then choose that file as your Import Upload File.{/ts}</td></tr>
+      <tr><td><strong>{ts}SQL Query{/ts}</strong></td></tr>
+      <tr><td>{ts}A direct SQL query in the form of a SELECT query. For example:{/ts}</td></tr>
+      <tr><td><code>SELECT first_name, last_name, email FROM somedatabase.sometable</code><td></tr>
+      <tr><td>{ts}This query can be against a different database, but that database has to be on the same database server and the CiviCRM database user has to have the SELECT privilege (and any other privileges required to execute the query).{/ts}</td></tr>
+    </table>
+  </p>
+{/htxt}
+
+{htxt id='id-dedupe_rule-title'}
+  {ts}Dedupe Rule{/ts}
+{/htxt}
+{htxt id='id-dedupe_rule'}
+  {ts}If you have selected one of the dedupe options besides "no duplicate checking," CiviCRM will use a predefined dedupe rule to determine possible matches for your imported records. Existing dedupe rules may be reviewed, and new rules created, by visiting Contacts > Find and Merge Duplicate Contacts.{/ts}
+  {ts}When selecting a dedupe rule, be sure to choose one that includes fields contained in your import file. Also be aware that the update and fill options could have significant impact on your existing data. You should define and select a rule that is strict enough to ensure there are no false positive matches.{/ts}
+{/htxt}
+
+{htxt id='id-fieldSeparator-title'}
+  {ts}Field Separator{/ts}
+{/htxt}
+{htxt id='id-fieldSeparator'}
+  {ts}Enter the character used to separate data columns in your import file. By default, the field will populate with the separator defined in your global settings. Common values include a comma, semicolon, or pipe character. To import a tab separated file, enter "tab" (without quotes) in the field.{/ts}
+{/htxt}

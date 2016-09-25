@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+require_once dirname(dirname(__DIR__)) . '/tests/phpunit/CiviTest/bootstrap.php';
+error_reporting(E_ALL);
+
+if (!class_exists('PHPUnit_Framework_TestCase')) {
+  // Oooph.  PHPUnit isn't available, and we don't really need its services,
+  // but the scanner will try to read metadata about our test-classes, and
+  // that requires having the parent-classes defined.
+
+  class PHPUnit_Framework_TestCase {}
+  class PHPUnit_Extensions_Database_TestCase {}
+  class PHPUnit_Extensions_SeleniumTestCase {}
+}
+
+\Civi\CiUtil\Command\LsCommand::main($argv);

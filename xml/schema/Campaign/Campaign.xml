@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Campaign</base>
+  <class>Campaign</class>
+  <name>civicrm_campaign</name>
+  <comment>Campaign Details.</comment>
+  <add>3.3</add>
+
+  <field>
+    <name>id</name>
+    <title>Campaign ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Campaign ID.</comment>
+    <import>true</import>
+    <add>3.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>name</name>
+    <title>Campaign Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <comment>Name of the Campaign.</comment>
+    <import>true</import>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>3.3</add>
+  </field>
+
+  <field>
+    <name>title</name>
+    <title>Campaign Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Title of the Campaign.</comment>
+    <import>true</import>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>3.3</add>
+  </field>
+
+  <field>
+    <name>description</name>
+    <title>Campaign Description</title>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
+    <comment>Full description of Campaign.</comment>
+    <add>3.3</add>
+  </field>
+
+  <field>
+    <name>start_date</name>
+    <title>Campaign Start Date</title>
+    <type>datetime</type>
+    <headerPattern>/^start|(s(tart\s)?date)$/i</headerPattern>
+    <comment>Date and time that Campaign starts.</comment>
+    <import>true</import>
+    <html>
+      <type>Select Date</type>
+    </html>
+    <add>3.3</add>
+  </field>
+
+  <field>
+    <name>end_date</name>
+    <title>Campaign End Date</title>
+    <type>datetime</type>
+    <headerPattern>/^end|(e(nd\s)?date)$/i</headerPattern>
+    <comment>Date and time that Campaign ends.</comment>
+    <import>true</import>
+    <html>
+      <type>Select Date</type>
+    </html>
+    <add>3.3</add>
+  </field>
+
+  <field>
+    <name>campaign_type_id</name>
+    <title>Campaign Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type</comment>
+    <import>true</import>
+    <pseudoconstant>
+      <optionGroupName>campaign_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>3.3</add>
+  </field>
+  <index>
+    <name>UI_campaign_type_id</name>
+    <fieldName>campaign_type_id</fieldName>
+    <add>3.3</add>
+  </index>
+
+  <field>
+    <name>status_id</name>
+    <title>Campaign Status</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Campaign status ID.Implicit FK to civicrm_option_value where option_group = campaign_status</comment>
+    <import>true</import>
+    <pseudoconstant>
+      <optionGroupName>campaign_status</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>3.3</add>
+  </field>
+  <index>
+    <name>UI_campaign_status_id</name>
+    <fieldName>status_id</fieldName>
+    <add>3.3</add>
+  </index>
+
+  <field>
+    <name>external_identifier</name>
+    <type>varchar</type>
+    <title>Campaign External ID</title>
+    <length>32</length>
+    <headerPattern>/external\s?id/i</headerPattern>
+    <dataPattern>/^\d{11,}$/</dataPattern>
+    <comment>Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.</comment>
+    <import>true</import>
+    <add>3.3</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>UI_external_identifier</name>
+    <unique>true</unique>
+    <fieldName>external_identifier</fieldName>
+    <add>3.3</add>
+  </index>
+
+  <field>
+    <name>parent_id</name>
+    <title>Parent Campaign</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Optional parent id for this Campaign.</comment>
+    <import>true</import>
+    <add>3.3</add>
+    <html>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>parent_id</name>
+    <table>civicrm_campaign</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>is_active</name>
+    <title>Is Campaign Active?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this Campaign enabled or disabled/cancelled?</comment>
+    <add>3.3</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Campaign Created By</title>
+    <comment>FK to civicrm_contact, who created this Campaign.</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <title>Campaign Created Date</title>
+    <comment>Date and time that Campaign was created.</comment>
+    <add>3.3</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+
+  <field>
+    <name>last_modified_id</name>
+    <type>int unsigned</type>
+    <title>Campaign Modified By</title>
+    <comment>FK to civicrm_contact, who recently edited this Campaign.</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>last_modified_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>last_modified_date</name>
+    <type>datetime</type>
+    <title>Campaign Modified Date</title>
+    <comment>Date and time that Campaign was edited last time.</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>goal_general</name>
+    <type>text</type>
+    <title>Campaign Goals</title>
+    <comment>General goals for Campaign.</comment>
+    <add>3.4</add>
+    <html>
+      <type>RichTextEditor</type>
+    </html>
+  </field>
+  <field>
+    <name>goal_revenue</name>
+    <type>decimal</type>
+    <comment>The target revenue for this campaign.</comment>
+    <add>3.4</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+</table>

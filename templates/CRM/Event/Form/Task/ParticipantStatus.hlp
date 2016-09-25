@@ -1,0 +1,34 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-status_change-title"}
+  {ts}Participant Status{/ts}
+{/htxt}
+{htxt id="id-status_change"}
+<p><strong>{ts}Enabling Waitlisting and Registration Approval{/ts}</strong><br />
+{ts}This screen is particularly useful for managing events with Waitlisting and / or Registration Approval features enabled. In order to use these features you must first enable the related Participant Statuses (Administer &raquo; CiviEvent &raquo; Participant Statuses).{/ts}</p>
+<p><strong>{ts}Tip: Managing waitlisted participants{/ts}</strong><br />
+{ts}If you are moving participants from "On waitlist" to "Pending from waitlist" status, make sure there are available spaces for the event. An email with a link to confirm their registration will be automatically sent. However, they will only be allowed to complete their registration if the event is not full (e.g. the number of registered participants is less than the maximum number of participants configured for the event).{/ts}</p>
+{/htxt}

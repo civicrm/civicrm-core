@@ -1,0 +1,194 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-emailFormat-title"}
+  {ts}Email Format{/ts}
+{/htxt}
+{htxt id="id-emailFormat"}
+{ts}Select the email format preferred by this contact. Select 'Both' to send HTML and Text formats.{/ts}
+{/htxt}
+
+{htxt id="id-bulkmail-title"}
+  {ts}Bulk Mailings{/ts}
+{/htxt}
+{htxt id="id-bulkmail"}
+{ts}If you are using the CiviMail component to send mailings to contacts, this field provides additional control over which email address is used. By default, CiviMail sends mail to each contact's preferred email address. If the contact has multiple locations, then the preferred email of the primary location is used. However, if the contact prefers to have CiviMail ('bulk') mailings set to an alternate email address - check the 'Use for Bulk Mailings' box next to that email address.{/ts}
+{/htxt} 
+
+{htxt id="id-optOut-title"}
+  {ts}Opt Out{/ts}
+{/htxt}
+{htxt id="id-optOut"}
+{ts}This option is designed to be set by the contact themselves when they don't want to receive bulk email from your organization (they set it using the opt-out action from a CiviMail mailing).   Please think before changing it, as it will override the preference they have set.{/ts}
+{/htxt}
+
+{htxt id="id-onhold-title"}
+  {ts}Email Hold{/ts}
+{/htxt}
+{htxt id="id-onhold"}
+{ts}This flag is most commonly used to mark an email address that is bouncing. If you are using the CiviMail component, emails that bounce excessively are automatically placed on hold and mailings are not sent to this address as long as it is marked hold. You can also set (or unset) this option manually - but remember that emails will not be sent to this address as long as it is marked 'On Hold'.{/ts}
+{/htxt}
+
+{htxt id="id-preferred_communication_method-title"}
+  {ts}Preferred Communication{/ts}
+{/htxt}
+{htxt id="id-preferred_communication_method"}
+{ts}Select the preferred method(s) of communicating with this contact.{/ts}
+{/htxt}
+
+{htxt id="id-privacy-title"}
+  {ts}Privacy{/ts}
+{/htxt}
+{htxt id="id-privacy"}
+{ts}Select the appropriate Privacy Options.{/ts}
+<p>{ts}Contacts with 'Do not email' will be excluded from receiving CiviMail mailings, and the Send Email activity will be disabled for them. However they will still receive email for contribution receipts and event registration confirmations.{/ts}</p>
+<p>{ts}Contacts with 'Do not SMS' will be excluded from receiving Bulk SMS messages, and the Send SMS activity will be disabled.{/ts}</p>
+<p>{ts}Contacts with 'Do not mail' will be excluded when mailing labels are created.{/ts}</p>
+{/htxt}
+
+{htxt id="id-sharedAddress-title"}
+  {ts}Shared Address{/ts}
+{/htxt}
+{htxt id="id-sharedAddress"}
+<p>{ts}Check this option if you want to link this address to another contact's address. For example, you might want to link a person's "Work" address to their employer's address. Or, you might want to link their "Home" address to a Household record. Changes made to the linked address will automatically be applied to this address. For example, if you use an employer (organization) address for an individual's work address - any updates to the employer address will also be applied to the individual's work address.{/ts}</p>
+<p>{ts}You can use an address belonging to an existing contact or create a new contact by selecting the desired contact type from the select field. If you link an individual's address to an organization, an employee-employer relationship will be automatically created. If you link an individual's address to a household, a household member relationship is created.{/ts}</p>
+{/htxt}
+
+{htxt id="id-communication_style-title"}
+  {ts}Communication Style{/ts}
+{/htxt}
+{htxt id="id-communication_style"}
+<p>{ts}Choose how you communicate with this contact, e.g. on formal or familiar terms.{/ts}</p>
+<p>{ts}Depending on the CiviCRM setup, email and postal greetings (see below) may be automatically adapted accordingly; or the information can be used in other ways.{/ts}</p>
+{/htxt}
+
+{htxt id="id-greeting-title"}
+  {ts}Greeting{/ts}
+{/htxt}
+{htxt id="id-greeting"}
+{capture assign=docLink}{docURL page="user/common-workflows/tokens-and-mail-merge"}{/capture}
+<p>{ts}Use the greeting/address options to determine how you would like the contact's salutation and name displayed for different communication methods. When you send an email or export a list of records to a .csv file for mail merging, the greeting and addressee fields will reflect your preferences.{/ts}</p>
+<p>{ts 1=$docLink}You may also create a customized greeting and use field tokens to insert fields of your choice. For more information on available tokens, see the online documentation %1.{/ts}</p>
+{/htxt}
+
+{htxt id="id-edit-street-elements-title"}
+  {ts}Street Address{/ts}
+{/htxt}
+{htxt id="id-edit-street-elements"}
+<p>{ts}CiviCRM will attempt to split street addresses into separate elements (street number, street name and unit/apt) to help you make lists and reports where you need to sort by street number (and/or separate addresses with odd and even numbers). For most addresses, this is done for you automatically. However, you can manually edit these elements, and potentially handle addresses that are in unusual formats, by clicking 'Edit Address Elements'.{/ts}</p>
+{/htxt}
+
+{htxt id="id-edit-complete-street-title"}
+  {ts}Street Editing{/ts}
+{/htxt}
+{htxt id="id-edit-complete-street"}
+<p>{ts}Click here to return to editing the street address as a single field. Addresses which don't fit the expected format for address elements can still be saved by entering them in the single 'Street Address' field.{/ts}
+{/htxt}
+
+{htxt id="id-current-employer-title"}
+  {ts}Current Employer{/ts}
+{/htxt}
+{htxt id="id-current-employer"}
+<p>{ts}You can select an existing organization record here, OR type in the name of a new organization if this person's employer is not already in your database. However, if you want this person to share their work address with their employer AND that organization doesn't exist yet - leave this field blank and use the Shared Address feature in the Address pane below to create the employer record AND enter the employer address. The 'current employer' relationship will be automatically created for you.{/ts}</p>
+{/htxt}
+
+{htxt id="id-website-title"}
+  {ts}Website{/ts}
+{/htxt}
+{htxt id="id-website"}
+<p>{ts}Record one or more web addresses (URLs) associated with this contact. Examples include personal web addresses like a Facebook or Twitter page, as well as links to a company or organization web site or page.{/ts}</p>
+{/htxt}
+
+{htxt id="id-upload-image-title"}
+  {ts}Contact Image{/ts}
+{/htxt}
+{htxt id="id-upload-image"}
+<p>{ts}Upload a photo or icon that you want to be displayed when viewing this contact.{/ts}</p>
+{/htxt}
+
+{htxt id="id-internal-id-title"}
+  {ts}Contact ID{/ts}
+{/htxt}
+{htxt id="id-internal-id"}
+<p>{ts}Every contact in CiviCRM has a unique ID number. This number will never change and is the most accurate way of identifying a contact.{/ts}</p>
+{/htxt}
+
+{htxt id="id-external-id-title"}
+  {ts}External ID{/ts}
+{/htxt}
+{htxt id="id-external-id"}
+<p>{ts}Use this field to store a unique identifier. This is generally used to link contacts with records in a related or legacy application. When migrating data from another system, import the unique contact identifier from the old system to this field. You can then use it to match imported contributions and other transactional data to the corresponding contact record.{/ts}</p>
+{/htxt}
+
+{htxt id="id-address-name-title"}
+  {ts}Address Name{/ts}
+{/htxt}
+{htxt id="id-address-name"}
+<p>{ts}Enter a descriptive name for this address block such as "Summer Home", "School Address", etc.{/ts}
+{/htxt}
+
+{htxt id="id-postal-code-suffix-title"}
+  {ts}Postal Code Suffix{/ts}
+{/htxt}
+{htxt id="id-postal-code-suffix"}
+<p>{ts}Enter optional 'add-on' code after the dash ('plus 4' code for U.S. addresses).{/ts}</p>
+{/htxt}
+
+{htxt id="id-geo-code-title"}
+  {ts}Geocoding{/ts}
+{/htxt}
+{htxt id="id-geo-code"}
+{capture assign=docLink}{docURL page="user/initial-set-up/installation-and-basic-setup" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}{/capture}
+<p>{ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {$docLink}</p>
+{/htxt}
+
+{htxt id="id-geo-code-override-title"}
+  {ts}Override Geocoding{/ts}
+{/htxt}
+{htxt id="id-geo-code-override"}
+<p>{ts}Check this box if you want to assign latitude and longitude manually rather than letting your mapping provider assign it. This is useful for addresses in locations where your mapping provider is not able to provide accurate geocoding.{/ts}</p>
+{/htxt}
+
+{htxt id="id-street-address-title"}
+  {ts}Street Address{/ts}
+{/htxt}
+{htxt id="id-street-address"}
+<p>{ts}Street number, street name, apartment/unit/suite - OR P.O. box.{/ts}</p>
+{/htxt}
+
+{htxt id="id-supplemental-address-title"}
+  {ts}Supplemental Address{/ts}
+{/htxt}
+{htxt id="id-supplemental-address"}
+<p>{ts}Supplemental address info, e.g. c/o, department name, building name, etc.{/ts}</p>
+{/htxt}
+
+{htxt id="id-source-title"}
+  {ts}Contact Source{/ts}
+{/htxt}
+{htxt id="id-source"}
+<p>{ts}Use this field to store a description of how/why this contact was added to the database. This field is usually auto-filled when a contact is created from a public form i.e. Event Registration.{/ts}</p>
+{/htxt}
+

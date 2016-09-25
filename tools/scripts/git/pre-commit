@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Note: This shell script should be designed and tested for cross-platform use
+
+# URL: https://github.com/totten/git-php-syntax-checker/
+# Author: Remigijus Jarmalavičius <remigijus@jarmalavicius.lt>
+# Author: Vytautas Povilaitis <php-checker@vytux.lt>
+# License: GPLv3
+
+ROOT_DIR="$(pwd)/"
+LIST=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD)
+ERRORS_BUFFER=""
+for file in $LIST
+do
+    EXTENSION=$(echo "$file" | grep  -E ".php$|.module$|.inc$|.install$")
+    if [ "$EXTENSION" != "" ]; then
+        ERRORS=$(php -l $ROOT_DIR$file 2>&1 | grep "Parse error")
+        if [ "$ERRORS" != "" ]; then
+            if [ "$ERRORS_BUFFER" != "" ]; then
+                ERRORS_BUFFER="$ERRORS_BUFFER\n$ERRORS"
+            else
+                ERRORS_BUFFER="$ERRORS"
+            fi
+            echo "Syntax errors found in file: $file "
+        fi
+    fi
+done
+if [ "$ERRORS_BUFFER" != "" ]; then
+    echo
+    echo "These errors were found in try-to-commit files: "
+    echo -e $ERRORS_BUFFER
+    echo
+    echo "Can't commit, fix errors first."
+    exit 1
+else
+    echo "Committed successfully."
+fi

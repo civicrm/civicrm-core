@@ -1,0 +1,86 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+
+{htxt id="id-financial_type-title"}
+  {ts}Financial Type{/ts}
+{/htxt}
+{htxt id="id-financial_type"}
+<p>{ts}Select the corresponding financial type for contributions made using this page (e.g. donation, capital campaign, etc.). Financial types (and associated accounting codes) are included when contributions are exported, so it can helpful to set up specific types for accounting purposes. You can add or modify contribution available types from Administer &gt; CiviContribute &gt; Financial Types.{/ts}</p>
+<p>{ts}NOTE: If you are using this contribution page for membership signup and renewals, the financial type configured in the membership type settings will be used when recording the membership payment. The financial type selected here will only be used if you are also collecting additional contributions (as configured on the Membership Settings page).{/ts}</p>
+{/htxt}
+
+{htxt id="id-intro_msg-title"}
+  {ts}Intro Content{/ts}
+{/htxt}
+{htxt id="id-intro_msg"}
+{ts}Enter content for the introductory message. This will be displayed below the page title. You can include images, as long as they are already uploaded to a server - click the "Image" button in the button bar.{/ts}
+{/htxt}
+
+{htxt id="id-footer_msg-title"}
+  {ts}Footer Content{/ts}
+{/htxt}
+{htxt id="id-footer_msg"}
+{ts}If you want content displayed at the bottom of the contribution page, enter it here.{/ts}
+{/htxt}
+
+{htxt id="id-goal_amount-title"}
+  {ts}Goal Amount{/ts}
+{/htxt}
+{htxt id="id-goal_amount"}
+{ts}Enter an optional goal amount for this contribution page (e.g. for this 'campaign'). If you enable a contribution widget for this page, the widget will track progress against this goal. Otherwise, the goal will display as 'no limit'.{/ts}
+{/htxt}
+
+{htxt id="id-start_date-title"}
+  {ts}Date Range{/ts}
+{/htxt}
+{htxt id="id-start_date"}
+{ts}You can optionally set an "active date range" for this contribution page. These dates are currently used by the "Contribution Widget" and "Personal Campaign Pages". The widget will give a "Campaign is over" message if it is accessed outside of the specified range. The "Donate" button will be hidden on Personal Campaign Pages if accessed outside of the specified range.{/ts}
+{/htxt}
+
+{htxt id="id-honoree_section-title"}
+  {ts}Honoree{/ts}
+{/htxt}
+{htxt id="id-honoree_section"}
+{ts}If you want to allow contributors to specify a person whom they are honoring with their gift, check this box. An optional Honoree section will be included in the form. Honoree information is automatically saved and linked with the contribution record.{/ts}
+{/htxt}
+
+{htxt id="id-is_organization-title"}
+  {ts}Organization{/ts}
+{/htxt}
+{htxt id="id-is_organization"}
+<p>{ts}When enabled, this feature allows users to identify an organization as the donor or member. Logged in users will be given a choice of selecting from a list of organizations that they have a permissioned relationship with OR entering a new organization. Anonymous users are prompted to enter the organization name. If a matching organization is found using your site's configured unsupervised duplicate matching rules for Organizations, the contribution or membership will be linked to that organization. Otherwise a new organization contact record is created.{/ts}</p>
+{capture assign="profileURL"}{crmURL p='civicrm/admin/uf/group' q='reset=1'}{/capture}
+<p>{ts 1=$profileURL}The organization data collected from users is controlled by the Organization Profile selected below. You can use the default "On Behalf Of Organization" profile, or any other profile with type 'Contact' and/or 'Organization' (<a href="%1">Administer > Customize Data and Screens > Profiles</a>). The profile must include Organization Name and Email Address.{/ts}</p>
+{/htxt}
+
+{htxt id="id-is_share-title"}
+  {ts}Social Sharing{/ts}
+{/htxt}
+{htxt id="id-is_share"}
+<p>{ts}When enabled, links allowing people to share this online contribution page with their social network will be displayed (e.g. Facebook "Like", Google+, and Twitter).{/ts}</p>
+<p>{ts}Social media links will be included on the Contribution Thank-you page, Tell-a-Friend page (if enabled), and in contribution receipt emails.{/ts}</p>
+{/htxt}
+

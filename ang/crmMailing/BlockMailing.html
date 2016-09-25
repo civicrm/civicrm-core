@@ -1,0 +1,83 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+Note: Much of this file is duplicated in crmMailing and crmMailingAB with variations on placement/title/binding.
+It could perhaps be thinned by 30-60% by making more directives.
+-->
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="{name: 'subform.msg_template_id', title: ts('Template')}">
+      <div ng-controller="MsgTemplateCtrl">
+        <select
+          crm-ui-id="subform.msg_template_id"
+          name="msg_template_id"
+          class="fa-clipboard"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
+          ng-model="mailing.msg_template_id"
+          ng-change="loadTemplate(mailing, mailing.msg_template_id)"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+        </select>
+        <a crm-icon="fa-floppy-o" ng-if="checkPerm('edit message templates')" ng-click="saveTemplate(mailing)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+      </div>
+    </div>
+    <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From'), help: hs('from_email')}">
+      <div ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="mailing">
+        <select
+          crm-ui-id="subform.fromAddress"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          name="fromAddress"
+          ng-model="fromPlaceholder.label"
+          required>
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </div>
+    </div>
+    <div crm-ui-field="{name: 'subform.replyTo', title: ts('Reply-To')}" ng-show="crmMailingConst.enableReplyTo">
+      <div ng-controller="EmailAddrCtrl">
+        <select
+          crm-ui-id="subform.replyTo"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          name="replyTo"
+          ng-change="checkReplyToChange(mailing)"
+          ng-model="mailing.replyto_email"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </div>
+    </div>
+    <div crm-ui-field="{name: 'subform.recipients', title: ts('Recipients')}">
+      <div crm-mailing-block-recipients="{name: 'recipients', id: 'subform.recipients'}" crm-mailing="mailing"></div>
+    </div>
+    <span ng-controller="EditUnsubGroupCtrl">
+      <div crm-ui-field="{name: 'subform.baseGroup', title: ts('Unsubscribe Group')}" ng-if="isUnsubGroupRequired(mailing)">
+        <select
+          crm-ui-id="subform.baseGroup"
+          crm-ui-select
+          name="baseGroup"
+          ng-model="mailing.recipients.groups.base[0]"
+          ng-required="true"
+          >
+          <option ng-repeat="grp in crmMailingConst.groupNames | orderBy:'title'" value="{{grp.id}}">{{grp.title}}</option>
+        </select>
+      </div>
+    </span>
+    <div crm-ui-field="{name: 'subform.subject', title: ts('Subject')}">
+      <div style="float: right;">
+        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1"/>
+      </div>
+      <input
+        crm-ui-id="subform.subject"
+        crm-ui-insert-rx="insert:subject"
+        type="text"
+        class="crm-form-text"
+        ng-model="mailing.subject"
+        required
+        placeholder="Subject"
+        name="subject" />
+    </div>
+  </div>
+</div>

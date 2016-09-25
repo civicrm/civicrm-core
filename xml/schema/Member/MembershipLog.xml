@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Member</base>
+  <class>MembershipLog</class>
+  <name>civicrm_membership_log</name>
+  <log>true</log>
+  <comment>Logs actions which affect a Membership record (signup, status override, renewal, etc.)</comment>
+  <add>1.5</add>
+  <field>
+    <name>id</name>
+    <title>Membership Log ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.5</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>membership_id</name>
+    <title>Membership ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Membership table</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>membership_id</name>
+    <table>civicrm_membership</table>
+    <key>id</key>
+    <add>1.5</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>status_id</name>
+    <title>Membership Status</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>New status assigned to membership by this action. FK to Membership Status</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>status_id</name>
+    <table>civicrm_membership_status</table>
+    <key>id</key>
+    <add>1.5</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>start_date</name>
+    <title>Membership Log Start Date</title>
+    <type>date</type>
+    <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
+    <comment>New membership period start date</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>end_date</name>
+    <title>Membership Log End Date</title>
+    <type>date</type>
+    <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
+    <comment>New membership period expiration date.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>modified_id</name>
+    <title>Membership Log modified By</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID of person under whose credentials this data modification was made.</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>modified_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.5</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>modified_date</name>
+    <title>Membership Change Date</title>
+    <type>date</type>
+    <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
+    <comment>Date this membership modification action was logged.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>membership_type_id</name>
+    <title>Membership Type ID</title>
+    <type>int unsigned</type>
+    <comment>FK to Membership Type.</comment>
+    <add>3.4</add>
+  </field>
+  <foreignKey>
+    <name>membership_type_id</name>
+    <table>civicrm_membership_type</table>
+    <key>id</key>
+    <add>3.4</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>max_related</name>
+    <title>Maximum Related Memberships</title>
+    <type>int</type>
+    <comment>Maximum number of related memberships.</comment>
+    <add>4.3</add>
+  </field>
+</table>

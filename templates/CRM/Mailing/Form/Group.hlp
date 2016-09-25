@@ -1,0 +1,97 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="mailing-name-title"}
+  {ts}Name{/ts}
+{/htxt}
+{htxt id="mailing-name"}
+{ts}Assign a unique name to each of your mailings. Select a naming convention that will help keep your mailings organized and easy to find when you want to review and compare mailing results. For example, if you do a monthly general-interest newsletter - you might use the following naming convention:{/ts}
+<div class="status">
+{ts}General Monthly Newsletter: 200709{/ts}
+</div>
+<p></p>
+{/htxt}
+
+{htxt id="base-group-title"}
+  {ts}Group{/ts}
+{/htxt}
+{htxt id="base-group"}
+<h3>{ts}Search-based mailings require an "unsubscribe tracking" group.{/ts}</h3>
+<p>{ts}Because this mailing is using the results of a search to provide the recipient list, you need to specify a group to track people who unsubscribe in response to this mailing.{/ts}</p>
+<p>{ts}If a recipient unsubscribes from this mailing, they will be excluded from future mailings which use the same "Unsubscription Group". This is achieved through actually marking the contact as "unsubscribed from the group". If a contact in your search results has already been marked as unsubscribed from that group, they will be excluded from this mailing.{/ts}</p>
+<p>{ts}If a recipient clicks the unsubscribe link they will see the "Unsubscription Group" title on the unsubscribe page. The selected group should have a title that corresponds to the content / type of mailing being sent.{/ts}</p> 
+<p>{ts}NOTE: Contacts who are in the "Unsubscription Group" but do not match your search critera will not be included in the mailing regardless of their status in that group. This is a change from previous versions which used the term "Base Group".{/ts}</p>
+{/htxt}
+
+{htxt id="dedupe-email-title"}
+  {ts}Dedupe{/ts}
+{/htxt}
+{htxt id="dedupe-email"}
+<p>{ts}CiviCRM will always dedupe your mailing based on unique contact records. For example, if a contact is in three of the groups you are including in your mailing, they will only be sent one copy of the email.{/ts}</p>
+<p>{ts}However, if the same email is used by multiple contacts, that email address will receive multiple copies of the email -- one for each contact using that address.{/ts}</p>
+<p>{ts}Selecting this option will ensure only one email is sent to each address. Note that when using this option and including contact tokens in your email content, the email with it's respective tokens will only be created for one of the matching contacts.{/ts}</p>
+{/htxt}
+
+{htxt id="email-selection-title"}
+  {ts}Email selection{/ts}
+{/htxt}
+{htxt id="email-selection"}
+<p>{ts}Some of your contacts may have more than one email address. By selecting a location and a selection method, you can tell CiviCRM which email address to use for this mailing.{/ts}</p>
+<p>{ts}Automatic: If you choose automatic for both the location and the selection method, CiviCRM will choose the best option for each user: If an email is marked "Bulk" then it will be used; otherwise, the email marked "Primary" will be used.{/ts}</p>
+<p>{ts}If "Only send to email addresses assigned to the specified location" is selected, then the recipients will be restricted to only include contacts that have an email address assigned to the given location. This option may limit the number of recipients in your mailing.{/ts}</p>
+<p>{ts}If "Prefer email addresses assigned to the specified location" is selected, then recipients that have an email address assigned to the given location will have that email used. Other recipients will have their email selected using the automatic method.{/ts}</p>
+<p>{ts}If "Exclude email addresses assigned to the specified location" is chosen, then recipients who only have an email address assigned to the given location will be excluded. Everyone else will have their email chosen from the list of emails that are not assigned to the given location, using the automatic method.{/ts}</p>
+{/htxt}
+
+{htxt id="include-groups-title"}
+  {ts}Include Groups{/ts}
+{/htxt}
+{htxt id="include-groups"}
+<p>{ts}Determine the contacts in your database who should receive this mailing by first selecting one or more <strong>Included Groups</strong>. (Groups must be assigned the <strong>Mailing List</strong> type to be available on this screen - you can update this for an existing group from <strong>Manage Groups &raquo; Settings</strong>.){/ts}</p>
+<p>{ts}You also have the option to <strong>Exclude</strong> some contacts from your included groups by selecting one or more <strong>Excluded Groups</strong>. Contacts who are in both groups will NOT receive the mailing (they are 'excluded').{/ts}</p>
+<p>{ts}If you have sent other mailings - you can additionally Include (or Exclude) contacts who received those mailings. CiviCRM will eliminate any duplications so that contacts who are in an Included Group AND were recipients of an Included Mailing will only be sent one copy of this mailing.{/ts}</p>
+<p>{ts}After you click <strong>Next</strong> - the total number of selected recipients will be displayed on the next screen. Use this as a 'reality-check' to help you confirm that you've targeted (and excluded) the desired recipients.{/ts}</p>
+{/htxt}
+
+{htxt id="exclude-groups-title"}
+  {ts}Exclude Groups{/ts}
+{/htxt}
+{htxt id="exclude-groups"}
+<p>{ts}You also have the option to <strong>Exclude</strong> some contacts in your included groups by selecting one or more <strong>Excluded Groups</strong>. Contacts who are in both groups will NOT receive the mailing (they are 'excluded').{/ts}</p>
+{/htxt}
+
+{htxt id="include-mailings-title"}
+  {ts}Include Mailings{/ts}
+{/htxt}
+{htxt id="include-mailings"}
+<p>{ts}If you have sent other mailings - you can additionally Include (or Exclude) contacts who received those mailings. CiviCRM will eliminate any duplications so that contacts who are in an Included Group AND were recipients of an Included Mailing will only be sent one copy of this mailing.{/ts}</p>
+{/htxt}
+
+{htxt id="exclude-mailings-title"}
+  {ts}Exclude Mailings{/ts}
+{/htxt}
+{htxt id="exclude-mailings"}
+<p>{ts}If you have sent other mailings - you can additionally Include (or Exclude) contacts who received those mailings. CiviCRM will eliminate any duplications so that contacts who are in an Included Group AND were recipients of an Included Mailing will only be sent one copy of this mailing.{/ts}</p>
+{/htxt}

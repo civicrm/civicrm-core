@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: activity_contact_1_emailed.xml 23352 2009-08-19 21:52:45Z walt $  -->
+<dataset>
+  <table name="civicrm_activity_contact">
+    <column>id</column>
+    <column>activity_id</column>
+    <column>contact_id</column>
+    <column>record_type_id</column>
+    <row>
+      <value>1</value>                      <!--  id  -->
+      <value>1</value>                      <!--  activity_id  -->
+      <value>17</value>                      <!--  target_contact_id  -->
+      <value>3</value>                      <!--  record_type_id  -->
+    </row>
+  </table>
+</dataset>

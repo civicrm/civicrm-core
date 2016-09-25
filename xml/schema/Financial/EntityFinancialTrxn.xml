@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financial</base>
+  <class>EntityFinancialTrxn</class>
+  <name>civicrm_entity_financial_trxn</name>
+  <add>3.2</add>
+  <field>
+    <name>id</name>
+    <title>Entity Financial Transaction ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID</comment>
+    <add>3.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <import>true</import>
+    <add>3.2</add>
+    <comment>May contain civicrm_financial_item, civicrm_contribution, civicrm_financial_trxn, civicrm_grant, etc</comment>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>3.2</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>3.2</add>
+  </dynamicForeignKey>
+  <field>
+    <name>financial_trxn_id</name>
+    <title>Financial Transaction Id</title>
+    <type>int unsigned</type>
+    <add>3.2</add>
+  </field>
+  <foreignKey>
+    <name>financial_trxn_id</name>
+    <table>civicrm_financial_trxn</table>
+    <key>id</key>
+    <add>3.2</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>amount</name>
+    <title>Amount</title>
+    <type>decimal</type>
+    <required>true</required>
+    <import>true</import>
+    <headerPattern>/amount/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>allocated amount of transaction to this entity</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>currency</name>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <drop>4.3</drop>
+  </field>
+  <index>
+    <name>UI_entity_financial_trxn_entity_table</name>
+    <fieldName>entity_table</fieldName>
+    <add>4.3</add>
+  </index>
+  <index>
+    <name>UI_entity_financial_trxn_entity_id</name>
+    <fieldName>entity_id</fieldName>
+    <add>4.3</add>
+  </index>
+</table>
+

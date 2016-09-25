@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>JobLog</class>
+  <name>civicrm_job_log</name>
+  <comment>Scheduled jobs log.</comment>
+  <add>4.1</add>
+  <log>false</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <title>Job Log ID</title>
+    <comment>Job log entry Id</comment>
+    <add>4.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>Domain ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this scheduled job for</comment>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>4.1</add>
+  </foreignKey>
+  <field>
+    <name>run_time</name>
+    <type>timestamp</type>
+    <title>Timestamp</title>
+    <comment>Log entry date</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>job_id</name>
+    <title>Job ID</title>
+    <type>int unsigned</type>
+    <comment>Pointer to job id - not a FK though, just for logging purposes</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Job Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Title of the job</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>command</name>
+    <title>Command</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Full path to file containing job script</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Description</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Title line of log entry</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>data</name>
+    <title>Extended Data</title>
+    <type>text</type>
+    <comment>Potential extended data for specific job run (e.g. tracebacks).</comment>
+    <add>4.1</add>
+  </field>
+</table>

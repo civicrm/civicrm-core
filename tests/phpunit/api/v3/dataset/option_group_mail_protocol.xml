@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+  <civicrm_option_group
+    id="37"
+    name="mail_protocol"
+    description="Mail Protocol"
+    is_reserved="0"
+    is_active="1"
+   />
+</dataset>

@@ -1,0 +1,12 @@
+INSERT INTO `civicrm_payment_processor` (`domain_id`, `name`, `description`, `payment_processor_type_id`, `is_active`, `is_default`, `is_test`, `user_name`, `password`, `signature`, `url_site`, `url_api`, `url_recur`, `url_button`, `subject`, `class_name`, `billing_mode`, `is_recur`, `payment_type`) VALUES (1, 'Test Processor', '', 9, 1, 1, 0, 'dummy', NULL, NULL, 'http://dummy.com', NULL, 'http://dummyrecur.com', NULL, NULL, 'Payment_Dummy', 1, 1, 1);
+INSERT INTO `civicrm_payment_processor` (`domain_id`, `name`, `description`, `payment_processor_type_id`, `is_active`, `is_default`, `is_test`, `user_name`, `password`, `signature`, `url_site`, `url_api`, `url_recur`, `url_button`, `subject`, `class_name`, `billing_mode`, `is_recur`, `payment_type`) VALUES (1, 'Test Processor', '', 9, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Payment_Dummy', 1, 1, 1);
+
+SELECT @dp            := max(id) from civicrm_payment_processor where name = 'Test Processor' AND is_test = 0;
+SELECT @dpTest        := max(id) from civicrm_payment_processor where name = 'Test Processor' AND is_test = 1;
+
+INSERT INTO `civicrm_entity_financial_account` (`entity_table`, `entity_id`, `account_relationship`, `financial_account_id`) VALUES ('civicrm_payment_processor', @dp, 6, 12);
+INSERT INTO `civicrm_entity_financial_account` (`entity_table`, `entity_id`, `account_relationship`, `financial_account_id`) VALUES ('civicrm_payment_processor', @dpTest, 6, 12);
+
+UPDATE  `civicrm_contribution_page` SET payment_processor = @dp;
+
+UPDATE  `civicrm_event` SET payment_processor = @dp;

@@ -1,0 +1,41 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: caseType
+-->
+<table>
+  <thead>
+  <tr>
+    <th>{{ts('Activity Type')}}</th>
+    <th>{{ts('Max Instances')}}</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody ui-sortable ng-model="caseType.definition.activityTypes">
+  <tr ng-repeat="activityType in caseType.definition.activityTypes">
+    <td>
+      <i class="crm-i fa-arrows grip-n-drag"></i>
+      {{ activityType.name }}
+    </td>
+    <td>
+      <input class="number" type="text" ng-pattern="/^[0-9]*$/" ng-model="activityType.max_instances" />
+    </td>
+    <td>
+      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)" title="{{ts('Remove')}}"></a>
+    </td>
+  </tr>
+  </tbody>
+
+  <tfoot>
+  <tr class="addRow">
+    <td colspan="3">
+      <span crm-add-name
+           crm-options="activityTypeNames"
+           crm-var="newActivity"
+           crm-on-add="addActivityType(newActivity)"
+           placeholder="{{ts('Add activity type')}}"
+              />
+    </td>
+  </tr>
+  </tfoot>
+</table>

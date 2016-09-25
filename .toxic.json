@@ -1,0 +1,18 @@
+{
+  "templates": {
+    "toxicAlert": "<img alt=\"Please: Help save the fish from toxic code\" src=\"https://civicrm.org/sites/civicrm.org/files/HazCode-Please.png\">\n\n(Automated notice) This pull-request modifies {SYMBOLS}. That code has been previously identified as hazardous. For advice on dealing with it, please review [Toxic Code Protocol](http://wiki.civicrm.org/confluence/display/CRM/Toxic+Code+Protocol)."
+  },
+  "checks": {
+    "CRM_Contact_Import_Parser_Contact::import()": "toxicAlert",
+    "CRM_Core_BAO_Mapping::buildMappingForm()": "toxicAlert",
+    "CRM_Event_Form_Participant::postProcess()": "toxicAlert",
+    "CRM_Export_BAO_Export::exportComponents()": "toxicAlert",
+    "CRM_Member_Form_Membership::postProcess()": "toxicAlert",
+    "CRM_Contribute_Form_Contribution::postProcess()": "toxicAlert",
+    "CRM_Contact_Import_Form_MapField::buildQuickForm()": "toxicAlert",
+    "CRM_Contribute_Form_Contribution_Main::formRule()": "toxicAlert",
+    "CRM_Event_Form_Registration_Confirm::postProcess()": "toxicAlert",
+    "CRM_Event_BAO_Event::displayProfile()": "toxicAlert",
+    "CRM_Contribute_Form_Contribution_Confirm::postProcess()": "toxicAlert"
+  }
+}

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>BouncePattern</class>
+  <name>civicrm_mailing_bounce_pattern</name>
+  <comment>Pseudo-constant table of patterns for bounce classification</comment>
+  <field>
+    <name>id</name>
+    <title>Bounce Pattern ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>bounce_type_id</name>
+    <title>Bounce Type</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Type of bounce</comment>
+  </field>
+  <foreignKey>
+    <name>bounce_type_id</name>
+    <table>civicrm_mailing_bounce_type</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>pattern</name>
+    <title>Pattern</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>A regexp to match a message to a bounce type</comment>
+  </field>
+</table>

@@ -1,0 +1,40 @@
+-- +--------------------------------------------------------------------+
+-- | CiviCRM version 4.7                                                |
+-- +--------------------------------------------------------------------+
+-- | Copyright CiviCRM LLC (c) 2004-2016                                |
+-- +--------------------------------------------------------------------+
+-- | This file is a part of CiviCRM.                                    |
+-- |                                                                    |
+-- | CiviCRM is free software; you can copy, modify, and distribute it  |
+-- | under the terms of the GNU Affero General Public License           |
+-- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+-- |                                                                    |
+-- | CiviCRM is distributed in the hope that it will be useful, but     |
+-- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+-- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+-- | See the GNU Affero General Public License for more details.        |
+-- |                                                                    |
+-- | You should have received a copy of the GNU Affero General Public   |
+-- | License and the CiviCRM Licensing Exception along                  |
+-- | with this program; if not, contact CiviCRM LLC                     |
+-- | at info[AT]civicrm[DOT]org. If you have questions about the        |
+-- | GNU Affero General Public License or the licensing of CiviCRM,     |
+-- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- +--------------------------------------------------------------------+
+-- This script instantiates a PayPal Pro payment processor and assigns it to all existing contribution pages
+-- and events for a demo or test site. The processor setup uses a valid test account and a fake live account.
+-- This script also sets Outbound Email preferences to SMTP, localhost, port 25
+-- This script should be run after sample data is loaded (civicrm_generated.mysql).
+
+SELECT @ppTypeID := id FROM civicrm_payment_processor_type WHERE name = 'PayPal';
+
+INSERT INTO `civicrm_payment_processor` (`id`, `name`, `description`, `payment_processor_type_id`, `is_active`, `is_default`, `is_test`, `user_name`, `password`, `signature`, `url_site`, `url_api`, `url_recur`, `url_button`, `subject`, `class_name`, `billing_mode`, `is_recur`, `domain_id`) VALUES (3, 'PP Pro', '', @ppTypeID, 1, 1, 0, 'xxx', 'yyy', 'zzz', 'https://www.paypal.com/', 'https://api-3t.paypal.com/', NULL, 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif', NULL, 'Payment_PayPalImpl', 3, 1, 1);
+INSERT INTO `civicrm_payment_processor` (`id`, `name`, `description`, `payment_processor_type_id`, `is_active`, `is_default`, `is_test`, `user_name`, `password`, `signature`, `url_site`, `url_api`, `url_recur`, `url_button`, `subject`, `class_name`, `billing_mode`, `is_recur`, `domain_id`) VALUES (4, 'PP Pro', '', @ppTypeID, 1, 0, 1, 'dave_api1.northtower.com', 'S5YW42RS7WRWT9AD', 'AUsrQDMAfRs6zQSEYuw3M4QDuTBHAAvpXf7N0jYi8G1UCfKRI2NrvWVM', 'https://www.sandbox.paypal.com/', 'https://api-3t.sandbox.paypal.com/', NULL, 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif', NULL, 'Payment_PayPalImpl', 3, 1, 1);
+
+SET @pp := LAST_INSERT_ID();
+
+UPDATE  `civicrm_contribution_page`
+SET     payment_processor = @pp;
+
+UPDATE  `civicrm_event`
+SET     payment_processor = @pp;

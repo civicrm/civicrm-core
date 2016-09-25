@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_value_activity.xml 29583 2010-09-07 10:15:49Z shot $  -->
+<dataset>
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>component_id</column>
+    <column>visibility_id</column>
+    <row>
+      <value>1</value>          <!--  id  -->
+      <value>1</value>          <!--  option_group_id  -->
+      <value>Scheduled</value>  <!--  label  -->
+      <value>1</value>          <!--  value  -->
+      <value>Scheduled</value>  <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>0</value>          <!--  filter  -->
+      <value>1</value>          <!--  is_default  -->
+      <value>1</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>1</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+    <row>
+      <value>2</value>          <!--  id  -->
+      <value>1</value>          <!--  option_group_id  -->
+      <value>Completed</value>  <!--  label  -->
+      <value>2</value>          <!--  value  -->
+      <value>Completed</value>  <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>0</value>          <!--  filter  -->
+      <null />                  <!--  is_default  -->
+      <value>2</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>1</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+    <row>
+      <value>3</value>          <!--  id  -->
+      <value>1</value>          <!--  option_group_id  -->
+      <value>Canceled</value>   <!--  label  -->
+      <value>3</value>          <!--  value  -->
+      <value>Canceled</value>   <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>0</value>          <!--  filter  -->
+      <null />                  <!--  is_default  -->
+      <value>3</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>1</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+  </table>
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>component_id</column>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Test activity type</value>
+      <value>1</value>
+      <value>Test activity type</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>1</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <null />
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Email processing Test activity type</value>
+      <value>5</value>
+      <value>Email processing Test activity type</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>2</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <null />
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>PhoneBank</value>
+      <value>29</value>
+      <value>PhoneBank</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>29</value>
+      <null />
+      <value>0</value>
+      <value>1</value>
+      <value>1</value>
+      <value>9</value>
+    </row>
+  </table>
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <row>
+      <null />
+      <value>3</value>
+      <value>Test Priority</value>
+      <value>1</value>
+      <value>Test activity type</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>1</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+    </row>
+        <row>
+      <null />
+      <value>2</value>
+      <value>Email processing Test activity type</value>
+      <value>5</value>
+      <value>Email processing Test activity type</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>2</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+    </row>
+  </table>
+</dataset>

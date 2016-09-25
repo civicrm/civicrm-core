@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Event</base>
+  <class>ParticipantPayment</class>
+  <name>civicrm_participant_payment</name>
+  <add>1.7</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Payment ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Participant Payment Id</comment>
+    <add>1.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>participant_id</name>
+    <title>Participant ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Participant Id (FK)</comment>
+    <add>1.7</add>
+  </field>
+  <foreignKey>
+    <name>participant_id</name>
+    <table>civicrm_participant</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contribution_id</name>
+    <title>Contribution</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to contribution table.</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>UI_contribution_participant</name>
+    <unique>true</unique>
+    <fieldName>contribution_id</fieldName>
+    <fieldName>participant_id</fieldName>
+    <add>2.0</add>
+  </index>
+</table>
+

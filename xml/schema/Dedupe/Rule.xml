@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Dedupe</base>
+  <class>Rule</class>
+  <name>civicrm_dedupe_rule</name>
+  <comment>Dedupe rules for use by rule groups</comment>
+  <add>1.8</add>
+  <field>
+    <name>id</name>
+    <title>Dedupe Rule ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique dedupe rule id</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>dedupe_rule_group_id</name>
+    <title>Dedupe Rule Group</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>The id of the rule group this rule belongs to</comment>
+    <add>1.8</add>
+  </field>
+  <foreignKey>
+    <name>dedupe_rule_group_id</name>
+    <table>civicrm_dedupe_rule_group</table>
+    <key>id</key>
+    <add>1.8</add>
+  </foreignKey>
+  <field>
+    <name>rule_table</name>
+    <title>Rule Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>The name of the table this rule is about</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>rule_field</name>
+    <title>Rule Field</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>The name of the field of the table referenced in rule_table</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>rule_length</name>
+    <title>Rule Length</title>
+    <type>int unsigned</type>
+    <comment>The length of the matching substring</comment>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>rule_weight</name>
+    <title>Order</title>
+    <type>int</type>
+    <required>true</required>
+    <comment>The weight of the rule</comment>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+</table>

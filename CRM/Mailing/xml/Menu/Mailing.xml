@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+    <path>civicrm/mailing</path>
+    <title>CiviMail</title>
+    <page_callback>CRM_Mailing_Page_Browse</page_callback>
+    <access_arguments>access CiviMail;create mailings</access_arguments>
+    <page_type>1</page_type>
+    <weight>600</weight>
+    <component>CiviMail</component>
+  </item>
+  <item>
+    <path>civicrm/admin/mail</path>
+    <title>Mailer Settings</title>
+    <page_callback>CRM_Admin_Form_Setting_Mail</page_callback>
+    <desc>Configure spool period, throttling and other mailer settings.</desc>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
+    <adminGroup>CiviMail</adminGroup>
+    <icon>admin/small/07.png</icon>
+    <weight>400</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/component</path>
+    <title>Headers, Footers, and Automated Messages</title>
+    <page_callback>CRM_Mailing_Page_Component</page_callback>
+    <desc>Configure the header and footer used for mailings. Customize the content of automated Subscribe, Unsubscribe, Resubscribe and Opt-out messages.</desc>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
+    <adminGroup>CiviMail</adminGroup>
+    <icon>admin/small/Profile.png</icon>
+    <weight>410</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/options/from_email_address/civimail</path>
+    <title>From Email Addresses</title>
+    <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
+    <page_callback>CRM_Admin_Page_Options</page_callback>
+    <adminGroup>CiviMail</adminGroup>
+    <icon>admin/small/title.png</icon>
+    <weight>415</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/mailSettings</path>
+    <title>Mail Accounts</title>
+    <page_callback>CRM_Admin_Page_MailSettings</page_callback>
+    <desc>Configure email account setting.</desc>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
+    <adminGroup>CiviMail</adminGroup>
+    <icon>admin/small/07.png</icon>
+    <weight>420</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/setting/preferences/mailing</path>
+    <title>CiviMail Component Settings</title>
+    <page_callback>CRM_Admin_Form_Preferences_Mailing</page_callback>
+    <desc>Configure global CiviMail behaviors.</desc>
+    <access_arguments>access CiviMail,administer CiviCRM</access_arguments>
+    <adminGroup>CiviMail</adminGroup>
+    <weight>430</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/send</path>
+    <title>New Mailing</title>
+    <page_callback>CRM_Mailing_Controller_Send</page_callback>
+    <access_arguments>access CiviMail;create mailings;schedule mailings</access_arguments>
+    <page_type>1</page_type>
+    <weight>610</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/browse/scheduled</path>
+    <title>Find Mailings</title>
+    <path_arguments>scheduled=true</path_arguments>
+    <page_callback>CRM_Mailing_Page_Browse</page_callback>
+    <access_arguments>access CiviMail;approve mailings;create mailings;schedule mailings</access_arguments>
+    <page_type>1</page_type>
+    <weight>620</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/browse/unscheduled</path>
+    <title>Find Mailings</title>
+    <path_arguments>scheduled=false</path_arguments>
+    <page_callback>CRM_Mailing_Page_Browse</page_callback>
+    <access_arguments>access CiviMail;create mailings;schedule mailings</access_arguments>
+    <page_type>1</page_type>
+    <weight>620</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/browse/archived</path>
+    <title>Find Mailings</title>
+    <page_callback>CRM_Mailing_Page_Browse</page_callback>
+    <access_arguments>access CiviMail;create mailings</access_arguments>
+    <page_type>1</page_type>
+    <weight>625</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/component</path>
+    <title>Headers, Footers, and Automated Messages</title>
+    <page_callback>CRM_Mailing_Page_Component</page_callback>
+    <access_arguments>administer CiviCRM</access_arguments>
+    <page_type>1</page_type>
+    <weight>630</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/unsubscribe</path>
+    <title>Unsubscribe</title>
+    <page_callback>CRM_Mailing_Form_Unsubscribe</page_callback>
+    <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
+    <is_public>true</is_public>
+    <weight>640</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/resubscribe</path>
+    <title>Resubscribe</title>
+    <page_callback>CRM_Mailing_Page_Resubscribe</page_callback>
+    <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
+    <is_public>true</is_public>
+    <weight>645</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/optout</path>
+    <title>Opt-out</title>
+    <page_callback>CRM_Mailing_Form_Optout</page_callback>
+    <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
+    <is_public>true</is_public>
+    <weight>650</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/confirm</path>
+    <title>Confirm</title>
+    <page_callback>CRM_Mailing_Page_Confirm</page_callback>
+    <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
+    <is_public>true</is_public>
+    <weight>660</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/subscribe</path>
+    <title>Subscribe</title>
+    <page_callback>CRM_Mailing_Form_Subscribe</page_callback>
+    <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
+    <is_public>true</is_public>
+    <weight>660</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/preview</path>
+    <title>Preview Mailing</title>
+    <page_callback>CRM_Mailing_Page_Preview</page_callback>
+    <access_arguments>access CiviMail;approve mailings;create mailings;schedule mailings</access_arguments>
+    <weight>670</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/report</path>
+    <title>Mailing Report</title>
+    <page_callback>CRM_Mailing_Page_Report</page_callback>
+    <access_arguments>access CiviMail;create mailings</access_arguments>
+    <path_arguments>mid=%%mid%%</path_arguments>
+    <weight>680</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/forward</path>
+    <title>Forward Mailing</title>
+    <page_callback>CRM_Mailing_Form_ForwardMailing</page_callback>
+    <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
+    <is_public>true</is_public>
+    <weight>685</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/queue</path>
+    <title>Sending Mail</title>
+    <page_callback>CRM_Mailing_Page_Browse</page_callback>
+    <access_arguments>access CiviMail</access_arguments>
+    <weight>690</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/report/event</path>
+    <title>Mailing Event</title>
+    <page_callback>CRM_Mailing_Page_Event</page_callback>
+    <access_arguments>access CiviMail</access_arguments>
+    <weight>695</weight>
+  </item>
+  <item>
+    <path>civicrm/ajax/template</path>
+    <page_callback>CRM_Mailing_Page_AJAX::template</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/mailing/view</path>
+    <title>View Mailing</title>
+    <page_callback>CRM_Mailing_Page_View</page_callback>
+    <access_arguments>view public CiviMail content;access CiviMail;approve mailings</access_arguments>
+    <is_public>true</is_public>
+    <weight>800</weight>
+  </item>
+  <item>
+    <path>civicrm/mailing/approve</path>
+    <title>Approve Mailing</title>
+    <page_callback>CRM_Mailing_Form_Approve</page_callback>
+    <access_arguments>access CiviMail;approve mailings</access_arguments>
+    <weight>850</weight>
+  </item>
+  <item>
+    <path>civicrm/contact/view/mailing</path>
+    <page_callback>CRM_Mailing_Page_Tab</page_callback>
+  </item>
+  <item>
+    <path>civicrm/ajax/contactmailing</path>
+    <page_callback>CRM_Mailing_Page_AJAX::getContactMailings</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Log</class>
+  <name>civicrm_log</name>
+  <comment>Log can be linked to any object in the application.</comment>
+  <add>1.5</add>
+  <field>
+    <name>id</name>
+    <title>Log ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Log ID</comment>
+    <add>1.5</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Name of table where item being referenced is stored.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity ID </title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to the referenced item.</comment>
+    <add>1.5</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.5</add>
+  </dynamicForeignKey>
+  <index>
+    <name>index_entity</name>
+    <add>1.5</add>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>1.5</add>
+  </index>
+  <field>
+    <name>data</name>
+    <title>Data</title>
+    <type>text</type>
+    <comment>Updates does to this object if any.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>modified_id</name>
+    <title>Modified By</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID of person under whose credentials this data modification was made.</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>modified_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.5</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>modified_date</name>
+    <title>Modified Date</title>
+    <type>datetime</type>
+    <comment>When was the referenced entity created or modified or deleted.</comment>
+    <add>1.5</add>
+  </field>
+</table>

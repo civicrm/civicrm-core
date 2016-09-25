@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/case</path>
+     <title>CiviCase Dashboard</title>
+     <page_callback>CRM_Case_Page_DashBoard</page_callback>
+     <page_type>1</page_type>
+     <weight>900</weight>
+     <component>CiviCase</component>
+  </item>
+  <item>
+     <path>civicrm/case/add</path>
+     <title>Open Case</title>
+     <page_callback>CRM_Case_Form_Case</page_callback>
+     <page_type>1</page_type>
+     <component>CiviCase</component>
+  </item>
+  <item>
+     <path>civicrm/case/search</path>
+     <title>Find Cases</title>
+     <page_callback>CRM_Case_Controller_Search</page_callback>
+     <page_type>1</page_type>
+     <weight>910</weight>
+  </item>
+  <item>
+     <path>civicrm/case/activity</path>
+     <title>Case Activity</title>
+     <page_callback>CRM_Case_Form_Activity</page_callback>
+  </item>
+  <item>
+     <path>civicrm/case/report</path>
+     <title>Case Activity Audit</title>
+     <page_callback>CRM_Case_Form_Report</page_callback>
+     <access_arguments>access all cases and activities</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/case/cd/edit</path>
+     <title>Case Custom Set</title>
+     <page_callback>CRM_Case_Form_CustomData</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/case</path>
+     <title>Case</title>
+     <page_callback>CRM_Case_Page_Tab</page_callback>
+  </item>
+  <item>
+     <path>civicrm/case/activity/view</path>
+     <title>Activity View</title>
+     <page_callback>CRM_Case_Form_ActivityView</page_callback>
+  </item>
+  <item>
+     <path>civicrm/contact/view/case/editClient</path>
+     <title>Assign to Another Client</title>
+     <page_callback>CRM_Case_Form_EditClient</page_callback>
+  </item>
+  <item>
+     <path>civicrm/case/addToCase</path>
+     <title>File on Case</title>
+     <page_callback>CRM_Case_Form_ActivityToCase</page_callback>
+  </item>
+  <item>
+     <path>civicrm/case/details</path>
+     <title>Case Details</title>
+     <page_callback>CRM_Case_Page_CaseDetails</page_callback>
+  </item>
+  <item>
+     <path>civicrm/admin/options/case_type</path>
+     <title>Case Types</title>
+     <desc>List of types which can be assigned to Cases. (Enable the Cases tab from System Settings - Enable Components if you want to track cases.)</desc>
+     <access_arguments>administer CiviCase</access_arguments>
+     <page_callback>CRM_Core_Page_Redirect</page_callback>
+     <page_arguments>url=civicrm/a/#/caseType</page_arguments>
+     <adminGroup>CiviCase</adminGroup>
+     <icon>admin/small/case_type.png</icon>
+     <weight>390</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/redaction_rule</path>
+     <title>Redaction Rules</title>
+     <desc>List of rules which can be applied to user input strings so that the redacted output can be recognized as repeated instances of the same string or can be identified as a "semantic type of the data element" within case data.</desc>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <access_arguments>administer CiviCase</access_arguments>
+     <adminGroup>CiviCase</adminGroup>
+     <icon>admin/small/redaction_type.png</icon>
+     <weight>400</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/case_status</path>
+     <title>Case Statuses</title>
+     <desc>List of statuses that can be assigned to a case.</desc>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <access_arguments>administer CiviCase</access_arguments>
+     <adminGroup>CiviCase</adminGroup>
+     <icon>admin/small/case_type.png</icon>
+     <weight>400</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/encounter_medium</path>
+     <title>Encounter Mediums</title>
+     <desc>List of encounter mediums.</desc>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <access_arguments>administer CiviCase</access_arguments>
+     <adminGroup>CiviCase</adminGroup>
+     <icon>admin/small/case_type.png</icon>
+     <weight>400</weight>
+  </item>
+  <item>
+     <path>civicrm/case/report/print</path>
+     <page_callback>CRM_Case_XMLProcessor_Report::printCaseReport</page_callback>
+     <access_arguments>access all cases and activities</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/case/ajax/addclient</path>
+     <page_callback>CRM_Case_Page_AJAX::addClient</page_callback>
+  </item>
+  <item>
+     <path>civicrm/case/ajax/processtags</path>
+     <page_callback>CRM_Case_Page_AJAX::processCaseTags</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <page_type>3</page_type>
+  </item>
+   <item>
+     <path>civicrm/case/ajax/details</path>
+     <page_callback>CRM_Case_Page_AJAX::CaseDetails</page_callback>
+  </item>
+  <item>
+    <path>civicrm/ajax/delcaserole</path>
+    <page_callback>CRM_Case_Page_AJAX::deleteCaseRoles</page_callback>
+  </item>
+</menu>

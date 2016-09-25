@@ -1,0 +1,17 @@
+CiviCRM Licensing Exception
+
+Copyright (c) 2010 CiviCRM LLC, http://civicrm.org/
+
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+
+This CiviCRM Licensing Exception is an additional permission under section 7
+of the GNU Affero General Public License, version 3. It applies to a given file
+that bears a notice stating that the file is governed by that license along
+with this exception.
+
+Permission is hereby granted to combine the Program with works
+licensed under the PHP License versions 2.01, 2.02, 3.0 and 3.01.
+
+Permission is hereby granted to license modified versions of the
+Program to CiviCRM LLC under the Academic Free License version 3.

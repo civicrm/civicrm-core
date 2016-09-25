@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_group_email_greeting.xml 30511 2010-11-03 11:36:36Z shot $  -->
+<dataset>
+  <civicrm_option_group
+    id="42"
+    name="email_greeting"
+    description="Email Greeting Type"
+    is_reserved="0"
+    is_active="1"
+   />
+</dataset>

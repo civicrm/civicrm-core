@@ -1,0 +1,117 @@
+<div crm-ui-debug="appMetas"></div>
+<div crm-ui-debug="cxns"></div>
+<div crm-ui-debug="alerts"></div>
+
+<!--
+ The merits of this layout:
+ * On a fresh install, the available connections show up first.
+ * Once you've made a connection, the extant connections bubble up.
+ * Extant connections can be portrayed as enabled or disabled.
+-->
+
+<div class="help">
+  <p>{{ts('Connections provide a simplified way to link your CiviCRM installation to an external service.')}}</p>
+</div>
+
+<div ng-show="cxns.length > 0">
+  <span crm-ui-order="{var: 'cxnOrder', defaults: ['-created_date']}"></span>
+  <h3>{{ts('Existing Connections')}}</h3>
+  <table class="display">
+    <thead>
+    <tr>
+      <th>{{ts('Title')}}</th> <!-- <a crm-ui-order-by="[cxnOrder, 'app_meta.appId']"> -->
+      <th>{{ts('Description')}}</th> <!-- <a crm-ui-order-by="[cxnOrder, 'desc']"> -->
+      <th>{{ts('Status')}}</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="cxn in cxns  | orderBy:cxnOrder.get()" ng-class-even="'even-row even'" ng-class-odd="'odd-row odd'">
+      <td>
+        <a class="action-item"
+           crm-confirm='{width: "65%", resizable: true, title:ts("%1: About", {1: cxn.app_meta.title}), templateUrl: "~/crmCxn/AboutCtrl.html", export: {appMeta: cxn.app_meta}}'
+            >{{cxn.app_meta.title}}</a>
+      </td>
+      <td><div ng-bind-html="cxn.app_meta.desc"></div></td>
+      <td>{{cxn.is_active=="1" ? ts('Enabled') : ts('Disabled')}}</td>
+      <td>
+        <span>
+            <a class="action-item crm-hover-button" ng-click="openLink(cxn.app_meta, 'settings', {title: ts('%1: Settings (External)', {1: cxn.app_meta.title})})" ng-show="cxn.app_meta.links.settings">{{ts('Settings')}}</a>
+            <span class="btn-slide crm-hover-button">{{ts('more')}}
+              <ul class="panel" style="display: none;">
+                <li ng-show="cxn.app_meta.links.logs">
+                  <a class="action-item crm-hover-button" ng-click="openLink(cxn.app_meta, 'logs', {title: ts('%1: Logs (External)', {1: cxn.app_meta.title})})">
+                    {{ts('Logs')}}
+                  </a>
+                </li>
+                <li ng-show="cxn.app_meta.links.docs">
+                  <a class="action-item crm-hover-button" ng-click="openLink(cxn.app_meta, 'docs', {title: ts('%1: Documentation (External)', {1: cxn.app_meta.title})})">
+                    {{ts('Docs')}}
+                  </a>
+                </li>
+                <li ng-show="cxn.app_meta.links.support">
+                  <a class="action-item crm-hover-button" ng-click="openLink(cxn.app_meta, 'support', {title: ts('%1: Support (External)', {1: cxn.app_meta.title})})">
+                    {{ts('Support')}}
+                  </a>
+                </li>
+                <li>
+                  <a class="action-item crm-hover-button" ng-click="toggleCxn(cxn)">{{ cxn.is_active=="1" ? ts('Disable') : ts('Enable')}}</a>
+                </li>
+                <li>
+                  <a class="action-item crm-hover-button"
+                     crm-confirm='{width: "65%", resizable: true, title:ts("%1: Reconnect", {1: cxn.app_meta.title}), templateUrl: "~/crmCxn/ConfirmReconnectCtrl.html", export: {cxn: cxn, appMeta: findAppByAppId(cxn.app_guid)}}'
+                     on-yes="reregister(cxn.app_meta)"
+                      >{{ts('Reconnect')}}</a>
+                </li>
+                <li>
+                  <a class="action-item crm-hover-button"
+                     crm-confirm='{width: "65%", resizable: true, title: ts("%1: Disconnect", {1: cxn.app_meta.title}), message: ts("Are you sure you want to disconnect \"%1?\". Doing so may permanently destroy data linkage.", {1: cxn.app_meta.title})}'
+                     on-yes="unregister(cxn.app_meta)">
+                    {{ts('Disconnect')}}
+                  </a>
+                </li>
+              </ul>
+            </span>
+
+        </span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <br/>
+</div>
+
+<div ng-show="hasAvailApps()">
+  <span crm-ui-order="{var: 'availOrder', defaults: ['title']}"></span>
+
+  <h3>{{ts('New Connections')}}</h3>
+  <table class="display">
+    <thead>
+    <tr>
+      <th><a crm-ui-order-by="[availOrder, 'title']">{{ts('Title')}}</a></th>
+      <th><a crm-ui-order-by="[availOrder, 'desc']">{{ts('Description')}}</a></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="appMeta in appMetas | orderBy:availOrder.get()" ng-show="!findCxnByAppId(appMeta.appId)" ng-class-even="'even-row even'" ng-class-odd="'odd-row odd'">
+      <td>
+        <a crm-confirm='{width: "65%", resizable: true, title:ts("%1: About", {1: appMeta.title}), templateUrl: "~/crmCxn/AboutCtrl.html", export: {appMeta: appMeta}}'
+            >{{appMeta.title}}</a>
+      </td>
+      <td><div ng-bind-html="appMeta.desc"></div></td>
+      <td>
+        <a class="action-item crm-hover-button"
+           crm-confirm='{width: "65%", resizable: true, title:ts("%1: Connect", {1: appMeta.title}), templateUrl: "~/crmCxn/ConfirmConnectCtrl.html", export: {appMeta: appMeta}}'
+           on-yes="register(appMeta)"
+          >{{ts('Connect')}}</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div ng-show="$.isEmptyObject(appMetas)" class="messages status no-popup">
+  <i class="crm-i fa-info-circle"></i>
+  {{ts('No available applications')}}
+</div>

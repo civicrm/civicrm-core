@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/event</path>
+     <title>CiviEvent Dashboard</title>
+     <page_callback>CRM_Event_Page_DashBoard</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <page_type>1</page_type>
+     <weight>800</weight>
+     <component>CiviEvent</component>
+  </item>
+  <item>
+     <path>civicrm/participant/add</path>
+     <title>Register New Participant</title>
+     <page_callback>CRM_Event_Page_Tab</page_callback>
+     <path_arguments>action=add</path_arguments>
+     <access_arguments>access CiviEvent</access_arguments>
+     <component>CiviEvent</component>
+  </item>
+  <item>
+     <path>civicrm/event/info</path>
+     <page_callback>CRM_Event_Page_EventInfo</page_callback>
+     <title>Event Information</title>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+  </item>
+  <item>
+     <path>civicrm/event/register</path>
+     <title>Event Registration</title>
+     <page_callback>CRM_Event_Controller_Registration</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+     <is_ssl>true</is_ssl>
+  </item>
+  <item>
+     <path>civicrm/event/confirm</path>
+     <title>Confirm Event Registration</title>
+     <page_callback>CRM_Event_Form_Registration_ParticipantConfirm</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+     <is_ssl>true</is_ssl>
+  </item>
+  <item>
+     <path>civicrm/event/ical</path>
+     <title>Current and Upcoming Events</title>
+     <page_callback>CRM_Event_Page_ICalendar</page_callback>
+     <access_arguments>view event info</access_arguments>
+     <is_public>true</is_public>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/event/participant</path>
+     <title>Event Participants List</title>
+     <page_callback>CRM_Event_Page_ParticipantListing</page_callback>
+     <access_arguments>view event participants</access_arguments>
+     <is_public>true</is_public>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/event</path>
+     <title>Manage Events</title>
+     <page_callback>CRM_Event_Page_ManageEvent</page_callback>
+     <desc>Create and edit event configuration including times, locations, online registration forms, and fees. Links for iCal and RSS syndication.</desc>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <adminGroup>CiviEvent</adminGroup>
+     <icon>admin/small/event_manage.png</icon>
+     <weight>370</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/eventTemplate</path>
+     <title>Event Templates</title>
+     <page_callback>CRM_Admin_Page_EventTemplate</page_callback>
+     <desc>Administrators can create Event Templates - which are basically master event records pre-filled with default values</desc>
+     <access_arguments>access CiviEvent</access_arguments>
+     <adminGroup>CiviEvent</adminGroup>
+     <icon>admin/small/template.png</icon>
+     <weight>375</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/event_type</path>
+     <title>Event Types</title>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <desc>Use Event Types to categorize your events. Event feeds can be filtered by Event Type and participant searches can use Event Type as a criteria.</desc>
+     <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
+     <adminGroup>CiviEvent</adminGroup>
+     <icon>admin/small/event_type.png</icon>
+     <weight>385</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/participant_status</path>
+     <title>Participant Status</title>
+     <page_callback>CRM_Admin_Page_ParticipantStatusType</page_callback>
+     <desc>Define statuses for event participants here (e.g. Registered, Attended, Cancelled...). You can then assign statuses and search for participants by status.</desc>
+     <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
+     <adminGroup>CiviEvent</adminGroup>
+     <icon>admin/small/parti_status.png</icon>
+     <weight>390</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/participant_role</path>
+     <title>Participant Role</title>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <desc>Define participant roles for events here (e.g. Attendee, Host, Speaker...). You can then assign roles and search for participants by role.</desc>
+     <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
+     <adminGroup>CiviEvent</adminGroup>
+     <icon>admin/small/parti_role.png</icon>
+     <weight>395</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/participant_listing</path>
+     <title>Participant Listing Templates</title>
+     <desc>Template to control participant listing display.</desc>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <adminGroup>CiviEvent</adminGroup>
+     <icon>admin/small/01.png</icon>
+     <weight>398</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/badgelayout</path>
+     <title>Event Name Badge Layouts</title>
+     <desc>Configure name badge layouts for event participants, including logos and what data to include on the badge.</desc>
+     <path_arguments>action=browse</path_arguments>
+     <page_callback>CRM_Badge_Page_Layout</page_callback>
+     <adminGroup>CiviEvent</adminGroup>
+     <weight>399</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/conference_slots</path>
+     <title>Conference Slot Labels</title>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <desc>Define conference slots and labels.</desc>
+     <path_arguments>group=conference_slot</path_arguments>
+     <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
+     <adminGroup>CiviEvent</adminGroup>
+     <weight>415</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/setting/preferences/event</path>
+     <title>CiviEvent Component Settings</title>
+     <page_callback>CRM_Admin_Form_Preferences_Event</page_callback>
+     <desc>Configure global CiviEvent behaviors.</desc>
+     <access_arguments>access CiviEvent,administer CiviCRM</access_arguments>
+     <adminGroup>CiviEvent</adminGroup>
+     <weight>420</weight>
+  </item>
+  <item>
+     <path>civicrm/event/search</path>
+     <title>Find Participants</title>
+     <page_callback>CRM_Event_Controller_Search</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <page_type>1</page_type>
+     <weight>810</weight>
+  </item>
+  <item>
+     <path>civicrm/event/manage</path>
+     <title>Manage Events</title>
+     <page_callback>CRM_Event_Page_ManageEvent</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <page_type>1</page_type>
+     <is_ssl>true</is_ssl>
+     <weight>820</weight>
+  </item>
+  <item>
+     <path>civicrm/event/badge</path>
+     <title>Print Event Name Badge</title>
+     <page_callback>CRM_Event_Form_Task_Badge</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/event/manage/settings</path>
+     <title>Event Info and Settings</title>
+     <page_callback>CRM_Event_Form_ManageEvent_EventInfo</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>910</weight>
+  </item>
+  <item>
+     <path>civicrm/event/manage/location</path>
+     <title>Event Location</title>
+     <page_callback>CRM_Event_Form_ManageEvent_Location</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>930</weight>
+  </item>
+  <item>
+     <path>civicrm/event/manage/fee</path>
+     <title>Event Fees</title>
+     <page_callback>CRM_Event_Form_ManageEvent_Fee</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>920</weight>
+  </item>
+  <item>
+     <path>civicrm/event/manage/registration</path>
+     <title>Event Online Registration</title>
+     <page_callback>CRM_Event_Form_ManageEvent_Registration</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>930</weight>
+  </item>
+  <item>
+     <path>civicrm/event/manage/friend</path>
+     <title>Tell a Friend</title>
+     <page_callback>CRM_Friend_Form_Event</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>940</weight>
+  </item>
+  <item>
+     <path>civicrm/event/manage/reminder</path>
+     <title>Schedule Reminders</title>
+     <page_callback>CRM_Event_Form_ManageEvent_ScheduleReminders</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>950</weight>
+  </item>
+  <item>
+     <path>civicrm/event/manage/repeat</path>
+     <title>Repeat Event</title>
+     <page_callback>CRM_Event_Form_ManageEvent_Repeat</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>960</weight>
+  </item>
+  <item>
+     <path>civicrm/event/manage/conference</path>
+     <title>Conference Slots</title>
+     <page_callback>CRM_Event_Form_ManageEvent_Conference</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>950</weight>
+  </item>
+  <item>
+     <path>civicrm/event/add</path>
+     <path_arguments>action=add</path_arguments>
+     <title>New Event</title>
+     <page_callback>CRM_Event_Form_ManageEvent_EventInfo</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <weight>830</weight>
+  </item>
+  <item>
+     <path>civicrm/event/import</path>
+     <title>Import Participants</title>
+     <page_callback>CRM_Event_Import_Controller</page_callback>
+     <access_arguments>access CiviEvent,edit event participants</access_arguments>
+     <page_type>1</page_type>
+     <weight>840</weight>
+  </item>
+  <item>
+     <path>civicrm/event/price</path>
+     <title>Manage Price Sets</title>
+     <page_callback>CRM_Price_Page_Set</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <page_type>1</page_type>
+     <weight>850</weight>
+  </item>
+  <item>
+     <path>civicrm/event/selfsvcupdate</path>
+     <title>Self-service Registration Update</title>
+     <is_public>true</is_public>
+     <page_callback>CRM_Event_Form_SelfSvcUpdate</page_callback>
+     <access_callback>1</access_callback>
+     <page_type>1</page_type>
+     <weight>880</weight>
+  </item>
+  <item>
+     <path>civicrm/event/selfsvctransfer</path>
+     <title>Self-service Registration Transfer</title>
+     <is_public>true</is_public>
+     <page_callback>CRM_Event_Form_SelfSvcTransfer</page_callback>
+     <page_type>1</page_type>
+     <access_callback>1</access_callback>
+     <weight>890</weight>
+  </item>
+  <item>
+     <path>civicrm/contact/map/event</path>
+     <title>Map Event Location</title>
+     <page_callback>CRM_Contact_Form_Task_Map_Event</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+     <weight>1</weight>
+  </item>
+  <item>
+     <path>civicrm/contact/view/participant</path>
+     <page_callback>CRM_Event_Page_Tab</page_callback>
+     <weight>4</weight>
+  </item>
+  <item>
+     <path>civicrm/ajax/eventFee</path>
+     <page_callback>CRM_Event_Page_AJAX::eventFee</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/locBlock</path>
+     <page_callback>CRM_Core_Page_AJAX_Location::getLocBlock</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ajax/event/add_participant_to_cart</path>
+    <page_callback>CRM_Event_Cart_Page_CheckoutAJAX::add_participant_to_cart</page_callback>
+    <access_callback>1</access_callback>
+  </item>
+  <item>
+    <path>civicrm/ajax/event/remove_participant_from_cart</path>
+    <page_callback>CRM_Event_Cart_Page_CheckoutAJAX::remove_participant_from_cart</page_callback>
+    <access_callback>1</access_callback>
+  </item>
+  <item>
+    <path>civicrm/event/add_to_cart</path>
+    <title>Add Event To Cart</title>
+    <page_callback>CRM_Event_Cart_Page_AddToCart</page_callback>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+    <is_ssl>false</is_ssl>
+  </item>
+  <item>
+    <path>civicrm/event/cart_checkout</path>
+    <title>Cart Checkout</title>
+    <page_callback>CRM_Event_Cart_Controller_Checkout</page_callback>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+    <is_ssl>true</is_ssl>
+  </item>
+  <item>
+    <path>civicrm/event/remove_from_cart</path>
+    <title>Remove From Cart</title>
+    <page_callback>CRM_Event_Cart_Page_RemoveFromCart</page_callback>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+    <is_ssl>false</is_ssl>
+  </item>
+  <item>
+    <path>civicrm/event/view_cart</path>
+    <title>View Cart</title>
+    <page_callback>CRM_Event_Cart_Page_ViewCart</page_callback>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+    <is_ssl>false</is_ssl>
+  </item>
+  <item>
+    <path>civicrm/event/participant/feeselection</path>
+    <title>Change Registration Selections</title>
+    <page_callback>CRM_Event_Form_ParticipantFeeSelection</page_callback>
+    <access_arguments>access CiviEvent</access_arguments>
+  </item>
+</menu>

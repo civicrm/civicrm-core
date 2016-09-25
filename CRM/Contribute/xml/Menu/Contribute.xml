@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+    <path>civicrm/contribute</path>
+    <title>CiviContribute Dashboard</title>
+    <page_callback>CRM_Contribute_Page_DashBoard</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>500</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/contribute/add</path>
+    <title>New Contribution</title>
+    <page_callback>CRM_Contribute_Page_Tab</page_callback>
+    <path_arguments>action=add</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/contribute/chart</path>
+    <title>Contribution Summary - Chart View</title>
+    <page_callback>CRM_Contribute_Form_ContributionCharts</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/contribute/transact</path>
+    <title>CiviContribute</title>
+    <page_callback>CRM_Contribute_Controller_Contribution</page_callback>
+    <access_arguments>make online contributions</access_arguments>
+    <weight>0</weight>
+    <is_ssl>true</is_ssl>
+    <is_public>true</is_public>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute</path>
+    <title>Manage Contribution Pages</title>
+    <page_callback>CRM_Contribute_Page_ContributionPage</page_callback>
+    <desc>CiviContribute allows you to create and maintain any number of Online Contribution Pages. You can create different pages for different programs or campaigns - and customize text, amounts, types of information collected from contributors, etc.</desc>
+    <adminGroup>CiviContribute</adminGroup>
+    <icon>admin/small/online_contribution_pages.png</icon>
+    <weight>360</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/settings</path>
+    <title>Title and Settings</title>
+    <page_callback>CRM_Contribute_Form_ContributionPage_Settings</page_callback>
+    <weight>400</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/amount</path>
+    <title>Contribution Amounts</title>
+    <page_callback>CRM_Contribute_Form_ContributionPage_Amount</page_callback>
+    <weight>410</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/membership</path>
+    <title>Membership Section</title>
+    <page_callback>CRM_Member_Form_MembershipBlock</page_callback>
+    <weight>420</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/custom</path>
+    <title>Include Profiles</title>
+    <page_callback>CRM_Contribute_Form_ContributionPage_Custom</page_callback>
+    <weight>430</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/thankyou</path>
+    <title>Thank-you and Receipting</title>
+    <page_callback>CRM_Contribute_Form_ContributionPage_ThankYou</page_callback>
+    <weight>430</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/friend</path>
+    <title>Tell a Friend</title>
+    <page_callback>CRM_Friend_Form_Contribute</page_callback>
+    <weight>440</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/widget</path>
+    <title>Configure Widget</title>
+    <page_callback>CRM_Contribute_Form_ContributionPage_Widget</page_callback>
+    <weight>460</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/premium</path>
+    <title>Premiums</title>
+    <page_callback>CRM_Contribute_Form_ContributionPage_Premium</page_callback>
+    <weight>470</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/addProductToPage</path>
+    <title>Add Products to This Page</title>
+    <page_callback>CRM_Contribute_Form_ContributionPage_AddProduct</page_callback>
+    <weight>480</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/add</path>
+    <title>New Contribution Page</title>
+    <page_callback>CRM_Contribute_Controller_ContributionPage</page_callback>
+    <path_arguments>action=add</path_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/managePremiums</path>
+    <title>Manage Premiums</title>
+    <page_callback>CRM_Contribute_Page_ManagePremiums</page_callback>
+    <desc>CiviContribute allows you to configure any number of Premiums which can be offered to contributors as incentives / thank-you gifts. Define the premiums you want to offer here.</desc>
+    <adminGroup>CiviContribute</adminGroup>
+    <icon>admin/small/Premiums.png</icon>
+    <weight>365</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/financial/financialType</path>
+    <title>Financial Types</title>
+    <page_callback>CRM_Financial_Page_FinancialType</page_callback>
+    <desc>Formerly civicrm_contribution_type merged into this table in 4.1</desc>
+    <adminGroup>CiviContribute</adminGroup>
+    <weight>580</weight>
+  </item>
+  <item>
+    <path>civicrm/payment</path>
+    <title>New Payment</title>
+    <page_callback>CRM_Contribute_Form_AdditionalPayment</page_callback>
+    <path_arguments>action=add</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/admin/financial/financialAccount</path>
+    <title>Financial Accounts</title>
+    <page_callback>CRM_Financial_Page_FinancialAccount</page_callback>
+    <desc>Financial types are used to categorize contributions for reporting and accounting purposes. These are also referred to as Funds.</desc>
+    <adminGroup>CiviContribute</adminGroup>
+    <icon>admin/small/contribution_types.png</icon>
+    <weight>370</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/options/payment_instrument</path>
+    <title>Payment Methods</title>
+    <page_callback>CRM_Admin_Page_Options</page_callback>
+    <desc>You may choose to record the payment instrument used for each contribution. Common payment methods are installed by default (e.g. Check, Cash, Credit Card...). If your site requires additional payment methods, add them here.</desc>
+    <adminGroup>CiviContribute</adminGroup>
+    <icon>admin/small/payment_instruments.png</icon>
+    <weight>380</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/options/accept_creditcard</path>
+    <title>Accepted Credit Cards</title>
+    <page_callback>CRM_Admin_Page_Options</page_callback>
+    <desc>Credit card options that will be offered to contributors using your Online Contribution pages.</desc>
+    <adminGroup>CiviContribute</adminGroup>
+    <icon>admin/small/accepted_creditcards.png</icon>
+    <weight>395</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/options/soft_credit_type</path>
+    <title>Soft Credit Types</title>
+    <page_callback>CRM_Admin_Page_Options</page_callback>
+    <desc>Soft Credit Types that will be offered to contributors during soft credit contribution</desc>
+    <adminGroup>CiviContribute</adminGroup>
+    <icon>admin/small/soft_credit_type.png</icon>
+  </item>
+  <item>
+    <path>civicrm/contact/view/contribution</path>
+    <title>Contributions</title>
+    <page_callback>CRM_Contribute_Page_Tab</page_callback>
+    <weight>1</weight>
+  </item>
+  <item>
+    <path>civicrm/contact/view/contributionrecur</path>
+    <title>Recurring Contributions</title>
+    <page_callback>CRM_Contribute_Page_ContributionRecur</page_callback>
+  </item>
+  <item>
+    <path>civicrm/contact/view/contribution/additionalinfo</path>
+    <title>Additional Info</title>
+    <page_callback>CRM_Contribute_Form_AdditionalInfo</page_callback>
+  </item>
+  <item>
+    <path>civicrm/contribute/search</path>
+    <title>Find Contributions</title>
+    <page_callback>CRM_Contribute_Controller_Search</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>510</weight>
+  </item>
+  <item>
+    <path>civicrm/contribute/searchBatch</path>
+    <page_callback>CRM_Contribute_Controller_SearchBatch</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>588</weight>
+  </item>
+  <item>
+    <path>civicrm/contribute/import</path>
+    <title>Import Contributions</title>
+    <page_callback>CRM_Contribute_Import_Controller</page_callback>
+    <access_arguments>access CiviContribute,edit contributions</access_arguments>
+    <page_type>1</page_type>
+    <weight>520</weight>
+  </item>
+  <item>
+    <path>civicrm/contribute/manage</path>
+    <title>Manage Contribution Pages</title>
+    <page_callback>CRM_Contribute_Page_ContributionPage</page_callback>
+    <access_arguments>administer CiviCRM,access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>530</weight>
+  </item>
+  <item>
+    <path>civicrm/contribute/additionalinfo</path>
+    <title>AdditionalInfo Form</title>
+    <page_callback>CRM_Contribute_Form_AdditionalInfo</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <weight>0</weight>
+  </item>
+  <item>
+    <path>civicrm/ajax/permlocation</path>
+    <page_callback>CRM_Core_Page_AJAX_Location::getPermissionedLocation</page_callback>
+    <access_arguments>make online contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribute/unsubscribe</path>
+    <title>Cancel Subscription</title>
+    <page_callback>CRM_Contribute_Form_CancelSubscription</page_callback>
+    <access_arguments>make online contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribute/onbehalf</path>
+    <page_callback>CRM_Contribute_Form_Contribution_OnBehalfOf</page_callback>
+    <access_arguments>make online contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribute/updatebilling</path>
+    <title>Update Billing Details</title>
+    <page_callback>CRM_Contribute_Form_UpdateBilling</page_callback>
+    <access_arguments>make online contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribute/updaterecur</path>
+    <title>Update Subscription</title>
+    <page_callback>CRM_Contribute_Form_UpdateSubscription</page_callback>
+    <access_arguments>make online contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribute/subscriptionstatus</path>
+    <page_callback>CRM_Contribute_Page_SubscriptionStatus</page_callback>
+    <access_arguments>make online contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/financial/financialType/accounts</path>
+    <title>Financial Type Accounts</title>
+    <page_callback>CRM_Financial_Page_FinancialTypeAccount</page_callback>
+    <weight>581</weight>
+  </item>
+  <item>
+    <path>civicrm/financial/batch</path>
+    <title>Accounting Batch</title>
+    <page_callback>CRM_Financial_Page_FinancialBatch</page_callback>
+    <access_arguments>create manual batch</access_arguments>
+    <weight>585</weight>
+  </item>
+  <item>
+    <path>civicrm/financial/financialbatches</path>
+    <title>Accounting Batches</title>
+    <page_callback>CRM_Financial_Page_Batch</page_callback>
+    <weight>586</weight>
+  </item>
+  <item>
+    <path>civicrm/batchtransaction</path>
+    <title>Accounting Batch</title>
+    <page_callback>CRM_Financial_Page_BatchTransaction</page_callback>
+    <weight>600</weight>
+  </item>
+  <item>
+    <path>civicrm/financial/batch/export</path>
+    <title>Accounting Batch Export</title>
+    <page_callback>CRM_Financial_Form_Export</page_callback>
+    <weight>610</weight>
+  </item>
+  <item>
+    <path>civicrm/payment/view</path>
+    <title>View Payment</title>
+    <page_callback>CRM_Contribute_Page_PaymentInfo</page_callback>
+    <path_arguments>action=view</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/admin/setting/preferences/contribute</path>
+    <title>CiviContribute Component Settings</title>
+    <page_callback>CRM_Admin_Form_Preferences_Contribute</page_callback>
+    <desc>Configure global CiviContribute behaviors.</desc>
+    <access_arguments>access CiviContribute,administer CiviCRM</access_arguments>
+    <adminGroup>CiviContribute</adminGroup>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice</path>
+    <title>PDF Invoice</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice::getPrintPDF</page_callback>
+    <access_callback>CRM_Core_Permission::checkDownloadInvoice</access_callback>
+    <page_type>1</page_type>
+    <weight>620</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice/email</path>
+    <title>Email Invoice</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>630</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/closeaccperiod</path>
+    <title>Close Accounting Period</title>
+    <page_callback>CRM_Contribute_Form_CloseAccPeriod</page_callback>
+    <access_arguments>access CiviContribute,administer CiviCRM,administer Accounting</access_arguments>
+    <page_type>1</page_type>
+    <weight>640</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/ajax/softcontributionlist</path>
+    <page_callback>CRM_Contribute_Page_AJAX::getSoftContributionRows</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

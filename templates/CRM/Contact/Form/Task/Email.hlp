@@ -1,0 +1,92 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-from_email-title"}
+  {ts}From Address{/ts}
+{/htxt}
+{htxt id="id-from_email"}
+<p>{ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, users with Administer CiviCRM permission can configure one or more general email addresses that can be selected as an alternative. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
+{if $params.isAdmin}
+    {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
+    <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit general email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
+{/if}
+{/htxt}
+
+{htxt id="id-token-subject-title"}
+  {ts}Subject Tokens{/ts}
+{/htxt}
+{htxt id="id-token-subject"}
+<p>{ts}Use a token in the Subject when you are sending mail to a number of recipients and want to include their name and / or other values from their contact record automatically in the subject line.{/ts}</p>
+{/htxt}
+
+{htxt id="id-token-text-title"}
+  {ts}Tokens{/ts}
+{/htxt}
+{htxt id="id-token-text"}
+<p>{ts}Use tokens when you are sending mail to a number of recipients, and want to include their name and / or other values from their contact record automatically within your message.{/ts}</p>
+<p>{ts 1='&#123;contact.first_name&#125;'}EXAMPLE: If you want your message to begin with "Dear " followed by the recipient's first name, you can use the %1 token in your message. <em>Dear %1</em>{/ts}</p>
+<p>{ts}Place your cursor within the Message box where you want to the token to be inserted. Then click the &quot;Insert Tokens&quot; link in the upper right corner of the message box to see a list of available tokens. Insert the token by clicking the desired token name in the list (for example, click &quot;First Name&quot;).{/ts}</p>
+{if $params.tplFile EQ 'CRM/Mailing/Form/Upload.tpl'}
+    <p>
+    {ts}You will also use tokens to insert Unsubscribe, Opt out and Forwarding links in your message.{/ts}
+    </p>
+{/if}
+<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
+go Administer > Customize Data & Screens > Custom Fields and click ‘edit’ on the field you want to use. Look at the URL. The last part of the URL will
+be an equal sign and a number (=12). The number (12 in this example) is the id of that custom field.{/ts}</p>
+{/htxt}
+
+{htxt id="id-token-html-title"}
+  {ts}Message Tokens{/ts}
+{/htxt}
+{htxt id="id-token-html"}
+<p>{ts}Use tokens when you are sending mail or generating PDF letters for a number of recipients, and want to include their name and / or other values from their contact record automatically within your message.{/ts}</p>
+<p>{ts 1='&#123;contact.first_name&#125;'}EXAMPLE: If you want your message to begin with "Dear " followed by the recipient's first name, you can use the %1 token in your message. <em>Dear %1</em>{/ts}</p>
+<p>{ts}Place your cursor within the Message box where you want to the token to be inserted. Then click the &quot;Insert Tokens&quot; link in the upper right corner of the message box to see a list of available tokens. Insert the token by clicking the desired token name in the list (for example, click &quot;First Name&quot;).{/ts}</p>
+{if $params.tplFile EQ 'CRM/Mailing/Form/Upload.tpl'}
+    <p>
+    {ts}You will also use tokens to insert Unsubscribe, Opt out and Forwarding links in your message.{/ts}
+        {ts}Use these steps to insert clickable action links:{/ts}
+        <ul>
+            <li>{ts}Select the action token from the Insert Tokens pop-up list - e.g. Unsubscribe via web page - and insert into your message.{/ts}</li>
+            <li>{ts 1='&#123;action.unsubscribeUrl&#125;}'}Highlight the token and copy it to your clipboard - e.g. %1.{/ts}</li>
+            <li>{ts}Replace the token in your message with the text you want for the link - e.g. Click here to unsubscribe.{/ts}</li>
+            <li>{ts}With the text highlighted, click the Insert/Edit Link icon in the editor toolbar.{/ts}</li>
+            <li>{ts}Paste the action token into the URL field and click Insert (or Update).{/ts}</li>
+        </ul>
+    </p>
+{/if}
+<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
+go Administer > Customize Data & Screens > Custom Fields and click ‘edit’ on the field you want to use. Look at the URL. The last part of the URL will
+be an equal sign and a number (=12). The number (12 in this example) is the id of that custom field.{/ts}</p>
+{/htxt}
+
+{htxt id="id-message-text-title"}
+  {ts}Message Text{/ts}
+{/htxt}
+{htxt id="id-message-text"}
+<p>{ts}You can send your email as a simple text-only message, as an HTML formatted message, or both. Text-only messages are sufficient for most email communication - and some recipients may prefer not to receive HTML formatted messages.{/ts}</p>
+<p>{ts}HTML messages have more visual impact, allow you to include images, and may be more readable if you are including links to website pages. However, different email programs may interpret HTML formats differently - so use this option cautiously unless you have a template format that has been tested with different web and desktop email programs.{/ts}</p>
+{/htxt}

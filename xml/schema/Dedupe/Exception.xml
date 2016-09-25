@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Dedupe</base>
+  <class>Exception</class>
+  <name>civicrm_dedupe_exception</name>
+  <comment>Dedupe exceptions</comment>
+  <add>3.3</add>
+  <field>
+    <name>id</name>
+    <title>Dedupe Exception ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique dedupe exception id</comment>
+    <add>3.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id1</name>
+    <title>First Dupe Contact ID</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>contact_id1</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id2</name>
+    <title>Second Dupe Contact ID</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>contact_id2</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>UI_contact_id1_contact_id2</name>
+    <fieldName>contact_id1</fieldName>
+    <fieldName>contact_id2</fieldName>
+    <unique>true</unique>
+    <add>3.3</add>
+  </index>
+ </table>

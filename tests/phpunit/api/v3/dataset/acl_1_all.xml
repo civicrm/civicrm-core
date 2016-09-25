@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: acl_1_all.xml 30511 2010-11-03 11:36:36Z shot $  -->
+<dataset>
+  <table name="civicrm_acl">
+    <column>id</column>
+    <column>name</column>
+    <column>deny</column>
+    <column>entity_table</column>
+    <column>entity_id</column>
+    <column>operation</column>
+    <column>object_table</column>
+    <column>object_id</column>
+    <column>acl_table</column>
+    <column>acl_id</column>
+    <column>is_active</column>
+    <row>
+      <value>1</value>  <!--  id  -->
+      <value>Core ACL</value>  <!--  name  -->
+      <value>0</value>  <!--  deny  -->
+      <value>civicrm_contact</value>  <!--  entity_table  -->
+      <value>1</value>  <!--  entity_id  -->
+      <value>All</value>  <!--  operation  -->
+      <value>access all custom data</value>  <!--  object_table  -->
+      <null />  <!--  object_id  -->
+      <null />  <!--  acl_table  -->
+      <null />  <!--  acl_id  -->
+      <value>1</value>  <!--  is_active  -->
+    </row>
+    <row>
+      <value>3</value>  <!--  id  -->
+      <value>Core ACL</value>  <!--  name  -->
+      <value>0</value>  <!--  deny  -->
+      <value>civicrm_acl_role</value>  <!--  entity_table  -->
+      <value>1</value>  <!--  entity_id  -->
+      <value>All</value>  <!--  operation  -->
+      <value>access all custom data</value>  <!--  object_table  -->
+      <null />  <!--  object_id  -->
+      <null />  <!--  acl_table  -->
+      <null />  <!--  acl_id  -->
+      <value>1</value>  <!--  is_active  -->
+    </row>
+  </table>
+</dataset>

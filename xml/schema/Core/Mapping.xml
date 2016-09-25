@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Mapping</class>
+  <name>civicrm_mapping</name>
+  <comment>Store field mappings in import or export for reuse</comment>
+  <add>1.2</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Mapping ID</title>
+    <required>true</required>
+    <comment>Mapping ID</comment>
+    <add>1.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+    <add>1.2</add>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name of Mapping</comment>
+    <add>1.2</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Description of Mapping.</comment>
+    <add>1.2</add>
+  </field>
+  <field>
+    <name>mapping_type</name>
+    <type>enum</type>
+    <values>Export, Import, Export Contributions, Import Contributions, Import Activity, Search Builder, Import
+      Memberships, Import Participants
+    </values>
+    <comment>Type of Mapping.</comment>
+    <add>1.2</add>
+    <drop>2.1</drop>
+  </field>
+  <field>
+    <name>mapping_type_id</name>
+    <type>int unsigned</type>
+    <title>Mapping Type</title>
+    <comment>Mapping Type</comment>
+    <add>2.1</add>
+    <pseudoconstant>
+      <optionGroupName>mapping_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <add>1.2</add>
+  </index>
+</table>

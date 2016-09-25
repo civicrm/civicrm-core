@@ -1,0 +1,25 @@
+<!--
+Required vars: mailing
+-->
+<div ng-form="htmlForm" crm-ui-id-scope>
+  <div ng-controller="EmailBodyCtrl">
+    <div style="float: right;">
+      <input crm-mailing-token on-select="$broadcast('insert:body_html', token.name)" tabindex="-1" style="z-index:1"/>
+    </div>
+
+    <div>
+      <textarea
+        crm-ui-id="htmlForm.body_html"
+        crm-ui-richtext name="body_html"
+        crm-ui-insert-rx="insert:body_html"
+        ng-model="mailing.body_html"
+        ng-blur="checkTokens(mailing, 'body_html', 'insert:body_html')"
+        class="crm-wysiwyg-fullpage"
+        ></textarea>
+      <span ng-model="body_html_tokens" crm-ui-validate="hasAllTokens(mailing, 'body_html')"></span>
+      <div ng-show="htmlForm.$error.crmUiValidate" class="crmMailing-error-link">
+        {{ts('Required tokens are missing.')}} <a class="helpicon" ng-click="checkTokens(mailing, 'body_html', 'insert:body_html')"></a>
+      </div>
+    </div>
+  </div>
+</div>

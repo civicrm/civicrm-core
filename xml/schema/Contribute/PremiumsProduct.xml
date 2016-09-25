@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contribute</base>
+  <class>PremiumsProduct</class>
+  <name>civicrm_premiums_product</name>
+  <comment>joins premiums (settings) to individual product/premium items - determines which products are available for a given contribution page</comment>
+  <add>1.4</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Premium Product ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Contribution ID</comment>
+    <add>1.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>premiums_id</name>
+    <title>Premium</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to premiums settings record.</comment>
+    <add>1.4</add>
+  </field>
+  <foreignKey>
+    <name>premiums_id</name>
+    <table>civicrm_premiums</table>
+    <key>id</key>
+    <add>1.4</add>
+  </foreignKey>
+  <field>
+    <name>product_id</name>
+    <title>Product</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to each product object.</comment>
+    <add>1.4</add>
+  </field>
+  <foreignKey>
+    <name>product_id</name>
+    <table>civicrm_product</table>
+    <key>id</key>
+    <add>1.4</add>
+  </foreignKey>
+  <field>
+    <name>sort_position</name>
+    <title>Sort Position</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.4</add>
+    <drop>2.0</drop>
+  </field>
+  <field>
+    <name>weight</name>
+    <title>Order</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>FK to Financial Type.</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.3</add>
+  </foreignKey>
+</table>

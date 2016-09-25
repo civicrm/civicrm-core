@@ -1,0 +1,15 @@
+<div class="crm-wizard">
+  <ul class="crm-wizard-nav wizard-bar">
+    <li ng-repeat="step in steps" ng-class="{'current-step':step.selected}">
+      <span>{{crmUiWizardCtrl.iconFor($index)}}</span>
+      <a href="" ng-click="crmUiWizardCtrl.select(step)" ng-show="crmUiWizardCtrl.isSelectable(step)">{{1 + $index}}. {{step.$parent.$eval(step.crmTitle)}}</a>
+      <span ng-show="!crmUiWizardCtrl.isSelectable(step)">{{1 + $index}}. {{step.$parent.$eval(step.crmTitle)}}</span>
+      <!-- Don't know a good way to localize text like "1. Title" -->
+    </li>
+  </ul>
+  <div class="crm-wizard-body" ng-transclude/>
+  <div class="crm-wizard-buttons">
+    <button crm-icon="fa-chevron-left" ng-click="crmUiWizardCtrl.previous()" ng-show="!crmUiWizardCtrl.$first()">{{ts('Previous')}}</button>
+    <button crm-icon="fa-chevron-right" title="{{!crmUiWizardCtrl.$validStep() ? ts('Complete all required fields first') : ts('Next step')}}" ng-click="crmUiWizardCtrl.next()" ng-show="!crmUiWizardCtrl.$last()" ng-disabled="!crmUiWizardCtrl.$validStep()">{{ts('Next')}}</button>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-email_settings-title"}
+  {ts}Email Settings{/ts}
+{/htxt}
+{htxt id="id-email_settings"}
+<p>
+  {ts}A copy of this report can be automatically generated and delivered via email to specified recipients. Use the settings in this section to control Subject of the email containing the report, as well as the recipient list (To and Cc fields). Separate multiple 'To' or 'CC' email addresses with commas.{/ts}
+</p>
+<p>
+  {ts}Your site administrator will need to setup an instance of the Scheduled Job "Mail Reports" to trigger creation and delivery of each report. When invoked, this job will deliver email to the recipients specified for the report. The report can be attached to the email as a PDF file (default), as a CSV file, or included in HTML format.{/ts} {docURL page="Managing Scheduled Jobs" resource="wiki"}
+</p>
+{/htxt}
+
+{htxt id="id-report_title-title"}
+  {ts}Title{/ts}
+{/htxt}
+{htxt id="id-report_title"}
+  {ts}This title and the description below will be displayed to users in the reports list when they click the 'Reports Listing' menu. The title should reflect the report's default criteria. EXAMPLE: Activity Report - Current Month{/ts}
+{/htxt}
+
+{htxt id="id-report_header-title"}
+  {ts}Header{/ts}
+{/htxt}
+{htxt id="id-report_header"}
+<p>{ts}The Report Header contains HTML code that will be output at the beginning of the document whenever this report is printed or downloaded in PDF format. The default values will work for most situations. However you may want to enter the actual report title in the &lt;title&gt; tag (replacing 'CiviCRM Report'). You can include a logo by adding an &lt;img&gt; tag. You can also modify the look and feel of the printed report by including a custom CSS file (instead of print.css).{/ts}</p>
+<p>{ts}The Report Footer HTML code will be output at the end of the document. You can add any additional footer text, replace the CiviCRM logo, or make other changes as needed.{/ts}</p>
+{/htxt}
+
+{htxt id="id-report_perms-title"}
+  {ts}Permission{/ts}
+{/htxt}
+{htxt id="id-report_perms"}
+{ts}You can control access to this report by selecting a 'Permission' from the list, or selecting one or more Roles. For example, you might select <em>access CiviContribute</em> for contribution reports (e.g. the same people who can see contribution data would also have access to the report). You can also prevent users from modifying the default report criteria and filters for reports by NOT giving them <em>access Report Criteria</em> permission. Those users will be able to run the report - but only with the criteria and filters that you've established for them.{/ts}
+{/htxt}
+
+{htxt id="id-dash_avail-title"}
+  {ts}Dashboard{/ts}
+{/htxt}
+{htxt id="id-dash_avail"}
+{ts}You can make this report instance available for users to include in their CiviCRM 'Home Dashboard' by checking this box. Users with appropriate permissions will see the report in the 'Available Dashlets' box when they 'Configure' their dashboard. If you want to make a graphic version of the report available, select the desired 'View' and click 'Update Report'. You may want to create a set of report instances specifically for use as dashlets (and you can choose to NOT include them in the navigation menu if you want to distinguish these from the reports that users typically utilize in full screen mode).{/ts}
+<p>
+  {ts}If you need to make a dashlet NOT available, AND remove it from existing user dashboards - you can do that from the 'Configure' screen on your dashboard. Click the 'x' on the right side of the dashlet's icon.{/ts}
+</p>
+{/htxt}
+
+{htxt id="id-dash_limit-title"}
+  {ts}Limit Rows per Page in Dashboard{/ts}
+{/htxt}
+{htxt id="id-dash_limit"}
+  {ts}The default number of rows per page for most reports is 50. However, this may be too many for a report which is included in the 'Home Dashboard'. You can reduce the number of rows included in each page when the report is part of the Dashboard by entering the desired row count here. Users will still be able to navigate through the full report using a pager.{/ts}
+{/htxt}
+
+{htxt id="cache_minutes-title"}
+  {ts}Dashboard Caching{/ts}
+{/htxt}
+{htxt id="cache_minutes"}
+  {ts}How often should the contents of this dashlet be automatically refreshed? Users can manually reload by clicking the refresh button on their dashboards.{/ts}
+{/htxt}
+
+{htxt id="id-is_reserved-title"}
+  {ts}Reserved{/ts}
+{/htxt}
+{htxt id="id-is_reserved"}
+{ts}Users with 'administer reserved reports' permission can mark a report instance as reserved, which prevents other users from accessing or modifying Report Criteria and Report Settings. This is particularly useful for report instances whose criteria affect the data available on non-report screens. For example, the display columns configured for the  Contact Logging Summary affect the columns shown under each contact's Change Log tab.{/ts}
+{/htxt}
+
+{htxt id="id-add_to_my_reports-title"}
+{ts}Add to My Reports{/ts}
+{/htxt}
+{htxt id="id-add_to_my_reports"}
+{ts}Selecting Yes will set the report to be visible only to the user
+  that clicked this option and saved the report settings form. If this is
+  enabled, the permissions configuration for this report will be disabled.{/ts}
+{/htxt}

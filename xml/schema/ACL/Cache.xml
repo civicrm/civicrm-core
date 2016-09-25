@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/ACL</base>
+  <class>Cache</class>
+  <name>civicrm_acl_cache</name>
+  <comment>Cache for acls and contacts</comment>
+  <add>1.6</add>
+  <field>
+    <name>id</name>
+    <title>Cache ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique table ID</comment>
+    <add>1.6</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>Cache Contact</title>
+    <type>int unsigned</type>
+    <comment>Foreign Key to Contact</comment>
+    <add>1.6</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.6</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>acl_id</name>
+    <title>Cache ACL</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign Key to ACL</comment>
+    <add>1.6</add>
+  </field>
+  <foreignKey>
+    <name>acl_id</name>
+    <table>civicrm_acl</table>
+    <key>id</key>
+    <add>1.6</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>index_acl_id</name>
+    <fieldName>acl_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>modified_date</name>
+    <title>Cache Modified Date</title>
+    <type>timestamp</type>
+    <required>false</required>
+    <comment>When was this cache entry last modified</comment>
+    <add>1.6</add>
+  </field>
+</table>

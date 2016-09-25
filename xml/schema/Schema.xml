@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<database xmlns:xi="http://www.w3.org/2001/XInclude">
+<name>civicrm</name>
+<character_set>utf8</character_set>
+<collate>utf8_unicode_ci</collate>
+<table_type>InnoDB</table_type>
+<comment>Schema for CiviCRM</comment>
+
+<xi:include href="Core/files.xml"              parse="xml" />
+<xi:include href="ACL/files.xml"               parse="xml" />
+<xi:include href="Contact/files.xml"           parse="xml" />
+<xi:include href="Batch/files.xml"             parse="xml" />
+<xi:include href="Mailing/files.xml"           parse="xml" />
+<xi:include href="Mailing/Event/files.xml"     parse="xml" />
+<xi:include href="Contribute/files.xml"        parse="xml" />
+<xi:include href="Financial/files.xml"         parse="xml" />
+<xi:include href="SMS/files.xml"               parse="xml" />
+<xi:include href="Member/files.xml"            parse="xml" />
+<xi:include href="Campaign/files.xml"          parse="xml" />
+<xi:include href="Activity/files.xml"          parse="xml" />
+<xi:include href="Event/files.xml"             parse="xml" />
+<xi:include href="Event/Cart/files.xml"        parse="xml" />
+<xi:include href="Dedupe/files.xml"            parse="xml" />
+<xi:include href="Case/files.xml"              parse="xml" />
+<xi:include href="Grant/files.xml"             parse="xml" />
+<xi:include href="Friend/files.xml"            parse="xml" />
+<xi:include href="Pledge/files.xml"            parse="xml" />
+<xi:include href="Queue/files.xml"            parse="xml" />
+<xi:include href="Report/files.xml"            parse="xml" />
+<xi:include href="Price/files.xml"             parse="xml" />
+<xi:include href="PCP/files.xml"             parse="xml" />
+<xi:include href="Cxn/files.xml"              parse="xml" />
+</database>
