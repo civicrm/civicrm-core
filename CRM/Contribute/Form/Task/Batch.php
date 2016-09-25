@@ -143,6 +143,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
     foreach ($this->_contributionIds as $contributionId) {
       $typeId = CRM_Core_DAO::getFieldValue("CRM_Contribute_DAO_Contribution", $contributionId, 'financial_type_id');
       foreach ($this->_fields as $name => $field) {
+        $entityColumnValue = array();
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
           if (!empty($customValue['extends_entity_column_value'])) {
@@ -152,7 +153,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
           }
 
           if (!empty($entityColumnValue[$typeId]) ||
-            CRM_Utils_System::isNull($entityColumnValue[$typeId])
+            CRM_Utils_System::isNull(CRM_Utils_Array::value($typeId, $entityColumnValue))
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contributionId);
           }
