@@ -2134,7 +2134,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
   /**
    * Retrieve the contribution id for the associated Membership id.
-   * @todo we should get this off the line item
+   * @todo we should get this off the line item, which may not be easily doable
+   *       since adding memberships using priceSets calls this first to properly
+   *       update line-items that are in fluxing state.
    *
    * @param int $membershipId
    *   Membership id.
@@ -2146,10 +2148,14 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
     $membershipPayment = new CRM_Member_DAO_MembershipPayment();
     $membershipPayment->membership_id = $membershipId;
-    if ($membershipPayment->find(TRUE)) {
-      return $membershipPayment->contribution_id;
+    // Pre CRM-15861, only returning first was fine, since when this was called
+    // we only ever had one item.  Post CRM-15861, need to get last.
+    $last = NULL;
+    $membershipPayment->find();
+    while ($membershipPayment->fetch()) {
+      $last = $membershipPayment->contribution_id;
     }
-    return NULL;
+    return $last;
   }
 
   /**
@@ -2507,5 +2513,94 @@ WHERE      civicrm_membership.is_test = 0";
     }
     return $cancelledMembershipIds;
   }
+  
+  /**
+   * 
+   * Given specified contact, return a map of membeship orgs (that contact
+   * has ever been member of), and the last membership type option that the
+   * contact specified for this organization.
+   * 
+   * Initial use case for this method was to return a list of membership
+   * type that a contact should be renewed on when renewing using *any*
+   * priceset, unlike online renewals which only renew for a specific price set
+   * 
+   * @param type $contactId
+   * @return type
+   * 
+   */
+  public static function getContactMemberhipsByMembeshipOrg($contactId) {
+    $query = "
+      select distinct mem.membership_type_id, mem.id as membership_id, t.member_of_contact_id, co.receive_date, s.is_current_member, li.contribution_id
+ from civicrm_membership mem
+ 		inner join civicrm_membership_type t on t.id = mem.membership_type_id
+ 		inner join civicrm_membership_status s on s.id = mem.status_id
+ 		left join civicrm_line_item li on li.entity_table = 'civicrm_membership' and li.entity_id = mem.id
+ 		left join civicrm_contribution co on co.id = li.contribution_id
+  where mem.contact_id = $contactId
+  order by t.member_of_contact_id,
+           case when s.is_current_member then 0 else 1 end,
+  	      co.receive_date desc
+    ";
+    
+    $toReturn = array();
+    $dao = CRM_CORE_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      if (key_exists($dao->member_of_contact_id, $toReturn)) {
+        continue;
+      }
+      $toReturn[$dao->member_of_contact_id] = array(
+        'membership_type_id' => $dao->membership_type_id,
+        'receive_date' =>$dao->receive_date,
+        'is_current_member' =>$dao->is_current_member,
+        'membership_id' =>$dao->membership_id
+      );
+    }
+    return $toReturn;
+        
+  }
+  
+  /**
+   * 
+   * Given specified membership types, returns the membership ids that are applicable 
+   * (if one exists) for the contact.
+   * 
+   * @param type $contactId
+   *  e.g., 3.
+   * @param type $membershipTypes
+   *  e.g., 6, 8
+   * 
+   * @return array (6 => 10, 8 => NULL) to indicate that 
+   *   contact #3's membership type id 6 points to an org that already has a membership 
+   *   for this contact (and that memebership id happens to be 10.  In the case of
+   *   membership type 8, the contact does not have a membership for this org (hence NULL)
+   * 
+   */
+  public static function getMembershipIdsForMembershipTypeOrgs($contactId, $membershipTypes) {
+    $query = "
+          select id, member_of_contact_id, (
+                select id
+                  from civicrm_membership mem
+                 where contact_id = $contactId
+                   and membership_type_id in (select id from civicrm_membership_type mt2 where mt2.member_of_contact_id = mt1.member_of_contact_id)
+                 order by 
+                    case when mem.status_id in (select id from civicrm_membership_status where is_current_member)
+                         then 1
+                         else 0
+                    end,
+                    end_date DESC
+                limit 1) existing_membership_id
+            from civicrm_membership_type mt1
+           where id in (" . implode(", ", array_keys($membershipTypes) ) . ");
+    ";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $toReturn = array();
+    while ($dao->fetch()) {
+      $toReturn[$dao->id] = $dao->existing_membership_id; // Can be NULL
+    }
+    return $toReturn;
+  }
 
+  
+  
+  
 }
