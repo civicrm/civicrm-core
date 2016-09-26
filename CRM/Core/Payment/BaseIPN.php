@@ -75,6 +75,12 @@ class CRM_Core_Payment_BaseIPN {
     if (!is_array($parameters)) {
       throw new CRM_Core_Exception('Invalid input parameters');
     }
+    // some times the essential GET parameters got lost in IPN response,
+    // so fetch those variable from json encoded 'custom' parameter to provide data integritiy
+    elseif (CRM_Utils_Array::value('custom', $parameters)) {
+      $customParams = (array) json_decode($parameters['custom']);
+      $params = array_merge($customParams, $params);
+    }
     $this->_inputParameters = $parameters;
   }
 

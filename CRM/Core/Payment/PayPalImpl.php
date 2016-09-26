@@ -829,6 +829,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       TRUE, NULL, FALSE
     );
 
+    $customParams = array_merge($notifyParameters, array(
+      'accountingCode' => CRM_Utils_Array::value('accountingCode', $params),
+    ));
     $paypalParams = array(
       'business' => $this->_paymentProcessor['user_name'],
       'notify_url' => $notifyURL,
@@ -844,7 +847,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'invoice' => $params['invoiceID'],
       'lc' => substr($config->lcMessages, -2),
       'charset' => function_exists('mb_internal_encoding') ? mb_internal_encoding() : 'UTF-8',
-      'custom' => CRM_Utils_Array::value('accountingCode', $params),
+      'custom' => json_encode($customParams),
       'bn' => 'CiviCRM_SP',
     );
 
