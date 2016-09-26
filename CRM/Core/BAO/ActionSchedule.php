@@ -445,6 +445,7 @@ FROM civicrm_action_schedule cas
     }
 
     // change the language
+    $i18n = CRM_Core_I18n::singleton();
     $i18n->setLocale($language);
   }
 
