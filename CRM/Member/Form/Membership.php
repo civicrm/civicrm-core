@@ -66,7 +66,18 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @var int
    */
   public $_contactID = NULL;
-
+  
+  /**
+   * This is renewing all used in context of renewing *all* memberships using
+   * price sets.  Ideally, we'd be using a renew action instead of an add to
+   * handle this.  But getting the "add" with price set & contribution handling
+   * and all into the renew seems harder for now.  Maybe revisit once done.
+   * 
+   * Thouh one way to think of it as an add, is that it is technically
+   * possible to add a membership through this flow.
+   */
+  public $_renewingAll = 0;
+  
   /**
    * Display name of the person paying for the membership (used for receipts)
    *
@@ -112,7 +123,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   );
 
   /**
-   * Get selected membership type from the form values.
+   * Get selected membership types from the form values.
    *
    * @param array $priceSet
    * @param array $params
@@ -173,6 +184,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
     $this->assign('formClass', 'membership');
     parent::preProcess();
+    $this->_renewingAll = $this->_contactID && $this->_action & CRM_Core_Action::ADD && CRM_Utils_Request::retrieve("renewingAll", "Boolean", $this, FALSE, 0, "GET");
     // get price set id.
     $this->_priceSetId = CRM_Utils_Array::value('priceSetId', $_GET);
     $this->set('priceSetId', $this->_priceSetId);
@@ -192,6 +204,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         CRM_Core_Error::statusBounce(ts('There are no configured membership statuses. You cannot add this membership until your membership statuses are correctly configured'));
       }
       if ($this->_contactID) {
+        if (!$this->_renewingAll) {
         //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
         $contactMemberships = array();
         $memParams = array('contact_id' => $this->_contactID);
@@ -226,7 +239,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             $mems_by_org[$mem['member_of_contact_id']] = $mem;
           }
           $this->assign('existingContactMemberships', $mems_by_org);
-        }
+        }}
       }
       else {
         // In standalone mode we don't have a contact id yet so lookup will be done client-side with this script:
@@ -263,19 +276,30 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
     $this->assign('onlinePendingContributionId', $this->_onlinePendingContributionId);
 
-    $this->setPageTitle(ts('Membership'));
+    if ($this->_renewingAll) {
+      CRM_Utils_System::setTitle(ts('Renew or Add Memberships'));
+    } else {
+      $this->setPageTitle(ts('Membership'));
+    }
   }
 
   /**
    * Set default values for the form.
    */
   public function setDefaultValues() {
-
-    if ($this->_priceSetId) {
-      return CRM_Price_BAO_PriceSet::setDefaultPriceSet($this, $defaults);
+    $defaults = parent::setDefaultValues();
+    
+    if ($this->_renewingAll && $this->_priceSetId) {
+      $defaults['price_set_id'] = $this->_priceSetId;
     }
 
-    $defaults = parent::setDefaultValues();
+    if ($this->_priceSetId) {
+      if (!$this->_renewingAll) {
+        return CRM_Price_BAO_PriceSet::setDefaultPriceSet($this, $defaults);
+      } else {
+        CRM_Price_BAO_PriceSet::setPriceSetDefaultsToLastUsedValues($this, $defaults);
+      }
+    }
 
     //setting default join date and receive date
     list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
@@ -415,13 +439,29 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if (isset($invoicing)) {
       $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
     }
+    
+    // this is set to true when price set is changed on form, to update the form.
+    // In the case of renewing all, we aren't updating the form, but building it
+    // with an existing price set to be selected as default.  This should be the only
+    // case where price set is set, and we actually *want* to do some processing.
+    $getOnlyPriceSetElements = !$this->_renewingAll || !empty($_GET['priceSetId']) || $this->_priceSetId;
+    $earliestDate = NULL;
+        
+    if ($this->_renewingAll && !$getOnlyPriceSetElements) {
+      $bestPriceSet = CRM_Price_BAO_PriceSet::getLastPriceSetUsed($this->_contactID);
+      $this->_priceSetId = $bestPriceSet;
+    } else {
+      // empty array, will get filed later if appropriate.
+      $priceSets = array();
+    }
+
     // build price set form.
     $buildPriceSet = FALSE;
     if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
       if (!empty($_POST['price_set_id'])) {
         $buildPriceSet = TRUE;
       }
-      $getOnlyPriceSetElements = TRUE;
+      $getOnlyPriceSetElements = !$this->_renewingAll || !empty($_GET['priceSetId']);
       if (!$this->_priceSetId) {
         $this->_priceSetId = $_POST['price_set_id'];
         $getOnlyPriceSetElements = FALSE;
@@ -455,12 +495,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('buildPriceSet', $buildPriceSet);
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      $buildPriceSet = FALSE;
-      $priceSets = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviMember');
-      if (!empty($priceSets)) {
-        $buildPriceSet = TRUE;
+      if (empty($priceSets)) {
+        $priceSets = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviMember');
       }
-
+      $buildPriceSet = !empty($priceSets);
+       
       if ($buildPriceSet) {
         $this->add('select', 'price_set_id', ts('Choose price set'),
           array(
@@ -468,6 +507,19 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           ) + $priceSets,
           NULL, array('onchange' => "buildAmount( this.value );")
         );
+        
+        // TODO: Avoid the extra trip involved by this.  But this works for now.
+        if ($this->_priceSetId) {
+          $script = "\n";
+//          $script = $script . "\n" . CRM_Price_BAO_PriceSet::generateRenewScript($this->_contactID, $this->_priceSet, $earliestDate);
+          // trigger onChange event to force load of price set data.
+          CRM_Core_Resources::singleton()->addScript("
+                CRM.$(document).ready( function() {
+                  CRM.$('#price_set_id').val($this->_priceSetId).change();
+                });
+              ", -5000 // put earlier, so that we come before potential extension scripts.
+          );
+        }
       }
       $this->assign('hasPriceSets', $buildPriceSet);
     }
@@ -818,6 +870,19 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $joinDate = NULL;
+    $memTypeToMemIdUpdateMap = CRM_Member_BAO_Membership::getMembershipIdsForMembershipTypeOrgs(
+        $self->_contactID,
+        $selectedMemberships
+    );
+    if ($self->_renewingAll) {
+      // Renewing mulitple memberships.  JoinDate will be required if some of the
+      // selected price set options will result in creation of a new membership
+      $joinDateRequired = in_array(NULL, array_values($memTypeToMemIdUpdateMap), TRUE);
+    } else {
+      // Adding, of course join date must be specified.
+      $joinDateRequired = TRUE;
+    }
+    
     if (!empty($params['join_date'])) {
 
       $joinDate = CRM_Utils_Date::processDate($params['join_date']);
@@ -911,7 +976,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
-    else {
+    else if ($joinDateRequired) {
       $errors['join_date'] = ts('Please enter the Member Since.');
     }
 
@@ -1240,14 +1305,37 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $memTypeNumTerms = empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
 
+    if ($this->_renewingAll) {
+      $memTypeToMemIds = CRM_Member_BAO_Membership::getMembershipIdsForMembershipTypeOrgs($this->_contactID, $this->_memTypeSelected);
+    } else {
+      foreach (array_keys($membershipTypes) as $memType) {
+        $memTypeToMemIds[$memType] = NULL;
+      }
+    }
+    
     $calcDates = array();
     foreach ($this->_memTypeSelected as $memType) {
       if (empty($memTypeNumTerms)) {
         $memTypeNumTerms = CRM_Utils_Array::value($memType, $termsByType, 1);
       }
+      
+      // if renewing, and membership exists, don't change join date.
+      if (!$memTypeToMemIds[$memType]) {
+        $joinDate = NULL;
+        $startDate = NULL;
+      }
+      
       $calcDates[$memType] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
         $joinDate, $startDate, $endDate, $memTypeNumTerms
       );
+      
+      // if renewing, and membership exists, don't change join date.
+      if (!$memTypeToMemIds[$memType]) {
+        $joinDate = NULL;
+        $startDate = NULL;
+      }
+      
+
     }
 
     foreach ($calcDates as $memType => $calcDate) {
@@ -1275,9 +1363,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $memType
       );
     }
-
-    $membershipType = implode(', ', $membershipTypes);
-
+    
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
 
@@ -1508,7 +1594,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       // required for creating membership for related contacts
       $params['action'] = $this->_action;
-
+      
       //create membership record.
       $count = 0;
       foreach ($this->_memTypeSelected as $memType) {
@@ -1539,6 +1625,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           unset($membershipParams['lineItems']);
         }
 
+        $existingMembershipToUpdate = $memTypeToMemIds[$memType];
+        if ($existingMembershipToUpdate) {
+          $membershipParams['id'] = $existingMembershipToUpdate;
+        }
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
@@ -1631,6 +1721,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           if (!empty($softParams)) {
             $membershipParams['soft_credit'] = $softParams;
           }
+          
+          $existingMembershipToUpdate = $memTypeToMemIds[$memType];
+          if ($existingMembershipToUpdate) {
+            $membershipParams['id'] = $existingMembershipToUpdate;
+            if ($this->_renewingAll) {
+              $membershipObj = CRM_Member_BAO_Membership::findById($existingMembershipToUpdate);
+              // $membershipParams['start_date'] = $membershipObj->start_date;
+              $membershipParams['join_date'] = $membershipObj->join_date;
+            }
+          }
 
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
           $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
@@ -1713,7 +1813,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $isRecur = CRM_Utils_Array::value('is_recur', $params);
-    $this->setStatusMessage($membership, $endDate, $receiptSent, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend);
+    $this->setStatusMessage($membership, $endDate, $receiptSent, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend,
+        $memTypeToMemIds
+    );
     return $createdMemberships;
   }
 
@@ -1782,14 +1884,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @return array|string
    */
   protected function getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
-                                               $isRecur, $calcDates, $mailSent) {
+                                               $isRecur, $calcDates, $mailSent, $memTypeToMemIds) {
     // FIX ME: fix status messages
 
     $statusMsg = array();
     foreach ($membershipTypes as $memType => $membershipType) {
-      $statusMsg[$memType] = ts('%1 membership for %2 has been added.', array(
+      $statusMsg[$memType] = ts('%1 membership for %2 has been %3.', array(
         1 => $membershipType,
         2 => $this->_memberDisplayName,
+        3 => $memTypeToMemIds[$memType] ? ts('Renewed') : ts('Added')
       ));
 
       $membership = $createdMemberships[$memType];
@@ -1822,14 +1925,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param $calcDates
    * @param $mailSend
    */
-  protected function setStatusMessage($membership, $endDate, $receiptSend, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend) {
+  protected function setStatusMessage($membership, $endDate, $receiptSend, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend, $memTypeToMemIds) {
     $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       $statusMsg = $this->getStatusMessageForUpdate($membership, $endDate, $receiptSend);
     }
     elseif (($this->_action & CRM_Core_Action::ADD)) {
       $statusMsg = $this->getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
-        $isRecur, $calcDates, $mailSend);
+        $isRecur, $calcDates, $mailSend, $memTypeToMemIds);
     }
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
@@ -1854,5 +1957,5 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
   }
-
+  
 }
