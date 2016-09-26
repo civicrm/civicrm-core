@@ -2513,20 +2513,20 @@ WHERE      civicrm_membership.is_test = 0";
     }
     return $cancelledMembershipIds;
   }
-  
+
   /**
-   * 
+   *
    * Given specified contact, return a map of membeship orgs (that contact
    * has ever been member of), and the last membership type option that the
    * contact specified for this organization.
-   * 
+   *
    * Initial use case for this method was to return a list of membership
    * type that a contact should be renewed on when renewing using *any*
    * priceset, unlike online renewals which only renew for a specific price set
-   * 
+   *
    * @param type $contactId
    * @return type
-   * 
+   *
    */
   public static function getContactMemberhipsByMembeshipOrg($contactId) {
     $query = "
@@ -2541,7 +2541,7 @@ WHERE      civicrm_membership.is_test = 0";
            case when s.is_current_member then 0 else 1 end,
   	      co.receive_date desc
     ";
-    
+
     $toReturn = array();
     $dao = CRM_CORE_DAO::executeQuery($query);
     while ($dao->fetch()) {
@@ -2556,24 +2556,24 @@ WHERE      civicrm_membership.is_test = 0";
       );
     }
     return $toReturn;
-        
+
   }
-  
+
   /**
-   * 
-   * Given specified membership types, returns the membership ids that are applicable 
+   *
+   * Given specified membership types, returns the membership ids that are applicable
    * (if one exists) for the contact.
-   * 
+   *
    * @param type $contactId
    *  e.g., 3.
    * @param type $membershipTypes
    *  e.g., 6, 8
-   * 
-   * @return array (6 => 10, 8 => NULL) to indicate that 
-   *   contact #3's membership type id 6 points to an org that already has a membership 
+   *
+   * @return array (6 => 10, 8 => NULL) to indicate that
+   *   contact #3's membership type id 6 points to an org that already has a membership
    *   for this contact (and that memebership id happens to be 10.  In the case of
    *   membership type 8, the contact does not have a membership for this org (hence NULL)
-   * 
+   *
    */
   public static function getMembershipIdsForMembershipTypeOrgs($contactId, $membershipTypes) {
     $query = "
@@ -2582,7 +2582,7 @@ WHERE      civicrm_membership.is_test = 0";
                   from civicrm_membership mem
                  where contact_id = $contactId
                    and membership_type_id in (select id from civicrm_membership_type mt2 where mt2.member_of_contact_id = mt1.member_of_contact_id)
-                 order by 
+                 order by
                     case when mem.status_id in (select id from civicrm_membership_status where is_current_member)
                          then 1
                          else 0
@@ -2600,7 +2600,7 @@ WHERE      civicrm_membership.is_test = 0";
     return $toReturn;
   }
 
-  
-  
-  
+
+
+
 }
