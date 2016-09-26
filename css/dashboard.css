@@ -219,3 +219,13 @@
 #crm-container .ui-sortable-placeholder * {
   visibility: hidden;
 }
+
+@media screen and (max-width: 50em) {
+  #crm-container .column {
+    width: 100%;
+    min-height: 0;
+  }
+  #crm-container .column-0 {
+    padding: 0;
+  }
+}
