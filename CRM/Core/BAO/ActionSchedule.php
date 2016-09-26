@@ -427,9 +427,7 @@ FROM civicrm_action_schedule cas
   public static function setCommunicationLanguage($communication_language, $preferred_language) {
     $i18n = CRM_Core_I18n::singleton();
 
-    // FIXME: convert to getLocale when https://issues.civicrm.org/jira/browse/CRM-18362 is fixed
-    global $tsLocale;
-    $currentLocale = $tsLocale;
+    $currentLocale = CRM_Core_I18n::getLocale();
     $language = $currentLocale;
 
     // prepare the language for the email
