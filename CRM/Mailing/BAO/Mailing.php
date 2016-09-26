@@ -925,19 +925,20 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     $senderId = $session->get('userID');
     list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($senderId);
 
-    if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
-      $contacts = civicrm_api('contact', 'get', array(
-          'version' => 3,
-          'group' => $testParams['test_group'],
-          'return' => 'id',
-          'options' => array(
-            'limit' => 100000000000,
-          ),
-        )
-      );
+    if (array_key_exists('test_group', $testParams)) {
+      if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
+        $contacts = civicrm_api('contact', 'get', array(
+            'version' => 3,
+            'group' => $testParams['test_group'],
+            'return' => 'id',
+            'options' => array(
+              'limit' => 100000000000,
+            ),
+          )
+        );
 
-      foreach (array_keys($contacts['values']) as $groupContact) {
-        $query = "
+        foreach (array_keys($contacts['values']) as $groupContact) {
+          $query = "
 SELECT     civicrm_email.id AS email_id,
            civicrm_email.is_primary as is_primary,
            civicrm_email.is_bulkmail as is_bulkmail
@@ -954,14 +955,15 @@ AND        contact_a.is_opt_out = 0
 GROUP BY   civicrm_email.id
 ORDER BY   civicrm_email.is_bulkmail DESC
 ";
-        $dao = CRM_Core_DAO::executeQuery($query);
-        if ($dao->fetch()) {
-          $params = array(
-            'job_id' => $testParams['job_id'],
-            'email_id' => $dao->email_id,
-            'contact_id' => $groupContact,
-          );
-          CRM_Mailing_Event_BAO_Queue::create($params);
+          $dao = CRM_Core_DAO::executeQuery($query);
+          if ($dao->fetch()) {
+            $params = array(
+              'job_id' => $testParams['job_id'],
+              'email_id' => $dao->email_id,
+              'contact_id' => $groupContact,
+            );
+            CRM_Mailing_Event_BAO_Queue::create($params);
+          }
         }
       }
     }
