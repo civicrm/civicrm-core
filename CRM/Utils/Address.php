@@ -104,6 +104,9 @@ class CRM_Utils_Address {
         if ($fields['country'] == CRM_Core_PseudoConstant::country($domainCountryId)) {
           $fields['country'] = NULL;
         }
+        else {
+          $fields['country'] = strtoupper($fields['country']);
+        }
       }
       else {
         $fields['country'] = strtoupper($fields['country']);
