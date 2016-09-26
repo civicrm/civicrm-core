@@ -63,7 +63,7 @@
               <td class="crm-event-title">{$details.$pid.title}</td>
               {foreach from=$fields item=field key=fieldName}
                 {assign var=n value=$field.name}
-                {if ( $fields.$n.data_type eq 'Date') or ( $n eq 'participant_register_date' ) }
+                {if ( $n eq 'participant_register_date' ) }
                    <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$pid batchUpdate=1}</td>
                 {else}
                   <td class="compressed">{$form.field.$pid.$n.html}</td>
