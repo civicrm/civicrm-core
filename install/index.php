@@ -557,6 +557,7 @@ class InstallRequirements {
 
     $this->errors = NULL;
 
+    // See also: CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER
     $this->requirePHPVersion('5.3.4', array(
       ts("PHP Configuration"),
       ts("PHP5 installed"),
