@@ -425,8 +425,6 @@ FROM civicrm_action_schedule cas
    * @param $preferred_language
    */
   public static function setCommunicationLanguage($communication_language, $preferred_language) {
-    $i18n = CRM_Core_I18n::singleton();
-
     $currentLocale = CRM_Core_I18n::getLocale();
     $language = $currentLocale;
 
