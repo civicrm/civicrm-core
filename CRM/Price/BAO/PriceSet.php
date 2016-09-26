@@ -1358,9 +1358,9 @@ WHERE  id = %1";
   }
 
   /**
-   * 
+   *
    * Return the number of active price sets that include memberships.
-   * 
+   *
    * @return int
    *  e.g., 3 to indicate that there are 3 active price sets that
    *        use memberships
@@ -1731,18 +1731,18 @@ WHERE       ps.id = %1
   }
 
   /**
-   * 
+   *
    * Given a contact, return the last price set that was used to create memberships
-   * for this contact.  The logic gives preferences to price set used in a 
+   * for this contact.  The logic gives preferences to price set used in a
    * contribution for this contact.  However, if no contribution exists (e.g.,
-   * converted 
-   * 
+   * converted
+   *
    * @param type $contactId
    *  e.g., 3.
    * @return type
    *  e.g., 9.    To indicate that price set #9 is the last price set that as
    *              used on contact #3.
-   * 
+   *
    */
   public static function getLastPriceSetUsed($contactId) {
     $sql = "select pf.price_set_id
@@ -1763,54 +1763,54 @@ WHERE       ps.id = %1
     // no contributins found that used a previous price set.  Look amongst price sets that match
     // so that we can pick those.
     $sql = "
-              select * from ( 
-           select 
-           price_set_id, count(*) as cnt 
-           from 
-           ( 
-              select 
-              distinct mem.id as membership_id, ps.id as price_set_id 
-              from civicrm_membership mem 
-              left join civicrm_price_field_value pfv on pfv.membership_type_id = mem.membership_type_id 
-              and pfv.is_active = 1 
-              left join civicrm_price_field pf on pf.id = pfv.price_field_id 
-              and pf.is_active = 1 
-              left join civicrm_price_set ps on ps.id = pf.price_set_id 
-              and ps.is_active = 1 
-              and ps.is_reserved = 0 
-              where contact_id = $contactId 
-               and mem.status_id in (select id from civicrm_membership_status where is_current_member = 1) 
-           ) 
-           iq 
-           group by price_set_id 
-        ) 
-        iq2 
-        where iq2.cnt = 
-        ( 
-            select max(cnt) 
-            from 
-            ( 
-               select 
-               price_set_id, count(*) as cnt 
-               from 
-               ( 
-                  select 
-                  distinct mem.id as membership_id, ps.id as price_set_id 
-                  from civicrm_membership mem 
-                  left join civicrm_price_field_value pfv on pfv.membership_type_id = mem.membership_type_id 
-                  and pfv.is_active = 1 
-                  left join civicrm_price_field pf on pf.id = pfv.price_field_id 
-                  and pf.is_active = 1 
-                  left join civicrm_price_set ps on ps.id = pf.price_set_id 
-                  and ps.is_active = 1 
-                  and ps.is_reserved = 0 
-                  where contact_id = $contactId 
-                    and mem.status_id in (select id from civicrm_membership_status where is_current_member = 1) 
-               ) 
-               iq 
-               group by price_set_id 
-            ) iq2 
-        ) 
+              select * from (
+           select
+           price_set_id, count(*) as cnt
+           from
+           (
+              select
+              distinct mem.id as membership_id, ps.id as price_set_id
+              from civicrm_membership mem
+              left join civicrm_price_field_value pfv on pfv.membership_type_id = mem.membership_type_id
+              and pfv.is_active = 1
+              left join civicrm_price_field pf on pf.id = pfv.price_field_id
+              and pf.is_active = 1
+              left join civicrm_price_set ps on ps.id = pf.price_set_id
+              and ps.is_active = 1
+              and ps.is_reserved = 0
+              where contact_id = $contactId
+               and mem.status_id in (select id from civicrm_membership_status where is_current_member = 1)
+           )
+           iq
+           group by price_set_id
+        )
+        iq2
+        where iq2.cnt =
+        (
+            select max(cnt)
+            from
+            (
+               select
+               price_set_id, count(*) as cnt
+               from
+               (
+                  select
+                  distinct mem.id as membership_id, ps.id as price_set_id
+                  from civicrm_membership mem
+                  left join civicrm_price_field_value pfv on pfv.membership_type_id = mem.membership_type_id
+                  and pfv.is_active = 1
+                  left join civicrm_price_field pf on pf.id = pfv.price_field_id
+                  and pf.is_active = 1
+                  left join civicrm_price_set ps on ps.id = pf.price_set_id
+                  and ps.is_active = 1
+                  and ps.is_reserved = 0
+                  where contact_id = $contactId
+                    and mem.status_id in (select id from civicrm_membership_status where is_current_member = 1)
+               )
+               iq
+               group by price_set_id
+            ) iq2
+        )
     ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
