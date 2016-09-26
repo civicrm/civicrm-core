@@ -336,8 +336,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
           'accepted_credit_cards'
         ), TRUE);
     $acceptedCards = array();
-    foreach ($cards as $card => $val) {
-      $acceptedCards[$card] = 1;
+    if (!empty($cards)) {
+      foreach ($cards as $card => $val) {
+        $acceptedCards[$card] = 1;
+      }
     }
     $defaults['accept_credit_cards'] = $acceptedCards;
     unset($defaults['accepted_credit_cards']);
