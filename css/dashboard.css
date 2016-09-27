@@ -9,10 +9,8 @@
   float: left;
   margin: 0;
   /* padding-bottom and min-height make sure that there is always a sizable drop zone. */
-  min-height: 400px;
-  height: 400px;
-  height: auto !important;
-  padding: 0 0 250px;
+  min-height: 200px;
+  padding: 0 0 40px;
   list-style-type: none;
 }
 
