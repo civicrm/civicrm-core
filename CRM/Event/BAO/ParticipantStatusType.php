@@ -80,7 +80,9 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
 
     $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->id = $id;
-    $dao->find(TRUE);
+    if (!$dao->find()) {
+      return FALSE;
+    }
     $dao->delete();
     return TRUE;
   }
