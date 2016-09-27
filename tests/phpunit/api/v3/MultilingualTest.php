@@ -51,12 +51,12 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
   }
 
   public function testOptionLanguage() {
-    civicrm_api3('Setting', 'create', [
+    civicrm_api3('Setting', 'create', array(
       'lcMessages' => 'en_US',
-      'languageLimit' => [
+      'languageLimit' => array(
         'en_US' => 1,
-      ],
-    ]);
+      ),
+    ));
 
     CRM_Core_I18n_Schema::makeMultilingual('en_US');
 
