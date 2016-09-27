@@ -2571,12 +2571,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test completing first transaction in a recurring series.
    *
    * The status should be set to 'in progress' and the next scheduled payment date calculated.
+   *
+   * @dataProvider getScheduledDateData
+   *
+   * @param array $dataSet
+   *
+   * @throws \Exception
    */
-  public function testCompleteTransactionSetStatusToInProgress() {
+  public function testCompleteTransactionSetStatusToInProgress($dataSet) {
     $paymentProcessorID = $this->paymentProcessorCreate();
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
       'contact_id' => $this->_individualId,
-      'installments' => '12',
+      'installments' => '2',
       'frequency_interval' => '1',
       'amount' => '500',
       'contribution_status_id' => 'Pending',
@@ -2584,21 +2590,74 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'frequency_unit' => 'month',
       'payment_processor_id' => $paymentProcessorID,
-    ));
+    ), $dataSet['data']));
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge(
       $this->_params,
       array(
         'contribution_recur_id' => $contributionRecur['id'],
         'contribution_status_id' => 'Pending',
+        'receive_date' => $dataSet['receive_date'],
       ))
     );
-    $this->callAPISuccess('Contribution', 'completetransaction', array('id' => $contribution));
+    $this->callAPISuccess('Contribution', 'completetransaction', array(
+      'id' => $contribution,
+      'receive_date' => $dataSet['receive_date'],
+    ));
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array(
       'id' => $contributionRecur['id'],
       'return' => array('next_sched_contribution_date', 'contribution_status_id'),
     ));
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    $this->assertEquals(date('Y-m-d 00:00:00', strtotime('+1 month')), $contributionRecur['next_sched_contribution_date']);
+    $this->assertEquals($dataSet['expected'], $contributionRecur['next_sched_contribution_date']);
+    $this->callAPISuccess('Contribution', 'create', array_merge(
+      $this->_params,
+      array(
+        'contribution_recur_id' => $contributionRecur['id'],
+        'contribution_status_id' => 'Completed',
+      )
+    ));
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array(
+      'id' => $contributionRecur['id'],
+      'return' => array('contribution_status_id'),
+    ));
+    $this->assertEquals(1, $contributionRecur['contribution_status_id']);
+  }
+
+  /**
+   * Get dates for testing.
+   *
+   * @return array
+   */
+  public function getScheduledDateData() {
+    $result = array();
+    $result[]['2016-08-31-1-month'] = array(
+      'data' => array(
+        'start_date' => '2016-08-31',
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+      ),
+      'receive_date' => '2016-08-31',
+      'expected' => '2016-10-01 00:00:00',
+    );
+    $result[]['2012-01-01-1-month'] = array(
+      'data' => array(
+        'start_date' => '2012-01-01',
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+      ),
+      'receive_date' => '2012-01-01',
+      'expected' => '2012-02-01 00:00:00',
+    );
+    $result[]['2012-01-01-1-month'] = array(
+      'data' => array(
+        'start_date' => '2012-01-01',
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+      ),
+      'receive_date' => '2012-02-29',
+      'expected' => '2012-03-29 00:00:00',
+    );
+    return $result;
   }
 
   /**
