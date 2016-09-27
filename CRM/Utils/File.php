@@ -604,6 +604,8 @@ HTACCESS;
     // make everything absolute from the baseFilePath
     $basePath = ($basePath === NULL) ? self::baseFilePath() : $basePath;
 
+    // ensure that $basePath has a trailing slash
+    $basePath = self::addTrailingSlash($basePath);
     return $basePath . $directory;
   }
 
