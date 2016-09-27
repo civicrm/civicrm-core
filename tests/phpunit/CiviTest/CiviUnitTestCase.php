@@ -1266,7 +1266,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   public function relationshipTypeDelete($relationshipTypeID) {
     $params['id'] = $relationshipTypeID;
-    $this->callAPISuccess('relationship_type', 'delete', $params);
+    $check = $this->callAPISuccess('relationship_type', 'get', $params);
+    if (!empty($check['count'])) {
+      $this->callAPISuccess('relationship_type', 'delete', $params);
+    }
   }
 
   /**
@@ -1621,7 +1624,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array(
       'id' => $participantID,
     );
-    return $this->callAPISuccess('Participant', 'delete', $params);
+    $check = $this->callAPISuccess('Participant', 'get', $params);
+    if ($check['count'] > 0) {
+      return $this->callAPISuccess('Participant', 'delete', $params);
+    }
   }
 
   /**
