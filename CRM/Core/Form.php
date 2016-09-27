@@ -815,7 +815,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         $this->_paymentProcessor = array();
       }
-      CRM_Financial_Form_Payment::addCreditCardJs();
+      CRM_Financial_Form_Payment::addCreditCardJs($this->_paymentProcessorID);
     }
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
     // We save the fact that the profile 'billing' is required on the payment form.
