@@ -64,5 +64,5 @@ function civicrm_api3_acl_get($params) {
  *   API result array
  */
 function civicrm_api3_acl_delete($params) {
-  return print_r(_civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params));
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
