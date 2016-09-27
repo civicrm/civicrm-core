@@ -205,41 +205,42 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       if ($this->_contactID) {
         if (!$this->_renewingAll) {
-        //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
-        $contactMemberships = array();
-        $memParams = array('contact_id' => $this->_contactID);
-        CRM_Member_BAO_Membership::getValues($memParams, $contactMemberships, TRUE);
-        $cMemTypes = array();
-        foreach ($contactMemberships as $mem) {
-          $cMemTypes[] = $mem['membership_type_id'];
-        }
-        if (count($cMemTypes) > 0) {
-          $memberorgs = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($cMemTypes);
-          $mems_by_org = array();
+          //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
+          $contactMemberships = array();
+          $memParams = array('contact_id' => $this->_contactID);
+          CRM_Member_BAO_Membership::getValues($memParams, $contactMemberships, TRUE);
+          $cMemTypes = array();
           foreach ($contactMemberships as $mem) {
-            $mem['member_of_contact_id'] = CRM_Utils_Array::value($mem['membership_type_id'], $memberorgs);
-            if (!empty($mem['membership_end_date'])) {
-              $mem['membership_end_date'] = CRM_Utils_Date::customformat($mem['membership_end_date']);
-            }
-            $mem['membership_type'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-              $mem['membership_type_id'],
-              'name', 'id'
-            );
-            $mem['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
-              $mem['status_id'],
-              'label', 'id'
-            );
-            $mem['renewUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
-              "reset=1&action=renew&cid={$this->_contactID}&id={$mem['id']}&context=membership&selectedChild=member"
-              . ($this->_mode ? '&mode=live' : '')
-            );
-            $mem['membershipTab'] = CRM_Utils_System::url('civicrm/contact/view',
-              "reset=1&force=1&cid={$this->_contactID}&selectedChild=member"
-            );
-            $mems_by_org[$mem['member_of_contact_id']] = $mem;
+            $cMemTypes[] = $mem['membership_type_id'];
           }
-          $this->assign('existingContactMemberships', $mems_by_org);
-        }}
+          if (count($cMemTypes) > 0) {
+            $memberorgs = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($cMemTypes);
+            $mems_by_org = array();
+            foreach ($contactMemberships as $mem) {
+              $mem['member_of_contact_id'] = CRM_Utils_Array::value($mem['membership_type_id'], $memberorgs);
+              if (!empty($mem['membership_end_date'])) {
+                $mem['membership_end_date'] = CRM_Utils_Date::customformat($mem['membership_end_date']);
+              }
+              $mem['membership_type'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
+                $mem['membership_type_id'],
+                'name', 'id'
+              );
+              $mem['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
+                $mem['status_id'],
+                'label', 'id'
+              );
+              $mem['renewUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
+                "reset=1&action=renew&cid={$this->_contactID}&id={$mem['id']}&context=membership&selectedChild=member"
+                . ($this->_mode ? '&mode=live' : '')
+              );
+              $mem['membershipTab'] = CRM_Utils_System::url('civicrm/contact/view',
+                "reset=1&force=1&cid={$this->_contactID}&selectedChild=member"
+              );
+              $mems_by_org[$mem['member_of_contact_id']] = $mem;
+            }
+            $this->assign('existingContactMemberships', $mems_by_org);
+          }
+        }
       }
       else {
         // In standalone mode we don't have a contact id yet so lookup will be done client-side with this script:
@@ -278,7 +279,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     if ($this->_renewingAll) {
       CRM_Utils_System::setTitle(ts('Renew or Add Memberships'));
-    } else {
+    }
+    else {
       $this->setPageTitle(ts('Membership'));
     }
   }
@@ -296,7 +298,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_priceSetId) {
       if (!$this->_renewingAll) {
         return CRM_Price_BAO_PriceSet::setDefaultPriceSet($this, $defaults);
-      } else {
+      }
+      else {
         CRM_Price_BAO_PriceSet::setPriceSetDefaultsToLastUsedValues($this, $defaults);
       }
     }
@@ -450,7 +453,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_renewingAll && !$getOnlyPriceSetElements) {
       $bestPriceSet = CRM_Price_BAO_PriceSet::getLastPriceSetUsed($this->_contactID);
       $this->_priceSetId = $bestPriceSet;
-    } else {
+    }
+    else {
       // empty array, will get filed later if appropriate.
       $priceSets = array();
     }
@@ -878,7 +882,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // Renewing mulitple memberships.  JoinDate will be required if some of the
       // selected price set options will result in creation of a new membership
       $joinDateRequired = in_array(NULL, array_values($memTypeToMemIdUpdateMap), TRUE);
-    } else {
+    }
+    else {
       // Adding, of course join date must be specified.
       $joinDateRequired = TRUE;
     }
@@ -976,7 +981,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
-    else if ($joinDateRequired) {
+    elseif ($joinDateRequired) {
       $errors['join_date'] = ts('Please enter the Member Since.');
     }
 
@@ -1319,7 +1324,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     if ($this->_renewingAll) {
       $memTypeToMemIds = CRM_Member_BAO_Membership::getMembershipIdsForMembershipTypeOrgs($this->_contactID, $this->_memTypeSelected);
-    } else {
+    }
+    else {
       foreach (array_keys($membershipTypes) as $memType) {
         $memTypeToMemIds[$memType] = NULL;
       }
@@ -1346,8 +1352,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $joinDate = NULL;
         $startDate = NULL;
       }
-
-
     }
 
     foreach ($calcDates as $memType => $calcDate) {
@@ -1904,7 +1908,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $statusMsg[$memType] = ts('%1 membership for %2 has been %3.', array(
         1 => $membershipType,
         2 => $this->_memberDisplayName,
-        3 => $memTypeToMemIds[$memType] ? ts('Renewed') : ts('Added')
+        3 => $memTypeToMemIds[$memType] ? ts('Renewed') : ts('Added'),
       ));
 
       $membership = $createdMemberships[$memType];

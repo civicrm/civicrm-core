@@ -1362,8 +1362,8 @@ WHERE  id = %1";
    * Return the number of active price sets that include memberships.
    *
    * @return int
-   *  e.g., 3 to indicate that there are 3 active price sets that
-   *        use memberships
+   *    e.g., 3 to indicate that there are 3 active price sets that
+   *          use memberships
    */
   public static function getCountOfPriceSetsWithMemberships() {
     $query = "select count(distinct pf.price_set_id) cnt
@@ -1642,11 +1642,11 @@ WHERE       ps.id = %1
           $copyPriceSet = &CRM_Price_BAO_PriceSet::copy($setId);
 
           CRM_Core_DAO::copyGeneric(
-              'CRM_Core_DAO_Discount', array(
-            'id' => $discountId,
-              ), array(
-            'entity_id' => $newId,
-            'price_set_id' => $copyPriceSet->id,
+              'CRM_Core_DAO_Discount',
+              array('id' => $discountId,),
+              array(
+                'entity_id' => $newId,
+                'price_set_id' => $copyPriceSet->id,
               )
           );
         }
@@ -1737,9 +1737,9 @@ WHERE       ps.id = %1
    * contribution for this contact.  However, if no contribution exists (e.g.,
    * converted
    *
-   * @param type $contactId
+   * @param int $contactId
    *  e.g., 3.
-   * @return type
+   * @return int
    *  e.g., 9.    To indicate that price set #9 is the last price set that as
    *              used on contact #3.
    *
@@ -1838,11 +1838,11 @@ WHERE       ps.id = %1
       // if optional, pick last option active
       foreach ($priceField['options'] as $optionId => $option) {
         // price option isn't membership oriented.  Ignore
-        if (!key_exists('membership_type_id', $option) || !$option['membership_type_id']) {
+        if (!array_key_exists('membership_type_id', $option) || !$option['membership_type_id']) {
           continue;
         }
 
-        if (!key_exists($option['membership_type_id'], $allMemOfByMemTypes)) {
+        if (!array_key_exists($option['membership_type_id'], $allMemOfByMemTypes)) {
           continue;
         }
 
@@ -1853,7 +1853,7 @@ WHERE       ps.id = %1
         }
 
         // contact never a contact of this "member of contact".  So nothing to renew.  Ignore.
-        if (!key_exists($memOf, $contactMemTypesByMemOf)) {
+        if (!array_key_exists($memOf, $contactMemTypesByMemOf)) {
           continue;
         }
 
@@ -1872,7 +1872,7 @@ WHERE       ps.id = %1
           if ($priceField['is_required']) {
             self::setDefaultPriceSetField($priceFieldName, $optionId, $priceField['html_type'], $defaults);
           }
-          else if ($bestOptionIsActive) {
+          elseif ($bestOptionIsActive) {
             // optional.  Only pick if active
             self::setDefaultPriceSetField($priceFieldName, $optionId, $priceField['html_type'], $defaults);
           }
