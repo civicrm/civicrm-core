@@ -316,7 +316,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
     $this->_renewingAll = ($this->_action & CRM_Core_Action::ADD) && CRM_Utils_Request::retrieve('renewingAll', 'Boolean', $this, FALSE);
 
-
     $this->assign('action', $this->_action);
 
     if ($this->_permission == CRM_Core_Permission::EDIT && !CRM_Core_Permission::check('edit memberships')) {
