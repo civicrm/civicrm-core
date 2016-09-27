@@ -1643,7 +1643,7 @@ WHERE       ps.id = %1
 
           CRM_Core_DAO::copyGeneric(
               'CRM_Core_DAO_Discount',
-              array('id' => $discountId,),
+              array('id' => $discountId),
               array(
                 'entity_id' => $newId,
                 'price_set_id' => $copyPriceSet->id,
@@ -1738,10 +1738,10 @@ WHERE       ps.id = %1
    * converted
    *
    * @param int $contactId
-   *  e.g., 3.
+   *     e.g., 3.
    * @return int
-   *  e.g., 9.    To indicate that price set #9 is the last price set that as
-   *              used on contact #3.
+   *     e.g., 9. To indicate that price set #9 is the last price set that as
+   *           used on contact #3.
    *
    */
   public static function getLastPriceSetUsed($contactId) {
