@@ -75,12 +75,12 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     // Take a semi-random OptionGroup and test manually changing its label
     // in one language, while making sure it stays the same in English.
     $group = civicrm_api3('OptionGroup', 'getsingle', array(
-      'name' => 'contact_edit_options'
+      'name' => 'contact_edit_options',
     ));
 
     $english_original = civicrm_api3('OptionValue', 'getsingle', array(
       'option_group_id' => $group['id'],
-      'name' => 'IM'
+      'name' => 'IM',
     ));
 
     civicrm_api3('OptionValue', 'create', array(
@@ -98,7 +98,8 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
 
     $default = civicrm_api3('OptionValue', 'getsingle', array(
       'option_group_id' => $group['id'],
-      'name' => 'IM', 'option.language' => 'en_US',
+      'name' => 'IM',
+      'option.language' => 'en_US',
     ));
 
     $this->assertEquals($french['label'], 'Messagerie instantanée');
