@@ -605,8 +605,7 @@ HTACCESS;
     $basePath = ($basePath === NULL) ? self::baseFilePath() : $basePath;
 
     // ensure that $basePath has a trailing slash
-    $basePath = (substr($basePath, -strlen(DIRECTORY_SEPARATOR)) != DIRECTORY_SEPARATOR) ? $basePath . DIRECTORY_SEPARATOR : $basePath;
-
+    $basePath = self::addTrailingSlash($basePath);
     return $basePath . $directory;
   }
 
