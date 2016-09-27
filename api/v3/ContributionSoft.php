@@ -65,8 +65,11 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
  */
 function civicrm_api3_contribution_soft_delete($params) {
   // Non standard BAO - we have to write custom code to cope.
-  CRM_Contribute_BAO_ContributionSoft::del(array('id' => $params['id']));
-
+  $result = CRM_Contribute_BAO_ContributionSoft::del(array('id' => $params['id']));
+  if (!$result) {
+    throw new API_Exception('Cannot delete contributionSoft ' . $params['id']);
+  }
+  civicrm_api3_create_success(TRUE);
 }
 
 /**

@@ -240,9 +240,13 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   public static function del($optionValueId) {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->id = $optionValueId;
+    if (!$optionValue->find()) {
+      return FALSE;
+    }
     if (self::updateRecords($optionValueId, CRM_Core_Action::DELETE)) {
       CRM_Core_PseudoConstant::flush();
-      return $optionValue->delete();
+      $optionValue->delete();
+      return TRUE;
     }
     return FALSE;
   }
