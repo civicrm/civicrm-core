@@ -107,7 +107,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     );
     $this->quickCleanup($tablesToTruncate, TRUE);
     $type = $this->callAPISuccess('optionValue', 'get', array('id' => $this->test_activity_type_id));
-    print_r($type);
     if (!empty($type['count'])) {
       $this->callAPISuccess('option_value', 'delete', array('id' => $this->test_activity_type_id));
     }
