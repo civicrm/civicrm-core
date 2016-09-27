@@ -1363,10 +1363,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testInvalidID_delete($Entity) {
-    if (in_array($Entity, $this->toBeImplemented['delete'])) {
-      $this->markTestIncomplete("civicrm_api3_{$Entity}_delete to be implemented");
-      return;
-    }
     $result = $this->callAPIFailure($Entity, 'Delete', array('id' => 999));
   }
 
