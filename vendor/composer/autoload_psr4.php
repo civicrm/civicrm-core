@@ -6,5 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Dompdf\\' => array($vendorDir . '/dompdf/dompdf/src'),
     'Civi\\Cxn\\Rpc\\' => array($vendorDir . '/civicrm/civicrm-cxn-rpc/src'),
 );

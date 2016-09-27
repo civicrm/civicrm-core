@@ -28,8 +28,8 @@ class PathFilterIterator extends MultiplePcreFilterIterator
     {
         $filename = $this->current()->getRelativePathname();
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $filename = strtr($filename, '\\', '/');
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $filename = str_replace('\\', '/', $filename);
         }
 
         // should at least not match one rule to exclude
