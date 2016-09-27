@@ -214,7 +214,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->add('checkbox', 'is_active', ts('Is this Payment Processor active?'));
     $this->add('checkbox', 'is_default', ts('Is this Payment Processor the default?'));
     $creditCardTypes = CRM_Contribute_PseudoConstant::creditCard();
-    $this->addCheckBox('accept_credit_cards', ts('Select Credit Card Types that this payment processor can accept'),
+    $this->addCheckBox('accept_credit_cards', ts('Accepted Credit Card Type(s)'),
       $creditCardTypes, NULL, NULL, NULL, NULL, '&nbsp;&nbsp;&nbsp;');
     foreach ($this->_fields as $field) {
       if (empty($field['label'])) {
