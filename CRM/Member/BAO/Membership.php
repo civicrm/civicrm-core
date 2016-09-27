@@ -2536,14 +2536,14 @@ WHERE      civicrm_membership.is_test = 0";
  		inner join civicrm_membership_status s on s.id = mem.status_id
  		left join civicrm_line_item li on li.entity_table = 'civicrm_membership' and li.entity_id = mem.id
  		left join civicrm_contribution co on co.id = li.contribution_id
-  where mem.contact_id = $contactId
+  where mem.contact_id = %1
   order by t.member_of_contact_id,
            case when s.is_current_member then 0 else 1 end,
   	      co.receive_date desc
     ";
 
     $toReturn = array();
-    $dao = CRM_CORE_DAO::executeQuery($query);
+    $dao = CRM_CORE_DAO::executeQuery($query, array( 1 => array($contactId, 'Int')));
     while ($dao->fetch()) {
       if (key_exists($dao->member_of_contact_id, $toReturn)) {
         continue;
@@ -2580,7 +2580,7 @@ WHERE      civicrm_membership.is_test = 0";
           select id, member_of_contact_id, (
                 select id
                   from civicrm_membership mem
-                 where contact_id = $contactId
+                 where contact_id = %1
                    and membership_type_id in (select id from civicrm_membership_type mt2 where mt2.member_of_contact_id = mt1.member_of_contact_id)
                  order by
                     case when mem.status_id in (select id from civicrm_membership_status where is_current_member)
@@ -2592,7 +2592,7 @@ WHERE      civicrm_membership.is_test = 0";
             from civicrm_membership_type mt1
            where id in (" . implode(", ", array_keys($membershipTypes) ) . ");
     ";
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $dao = CRM_Core_DAO::executeQuery($query, array( 1 => array($contactId, 'Int')) );
     $toReturn = array();
     while ($dao->fetch()) {
       $toReturn[$dao->id] = $dao->existing_membership_id; // Can be NULL

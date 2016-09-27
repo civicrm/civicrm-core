@@ -1829,7 +1829,7 @@ WHERE       ps.id = %1
     // start by setting defaults?
     // Leaving out.  E.g., default is to select & first add didn't select.
     // self::setDefaultPriceSet($form, $defaults);
-    $allMemTypes = CRM_Member_BAO_MembershipType::getMembershipTypes();
+    $allMemTypes = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $allMemOfByMemTypes = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes(array_keys($allMemTypes));
 
     // go through all price fields
