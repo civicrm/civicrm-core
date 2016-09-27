@@ -623,8 +623,9 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param $default string
    */
   public function checkMultisite($root, $baseUrl, $default = "default") {
-    if (isset($this->filesUrl))
+    if (isset($this->filesUrl)) {
       return $this->filesUrl;
+    }
 
     $basepath = $this->checkBasePath($root);
     $correct = NULL;
@@ -636,11 +637,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       $folders = scandir($basepath . 'sites/');
       foreach ($folders as $folder) {
         //Ignore hidden directories/files...
-        if (strpos($folder, '.') === 0 || $folder == 'all')
+        if (strpos($folder, '.') === 0 || $folder == 'all') {
           continue;
+        }
         //Check if it is a directory
-        if (!is_dir($basepath . 'sites/' . $folder))
+        if (!is_dir($basepath . 'sites/' . $folder)) {
           continue;
+        }
 
         //Check if files path exists...
         if ($this->checkFilesExists($basepath, $folder)) {
@@ -650,4 +653,5 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
   }
+
 }
