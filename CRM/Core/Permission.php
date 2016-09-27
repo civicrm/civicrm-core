@@ -771,6 +771,10 @@ class CRM_Core_Permission {
         $prefix . ts('administer reserved groups'),
         ts('Edit and disable Reserved Groups (Needs Edit Groups)'),
       ),
+      'manage tags' => array(
+        $prefix . ts('manage tags'),
+        ts('Create and rename tags'),
+      ),
       'administer Tagsets' => array(
         $prefix . ts('administer Tagsets'),
       ),

@@ -34,7 +34,7 @@
 /**
  * Page for displaying list of categories.
  */
-class CRM_Admin_Page_Tag extends CRM_Core_Page_Basic {
+class CRM_Tag_Page_Tag extends CRM_Core_Page_Basic {
 
   public $useLivePageJS = TRUE;
 
@@ -66,13 +66,13 @@ class CRM_Admin_Page_Tag extends CRM_Core_Page_Basic {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/tag',
+          'url' => 'civicrm/tag',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Tag'),
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/tag',
+          'url' => 'civicrm/tag',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Tag'),
         ),
@@ -93,7 +93,7 @@ class CRM_Admin_Page_Tag extends CRM_Core_Page_Basic {
    *   Classname of edit form.
    */
   public function editForm() {
-    return 'CRM_Admin_Form_Tag';
+    return 'CRM_Tag_Form_Edit';
   }
 
   /**
@@ -125,7 +125,7 @@ class CRM_Admin_Page_Tag extends CRM_Core_Page_Basic {
    *   user context.
    */
   public function userContext($mode = NULL) {
-    return 'civicrm/admin/tag';
+    return 'civicrm/tag';
   }
 
   /**
@@ -135,7 +135,7 @@ class CRM_Admin_Page_Tag extends CRM_Core_Page_Basic {
    *   Classname of delete form.
    */
   public function deleteForm() {
-    return 'CRM_Admin_Form_Tag';
+    return 'CRM_Tag_Form_Edit';
   }
 
   /**
