@@ -4689,12 +4689,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       return FALSE;
     }
     $financialTypes = NULL;
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($this->financialTypes);
     $this->financialTypes = $financialTypes;
     if (strpos($query->_from, 'civicrm_contribution') === FALSE) {
       return FALSE;
     }
-    if (empty($financialTypes)) {
+    if (empty($this->financialTypes)) {
       $contFTs = "0";
       $liFTs = implode(',', array_keys(CRM_Contribute_Pseudoconstant::financialType()));
     }
