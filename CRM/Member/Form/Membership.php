@@ -515,7 +515,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         // TODO: Avoid the extra trip involved by this.  But this works for now.
         if ($this->_priceSetId) {
           $script = "\n";
-//          $script = $script . "\n" . CRM_Price_BAO_PriceSet::generateRenewScript($this->_contactID, $this->_priceSet, $earliestDate);
           // trigger onChange event to force load of price set data.
           CRM_Core_Resources::singleton()->addScript("
                 CRM.$(document).ready( function() {
