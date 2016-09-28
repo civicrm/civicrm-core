@@ -37,6 +37,7 @@ J5PACK=0
 WP5PACK=0
 SK5PACK=0
 L10NPACK=0
+REPOREPORT=0
 
 # Display usage
 display_usage()
@@ -137,6 +138,12 @@ case $1 in
   WP5PACK=1
   ;;
 
+  # REPO REPORT PHP5
+  report)
+  echo; echo "Generating repo report module"; echo;
+  REPOREPORT=1
+  ;;
+
   # ALL
   all)
   echo; echo "Generating all we've got."; echo;
@@ -146,6 +153,7 @@ case $1 in
   WP5PACK=1
   SKPACK=1
   L10NPACK=1
+  REPOREPORT=1
   ;;
 
   # USAGE
@@ -211,6 +219,11 @@ if [ "$WP5PACK" = 1 ]; then
   echo; echo "Packaging for Wordpress, PHP5 version"; echo;
   dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
   bash $P/dists/wordpress_php5.sh
+fi
+
+if [ "$REPOREPORT" = 1 ]; then
+  echo; echo "Preparing repository report"; echo;
+  bash $P/dists/repo-report.sh
 fi
 
 unset DM_SOURCEDIR DM_GENFILESDIR DM_TARGETDIR DM_TMPDIR DM_PHP DM_RSYNC DM_VERSION DM_ZIP

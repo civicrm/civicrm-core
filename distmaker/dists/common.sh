@@ -239,3 +239,15 @@ function dm_git_checkout() {
     git checkout "$2"
   popd
 }
+
+## usage: dm_repo_report <name> <path> <treeish>
+function dm_repo_report() {
+  local COMMIT
+  if [ -d "$2" ]; then
+    pushd "$2" >> /dev/null
+      COMMIT=$(git show "$3" | head -n1 | cut -f2 -d\  )
+    popd >> /dev/null
+  fi
+  [ -z "$COMMIT" ] && COMMIT=NONE
+  echo "$1 $3 $COMMIT"
+}
