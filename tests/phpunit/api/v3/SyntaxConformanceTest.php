@@ -1081,9 +1081,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     if ($Entity === 'Setting') {
       $this->markTestSkipped('It seems OK for setting to skip here as it silently sips invalid params');
     }
-    if ($Entity == 'Product') {
-      $this->markTestSkipped('At the moment product API does not complain if no params are passed need fixing');
-    }
     // should create php complaining that a param is missing
     civicrm_api3($Entity, 'Create');
   }
