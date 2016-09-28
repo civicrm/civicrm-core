@@ -1732,91 +1732,92 @@ WHERE       ps.id = %1
 
   /**
    *
-   * Given a contact, return the last price set that was used to create memberships
-   * for this contact.  The logic gives preferences to price set used in a
-   * contribution for this contact.  However, if no contribution exists (e.g.,
-   * converted
+   * Given a contact's membership record, return the last (still active) price
+   * set that was used to create that membreship.  If that price set does not
+   * exist, is not found or isn't active, then return the price set that will
+   * cover that membership's record organisation.  As multiple price sets may
+   * meet that criteria, the price set that cover's the most of that contact's
+   * membership of organizations will be returned.  As multiple price sets may
+   * still meet that criteria, the first defined price set is returned. Getting
+   * heuristics for determining the best price set here seems impossible.
    *
-   * @param int $contactId
-   *     e.g., 3.
+   * @param
+   *    int $membership_id        the membership that is being renewed
    * @return int
    *     e.g., 9. To indicate that price set #9 is the last price set that as
    *           used on contact #3.
    *
    */
-  public static function getLastPriceSetUsed($contactId) {
-    $sql = "select pf.price_set_id
-              from civicrm_membership mem
-                inner join civicrm_line_item li on li.entity_table = 'civicrm_membership' and li.entity_id = mem.id
-                inner join civicrm_contribution co on co.id = li.contribution_id
-                inner join civicrm_price_field pf on pf.id = li.price_field_id
-             where mem.contact_id = $contactId
-             order by co.receive_date desc
-             limit 1;
-            ";
-
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    if ($dao->fetch()) {
-      return $dao->price_set_id;
-    }
-
-    // no contributins found that used a previous price set.  Look amongst price sets that match
-    // so that we can pick those.
+  public static function getLastPriceSetUsed($membership_id) {
     $sql = "
-              select * from (
-           select
-           price_set_id, count(*) as cnt
-           from
-           (
-              select
-              distinct mem.id as membership_id, ps.id as price_set_id
-              from civicrm_membership mem
-              left join civicrm_price_field_value pfv on pfv.membership_type_id = mem.membership_type_id
-              and pfv.is_active = 1
-              left join civicrm_price_field pf on pf.id = pfv.price_field_id
-              and pf.is_active = 1
-              left join civicrm_price_set ps on ps.id = pf.price_set_id
-              and ps.is_active = 1
-              and ps.is_reserved = 0
-              where contact_id = $contactId
-               and mem.status_id in (select id from civicrm_membership_status where is_current_member = 1)
-           )
-           iq
-           group by price_set_id
-        )
-        iq2
-        where iq2.cnt =
-        (
-            select max(cnt)
-            from
-            (
-               select
-               price_set_id, count(*) as cnt
-               from
-               (
-                  select
-                  distinct mem.id as membership_id, ps.id as price_set_id
-                  from civicrm_membership mem
-                  left join civicrm_price_field_value pfv on pfv.membership_type_id = mem.membership_type_id
-                  and pfv.is_active = 1
-                  left join civicrm_price_field pf on pf.id = pfv.price_field_id
-                  and pf.is_active = 1
-                  left join civicrm_price_set ps on ps.id = pf.price_set_id
-                  and ps.is_active = 1
-                  and ps.is_reserved = 0
-                  where contact_id = $contactId
-                    and mem.status_id in (select id from civicrm_membership_status where is_current_member = 1)
-               )
-               iq
-               group by price_set_id
-            ) iq2
-        )
-    ";
+      select price_set_id
+  from civicrm_line_item li
+  	left join civicrm_price_field_value pfv on pfv.id = li.price_field_value_id and pfv.is_active = 1
+  	left join civicrm_price_field pf on pf.id = pfv.price_field_id and pf.is_active = 1
+  	left join civicrm_price_set ps on ps.id = pf.price_set_id and ps.is_active = 1
+    left join civicrm_contribution c on c.id = li.contribution_id
+ where entity_table = 'civicrm_membership'
+   and entity_id = $membership_id
+       order by c.receive_date desc, li.contribution_id desc";
 
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    if ($dao->fetch()) {
-      return $dao->price_set_id;
+    $dao = self::executeQuery($sql);
+    $activateByDefault = TRUE;
+    while ($dao->fetch()) {
+      // last price set used on this membership (could be multiple over the course of time)
+      // only select "price set view", if last contribution was for the price set.
+      if ($dao->price_set_id) {
+        return array(
+          'price_set_id' => $dao->price_set_id,
+          'price_set_is_through_contribution' => $activateByDefault
+        );
+      }
+      $activateByDefault = FALSE;
     }
+
+    // nothing found.  we want to pick, by default the price set that will cover
+    // the most of this contact's members of organizations.
+    $sql = "
+select ps.id, group_concat(distinct member_of_contact_id) as member_of_contact_ids
+ from civicrm_price_set ps
+ 	inner join civicrm_price_field pf on pf.price_set_id = ps.id and pf.is_active = 1
+ 	inner join civicrm_price_field_value pfv on pfv.price_field_id = pf.id and pfv.is_active = 1
+ 	inner join civicrm_membership_type mt on mt.id = pfv.membership_type_id
+ where ps.is_active = 1
+ group by ps.id
+ ";
+
+    $dao = self::executeQuery($sql);
+    $orgsByPriceSet = array();
+    while ($dao->fetch()) {
+      $orgsByPriceSet[$dao->id] = explode(",", $dao->member_of_contact_ids);
+    }
+
+    $memberhsip_type_id = CRM_Member_BAO_Membership::getFieldValue('CRM_Member_BAO_Membership', $membership_id, 'membership_type_id');
+    $member_of_contact_id = CRM_Member_BAO_MembershipType::getFieldValue('CRM_Member_BAO_MembershipType', $memberhsip_type_id, 'member_of_contact_id');
+    $contact_id = CRM_Member_BAO_Membership::getFieldValue('CRM_Member_BAO_Membership', $membership_id, 'contact_id');
+
+    // we've got an array, above, of all orgs mapped on price set id.
+    // now get an array of all orgs for this contact, and return the price set that has the most matches.
+    $contact_membership_orgs = CRM_Member_BAO_Membership::getActiveContactMemberships($contact_id);
+
+    $bestCnt = 0;
+    $bestSet = NULL;
+    foreach ($orgsByPriceSet as $priceSetid => $orgsInPriceSet) {
+      if (!in_array($member_of_contact_id, $orgsInPriceSet)) {
+        continue;
+      }
+
+      $common = sizeof(array_intersect($orgsInPriceSet, $contact_membership_orgs));
+      if ($common > $bestCnt) {
+        $bestCnt = $common;
+        $bestSet = $priceSetid;
+      }
+    }
+
+    return array(
+        'price_set_id' => $bestSet,
+        'price_set_is_through_contribution' => FALSE,
+    );
   }
 
   public static function setPriceSetDefaultsToLastUsedValues(&$form, &$defaults) {
@@ -1862,34 +1863,34 @@ WHERE       ps.id = %1
 
         // this is the option we want to renew with (for the org).  It may or may not exist in the price set.
         $bestOptionMemTypeId = $contactOrgMemberships[$memOf]['membership_type_id'];
-        // either way we only care for the current option being looked at
-        if ($bestOptionMemTypeId !== $option['membership_type_id']) {
-          continue;
-        }
         $bestOptionIsActive = $contactOrgMemberships[$memOf]['is_current_member'];
 
-        // if radio or select
-        if ($priceField['html_type'] == 'Radio' || $priceField['html_type'] == 'Select') {
-          // if mandatory, pick last option used ever
-          if ($priceField['is_required']) {
-            $defaultOrgPf[$memOf] = array($priceFieldId, $optionId, $priceField['html_type']);
-          }
-          elseif ($bestOptionIsActive) {
-            // optional.  Only pick if active
-            $defaultOrgPf[$memOf] = array($priceFieldId, $optionId, $priceField['html_type']);
-          }
-        }
-        else {
-          // check box.  Only pick if active
-          if ($bestOptionIsActive) {
-            // optional.  Only pick if active
-            $defaultOrgPf[$memOf] = array($priceFieldId, $optionId, $priceField['html_type']);
-          }
+        // select if:
+        //  membership types match AND
+        //    is_required (in which case we don't care if active or not, since we need to select something) )
+        //    OR
+        //    is_"active"
+        if ($bestOptionMemTypeId === $option['membership_type_id']
+            && (
+              ($priceField['is_required'] && $priceField['html_type'] == 'Radio' || $priceField['html_type'] == 'Select')
+                ||
+              ($bestOptionIsActive)
+            )
+        ) {
+          $defaultOrgPf[$memOf] = array(
+            'price_field_id' => $priceFieldId,
+            'price_field_value_id' => $optionId,
+            'membership_type_id' => $option['membership_type_id'],
+            'html_type'=>$priceField['html_type'],
+          );
         }
       }
     }
 
     // give preference to price field values from contact (overriding $defaultOrg)
+    // unless membership from which this flow was triggered already matches
+    // membership type (in which case we ignore the 'best' value calculated earlier
+    // in this method).
     foreach ($contactOrgMemberships as $member_of_contact_id => $membership_info) {
       $idealPriceFieldId = $membership_info['price_field_id'];
       $idealPriceValueId = $membership_info['price_field_value_id'];
@@ -1899,15 +1900,20 @@ WHERE       ps.id = %1
           $form->_priceSet['fields'][$idealPriceFieldId]['options'][$idealPriceValueId]
       )) {
         $type = $form->_priceSet['fields'][$idealPriceFieldId]['html_type'];
-        $defaultOrgPf[$member_of_contact_id] = array($idealPriceFieldId, $idealPriceValueId, $type);
+        $defaultOrgPf[$member_of_contact_id] = array(
+            'price_field_id' => $idealPriceFieldId,
+            'price_field_value_id' => $idealPriceValueId,
+            'membership_type_id' => $membership_info['membership_type_id'],
+            'html_type'=>$type,
+          );
       }
     }
 
     // now go ahead and select
     foreach ($defaultOrgPf as $member_of_contact_id => $selectOptions) {
-      $priceFieldName = "price_$selectOptions[0]";
+      $priceFieldName = "price_" . $selectOptions['price_field_id'];
       // old code: self::setDefaultPriceSetField($priceFieldName, $optionId, $priceField['html_type'], $defaults);
-      self::setDefaultPriceSetField($priceFieldName, $selectOptions[1], $selectOptions[2], $defaults);
+      self::setDefaultPriceSetField($priceFieldName, $selectOptions['price_field_value_id'], $selectOptions['html_type'], $defaults);
     }
     return $defaults;
   }

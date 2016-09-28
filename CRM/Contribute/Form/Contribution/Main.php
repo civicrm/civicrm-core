@@ -244,9 +244,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if ($this->_priceSetId) {
       if (($this->_useForMember && !empty($this->_currentMemberships)) || $this->_defaultMemTypeId) {
         // This logic is pseudo-replicated in PriceSet::setPriceSetDefaultsToLastUsedValues
-        // Created differently because: This doesn't handle same membership types reapeating
-        // with different price set options which price option picked will be random, as opposed
-        // to last one used
+        // Created differently because: This doesn't handle same membership types reapeating.
+        // With this code, with different price set options, which price option is picked is random,
+        // as opposed to last one used (which is likely more than acceptable for "on-line" renewals.
         $selectedCurrentMemTypes = array();
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {

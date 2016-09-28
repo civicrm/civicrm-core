@@ -32,9 +32,7 @@
     {include file="CRM/Member/Form/MembershipRenewal.tpl"}
 {elseif $action eq 16} {* Browse memberships for a contact *}
     {if $permission EQ 'edit'}
-      {capture assign=newURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership"}{/capture}
-      {capture assign=renewAllMembershipsURL}{crmURL p="civicrm/member/add" q="reset=1&action=add&renewingAll=1&cid=`$contactId`&context=membership"}{/capture}
-    {/if}
+      {capture assign=newURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership"}{/capture}{/if}
 
     {if $action ne 1 and $action ne 2 and $permission EQ 'edit'}
         <div class="help">
@@ -54,12 +52,10 @@
         <div class="action-link">
             <a accesskey="N" href="{$newURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Membership{/ts}</span></a>
             {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Membership{/ts}</span></a>
+                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Membership{/ts}</span></a><br /><br />
+            {else}
+                <br/ ><br/ >
             {/if}
-            {if ( $hasPriceSets and ($activeMembers or $inActiveMembers)) }
-                <a accesskey="N" href="{$renewAllMembershipsURL}" class="button"><span><i class="crm-i fa-renew"></i> {ts}Renew Memberships using Price Sets{/ts}</span></a>
-            {/if}
-            <br /><br />
         </div>
     {/if}
     {if NOT ($activeMembers or $inActiveMembers) and $action ne 2 and $action ne 1 and $action ne 8 and $action ne 4 and $action ne 32768}
