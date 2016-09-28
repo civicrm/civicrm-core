@@ -56,6 +56,7 @@ function civicrm_api3_product_create($params) {
  */
 function _civicrm_api3_product_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
+  $params['name']['api.required'] = 1;
 }
 
 /**
