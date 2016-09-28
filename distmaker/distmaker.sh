@@ -299,7 +299,16 @@ fi
 
 if [ "$REPOREPORT" = 1 ]; then
   echo; echo "Preparing repository report"; echo;
-  bash $P/dists/repo-report.sh
+  env \
+    L10NPACK="$L10NPACK" \
+    BPACK="$BPACK" \
+    D56PACK="$D56PACK" \
+    D5PACK="$D5PACK" \
+    D7DIR="$D7DIR" \
+    SKPACK="$SKPACK" \
+    J5PACK="$J5PACK" \
+    WP5PACK="$WP5PACK" \
+    bash $P/dists/repo-report.sh
 fi
 
 unset DM_SOURCEDIR DM_GENFILESDIR DM_TARGETDIR DM_TMPDIR DM_PHP DM_RSYNC DM_VERSION DM_ZIP
