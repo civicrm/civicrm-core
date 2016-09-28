@@ -473,12 +473,6 @@
       }
     }
   }
-
-  function status() {
-    cj("#cancel_date").val('');
-    cj("#cancel_reason").val('');
-  }
-
   </script>
   {/literal}
 
@@ -505,26 +499,26 @@
 
     {/literal}{if !$contributionMode}{literal}
      CRM.$(function($) {
-      showHideCancelInfo(cj('#contribution_status_id'));
+      showHideCancelInfo($('#contribution_status_id'));
 
-      cj('#contribution_status_id').change(function() {
-       showHideCancelInfo(cj('#contribution_status_id'));
+      $('#contribution_status_id').change(function() {
+       showHideCancelInfo($('#contribution_status_id'));
+      });
+
+      function showHideCancelInfo(obj) {
+        var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+        if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
+          $('#cancelInfo').show( );
+          $('#total_amount').attr('readonly', true);
+        }
+        else {
+          $("#cancel_date").val('');
+          $("#cancel_reason").val('');
+          $('#cancelInfo').hide( );
+          $("#total_amount").removeAttr('readonly');
+        }
       }
-       );
-     });
-
-     function showHideCancelInfo(obj) {
-       var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
-       if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
-         cj('#cancelInfo').show( );
-         cj('#total_amount').attr('readonly', true);
-       }
-       else {
-         status();
-         cj('#cancelInfo').hide( );
-         cj("#total_amount").removeAttr('readonly');
-       }
-     }
+    });
 
     {/literal}{/if}{literal}
     </script>
