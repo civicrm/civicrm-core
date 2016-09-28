@@ -240,6 +240,10 @@ function dm_git_checkout() {
   popd
 }
 
+function dm_key_value() {
+  echo -e "$1\n$2" | php -r '$lines = explode("\n", rtrim(file_get_contents("php://stdin"), "\r\n"), 2); fputcsv(STDOUT, $lines);'
+}
+
 ## usage: dm_repo_report <name> <path> <treeish>
 function dm_repo_report() {
   local COMMIT
@@ -249,5 +253,8 @@ function dm_repo_report() {
     popd >> /dev/null
   fi
   [ -z "$COMMIT" ] && COMMIT=NONE
-  echo "$1 $3 $COMMIT"
+
+  #echo -e "$1\n$3\n$COMMIT" | php -r '$lines = explode("\n", rtrim(file_get_contents("php://stdin"), "\r\n")); fputcsv(STDOUT, $lines);'
+  dm_key_value "${1}.branch" $3
+  dm_key_value "${1}.commit" $COMMIT
 }

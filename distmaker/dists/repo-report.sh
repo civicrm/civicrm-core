@@ -14,7 +14,7 @@ fi
 SRC=$DM_SOURCEDIR
 REPORT="$DM_TARGETDIR/civicrm-$DM_VERSION-repos.txt"
 
-echo '# <repo> <branch> <commit>' > "$REPORT"
+dm_key_value version "$DM_VERSION" > $REPORT
 dm_repo_report "civicrm-core"		"$DM_SOURCEDIR"			"$DM_REF_CORE"		>> $REPORT
 dm_repo_report "civicrm-backdrop@1.x"	"$DM_SOURCEDIR/backdrop"	"$DM_REF_BACKDROP"	>> $REPORT
 dm_repo_report "civicrm-drupal@6.x"	"$DM_SOURCEDIR/drupal"		"$DM_REF_DRUPAL6"	>> $REPORT
