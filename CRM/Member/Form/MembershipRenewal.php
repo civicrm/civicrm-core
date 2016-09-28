@@ -49,6 +49,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   protected $_memberEmail = NULL;
 
   /**
+   * Similarly to Membership.php & price sets.  Used to retrieve only price set
+   * values when price set changes.
+   */
+  protected $_priceSetOnly = 0;
+
+  /**
    * Contact ID of the member.
    *
    *
@@ -166,8 +172,47 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     CRM_Utils_System::setTitle(ts('Renew Membership'));
+    // there is a bunch of processing on price set id.  Make sure to retrieve it from
+    // submitteValues first when doing "submit".
+    if (!empty($this->_submitValues['price_set_id'])) {
+      $this->_priceSetId = $this->_submitValues['price_set_id'];
+    }
+    else {
+      $this->_priceSetId = CRM_Utils_Request::retrieve('priceSetId', 'Int', $this, FALSE);
+    }
+    $this->_priceSetOnly = CRM_Utils_Request::retrieve('priceSetOnly', 'Int', $this, FALSE, FALSE);
+
+    if (empty($this->_priceSetId)) {
+      $pair = CRM_Price_BAO_PriceSet::getLastPriceSetUsed($this->_id);
+      if ($pair != NULL) {
+        $this->_priceSetId = $pair['price_set_id'];
+        $this->assign('show_price_set', $pair['price_set_is_through_contribution']);
+      }
+    }
+    if (!empty($this->_submitValues['price_set_id'])) {
+      $this->assign('show_price_set', TRUE);
+    }
 
     parent::preProcess();
+  }
+
+  private function getPriceSetHasNewOrgs() {
+    if (empty($this->_priceSet)) {
+      return;
+    }
+    $contactMembersipOrgs = CRM_Member_BAO_Membership::getActiveContactMemberships ($this->_contactID);
+    foreach ($this->_priceSet['fields'] as $fieldOptions) {
+      foreach ($fieldOptions['options'] as $fieldValues) {
+        $membershipType = $fieldValues['membership_type_id'];
+        if ($membershipType) {
+          $membershipOr = CRM_Member_BAO_MembershipType::getFieldValue("CRM_Member_BAO_MembershipType", $membershipType, 'member_of_contact_id');
+          if (!in_array($membershipOr, $contactMembersipOrgs)) {
+            return TRUE;
+          }
+        }
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -187,6 +232,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['renewal_date'] = $now;
     $defaults['receive_date'] = $now;
     $defaults['receive_date_time'] = $currentTime;
+
+    if ($this->_priceSetId) {
+      CRM_Price_BAO_PriceSet::setPriceSetDefaultsToLastUsedValues($this, $defaults);
+      $defaults['price_set_id'] = $this->_priceSetId;
+    }
 
     if ($defaults['id']) {
       $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
@@ -209,7 +259,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $defaults['membership_type_id'] = $this->_memType;
     }
 
-    $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
+    if ($this->_priceSet) {
+      $defaults['financial_type_id'] = $this->_priceSet['financial_type_id'];
+    }
+    else {
+      // retrieve best price set to use for this contact & org (this will be default if user selects "use price set"
+      $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
+    }
 
     //CRM-13420
     if (empty($defaults['payment_instrument_id'])) {
@@ -253,6 +309,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('customDataType', 'Membership');
     $this->assign('customDataSubType', $this->_memType);
     $this->assign('entityID', $this->_id);
+    $selOrgMemType = array();
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
     $allMembershipInfo = array();
@@ -312,8 +369,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
 
+    $orgId = $this->allMembershipTypeDetails[$this->_memType]['member_of_contact_id'];
+
     if ($this->_memType) {
-      $this->assign('orgName', $selMemTypeOrg[$this->allMembershipTypeDetails[$this->_memType]['member_of_contact_id']]);
+      $this->assign('orgName', $selMemTypeOrg[$orgId]);
       $this->assign('memType', $this->allMembershipTypeDetails[$this->_memType]['name']);
     }
 
@@ -329,6 +388,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $selOrgMemType[$index] = $orgMembershipType;
     }
 
+    $this->buildQuickFormPriceSet($orgId);
     $js = array('onChange' => "setPaymentBlock(); CRM.buildCustomData('Membership', this.value);");
     $sel = &$this->addElement('hierselect',
       'membership_type_id',
@@ -408,10 +468,48 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         );
       }
     }
-    $this->addFormRule(array('CRM_Member_Form_MembershipRenewal', 'formRule'));
+    $this->addFormRule(array('CRM_Member_Form_MembershipRenewal', 'formRule'), $this);
     $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
     $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
     $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
+  }
+
+  private function buildQuickFormPriceSet($orgId) {
+    if ($this->_submitValues) {
+      if (!$this->_submitValues['price_set_id']) {
+        // user is 'submitting' and didn't select price set.  So no need to
+        // add price set fields for validation.
+        return;
+      }
+      else {
+        // build price set, since we'll need to validate it.
+      }
+    }
+    else {
+      // not submitting values.  Build price set.
+    }
+    // get all price sets in system that have members
+    $priceSets = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviMember');
+    // and create UI element for it
+    $this->add('select', 'price_set_id', ts('Price set'),
+          $priceSets,
+          NULL, array('onchange' => "buildAmount( this.value );")
+    );
+
+    // pass the price set id of default (or selected) price set back to smarty
+    $this->assign("priceSetId", $this->_priceSetId);
+    // set default on price set to value determined in buildQuickForm
+    $this->set("priceSetId", $this->_priceSetId);
+    // add all elements that are part of price set (these will be hidden to start)
+    // but will correspond to "last price set used".
+    CRM_Price_BAO_PriceSet::buildPriceSet($this);
+
+    // _priceSetOnly is set as request param via ajax onChange of price set field
+    // we pass it along to smarty template, so that it can exit early.
+    $this->assign("priceSetOnly", $this->_priceSetOnly);
+
+    $this->assign('price_set_has_new_orgs', $this->getPriceSetHasNewOrgs());
+
   }
 
   /**
@@ -420,20 +518,25 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
    *
+   * @param mixed $files
+   *    not used.
+   *
    * @return bool|array
    *   mixed true or array of errors
    */
-  public static function formRule($params) {
+  public static function formRule($params, $files, $self) {
     $errors = array();
-    if ($params['membership_type_id'][0] == 0) {
-      $errors['membership_type_id'] = ts('Oops. It looks like you are trying to change the membership type while renewing the membership. Please click the "change membership type" link, and select a Membership Organization.');
-    }
-    if ($params['membership_type_id'][1] == 0) {
-      $errors['membership_type_id'] = ts('Oops. It looks like you are trying to change the membership type while renewing the membership. Please click the "change membership type" link and select a Membership Type from the list.');
+    // Only validate membership type id & org, when not using price sets.  Otherwise, these *will* be missing.
+    if (empty($params['price_set_id'])) {
+      if ($params['membership_type_id'][0] == 0) {
+        $errors['membership_type_id'] = ts('Oops. It looks like you are trying to change the membership type while renewing the membership. Please click the "change membership type" link, and select a Membership Organization.');
+      }
+      if ($params['membership_type_id'][1] == 0) {
+        $errors['membership_type_id'] = ts('Oops. It looks like you are trying to change the membership type while renewing the membership. Please click the "change membership type" link and select a Membership Type from the list.');
+      }
     }
 
-    //total amount condition arise when membership type having no
-    //minimum fee
+    //total amount condition arise when membership type having no minimum fee.
     if (isset($params['record_contribution'])) {
       if (!$params['financial_type_id']) {
         $errors['financial_type_id'] = ts('Please select a Financial Type.');
@@ -445,7 +548,18 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
       }
     }
-    return empty($errors) ? TRUE : $errors;
+
+    if (empty($errors) && !empty($params['price_set_id'])) {
+      $clonedParams = $params;
+      $clonedParams['join_date'] = $params['renewal_date'];
+      // avoid warning by redefining properties used by CRM_Member_Form_Membership
+      $selfArray = (array)$self;
+      $selfArray['_onlinePendingContributionId'] = 0; // avoid warning.
+      return CRM_Member_Form_Membership::formRule($clonedParams, NULL, (object)$selfArray);
+    }
+    else {
+      return empty($errors) ? TRUE : $errors;
+    }
   }
 
   /**
@@ -497,20 +611,25 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('receive_date', $this->_params['receive_date']);
     $this->processBillingAddress();
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
-    $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
-      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
-    );
-    $this->_membershipId = $this->_id;
-    $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->_params,
-      $this->_id,
-      'Membership'
-    );
-    if (empty($this->_params['financial_type_id'])) {
-      $this->_params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
+    $this->assign('contactID', $this->_contactID);
+
+    if ($this->_priceSet) {
+      // renewing using a price set, set the default financial type (if not set) to the price set's default financial type.
+      if (empty($this->_params['financial_type_id'])) {
+        $this->_params['financial_type_id'] = _priceSet['financial_type'];
+      }
     }
+    else {
+      $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params, CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee'));
+      $this->_membershipId = $this->_id;
+      // renewing a plain "renew this membership".  Set default financial type (if not set) to membership type's default financial type.
+      if (empty($this->_params['financial_type_id'])) {
+        $this->_params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
+      }
+    }
+
     $contributionRecurID = NULL;
     $this->assign('membershipID', $this->_id);
-    $this->assign('contactID', $this->_contactID);
     $this->assign('module', 'Membership');
     $this->assign('receiptType', 'membership renewal');
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
@@ -562,68 +681,30 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->assign('trxn_id', $result['trxn_id']);
     }
 
-    $renewalDate = !empty($this->_params['renewal_date']) ? $renewalDate = CRM_Utils_Date::processDate($this->_params['renewal_date']) : NULL;
-
-    // check for test membership.
-    $isTestMembership = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_membershipId, 'is_test');
-
-    // chk for renewal for multiple terms CRM-8750
-    $numRenewTerms = 1;
-    if (is_numeric(CRM_Utils_Array::value('num_terms', $this->_params))) {
-      $numRenewTerms = $this->_params['num_terms'];
-    }
-
     //if contribution status is pending then set pay later
     $this->_params['is_pay_later'] = FALSE;
     if ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) {
       $this->_params['is_pay_later'] = 1;
     }
 
-    // These variable sets prior to renewMembership may not be required for this form. They were in
-    // a function this form shared with other forms.
-    $membershipSource = NULL;
-    if (!empty($this->_params['membership_source'])) {
-      $membershipSource = $this->_params['membership_source'];
+    // taken from membership, adds to _params
+    $this->submitAddContributionLineItemsToParams();
+
+    if ($this->_params['price_set_id']) {
+      $renewedMemberships = $this->submitRenewMembershipsPriceSet($contributionRecurID);
+      $renewMembership = $renewedMemberships[0];
     }
-
-    $isPending = ($this->_params['contribution_status_id'] == 2) ? TRUE : FALSE;
-
-    list($renewMembership) = CRM_Member_BAO_Membership::renewMembership(
-      $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
-      $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
-      $isPending,
-      $contributionRecurID, $membershipSource, $this->_params['is_pay_later'], CRM_Utils_Array::value('campaign_id',
-      $this->_params)
-    );
+    else {
+      $renewMembership = $this->submitRenewMembershipSingle($this->_id, $this->_params['membership_type_id'][1], $contributionRecurID);
+    }
 
     $this->endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
 
-    $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $renewMembership->membership_type_id,
-      'name');
+    $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $renewMembership->membership_type_id, 'name');
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
       $this->_params['contribution_source'] = "{$this->membershipTypeName} Membership: Offline membership renewal (by {$userName})";
-
-      //create line items
-      $lineItem = array();
-      $this->_params = $this->setPriceSetParameters($this->_params);
-      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $this->_params, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId
-      );
-      //CRM-11529 for quick config backoffice transactions
-      //when financial_type_id is passed in form, update the
-      //line items with the financial type selected in form
-      if ($submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $this->_params)) {
-        foreach ($lineItem[$this->_priceSetId] as &$li) {
-          $li['financial_type_id'] = $submittedFinancialType;
-        }
-      }
-
-      if (!empty($lineItem)) {
-        $this->_params['lineItems'] = $lineItem;
-        $this->_params['processPriceSet'] = TRUE;
-      }
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
@@ -726,6 +807,96 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         )
       );
     }
+  }
+
+  private function submitAddContributionLineItemsToParams() {
+    //create line items
+    $lineItem = array();
+    $this->_params = $this->setPriceSetParameters($this->_params);
+    CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $this->_params, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId);
+
+    // litespeedmarc: commented out, this only made sense for price set based renewals
+    // for single membership renewals, this doesn't apply.  And for price set based
+    // ones, we always want to use price set line items, unless quick config (see
+    // similar logic in CRM_Member_Form_Membership.php), which doesn't apply here.
+    //    //CRM-11529 for quick config backoffice transactions
+    //    //when financial_type_id is passed in form, update the
+    //    //line items with the financial type selected in form
+    //    $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $this->_params);
+    //    if ($submittedFinancialType) {
+    //      foreach ($lineItem[$this->_priceSetId] as &$li) {
+    //        $li['financial_type_id'] = $submittedFinancialType;
+    //      }
+    //    }
+
+    if (!empty($lineItem)) {
+      $this->_params['lineItems'] = $lineItem;
+      $this->_params['processPriceSet'] = TRUE;
+    }
+  }
+
+  private function submitRenewMembershipsPriceSet($contributionRecurID) {
+    $allOrgsByType = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization();
+
+    $membershipTypesSelected = CRM_Member_Form_Membership::getSelectedMemberships(
+      $this->_priceSet,
+      $this->_params
+    );
+
+    $renewedMemberships = array();
+
+    $allMemTypesByOrg = CRM_Member_BAO_Membership::getContactMemberhipsByMembeshipOrg($this->_contactID);
+
+    $priceFieldValueIds = array_keys($this->_params['lineItems'][$this->_priceSetId]);
+    $cnt = 0;
+    foreach ($membershipTypesSelected as $memType) {
+      $org = $allOrgsByType[$memType];
+      $membershipIdToUpdate = $allMemTypesByOrg[$org]['membership_id'] ?: NULL;
+      $membership = $this->submitRenewMembershipSingle($membershipIdToUpdate, $memType, $contributionRecurID);
+      // set the id on the line item.  This will result in the proper line_item row being created later on in
+      // CRM_Price_BAO_LineItem::processPriceSet (This is certainly a Demeter Law violation!)
+      $this->_params['lineItems'][$this->_priceSetId][$priceFieldValueIds[$cnt++]]['entity_id'] = $membership->id;
+      array_push($renewedMemberships, $membership);
+    }
+    return $renewedMemberships;
+
+  }
+
+
+  private function submitRenewMembershipSingle($membershiId, $membershpiTypeId, $contributionRecurID) {    // check for test membership.
+    $isPending = ($this->_params['contribution_status_id'] == 2) ? TRUE : FALSE;
+
+    // most vars are the same.  Some differ depending on whether a new membership, or renewing an existing one.
+
+    // set test flag... copy from pre-existing membership, or if new membership, copy from membersihp from which it was copied.
+    $isTestMembership = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', !$membershiId ? $this->_id : $membershiId, 'is_test');
+    $renewalDate = !empty($this->_params['renewal_date']) ? CRM_Utils_Date::processDate($this->_params['renewal_date']) : NULL;
+    $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->_params, $membershiId, 'Membership');
+
+    // These variable sets prior to renewMembership may not be required for this form. They were in
+    // a function this form shared with other forms.
+    $membershipSource = NULL;
+    if (!empty($this->_params['membership_source'])) {
+      $membershipSource = $this->_params['membership_source'];
+    }
+
+    // chk for renewal for multiple terms CRM-8750
+    $numRenewTerms = 1;
+    if (is_numeric(CRM_Utils_Array::value('num_terms', $this->_params))) {
+      $numRenewTerms = $this->_params['num_terms'];
+    }
+
+    list($result) = CRM_Member_BAO_Membership::renewMembership(
+            $this->_contactID,          $membershpiTypeId,
+            $isTestMembership,          $renewalDate,
+            NULL,                       $customFieldsFormatted,
+            $numRenewTerms,             $membershiId,
+            $isPending,                 $contributionRecurID,
+            $membershipSource,          $this->_params['is_pay_later'],
+            CRM_Utils_Array::value('campaign_id', $this->_params)
+    );
+    return $result;
+
   }
 
 }

@@ -44,7 +44,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
   public $_permission = NULL;
   public $_contactId = NULL;
-  public $_renewingAll = 0;
 
   /**
    * called when action is browse.
@@ -211,7 +210,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
     $activeMembers = CRM_Member_BAO_Membership::activeMembers($membership);
     $inActiveMembers = CRM_Member_BAO_Membership::activeMembers($membership, 'inactive');
-    $this->assign('hasPriceSets', CRM_Price_BAO_PriceSet::getCountOfPriceSetsWithMemberships());
     $this->assign('activeMembers', $activeMembers);
     $this->assign('inActiveMembers', $inActiveMembers);
     $this->assign('membershipTypes', $membershipTypes);
@@ -286,7 +284,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     }
     else {
       $path = 'CRM_Member_Form_Membership';
-      $title = $this->_renewingAll ? ts('Renew Memberships') : ts('Create Membership');
+      $title = ts('Create Membership');
     }
 
     $controller = new CRM_Core_Controller_Simple($path, $title, $this->_action);
@@ -294,7 +292,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $controller->set('BAOName', $this->getBAOName());
     $controller->set('id', $this->_id);
     $controller->set('cid', $this->_contactId);
-    $controller->set('renewingAll', $this->_renewingAll);
     return $controller->run();
   }
 
@@ -313,8 +310,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
     }
-
-    $this->_renewingAll = ($this->_action & CRM_Core_Action::ADD) && CRM_Utils_Request::retrieve('renewingAll', 'Boolean', $this, FALSE);
 
     $this->assign('action', $this->_action);
 
