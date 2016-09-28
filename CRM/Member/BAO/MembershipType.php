@@ -643,17 +643,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *   array of the details of membership types with Member of Contact id
    */
   public static function getMemberOfContactByMemTypes($membershipTypes) {
-    $memTypeOrganizations = array();
     if (empty($membershipTypes)) {
-      return $memTypeOrganizations;
+      return array();
     }
 
     $result = CRM_Core_DAO::executeQuery("SELECT id, member_of_contact_id FROM civicrm_membership_type WHERE id IN (" . implode(',', $membershipTypes) . ")");
-    while ($result->fetch()) {
-      $memTypeOrganizations[$result->id] = $result->member_of_contact_id;
-    }
-
-    return $memTypeOrganizations;
+    return $result->fetchMap('id', 'member_of_contact_id');
   }
 
   /**

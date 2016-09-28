@@ -873,14 +873,20 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $joinDate = NULL;
-    $memTypeToMemIdUpdateMap = CRM_Member_BAO_Membership::getMembershipIdsForMembershipTypeOrgs(
-        $self->_contactID,
-        $selectedMemberships
-    );
     if ($self->_renewingAll) {
+      $contactMemberships = CRM_Member_BAO_Membership::getContactMemberhipsByMembeshipOrg($self->_contactID);
+      $allOrgsByMemType = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization();
+
       // Renewing mulitple memberships.  JoinDate will be required if some of the
       // selected price set options will result in creation of a new membership
-      $joinDateRequired = in_array(NULL, array_values($memTypeToMemIdUpdateMap), TRUE);
+      $joinDateRequired = FALSE;
+      foreach ($selectedMemberships as $selectedMembershipType) {
+        $seletedMembershipOrg = $allOrgsByMemType[$selectedMembershipType];
+        if (empty($contactMemberships[$seletedMembershipOrg])) {
+          $joinDateRequired = TRUE;
+          break;
+        }
+      }
     }
     else {
       // Adding, of course join date must be specified.
@@ -1309,11 +1315,21 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $memTypeNumTerms = empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
 
+    $allOrgsByType = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization();
+    $memTypeToMemIds = array();
     if ($this->_renewingAll) {
-      $memTypeToMemIds = CRM_Member_BAO_Membership::getMembershipIdsForMembershipTypeOrgs($this->_contactID, $this->_memTypeSelected);
+      $allMemTypesByOrg = CRM_Member_BAO_Membership::getContactMemberhipsByMembeshipOrg($this->_contactID);
+      foreach ($this->_memTypeSelected as $memType) {
+        $org = $allOrgsByType[$memType];
+        if ( !empty($allMemTypesByOrg[$org]['membership_id'])) {
+           $memTypeToMemIds[$memType] = $allMemTypesByOrg[$org]['membership_id'];
+        } else {
+           $memTypeToMemIds[$memType] = NULL;
+        }
+      }
     }
     else {
-      foreach (array_keys($membershipTypes) as $memType) {
+      foreach ($this->_memTypeSelected as $memType) {
         $memTypeToMemIds[$memType] = NULL;
       }
     }
@@ -1324,21 +1340,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $memTypeNumTerms = CRM_Utils_Array::value($memType, $termsByType, 1);
       }
 
-      // if renewing, and membership exists, don't change join date.
-      if (!$memTypeToMemIds[$memType]) {
-        $joinDate = NULL;
-        $startDate = NULL;
-      }
-
       $calcDates[$memType] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
         $joinDate, $startDate, $endDate, $memTypeNumTerms
       );
-
-      // if renewing, and membership exists, don't change join date.
-      if (!$memTypeToMemIds[$memType]) {
-        $joinDate = NULL;
-        $startDate = NULL;
-      }
     }
 
     foreach ($calcDates as $memType => $calcDate) {
