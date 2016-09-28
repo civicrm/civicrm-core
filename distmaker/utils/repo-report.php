@@ -42,12 +42,14 @@ if (getenv('D5PACK')) {
   $data['tar']['Drupal'] = "civicrm-$DM_VERSION-drupal.tar.gz";
 }
 if (getenv('WPPACK')) {
-  $data['tar']['WordPresse'] = "civicrm-$DM_VERSION-wordpress.zip";
+  $data['tar']['WordPress'] = "civicrm-$DM_VERSION-wordpress.zip";
 }
 if (getenv('L10NPACK')) {
   $data['tar']['L10n'] = "civicrm-$DM_VERSION-l10n.tar.gz";
 }
 
 ksort($data);
+ksort($data['tar']);
+ksort($data['git']);
 $data['rev'] = md5(json_encode($data));
 echo json_encode($data);
