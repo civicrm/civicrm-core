@@ -1,12 +1,25 @@
 <?php
 
+/**
+ * Make a small report about the git content in a given folder+branch.
+ * @param string $path
+ * @param string $branch
+ * @return array
+ *   - branch: string
+ *   - commit: string
+ */
 function repo($path, $branch) {
   $escPath = escapeshellarg($path);
   $escBranch = escapeshellarg($branch);
-  return array(
-    'branch' => $branch,
-    'commit' => `cd $escPath ; git show $escBranch | head -n1 | cut -f2 -d\ `,
-  );
+  $commit = file_exists($path) ? trim(`cd $escPath ; git show $escBranch | head -n1 | cut -f2 -d\ `) : NULL;
+  if (!empty($commit)) {
+    return array(
+      'branch' => $branch,
+      'commit' => $commit,
+    );
+  } else {
+    return array();
+  }
 }
 
 $DM_SOURCEDIR = getenv('DM_SOURCEDIR');
@@ -51,5 +64,5 @@ if (getenv('L10NPACK')) {
 ksort($data);
 ksort($data['tar']);
 ksort($data['git']);
-$data['rev'] = md5(json_encode($data));
+$data['rev'] = $DM_VERSION . '-' . md5(json_encode($data));
 echo json_encode($data);
