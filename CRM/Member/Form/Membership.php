@@ -1333,10 +1333,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $allMemTypesByOrg = CRM_Member_BAO_Membership::getContactMemberhipsByMembeshipOrg($this->_contactID);
       foreach ($this->_memTypeSelected as $memType) {
         $org = $allOrgsByType[$memType];
-        if ( !empty($allMemTypesByOrg[$org]['membership_id'])) {
-           $memTypeToMemIds[$memType] = $allMemTypesByOrg[$org]['membership_id'];
-        } else {
-           $memTypeToMemIds[$memType] = NULL;
+        if (!empty($allMemTypesByOrg[$org]['membership_id'])) {
+          $memTypeToMemIds[$memType] = $allMemTypesByOrg[$org]['membership_id'];
+        }
+        else {
+          $memTypeToMemIds[$memType] = NULL;
         }
       }
     }

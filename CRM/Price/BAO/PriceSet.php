@@ -1889,7 +1889,6 @@ WHERE       ps.id = %1
       }
     }
 
-
     // give preference to price field values from contact (overriding $defaultOrg)
     foreach ($contactOrgMemberships as $member_of_contact_id => $membership_info) {
       $idealPriceFieldId = $membership_info['price_field_id'];
