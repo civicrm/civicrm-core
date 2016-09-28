@@ -333,6 +333,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $params['line_item'] = $params['lineItems'];
     }
 
+    //we failed to retrieve an existing membership payment contribution_id, just above.
+    //This means we're dealing with a first contribution.
     //do cleanup line  items if membership edit the Membership type.
     if (empty($ids['contribution']) && !empty($ids['membership'])) {
       CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
@@ -2550,26 +2552,55 @@ WHERE      civicrm_membership.is_test = 0";
             left join civicrm_line_item li
                    on li.entity_table = 'civicrm_membership'
                   and li.entity_id = mem.id
+                  and li.price_field_value_id in (select id from civicrm_price_field_value pfv where membership_type_id in (select id from civicrm_membership_type mt2 where mt2.member_of_contact_id  = org.member_of_contact_id))
             left join civicrm_contribution co
                 on co.id = li.contribution_id
             left join civicrm_membership_status st
                 on st.id = mem.status_id
-          order by  member_of_contact_id, is_current_member desc, receive_date desc";
+          order by  member_of_contact_id, is_current_member desc, receive_date desc, li.contribution_id desc";
 
     $dao = CRM_CORE_DAO::executeQuery($query, array(1 => array($contactId, 'Int')));
     $last = 0;
     $toReturn = array();
     while ($dao->fetch()) {
-      // only return one row per array.  This is easier than creating the crazy
+      // only return one row per member org.  This is easier than creating the crazy
       // subquery that would be required to get the same result.
       if ($dao->member_of_contact_id === $last) {
         continue;
       }
       $last = $dao->member_of_contact_id;
       $toReturn[$last] = (array) $dao;
+      $last = $dao->member_of_contact_id;
     }
 
     return $toReturn;
+  }
+
+  /**
+   *
+   * @param int $contact_id
+   * @return array
+   *   Array (int, int, int): The membership orgs that contact is part of.
+   */
+  public static function getActiveContactMemberships($contact_id) {
+    $sql = "select distinct member_of_contact_id
+  from civicrm_membership
+  	inner join civicrm_membership_type t on t.id = civicrm_membership.membership_type_id
+ where status_id in (select id from civicrm_membership_status where is_current_member = 1)
+   and contact_id = $contact_id
+   ";
+    $dao = self::executeQuery($sql);
+    $contact_membership_orgs = array();
+    $cnt = 0;
+    while ($dao->fetch()) {
+      array_push($contact_membership_orgs, $dao->member_of_contact_id);
+      $cnt++;
+    }
+    if (empty($contact_membership_orgs) || $cnt < 1) {
+      return NULL;
+    } else {
+      return $contact_membership_orgs;
+    }
   }
 
 }

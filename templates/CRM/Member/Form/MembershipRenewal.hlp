@@ -1,0 +1,9 @@
+{htxt id="join_date"}
+<p>
+{ts}This price set includes membership organizations for which this contact is not yet a member of.{ts}&nbsp
+{ts}If you select any of these options, you will also need to specify the 'member since' field.{ts}
+<p>
+{ts}Specifying a value in this field will not impact any of the existing membership options.{ts}
+<p>
+{ts}By default, the 'member since' will be set to the original 'member since' date of the membership being renewed.{ts}
+{/htxt}
