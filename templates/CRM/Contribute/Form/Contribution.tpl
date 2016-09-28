@@ -40,9 +40,12 @@
   {/if}
   {if $contributionMode}
   <div class="help">
-    {if $contactId}
-      {ts 1=$displayName 2=$contributionMode|upper}Use this form to {if $payNow} edit {else} submit a new {/if} contribution on behalf of %1. <strong>A
-        %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+    {if $contactId && $payNow}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to edit a contribution on behalf of %1. <strong>A
+      %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+    {elseif $contactId}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
+      %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {else}
       {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {/if}
