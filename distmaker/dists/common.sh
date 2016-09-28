@@ -239,22 +239,3 @@ function dm_git_checkout() {
     git checkout "$2"
   popd
 }
-
-function dm_key_value() {
-  echo -e "$1\n$2" | php -r '$lines = explode("\n", rtrim(file_get_contents("php://stdin"), "\r\n"), 2); fputcsv(STDOUT, $lines);'
-}
-
-## usage: dm_repo_report <name> <path> <treeish>
-function dm_repo_report() {
-  local COMMIT
-  if [ -d "$2" ]; then
-    pushd "$2" >> /dev/null
-      COMMIT=$(git show "$3" | head -n1 | cut -f2 -d\  )
-    popd >> /dev/null
-  fi
-  [ -z "$COMMIT" ] && COMMIT=NONE
-
-  #echo -e "$1\n$3\n$COMMIT" | php -r '$lines = explode("\n", rtrim(file_get_contents("php://stdin"), "\r\n")); fputcsv(STDOUT, $lines);'
-  dm_key_value "${1}.branch" $3
-  dm_key_value "${1}.commit" $COMMIT
-}

@@ -12,14 +12,17 @@ fi
 . "$P/common.sh"
 
 SRC=$DM_SOURCEDIR
-REPORT="$DM_TARGETDIR/civicrm-$DM_VERSION-repos.txt"
+REPORT="$DM_TARGETDIR/civicrm-$DM_VERSION-repos.json"
 
-dm_key_value version "$DM_VERSION" > $REPORT
-dm_repo_report "civicrm-core"		"$DM_SOURCEDIR"			"$DM_REF_CORE"		>> $REPORT
-dm_repo_report "civicrm-backdrop@1.x"	"$DM_SOURCEDIR/backdrop"	"$DM_REF_BACKDROP"	>> $REPORT
-dm_repo_report "civicrm-drupal@6.x"	"$DM_SOURCEDIR/drupal"		"$DM_REF_DRUPAL6"	>> $REPORT
-dm_repo_report "civicrm-drupal@7.x"	"$DM_SOURCEDIR/drupal"		"$DM_REF_DRUPAL"	>> $REPORT
-#dm_repo_report "civicrm-drupal@8.x"	"$DM_SOURCEDIR/drupal"		"$DM_REF_DRUPAL8"	>> $REPORT
-dm_repo_report "civicrm-joomla" 	"$DM_SOURCEDIR/joomla"		"$DM_REF_JOOMLA"	>> $REPORT
-dm_repo_report "civicrm-wordpress"	"$DM_SOURCEDIR/WordPress"	"$DM_REF_WORDPRESS"	>> $REPORT
-dm_repo_report "civicrm-packages"	"$DM_SOURCEDIR/packages"	"$DM_REF_PACKAGES"	>> $REPORT
+env \
+  DM_VERSION="$DM_VERSION" \
+  DM_SOURCEDIR="$DM_SOURCEDIR" \
+  DM_REF_CORE="$DM_REF_CORE" \
+  DM_REF_BACKDROP="$DM_REF_BACKDROP" \
+  DM_REF_DRUPAL6="$DM_REF_DRUPAL6" \
+  DM_REF_DRUPAL="$DM_REF_DRUPAL" \
+  DM_REF_JOOMLA="$DM_REF_JOOMLA" \
+  DM_REF_WORDPRESS="$DM_REF_WORDPRESS" \
+  DM_REF_PACKAGES="$DM_REF_PACKAGES" \
+  php "$DM_SOURCEDIR/distmaker/utils/repo-report.php" > "$REPORT"
+
