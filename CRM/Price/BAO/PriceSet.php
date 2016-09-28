@@ -1815,7 +1815,7 @@ WHERE       ps.id = %1
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     if ($dao->fetch()) {
-      $dao->price_set_id;
+      return $dao->price_set_id;
     }
   }
 
@@ -1824,68 +1824,93 @@ WHERE       ps.id = %1
       return $defaults;
     }
 
-    $contactMemTypesByMemOf = CRM_Member_BAO_Membership::getContactMemberhipsByMembeshipOrg($form->_contactID);
+    // this is detailed info on how membership orgs, and the best membership type & price set field to use
+    $contactOrgMemberships = CRM_Member_BAO_Membership::getContactMemberhipsByMembeshipOrg($form->_contactID);
 
-    // start by setting defaults?
-    // Leaving out.  E.g., default is to select & first add didn't select.
-    // self::setDefaultPriceSet($form, $defaults);
-    $allMemTypes = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
-    $allMemOfByMemTypes = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes(array_keys($allMemTypes));
+    // we need a list of all membership types, and the org that corresponds to them
+    // we use this later to associate price set mem type to the org it represents.
+    $allMemTypes = array_keys(CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE));
+    $allMemOfByMemTypes = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($allMemTypes);
 
-    // go through all price fields
+    // go through all price fields & options
     foreach ($form->_priceSet['fields'] as $priceFieldId => $priceField) {
-      // pick last option if active.
-      // if optional, pick last option active
       foreach ($priceField['options'] as $optionId => $option) {
         // price option isn't membership oriented.  Ignore
-        if (!array_key_exists('membership_type_id', $option) || !$option['membership_type_id']) {
+        // potential future enhancement: lookup last 'value' used for this price
+        // set (through civicrm_contribution -> civicrm_line_item)
+        if (empty($option['membership_type_id'])) {
           continue;
         }
 
-        if (!array_key_exists($option['membership_type_id'], $allMemOfByMemTypes)) {
+        if (empty(
+            // crazy expression to check that:
+            // given that price set's membership type ($option['membership_type_id'])
+            // we can lookup that type's "main org' ($allMemOfByMemTypes[previous])
+            // and that that contact has had a membership with that org ($contactMemTypesByMemOf[previous])
+            $contactOrgMemberships[$allMemOfByMemTypes[$option['membership_type_id']]]
+        )) {
+          // the price set option's membership type isn't one that this contact was ever part of
+          // Don't select it.
+          // Potential future enhancement: may be we should select it if:
+          //    Nothing gets selected for this 'select'/'radio', and it is default
+          //     OR
+          //    It is a checkbox, and its default is checked.
           continue;
         }
 
         $memOf = $allMemOfByMemTypes[$option['membership_type_id']];
-        // member of contact id not set for membership type?  Either way, can't use.  Ignore.
-        if (!$memOf) {
-          continue;
-        }
-
-        // contact never a contact of this "member of contact".  So nothing to renew.  Ignore.
-        if (!array_key_exists($memOf, $contactMemTypesByMemOf)) {
-          continue;
-        }
 
         // this is the option we want to renew with (for the org).  It may or may not exist in the price set.
-        $bestOptionMemTypeId = $contactMemTypesByMemOf[$memOf]['membership_type_id'];
+        $bestOptionMemTypeId = $contactOrgMemberships[$memOf]['membership_type_id'];
         // either way we only care for the current option being looked at
         if ($bestOptionMemTypeId !== $option['membership_type_id']) {
           continue;
         }
-        $bestOptionIsActive = $contactMemTypesByMemOf[$memOf]['is_current_member'];
-        $priceFieldName = 'price_' . $option['price_field_id'];
+        $bestOptionIsActive = $contactOrgMemberships[$memOf]['is_current_member'];
 
         // if radio or select
         if ($priceField['html_type'] == 'Radio' || $priceField['html_type'] == 'Select') {
           // if mandatory, pick last option used ever
           if ($priceField['is_required']) {
-            self::setDefaultPriceSetField($priceFieldName, $optionId, $priceField['html_type'], $defaults);
+            $defaultOrgPf[$memOf] = array($priceFieldId, $optionId, $priceField['html_type']);
           }
           elseif ($bestOptionIsActive) {
             // optional.  Only pick if active
-            self::setDefaultPriceSetField($priceFieldName, $optionId, $priceField['html_type'], $defaults);
+            $defaultOrgPf[$memOf] = array($priceFieldId, $optionId, $priceField['html_type']);
           }
         }
         else {
           // check box.  Only pick if active
           if ($bestOptionIsActive) {
             // optional.  Only pick if active
-            self::setDefaultPriceSetField($priceFieldName, $optionId, $priceField['html_type'], $defaults);
+            $defaultOrgPf[$memOf] = array($priceFieldId, $optionId, $priceField['html_type']);
           }
         }
       }
     }
+
+
+    // give preference to price field values from contact (overriding $defaultOrg)
+    foreach ($contactOrgMemberships as $member_of_contact_id => $membership_info) {
+      $idealPriceFieldId = $membership_info['price_field_id'];
+      $idealPriceValueId = $membership_info['price_field_value_id'];
+
+      if (!empty(
+          // crazy ref to get to the contact's last price set any one of these may not be
+          $form->_priceSet['fields'][$idealPriceFieldId]['options'][$idealPriceValueId]
+      )) {
+        $type = $form->_priceSet['fields'][$idealPriceFieldId]['html_type'];
+        $defaultOrgPf[$member_of_contact_id] = array($idealPriceFieldId, $idealPriceValueId, $type);
+      }
+    }
+
+    // now go ahead and select
+    foreach ($defaultOrgPf as $member_of_contact_id => $selectOptions) {
+      $priceFieldName = "price_$selectOptions[0]";
+      // old code: self::setDefaultPriceSetField($priceFieldName, $optionId, $priceField['html_type'], $defaults);
+      self::setDefaultPriceSetField($priceFieldName, $selectOptions[1], $selectOptions[2], $defaults);
+    }
+
     return $defaults;
   }
 
