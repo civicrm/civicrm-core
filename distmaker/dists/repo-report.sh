@@ -12,7 +12,7 @@ fi
 . "$P/common.sh"
 
 SRC=$DM_SOURCEDIR
-REPORT="$DM_TARGETDIR/civicrm-$DM_VERSION-repos.json"
+REPORT="$DM_TARGETDIR/civicrm-$DM_VERSION.json"
 
 env \
   DM_VERSION="$DM_VERSION" \
@@ -32,5 +32,5 @@ env \
   SKPACK="$SKPACK" \
   J5PACK="$J5PACK" \
   WP5PACK="$WP5PACK" \
-  php "$DM_SOURCEDIR/distmaker/utils/repo-report.php" > "$REPORT"
-
+  php "$DM_SOURCEDIR/distmaker/utils/repo-report.php" \
+  > "$REPORT"
