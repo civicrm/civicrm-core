@@ -2967,4 +2967,63 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('contact_undelete' => TRUE));
   }
 
+  /**
+   * Ensure format with return=group shows comma-separated group IDs.
+   *
+   * CRM-19426
+   */
+  public function testContactGetReturnGroup() {
+    // Set up a contact, asser that they were created.
+    $contact_params = array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Test',
+      'last_name' => 'Groupmember',
+      'email' => 'test@example.org',
+    );
+    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $this->assertEquals(0, $create_contact['is_error']);
+    $this->assertInternalType('int', $create_contact['id']);
+
+    $created_contact_id = $create_contact['id'];
+
+    // Set up multiple groups, add the contact to the groups.
+    $test_groups = array('Test group A', 'Test group B');
+    foreach ($test_groups as $title) {
+      // Use this contact as group owner, since we know they exist.
+      $group_params = array(
+        'title' => $title,
+        'created_id' => $created_contact_id,
+      );
+      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $this->assertEquals(0, $create_group['is_error']);
+      $this->assertInternalType('int', $create_group['id']);
+
+      $created_group_ids[] = $create_group['id'];
+
+      // Add contact to the new group.
+      $group_contact_params = array(
+        'contact_id' => $created_contact_id,
+        'group_id' => $create_group['id'],
+      );
+      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+      $this->assertEquals(0, $create_group_contact['is_error']);
+      $this->assertInternalType('int', $create_group_contact['added']);
+    }
+
+    // Use the Contact,get API to retrieve the contact
+    $contact_get_params = array(
+      'id' => $created_contact_id,
+      'return' => 'group',
+    );
+    $contact_get = $this->callApiSuccess('Contact', 'get', $contact_get_params);
+    $this->assertInternalType('array', $contact_get['values'][$created_contact_id]);
+    $this->assertInternalType('string', $contact_get['values'][$created_contact_id]['groups']);
+
+    // Ensure they are shown as being in each created group.
+    $contact_group_ids = explode(',', $contact_get['values'][$created_contact_id]['groups']);
+    foreach ($created_group_ids as $created_group_id) {
+      $this->assertContains($created_group_id, $contact_group_ids);
+    }
+  }
+
 }
