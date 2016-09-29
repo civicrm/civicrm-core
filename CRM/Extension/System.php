@@ -334,4 +334,5 @@ class CRM_Extension_System {
     }
     return $extensionRow;
   }
+
 }
