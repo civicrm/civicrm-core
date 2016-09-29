@@ -741,7 +741,7 @@
         restrict: 'EA',
         scope: {
           crmUiWizard: '@',
-          crmUiWizardNavClass: '@'
+          crmUiWizardNavClass: '@' // string, A list of classes that will be added to the nav items
         },
         templateUrl: '~/crmUi/wizard.html',
         transclude: true,
@@ -879,8 +879,8 @@
         restrict: 'EA',
         scope: {
           crmTitle: '@', // expression, evaluates to a printable string
-          crmUiWizardStep: '@' // int, a weight which determines the ordering of the steps
-          crmUiWizardStepClass: '@' // int, a weight which determines the ordering of the steps
+          crmUiWizardStep: '@', // int, a weight which determines the ordering of the steps
+          crmUiWizardStepClass: '@' // string, A list of classes that will be added to the template
         },
         template: '<div class="crm-wizard-step {{crmUiWizardStepClass}}" ng-show="selected" ng-transclude/></div>',
         transclude: true,
