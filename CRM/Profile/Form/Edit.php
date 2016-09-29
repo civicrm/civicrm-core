@@ -48,7 +48,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   protected $_context;
   protected $_blockNo;
   protected $_prefix;
-  protected $returnExtra = array();
+  protected $returnExtra;
 
   /**
    * Pre processing work done here.
@@ -73,8 +73,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     $this->_prefix = CRM_Utils_Request::retrieve('prefix', 'String', $this);
 
     // Fields for the EntityRef widget
-    $returnExtra = CRM_Utils_Request::retrieve('returnExtra', 'String', $this);
-    $this->returnExtra = $returnExtra ? explode(',', $returnExtra) : array();
+    $this->returnExtra = CRM_Utils_Request::retrieve('returnExtra', 'String', $this);
 
     $this->assign('context', $this->_context);
 
@@ -264,13 +263,15 @@ SELECT module,is_reserved
     parent::postProcess();
 
     // Send back data for the EntityRef widget
-    $contact = civicrm_api3('Contact', 'getsingle', array(
-      'id' => $this->_id,
-      'return' => array_merge(array('sort_name'), $this->returnExtra),
-    ));
-    $this->ajaxResponse['label'] = $contact['sort_name'];
-    foreach ($this->returnExtra as $field) {
-      $this->ajaxResponse['extra'][$field] = CRM_Utils_Array::value($field, $contact);
+    if ($this->returnExtra) {
+      $contact = civicrm_api3('Contact', 'getsingle', array(
+        'id' => $this->_id,
+        'return' => $this->returnExtra,
+      ));
+      foreach (explode(',', $this->returnExtra) as $field) {
+        $field = trim($field);
+        $this->ajaxResponse['extra'][$field] = CRM_Utils_Array::value($field, $contact);
+      }
     }
 
     // When saving (not deleting) and not in an ajax popup
