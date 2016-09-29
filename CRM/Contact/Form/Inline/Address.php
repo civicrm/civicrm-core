@@ -125,6 +125,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   public function buildQuickForm() {
     parent::buildQuickForm();
     CRM_Contact_Form_Edit_Address::buildQuickForm($this, $this->_locBlockNo, TRUE, TRUE);
+    $this->addFormRule(array('CRM_Contact_Form_Edit_Address', 'formRule'), $this);
   }
 
   /**
