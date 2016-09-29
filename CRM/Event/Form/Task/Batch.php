@@ -523,7 +523,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $notifyingStatuses = array_intersect($notifyingStatuses, CRM_Event_PseudoConstant::participantStatus());
     $this->assign('status', TRUE);
     if (!empty($notifyingStatuses)) {
-      $this->assign('notifyingStatuses', implode(', ', $notifyingStatuses));
+      $s = '<em>' . implode('</em>, <em>', $notifyingStatuses) . '</em>';
+      $this->assign('notifyingStatuses', $s);
     }
   }
 
