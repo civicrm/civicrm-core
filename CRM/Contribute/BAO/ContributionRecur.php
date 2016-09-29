@@ -902,6 +902,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
     $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
+    $lineSets = array();
     if (count($lineItems) == 1) {
       foreach ($lineItems as $index => $lineItem) {
         if ($financial_type_id) {
@@ -920,6 +921,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         $lineSets[$priceField->price_set_id][] = $lineItem;
       }
     }
+    // CRM-19309 if more than one then just pass them through:
+    elseif (count($lineItems) > 1) {
+      foreach ($lineItems as $index => $lineItem) {
+        $lineSets[$index][] = $lineItem;
+      }
+    }
+
     return $lineSets;
   }
 

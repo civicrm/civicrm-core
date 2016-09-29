@@ -189,6 +189,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
     $tables = array(
       'civicrm_event',
       'civicrm_contribution_page',
+      'civicrm_survey',
     );
     // Identical keys & values
     return array_combine($tables, $tables);

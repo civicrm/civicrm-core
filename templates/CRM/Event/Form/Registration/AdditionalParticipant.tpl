@@ -49,7 +49,7 @@
     <div class="messages status no-popup" style="width:25%"><span id="event_participant_status"></span></div>
 {/if}
 
-<div class="crm-block crm-event-additionalparticipant-form-block">
+<div class="crm-event-id-{$event.id} crm-block crm-event-additionalparticipant-form-block">
 {if $priceSet}
      <fieldset id="priceset" class="crm-public-form-item crm-group priceset-group"><legend>{$event.fee_label}</legend>
         {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}

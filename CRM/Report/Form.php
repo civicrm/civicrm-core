@@ -88,7 +88,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @var array
    */
-  protected $_options = array();
+  public $_options = array();
 
   /**
    * By default most reports hide contact id.
@@ -3746,6 +3746,15 @@ ORDER BY cg.weight, cf.weight";
           $curFilters[$fieldName]['type'] = CRM_Utils_Type::T_STRING;
       }
 
+      // CRM-19401 fix
+      if ($customDAO->html_type == 'Select' && !array_key_exists('options', $curFilters[$fieldName])) {
+        $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $customDAO->cf_id, array(), 'search');
+        if ($options !== FALSE) {
+          $curFilters[$fieldName]['operatorType'] = CRM_Core_BAO_CustomField::isSerialized($customDAO) ? CRM_Report_Form::OP_MULTISELECT_SEPARATOR : CRM_Report_Form::OP_MULTISELECT;
+          $curFilters[$fieldName]['options'] = $options;
+        }
+      }
+
       if (!array_key_exists('type', $curFields[$fieldName])) {
         $curFields[$fieldName]['type'] = CRM_Utils_Array::value('type', $curFilters[$fieldName], array());
       }
@@ -4620,12 +4629,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     // upload strictly for '.png' images
     $name = trim(basename(CRM_Utils_Request::retrieve('name', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET')));
     if (preg_match('/\.png$/', $name)) {
-      //
-      // POST data is usually string data, but we are passing a RAW .png
-      // so PHP is a bit confused and $_POST is empty. But it has saved
-      // the raw bits into $HTTP_RAW_POST_DATA
-      //
-      $httpRawPostData = $GLOBALS['HTTP_RAW_POST_DATA'];
+
+      // Get the RAW .png from the input.
+      $httpRawPostData = file_get_contents("php://input");
 
       // prepare the directory
       $config = CRM_Core_Config::singleton();

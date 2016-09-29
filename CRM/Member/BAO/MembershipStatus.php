@@ -207,6 +207,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     //delete from membership Type table
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->id = $membershipStatusId;
+    if (!$membershipStatus->find()) {
+      throw new CRM_Core_Exception(ts('Cannot delete membership status ' . $membershipStatusId));
+    }
     $membershipStatus->delete();
     CRM_Member_PseudoConstant::flush('membershipStatus');
     $membershipStatus->free();

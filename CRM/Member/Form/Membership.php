@@ -1004,22 +1004,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $form->assign('customValues', $customValues);
 
     if ($form->_mode) {
-      // assign the address formatted up for display
-      $addressParts = array(
-        "street_address-{$form->_bltID}",
-        "city-{$form->_bltID}",
-        "postal_code-{$form->_bltID}",
-        "state_province-{$form->_bltID}",
-        "country-{$form->_bltID}",
-      );
-      $addressFields = array();
-      foreach ($addressParts as $part) {
-        list($n, $id) = explode('-', $part);
-        if (isset($form->_params['billing_' . $part])) {
-          $addressFields[$n] = $form->_params['billing_' . $part];
-        }
-      }
-      $form->assign('address', CRM_Utils_Address::format($addressFields));
+      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
+        $form->_params,
+        $form->_bltID
+      ));
 
       $date = CRM_Utils_Date::format($form->_params['credit_card_exp_date']);
       $date = CRM_Utils_Date::mysqlToIso($date);

@@ -72,7 +72,6 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
  * @throws \API_Exception
  */
 function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array(), $verifyDAO = TRUE) {
-
   $unmatched = array();
   if ($daoName != NULL && $verifyDAO && empty($params['id'])) {
     $unmatched = _civicrm_api3_check_required_fields($params, $daoName, TRUE);
@@ -99,7 +98,7 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
           $optionset[] = $subkey;
         }
         else {
-          // as long as there is one match then we don't need to rtn anything
+          // As long as there is one match we don't need to return anything.
           $match = 1;
         }
       }
@@ -109,7 +108,7 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
     }
     else {
       // Disallow empty values except for the number zero.
-      // TODO: create a utility for this since it's needed in many places
+      // TODO: create a utility for this since it's needed in many places.
       if (!array_key_exists($key, $params) || (empty($params[$key]) && $params[$key] !== 0 && $params[$key] !== '0')) {
         $unmatched[] = $key;
       }
@@ -354,7 +353,7 @@ function _civicrm_api3_get_DAO($name) {
     return 'CRM_SMS_DAO_Provider';
   }
   // FIXME: DAO names should follow CamelCase convention
-  if ($name == 'Im' || $name == 'Acl') {
+  if ($name == 'Im' || $name == 'Acl' || $name == 'Pcp') {
     $name = strtoupper($name);
   }
   $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);
@@ -1458,9 +1457,14 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
   _civicrm_api3_check_edit_permissions($bao_name, array('id' => $params['id']));
   $args = array(&$params['id']);
   if (method_exists($bao_name, 'del')) {
-    $bao = call_user_func_array(array($bao_name, 'del'), $args);
-    if ($bao !== FALSE) {
-      return civicrm_api3_create_success(TRUE);
+    $dao = new $bao_name();
+    $dao->id = $params['id'];
+    if ($dao->find()) {
+      $bao = call_user_func_array(array($bao_name, 'del'), $args);
+      if ($bao !== FALSE) {
+        return civicrm_api3_create_success();
+      }
+      throw new API_Exception('Could not delete entity id ' . $params['id']);
     }
     throw new API_Exception('Could not delete entity id ' . $params['id']);
   }

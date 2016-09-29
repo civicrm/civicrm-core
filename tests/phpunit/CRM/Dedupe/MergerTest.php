@@ -319,7 +319,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       FALSE
     );
 
-    $this->assertEquals(array(
+    $expectedPairs = array(
       0 => array(
         'srcID' => $this->contacts[5]['id'],
         'srcName' => 'Walt Disney Ltd',
@@ -352,7 +352,26 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'weight' => 10,
         'canMerge' => TRUE,
       ),
-    ), $pairs);
+    );
+    usort($pairs, array(__CLASS__, 'compareDupes'));
+    usort($expectedPairs, array(__CLASS__, 'compareDupes'));
+    $this->assertEquals($expectedPairs, $pairs);
+  }
+
+  /**
+   * Function to sort $duplicate records in a stable way.
+   *
+   * @param array $a
+   * @param array $b
+   * @return int
+   */
+  public static function compareDupes($a, $b) {
+    foreach (array('srcName', 'dstName', 'srcID', 'dstID') as $field) {
+      if ($a[$field] != $b[$field]) {
+        return ($a[$field] < $b[$field]) ? 1 : -1;
+      }
+    }
+    return 0;
   }
 
   /**

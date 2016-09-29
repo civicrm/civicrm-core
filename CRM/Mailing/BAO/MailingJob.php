@@ -544,7 +544,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
                         AND     $ebTable.id IS null
                         AND    ( contact_a.is_opt_out = 0
                         OR       contact_a.do_not_sms = 0 )
-                        $aclWhere}";
+                        $aclWhere";
     }
     $eq->query($query);
 

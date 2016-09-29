@@ -1167,16 +1167,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // Collect existing fields from both 'main' and 'other' contacts first
       // This allows us to match up location/types when building the table rows
       foreach ($mergeTargets as $moniker => $cid) {
-        $cnt = 1;
         $searchParams = array(
-          'version' => 3,
           'contact_id' => $cid,
           // CRM-17556 Order by field-specific criteria
           'options' => array(
             'sort' => $blockInfo['sortString'],
           ),
         );
-        $values = civicrm_api($blockName, 'get', $searchParams);
+        $values = civicrm_api3($blockName, 'get', $searchParams);
         if ($values['count']) {
           $cnt = 0;
           foreach ($values['values'] as $index => $value) {

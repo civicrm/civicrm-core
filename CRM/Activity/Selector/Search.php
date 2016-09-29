@@ -174,7 +174,12 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $components = CRM_Core_Component::getNames();
     $componentClause = array();
     foreach ($components as $componentID => $componentName) {
-      if (!CRM_Core_Permission::check("access $componentName")) {
+      // CRM-19201: Add support for searching CiviCampaign and CiviCase
+      // activities. For CiviCase, "access all cases and activities" is
+      // required here rather than "access my cases and activities" to
+      // prevent those with only the later permission from seeing a list
+      // of all cases which might present a privacy issue.
+      if (!CRM_Core_Permission::access($componentName, TRUE, TRUE)) {
         $componentClause[] = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
       }
     }

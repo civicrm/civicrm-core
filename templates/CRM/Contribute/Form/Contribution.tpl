@@ -40,9 +40,12 @@
   {/if}
   {if $contributionMode}
   <div class="help">
-    {if $contactId}
+    {if $contactId && $payNow}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to edit a contribution on behalf of %1. <strong>A
+      %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+    {elseif $contactId}
       {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
-        %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+      %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {else}
       {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {/if}
@@ -97,21 +100,23 @@
       <td class="label">{$form.total_amount.label}</td>
       <td {$valueStyle}>
         <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
-        {if $hasPriceSets}
-          <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
-          <span id='selectPriceSet'>{$form.price_set_id.html}</span>
-          <div id="priceset" class="hiddenElement"></div>
-        {/if}
+        {if !$payNow}
+          {if $hasPriceSets}
+            <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
+            <span id='selectPriceSet'>{$form.price_set_id.html}</span>
+            <div id="priceset" class="hiddenElement"></div>
+          {/if}
 
-        {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
-        <div id="totalAmountBlock">
-          {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
-          <div id="totalTaxAmount" class="label"></div>
-        </div>
+          {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
+          <div id="totalAmountBlock">
+            {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
+            <div id="totalTaxAmount" class="label"></div>
+          </div>
+        {/if}
       </td>
     </tr>
 
-      {if $buildRecurBlock}
+      {if $buildRecurBlock && !$payNow}
       <tr id='recurringPaymentBlock' class='hiddenElement'>
         <td></td>
         <td>
@@ -173,14 +178,22 @@
       </td>
     </tr>
     {/if}
-    {if !$contributionMode}
+    {if !$contributionMode || $payNow}
       <tr class="crm-contribution-form-block-contribution_status_id">
         <td class="label">{$form.contribution_status_id.label}</td>
         <td>{$form.contribution_status_id.html}
         {if $contribution_status_id eq 2}{if $is_pay_later }: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
         </td>
+        <td>
+        {if $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
+          {capture assign=payNowLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=update&id=`$contribID`&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+          <a class="open-inline action-item crm-hover-button" href="{$payNowLink}">&raquo; {ts}Pay with Credit Card{/ts}</a>
+        {/if}
+      </td>
       </tr>
+    {/if}
 
+    {if !$contributionMode}
       {* Cancellation / Refunded fields are hidden unless contribution status is set to Cancelled or Refunded*}
       <tr id="cancelInfo" class="crm-contribution-form-block-cancelInfo">
         <td>&nbsp;</td>
@@ -213,7 +226,7 @@
         </td>
       </tr>
     {/if}
-    {if $form.revenue_recognition_date}
+    {if $form.revenue_recognition_date && !$payNow}
       <tr class="crm-contribution-form-block-revenue_recognition_date">
         <td class="label">{$form.revenue_recognition_date.label}</td>
         <td>{$form.revenue_recognition_date.html}</td>
@@ -224,24 +237,26 @@
   {include file='CRM/Core/BillingBlockWrapper.tpl'}
 
     <!-- start of soft credit -->
-    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
-      <div class="crm-accordion-header">
-        {ts}Soft Credit{/ts}&nbsp;{help id="id-soft_credit"}
+    {if !$payNow}
+      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
+        <div class="crm-accordion-header">
+          {ts}Soft Credit{/ts}&nbsp;{help id="id-soft_credit"}
+        </div>
+        <div class="crm-accordion-body">
+          <table class="form-layout-compressed">
+            <tr class="crm-contribution-form-block-soft_credit_to">
+              <td colspan="2">
+                {include file="CRM/Contribute/Form/SoftCredit.tpl"}
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
-      <div class="crm-accordion-body">
-        <table class="form-layout-compressed">
-          <tr class="crm-contribution-form-block-soft_credit_to">
-            <td colspan="2">
-              {include file="CRM/Contribute/Form/SoftCredit.tpl"}
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
+    {/if}
     <!-- end of soft credit -->
 
     <!-- start of PCP -->
-    {if $siteHasPCPs}
+    {if $siteHasPCPs && !$payNow}
       <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="softCredit">
         <div class="crm-accordion-header">
           {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}
@@ -343,7 +358,9 @@
     </div>
     {/if}
 
-  <div id="customData" class="crm-contribution-form-block-customData"></div>
+  {if !$payNow}
+    <div id="customData" class="crm-contribution-form-block-customData"></div>
+  {/if}
 
   {*include custom data js file*}
   {include file="CRM/common/customData.tpl"}
@@ -456,12 +473,6 @@
       }
     }
   }
-
-  function status() {
-    cj("#cancel_date").val('');
-    cj("#cancel_reason").val('');
-  }
-
   </script>
   {/literal}
 
@@ -488,26 +499,26 @@
 
     {/literal}{if !$contributionMode}{literal}
      CRM.$(function($) {
-      showHideCancelInfo(cj('#contribution_status_id'));
+      showHideCancelInfo($('#contribution_status_id'));
 
-      cj('#contribution_status_id').change(function() {
-       showHideCancelInfo(cj('#contribution_status_id'));
+      $('#contribution_status_id').change(function() {
+       showHideCancelInfo($('#contribution_status_id'));
+      });
+
+      function showHideCancelInfo(obj) {
+        var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+        if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
+          $('#cancelInfo').show( );
+          $('#total_amount').attr('readonly', true);
+        }
+        else {
+          $("#cancel_date").val('');
+          $("#cancel_reason").val('');
+          $('#cancelInfo').hide( );
+          $("#total_amount").removeAttr('readonly');
+        }
       }
-       );
-     });
-
-     function showHideCancelInfo(obj) {
-       var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
-       if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
-         cj('#cancelInfo').show( );
-         cj('#total_amount').attr('readonly', true);
-       }
-       else {
-         status();
-         cj('#cancelInfo').hide( );
-         cj("#total_amount").removeAttr('readonly');
-       }
-     }
+    });
 
     {/literal}{/if}{literal}
     </script>

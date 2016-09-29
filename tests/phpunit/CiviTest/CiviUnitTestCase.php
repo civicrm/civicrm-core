@@ -1154,7 +1154,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'period_type' => 'rolling',
       'member_of_contact_id' => $memberOfOrganization,
       'domain_id' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => 2,
       'is_active' => 1,
       'sequential' => 1,
       'visibility' => 'Public',
@@ -1266,7 +1266,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   public function relationshipTypeDelete($relationshipTypeID) {
     $params['id'] = $relationshipTypeID;
-    $this->callAPISuccess('relationship_type', 'delete', $params);
+    $check = $this->callAPISuccess('relationship_type', 'get', $params);
+    if (!empty($check['count'])) {
+      $this->callAPISuccess('relationship_type', 'delete', $params);
+    }
   }
 
   /**
@@ -1621,7 +1624,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array(
       'id' => $participantID,
     );
-    return $this->callAPISuccess('Participant', 'delete', $params);
+    $check = $this->callAPISuccess('Participant', 'get', $params);
+    if ($check['count'] > 0) {
+      return $this->callAPISuccess('Participant', 'delete', $params);
+    }
   }
 
   /**
@@ -3305,7 +3311,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'is_active' => array('1' => 1),
       'price_set_id' => $priceset->id,
       'is_enter_qty' => 1,
-      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     );
     CRM_Price_BAO_PriceField::create($paramsField);
 
@@ -3397,8 +3403,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @return array
    */
   protected function createPriceSet($component = 'contribution_page', $componentId = NULL) {
-    $paramsSet['title'] = 'Price Set';
-    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
+    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
+    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 4;
     $paramsSet['extends'] = 1;
@@ -3423,7 +3429,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'is_active' => array('1' => 1, '2' => 1),
       'price_set_id' => $priceSet['id'],
       'is_enter_qty' => 1,
-      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     );
     $priceField = CRM_Price_BAO_PriceField::create($paramsField);
     if ($componentId) {
@@ -3597,6 +3603,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
     // when calling completeTransaction or repeatTransaction.
     $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
+  }
+
+  /**
+   * Return financial type id on basis of name
+   *
+   * @param string $name Financial type m/c name
+   *
+   * @return int
+   */
+  public function getFinancialTypeId($name) {
+    return CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $name, 'id', 'name');
   }
 
   /**

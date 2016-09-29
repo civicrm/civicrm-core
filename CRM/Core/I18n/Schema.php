@@ -78,14 +78,18 @@ class CRM_Core_I18n_Schema {
       // drop old indices
       if (isset($indices[$table])) {
         foreach ($indices[$table] as $index) {
-          $queries[] = "DROP INDEX {$index['name']} ON {$table}";
+          if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
+            $queries[] = "DROP INDEX {$index['name']} ON {$table}";
+          }
         }
       }
       // deal with columns
       foreach ($hash as $column => $type) {
         $queries[] = "ALTER TABLE {$table} ADD {$column}_{$locale} {$type}";
-        $queries[] = "UPDATE {$table} SET {$column}_{$locale} = {$column}";
-        $queries[] = "ALTER TABLE {$table} DROP {$column}";
+        if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+          $queries[] = "UPDATE {$table} SET {$column}_{$locale} = {$column}";
+          $queries[] = "ALTER TABLE {$table} DROP {$column}";
+        }
       }
 
       // add view

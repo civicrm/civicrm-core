@@ -67,16 +67,24 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $_defaults = array();
 
   /**
-   * The options passed into this form
+   * (QUASI-PROTECTED) The options passed into this form
+   *
+   * This field should marked `protected` and is not generally
+   * intended for external callers, but some edge-cases do use it.
+   *
    * @var mixed
    */
-  protected $_options = NULL;
+  public $_options = NULL;
 
   /**
-   * The mode of operation for this form
+   * (QUASI-PROTECTED) The mode of operation for this form
+   *
+   * This field should marked `protected` and is not generally
+   * intended for external callers, but some edge-cases do use it.
+   *
    * @var int
    */
-  protected $_action;
+  public $_action;
 
   /**
    * Available payment processors.
@@ -807,7 +815,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         $this->_paymentProcessor = array();
       }
-      CRM_Financial_Form_Payment::addCreditCardJs();
+      CRM_Financial_Form_Payment::addCreditCardJs($this->_paymentProcessorID);
     }
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
     // We save the fact that the profile 'billing' is required on the payment form.
@@ -2280,6 +2288,33 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
     }
+  }
+
+  /**
+   * Assign billing name to the template.
+   *
+   * @param array $params
+   *   Form input params, default to $this->_params.
+   */
+  public function assignBillingName($params = array()) {
+    $name = '';
+    if (empty($params)) {
+      $params = $this->_params;
+    }
+    if (!empty($params['billing_first_name'])) {
+      $name = $params['billing_first_name'];
+    }
+
+    if (!empty($params['billing_middle_name'])) {
+      $name .= " {$params['billing_middle_name']}";
+    }
+
+    if (!empty($params['billing_last_name'])) {
+      $name .= " {$params['billing_last_name']}";
+    }
+    $name = trim($name);
+    $this->assign('billingName', $name);
+    return $name;
   }
 
 }

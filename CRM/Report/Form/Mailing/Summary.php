@@ -298,7 +298,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $mailing->query($query);
 
     while ($mailing->fetch()) {
-      $data[mysql_real_escape_string($mailing->name)] = $mailing->name;
+      $data[CRM_Core_DAO::escapeString($mailing->name)] = $mailing->name;
     }
 
     return $data;
@@ -458,7 +458,6 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   public function groupBy() {
     $groupBy = array(
       "{$this->_aliases['civicrm_mailing']}.id",
-      "{$this->_aliases['civicrm_mailing_job']}.end_date",
     );
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }

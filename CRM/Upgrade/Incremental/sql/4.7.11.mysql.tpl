@@ -14,6 +14,13 @@ UPDATE civicrm_dashboard SET name = 'myCases' WHERE (name IS NULL OR name = '') 
 UPDATE civicrm_dashboard SET name = 'allCases' WHERE (name IS NULL OR name = '') AND url LIKE "civicrm/dashlet/allCases?%";
 UPDATE civicrm_dashboard SET name = 'casedashboard' WHERE (name IS NULL OR name = '') AND url LIKE "civicrm/dashlet/casedashboard?%";
 
+-- CRM-19291 Fix names on dashlets where name is an empty string
+{if $multilingual}
+UPDATE civicrm_dashboard SET name = label_{$locales.0} WHERE name = '';
+{else}
+UPDATE civicrm_dashboard SET name = label WHERE name = '';
+{/if}
+
 -- CRM-18508 Display State/Province in event address in registration emails
 {include file='../CRM/Upgrade/4.7.11.msg_template/civicrm_msg_template.tpl'}
 

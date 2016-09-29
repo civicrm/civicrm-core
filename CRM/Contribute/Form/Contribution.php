@@ -289,7 +289,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('lineItem', empty($this->_lineItems) ? FALSE : $this->_lineItems);
 
     // Set title
-    if ($this->_mode) {
+    if ($this->_mode && $this->_id) {
+      $this->_payNow = TRUE;
+      $this->assign('payNow', $this->_payNow);
+      CRM_Utils_System::setTitle(ts('Pay with Credit Card'));
+    }
+    elseif ($this->_mode) {
       $this->setPageTitle($this->_ppID ? ts('Credit Card Pledge Payment') : ts('Credit Card Contribution'));
     }
     else {
@@ -545,15 +550,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['hidden_AdditionalDetail'] = 1;
     }
 
-    $paneNames = array(
-      ts('Additional Details') => 'AdditionalDetail',
-    );
+    $paneNames = array();
+    if (empty($this->_payNow)) {
+      $paneNames[ts('Additional Details')] = 'AdditionalDetail';
+    }
 
     //Add Premium pane only if Premium is exists.
     $dao = new CRM_Contribute_DAO_Product();
     $dao->is_active = 1;
 
-    if ($dao->find(TRUE)) {
+    if ($dao->find(TRUE) && empty($this->_payNow)) {
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
@@ -743,15 +749,25 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       unset($status[CRM_Utils_Array::key('Chargeback', $statusName)]);
     }
 
-    $this->add('select', 'contribution_status_id',
+    $statusElement = $this->add('select', 'contribution_status_id',
       ts('Contribution Status'),
       $status,
       FALSE
     );
 
+    $currencyFreeze = FALSE;
+    if (!empty($this->_payNow) && ($this->_action & CRM_Core_Action::UPDATE)) {
+      $statusElement->freeze();
+      $currencyFreeze = TRUE;
+      $attributes['total_amount']['readonly'] = TRUE;
+    }
+
     // CRM-16189, add Revenue Recognition Date
     if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
-      $this->add('date', 'revenue_recognition_date', ts('Revenue Recognition Date'), CRM_Core_SelectValues::date(NULL, 'M Y', NULL, 5));
+      $revenueDate = $this->add('date', 'revenue_recognition_date', ts('Revenue Recognition Date'), CRM_Core_SelectValues::date(NULL, 'M Y', NULL, 5));
+      if ($this->_id && !CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($this->_id)) {
+        $revenueDate->freeze();
+      }
     }
 
     // add various dates
@@ -824,7 +840,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
       $this->assign('hasPriceSets', $hasPriceSets);
-      $currencyFreeze = FALSE;
       if (!($this->_action & CRM_Core_Action::UPDATE)) {
         if ($this->_online || $this->_ppID) {
           $attributes['total_amount'] = array_merge($attributes['total_amount'], array(
@@ -858,7 +873,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // CRM-7362 --add campaigns.
     CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
 
-    CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
+    if (empty($this->_payNow)) {
+      CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
+    }
 
     $js = NULL;
     if (!$this->_mode) {
@@ -1218,6 +1235,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->set('is_deductible', TRUE);
     }
     $contributionParams = array(
+      'id' => CRM_Utils_Array::value('contribution_id', $this->_params),
       'contact_id' => $contactID,
       'line_item' => $lineItem,
       'is_test' => $isTest,
@@ -1496,6 +1514,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         elseif (array_key_exists('participant', $contributionDetails)) {
           $pId = $contributionDetails['participant'];
         }
+      }
+      if (!empty($this->_payNow)) {
+        $this->_params['contribution_id'] = $this->_id;
       }
     }
 
