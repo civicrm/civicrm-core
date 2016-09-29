@@ -3020,7 +3020,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertInternalType('string', $contact_get['values'][$created_contact_id]['groups']);
 
     // Ensure they are shown as being in each created group.
-    $contact_group_ids = explode(',', $contact_get[$created_contact_id]['values']['groups']);
+    $contact_group_ids = explode(',', $contact_get['values'][$created_contact_id]['groups']);
     foreach ($created_group_ids as $created_group_id) {
       $this->assertContains($created_group_id, $contact_group_ids);
     }
