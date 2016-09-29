@@ -148,7 +148,12 @@ class CRM_Core_Config_Defaults {
         $defaults['userFrameworkResourceURL'] = $baseURL . "components/com_civicrm/civicrm/";
       }
       elseif ($config->userFramework == 'WordPress') {
-        $defaults['userFrameworkResourceURL'] = $baseURL . "wp-content/plugins/civicrm/civicrm/";
+        if (defined('CIVICRM_PLUGIN_URL')) {
+          $defaults['userFrameworkResourceURL'] = CIVICRM_PLUGIN_URL . "civicrm/";
+        }
+        else {
+          $defaults['userFrameworkResourceURL'] = $baseURL . "wp-content/plugins/civicrm/civicrm/";
+        }
       }
       else {
         // Drupal setting
@@ -200,7 +205,13 @@ class CRM_Core_Config_Defaults {
       }
       elseif ($config->userFramework == 'WordPress') {
         //for standalone no need of sites/defaults directory
-        $defaults['imageUploadURL'] = $baseURL . "wp-content/plugins/files/civicrm/persist/contribute/";
+        if (defined('CIVICRM_PLUGIN_DIR')) {
+          // CIVICRM_PLUGIN_DIR points to: wp-content/plugins/civicrm/ or similar (with trailing '/')
+          $defaults['imageUploadURL'] = str_replace('civicrm', 'files/civicrm', CIVICRM_PLUGIN_DIR) . 'persist/contribute/';
+        }
+        else {
+          $defaults['imageUploadURL'] = $baseURL . "wp-content/plugins/files/civicrm/persist/contribute/";
+        }
       }
       else {
         $defaults['imageUploadURL'] = $baseURL . "sites/default/files/civicrm/persist/contribute/";
