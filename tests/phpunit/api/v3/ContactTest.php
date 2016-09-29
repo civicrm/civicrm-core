@@ -2972,7 +2972,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * CRM-19426
    */
-  public function testReturnGroup() {
+  public function testContactGetReturnGroup() {
     // Set up a contact, asser that they were created.
     $contact_params = array(
       'contact_type' => 'Individual',
