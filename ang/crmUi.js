@@ -895,7 +895,7 @@
             return form.$valid;
           };
           crmUiWizardCtrl.add(scope);
-          element.on('$destroy', function(){
+          scope.$on('$destroy', function(){
             crmUiWizardCtrl.remove(scope);
           });
         }
