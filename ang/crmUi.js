@@ -871,6 +871,7 @@
     // example: <div crm-ui-wizard-step crm-title="ts('My Title')" ng-form="mySubForm">...content...</div>
     // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
     // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
+    // example with custom classes: <div crm-ui-wizard-step="100" crm-ui-wizard-step-class="ng-animate-out ...">...content...</div>
     .directive('crmUiWizardStep', function() {
       var nextWeight = 1;
       return {
@@ -879,8 +880,9 @@
         scope: {
           crmTitle: '@', // expression, evaluates to a printable string
           crmUiWizardStep: '@' // int, a weight which determines the ordering of the steps
+          crmUiWizardStepClass: '@' // int, a weight which determines the ordering of the steps
         },
-        template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
+        template: '<div class="crm-wizard-step {{crmUiWizardStepClass}}" ng-show="selected" ng-transclude/></div>',
         transclude: true,
         link: function (scope, element, attrs, ctrls) {
           var crmUiWizardCtrl = ctrls[0], form = ctrls[1];
