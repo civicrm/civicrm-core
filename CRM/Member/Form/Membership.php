@@ -1079,7 +1079,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $form->assign('customValues', $customValues);
 
     if ($form->_mode) {
-      $form>assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
+      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
         $form->_params,
         $form->_bltID
       ));
