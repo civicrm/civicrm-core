@@ -51,7 +51,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
   }
 
   public function testOptionLanguage() {
-    civicrm_api3('Setting', 'create', array(
+    $this->callAPISuccess('Setting', 'create', array(
       'lcMessages' => 'en_US',
       'languageLimit' => array(
         'en_US' => 1,
@@ -65,7 +65,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
 
     CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
 
-    civicrm_api3('Setting', 'create', array(
+    $this->callAPISuccess('Setting', 'create', array(
       'languageLimit' => array(
         'en_US',
         'fr_CA',
@@ -74,29 +74,29 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
 
     // Take a semi-random OptionGroup and test manually changing its label
     // in one language, while making sure it stays the same in English.
-    $group = civicrm_api3('OptionGroup', 'getsingle', array(
+    $group = $this->callAPISuccess('OptionGroup', 'getsingle', array(
       'name' => 'contact_edit_options',
     ));
 
-    $english_original = civicrm_api3('OptionValue', 'getsingle', array(
+    $english_original = $this->callAPISuccess('OptionValue', 'getsingle', array(
       'option_group_id' => $group['id'],
       'name' => 'IM',
     ));
 
-    civicrm_api3('OptionValue', 'create', array(
+    $this->callAPISuccess('OptionValue', 'create', array(
       'id' => $english_original['id'],
       'name' => 'IM',
       'label' => 'Messagerie instantanée',
       'option.language' => 'fr_CA',
     ));
 
-    $french = civicrm_api3('OptionValue', 'getsingle', array(
+    $french = $this->callAPISuccess('OptionValue', 'getsingle', array(
       'option_group_id' => $group['id'],
       'name' => 'IM',
       'option.language' => 'fr_CA',
     ));
 
-    $default = civicrm_api3('OptionValue', 'getsingle', array(
+    $default = $this->callAPISuccess('OptionValue', 'getsingle', array(
       'option_group_id' => $group['id'],
       'name' => 'IM',
       'option.language' => 'en_US',
