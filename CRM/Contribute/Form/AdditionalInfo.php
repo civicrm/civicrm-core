@@ -382,29 +382,11 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     $form->assign('ccContribution', $ccContribution);
     if ($ccContribution) {
-      //build the name.
-      $name = CRM_Utils_Array::value('billing_first_name', $params);
-      if (!empty($params['billing_middle_name'])) {
-        $name .= " {$params['billing_middle_name']}";
-      }
-      $name .= ' ' . CRM_Utils_Array::value('billing_last_name', $params);
-      $name = trim($name);
-      $form->assign('billingName', $name);
-
-      //assign the address formatted up for display
-      $addressParts = array(
-        "street_address" => "billing_street_address-{$form->_bltID}",
-        "city" => "billing_city-{$form->_bltID}",
-        "postal_code" => "billing_postal_code-{$form->_bltID}",
-        "state_province" => "state_province-{$form->_bltID}",
-        "country" => "country-{$form->_bltID}",
-      );
-
-      $addressFields = array();
-      foreach ($addressParts as $name => $field) {
-        $addressFields[$name] = CRM_Utils_Array::value($field, $params);
-      }
-      $form->assign('address', CRM_Utils_Address::format($addressFields));
+      $form->assignBillingName($params);
+      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
+        $params,
+        $form->_bltID
+      ));
 
       $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
       $date = CRM_Utils_Date::mysqlToIso($date);
