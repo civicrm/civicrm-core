@@ -327,4 +327,28 @@ class CRM_Utils_Address {
     return $newSequence;
   }
 
+  /**
+   * Extract the billing fields from the form submission and format them for display.
+   *
+   * @param array $params
+   * @param int $billingLocationTypeID
+   *
+   * @return string
+   */
+  public static function getFormattedBillingAddressFieldsFromParameters($params, $billingLocationTypeID) {
+    $addressParts = array(
+      "street_address" => "billing_street_address-{$billingLocationTypeID}",
+      "city" => "billing_city-{$billingLocationTypeID}",
+      "postal_code" => "billing_postal_code-{$billingLocationTypeID}",
+      "state_province" => "state_province-{$billingLocationTypeID}",
+      "country" => "country-{$billingLocationTypeID}",
+    );
+
+    $addressFields = array();
+    foreach ($addressParts as $name => $field) {
+      $addressFields[$name] = CRM_Utils_Array::value($field, $params);
+    }
+    return CRM_Utils_Address::format($addressFields);
+  }
+
 }
