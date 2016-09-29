@@ -148,7 +148,7 @@ class CRM_Core_Config_Defaults {
         $defaults['userFrameworkResourceURL'] = $baseURL . "components/com_civicrm/civicrm/";
       }
       elseif ($config->userFramework == 'WordPress') {
-        if (defined( 'CIVICRM_PLUGIN_URL')) {
+        if (defined('CIVICRM_PLUGIN_URL')) {
           $defaults['userFrameworkResourceURL'] = CIVICRM_PLUGIN_URL . "civicrm/";
         }
         else {
