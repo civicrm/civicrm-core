@@ -1143,8 +1143,6 @@ abstract class CRM_Core_Payment {
         'processor_name' => @$_GET['processor_name'],
         'processor_id' => @$_GET['processor_id'],
         'mode' => @$_GET['mode'],
-        'q' => @$_GET['q'],
-        'task' => @$_GET['task'], // for Joomla
       )
     );
     CRM_Utils_System::civiExit();
@@ -1169,12 +1167,7 @@ abstract class CRM_Core_Payment {
    */
   public static function handlePaymentMethod($method, $params = array()) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
-      $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
-
-      if (CRM_Core_Config::singleton()->userFramework == 'Joomla' && !empty($params['task'])) {
-        $q = explode('/', CRM_Utils_Array::value('path', parse_url($params['task']), ''));
-      }
-
+      $q = explode('/', CRM_Utils_Array::value(CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET, ''));
       $lastParam = array_pop($q);
       if (is_numeric($lastParam)) {
         $params['processor_id'] = $_GET['processor_id'] = $lastParam;
