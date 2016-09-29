@@ -220,7 +220,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
 
     foreach ($subTypes as $subType => $val) {
       $subTypeRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $val['parent'],
-        FALSE, 'label', TRUE, array($subType)
+        FALSE, 'label', TRUE, (array) $subType
       );
       $allRelationshipType = array_merge($allRelationshipType, $subTypeRelationshipTypes);
     }
