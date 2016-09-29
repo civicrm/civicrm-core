@@ -732,6 +732,7 @@
     })
 
     // example: <div crm-ui-wizard="myWizardCtrl"><div crm-ui-wizard-step crm-title="ts('Step 1')">...</div><div crm-ui-wizard-step crm-title="ts('Step 2')">...</div></div>
+    // example with custom nav classes: <div crm-ui-wizard crm-ui-wizard-nav-class="ng-animate-out ...">...</div>
     // Note: "myWizardCtrl" has various actions/properties like next() and $first().
     // WISHLIST: Allow each step to determine if it is "complete" / "valid" / "selectable"
     // WISHLIST: Allow each step to enable/disable (show/hide) itself
@@ -739,7 +740,8 @@
       return {
         restrict: 'EA',
         scope: {
-          crmUiWizard: '@'
+          crmUiWizard: '@',
+          crmUiWizardNavClass: '@'
         },
         templateUrl: '~/crmUi/wizard.html',
         transclude: true,
