@@ -100,6 +100,10 @@
         {/if}
         </td>
       </tr>
+      <tr class="crm-price-field-form-block-non-deductible-amount">
+        <td class="label">{$form.non_deductible_amount.label}</td>
+        <td>{$form.non_deductible_amount.html}</td>
+      </tr>
     {if $useForEvent}
       <tr class="crm-price-field-form-block-count">
         <td class="label">{$form.count.label}</td>
