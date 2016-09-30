@@ -629,13 +629,19 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
         $addCaptcha = FALSE;
+        // fetch file preview when not submitted yet, like in online contribution Confirm and ThankYou page
+        $viewOnlyFileValues = array();
         foreach ($fields as $key => $field) {
           if ($viewOnly &&
             isset($field['data_type']) &&
             $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
           ) {
-            // ignore file upload fields
-            continue;
+            $viewOnlyFileValues[$key] = '';
+            if (!empty($this->_params[$key])) {
+              $path = CRM_Utils_Array::value('name', $this->_params[$key]);
+              $fileType = CRM_Utils_Array::value('type', $this->_params[$key]);
+              $viewOnlyFileValues[$key] = CRM_Utils_File::getFileURL($path, $fileType);
+            }
           }
 
           if ($profileContactType) {
@@ -686,6 +692,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         $this->assign($name, $fields);
+
+        if (count($viewOnlyFileValues)) {
+          $this->assign('viewOnlyFileValues', $viewOnlyFileValues);
+        }
 
         if ($addCaptcha && !$viewOnly) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();
