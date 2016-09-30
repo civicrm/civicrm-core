@@ -27,7 +27,12 @@
 
 /**
  * Class CRM_Core_BAO_ActionScheduleTest
+ * @group ActionSchedule
  * @group headless
+ *
+ * There are additional tests for some specific entities in other classes:
+ * @see CRM_Activity_ActionMappingTest
+ * @see CRM_Contribute_ActionMapping_ByTypeTest
  */
 class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
