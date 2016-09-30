@@ -179,7 +179,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
       $mapper,
       $skipColumnHeader,
       CRM_Import_Parser::MODE_MAPFIELD,
-      $this->get('contactType')
+      $this->get('contactType'),
+      $this->get('contactSubType')
     );
 
     // add all the necessary variables to the form

@@ -217,7 +217,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $parser = new $this->_parser($mapperKeysMain);
     $parser->setEntity($this->_multipleCustomData);
     $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
-      CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
+      CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType'), $this->get('contactSubType')
     );
     // add all the necessary variables to the form
     $parser->set($this);

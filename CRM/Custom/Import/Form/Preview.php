@@ -113,6 +113,7 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
       $skipColumnHeader,
       CRM_Import_Parser::MODE_IMPORT,
       $this->get('contactType'),
+      $this->get('contactSubType'),
       $onDuplicate
     );
 

@@ -1130,22 +1130,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       $params['contact_type'] = 'Individual';
     }
 
-    // get array of subtypes - CRM-18708
-    if (in_array($csType, array('Individual', 'Organization', 'Household'))) {
-      $csType = self::getSubtypes($params['contact_type']);
-    }
-
-    if (is_array($csType)) {
-      // fetch custom fields for every subtype and add it to $customFields array
-      // CRM-18708
-      $customFields = array();
-      foreach ($csType as $cType) {
-        $customFields += CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, FALSE, $cType);
-      }
-    }
-    else {
-      $customFields = CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, FALSE, $csType);
-    }
+    $customFields = CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, FALSE, $csType);
 
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
     $customFields = $customFields + $addressCustomFields;

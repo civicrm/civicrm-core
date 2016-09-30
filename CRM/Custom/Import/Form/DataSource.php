@@ -53,9 +53,9 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       'multipleCustomData' => $this->_id,
     );
 
-    if ($loadeMapping = $this->get('loadedMapping')) {
-      $this->assign('loadedMapping', $loadeMapping);
-      $defaults['savedMapping'] = $loadeMapping;
+    if ($loadedMapping = $this->get('loadedMapping')) {
+      $this->assign('loadedMapping', $loadedMapping);
+      $defaults['savedMapping'] = $loadedMapping;
     }
 
     return $defaults;
@@ -72,7 +72,30 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), array('' => ts('- select -')) + $multipleCustomData, TRUE);
 
-    $this->addContactTypeSelector();
+    $js = array('onClick' => "buildSubTypes()");
+    // contact types option
+    $contactOptions = array();
+    if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
+      $contactOptions[] = $this->createElement('radio',
+        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL, $js
+      );
+    }
+    if (CRM_Contact_BAO_ContactType::isActive('Household')) {
+      $contactOptions[] = $this->createElement('radio',
+        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD, $js
+      );
+    }
+    if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
+      $contactOptions[] = $this->createElement('radio',
+        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION, $js
+      );
+    }
+
+    $this->addGroup($contactOptions, 'contactType',
+      ts('Contact Type')
+    );
+
+    $this->addElement('select', 'contactSubType', ts('Subtype'));
   }
 
   /**
@@ -83,6 +106,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function postProcess() {
     $this->storeFormValues(array(
       'contactType',
+      'contactSubType',
       'dateFormats',
       'savedMapping',
       'multipleCustomData',

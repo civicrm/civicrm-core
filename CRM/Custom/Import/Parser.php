@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
+abstract class CRM_Custom_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
@@ -81,6 +81,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
+    $contactSubType = NULL,
     $onDuplicate = self::DUPLICATE_SKIP
   ) {
     if (!is_array($fileName)) {
@@ -100,6 +101,8 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
       case CRM_Import_Parser::CONTACT_ORGANIZATION:
         $this->_contactType = 'Organization';
     }
+
+    $this->_contactSubType = $contactSubType;
     $this->init();
 
     $this->_haveColumnHeader = $skipColumnHeader;
@@ -324,6 +327,25 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
       }
     }
     return $params;
+  }
+
+  /**
+   * @param string $name
+   * @param $title
+   * @param int $type
+   * @param string $headerPattern
+   * @param string $dataPattern
+   * @param bool $hasLocationType
+   */
+  public function addField(
+    $name, $title, $type = CRM_Utils_Type::T_INT,
+    $headerPattern = '//', $dataPattern = '//',
+    $hasLocationType = FALSE
+  ) {
+    $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
+    if (empty($name)) {
+      $this->_fields['doNotImport'] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
+    }
   }
 
   /**

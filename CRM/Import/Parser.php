@@ -444,4 +444,50 @@ abstract class CRM_Import_Parser {
     return $fileName;
   }
 
+  /**
+   * Export data to a CSV file.
+   *
+   * @param string $fileName
+   * @param array $header
+   * @param array $data
+   */
+  public static function exportCSV($fileName, $header, $data) {
+
+    if (file_exists($fileName) && !is_writable($fileName)) {
+      CRM_Core_Error::movedSiteError($fileName);
+    }
+    //hack to remove '_status', '_statusMsg' and '_id' from error file
+    $errorValues = array();
+    $dbRecordStatus = array('IMPORTED', 'ERROR', 'DUPLICATE', 'INVALID', 'NEW');
+    foreach ($data as $rowCount => $rowValues) {
+      $count = 0;
+      foreach ($rowValues as $key => $val) {
+        if (in_array($val, $dbRecordStatus) && $count == (count($rowValues) - 3)) {
+          break;
+        }
+        $errorValues[$rowCount][$key] = $val;
+        $count++;
+      }
+    }
+    $data = $errorValues;
+
+    $output = array();
+    $fd = fopen($fileName, 'w');
+
+    foreach ($header as $key => $value) {
+      $header[$key] = "\"$value\"";
+    }
+    $config = CRM_Core_Config::singleton();
+    $output[] = implode($config->fieldSeparator, $header);
+
+    foreach ($data as $datum) {
+      foreach ($datum as $key => $value) {
+        $datum[$key] = "\"$value\"";
+      }
+      $output[] = implode($config->fieldSeparator, $datum);
+    }
+    fwrite($fd, implode("\n", $output));
+    fclose($fd);
+  }
+
 }
