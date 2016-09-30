@@ -588,12 +588,20 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function postProcess() {
     $this->beginPostProcess();
 
-    $originalRelationshipTypeIdValue = $this->_params['relationship_type_id_value'];
+    $originalRelationshipTypeIdValue = null;
     if (!empty($this->_params['relationship_type_id_value'])) {
+        $originalRelationshipTypeIdValue = $this->_params['relationship_type_id_value'];
+        // Create an array to analyse the relationship types.
+        if (!is_array($this->_params['relationship_type_id_value'])) {
+            $relationshipIds = array($this->_params['relationship_type_id_value']);
+        }
+        else {
+            $relationshipIds = $this->_params['relationship_type_id_value'];        
+        }
       $relationshipTypes = array();
       $direction = array();
       $relType = array();
-      foreach ($this->_params['relationship_type_id_value'] as $relationship_type) {
+      foreach ($relationshipIds as $relationship_type) {
         $relType = explode('_', $relationship_type);
         $direction[] = $relType[1] . '_' . $relType[2];
         $relationshipTypes[] = intval($relType[0]);
