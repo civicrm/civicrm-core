@@ -186,15 +186,15 @@
     <add>4.3</add>
   </foreignKey>
   <field>
-    <name>deductible_amount</name>
-    <title>Deductible Amount</title>
+    <name>non_deductible_amount</name>
+    <title>Non-deductible Amount</title>
     <type>decimal</type>
     <default>0.0</default>
-    <headerPattern>/unit?.?amoun/i</headerPattern>
+    <headerPattern>/non?.?deduct/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <required>true</required>
-    <comment>Tax-deductible portion of the amount</comment>
-    <add>4.3</add>
+    <comment>Portion of total amount which is NOT tax deductible.</comment>
+    <add>4.7</add>
     <html>
       <type>Text</type>
     </html>

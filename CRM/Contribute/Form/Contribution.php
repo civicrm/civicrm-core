@@ -1874,6 +1874,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($params['non_deductible_amount'])) {
       return $params['non_deductible_amount'];
     }
+    $priceSetId = CRM_Utils_Array::value('price_set_id', $params);
+
+    // return non-deductible amount if it is set at the price field option level
+    if (!empty($priceSetId) && $params['line_item'][$priceSetId]) {
+      $nonDeductibleAmount = 0;
+      foreach ($params['line_item'][$priceSetId] as $fieldId => $options) {
+        $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
+      }
+      if ($nonDeductibleAmount) {
+        return $nonDeductibleAmount;
+      }
+    }
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];
