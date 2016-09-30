@@ -136,6 +136,8 @@
                     {$form.onbehalfof_id.html}
                   {/if}
                   {$form.$prefix.$n.html}
+    {elseif $field.html_type eq 'File' && $viewOnlyFileValues}
+      {$viewOnlyFileValues.$n}
 		{else}
 		  {$form.$n.html}
 		{/if}
