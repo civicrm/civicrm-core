@@ -588,12 +588,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function postProcess() {
     $this->beginPostProcess();
 
-    $originalRelationshipTypeIdValue = $this->_params['relationship_type_id_value'];
-    if (!empty($this->_params['relationship_type_id_value'])) {
+    $originalRelationshipTypeIdValue = CRM_Utils_Array::value('relationship_type_id_value', $this->_params);
+    if ($originalRelationshipTypeIdValue) {
       $relationshipTypes = array();
       $direction = array();
-      $relType = array();
-      foreach ($this->_params['relationship_type_id_value'] as $relationship_type) {
+      foreach ((array) $originalRelationshipTypeIdValue as $relationship_type) {
         $relType = explode('_', $relationship_type);
         $direction[] = $relType[1] . '_' . $relType[2];
         $relationshipTypes[] = intval($relType[0]);
