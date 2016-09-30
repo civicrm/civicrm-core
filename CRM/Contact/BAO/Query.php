@@ -4336,7 +4336,7 @@ civicrm_relationship.is_permission_a_b = 0
     $sql = "$select $from $where $having";
 
     // add group by
-    if(!empty($groupBy)) {
+    if (!empty($groupBy)) {
       $sql .= self::getGroupByFromSelectColumns($query->_select, $groupBy);
     }
     elseif ($query->_useGroupBy) {
