@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,18 +25,23 @@
  +--------------------------------------------------------------------+
  */
 
+require_once 'CiviTest/CiviUnitTestCase.php';
+
 /**
- * Class CRM_Contribute_ActionMapping_ByTypeTest
+ * Class CRM_Activity_ActionMappingTest
  * @group ActionSchedule
  *
  * This class tests various configurations of scheduled-reminders, with a focus on
- * reminders for *contribution types*. It follows a design/pattern described in
+ * reminders for *activity types*. It follows a design/pattern described in
  * AbstractMappingTest.
  *
+ * NOTE: There are also pretty deep tests of activity-based reminders in
+ * CRM_Core_BAO_ActionScheduleTest.
+ *
  * @see \Civi\ActionSchedule\AbstractMappingTest
- * @group headless
+ * @see CRM_Core_BAO_ActionScheduleTest
  */
-class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\AbstractMappingTest {
+class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappingTest {
 
   /**
    * Generate a list of test cases, where each is a distinct combination of
@@ -54,16 +59,23 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   public function createTestCases() {
     $cs = array();
 
-    // FIXME: CRM-19415: The right email content goes out, but it appears that the dates are incorrect.
+    $cs[] = array(
+      '2015-02-01 00:00:00',
+      'addAliceMeeting scheduleForAny startOnTime useHelloFirstName recipientIsActivitySource',
+      array(
+        array(
+          'time' => '2015-02-01 00:00:00',
+          'to' => array('alice@example.org'),
+          'subject' => '/Hello, Alice.*via subject/',
+        ),
+      ),
+    );
+
+    // FIXME: CRM-19415: This test should pass...
     //    $cs[] = array(
     //      '2015-02-01 00:00:00',
-    //      'addAliceDues scheduleForAny startOnTime useHelloFirstName alsoRecipientBob',
+    //      'addAliceMeeting scheduleForAny startOnTime useHelloFirstName recipientIsBob',
     //      array(
-    //        array(
-    //          'time' => '2015-02-01 00:00:00',
-    //          'to' => array('alice@example.org'),
-    //          'subject' => '/Hello, Alice.*via subject/',
-    //        ),
     //        array(
     //          'time' => '2015-02-01 00:00:00',
     //          'to' => array('bob@example.org'),
@@ -75,13 +87,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
 
     $cs[] = array(
       '2015-02-01 00:00:00',
-      'addAliceDues scheduleForAny startOnTime useHelloFirstName limitToRecipientBob',
-      array(),
-    );
-
-    $cs[] = array(
-      '2015-02-01 00:00:00',
-      'addAliceDues scheduleForAny startOnTime useHelloFirstName limitToRecipientAlice',
+      'addAliceMeeting addBobPhoneCall scheduleForMeeting startOnTime useHelloFirstName recipientIsActivitySource',
       array(
         array(
           'time' => '2015-02-01 00:00:00',
@@ -93,20 +99,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
 
     $cs[] = array(
       '2015-02-01 00:00:00',
-      // 'addAliceDues addBobDonation scheduleForDues startOnTime useHelloFirstName',
-      'addAliceDues addBobDonation scheduleForDues startOnTime useHelloFirstNameStatus',
-      array(
-        array(
-          'time' => '2015-02-01 00:00:00',
-          'to' => array('alice@example.org'),
-          'subject' => '/Hello, Alice. @Completed.*via subject/',
-        ),
-      ),
-    );
-
-    $cs[] = array(
-      '2015-02-01 00:00:00',
-      'addAliceDues addBobDonation scheduleForAny startOnTime useHelloFirstName',
+      'addAliceMeeting addBobPhoneCall scheduleForAny startOnTime useHelloFirstName recipientIsActivitySource',
       array(
         array(
           'time' => '2015-02-01 00:00:00',
@@ -123,7 +116,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
 
     $cs[] = array(
       '2015-02-02 00:00:00',
-      'addAliceDues addBobDonation scheduleForDonation startWeekBefore repeatTwoWeeksAfter useHelloFirstName',
+      'addAliceMeeting addBobPhoneCall scheduleForPhoneCall startWeekBefore repeatTwoWeeksAfter useHelloFirstName recipientIsActivitySource',
       array(
         array(
           'time' => '2015-01-26 00:00:00',
@@ -148,79 +141,56 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       ),
     );
 
-    $cs[] = array(
-      '2015-02-03 00:00:00',
-      'addAliceDues addBobDonation scheduleForSoftCreditor startWeekAfter useHelloFirstName',
-      array(
-        array(
-          'time' => '2015-02-10 00:00:00',
-          'to' => array('carol@example.org'),
-          'subject' => '/Hello, Carol.*via subject/',
-        ),
-      ),
-    );
-
     return $cs;
   }
 
   /**
-   * Create a contribution record for Alice with type "Member Dues".
+   * Create an activity record for Alice with type "Meeting".
    */
-  public function addAliceDues() {
-    $this->callAPISuccess('Contribution', 'create', array(
-      'contact_id' => $this->contacts['alice']['id'],
-      'receive_date' => date('Ymd', strtotime($this->targetDate)),
-      'total_amount' => '100',
-      'financial_type_id' => 1,
-      'non_deductible_amount' => '10',
-      'fee_amount' => '5',
-      'net_amount' => '95',
-      'source' => 'SSF',
-      'contribution_status_id' => 1,
-      'soft_credit' => array(
-        '1' => array(
-          'contact_id' => $this->contacts['carol']['id'],
-          'amount' => 50,
-          'soft_credit_type_id' => 3,
-        ),
-      ),
+  public function addAliceMeeting() {
+    $this->callAPISuccess('Activity', 'create', array(
+      'source_contact_id' => $this->contacts['alice']['id'],
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Subject for Alice',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
+      'status_id' => 2,
+      'assignee_contact_id' => array($this->contacts['carol']['id']),
     ));
   }
 
   /**
    * Create a contribution record for Bob with type "Donation".
    */
-  public function addBobDonation() {
-    $this->callAPISuccess('Contribution', 'create', array(
-      'contact_id' => $this->contacts['bob']['id'],
-      'receive_date' => date('Ymd', strtotime($this->targetDate)),
-      'total_amount' => '150',
-      'financial_type_id' => 2,
-      'non_deductible_amount' => '10',
-      'fee_amount' => '5',
-      'net_amount' => '145',
-      'source' => 'SSF',
-      'contribution_status_id' => 2,
+  public function addBobPhoneCall() {
+    $this->callAPISuccess('Activity', 'create', array(
+      'source_contact_id' => $this->contacts['bob']['id'],
+      'activity_type_id' => 'Phone Call',
+      'subject' => 'Subject for Bob',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
+      'status_id' => 2,
+      'assignee_contact_id' => array($this->contacts['carol']['id']),
     ));
   }
 
   /**
-   * Schedule message delivery for contributions of type "Member Dues".
+   * Schedule message delivery for activities of type "Meeting".
    */
-  public function scheduleForDues() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+  public function scheduleForMeeting() {
+    $actTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
+    $this->schedule->mapping_id = CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(1));
-    $this->schedule->entity_status = CRM_Utils_Array::implodePadded(array(1));
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(array_search('Meeting', $actTypes)));
+    $this->schedule->entity_status = CRM_Utils_Array::implodePadded(array(2));
   }
 
   /**
-   * Schedule message delivery for contributions of type "Donation".
+   * Schedule message delivery for activities of type "Phone Call".
    */
-  public function scheduleForDonation() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+  public function scheduleForPhoneCall() {
+    $actTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
+    $this->schedule->mapping_id = CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(2));
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(array_search('Phone Call', $actTypes)));
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
@@ -228,29 +198,41 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery for any contribution, regardless of type.
    */
   public function scheduleForAny() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $actTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
+    $this->schedule->mapping_id = CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array_keys($actTypes));
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
   /**
-   * Schedule message delivery to the 'soft credit' assignee.
+   * Set the recipient to "Choose Recipient(s): Bob".
    */
-  public function scheduleForSoftCreditor() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
-    $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
-    $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
+  public function recipientIsBob() {
     $this->schedule->limit_to = 1;
-    $this->schedule->recipient = 'soft_credit_type';
-    $this->schedule->recipient_listing = CRM_Utils_Array::implodePadded(array(3));
+    $this->schedule->recipient = NULL;
+    $this->schedule->recipient_listing = NULL;
+    $this->schedule->recipient_manual = $this->contacts['bob']['id'];
   }
 
-  public function useHelloFirstNameStatus() {
-    $this->schedule->subject = 'Hello, {contact.first_name}. @{contribution.status}. (via subject)';
-    $this->schedule->body_html = '<p>Hello, {contact.first_name}. @{contribution.status}. (via body_html)</p>';
-    $this->schedule->body_text = 'Hello, {contact.first_name}. @{contribution.status}. (via body_text)';
+  /**
+   * Set the recipient to "Activity Assignee".
+   */
+  public function recipientIsActivityAssignee() {
+    $this->schedule->limit_to = 1;
+    $this->schedule->recipient = 1;
+    $this->schedule->recipient_listing = NULL;
+    $this->schedule->recipient_manual = NULL;
+  }
+
+  /**
+   * Set the recipient to "Activity Source".
+   */
+  public function recipientIsActivitySource() {
+    $this->schedule->limit_to = 1;
+    $this->schedule->recipient = 2;
+    $this->schedule->recipient_listing = NULL;
+    $this->schedule->recipient_manual = NULL;
   }
 
 }
