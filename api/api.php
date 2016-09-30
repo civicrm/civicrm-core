@@ -40,6 +40,15 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
  */
 function civicrm_api3($entity, $action, $params = array()) {
   $params['version'] = 3;
+  //Issue Fix for https://issues.civicrm.org/jira/browse/CRM-19297
+  foreach ($params as $key => $param) {
+    if ($key == 'return') {
+      if (is_array($param)) {
+        $param[$key] = json_encode($param);
+        break;
+      }
+    }
+  }
   $result = civicrm_api($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {
     throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
