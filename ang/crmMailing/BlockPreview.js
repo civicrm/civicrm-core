@@ -28,12 +28,17 @@
 
         scope.previewTestGroup = function(e) {
           var $dialog = $(this);
+          var $groupStr = '';
+          if (scope.mailing.dedupe_email == 1) {
+            $groupStr = 'email';
+          }
           $dialog.html('<div class="crm-loading-element"></div>').parent().find('button[data-op=yes]').prop('disabled', true);
           $dialog.dialog('option', 'title', ts('Send to %1', {1: _.pluck(_.where(scope.crmMailingConst.groupNames, {id: scope.testGroup.gid}), 'title')[0]}));
           CRM.api3('contact', 'get', {
             group: scope.testGroup.gid,
             options: {limit: 0},
-            return: 'display_name,email'
+            return: 'display_name,email',
+            group_by: $groupStr
           }).done(function(data) {
             var count = 0,
             // Fixme: should this be in a template?
