@@ -152,6 +152,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
               'avg' => ts('Contribution Avg'),
             ),
           ),
+          'non_deductible_amount' => array(
+            'title' => ts('Non-deductible Amount'),
+          ),
         ),
         'grouping' => 'contri-fields',
         'filters' => array(
@@ -184,6 +187,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           ),
           'total_amount' => array(
             'title' => ts('Contribution Amount'),
+          ),
+          'non_deductible_amount' => array(
+            'title' => ts('Non-deductible Amount'),
           ),
           'total_sum' => array(
             'title' => ts('Contribution Aggregate'),

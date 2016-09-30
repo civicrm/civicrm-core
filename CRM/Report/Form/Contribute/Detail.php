@@ -193,6 +193,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'required' => TRUE,
             'statistics' => array('sum' => ts('Amount')),
           ),
+          'non_deductible_amount' => array(
+            'title' => ts('Non-deductible Amount'),
+          ),
           'fee_amount' => NULL,
           'net_amount' => NULL,
           'contribution_or_soft' => array(
@@ -232,6 +235,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'non_deductible_amount' => array(
+            'title' => ts('Non-deductible Amount'),
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
