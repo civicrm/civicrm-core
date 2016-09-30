@@ -1007,7 +1007,7 @@ WHERE  id = %1";
   public static function getCachedPriceSetDetail($priceSetID) {
     $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID;
     $cache = CRM_Utils_Cache::singleton();
-    $values = (array) $cache->get($cacheKey);
+    $values = $cache->get($cacheKey);
     if (empty($values)) {
       $data = self::getSetDetail($priceSetID);
       $values = $data[$priceSetID];
