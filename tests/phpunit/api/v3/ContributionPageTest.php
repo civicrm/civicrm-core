@@ -147,7 +147,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    //assert non-deductible amount
+    $this->assertEquals(5.00, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -891,6 +893,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'financial_type_id' => 'Donation',
           'amount' => 20,
           'financial_type_id' => 'Donation',
+          'non_deductible_amount' => 15,
         )
       );
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
@@ -900,6 +903,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'financial_type_id' => 'Donation',
           'amount' => 10,
           'financial_type_id' => 'Donation',
+          'non_deductible_amount' => 5,
         )
       );
       $this->_ids['price_field_value'] = array($priceFieldValue['id']);
